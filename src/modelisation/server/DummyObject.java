@@ -1,6 +1,8 @@
 package modelisation.server;
 
-public class DummyObject implements java.io.Serializable {
-    public DummyObject() {
-    }
+
+public class DummyObject implements  java.io.Serializable {
+    
+    public DummyObject() {}
+
 }

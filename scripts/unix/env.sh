@@ -109,54 +109,9 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bouncycastle.jar
 fi
 
-if [ -f $PROACTIVE/lib/soap.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/soap.jar
-fi
-
-if [ -f $PROACTIVE/lib/saaj.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/saaj.jar
-fi
-
-if [ -f $PROACTIVE/lib/mail.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/mail.jar
-fi
-
-if [ -f $PROACTIVE/lib/activation.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/activation.jar
-fi
-
-if [ -f $PROACTIVE/lib/xmlParserAPIs.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xmlParserAPIs.jar
-fi
-
-if [ -f $PROACTIVE/lib/jaxrpc.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jaxrpc.jar
-fi
-
-if [ -f $PROACTIVE/lib/axis.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/axis.jar
-fi
-
-if [ -f $PROACTIVE/lib/commons-logging.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/commons-logging.jar
-fi
-
-if [ -f $PROACTIVE/lib/commons-discovery.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/commons-discovery.jar
-fi
-
 
 echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$workingDir/proactive.java.policy -Dlog4j.configuration=$workingDir/proactive-log4j"
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.library.path=$PROACTIVE/lib -Djava.security.policy=$workingDir/proactive.java.policy -Dlog4j.configuration=$workingDir/proactive-log4j"
 export JAVACMD

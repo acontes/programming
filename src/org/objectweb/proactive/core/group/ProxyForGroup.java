@@ -30,8 +30,16 @@
  */
 package org.objectweb.proactive.core.group;
 
-import org.apache.log4j.Logger;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -45,16 +53,9 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
+import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 
 
 public class ProxyForGroup extends AbstractProxy
@@ -67,11 +68,11 @@ public class ProxyForGroup extends AbstractProxy
     /** The name of the Class : all members of the group are "className" assignable */
     protected String className;
 
-    /** The list of member : it contains exclusively, StubObjects connected to Proxies, or Java Objects */
-    protected Vector memberList;
+	/** The list of member : it contains exclusively, StubObjects connected to Proxies, or Java Objects */
+	protected Vector memberList;
 
-    /** The map : to name members of the group*/
-    protected Map elementNames;
+	/** The map : to name members of the group*/
+	protected Map elementNames;
 
     /** Unique identificator for body (avoid infinite loop in some hierarchicals groups) */
 
@@ -93,38 +94,39 @@ public class ProxyForGroup extends AbstractProxy
     /** A pool of thread to serve the request */
     transient private ThreadPool threadpool;
 
+    /** Used for profiling */
+     private CompositeAverageMicroTimer timer;
+    
     /* ----------------------- CONSTRUCTORS ----------------------- */
     public ProxyForGroup(String nameOfClass)
         throws ConstructionOfReifiedObjectFailedException {
+        this();
         this.className = nameOfClass;
-        this.memberList = new Vector();
-        this.proxyForGroupID = new UniqueID();
-        this.threadpool = new ThreadPool();
-        this.elementNames = new HashMap();
     }
 
-    public ProxyForGroup(String nameOfClass, Integer size)
-        throws ConstructionOfReifiedObjectFailedException {
-        this.className = nameOfClass;
-        this.memberList = new Vector(size.intValue());
-        this.proxyForGroupID = new UniqueID();
-        this.threadpool = new ThreadPool();
-        this.elementNames = new HashMap();
-    }
+//    public ProxyForGroup(String nameOfClass, Integer size)
+//        throws ConstructionOfReifiedObjectFailedException {
+//        this.className = nameOfClass;
+//        this.memberList = new Vector(size.intValue());
+//        this.proxyForGroupID = new UniqueID();
+//        this.threadpool = new ThreadPool();
+//		this.elementNames = new HashMap();
+//    }
 
     public ProxyForGroup() throws ConstructionOfReifiedObjectFailedException {
         this.memberList = new Vector();
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
-        this.elementNames = new HashMap();
+		this.elementNames = new HashMap();
+		if (Profiling.GROUP) {
+			timer = new CompositeAverageMicroTimer("Group");
+			PAProfilerEngine.registerTimer(timer);
+		}
     }
 
     public ProxyForGroup(ConstructorCall c, Object[] p)
         throws ConstructionOfReifiedObjectFailedException {
-        this.memberList = new Vector();
-        this.proxyForGroupID = new UniqueID();
-        this.threadpool = new ThreadPool();
-        this.elementNames = new HashMap();
+      this();
     }
 
     /* ----------------------------- GENERAL ---------------------------------- */
@@ -184,7 +186,8 @@ public class ProxyForGroup extends AbstractProxy
      * @throws InvocationTargetException if a problem occurs when invoking the method on the members of the Group
      */
     public Object reify(MethodCall mc) throws InvocationTargetException {
-        //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
+
+		//System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
 
         /* if the method called is toString, apply it to the proxy, not to the members */
         if ("toString".equals(mc.getName())) {
@@ -231,7 +234,10 @@ public class ProxyForGroup extends AbstractProxy
     protected synchronized Object asynchronousCallOnGroup(MethodCall mc) {
         Object result;
         Body body = ProActive.getBodyOnThis();
-
+        if (Profiling.GROUP) {
+        	timer.setTimer("asynchronousCallOnGroup."+mc.getName());
+        	timer.start();
+        }
         // Creates a stub + ProxyForGroup for representing the result
         try {
             Object[] paramProxy = new Object[0];
@@ -282,7 +288,9 @@ public class ProxyForGroup extends AbstractProxy
         }
 
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
-
+        if (Profiling.GROUP) {
+        	timer.stop();
+        }
         return result;
     }
 
@@ -306,7 +314,10 @@ public class ProxyForGroup extends AbstractProxy
     protected synchronized void oneWayCallOnGroup(MethodCall mc) {
         Body body = ProActive.getBodyOnThis();
         ExceptionList exceptionList = new ExceptionList();
-
+        if (Profiling.GROUP) {
+        	timer.setTimer("oneWayCallOnGroup."+mc.getName());
+        	timer.start();
+        }
         // Creating Threads
         if (isDispatchingCall(mc) == false) {
             if (uniqueSerialization) {
@@ -315,7 +326,7 @@ public class ProxyForGroup extends AbstractProxy
             for (int index = 0; index < this.memberList.size(); index++) {
                 this.threadpool.addAJob(new ProcessForOneWayCall(this,
                         this.memberList, index, mc, body, exceptionList));
-            }
+	        }
         } else { // isDispatchingCall == true
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
@@ -339,6 +350,10 @@ public class ProxyForGroup extends AbstractProxy
         if (exceptionList.size() != 0) {
             throw exceptionList;
         }
+        
+        if (Profiling.GROUP) {
+            	timer.stop();
+            }
     }
 
     /* ------------------- THE COLLECTION'S METHOD ------------------ */
@@ -433,12 +448,18 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Compares the specified object with this group for equality.
+     * Returns <code>true</code> if and only if the specified Object <code>o</code>
+     * is also a <code>Group</code>, both <code>Group</code>s have the same size,
+     * and all corresponding pairs of elements in the two <code>Group</code>s are equal.
+     * (Two elements e1 and e2 are equal if (<code>e1==null ? e2==null : e1.equals(e2)</code>).
+     * In other words, two <code>Group</code>s are defined to be equal if they contain the
+     * same elements in the same order.
      * @param o the Object for wich we test the equality.
      * @return <code>true</code> if <code>o</code> is the same Group as <code>this</code>.
      */
     public boolean equals(Object o) {
         if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
-            return this.proxyForGroupID.equals(((org.objectweb.proactive.core.group.ProxyForGroup) o).proxyForGroupID);
+        	return this.memberList.equals(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
         } else {
             return false;
         }
@@ -596,15 +617,15 @@ public class ProxyForGroup extends AbstractProxy
      * @return the object that has been removed
      */
     public Object remove(int index) {
-        // decrease indexes in the map element names <-> indexes
-        Iterator it = elementNames.keySet().iterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            Integer value = (Integer) elementNames.get(key);
-            if (value.intValue() > index) {
-                elementNames.put(key, new Integer(value.intValue() - 1));
-            }
-        }
+    	// decrease indexes in the map element names <-> indexes
+    	Iterator it = elementNames.keySet().iterator();
+    	while (it.hasNext()) {
+    		String key = (String)it.next();
+    		Integer value = (Integer)elementNames.get(key);
+    		if (value.intValue() > index) {
+    			elementNames.put(key, new Integer(value.intValue() - 1));
+    		}
+    	}
         return this.memberList.remove(index);
     }
 
@@ -664,183 +685,160 @@ public class ProxyForGroup extends AbstractProxy
     //  }
     //  An other way is to "store" the stub and return it when asked
 
-    /**
-     * Creates a new group with all members of the group and all the members of the group <code>g</code>
-     * @param g - a group
-     * @return a group that contain all the members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
-     */
-    public Group union(Group g) {
-        try {
-            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(
-                            g.getTypeName()))) {
-                ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+	/**
+	 * Creates a new group with all members of the group and all the members of the group <code>g</code>
+	 * @param g - a group
+	 * @return a group that contain all the members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
+	 */
+	public Group union (Group g) {
+		try {
+			if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
+				ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+				// add the members of this
+				Iterator it = this.iterator();
+				while (it.hasNext()) {
+					result.add(it.next()); 
+				}
+				// add the members of g
+				it = g.iterator();
+				while (it.hasNext()) {
+					result.add(it.next()); 
+				}
+				return result; 
+			} }
+		catch (ClassNotFoundException e) { e.printStackTrace();	}
+		catch (ConstructionOfReifiedObjectFailedException e) { e.printStackTrace(); }
+		// the group are incompatible (i.e. they have not members of the the same class)
+		return null;
+	}
 
-                // add the members of this
-                Iterator it = this.iterator();
-                while (it.hasNext()) {
-                    result.add(it.next());
-                }
+	/**
+	 * Creates a new group with all members that belong to the group and to the group <code>g</code>.
+	 * @param g - a group
+	 * @return a group that contain the common members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
+	 */
+	public Group intersection (Group g) {
+		try {
+			if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
+				ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+				Object member;
+				Iterator it = this.iterator();
+				// add the members of the group that belong to g
+				while (it.hasNext()) {
+					member = it.next();
+					if (g.indexOf(member) > -1) {
+						result.add(member);
+					} 
+				}
+				return result; 
+			} }
+		catch (ClassNotFoundException e) { e.printStackTrace();	}
+		catch (ConstructionOfReifiedObjectFailedException e) { e.printStackTrace(); }
+		// the group are incompatible (i.e. they have not members of the the same class)
+		return null;
+	}
 
-                // add the members of g
-                it = g.iterator();
-                while (it.hasNext()) {
-                    result.add(it.next());
-                }
-                return result;
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (ConstructionOfReifiedObjectFailedException e) {
-            e.printStackTrace();
-        }
+	/**
+	 * Creates a new group with the members that belong to the group, but not to the group <code>g</code>.
+	 * @param g - a group
+	 * @return a group that contain the members of the group without the member <code>g</code>. <code>null<code> if the class of the group is incompatible.
+	 */
+	public Group exclude (Group g) {
+		try {
+			if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
+				ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+				Object member;
+				Iterator it = this.iterator();
+				while (it.hasNext()) {
+					member = it.next();
+					if (g.indexOf(member) < 0) {
+						result.add(member);
+					} 
+				}
+				return result; 
+			} }
+		catch (ClassNotFoundException e) { e.printStackTrace();	}
+		catch (ConstructionOfReifiedObjectFailedException e) { e.printStackTrace(); }
+		// the group are incompatible (i.e. they have not members of the the same class)
+		return null;
+	}
 
-        // the group are incompatible (i.e. they have not members of the the same class)
-        return null;
-    }
+	/**
+	 * Creates a new group with all members that belong to the group or to the group <code>g</code>, but not to both.
+	 * @param g - a group
+	 * @return a group that contain the non-common members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
+	 */
+	public Group difference (Group g) {
+		try {
+			if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
+				ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+				Object member;
+				Iterator it = this.iterator();
+				// add the members of the group that do not belong to g
+				while (it.hasNext()) {
+					member = it.next();
+					if (g.indexOf(member) < 0) {
+						result.add(member);
+					} 
+				}
+				it = g.iterator();
+				// add the members of g that do not belong to the group
+				while (it.hasNext()) {
+					member = it.next();
+					if (this.indexOf(member) < 0) {
+						result.add(member);
+					} 
+				}
+				return result; 
+			} }
+		catch (ClassNotFoundException e) { e.printStackTrace();	}
+		catch (ConstructionOfReifiedObjectFailedException e) { e.printStackTrace(); }
+		// the group are incompatible (i.e. they have not members of the the same class)
+		return null;
+	}
 
-    /**
-     * Creates a new group with all members that belong to the group and to the group <code>g</code>.
-     * @param g - a group
-     * @return a group that contain the common members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
-     */
-    public Group intersection(Group g) {
-        try {
-            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(
-                            g.getTypeName()))) {
-                ProxyForGroup result = new ProxyForGroup(this.getTypeName());
-                Object member;
-                Iterator it = this.iterator();
+	/**
+	 * Creates a new group with the members of the group begining at the index <code>begin</code> and ending at the index <code>end</code>.
+	 * @param begin - the begining index
+	 * @param end - the ending index
+	 * @return a group that contain the members of the group from <code>begin</code> to <code>end</code>. <code>null</code> if <code>begin > end</code>.
+	 */
+	public Group range (int begin, int end) {
+		// bag arguments => return null
+		if (begin > end) {
+			return null;
+		}
+		if (begin < 0) {
+			begin = 0;
+		}
+		if (end > this.size()) {
+			end = this.size();
+		}
+		try {
+			ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+			for (int i = begin ; i <= end ; i++) {
+				result.add(this.get(i));
+			}
+			return result;
+		}
+		catch (ConstructionOfReifiedObjectFailedException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-                // add the members of the group that belong to g
-                while (it.hasNext()) {
-                    member = it.next();
-                    if (g.indexOf(member) > -1) {
-                        result.add(member);
-                    }
-                }
-                return result;
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (ConstructionOfReifiedObjectFailedException e) {
-            e.printStackTrace();
-        }
-
-        // the group are incompatible (i.e. they have not members of the the same class)
-        return null;
-    }
-
-    /**
-     * Creates a new group with the members that belong to the group, but not to the group <code>g</code>.
-     * @param g - a group
-     * @return a group that contain the members of the group without the member <code>g</code>. <code>null<code> if the class of the group is incompatible.
-     */
-    public Group exclude(Group g) {
-        try {
-            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(
-                            g.getTypeName()))) {
-                ProxyForGroup result = new ProxyForGroup(this.getTypeName());
-                Object member;
-                Iterator it = this.iterator();
-                while (it.hasNext()) {
-                    member = it.next();
-                    if (g.indexOf(member) < 0) {
-                        result.add(member);
-                    }
-                }
-                return result;
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (ConstructionOfReifiedObjectFailedException e) {
-            e.printStackTrace();
-        }
-
-        // the group are incompatible (i.e. they have not members of the the same class)
-        return null;
-    }
-
-    /**
-     * Creates a new group with all members that belong to the group or to the group <code>g</code>, but not to both.
-     * @param g - a group
-     * @return a group that contain the non-common members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
-     */
-    public Group difference(Group g) {
-        try {
-            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(
-                            g.getTypeName()))) {
-                ProxyForGroup result = new ProxyForGroup(this.getTypeName());
-                Object member;
-                Iterator it = this.iterator();
-
-                // add the members of the group that do not belong to g
-                while (it.hasNext()) {
-                    member = it.next();
-                    if (g.indexOf(member) < 0) {
-                        result.add(member);
-                    }
-                }
-                it = g.iterator();
-                // add the members of g that do not belong to the group
-                while (it.hasNext()) {
-                    member = it.next();
-                    if (this.indexOf(member) < 0) {
-                        result.add(member);
-                    }
-                }
-                return result;
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (ConstructionOfReifiedObjectFailedException e) {
-            e.printStackTrace();
-        }
-
-        // the group are incompatible (i.e. they have not members of the the same class)
-        return null;
-    }
-
-    /**
-     * Creates a new group with the members of the group begining at the index <code>begin</code> and ending at the index <code>end</code>.
-     * @param begin - the begining index
-     * @param end - the ending index
-     * @return a group that contain the members of the group from <code>begin</code> to <code>end</code>. <code>null</code> if <code>begin > end</code>.
-     */
-    public Group range(int begin, int end) {
-        // bag arguments => return null
-        if (begin > end) {
-            return null;
-        }
-        if (begin < 0) {
-            begin = 0;
-        }
-        if (end > this.size()) {
-            end = this.size();
-        }
-        try {
-            ProxyForGroup result = new ProxyForGroup(this.getTypeName());
-            for (int i = begin; i <= end; i++) {
-                result.add(this.get(i));
-            }
-            return result;
-        } catch (ConstructionOfReifiedObjectFailedException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Communicates the SPMD Group to members
-     * @param spmdGroup - the SPMD group
-     */
-    public void setSPMDGroup(Object spmdGroup) {
-        try {
-            this.reify(new MethodCallSetSPMDGroup(spmdGroup));
-        } catch (InvocationTargetException e) {
-            logger.info("Unable to set the SPMD group");
-            e.printStackTrace();
-        }
-    }
+	/**
+	 * Communicates the SPMD Group to members
+	 * @param spmdGroup - the SPMD group
+	 */
+	public void setSPMDGroup (Object spmdGroup) {
+		try {
+			this.reify(new MethodCallSetSPMDGroup(spmdGroup)); }
+		catch (InvocationTargetException e) {
+			logger.info("Unable to set the SPMD group");
+			e.printStackTrace();
+		}
+	}
 
     /**
      * To debug, display the size of the Group and all its members with there position
@@ -894,13 +892,14 @@ public class ProxyForGroup extends AbstractProxy
         return this.memberList.get(ProActive.waitForAny(this.memberList));
     }
 
-    /**
-     * Waits one future is arrived and returns it (removes it from the group).
-     * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
-     */
-    public Object waitAndGetOneThenRemoveIt() {
-        return this.memberList.remove(ProActive.waitForAny(this.memberList));
-    }
+	/**
+	 * Waits one future is arrived and returns it (removes it from the group).
+	 * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
+	 */
+	public Object waitAndGetOneThenRemoveIt() {
+		return this.memberList.remove(ProActive.waitForAny(this.memberList));
+	}
+
 
     /**
      * Waits that the member at the specified rank is arrived and returns it.
@@ -989,13 +988,13 @@ public class ProxyForGroup extends AbstractProxy
         this.threadpool.ratio(i);
     }
 
-    /**
-     * Modifies the number of additional threads to serve members
-     * @param i - the new number
-     */
-    public void setAdditionalThread(int i) {
-        this.threadpool.thread(i);
-    }
+	/**
+	 * Modifies the number of additional threads to serve members
+	 * @param i - the new number
+	 */
+	public void setAdditionalThread(int i) {
+		this.threadpool.thread(i);
+	}
 
     /* ---------------------- METHOD FOR SYNCHRONOUS CREATION OF A TYPED GROUP ---------------------- */
 
@@ -1063,99 +1062,103 @@ public class ProxyForGroup extends AbstractProxy
         this.threadpool = new ThreadPool();
     }
 
-    //Map class style method
 
-    /**
-     * Returns <code>true</code> if this Group contains a mapping for the specified key.
-     * More formally, returns <code>true</code> if and only if this Group contains at
-     * a mapping for a key <code>k</code> such that <code>(key==null ? k==null : key.equals(k))</code>.
-     * (There can be at most one such mapping.)
-     * @param key - key whose presence in this Group is to be tested.
-     * @return <code>true</code> if this Group contains a mapping for the specified key.
-     * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
-     * @throws NullPointerException - if the key is null and this Group does not not permit null keys (optional).
-     */
-    public boolean containsKey(String key) {
-        return this.elementNames.containsKey(key);
-    }
+	//Map class style method
+	/**
+	 * Returns <code>true</code> if this Group contains a mapping for the specified key.
+	 * More formally, returns <code>true</code> if and only if this Group contains at
+	 * a mapping for a key <code>k</code> such that <code>(key==null ? k==null : key.equals(k))</code>.
+	 * (There can be at most one such mapping.)
+	 * @param key - key whose presence in this Group is to be tested.
+	 * @return <code>true</code> if this Group contains a mapping for the specified key.
+	 * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
+	 * @throws NullPointerException - if the key is null and this Group does not not permit null keys (optional).
+	 */
+	public boolean containsKey(String key) {
+		return this.elementNames.containsKey(key);
+	}
 
-    /**
-     * Returns <code>true</code> if this Group maps one or more keys to the specified value.
-     * More formally, returns <code>true</code> if and only if this Group contains at least
-     * one mapping to a value <code>v</code> such that <code>(value==null ? v==null : value.equals(v))</code>.
-     * @param value - value whose presence in this map is to be tested.
-     * @return <code>true</code> if this Group maps one or more keys to the specified value.
-     * @throws ClassCastException - if the value is of an inappropriate type for this Collection (optional).
-     * @throws NullPointerException - if the value is null and this Group does not not permit null values (optional).
-     */
-    public boolean containsValue(Object value) {
-        return this.memberList.contains(value);
-    }
+	/**
+	 * Returns <code>true</code> if this Group maps one or more keys to the specified value.
+	 * More formally, returns <code>true</code> if and only if this Group contains at least
+	 * one mapping to a value <code>v</code> such that <code>(value==null ? v==null : value.equals(v))</code>.
+	 * @param value - value whose presence in this map is to be tested.
+	 * @return <code>true</code> if this Group maps one or more keys to the specified value.
+	 * @throws ClassCastException - if the value is of an inappropriate type for this Collection (optional).
+	 * @throws NullPointerException - if the value is null and this Group does not not permit null values (optional).  
+	 */
+	public boolean containsValue(Object value) {
+		return this.memberList.contains(value);
+	}
 
-    /**
-     * Returns the Object to which this Group maps the specified key.
-     * Returns <code>null</code> if the Collection contains no mapping for this key.
-     * A return value of <code>null</code> does not necessarily indicate that the Collection
-     * contains no mapping for the key; it's also possible that the Group explicitly maps the key to null.
-     * The containsKey operation may be used to distinguish these two cases.
-     * More formally, if this Group contains a mapping from a key <code>k</code> to a value
-     * <code>v</code> such that <code>(key==null ? k==null : key.equals(k))</code>,
-     * then this method returns <code>v</code>; otherwise it returns <code>null</code>.
-     * (There can be at most one such mapping.)
-     * @param key - key whose associated value is to be returned.
-     * @return the value to which this map maps the specified key, or <code>null</code> if the map contains no mapping for this key.
-     * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
-     * @throws NullPointerException - key is <code>null</code> and this Group does not not permit null keys (optional).
-     */
-    public synchronized Object getNamedElement(String key) {
-        return get(((Integer) this.elementNames.get(key)).intValue());
-    }
 
-    /**
-     * Associates the specified value with the specified key in this Group (optional operation).
-     * If the Group previously contained a mapping for this key, the old value is replaced by
-     * the specified value. (A map <code>m</code> is said to contain a mapping for a key
-     * <code>k</code> if and only if <code>m.containsKey(k)</code> would return <code>true</code>.))
-     * In that case, the old value is also removed from the group.
-     * @param key - key with which the specified value is to be associated.
-     * @param value - value to be associated with the specified key.
-     * @throws UnsupportedOperationException - if the put operation is not supported by this Group.
-     * @throws ClassCastException - if the class of the specified key or value prevents it from being stored in this Group.
-     * @throws IllegalArgumentException - if some aspect of this key or value prevents it from being stored in this Group.
-     * @throws NullPointerException - this map does not permit null keys or values, and the specified key or value is <code>null</code>.
-     */
-    public synchronized void addNamedElement(String key, Object value) {
-        if (elementNames.containsKey(key)) {
-            removeNamedElement(key);
-        }
-        this.elementNames.put(key, new Integer(this.size()));
-        this.add(value);
-    }
+	/**
+ 	 * Returns the Object to which this Group maps the specified key.
+ 	 * Returns <code>null</code> if the Collection contains no mapping for this key.
+ 	 * A return value of <code>null</code> does not necessarily indicate that the Collection
+ 	 * contains no mapping for the key; it's also possible that the Group explicitly maps the key to null.
+ 	 * The containsKey operation may be used to distinguish these two cases.
+ 	 * More formally, if this Group contains a mapping from a key <code>k</code> to a value
+ 	 * <code>v</code> such that <code>(key==null ? k==null : key.equals(k))</code>,
+ 	 * then this method returns <code>v</code>; otherwise it returns <code>null</code>.
+ 	 * (There can be at most one such mapping.)
+ 	 * @param key - key whose associated value is to be returned.
+ 	 * @return the value to which this map maps the specified key, or <code>null</code> if the map contains no mapping for this key.
+ 	 * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
+ 	 * @throws NullPointerException - key is <code>null</code> and this Group does not not permit null keys (optional).
+	 */
+	public synchronized Object getNamedElement(String key) {
+		return get(((Integer)this.elementNames.get(key)).intValue());
+	}
 
-    /**
-     *        Returns a set view of the keys contained in this Group.
-     * The set is backed by the Group, so changes to the Group are reflected in the set,
-     * and vice-versa. If the Group is modified while an iteration over the set is in progress,
-     * the results of the iteration are undefined. The set supports element removal,
-     * which removes the corresponding mapping from the Group, via the Iterator.remove,
-     * Set.remove, removeAll retainAll, and clear operations.
-     * It does not support the add or addAll operations.
-     * @return a set view of the keys contained in this Group.
-     */
-    public Set keySet() {
-        return this.elementNames.keySet();
-    }
+	/**
+	 * Associates the specified value with the specified key in this Group (optional operation).
+	 * If the Group previously contained a mapping for this key, the old value is replaced by
+	 * the specified value. (A map <code>m</code> is said to contain a mapping for a key
+	 * <code>k</code> if and only if <code>m.containsKey(k)</code> would return <code>true</code>.))
+	 * In that case, the old value is also removed from the group.
+	 * @param key - key with which the specified value is to be associated.
+	 * @param value - value to be associated with the specified key.
+	 * @throws UnsupportedOperationException - if the put operation is not supported by this Group.
+	 * @throws ClassCastException - if the class of the specified key or value prevents it from being stored in this Group.
+	 * @throws IllegalArgumentException - if some aspect of this key or value prevents it from being stored in this Group.
+	 * @throws NullPointerException - this map does not permit null keys or values, and the specified key or value is <code>null</code>.
+	 */
+	public synchronized void addNamedElement(String key, Object value) {
+		if (elementNames.containsKey(key)) {
+			removeNamedElement(key);
+		}
+		this.elementNames.put(key,new Integer(this.size()));
+		this.add(value);
+	}
 
-    /**
-     * Removes the named element of the group. It also returns this element.
-     * @param key the name of the element
-     * @return the removed element
-     */
-    public synchronized Object removeNamedElement(String key) {
-        int index = ((Integer) elementNames.get(key)).intValue();
-        Object removed = get(index);
-        remove(index);
-        elementNames.remove(key);
-        return removed;
-    }
+
+	/**
+	 *	Returns a set view of the keys contained in this Group.
+	 * The set is backed by the Group, so changes to the Group are reflected in the set,
+	 * and vice-versa. If the Group is modified while an iteration over the set is in progress,
+	 * the results of the iteration are undefined. The set supports element removal,
+	 * which removes the corresponding mapping from the Group, via the Iterator.remove,
+	 * Set.remove, removeAll retainAll, and clear operations.
+	 * It does not support the add or addAll operations.
+	 * @return a set view of the keys contained in this Group.
+	 */
+	public Set keySet() {
+		return this.elementNames.keySet();
+	}
+	
+	
+	/**
+	 * Removes the named element of the group. It also returns this element.
+	 * @param key the name of the element
+	 * @return the removed element
+	 */
+	public synchronized Object removeNamedElement(String key) {
+		int index = ((Integer)elementNames.get(key)).intValue();
+		Object removed = get(index);
+		remove(index);
+		elementNames.remove(key);
+		return removed;
+	}
+
 }

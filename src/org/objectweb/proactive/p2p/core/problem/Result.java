@@ -68,7 +68,7 @@ public abstract class Result implements Serializable {
     public void setResult(Object result) {
         this.result = result;
     }
-
+    
     /**
      * @see java.lang.Object#toString()
      */

@@ -2,15 +2,14 @@ package modelisation.simulator.mixed;
 
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
-
 import org.apache.log4j.Logger;
 
-
 public class Server extends SimulatorElement {
-    protected static Logger logger = Logger.getLogger(Server.class.getName());
-    public final static int IDLE = 1;
 
-    //  public final static int IDL_REQUEST = 2;
+protected static Logger logger = Logger.getLogger(Server.class.getName());
+
+    public final static int IDLE = 1;
+  //  public final static int IDL_REQUEST = 2;
     public final static int SENDING_REPLY = 4;
     public final static int SERVING_SOURCE = 5;
     public final static int SERVING_AGENT = 6;
@@ -44,20 +43,20 @@ public class Server extends SimulatorElement {
     public void update(double time) {
         if (this.remainingTime == 0) {
             switch (this.state) {
-            case IDLE:
-                if (this.requestQueue.isEmpty()) {
-                    this.remainingTime = 500000;
-                } else {
-                    this.serveNextRequest(time);
-                }
-                break;
-            case SERVING_SOURCE:
-            case SERVING_AGENT:
-                this.endOfService(time);
-                break;
-            case SENDING_REPLY:
-                this.endOfSendReply(time);
-                break;
+                case IDLE:
+                    if (this.requestQueue.isEmpty()) {
+                        this.remainingTime = 500000;
+                    } else {
+                        this.serveNextRequest(time);
+                    }
+                    break;
+                case SERVING_SOURCE:
+                case SERVING_AGENT:
+                    this.endOfService(time);
+                    break;
+                case SENDING_REPLY:
+                    this.endOfSendReply(time);
+                    break;
             }
         }
     }
@@ -75,10 +74,10 @@ public class Server extends SimulatorElement {
     public synchronized void receiveRequestFromForwarder(int number, int id) {
         if (log) {
             this.simulator.log("Server.receiveRequestFromForwarder");
-        }
-        if (logger.isDebugEnabled()) {
-            //       logger.debug("XXXXX");
-        }
+       }
+if (logger.isDebugEnabled()) {
+//       logger.debug("XXXXX");
+}
         this.requestQueue.addRequest(new Request(Request.AGENT, number));
         this.requestReceived();
         //        this.messageFromAgent = true;
@@ -94,7 +93,7 @@ public class Server extends SimulatorElement {
         //        this.messageFromAgent = true;
     }
 
-    public synchronized void receiveRequestFromSource(int id) {
+    public synchronized void  receiveRequestFromSource(int id) {
         if (log) {
             this.simulator.log("Server.receiveRequestFromSource");
         }
@@ -105,7 +104,6 @@ public class Server extends SimulatorElement {
             r.setCreationTime(this.simulator.currentTime);
             //           this.averagatorWaitTimeSource0
         }
-
         //        this.messageFromSource = true;
     }
 
@@ -116,22 +114,21 @@ public class Server extends SimulatorElement {
             //serving request from agent
             //            if (this.id == 0) {
             //                //            r.setCreationTime(this.simulator.getCurrentTime());
-            if (logger.isDebugEnabled()) {
-                //                logger.debug(
-            }
-
+if (logger.isDebugEnabled()) {
+            //                logger.debug(
+}
             //                        " -> request served  at  " +
             //                        this.simulator.getCurrentTime());
             //            }
             this.state = SERVING_AGENT;
             this.remainingTime = simulator.generateServiceTimeMu1();
             if (log) {
-                this.simulator.log("Server.serveNextRequest will last " +
-                    this.remainingTime);
                 this.simulator.log(
-                    "getNextRequestQueueFifo: the request waited " +
-                    (this.simulator.currentTime -
-                    this.currentRequest.getCreationTime()));
+                        "Server.serveNextRequest will last " + 
+                        this.remainingTime);
+                this.simulator.log(
+                        "getNextRequestQueueFifo: the request waited " + 
+                        (this.simulator.currentTime - this.currentRequest.getCreationTime()));
             }
             this.averagatorMu1.add(this.remainingTime);
         } else {
@@ -140,8 +137,8 @@ public class Server extends SimulatorElement {
             this.remainingTime = simulator.generateServiceTimeMu2();
             this.averagatorMu2.add(this.remainingTime);
             if (currentRequest.getSenderID() == 0) {
-                this.averagatorWaitTimeSource0.add(startTime -
-                    this.currentRequest.getCreationTime());
+                this.averagatorWaitTimeSource0.add(
+                        startTime - this.currentRequest.getCreationTime());
             }
         }
         this.averagatorUtilisation.add(this.remainingTime);
@@ -157,8 +154,9 @@ public class Server extends SimulatorElement {
             } else {
                 if (log) {
                     this.simulator.log("Server: ignoring request from agent");
-                    this.simulator.log("CurrentLocation " + currentLocation +
-                        " new " + this.currentRequest.getNumber());
+                    this.simulator.log(
+                            "CurrentLocation " + currentLocation + " new " + 
+                            this.currentRequest.getNumber());
                 }
             }
             this.stateAfterService();
@@ -167,7 +165,7 @@ public class Server extends SimulatorElement {
                 //we put the request back in the queue
                 if (log) {
                     this.simulator.log(
-                        "Server.endOfService puting request in the queue");
+                            "Server.endOfService puting request in the queue");
                 }
                 this.currentRequest.setCreationTime(this.simulator.getCurrentTime());
                 this.requestQueue.addRequest(this.currentRequest);
@@ -192,11 +190,11 @@ public class Server extends SimulatorElement {
 
     public void endOfSendReply(double endTime) {
         if (log) {
-            this.simulator.log("SelectiveServer: time microtimer = " +
-                ((endTime - startTime) * 1000) + " for method " +
-                "searchObject");
+            this.simulator.log(
+                    "SelectiveServer: time microtimer = " + 
+                    (endTime - startTime) * 1000 + " for method " + 
+                    "searchObject");
         }
-
         //        this.state = stateAfterService();
         //        if (this.state == IDL_REQUEST) {
         //            this.serveNextRequest(endTime);
@@ -206,59 +204,63 @@ public class Server extends SimulatorElement {
     }
 
     public void end() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("* mu1 = " + (1000 / this.averagatorMu1.average()) +
-                " " + this.averagatorMu1.getCount());
-            logger.debug("* mu2  = " + (1000 / this.averagatorMu2.average()) +
-                " " + this.averagatorMu2.getCount());
-            logger.debug(" * utilisation = " +
-                (this.averagatorUtilisation.getTotal() / this.simulator.getCurrentTime()));
-            logger.debug(" * waittimeSource0 = " +
+if (logger.isDebugEnabled()) {
+        logger.debug(
+                "* mu1 = " + 1000 / this.averagatorMu1.average() + " " + 
+                this.averagatorMu1.getCount());
+        logger.debug(
+                "* mu2  = " + 1000 / this.averagatorMu2.average() + " " + 
+                this.averagatorMu2.getCount());
+        logger.debug(
+                " * utilisation = " + 
+                this.averagatorUtilisation.getTotal() / this.simulator.getCurrentTime());
+        logger.debug(
+                " * waittimeSource0 = " + 
                 this.averagatorWaitTimeSource0.average());
-            logger.debug(" * gamma2 server = " +
-                (1000 / this.averagatorGamma2.average()));
-        }
+                    logger.debug(
+                " * gamma2 server = " + 
+                1000/this.averagatorGamma2.average());
+}
+
     }
 
     public String toString() {
         StringBuffer tmp = new StringBuffer();
         switch (this.state) {
-        case IDLE:
-            tmp.append("IDLE ");
-            break;
-
-        //            case IDL_REQUEST:
-        //                tmp.append("IDL_REQUEST ");
-        //                //                if (this.messageFromSource) {
-        //                //                    tmp.append("messageFromSource ");
-        //                //                }
-        //                //                if (this.messageFromAgent) {
-        //                //                    tmp.append("messageFromAgent ");
-        //                //                }
-        //                //                return tmp.toString();
-        //                break;
-        case SERVING_SOURCE:
-            //                if (this.messageFromAgent) {
-            //                    return "SERVING_SOURCE messageFromAgent ";
-            //                } else {
-            //                    return "SERVING_SOURCE ";
-            //                }
-            tmp.append("SERVING_SOURCE ");
-            break;
-        case SERVING_AGENT:
-            tmp.append("SERVING_AGENT ");
-            //                if (this.messageFromSource) {
-            //                    tmp.append("messageFromSource ");
-            //                }
-            //                if (this.messageFromAgent) {
-            //                    tmp.append("messageFromAgent ");
-            //                }
-            //                return tmp.toString();
-            break;
-        case SENDING_REPLY:
-            tmp.append("SENDING_REPLY ");
-            break;
-
+            case IDLE:
+                tmp.append("IDLE ");
+                break;
+//            case IDL_REQUEST:
+//                tmp.append("IDL_REQUEST ");
+//                //                if (this.messageFromSource) {
+//                //                    tmp.append("messageFromSource ");
+//                //                }
+//                //                if (this.messageFromAgent) {
+//                //                    tmp.append("messageFromAgent ");
+//                //                }
+//                //                return tmp.toString();
+//                break;
+            case SERVING_SOURCE:
+                //                if (this.messageFromAgent) {
+                //                    return "SERVING_SOURCE messageFromAgent ";
+                //                } else {
+                //                    return "SERVING_SOURCE ";
+                //                }
+                tmp.append("SERVING_SOURCE ");
+                break;
+            case SERVING_AGENT:
+                tmp.append("SERVING_AGENT ");
+                //                if (this.messageFromSource) {
+                //                    tmp.append("messageFromSource ");
+                //                }
+                //                if (this.messageFromAgent) {
+                //                    tmp.append("messageFromAgent ");
+                //                }
+                //                return tmp.toString();
+                break;
+            case SENDING_REPLY:
+                tmp.append("SENDING_REPLY ");
+                break;
             //                if (this.messageFromSource) {
             //                    tmp.append("messageFromSource ");
             //                }
@@ -275,28 +277,28 @@ public class Server extends SimulatorElement {
     public static void main(String[] args) {
         Simulator s = new Simulator(1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
         Server server = new Server(s);
-        if (logger.isDebugEnabled()) {
-            logger.debug("State of server: " + server);
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("State of server: " + server);
+}
         server.receiveRequestFromSource(0);
         server.receiveRequestFromAgent(1, 0);
-        if (logger.isDebugEnabled()) {
-            logger.debug("State of server: " + server);
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("State of server: " + server);
+}
         server.setRemainingTime(0);
         server.update(100);
-        if (logger.isDebugEnabled()) {
-            logger.debug("State of server: " + server);
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("State of server: " + server);
+}
         server.setRemainingTime(0);
         server.update(100);
-        if (logger.isDebugEnabled()) {
-            logger.debug("State of server: " + server);
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("State of server: " + server);
+}
         server.setRemainingTime(0);
         server.update(100);
-        if (logger.isDebugEnabled()) {
-            logger.debug("State of server: " + server);
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("State of server: " + server);
+}
     }
 }

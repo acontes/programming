@@ -18,7 +18,7 @@ fi
 
 workingDir=`dirname $0`
 . $workingDir/env.sh
-$JAVACMD -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n org.objectweb.proactive.examples.cs.Client $1 $2
+$JAVACMD org.objectweb.proactive.examples.cs.Client $1 $2
 
 echo
 echo ---------------------------------------------------------

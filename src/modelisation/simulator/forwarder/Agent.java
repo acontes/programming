@@ -4,17 +4,20 @@ import modelisation.statistics.ExponentialLaw;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
 
-
 public class Agent {
+
     private RandomNumberGenerator expoDelta;
     private RandomNumberGenerator expoNu;
+
     private double delta;
     private double nu;
     private double remainingTime;
     private double currentMigrationLength;
+
     public final static int WAITING = 0;
     public final static int MIGRATING = 1;
     public final static int WAITING_FOR_TENSIONING = 2;
+
     private int state;
 
     /**
@@ -51,6 +54,7 @@ public class Agent {
 
     protected ExponentialLaw expo;
 
+
     public Agent() {
     }
 
@@ -61,11 +65,12 @@ public class Agent {
         //	this.expoNu = new ExponentialLaw(nu);
     }
 
+
     public void waitBeforeMigration() {
         if (this.expoNu == null) {
-            this.expoNu = RandomNumberFactory.getGenerator("nu");
-            this.expoNu.initialize(nu, 39566417);
-        }
+                this.expoNu = RandomNumberFactory.getGenerator("nu");
+                this.expoNu.initialize(nu,  39566417);
+            }
         double time = expoNu.next() * 1000;
         this.remainingTime = time;
         this.state = WAITING;
@@ -74,27 +79,26 @@ public class Agent {
 
     public void startMigration() {
         if (this.expoDelta == null) {
-            this.expoDelta = RandomNumberFactory.getGenerator("delta");
-            this.expoDelta.initialize(delta, 58373435);
-        }
+                this.expoDelta = RandomNumberFactory.getGenerator("delta");
+                this.expoDelta.initialize(delta,  58373435);
+            }
 
         double time = expoDelta.next() * 1000;
         this.remainingTime = time;
         this.currentMigrationLength = time;
         this.state = MIGRATING;
-        System.out.println("Agent: migration started, will last " +
-            this.currentMigrationLength);
+        System.out.println("Agent: migration started, will last " + this.currentMigrationLength);
     }
 
     public void endMigration() {
         this.state = WAITING;
-        System.out.println("Agent: length of the migration " +
-            currentMigrationLength);
+        System.out.println("Agent: length of the migration " + currentMigrationLength);
     }
 
     public void waitEndOfTensioning(double length) {
         this.state = WAITING_FOR_TENSIONING;
         this.remainingTime = length;
+
     }
 
     public void decreaseRemainingTime(double l) {
@@ -110,16 +114,25 @@ public class Agent {
     }
 
     public void migrationOver() {
-        System.out.println("TimedMigrationManager: length of the migration " +
-            this.currentMigrationLength);
+        System.out.println("TimedMigrationManager: length of the migration " + this.currentMigrationLength);
     }
 
     public String toString() {
         switch (state) {
-        case WAITING:return "waiting";
-        case MIGRATING:return "migrating";
-        case WAITING_FOR_TENSIONING:return "waiting end of tensioning";
+            case WAITING:
+                {
+                    return "waiting";
+                }
+            case MIGRATING:
+                {
+                    return "migrating";
+                }
+            case WAITING_FOR_TENSIONING:
+                {
+                    return "waiting end of tensioning";
+                }
         }
         return null;
     }
+
 }

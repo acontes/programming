@@ -8,8 +8,8 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.MigrationManagerWithLocationServer;
 
 
-public class TimedMigrationManagerWithServer
-    extends MigrationManagerWithLocationServer {
+public class TimedMigrationManagerWithServer extends MigrationManagerWithLocationServer {
+
     public TimedMigrationManagerWithServer() {
     }
 
@@ -17,16 +17,13 @@ public class TimedMigrationManagerWithServer
         super(l);
     }
 
-    public UniversalBody migrateTo(Node node, Body body)
-        throws MigrationException {
-        System.out.println(
-            "TimedMigrationManagerWithServer: starting migration to " +
-            node.getNodeInformation().getURL());
+
+    public UniversalBody migrateTo(Node node, Body body) throws MigrationException {
+        System.out.println("TimedMigrationManagerWithServer: starting migration to " + node.getNodeInformation().getURL());
         long startTime = System.currentTimeMillis();
         UniversalBody remote = super.migrateTo(node, body);
         long endTime = System.currentTimeMillis();
-        System.out.println("TimedMigrationManagerWithServer: Migration Time " +
-            (endTime - startTime));
+        System.out.println("TimedMigrationManagerWithServer: Migration Time " + (endTime - startTime));
         return remote;
     }
 }

@@ -268,7 +268,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             t.printStackTrace();
         }
     }
-
+    
     // end inner class StandardOutputMessageLogger
 
     /**
@@ -361,7 +361,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
         public void run() {
             if (AbstractExternalProcess.clogger.isDebugEnabled()) {
-                AbstractExternalProcess.clogger.debug("Process started Thread=" +
+				AbstractExternalProcess.clogger.debug("Process started Thread=" +
                     Thread.currentThread().getName());
             }
 
@@ -369,14 +369,15 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             try {
                 while (true) {
                     //threadMonitor.setActive(false);
-                    //                    if (AbstractExternalProcess.clogger.isDebugEnabled()) {
-                    //						AbstractExternalProcess.clogger.debug(
-                    //                            "ProcessInputHandler before readLine()");
-                    //                    }
+//                    if (AbstractExternalProcess.clogger.isDebugEnabled()) {
+//						AbstractExternalProcess.clogger.debug(
+//                            "ProcessInputHandler before readLine()");
+//                    }
+
                     String s = in.readLine();
                     if (AbstractExternalProcess.clogger.isDebugEnabled()) {
-                        //                        AbstractExternalProcess.clogger.debug(
-                        //                            "ProcessInputHandler after readLine() s=" + s);
+//                        AbstractExternalProcess.clogger.debug(
+//                            "ProcessInputHandler after readLine() s=" + s);
                         AbstractExternalProcess.clogger.debug(s);
                     }
 

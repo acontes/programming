@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 
@@ -67,15 +67,29 @@ public class NodeExploration implements JobMonitorConstants {
         controller.log(e, false);
     }
 
-    /* url : "//host/object" */
+    /* url : "//host:port/object" */
     private ProActiveRuntime resolveURL(String url) {
-        try {
-            StringTokenizer tokenizer = new StringTokenizer(url, "/");
-            String host = tokenizer.nextToken();
-            String name = tokenizer.nextToken();
+        System.out.println(url);
+        Pattern p = Pattern.compile("(.*//)?(.+):?([0-9]*)/(.+)");
+        Matcher m = p.matcher(url);
+        if (!m.matches()) {
+            return null;
+        }
 
-            Registry registry = LocateRegistry.getRegistry(host);
-            RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(name);
+        String host = m.group(2);
+        String port = m.group(3);
+        String object = m.group(4);
+
+        try {
+            Registry registry;
+            if (!port.equals("")) {
+                int portNumber = Integer.parseInt(port);
+                registry = LocateRegistry.getRegistry(host, portNumber);
+            } else {
+                registry = LocateRegistry.getRegistry(host);
+            }
+
+            RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(object);
             return new RemoteProActiveRuntimeAdapter(r);
         } catch (Exception e) {
             log(e);
@@ -103,11 +117,11 @@ public class NodeExploration implements JobMonitorConstants {
 
         try {
             ProActiveRuntime[] registered = from.getProActiveRuntimes();
-            known = new LinkedList(Arrays.asList(registered));
+            known = new ArrayList(Arrays.asList(registered));
             parents = from.getParents();
         } catch (ProActiveException e) {
             log(e);
-            return new LinkedList();
+            return new ArrayList();
         }
 
         for (int i = 0; i < parents.length; i++) {
@@ -286,7 +300,7 @@ public class NodeExploration implements JobMonitorConstants {
             }
 
             MonitoredAO aoObject = new MonitoredAO(aoName);
-            if (skippedObjects.contains(aoObject)) {
+            if (!skippedObjects.contains(aoObject)) {
                 asso.addChild(nodeObject, aoObject);
                 asso.addChild(jobObject, aoObject);
             }
@@ -297,9 +311,6 @@ public class NodeExploration implements JobMonitorConstants {
         Iterator iter = asso.getJVM().iterator();
         while (iter.hasNext()) {
             MonitoredJVM jvmObject = (MonitoredJVM) iter.next();
-            if (jvmObject.isDeleted()) {
-                continue;
-            }
             ProActiveRuntime pr = urlToRuntime(jvmObject.getFullName());
             if (pr != null) {
                 handleProActiveRuntime(pr, jvmObject.getDepth());
@@ -313,5 +324,6 @@ public class NodeExploration implements JobMonitorConstants {
 
     public void endExploration() {
         visitedVM = null;
+        asso.updateReallyDeleted();
     }
 }

@@ -1,7 +1,5 @@
 package org.objectweb.proactive.p2p.peerconfiguration;
-
 import java.util.*;
-
 
 /*
  * Created on Jan 21, 2004
@@ -17,115 +15,114 @@ import java.util.*;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class ScheduleBean {
-    private double maxLoad;
-    private int days;
-    private int startTime;
-    private int workTime;
-    private GregorianCalendar begin;
-    private GregorianCalendar end;
+private double maxLoad;
+private int days;
+private int startTime;
+private int workTime;
+private GregorianCalendar begin;
+private GregorianCalendar end;
 
-    public ScheduleBean() {
-        maxLoad = 0;
-        days = 0;
-        startTime = 0;
-        workTime = 0;
-        begin = null;
-        end = null;
-    }
+public ScheduleBean() {
+	maxLoad=0;
+	days = 0;
+	startTime = 0;
+	workTime=0;
+	begin = null;
+	end = null;
+}
 
-    /******************** SETTERS  ***************************/
-    public void setMaxLoad(double maxLoad) {
-        this.maxLoad = maxLoad;
-    }
+/******************** SETTERS  ***************************/
 
-    public void setDays(int days) {
-        this.days = days;
-    }
+public void setMaxLoad(double maxLoad) {
+	this.maxLoad = maxLoad;
+}
 
-    public void setStartTime(int startTime) {
-        this.startTime = startTime;
-    }
+public void setDays (int days) {
+	this.days = days;
+}
 
-    public void setWorkTime(int workTime) {
-        this.workTime = workTime;
-    }
+public void setStartTime (int startTime) {
+	this.startTime = startTime;
+}
 
-    public void setBegin(GregorianCalendar begin) {
-        this.begin = begin;
-    }
+public void setWorkTime (int workTime) {
+	this.workTime = workTime;
+}
 
-    public void setEnd(GregorianCalendar end) {
-        this.end = end;
-    }
+public void setBegin(GregorianCalendar begin) {
+	this.begin = begin;
+}
 
-    /******************** GETTERS *****************************/
-    public double getMaxLoad() {
-        return maxLoad;
-    }
+public void setEnd(GregorianCalendar end) {
+	this.end=end;
+}
+/******************** GETTERS *****************************/
 
-    public int getDays() {
-        return days;
-    }
 
-    public int getStartTime() {
-        return startTime;
-    }
+public double getMaxLoad() {
+	return maxLoad;
+}
 
-    public int getWorkTime() {
-        return workTime;
-    }
+public int getDays() {
+	return days;
+}
 
-    public GregorianCalendar getBegin() {
-        return begin;
-    }
+public int getStartTime() {
+	return startTime;
+}
 
-    public GregorianCalendar getEnd() {
-        return end;
-    }
+public int getWorkTime() {
+	return workTime;
+}
 
-    /********************* other methods ************************/
+public GregorianCalendar getBegin() {
+	return begin;
+}
 
-    /* The days are scheduled in a long string "Monday, Fryday, etc"
-     * This method traduce that string to an internal representation (bit = 1 => valid day)
-     */
-    public int Days2Byte(String strDays) {
-        strDays = strDays.trim();
+public GregorianCalendar getEnd() {
+	return end;
+}
 
-        int internal = 0;
-        String[] days = strDays.split(" ");
+/********************* other methods ************************/
 
-        String[] week = {
-                "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-                "Saturday"
-            };
-        int j = days.length - 1;
-        for (int i = week.length - 1; i >= 0; i--) {
-            internal = internal << 1;
-            if ((j >= 0) && week[i].equals(days[j])) {
-                internal++;
-                j--;
-            }
-        }
+/* The days are scheduled in a long string "Monday, Fryday, etc"
+ * This method traduce that string to an internal representation (bit = 1 => valid day)
+ */
+ 
+public int Days2Byte(String strDays) {
+	strDays = strDays.trim();
+	
+	int internal = 0;
+	String days[] = strDays.split(" ");
+	
+	String[] week = {"Sunday","Monday", "Tuesday","Wednesday", "Thursday","Friday", "Saturday"};
+	int j=days.length-1;
+	for (int i=week.length-1; i >=0 ; i--) {
+		internal = internal << 1;
+		if  (j >=0  && week[i].equals(days[j])) {
+			internal++;
+			j--;
+		}
+	}
+	
+	return internal;
+}
 
-        return internal;
-    }
+/* 
+ * This method return true if, by calendar, the load balancer has to work today
+ */
+ 
+public boolean WorkToday() {
+	Calendar today= Calendar.getInstance();
+	
+	if (begin==null && end == null) return true;
+	 
+	if (today.after(begin) && today.before(end)) { 
+		today.setFirstDayOfWeek(Calendar.SUNDAY);
+		int weekday = (int) Math.round(Math.pow(2,today.get(Calendar.DAY_OF_WEEK)-1));
+		return (days & weekday) != 0;
+	}
+	return false;
+}
 
-    /*
-     * This method return true if, by calendar, the load balancer has to work today
-     */
-    public boolean WorkToday() {
-        Calendar today = Calendar.getInstance();
-
-        if ((begin == null) && (end == null)) {
-            return true;
-        }
-
-        if (today.after(begin) && today.before(end)) {
-            today.setFirstDayOfWeek(Calendar.SUNDAY);
-            int weekday = (int) Math.round(Math.pow(2,
-                        today.get(Calendar.DAY_OF_WEEK) - 1));
-            return (days & weekday) != 0;
-        }
-        return false;
-    }
 }

@@ -1,7 +1,7 @@
 package org.objectweb.proactive.examples.matrix;
 
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
@@ -11,431 +11,507 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 public class Matrix implements java.io.Serializable {
-    static Logger logger = Logger.getLogger(Matrix.class.getName());
+
+		static Logger logger = Logger.getLogger(Matrix.class.getName());
     private int width;
     private int height;
     private double[][] tab;
-    boolean migration = true;
+		boolean migration = true;
+
 
     // -----------------------------//
     //        CONSTRUCTORS          //
     //------------------------------//
-    public Matrix() {
+
+    public Matrix () {}
+
+    public Matrix (int w, int h) {
+	width = w;
+	height = h;
+	tab = new double[w][h];
     }
 
-    public Matrix(int w, int h) {
-        width = w;
-        height = h;
-        tab = new double[w][h];
-    }
 
-    public Matrix(double[][] table) {
-        width = table.length;
-        height = table[0].length;
-        tab = new double[width][];
-        for (int i = 0; i < width; i++)
-            tab[i] = table[i];
+    public Matrix (double[][] table) {
+	width = table.length;
+	height = table[0].length;
+	tab = new double[width][];
+	for (int i=0; i < width ; i++)
+	    tab[i] = table[i];
     }
 
     //Udab: ERREUR ICI, LE WIDTH NE DEVRAIT PAS ETRE MODIFIE
     // EN FAIT IL Y A CONFUSION ENTRE LE WIDTH ATTRIBUT DE L'OBJET ET LE WIDTH VARIABLE LOCALE
     //C'EST UN PEU LE BORDEL EN FAIT ICI
     public Matrix(Matrix mr, int w) {
-        int index = 0;
-        int width = 0;
-        Matrix result = null;
 
-        int size = ProActiveGroup.size(mr);
+	int index = 0;
+	int width = 0;
+	Matrix result = null;
 
-        /*        for (int i = 0 ; i < size ; i++) {
-           System.out.println("MATRIX : INIT ::  " + ((FutureProxy)ProActiveGroup.get(mr,i)));
-           ((FutureProxy)ProActiveGroup.get(mr,i)).waitFor();
-           }
-               System.out.println("nombre de matrices dans le groupe : " + size);
-         */
-        this.width = w;
-        this.height = w; // ((Matrix)((FutureProxy)ProActiveGroup.get(mr,0)).getResult()).getHeight();
+	int size =  ProActiveGroup.size(mr) ;
+/*	for (int i = 0 ; i < size ; i++) {
+	    System.out.println("MATRIX : INIT ::  " + ((FutureProxy)ProActiveGroup.get(mr,i)));
+	    ((FutureProxy)ProActiveGroup.get(mr,i)).waitFor();
+	}
+    	System.out.println("nombre de matrices dans le groupe : " + size);
+*/
 
-        /*
-           startTime = System.currentTimeMillis();
-           FutureProxy fp = (FutureProxy)ProActiveGroup.get(mr,0);
-           endTime = System.currentTimeMillis() - startTime;
-           System.out.println("         Initialisation de reconstruction 1 : " + endTime + " millisecondes\n");
-           startTime = System.currentTimeMillis();
-           Matrix m = (Matrix)fp.getResult();
-           endTime = System.currentTimeMillis() - startTime;
-           System.out.println("         Initialisation de reconstruction 2 : " + endTime + " millisecondes\n");
-           startTime = System.currentTimeMillis();
-           this.height = m.getHeight();
-           endTime = System.currentTimeMillis() - startTime;
-           System.out.println("         Initialisation de reconstruction 3 : " + endTime + " millisecondes\n");
-         */
-        tab = new double[this.width][];
 
-        for (int i = 0; i < size; i++) {
-            result = ((Matrix) ProActiveGroup.get(mr, i));
+	this.width = w;
+	this.height = w;  // ((Matrix)((FutureProxy)ProActiveGroup.get(mr,0)).getResult()).getHeight();
 
-            // 	    result = ((Matrix)
-            // 		      ((FutureProxy)ProActiveGroup.get(mr,i))
-            // 		      .getResult());
-            int widthTmp = result.getWidth();
-            for (int j = 0; j < widthTmp; j++) {
-                // Recopie de la colonne "index"
-                tab[index] = result.getColumn(j);
-                index++;
-            }
-        }
+/*
+	startTime = System.currentTimeMillis();
+	FutureProxy fp = (FutureProxy)ProActiveGroup.get(mr,0);
+	endTime = System.currentTimeMillis() - startTime;
+	System.out.println("         Initialisation de reconstruction 1 : " + endTime + " millisecondes\n");
+
+	startTime = System.currentTimeMillis();
+	Matrix m = (Matrix)fp.getResult();
+	endTime = System.currentTimeMillis() - startTime;
+	System.out.println("         Initialisation de reconstruction 2 : " + endTime + " millisecondes\n");
+
+	startTime = System.currentTimeMillis();
+	this.height = m.getHeight();
+	endTime = System.currentTimeMillis() - startTime;
+	System.out.println("         Initialisation de reconstruction 3 : " + endTime + " millisecondes\n");
+*/
+	
+	tab = new double[this.width][];
+
+	for (int i=0 ; i < size ; i++) {
+	    result = ((Matrix)ProActiveGroup.get(mr,i));
+
+// 	    result = ((Matrix)
+// 		      ((FutureProxy)ProActiveGroup.get(mr,i))
+// 		      .getResult());
+
+	    int  widthTmp = result.getWidth();
+	    for (int j=0 ; j < widthTmp ; j++) {
+		// Recopie de la colonne "index"
+		tab[index] = result.getColumn(j);
+		index++;
+	    }
+	}
     }
 
-    public Matrix(Matrix mr) {
-        int index = 0;
-        int width = 0;
-        Matrix result = null;
+    public Matrix (Matrix mr) {
+	int index = 0;
+	int width = 0;
+	Matrix result = null;
 
-        int size = ProActiveGroup.size(mr);
+	int size =  ProActiveGroup.size(mr) ;
+	
+	for (int i=0 ; i < size ; i++) {
+ 	    width += ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getWidth();
+ 	}
 
-        for (int i = 0; i < size; i++) {
-            width += ((Matrix) ((FutureProxy) ProActiveGroup.get(mr, i)).getResult()).getWidth();
-        }
-
-        height = ((Matrix) ((FutureProxy) ProActiveGroup.get(mr, 0)).getResult()).getHeight();
-        tab = new double[width][];
-        for (int i = 0; i < size; i++) {
-            result = ((Matrix) ((FutureProxy) ProActiveGroup.get(mr, i)).getResult());
-            width = result.getWidth();
-            for (int j = 0; j < width; j++) {
-                tab[index] = result.getColumn(j);
-                index++;
-            }
-        }
+	height = ((Matrix)((FutureProxy)ProActiveGroup.get(mr,0)).getResult()).getHeight();
+	tab = new double[width][];
+	for (int i=0 ; i < size ; i++) {
+	    result = ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult());
+	    width = result.getWidth();
+	    for (int j=0 ; j < width ; j++) {
+		tab[index] = result.getColumn(j);
+		index++;
+	    }
+	}
     }
 
-    //     public Matrix (Matrix mr) {
-    // 	int w = 0;
-    // // 	System.out.println(mr.getClass());
-    // // 	org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject)mr).getProxy();
-    // // 	System.out.println(theProxy.getClass());
-    // // 	System.out.println(((FutureProxy)theProxy).getResult().getClass());
-    // // 	if (!(theProxy instanceof org.objectweb.proactive.core.group.ProxyForGroup))
-    // // 	    System.out.println("m2group est bien un group !!!!!!!");
-    // 	for (int i=0 ; i < ProActiveGroup.size(mr) ; i++) {
-    // //  	    System.out.println(" taille width : " + ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getWidth() +
-    // //  			       " taille height : " + ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getHeight() );
-    // 	    w += ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getWidth();
-    // 	}
-    // 	width = w;
-    // 	height = ((Matrix)((FutureProxy)ProActiveGroup.get(mr,0)).getResult()).getHeight();
-    // //        	System.out.println("Largeur de la matrix resultat : "+ width);
-    // 	tab = new double[width][];
-    // 	int index = 0;
-    // 	for (int i=0 ; i < ProActiveGroup.size(mr) ; i++) {
-    // // 	    System.out.println("Matrix resultat : " + i);
-    // 	    for (int j=0 ; j < ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getWidth() ; j++) {
-    // // 		System.out.println("Je m'occupe de la colonne : " + index);
-    // 		tab[index] = ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getColumn(j);
-    // 		index++;
-    // 	    }
-    // 	}
-    //     }
-    public Matrix(Matrix[] mr) {
-        int w = 0;
-        for (int i = 0; i < mr.length; i++)
-            w += mr[i].getWidth();
 
-        width = w;
-        height = mr[0].getHeight();
+//     public Matrix (Matrix mr) {
 
-        tab = new double[width][];
+// 	int w = 0;
 
-        int index = 0;
-        for (int i = 0; i < mr.length; i++) {
-            for (int j = 0; j < mr[i].getWidth(); j++) {
-                tab[index] = mr[i].getColumn(j);
-                index++;
-            }
-        }
+
+
+
+
+// // 	System.out.println(mr.getClass());
+// // 	org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject)mr).getProxy();
+// // 	System.out.println(theProxy.getClass());
+// // 	System.out.println(((FutureProxy)theProxy).getResult().getClass());
+// // 	if (!(theProxy instanceof org.objectweb.proactive.core.group.ProxyForGroup))
+// // 	    System.out.println("m2group est bien un group !!!!!!!");
+
+
+
+
+
+
+
+// 	for (int i=0 ; i < ProActiveGroup.size(mr) ; i++) {
+// //  	    System.out.println(" taille width : " + ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getWidth() +
+// //  			       " taille height : " + ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getHeight() );
+// 	    w += ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getWidth();
+// 	}
+
+// 	width = w;
+// 	height = ((Matrix)((FutureProxy)ProActiveGroup.get(mr,0)).getResult()).getHeight();
+
+// //        	System.out.println("Largeur de la matrix resultat : "+ width);
+
+// 	tab = new double[width][];
+	
+// 	int index = 0;
+// 	for (int i=0 ; i < ProActiveGroup.size(mr) ; i++) {
+// // 	    System.out.println("Matrix resultat : " + i);
+// 	    for (int j=0 ; j < ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getWidth() ; j++) {
+// // 		System.out.println("Je m'occupe de la colonne : " + index);
+// 		tab[index] = ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult()).getColumn(j);
+// 		index++;
+// 	    }
+// 	}
+//     }
+
+
+    public Matrix (Matrix[] mr) {
+	int w = 0;
+	for (int i=0 ; i < mr.length ; i++)
+	    w += mr[i].getWidth();
+	
+	width = w;
+	height = mr[0].getHeight();
+
+	tab = new double[width][];
+	
+	int index = 0;
+	for (int i=0 ; i < mr.length ; i++) {
+	    for (int j=0 ; j < mr[i].getWidth() ; j++) {
+		tab[index] = mr[i].getColumn(j);
+		index++;
+	    }
+	}
     }
 
+	    
+	
+
+    
     //----------------------------//
     //         ACCESSORS          //
     //----------------------------//
+       
     public int getWidth() {
-        return width;
+	return width;
     }
 
     public void setWidth(int w) {
-        width = w;
+	width = w;
     }
 
     public int getHeight() {
-        return height;
+	return height;
     }
 
     public void setHeight(int h) {
-        height = h;
+	height = h;
     }
 
     public double getWH(int w, int h) {
-        return tab[w][h];
+	return tab[w][h];
     }
 
     public void setWH(int w, int h, double val) {
-        tab[w][h] = val;
+	tab[w][h] = val;
     }
 
     public double[][] getTab() {
-        return tab;
+	return tab;
     }
 
     public double[] getColumn(int w) {
-        return tab[w];
+	return tab[w];
     }
+
 
     //-----------------------------------//
     //             METHODS               //
     //-----------------------------------//
-    static int k = 0;
+
+    static int k=0;
 
     public void initializeWithRandomValues() {
-        //int k= 0;
-        for (int i = 0; i < tab.length; i++)
-            for (int j = 0; j < tab[i].length; j++)
-                setWH(i, j, k++);
 
-        /*        for (int i = 0 ; i < tab.length ; i++)
-           for (int j = 0 ; j < tab[i].length ; j++)
-               tab[i][j] = Math.round(Math.random()*10);
-         */
-    }
+	//int k= 0;
+	for (int i = 0 ; i < tab.length ; i++)
+	    for (int j = 0 ; j < tab[i].length ; j++)
+	        setWH(i,j,k++);
+
+/*	for (int i = 0 ; i < tab.length ; i++)
+	    for (int j = 0 ; j < tab[i].length ; j++)
+		tab[i][j] = Math.round(Math.random()*10);
+*/    }
 
     //Udab: Modifie pour tests
     public String toString() {
-        //System.out.println("Methode Matrix::toString");
-        String s = new String("");
-        int height = this.getHeight();
-        int width = this.getWidth();
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                // System.out.println(" i = " + i + ";   j = " + j + ";");
-                s += Double.toString(getWH(j, i));
-                s += "   ";
-            }
-            s += "\n";
-        }
-        return s;
+	//System.out.println("Methode Matrix::toString");
+	String s = new String("");
+	int height = this.getHeight();
+	int width = this.getWidth();
+	for (int i = 0 ; i < height ; i++) {
+	    for (int j = 0 ; j < width ; j++) {
+		// System.out.println(" i = " + i + ";   j = " + j + ";");
+		s += Double.toString(getWH(j,i));
+		s += "   ";
+	    }
+	    s += "\n";
+	}
+	return s;
+    }
+    
+
+
+    public Matrix getVerticalSubMatrix (int widthStart, int widthStop) {
+	double[][] d = new double[widthStop-widthStart][];
+	for (int i=0 ; i < widthStop-widthStart ; i++)
+	    d[i] = tab[widthStart+i];
+	return new Matrix(d);
+    }
+    
+
+    public Matrix getActiveVerticalSubMatrix (int widthStart, int widthStop, Node node) {
+	Matrix vsm = null;
+
+	double[][] d = new double[widthStop-widthStart][];
+	for (int i=0 ; i < widthStop-widthStart ; i++)
+	    d[i] = tab[widthStart+i];
+	
+	Object [] params = new Object[1];
+	params[0] = d;
+
+	try {
+	    vsm = (Matrix) ProActive.newActive("org.objectweb.proactive.examples.matrix.Matrix", params, node); }
+	catch (ActiveObjectCreationException e) {
+	    logger.error("Error create Active Vertical Sub Matrix : ActiveObjectCreationException\n"); }
+	catch (NodeException e) {
+	    logger.error("Error create Active Vertical Sub Matrix : NodeException\n"); }
+	return vsm;
     }
 
-    public Matrix getVerticalSubMatrix(int widthStart, int widthStop) {
-        double[][] d = new double[widthStop - widthStart][];
-        for (int i = 0; i < (widthStop - widthStart); i++)
-            d[i] = tab[widthStart + i];
-        return new Matrix(d);
-    }
-
-    public Matrix getActiveVerticalSubMatrix(int widthStart, int widthStop,
-        Node node) {
-        Matrix vsm = null;
-
-        double[][] d = new double[widthStop - widthStart][];
-        for (int i = 0; i < (widthStop - widthStart); i++)
-            d[i] = tab[widthStart + i];
-
-        Object[] params = new Object[1];
-        params[0] = d;
-
-        try {
-            vsm = (Matrix) ProActive.newActive("org.objectweb.proactive.examples.matrix.Matrix",
-                    params, node);
-        } catch (ActiveObjectCreationException e) {
-            logger.error(
-                "Error create Active Vertical Sub Matrix : ActiveObjectCreationException\n");
-        } catch (NodeException e) {
-            logger.error(
-                "Error create Active Vertical Sub Matrix : NodeException\n");
-        }
-        return vsm;
-    }
 
     public Matrix transformIntoActiveVerticalSubMatrixGroup(Node[] nodeList) {
-        // if (getWidth() >= nodeList.length)
-        Matrix result = null;
-        int widthSubMatrix;
-        int more;
-        boolean pile;
-        if ((getWidth() % nodeList.length) == 0) {
-            widthSubMatrix = getWidth() / nodeList.length;
-            more = 0;
-            pile = true;
-        } else {
-            widthSubMatrix = (getWidth() / nodeList.length) + 1;
-            more = getWidth() % widthSubMatrix;
-            pile = false;
-        }
+	// if (getWidth() >= nodeList.length)
+	Matrix result = null;
+	int widthSubMatrix;
+	int more;
+	boolean pile;
+	if ((getWidth() % nodeList.length) == 0) {
+	    widthSubMatrix = getWidth() / nodeList.length;
+	    more = 0;
+	    pile = true;
+	}
+	else {
+	    widthSubMatrix = (getWidth() / nodeList.length)+1;
+	    more = getWidth() % widthSubMatrix;
+	    pile = false;
+	}
 
-        Object[][] params = new Object[nodeList.length][];
+	Object[][] params = new Object[nodeList.length][];
+	
+	for (int i=0 ; i < nodeList.length ; i++) {
+	    Object[] po = new Object[1];
+	    double[][] d;
+	    if ((!pile) && (i == nodeList.length-1))
+		d = new double[more][];
+	    else
+		d = new double[widthSubMatrix][];
+	    
+	    for (int j=0 ; j < d.length ; j++) 
+		d[j] = tab[(i*widthSubMatrix)+j];
+	    
+	    po[0] = d;
+	    
+	    params[i] = po;
 
-        for (int i = 0; i < nodeList.length; i++) {
-            Object[] po = new Object[1];
-            double[][] d;
-            if ((!pile) && (i == (nodeList.length - 1))) {
-                d = new double[more][];
-            } else {
-                d = new double[widthSubMatrix][];
-            }
 
-            for (int j = 0; j < d.length; j++)
-                d[j] = tab[(i * widthSubMatrix) + j];
 
-            po[0] = d;
 
-            params[i] = po;
 
-            /* Debugging
-               System.out.println("SubMatrix " + i + "  d.length = " + d.length);
-               String s = new String("");
-               for (int h=0 ; h < d[0].length ; h++) {
-                   for (int l=0 ; l < d.length ; l++) {
-                       s += d[l][h];
-                       s += "   ";
-                   }
-                   s += "\n";
-               }
-               System.out.println(s);
-            
-             */
-        }
+/* Debugging
 
-        try {
-            result = (Matrix) ProActiveGroup.newGroup("org.objectweb.proactive.examples.matrix.Matrix",
-                    params, nodeList);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+ 	    System.out.println("SubMatrix " + i + "  d.length = " + d.length);
+ 	    String s = new String("");
+	    for (int h=0 ; h < d[0].length ; h++) {
+		for (int l=0 ; l < d.length ; l++) {
+		    s += d[l][h];
+		    s += "   ";
+		}
+		s += "\n";
+	    }
+	    System.out.println(s);
+	    
+*/
 
-        return result;
+
+
+
+
+
+
+	}
+
+	try {
+	    result = (Matrix) ProActiveGroup.newGroup("org.objectweb.proactive.examples.matrix.Matrix",params,nodeList);
+	}
+	catch (Exception e) { e.printStackTrace();}
+	
+	return result;
     }
+    
 
-    public Matrix localMultiplyForGroup(Matrix m) {
-        //long startTime;
-        //long endTime;
-        //startTime= System.currentTimeMillis();
-        Matrix res = new Matrix(getWidth(), m.getHeight());
-        int height = res.getHeight();
+    public Matrix localMultiplyForGroup (Matrix m) {
+	//long startTime;
+ 	//long endTime;
+	//startTime= System.currentTimeMillis();
+
+
+	Matrix res = new Matrix(getWidth(),m.getHeight());
+	int height=res.getHeight() ;
         int width = res.getWidth();
-        for (int line = 0; line < height; line++) {
-            for (int column = 0; column < width; column++) {
-                double val = 0;
-                for (int index = 0; index < height; index++) {
-                    //System.out.println("(" + m.getWH(index,line) + " * " + getWH(column,index) + ") + ");
-                    val += (m.getWH(index, line) * getWH(column, index));
-                }
+	for (int line=0 ; line < height ; line++) {
+	    for (int column=0 ; column < width ; column++) {
+		double val = 0;
+		for (int index=0 ; index < height ; index++)
+		    {
 
-                //System.out.println(" == " + val + "\n");
-                res.setWH(column, line, val);
-            }
-        }
 
-        //endTime = System.currentTimeMillis() - startTime;
-        //System.out.println(" Local multiply for group : " + endTime + " millisecondes\n\n");
-        return res;
+		    //System.out.println("(" + m.getWH(index,line) + " * " + getWH(column,index) + ") + ");
+
+
+		    val += m.getWH(index,line) * getWH(column,index);
+		    }
+		//System.out.println(" == " + val + "\n");
+		res.setWH(column,line,val);
+	    }
+	}
+
+
+	//endTime = System.currentTimeMillis() - startTime;
+	//System.out.println(" Local multiply for group : " + endTime + " millisecondes\n\n");
+	
+	
+	return res;
     }
 
-    public Matrix distributedMultiply(Matrix m, Node[] nodeList) {
-        if (getWidth() != m.getHeight()) {
-            logger.error("Error : no compatible Matrix");
-            return null;
-        } else {
-            Matrix verticalSubMatrixGroup = null;
 
-            verticalSubMatrixGroup = m.transformIntoActiveVerticalSubMatrixGroup(nodeList);
+    
+    public Matrix distributedMultiply (Matrix m, Node[] nodeList) {
+	if (getWidth() != m.getHeight()) {
+	    logger.error("Error : no compatible Matrix");
+	    return null;
+	}
+       	else {
+	    Matrix verticalSubMatrixGroup = null;
 
-            Matrix mr = verticalSubMatrixGroup.localMultiplyForGroup(this);
-            return new Matrix(mr);
-        }
+	    verticalSubMatrixGroup = m.transformIntoActiveVerticalSubMatrixGroup(nodeList);
+
+	    Matrix mr = verticalSubMatrixGroup.localMultiplyForGroup(this);
+	    return new Matrix(mr);
+	}
     }
 
-    public Matrix distributedMultiply(Matrix m) {
-        Node[] nodeList = new Node[1];
-        nodeList[0] = null;
-        return distributedMultiply(m, nodeList);
+
+    public Matrix distributedMultiply (Matrix m) {
+	Node[] nodeList = new Node[1];
+	nodeList[0] = null;
+	return distributedMultiply(m,nodeList);
     }
 
-    public Matrix localMultiply(Matrix m) {
-        return m.localMultiplyForGroup(this);
+
+
+    public Matrix localMultiply (Matrix m) {
+	return m.localMultiplyForGroup(this);
     }
+
+
+
+
 
     public Matrix[] transformIntoActiveMatrixTable(Node[] nodeList) {
-        // if (getWidth() >= nodeList.length)
-        Matrix[] result = new Matrix[nodeList.length];
-        int widthSubMatrix;
-        int more;
-        boolean pile;
-        if ((getWidth() % nodeList.length) == 0) {
-            widthSubMatrix = getWidth() / nodeList.length;
-            more = 0;
-            pile = true;
-        } else {
-            widthSubMatrix = (getWidth() / nodeList.length) + 1;
-            more = getWidth() % widthSubMatrix;
-            pile = false;
-        }
+	// if (getWidth() >= nodeList.length)
+	Matrix[] result = new Matrix[nodeList.length];
+	int widthSubMatrix;
+	int more;
+	boolean pile;
+	if ((getWidth() % nodeList.length) == 0) {
+	    widthSubMatrix = getWidth() / nodeList.length;
+	    more = 0;
+	    pile = true;
+	}
+	else {
+	    widthSubMatrix = (getWidth() / nodeList.length)+1;
+	    more = getWidth() % widthSubMatrix;
+	    pile = false;
+	}
 
-        for (int i = 0; i < nodeList.length; i++) {
-            Object[] po = new Object[1];
-            double[][] d;
-            if ((!pile) && (i == (nodeList.length - 1))) {
-                d = new double[more][];
-            } else {
-                d = new double[widthSubMatrix][];
-            }
+	for (int i=0 ; i < nodeList.length ; i++) {
+	    Object[] po = new Object[1];
+	    double[][] d;
+	    if ((!pile) && (i == nodeList.length-1))
+		d = new double[more][];
+	    else
+		d = new double[widthSubMatrix][];
+	    
+	    for (int j=0 ; j < d.length ; j++) 
+		d[j] = tab[(i*widthSubMatrix)+j];
+	    
+	    po[0] = d;
 
-            for (int j = 0; j < d.length; j++)
-                d[j] = tab[(i * widthSubMatrix) + j];
-
-            po[0] = d;
-
-            try {
-                result[i] = (Matrix) ProActive.newActive("org.objectweb.proactive.examples.matrix.Matrix",
-                        po, nodeList[i]);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        return result;
+	    try {
+		result[i] = (Matrix) ProActive.newActive("org.objectweb.proactive.examples.matrix.Matrix",po,nodeList[i]);
+	    }
+	    catch (Exception e) { e.printStackTrace();}
+	}
+	
+	return result;
     }
 
-    public Matrix distributedMultiplyWithOutGroup(Matrix m, Node[] nodeList) {
-        if (getWidth() != m.getHeight()) {
-            logger.error("Error : no compatible Matrix");
-            return null;
-        } else {
-            Matrix[] verticalSubMatrixTable;
 
-            verticalSubMatrixTable = m.transformIntoActiveMatrixTable(nodeList);
+    public Matrix distributedMultiplyWithOutGroup (Matrix m, Node[] nodeList) {
+	if (getWidth() != m.getHeight()) {
+	    logger.error("Error : no compatible Matrix");
+	    return null;
+	}
+       	else {
+	    Matrix[] verticalSubMatrixTable;
 
-            Matrix[] mr = new Matrix[verticalSubMatrixTable.length];
+	    verticalSubMatrixTable = m.transformIntoActiveMatrixTable(nodeList);
 
-            for (int i = 0; i < verticalSubMatrixTable.length; i++)
-                mr[i] = verticalSubMatrixTable[i].localMultiplyForGroup(this);
+	    Matrix[] mr = new Matrix[verticalSubMatrixTable.length];
 
-            return new Matrix(mr);
-        }
+	    for (int i=0 ; i < verticalSubMatrixTable.length ; i++)
+		mr[i] = verticalSubMatrixTable[i].localMultiplyForGroup(this);
+
+	    return new Matrix(mr);
+	}
     }
+
+
 
     // -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
-        //long startTime;
-        //long endTime;
-        //startTime = System.currentTimeMillis();
-        out.defaultWriteObject();
+  
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+	//long startTime;
+ 	//long endTime;
+	
+	//startTime = System.currentTimeMillis();
+	
+	out.defaultWriteObject();
 
-        //endTime = System.currentTimeMillis() - startTime;
-        //	System.out.println("     Serialization : " + endTime + " millisecondes\n");
+	//endTime = System.currentTimeMillis() - startTime;
+	//	System.out.println("     Serialization : " + endTime + " millisecondes\n");
     }
 
-    //     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-    // 	in.defaultReadObject();
-    //     }
+
+//     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+// 	in.defaultReadObject();
+//     }
+
+
+
+
+
+    
 }

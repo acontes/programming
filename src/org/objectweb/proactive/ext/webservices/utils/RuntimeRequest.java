@@ -32,7 +32,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class RuntimeRequest implements Serializable {
-    private static Logger logger = ProActive.xmlLogger;
+    private static Logger logger = Logger.getLogger("XML_HTTP");
     private String methodName;
     private ArrayList parameters = new ArrayList();
     private ArrayList paramsTypes;

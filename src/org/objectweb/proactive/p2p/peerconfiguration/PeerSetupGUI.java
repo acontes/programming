@@ -63,9 +63,8 @@ public class PeerSetupGUI {
         //		>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         //The configuration table.
         String[] columnNames = {
-                "Days", "Start time", "Work time", "Maximum CPU load",
-                "Validity"
-            };
+            "Days", "Start time", "Work time", "Maximum CPU load", "Validity"
+        };
         Object[][] tableData = new Object[7][5];
         grid = tableData;
         table = new JTable(tableData, columnNames);

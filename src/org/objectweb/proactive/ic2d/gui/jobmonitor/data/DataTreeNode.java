@@ -171,6 +171,10 @@ public class DataTreeNode extends DefaultMutableTreeNode
         }
 
         if (isRoot()) {
+            if (getKey() == NO_KEY) {
+                return "Empty";
+            }
+
             return NAMES[KEY2INDEX[getKey()]];
         }
 

@@ -96,12 +96,13 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
         return remoteBody;
     }
 
-    //    public void startingAfterMigration(Body body) {
-    //        //we update our location
-    //        //   System.out.println("YYYYYYYY");
-    //        super.startingAfterMigration(body);
-    //        updateLocation(body);
-    //    }
+//    public void startingAfterMigration(Body body) {
+//        //we update our location
+//        //   System.out.println("YYYYYYYY");
+//        super.startingAfterMigration(body);
+//        updateLocation(body);
+//    }
+
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
         RequestReceiver currentRequestReceiver) {
         return new BouncingRequestReceiver();

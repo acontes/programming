@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.util; 
+package org.objectweb.proactive.ic2d.util;
 
 import org.apache.log4j.Logger;
 

@@ -35,16 +35,24 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.ContentController;
+import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.TypeFactory;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import java.io.Serializable;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -56,14 +64,23 @@ import java.util.Vector;
 public class ProActiveContentController extends ProActiveController
     implements ContentController, Serializable {
     protected static Logger logger = Logger.getLogger(ProActiveContentController.class.getName());
-    Vector fcSubComponents;
+    List fcSubComponents;
 
     /**
      * Constructor for ProActiveContentController.
      */
     public ProActiveContentController(Component owner) {
-        super(owner, Constants.CONTENT_CONTROLLER);
-        fcSubComponents = new Vector();
+        super(owner);
+        try {
+            setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
+                    ProActiveContentController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
+        } catch (InstantiationException e) {
+            throw new ProActiveRuntimeException("cannot create controller " +
+                this.getClass().getName());
+        }
+        fcSubComponents = new ArrayList();
     }
 
     /**
@@ -100,18 +117,36 @@ public class ProActiveContentController extends ProActiveController
     }
 
     public boolean isSubComponent(Component component) {
-        return fcSubComponents.contains(component);
+        // parse list and see if the given component has an equivalent
+        Iterator it = fcSubComponents.iterator();
+        ProActiveComponent current;
+        Group group = null;
+        if (ProActiveGroup.isGroup(component)) {
+            group = ProActiveGroup.getGroup(component);
+        }
+        while (it.hasNext()) {
+            current = (ProActiveComponent) it.next();
+            if (current.equals(component)) {
+                return true;
+            }
+            if ((group != null) && ProActiveGroup.isGroup(current)) {
+                if (ProActiveGroup.getGroup(current).equals(group)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
      * @see org.objectweb.fractal.api.control.ContentController#addFcSubComponent(Component)
      */
     public void addFcSubComponent(Component subComponent)
-        throws IllegalLifeCycleException {
+        throws IllegalLifeCycleException, IllegalContentException {
         checkLifeCycleIsStopped();
 
         // check whether the subComponent is the component itself
-        if (getFcItfOwner().equals((ProActiveComponent) subComponent)) {
+        if (getFcItfOwner().equals(subComponent)) {
             try {
                 throw new IllegalArgumentException("cannot add " +
                     Fractive.getComponentParametersController(getFcItfOwner())
@@ -136,8 +171,16 @@ public class ProActiveContentController extends ProActiveController
             }
             throw new IllegalArgumentException("already a sub component : " +
                 name);
-        } else {
-            fcSubComponents.addElement(subComponent);
+        }
+        fcSubComponents.add(subComponent);
+        // add a ref on the current component
+        try {
+            Object itf = subComponent.getFcInterface(Constants.SUPER_CONTROLLER);
+
+            ((ProActiveSuperController) itf).addParent(((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis());
+        } catch (NoSuchInterfaceException e) {
+            throw new IllegalContentException(
+                "Cannot add component : cannot find super-controller interface.");
         }
 
         // FIXME : component cycle checking
@@ -169,11 +212,17 @@ public class ProActiveContentController extends ProActiveController
      * @see org.objectweb.fractal.api.control.ContentController#removeFcSubComponent(Component)
      */
     public void removeFcSubComponent(Component subComponent)
-        throws IllegalLifeCycleException {
+        throws IllegalLifeCycleException, IllegalContentException {
         checkLifeCycleIsStopped();
-        if (!fcSubComponents.removeElement(subComponent)) {
+        if (!fcSubComponents.remove(subComponent)) {
             throw new IllegalArgumentException("not a sub component : " +
                 subComponent);
+        }
+        try {
+            ((ProActiveSuperController) subComponent.getFcInterface(Constants.SUPER_CONTROLLER)).removeParent(subComponent);
+        } catch (NoSuchInterfaceException e) {
+            throw new IllegalContentException(
+                "Cannot remove component : cannot find super-controller interface");
         }
 
         if (logger.isDebugEnabled()) {

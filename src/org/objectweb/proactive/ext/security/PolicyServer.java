@@ -1,44 +1,34 @@
 /*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
+* ################################################################
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
+*            Concurrent computing with Security and Mobility
+*
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s):
+*
+* ################################################################
+*/
 package org.objectweb.proactive.ext.security;
-
-import org.apache.log4j.Logger;
-
-import org.bouncycastle.asn1.x509.X509Name;
-
-import org.bouncycastle.jce.X509Principal;
-
-import org.objectweb.proactive.core.runtime.VMInformation;
-import org.objectweb.proactive.core.xml.XMLPropertiesStore;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +38,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -63,10 +52,16 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.jce.X509Principal;
+import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.core.xml.XMLPropertiesStore;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 public class PolicyServer implements Serializable, Cloneable {
@@ -91,25 +86,31 @@ public class PolicyServer implements Serializable, Cloneable {
     protected String applicationName;
     protected transient KeyStore keyStore;
     protected byte[] encodedKeyStore;
-
+    
     public PolicyServer() {
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         Security.addProvider(myProvider);
     }
 
     /*public PolicyServer(String file) {
-       try {
-           p = new XMLPropertiesStore(file);
-       } catch (IOException e) {
-           logger.warn("can't find file " + file);
-           e.printStackTrace();
-       }
-       certificates = new Hashtable();
-       storeCertificate(p.getAllNodes("/Policy/Rules/Rule/From"));
-       storeCertificate(p.getAllNodes("/Policy/Rules/Rule/To"));
-       System.out.println("done");
-       }
-     */
+        try {
+            p = new XMLPropertiesStore(file);
+        } catch (IOException e) {
+            logger.warn("can't find file " + file);
+            e.printStackTrace();
+        }
+
+        certificates = new Hashtable();
+        storeCertificate(p.getAllNodes("/Policy/Rules/Rule/From"));
+        storeCertificate(p.getAllNodes("/Policy/Rules/Rule/To"));
+
+        System.out.println("done");
+
+
+
+
+    }
+    */
 
     /**
      * Method storeCertificate.
@@ -258,61 +259,66 @@ public class PolicyServer implements Serializable, Cloneable {
         int length = policies.size();
 
         /*
-           String s = "================================\nFrom :";
-           for (int i = 0; i < entitiesFrom.size(); i++)
-               s += (((Entity) entitiesFrom.get(i)) + " ");
-           System.out.println(s);
-           s = "To :";
-           for (int i = 0; i < entitiesTo.size(); i++)
-               s += (((Entity) entitiesTo.get(i)) + " ");
-           System.out.println(s + "\n=================================\n");
-         */
-
+        String s = "================================\nFrom :";
+        for (int i = 0; i < entitiesFrom.size(); i++)
+            s += (((Entity) entitiesFrom.get(i)) + " ");
+        System.out.println(s);
+        s = "To :";
+        for (int i = 0; i < entitiesTo.size(); i++)
+            s += (((Entity) entitiesTo.get(i)) + " ");
+        System.out.println(s + "\n=================================\n");
+        */
+        
         // iterate on all rules
         for (int i = 0; i < length; i++) {
-            // retreiving a rule 
-            policy = (Policy) policies.get(i);
+        
+        	// retreiving a rule 
+        	policy = (Policy) policies.get(i);
 
             ArrayList policyEntitiesFrom = policy.getEntitiesFrom();
-
+            
             // testing if From tag matches From entities 
             for (int j = 0; !matchingFrom && (j < policyEntitiesFrom.size());
                     j++) {
-                // from rules entities
-                Entity policyEntityFrom = (Entity) policyEntitiesFrom.get(j);
+            	
+            	// from rules entities
+               Entity policyEntityFrom = (Entity) policyEntitiesFrom.get(j);
 
-                //System.out.println("testing from" + policyEntityFrom);
-                for (int z = 0; !matchingFrom && (z < entitiesFrom.size());
+               //System.out.println("testing from" + policyEntityFrom);
+               
+               
+               for (int z = 0; !matchingFrom && (z < entitiesFrom.size());
                         z++) {
                     Entity entity = (Entity) entitiesFrom.get(z);
-
                     //System.out.println("testing from -------------" + entity);
                     if (policyEntityFrom instanceof DefaultEntity) {
                         matchingFromDefault = true;
                     } else if (policyEntityFrom.equals(entity)) {
-                        //System.out.println("Matching From " + policyEntityFrom);
+                    	//System.out.println("Matching From " + policyEntityFrom);
                         matchingFrom = true;
                     }
                 }
             }
+
 
             // testing To rules
             ArrayList policyEntitiesTo = policy.getEntitiesTo();
 
             for (int j = 0; !matchingTo && (j < policyEntitiesTo.size());
                     j++) {
-                // retrieves To rule entities 
+            	
+            	// retrieves To rule entities 
                 Entity policyEntityTo = (Entity) policyEntitiesTo.get(j);
 
                 //System.out.println("testing to" + policyEntityTo );
                 for (int z = 0; !matchingTo && (z < entitiesTo.size()); z++) {
                     Entity entity = (Entity) entitiesTo.get(z);
 
-                    //  System.out.println("testing to -------------" + entity);
+                  //  System.out.println("testing to -------------" + entity);
                     if (policyEntityTo instanceof DefaultEntity) {
                         matchingToDefault = true;
                     } else if (policyEntityTo.equals(entity)) {
-                        //		System.out.println("Matching To " + policyEntityTo);
+				//		System.out.println("Matching To " + policyEntityTo);
                         matchingTo = true;
                     }
                 }
@@ -328,7 +334,7 @@ public class PolicyServer implements Serializable, Cloneable {
             if (matchingToDefault && matchingFromDefault) {
                 defaultPolicy = policy;
             }
-
+            
             matchingToDefault = matchingFromDefault = false;
             matchingTo = matchingFrom = false;
             //System.out.println("----------- reset matching, next rule ---------");
@@ -445,76 +451,80 @@ public class PolicyServer implements Serializable, Cloneable {
     // implements Serializable
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
-        ByteArrayOutputStream bout = null;
-        try {
-            keyStore = KeyStore.getInstance("PKCS12", "BC");
+    	
+  
+    	 ByteArrayOutputStream bout = null;
+    	try {
+    	keyStore = KeyStore.getInstance("PKCS12", "BC");
 
-            keyStore.load(null, null);
+    	keyStore.load(null, null);
 
-            //
-            // if you haven't set the friendly name and local key id above
-            // the name below will be the name of the key
-            //
-            keyStore.setCertificateEntry("entityCertificate", certificate);
+        //
+        // if you haven't set the friendly name and local key id above
+        // the name below will be the name of the key
+        //
+        keyStore.setCertificateEntry("entityCertificate", certificate);
 
-            keyStore.setCertificateEntry("applicationCertificate",
-                applicationCertificate);
-
-            bout = new ByteArrayOutputStream();
-
-            keyStore.store(bout, "ha".toCharArray());
-
-            encodedKeyStore = bout.toByteArray();
-            bout.close();
+        keyStore.setCertificateEntry("applicationCertificate", applicationCertificate);
+        
+        bout = new ByteArrayOutputStream();
+        
+        keyStore.store(bout,"ha".toCharArray());
+    	
+        encodedKeyStore = bout.toByteArray();
+        bout.close();
+        
         } catch (CertificateEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+              
+       
         } catch (KeyStoreException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        out.defaultWriteObject();
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	  	out.defaultWriteObject();
+		
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-
+       
         try {
-            keyStore = KeyStore.getInstance("PKCS12", "BC");
-            keyStore.load(new ByteArrayInputStream(encodedKeyStore),
-                "ha".toCharArray());
-            applicationCertificate = (X509Certificate) keyStore.getCertificate(
-                    "applicationCertificate");
-            certificate = (X509Certificate) keyStore.getCertificate(
-                    "entityCertificate");
-        } catch (KeyStoreException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        }
+			keyStore = KeyStore.getInstance("PKCS12", "BC");
+			keyStore.load(new ByteArrayInputStream(encodedKeyStore),"ha".toCharArray());
+		    applicationCertificate = (X509Certificate) keyStore.getCertificate("applicationCertificate");
+		    certificate = (X509Certificate) keyStore.getCertificate("entityCertificate");
+		        
+			
+		} catch (KeyStoreException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     /**
@@ -638,7 +648,7 @@ public class PolicyServer implements Serializable, Cloneable {
             e.printStackTrace();
         }
         this.applicationCertificate = certificate;
-        //    logger.debug("Application certificate loaded" + applicationCertificate);
+    //    logger.debug("Application certificate loaded" + applicationCertificate);
     }
 
     /**
@@ -688,22 +698,21 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     public void generateEntityCertificate(String entityName) {
-        generateEntityCertificate(entityName, null);
+    	generateEntityCertificate(entityName,null);
     }
-
+    
     /**
      * @param entityName
      * @param vmInformation
      */
     public void generateEntityCertificate(String entityName,
         VMInformation vmInformation) {
-
         /*
-           if (certificate != null) {
-           // Node certificate already generated
-           return;
-           }
-         */
+    	if (certificate != null) {
+            // Node certificate already generated
+            return;
+        }
+*/
         Object[] secret = null;
 
         // create node certificate
@@ -722,7 +731,7 @@ public class PolicyServer implements Serializable, Cloneable {
             name = new X509Name(order, vName);
 
             System.out.println("NAME X%)( genen " + name.toString());
-
+            
             secret = ProActiveSecurity.generateCertificate(name.toString(),
                     applicationCertificate.getSubjectDN().toString(),
                     applicationPrivateKey, applicationCertificate.getPublicKey());
@@ -740,7 +749,7 @@ public class PolicyServer implements Serializable, Cloneable {
 
     /**
      * Set application name
-     * @param applicationName
+     * @param applicationName 
      */
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
@@ -749,61 +758,59 @@ public class PolicyServer implements Serializable, Cloneable {
     public String getApplicationName() {
         return applicationName;
     }
-
+    
     public Object clone() throws CloneNotSupportedException {
-        // PolicyServer clone = (PolicyServer) super.clone();
-        PolicyServer clone = null;
+    	// PolicyServer clone = (PolicyServer) super.clone();
+    	PolicyServer clone = null;
+    	
+    	try {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bout);
+        
+        out.writeObject(this);
+        out.flush();
+        bout.close();
 
-        try {
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(bout);
+        byte[] byteArray = bout.toByteArray();
 
-            out.writeObject(this);
-            out.flush();
-            bout.close();
-
-            byte[] byteArray = bout.toByteArray();
-
-            bout.close();
-
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(
-                        bout.toByteArray()));
-
-            clone = (PolicyServer) ois.readObject();
-        } catch (IOException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODOSECURITYSECURITY Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        /*
-           clone.p = p;
-           certificates =certificates;
-           policy = policy;
-           VNName = VNName;
-           certificate = certificate;
-           privateKey = privateKey;
-           policies = policies;
-           applicationCertificate =applicationCertificate;
-           applicationPrivateKey = applicationPrivateKey;
-           applicationName = applicationName;
-         */
-        return clone;
+        bout.close();
+    	
+    	ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bout.toByteArray()));
+    	
+    	clone = (PolicyServer) ois.readObject();
+    	
+		} catch (IOException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODOSECURITYSECURITY Auto-generated catch block
+			e.printStackTrace();
+		}
+    	/*
+    	clone.p = p;
+         certificates =certificates;
+         policy = policy;
+         VNName = VNName;
+         certificate = certificate;
+         privateKey = privateKey;
+         policies = policies;
+         applicationCertificate =applicationCertificate;
+         applicationPrivateKey = applicationPrivateKey;
+        applicationName = applicationName;
+        */
+    	return clone;
+    	
     }
-
-    /**
-     * @return Returns the privateKey.
-     */
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
-
-    /**
-     * @param privateKey The privateKey to set.
-     */
-    public void setPrivateKey(PrivateKey privateKey) {
-        this.privateKey = privateKey;
-    }
+	/**
+	 * @return Returns the privateKey.
+	 */
+	public PrivateKey getPrivateKey() {
+		return privateKey;
+	}
+	/**
+	 * @param privateKey The privateKey to set.
+	 */
+	public void setPrivateKey(PrivateKey privateKey) {
+		this.privateKey = privateKey;
+	}
 }

@@ -1,7 +1,7 @@
 /*
  * Created on Oct 20, 2003
  * author : Matthieu Morel
- */
+  */
 package nonregressiontest.component;
 
 import org.apache.log4j.Logger;

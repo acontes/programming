@@ -18,8 +18,7 @@ public class TimedMigrationManagerWithMixedLocation
     extends MigrationManagerWithMixedLocation implements Serializable {
     protected double ttl;
     protected int maxMigrations;
-    protected Body myBody;
-
+protected  Body myBody;
     //   public TimedMigrationManagerWithMixedLocation() {
     //      super();
     //   }
@@ -51,9 +50,9 @@ public class TimedMigrationManagerWithMixedLocation
         System.out.println(
             "TimedMigrationManagerWithServer: starting migration to " +
             node.getNodeInformation().getURL());
-        if (myBody == null) {
-            this.myBody = body;
-        }
+if (myBody == null) {
+	this.myBody = body;
+}
         long startTime = System.currentTimeMillis();
         UniversalBody remote = super.migrateTo(node, body);
         long endTime = System.currentTimeMillis();
@@ -62,35 +61,36 @@ public class TimedMigrationManagerWithMixedLocation
         return remote;
     }
 
-    //    public void updateLocation(Body body) {
-    //        //        System.out.println("MigrationManagerWithMixedLocation.updateLocation " +
-    //        //        locationServer);
-    //        System.out.println(" Migration Counter is " + (this.migrationCounter) +
-    //            " maxMigrations is " + this.maxMigrations + " should update " +
-    //            (this.migrationCounter % maxMigrations));
-    //        if ((this.migrationCounter % maxMigrations) == 0) {
-    //            if (locationServer == null) {
-    //                this.locationServer = LocationServerFactory.getLocationServer();
-    //            }
-    //            System.out.println(
-    //                "MigrationManagerWithMixedLocation.updateLocation");
-    //            locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
-    //        }
-    //    }
+//    public void updateLocation(Body body) {
+//        //        System.out.println("MigrationManagerWithMixedLocation.updateLocation " +
+//        //        locationServer);
+//        System.out.println(" Migration Counter is " + (this.migrationCounter) +
+//            " maxMigrations is " + this.maxMigrations + " should update " +
+//            (this.migrationCounter % maxMigrations));
+//        if ((this.migrationCounter % maxMigrations) == 0) {
+//            if (locationServer == null) {
+//                this.locationServer = LocationServerFactory.getLocationServer();
+//            }
+//            System.out.println(
+//                "MigrationManagerWithMixedLocation.updateLocation");
+//            locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
+//        }
+//    }
+    
     public void updateLocation2(Body body) {
-        //        System.out.println("MigrationManagerWithMixedLocation.updateLocation " +
-        //        locationServer);
-        System.out.println(" Migration Counter is " + (this.migrationCounter) +
-            " maxMigrations is " + this.maxMigrations + " should update " +
-            (this.migrationCounter % maxMigrations));
-        if ((this.migrationCounter % maxMigrations) == 0) {
-            if (locationServer == null) {
-                this.locationServer = LocationServerFactory.getLocationServer();
-            }
-            System.out.println(
-                "MigrationManagerWithMixedLocation.updateLocation");
-            locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
-        }
+    	//        System.out.println("MigrationManagerWithMixedLocation.updateLocation " +
+    	//        locationServer);
+    	System.out.println(" Migration Counter is " + (this.migrationCounter) +
+    			" maxMigrations is " + this.maxMigrations + " should update " +
+    			(this.migrationCounter % maxMigrations));
+    	if ((this.migrationCounter % maxMigrations) == 0) {
+    		if (locationServer == null) {
+    			this.locationServer = LocationServerFactory.getLocationServer();
+    		}
+    		System.out.println(
+    		"MigrationManagerWithMixedLocation.updateLocation");
+    		locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
+    	}
     }
 
     private void readObject(ObjectInputStream in)

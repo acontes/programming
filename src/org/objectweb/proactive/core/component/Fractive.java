@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.core.component;
 
-import org.apache.log4j.Logger;
+import java.util.Hashtable;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -41,12 +43,12 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ParallelComposite;
@@ -54,13 +56,10 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-
-import java.util.Hashtable;
 
 
 /**
@@ -113,7 +112,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                                                          .createFcItfType(itfName,
                     itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
                     TypeFactory.COLLECTION);
-            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newActiveComponentInterfaceGroup(itf_type);
+            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type);
             return itf_ref_group;
         } catch (Exception e) {
             throw new ProActiveRuntimeException("Impossible to create a collective client interface ",
@@ -154,7 +153,8 @@ public class Fractive implements GenericFactory, Component, Factory {
                 }
                 Node[] nodes = contentDesc.getVirtualNode().getNodes();
                 if (nodes.length > 1) { // cyclic node
-                    Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
+                    //Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
+                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType());
                     Group group_of_components = ProActiveGroup.getGroup(components);
                     Proxy proxy = null;
 
@@ -194,24 +194,25 @@ public class Fractive implements GenericFactory, Component, Factory {
                 }
             }
 
-            // the following corresponds to the case when the component is created on the local vm or on a single node.
-            componentParameters.setStubOnReifiedObject(ao);
             // Find the proxy
             org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) ao).getProxy();
             if (myProxy == null) {
                 throw new ProActiveRuntimeException(
                     "Cannot find a Proxy on the stub object: " + ao);
             }
-            return ProActiveComponentRepresentativeFactory.instance()
-                                                          .createComponentRepresentative(componentParameters,
-                myProxy);
+            ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
+                                                                                                     .createComponentRepresentative(componentParameters.getComponentType(),
+                    myProxy);
+            representative.setStubOnBaseObject((StubObject) ao);
+            return representative;
         } catch (ActiveObjectCreationException e) {
             throw new InstantiationException(e.getMessage());
         } catch (NodeException e) {
             throw new InstantiationException(e.getMessage());
-        } catch (ClassNotReifiableException e) {
-            throw new InstantiationException(e.getMessage());
         } catch (ClassNotFoundException e) {
+            throw new InstantiationException(e.getMessage());
+        } catch (java.lang.InstantiationException e) {
+            e.printStackTrace();
             throw new InstantiationException(e.getMessage());
         }
     }
@@ -245,6 +246,35 @@ public class Fractive implements GenericFactory, Component, Factory {
             return newFcInstance(arg0, (ControllerDescription) arg1,
                 (ContentDescription) arg2);
         } catch (ClassCastException e) {
+            if ((arg0 == null) && (arg1 == null) && (arg2 instanceof Map)) {
+                // for compatibility with the new org.objectweb.fractal.util.Fractal class
+                return this;
+            }
+            if ((arg0 instanceof Type) &&
+                    (arg1 instanceof ControllerDescription) &&
+                    ((arg2 instanceof String) || (arg2 == null))) {
+                // for the ADL, when only type and ControllerDescription are given
+                return newFcInstance(arg0, arg1,
+                    (arg2 == null) ? null : new ContentDescription(
+                        (String) arg2));
+            }
+
+            // code compatibility with Julia
+            if ("composite".equals(arg1) && (arg2 == null)) {
+                return newFcInstance(arg0,
+                    new ControllerDescription(null, Constants.COMPOSITE), null);
+            }
+            if ("primitive".equals(arg1) && (arg2 instanceof String)) {
+                return newFcInstance(arg0,
+                    new ControllerDescription(null, Constants.PRIMITIVE),
+                    new ContentDescription((String) arg2));
+            }
+            if ("parallel".equals(arg1) && (arg2 == null)) {
+                return newFcInstance(arg0,
+                    new ControllerDescription(null, Constants.PARALLEL), null);
+            }
+
+            // any other case
             throw new InstantiationException(
                 "With this implementation, parameters must be of respective types : " +
                 Type.class.getName() + ',' +

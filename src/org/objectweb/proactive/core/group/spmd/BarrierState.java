@@ -32,70 +32,68 @@ package org.objectweb.proactive.core.group.spmd;
 
 import java.io.Serializable;
 
-
 /**
  * @author Laurent Baduel
  */
 public class BarrierState implements Serializable {
 
-    /** The number of calls awaited to finish the barrier */
-    private int awaitedCalls = 0;
+	/** The number of calls awaited to finish the barrier */
+	private int awaitedCalls = 0;
+	/** The number of calls already received */
+	private int receivedCalls = 0;
+	/** The local call is arrived ? */
+	private boolean localyCalled = false;
 
-    /** The number of calls already received */
-    private int receivedCalls = 0;
+	/**
+	 * Constructor
+	 */
+	public BarrierState() {}
 
-    /** The local call is arrived ? */
-    private boolean localyCalled = false;
+	/**
+	 * Returns the number of awaited calls to finish the barrier
+	 * @return the number of awaited calls to finish the barrier
+	 */
+	public int getAwaitedCalls() {
+		return this.awaitedCalls;
+	}
 
-    /**
-     * Constructor
-     */
-    public BarrierState() {
-    }
+	/**
+	 * Returns the number of received calls to finish the barrier
+	 * @return the number of received calls to finish the barrier
+	 */
+	public int getReceivedCalls() {
+		return this.receivedCalls;
+	}
 
-    /**
-     * Returns the number of awaited calls to finish the barrier
-     * @return the number of awaited calls to finish the barrier
-     */
-    public int getAwaitedCalls() {
-        return this.awaitedCalls;
-    }
+	/**
+	 * Sets the number of calls need to finish the barrier
+	 * @param nbCalls the number of calls need to finish the barrier
+	 */
+	public void setAwaitedCalls(int nbCalls) {
+		this.awaitedCalls = nbCalls;
+	}
 
-    /**
-     * Returns the number of received calls to finish the barrier
-     * @return the number of received calls to finish the barrier
-     */
-    public int getReceivedCalls() {
-        return this.receivedCalls;
-    }
+	/**
+	 * Increments the number of received calls to finish the barrier
+	 */
+	public void incrementReceivedCalls() {
+		this.receivedCalls++;
+	}
 
-    /**
-     * Sets the number of calls need to finish the barrier
-     * @param nbCalls the number of calls need to finish the barrier
-     */
-    public void setAwaitedCalls(int nbCalls) {
-        this.awaitedCalls = nbCalls;
-    }
+	
+	/**
+	 * Set the localy call state to <code>true</code>
+	 */
+	public void tagLocalyCalled() {
+		this.localyCalled = true;
+	}
 
-    /**
-     * Increments the number of received calls to finish the barrier
-     */
-    public void incrementReceivedCalls() {
-        this.receivedCalls++;
-    }
+	/**
+	 * Return <code>true</code> if the local barrier call was performed 
+	 * @return <code>true</code> if the local barrier call was performed, else return <code>false</code>
+	 */
+	public boolean isLocalyCalled () {
+		return this.localyCalled;
+	}
 
-    /**
-     * Set the localy call state to <code>true</code>
-     */
-    public void tagLocalyCalled() {
-        this.localyCalled = true;
-    }
-
-    /**
-     * Return <code>true</code> if the local barrier call was performed
-     * @return <code>true</code> if the local barrier call was performed, else return <code>false</code>
-     */
-    public boolean isLocalyCalled() {
-        return this.localyCalled;
-    }
 }

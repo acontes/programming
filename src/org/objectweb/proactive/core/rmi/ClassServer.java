@@ -171,8 +171,7 @@ public class ClassServer implements Runnable {
             try {
                 socket = server.accept();
                 ProActiveService service = (new ProActiveService(socket, paths));
-               // service.start();
-               this.threadPool.addAJob(service);
+               service.start();
             } catch (java.io.IOException e) {
                 System.out.println("Class Server died: " + e.getMessage());
                 e.printStackTrace();

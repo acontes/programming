@@ -1,5 +1,4 @@
 package org.objectweb.proactive.examples.components.helloworld;
-
 /***
  * Julia: France Telecom's implementation of the Fractal API
  * Copyright (C) 2001-2002 France Telecom R&D
@@ -22,15 +21,12 @@ package org.objectweb.proactive.examples.components.helloworld;
  *
  * Author: Eric Bruneton
  */
+
 import org.objectweb.fractal.api.control.AttributeController;
 
-
 public interface ServiceAttributes extends AttributeController {
-    String getHeader();
-
-    void setHeader(String header);
-
-    int getCount();
-
-    void setCount(int count);
+  String getHeader ();
+  void setHeader (String header);
+  int getCount ();
+  void setCount (int count);
 }

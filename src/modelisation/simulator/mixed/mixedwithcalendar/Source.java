@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 
 public class Source extends SimulatorElement {
+
     static Logger logger = Logger.getLogger(Source.class.getName());
     static Logger timeLogger = Logger.getLogger(Source.class.getName() +
             "Time");
@@ -110,12 +111,14 @@ public class Source extends SimulatorElement {
     }
 
     public void agentReached(int number) {
+
         //this.remainingTime = 0;
         this.currentLocation = number;
         this.endCommunication(simulator.getCurrentTime());
     }
 
     public void firstForwarderReached() {
+
         //if (this.tries ==1) {
         this.averagatorFirstForwarder.add(simulator.getCurrentTime() -
             this.endTime);
@@ -129,6 +132,7 @@ public class Source extends SimulatorElement {
     }
 
     public void update(double time) {
+
         //    if (this.remainingTime == 0) {
         switch (this.state) {
         case WAITING:
@@ -149,6 +153,7 @@ public class Source extends SimulatorElement {
             break;
         case CALLING_SERVER:
             this.state = WAITING_SERVER;
+
             // this.remainingTime = 5000000;
             this.server.receiveRequestFromSource(this.id);
             this.processingServerStartTime = time;
@@ -157,6 +162,7 @@ public class Source extends SimulatorElement {
             break;
         case WAITING_SERVER:
             this.state = COMMUNICATION;
+
             // this.remainingTime = 5000000;
             if (logger.isDebugEnabled()) {
                 logger.debug("Source: reply from server total " +
@@ -199,6 +205,7 @@ public class Source extends SimulatorElement {
     }
 
     public void startCommunication(double startTime) {
+
         // this.remainingTime = Double.MAX_VALUE;
         // this.notifyEvent();
         this.state = COMMUNICATION;
@@ -213,6 +220,7 @@ public class Source extends SimulatorElement {
     }
 
     public void endCommunication(double endTime) {
+
         //        this.start = false;
         this.state = WAITING;
         this.endTime = endTime;
@@ -320,6 +328,7 @@ public class Source extends SimulatorElement {
     }
 
     public String toString() {
+
         StringBuffer tmp = new StringBuffer("Source: ");
 
         switch (this.state) {

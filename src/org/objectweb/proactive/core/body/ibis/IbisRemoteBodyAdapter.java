@@ -1,33 +1,33 @@
 /*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
+* ################################################################
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
+*            Concurrent computing with Security and Mobility
+*
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s):
+*
+* ################################################################
+*/
 package org.objectweb.proactive.core.body.ibis;
 
 import org.apache.log4j.Logger;
@@ -76,7 +76,7 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
      * Cache the ID of the Body locally for speed
      */
     protected UniqueID bodyID;
-
+    
     /**
      * Cache the jobID locally for speed
      */
@@ -194,18 +194,19 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
     // -- implements UniversalBody -----------------------------------------------
     //
     public String getJobID() {
-        if (jobID == null) {
-            try {
-                jobID = proxiedRemoteBody.getJobID();
-            } catch (ibis.rmi.RemoteException e) {
-                e.printStackTrace();
-                return "";
-            }
-        }
-
-        return jobID;
+    	if (jobID == null) {
+    		try {
+    			jobID = proxiedRemoteBody.getJobID();
+    		} catch (ibis.rmi.RemoteException e) {
+    			e.printStackTrace();
+    			return "";
+    		}
+    	}
+    	
+    	return jobID;
     }
 
+    
     public void receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
         proxiedRemoteBody.receiveRequest(r);
@@ -390,25 +391,39 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
         return proxiedRemoteBody.getEntities();
     }
 
+	/**
+	 * Get information about the handlerizable object
+	 * @return information about the handlerizable object
+	 */
+	public String getHandlerizableInfo() throws java.io.IOException {
+		return "BODY of CLASS ["+ this.getClass()  +"]";
+	}
+
     /** Give a reference to a local map of handlers
      * @return A reference to a map of handlers
      */
-    public HashMap getHandlersLevel() {
+    public HashMap getHandlersLevel() throws java.io.IOException {
         return null;
     }
 
+	/** 
+	 * Clear the local map of handlers
+	 */
+	public void clearHandlersLevel() throws java.io.IOException {
+	}
+	
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      */
-    public void setExceptionHandler(Handler handler, Class exception) {
+    public void setExceptionHandler(Handler handler, Class exception) throws java.io.IOException {
     }
 
     /** Remove a handler from the table of the Handlerizable Object
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      * @return The removed handler or null
      */
-    public Handler unsetExceptionHandler(Class exception) {
+    public Handler unsetExceptionHandler(Class exception) throws java.io.IOException {
         return null;
     }
 

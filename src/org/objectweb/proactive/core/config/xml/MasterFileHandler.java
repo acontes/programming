@@ -30,27 +30,26 @@
  */
 package org.objectweb.proactive.core.config.xml;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-
 
 public class MasterFileHandler extends AbstractUnmarshallerDecorator
     implements MasterFileConstants {
-    //    static {
-    //        BasicConfigurator.configure();
-    //    }
+
+//    static {
+//        BasicConfigurator.configure();
+//    }
+
     protected static ProActiveConfiguration config;
 
     public MasterFileHandler() {
-        addHandler(PROPERTIES_TAG,
-            new PropertiesHandler(MasterFileHandler.config));
-        //addHandler(LOG4J_FILE_TAG, new Log4jConfigurationHandler());
+        addHandler(PROPERTIES_TAG, new PropertiesHandler(MasterFileHandler.config));
+		//addHandler(LOG4J_FILE_TAG, new Log4jConfigurationHandler());
     }
 
     /**
@@ -59,7 +58,7 @@ public class MasterFileHandler extends AbstractUnmarshallerDecorator
      */
     public static void createMasterFileHandler(String filename,
         ProActiveConfiguration config) {
-        MasterFileHandler.config = config;
+			MasterFileHandler.config = config;
         InitialHandler h = new InitialHandler();
         org.objectweb.proactive.core.xml.io.StreamReader sr;
         try {
@@ -73,11 +72,11 @@ public class MasterFileHandler extends AbstractUnmarshallerDecorator
 
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
-        //   System.out.println("End active handler");
+     //   System.out.println("End active handler");
     }
 
     public Object getResultObject() throws SAXException {
-        //  System.out.println("get result object");
+      //  System.out.println("get result object");
         return null;
     }
 

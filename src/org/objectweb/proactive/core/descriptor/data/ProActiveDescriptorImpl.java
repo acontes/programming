@@ -252,23 +252,29 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             //       prR.setProActiveSecurityManager(psm);
             //   } catch (ProActiveException e) {
             //       e.printStackTrace();
+            
             // set the security policyserver to the default proactive meta object
             PolicyServer clonedPolicyServer = null;
             try {
-                clonedPolicyServer = (PolicyServer) policyServer.clone();
-
-                clonedPolicyServer.generateEntityCertificate("HalfBody for " +
-                    policyServer.getApplicationName());
-
-                ProActiveSecurityManager psm = new ProActiveSecurityManager(clonedPolicyServer);
-                ProActiveMetaObjectFactory.newInstance()
-                                          .setProActiveSecurityManager(psm);
-            } catch (CloneNotSupportedException e1) {
-                e1.printStackTrace();
-            }
+            	 clonedPolicyServer = (PolicyServer) policyServer.clone();
+            	 
+            	 clonedPolicyServer.generateEntityCertificate("HalfBody for " + policyServer.getApplicationName());
+            	 
+            	 ProActiveSecurityManager psm = new ProActiveSecurityManager(clonedPolicyServer);
+            	 ProActiveMetaObjectFactory.newInstance().setProActiveSecurityManager(psm);
+            	 
+            	 
+			} catch (CloneNotSupportedException e1) {
+				e1.printStackTrace();
+			}
+            
+            
+            
         } catch (IOException e) {
+         
             e.printStackTrace();
         } catch (SAXException e) {
+       
             e.printStackTrace();
         }
     }

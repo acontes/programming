@@ -38,7 +38,7 @@ public class RuntimeAdapterImpl implements RuntimeAdapter {
 	
 	private RuntimeStrategyAdapter runtimeadapter;
 	
-	private static transient Logger logger = ProActive.xmlLogger;
+	private static transient Logger logger = Logger.getLogger("XML_HTTP");
 	
 	ProActiveRuntime remoteProActiveRuntime;
 	

@@ -11,27 +11,28 @@ public class Caller {
     public static void main(String[] args) {
         ObjetDistantInterface od = null;
         try {
-            od = (ObjetDistantInterface) Naming.lookup(args[0]);
+            od = (ObjetDistantInterface)Naming.lookup(args[0]);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        } catch (RemoteException e) {
+        }
+         catch (RemoteException e) {
             e.printStackTrace();
-        } catch (NotBoundException e) {
+        }
+         catch (NotBoundException e) {
             e.printStackTrace();
         }
         try {
             od.echo();
             od = null;
-            System.out.println("Calling gc at time " +
-                System.currentTimeMillis());
-            //  System.gc();
+            System.out.println("Calling gc at time " + System.currentTimeMillis());
+          //  System.gc();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-        }
+        
+      try {
+			  Thread.sleep(2000);
+		} catch (InterruptedException e) {
+		}
     }
 }

@@ -71,28 +71,29 @@ public interface VirtualMachine {
      */
     public String getName();
 
-    //    /**
-    //     * Sets the acquisitionMethod field to the given value
-    //     * @param s
-    //     */
-    //    public void setAcquisitionMethod(String s);
-    //
-    //    /**
-    //     * Returns the AcquisitionMethod value
-    //     * @return String
-    //     */
-    //    public String getAcquisitionMethod();
-    //    /**
-    //     * Sets the port number of the acquisition process
-    //     * @param s
-    //     */
-    //    public void setPortNumber(String s);
-    //
-    //    /**
-    //     * Return the Acquisition port number
-    //     * @param s
-    //     */
-    //    public String getPortNumber();
+//    /**
+//     * Sets the acquisitionMethod field to the given value
+//     * @param s
+//     */
+//    public void setAcquisitionMethod(String s);
+//
+//    /**
+//     * Returns the AcquisitionMethod value
+//     * @return String
+//     */
+//    public String getAcquisitionMethod();
+
+//    /**
+//     * Sets the port number of the acquisition process
+//     * @param s
+//     */
+//    public void setPortNumber(String s);
+//
+//    /**
+//     * Return the Acquisition port number
+//     * @param s
+//     */
+//    public String getPortNumber();
 
     /**
      * Sets the process mapped to this VirtualMachine to the given process
@@ -125,24 +126,25 @@ public interface VirtualMachine {
      */
     public String getCreatorId();
 
-    /**
-     * Returns true if this machine has been acquired false otherwise
-     * @return boolean if the machine result of a lookup
-     */
-    public boolean isAcquired();
-
-    /**
+	/**
+	 * Returns true if this machine has been acquired false otherwise 
+	 * @return boolean if the machine result of a lookup 
+	 */
+	public boolean isAcquired();
+	
+	/**
      * @param isAcquired The isAcquired to set.
      */
-    public void setAcquired(boolean isAcquired);
+    public void setAcquired(boolean isAcquired); 
+    
+	/**
+	 * @return Returns the remoteRuntime.
+	 */
+	public ProActiveRuntime getRemoteRuntime() ;
+	
+	/**
+	 * @param remoteRuntime The remoteRuntime to set.
+	 */
+	public void setRemoteRuntime(ProActiveRuntime remoteRuntime) ;
 
-    /**
-     * @return Returns the remoteRuntime.
-     */
-    public ProActiveRuntime getRemoteRuntime();
-
-    /**
-     * @param remoteRuntime The remoteRuntime to set.
-     */
-    public void setRemoteRuntime(ProActiveRuntime remoteRuntime);
 }

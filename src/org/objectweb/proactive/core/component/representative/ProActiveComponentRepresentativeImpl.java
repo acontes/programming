@@ -39,6 +39,8 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.api.control.NameController;
+import org.objectweb.fractal.api.control.SuperController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 
@@ -47,10 +49,13 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.controller.ProActiveSuperController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
+import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -61,25 +66,17 @@ import java.io.Serializable;
 public class ProActiveComponentRepresentativeImpl
     implements ProActiveComponentRepresentative, BindingController,
         LifeCycleController, ContentController, ComponentParametersController,
-        Interface, Serializable {
+        ProActiveSuperController, Interface, Serializable {
     protected static Logger logger = Logger.getLogger(ProActiveComponentRepresentativeImpl.class.getName());
     private Interface[] interfaceReferences;
     private Proxy proxy;
 
     //private ComponentParameters componentParameters;
     private ComponentType componentType = null; // immutable
-    private Object stubOnBaseObject = null; // kept for possible direct invocations on the base object
+    private StubObject stubOnBaseObject = null;
 
-    //	public ProActiveComponentRepresentativeImpl() {
-    //		// required for reification in group mechanism
-    //	}
-    public ProActiveComponentRepresentativeImpl(
-        ComponentParameters componentParameters, Proxy proxy) {
-        // set the reference to the proxy for delegating calls to the component metalevel of the active object
-        this.proxy = proxy;
-
-        componentType = componentParameters.getComponentType();
-        stubOnBaseObject = componentParameters.getStubOnReifiedObject();
+    public ProActiveComponentRepresentativeImpl(ComponentType componentType) {
+        this.componentType = componentType;
 
         // create the interface references tables
         // the size is the addition of :  
@@ -88,8 +85,7 @@ public class ProActiveComponentRepresentativeImpl
         // - the number of client functional interfaces
         // - the number of server functional interfaces
         interfaceReferences = new Interface[1 +
-            (componentParameters.getClientInterfaceTypes().length +
-            componentParameters.getServerInterfaceTypes().length)];
+            componentType.getFcInterfaceTypes().length];
 
         int i = 0;
 
@@ -100,15 +96,12 @@ public class ProActiveComponentRepresentativeImpl
         // add functional interfaces
         // functional interfaces are proxies on the corresponding meta-objects
         // 3. external functional interfaces
-        InterfaceType[] interface_types = componentParameters.getComponentType()
-                                                             .getFcInterfaceTypes();
+        InterfaceType[] interface_types = componentType.getFcInterfaceTypes();
         try {
             for (int j = 0; j < interface_types.length; j++) {
                 Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
                                                                                      .generateInterface(interface_types[j].getFcItfName(),
                         this, interface_types[j], false);
-
-                ((StubObject) interface_reference).setProxy(proxy);
 
                 // all calls are to be reified
                 interfaceReferences[i] = interface_reference;
@@ -216,8 +209,9 @@ public class ProActiveComponentRepresentativeImpl
      *see {@link  org.objectweb.fractal.api.Interface#getFcItfOwner()}
      */
     public Component getFcItfOwner() {
-        return (Component) reifyCall(Interface.class.getName(),
-            "getFcItfOwner", new Class[] {  }, new Object[] {  });
+        return this;
+        //        return (Component) reifyCall(Interface.class.getName(),
+        //            "getFcItfOwner", new Class[] {  }, new Object[] {  });
     }
 
     /**
@@ -243,7 +237,7 @@ public class ProActiveComponentRepresentativeImpl
         return false;
     }
 
-    private Object reifyCall(String className, String methodName,
+    protected Object reifyCall(String className, String methodName,
         Class[] parameterTypes, Object[] effectiveParameters) {
         try {
             return proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
@@ -266,29 +260,52 @@ public class ProActiveComponentRepresentativeImpl
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        if (interfaceName.equals(Constants.BINDING_CONTROLLER) ||
-                interfaceName.equals(Constants.CONTENT_CONTROLLER) ||
-                interfaceName.equals(Constants.LIFECYCLE_CONTROLLER) ||
-                interfaceName.equals(Constants.COMPONENT_PARAMETERS_CONTROLLER)) {
+        if (isControllerInterface(interfaceName)) {
             return this;
-        } else {
-            for (int i = 0; i < interfaceReferences.length; i++) {
-                if (interfaceReferences[i].getFcItfName() != null) {
-                    if (interfaceReferences[i].getFcItfName().equals(interfaceName)) {
+        }
+        for (int i = 0; i < interfaceReferences.length; i++) {
+            if (interfaceReferences[i].getFcItfName() != null) {
+                if (interfaceReferences[i].getFcItfName().equals(interfaceName) ||
+                        interfaceName.startsWith(
+                            interfaceReferences[i].getFcItfName())) {
+                    if (getProxy() instanceof ProxyForGroup) {
+                        //create a new group of called functional interfaces 
+                        try {
+                            StubObject stub_on_group_of_itfs = (StubObject) reifyCall(Component.class.getName(),
+                                    "getFcInterface",
+                                    new Class[] { String.class },
+                                    new Object[] { interfaceName });
+
+                            // create a component stub and affect the proxy containing the group resulting from the previous call
+                            ProActiveInterface result = (ProActiveInterface) interfaceReferences[i].getClass()
+                                                                                                   .newInstance();
+
+                            // fill in data
+                            result.setName(interfaceReferences[i].getFcItfName());
+                            result.setOwner(interfaceReferences[i].getFcItfOwner());
+                            result.setType(interfaceReferences[i].getFcItfType());
+                            // set proxy
+                            ((StubObject) result).setProxy(stub_on_group_of_itfs.getProxy());
+                            return result;
+                        } catch (Exception e) {
+                            throw new NoSuchInterfaceException(
+                                "could not generate a group of interfaces");
+                        }
+                    } else {
                         return interfaceReferences[i];
                     }
                 }
             }
-            throw new NoSuchInterfaceException(interfaceName);
         }
+        throw new NoSuchInterfaceException(interfaceName);
     }
 
     /**
      *see {@link  org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        // TODO implementation
-        throw new ProActiveRuntimeException("not yet implemented");
+        return (Object[]) reifyCall(Component.class.getName(),
+            "getFcInterfaces", new Class[] {  }, new Object[] {  });
     }
 
     /**
@@ -310,6 +327,11 @@ public class ProActiveComponentRepresentativeImpl
      */
     public void setProxy(Proxy proxy) {
         this.proxy = proxy;
+        for (int i = 0; i < interfaceReferences.length; i++) {
+            if (interfaceReferences[i] != this) {
+                ((StubObject) interfaceReferences[i]).setProxy(proxy);
+            }
+        }
     }
 
     /**
@@ -322,16 +344,27 @@ public class ProActiveComponentRepresentativeImpl
                 "can only compare proactive components to proactive components ");
             return false;
         }
-        return getID().equals(((ProActiveComponent) component).getID());
+        return getProxy().equals(((ProActiveComponentRepresentative)component).getProxy());
     }
 
     public int hashCode() {
         // should be cached maybe
-        return ((UniversalBodyProxy) getProxy()).getBodyID().hashCode();
+        if (!(getProxy() instanceof ProxyForGroup)) {
+            return ((UniversalBodyProxy) getProxy()).getBodyID().hashCode();
+        } else {
+            return super.hashCode();
+        }
     }
 
+    /**
+     * Only valid for a single element. return null for a group.
+     */
     public UniqueID getID() {
-        return ((UniversalBodyProxy) getProxy()).getBodyID();
+        if (!(getProxy() instanceof ProxyForGroup)) {
+            return ((UniversalBodyProxy) getProxy()).getBodyID();
+        } else {
+           return null;
+        }
     }
 
     /**
@@ -357,16 +390,23 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     /**
-     * see {@link org.objectweb.proactive.core.component.controller.ComponentParametersController#setComponentName(java.lang.String)}
+     * see {@link org.objectweb.fractal.api.control.NameController#setFcName(String name)}
      */
-    public void setComponentName(String componentName) {
-        reifyCall(ComponentParametersController.class.getName(),
-            "setComponentName", new Class[] { String.class },
-            new Object[] { componentName });
+    public void setFcName(String componentName) {
+        reifyCall(NameController.class.getName(), "setFcName",
+            new Class[] { String.class }, new Object[] { componentName });
     }
 
     /**
-     * @see org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()
+     * see {@link org.objectweb.fractal.api.control.NameController#getFcName()}
+     */
+    public String getFcName() {
+        return (String) reifyCall(NameController.class.getName(), "getFcName",
+            new Class[] {  }, new Object[] {  });
+    }
+
+    /**
+     * see {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()}
      */
     public Object getReferenceOnBaseObject() {
         return null;
@@ -378,5 +418,63 @@ public class ProActiveComponentRepresentativeImpl
     public ComponentRequestQueue getRequestQueue() {
         logger.error("only available in the meta-objects");
         return null;
+    }
+
+    /** (non-Javadoc)
+     * see {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
+     */
+    public Component getRepresentativeOnThis() {
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.fractal.api.control.SuperController#getFcSuperComponents()
+     */
+    public Component[] getFcSuperComponents() {
+        return (Component[]) reifyCall(SuperController.class.getName(),
+            "getFcSuperComponents", new Class[] {  }, new Object[] {  });
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.component.controller.ProActiveSuperController#addParent(org.objectweb.fractal.api.Component)
+     */
+    public void addParent(Component parent) {
+        reifyCall(ProActiveSuperController.class.getName(), "addParent",
+            new Class[] { Component.class }, new Object[] { parent });
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.component.controller.ProActiveSuperController#removed(org.objectweb.fractal.api.Component)
+     */
+    public void removeParent(Component parent) {
+        reifyCall(ProActiveSuperController.class.getName(), "removeParent",
+            new Class[] { Component.class }, new Object[] { parent });
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative#getStubOnReifiedObject()
+     */
+    public StubObject getStubOnBaseObject() {
+        return stubOnBaseObject;
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative#setStubOnReifiedObject(org.objectweb.proactive.core.mop.StubObject)
+     */
+    public void setStubOnBaseObject(StubObject stub) {
+        stubOnBaseObject = stub;
+    }
+
+    protected boolean isControllerInterface(String interfaceName) {
+        if (interfaceName.equals(Constants.BINDING_CONTROLLER) ||
+                interfaceName.equals(Constants.CONTENT_CONTROLLER) ||
+                interfaceName.equals(Constants.LIFECYCLE_CONTROLLER) ||
+                interfaceName.equals(Constants.COMPONENT_PARAMETERS_CONTROLLER) ||
+                interfaceName.equals(Constants.NAME_CONTROLLER) ||
+                interfaceName.equals(Constants.SUPER_CONTROLLER)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -68,7 +68,6 @@ public class RuntimeRegistrationEvent extends ProActiveEvent {
         this.registeredRuntimeName = registeredRuntimeName;
         this.protocol = protocol;
         this.vmName = vmName;
-        
     }
 
     public String getCreatorID() {

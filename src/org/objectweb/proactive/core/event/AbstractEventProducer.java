@@ -385,6 +385,5 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
             return null;
         }
     }
-
-    // end inner class WeakReferenceIterator
+     // end inner class WeakReferenceIterator
 }

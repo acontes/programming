@@ -1,47 +1,45 @@
 /*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
+* ################################################################
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
+*            Concurrent computing with Security and Mobility
+*
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s):
+*
+* ################################################################
+*/
 package testsuite.result;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import testsuite.exception.BadTypeException;
-
 import testsuite.test.AbstractTest;
-
-import java.text.DateFormat;
-
-import java.util.Calendar;
-import java.util.Date;
 
 
 /**
@@ -66,7 +64,7 @@ public class TestResult extends AbstractResult {
     public Node toXMLNode(Document document) {
         Element root = document.createElement("Result");
         root.setAttribute("type", getType() + "");
-
+        
         if (test != null) {
             root.setAttribute("failed", test.isFailed() + "");
 
@@ -145,14 +143,14 @@ public class TestResult extends AbstractResult {
         case 0:
         case -2:
             res = time() + " [MESSAGE] " +
-                ((test != null) ? (test.getName() + " : ") : "") +
+                ((test != null) ? (test.getName() + " : ") : "")  +
                 ((getMessage() != null) ? getMessage() : "No message") +
                 ((getException() != null) ? (" :\n" + getException()) : "");
             break;
         case 1:
         case -1:
             res = time() + " [RESULT] " +
-                ((test != null) ? (test.getName() + " : ") : "") +
+                ((test != null) ? (test.getName() + " : ") : "")  +
                 ((getMessage() != null) ? getMessage() : "No message") +
                 (((test != null) && test.isFailed()) ? " [FAILED]" : " [SUCCESS]") +
                 ((getException() != null) ? ("\nwith error :" + getException())

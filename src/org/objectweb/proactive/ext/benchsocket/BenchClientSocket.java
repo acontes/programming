@@ -3,14 +3,11 @@ package org.objectweb.proactive.ext.benchsocket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
-
 import java.nio.channels.SocketChannel;
-
 
 public class BenchClientSocket extends Socket {
     private static int counter;
@@ -18,8 +15,8 @@ public class BenchClientSocket extends Socket {
     private BenchOutputStream output;
     private BenchInputStream input;
     private int number;
-    private BenchFactory parent;
-
+	private BenchFactoryInterface parent;
+    
     public BenchClientSocket() throws IOException {
         synchronized (BenchClientSocket.class) {
             BenchClientSocket.counter++;
@@ -29,8 +26,7 @@ public class BenchClientSocket extends Socket {
         }
     }
 
-    public BenchClientSocket(Socket s, BenchFactory parent)
-        throws IOException {
+    public BenchClientSocket(Socket s, BenchFactoryInterface parent) throws IOException {
         synchronized (BenchClientSocket.class) {
             BenchClientSocket.counter++;
             this.number = BenchClientSocket.counter;
@@ -40,8 +36,7 @@ public class BenchClientSocket extends Socket {
         }
     }
 
-    public BenchClientSocket(String host, int port, BenchFactory parent)
-        throws IOException {
+    public BenchClientSocket(String host, int port, BenchFactoryInterface  parent) throws IOException {
         synchronized (BenchClientSocket.class) {
             BenchClientSocket.counter++;
             this.number = BenchClientSocket.counter;
@@ -51,7 +46,7 @@ public class BenchClientSocket extends Socket {
         }
     }
 
-    public BenchClientSocket(InetAddress address, int port, BenchFactory parent)
+    public BenchClientSocket(InetAddress address, int port, BenchFactoryInterface parent)
         throws IOException {
         synchronized (BenchClientSocket.class) {
             BenchClientSocket.counter++;
@@ -84,18 +79,19 @@ public class BenchClientSocket extends Socket {
         this.realSocket.bind(bindpoint);
     }
 
+
     public synchronized void close() throws IOException {
         if (this.input != null) {
             this.input.close();
-            this.input = null;
+            this.input=null;
         }
         if (this.output != null) {
             this.output.close();
             this.output = null;
         }
-        if (this.realSocket != null) {
-            this.realSocket.close();
-            this.realSocket = null;
+        if (this.realSocket!=null) {
+        this.realSocket.close();
+        this.realSocket=null;
         }
     }
 

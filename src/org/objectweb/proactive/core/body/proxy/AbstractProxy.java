@@ -1,43 +1,41 @@
 /*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
+* ################################################################
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
+*            Concurrent computing with Security and Mobility
+*
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s):
+*
+* ################################################################
+*/
 package org.objectweb.proactive.core.body.proxy;
 
-import org.apache.log4j.Logger;
+import java.util.HashMap;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
-
-import java.util.HashMap;
 
 
 public abstract class AbstractProxy implements Proxy, java.io.Serializable {
@@ -83,19 +81,34 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable {
         return mc.isOneWayCall();
     }
 
+	/**
+	 * Get information about the handlerizable object
+	 * @return information about the handlerizable object
+	 */
+	public String getHandlerizableInfo()  throws java.io.IOException {
+		return "PROXY of CLASS ["+ this.getClass()  +"]";
+	}
+	
     /** Give a reference to a local map of handlers
-     * @return A reference to a map of handlers
-     */
-    public HashMap getHandlersLevel() throws ProActiveException {
+    * @return A reference to a map of handlers
+    */
+    public HashMap getHandlersLevel() throws java.io.IOException {
         return proxyLevel;
     }
+
+	/** 
+	 * Clear the local map of handlers
+	 */
+	public void clearHandlersLevel() throws java.io.IOException {
+		 proxyLevel.clear();
+	}
 
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      */
     public void setExceptionHandler(Handler handler, Class exception)
-        throws ProActiveException {
+        throws java.io.IOException {
         // add handler to proxy level
         if (proxyLevel == null) {
             proxyLevel = new HashMap();
@@ -108,16 +121,15 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable {
      * @return The removed handler or null
      */
     public Handler unsetExceptionHandler(Class exception)
-        throws ProActiveException {
+        throws java.io.IOException {
         // remove handler from proxy level
         if (proxyLevel != null) {
             Handler handler = (Handler) proxyLevel.remove(exception);
             return handler;
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "[NFE_REMOVE_PROXY_WARNING] : handler for exception " +
-                    exception.getName() + "did not exist in PROXY level");
+                logger.debug("[NFE_WARNING] No handler for [" +
+                    exception.getName() + "] can be removed from PROXY level");
             }
             return null;
         }

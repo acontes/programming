@@ -213,28 +213,29 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 // else the vm was already created by another virtualNode, in that case, nothing is
                 // done at this point, nodes creation will occur when the runtime associated with the jvm
                 // will register.
-                if (!vmAlreadyAssigned) {
+                if (!vmAlreadyAssigned ) {
                     if (vm.isAcquired()) {
-                        String nodeName;
+                    	
+                    	String nodeName;
                         String[] nodeNames = null;
                         ProActiveRuntime proActiveRuntimeRegistered;
                         String nodeHost;
                         String protocol = null;
                         String url = null;
                         int port = 0;
-
-                        //                    	gets the registered runtime
+                       
+                    	
+//                    	gets the registered runtime
                         proActiveRuntimeRegistered = vm.getRemoteRuntime();
-
+                  
                         try {
                             protocol = UrlBuilder.getProtocol(proActiveRuntimeRegistered.getURL());
-                            url = UrlBuilder.removeProtocol(proActiveRuntimeRegistered.getURL(),
-                                    protocol);
-                        } catch (ProActiveException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        }
-
+							url = UrlBuilder.removeProtocol(proActiveRuntimeRegistered.getURL(),protocol);
+						} catch (ProActiveException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+                       
                         // get the host of nodes
                         nodeHost = proActiveRuntimeRegistered.getVMInformation()
                                                              .getInetAddress()
@@ -253,8 +254,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                                 nodeName = this.name +
                                     Integer.toString(new java.util.Random(
                                             System.currentTimeMillis()).nextInt());
-                                url = buildURL(nodeHost, nodeName, protocol,
-                                        port);
+                                url = buildURL(nodeHost, nodeName, protocol, port);
 
                                 // nodes are created from the registered runtime, since this virtualNode is
                                 // waiting for runtime registration to perform co-allocation in the jvm.
@@ -265,17 +265,19 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                                     nodePolicyServer.generateEntityCertificate(name);
                                 }
 
-                                proActiveRuntimeRegistered.createLocalNode(url,
-                                    false, nodePolicyServer, this.getName(),
-                                    this.jobID);
-                                performOperations(proActiveRuntimeRegistered,
-                                    url, protocol);
+                                proActiveRuntimeRegistered.createLocalNode(url, false,
+                                    nodePolicyServer, this.getName(), this.jobID);
+                                performOperations(proActiveRuntimeRegistered, url, protocol);
                             }
                         } catch (ProActiveException e) {
                             e.printStackTrace();
                         } catch (CloneNotSupportedException e) {
                             e.printStackTrace();
                         }
+                    
+                    	
+                    	
+                    	
                     } else {
                         setParameters(process, vm);
                         process.setSecurityFile(policyServerFile);
@@ -440,7 +442,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                     } catch (ProActiveException e1) {
                         e1.printStackTrace();
                     } catch (Exception e) {
-                        logger.info(" Virutal Machine " +
+                        logger.info(" Virtual Machine " +
                             part.getVMInformation().getVMID() + " on host " +
                             part.getVMInformation().getInetAddress()
                                 .getCanonicalHostName() + " terminated!!!");
@@ -585,7 +587,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                                                  .getCanonicalHostName();
 
             try {
-            	
                 port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
             } catch (ProActiveException e) {
                 logger.warn("port unknown: " + port);

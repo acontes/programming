@@ -38,9 +38,10 @@ import org.objectweb.proactive.core.component.controller.ComponentParametersCont
 
 import java.io.Serializable;
 
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 
 /**
@@ -53,17 +54,19 @@ import java.util.Vector;
  *         the inner components)
  *
  *
- *
  * @author Matthieu Morel
  */
 public class Bindings implements Serializable {
-    private Hashtable clientInterfaceBindings;
-    private Hashtable parallelInternalClientInterfaceBindings;
+    //	 In case of collective bindings, the interfaces of the collection can be : 
+    //	  1. named (as in Fractal 2.0 spec) : they are mapped in clientInterfaceBindings according to their name
+    //	  2. anonymous : they are put in a list which is mapped in clientInterfaceBindings with the type name of the collective interface 
+    private HashMap clientInterfaceBindings;
+    private HashMap parallelInternalClientInterfaceBindings;
 
     // key = interfaceName ; value = binding
     // if collective binding : key = interfaceName ; value = Vector (Binding objects)
     public Bindings() {
-        clientInterfaceBindings = new Hashtable();
+        clientInterfaceBindings = new HashMap();
     }
 
     /**
@@ -89,7 +92,7 @@ public class Bindings implements Serializable {
         }
     }
 
-    // returns either a Binding or a Vector of Binding objects (collection interface case)
+    // returns either a Binding or a List of Binding objects (collection interface case)
 
     /**
      * removes the binding on the given client interface
@@ -146,14 +149,18 @@ public class Bindings implements Serializable {
     }
 
     private void addCollectiveBinding(Map bindingsTable, Binding binding) {
-        String clientItfName = binding.getClientInterface().getFcItfName();
-        if (bindingsTable.containsKey(clientItfName)) {
-            // there should be a Vector for containing the bindings associated
-            ((Vector) bindingsTable.get(clientItfName)).add(binding);
-        } else { // we create a Vector for keeping the bindings
-            Vector bindings_collection = new Vector();
-            bindings_collection.add(binding);
-            bindingsTable.put(clientItfName, bindings_collection);
+        String client_itf_name = binding.getClientInterfaceName();
+        if (binding.getClientInterface().getFcItfName().equals(client_itf_name)) {
+            if (bindingsTable.containsKey(client_itf_name)) {
+                // there should be a List for containing the bindings associated
+                ((List) bindingsTable.get(client_itf_name)).add(binding);
+            } else { // we create a List for keeping the bindings
+                ArrayList bindings_collection = new ArrayList();
+                bindings_collection.add(binding);
+                bindingsTable.put(client_itf_name, bindings_collection);
+            }
+        } else {
+            bindingsTable.put(client_itf_name, binding);
         }
     }
 
@@ -163,7 +170,7 @@ public class Bindings implements Serializable {
 
     private void addCollectiveBindingOnInternalClientItf(Binding binding) {
         if (parallelInternalClientInterfaceBindings == null) {
-            parallelInternalClientInterfaceBindings = new Hashtable();
+            parallelInternalClientInterfaceBindings = new HashMap();
         }
         addCollectiveBinding(parallelInternalClientInterfaceBindings, binding);
     }

@@ -1,15 +1,15 @@
 package modelisation.simulator.mixed;
 
-import modelisation.simulator.common.SimulatorElement;
-
-import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+import modelisation.simulator.common.SimulatorElement;
+import org.apache.log4j.Logger;
 
 public class RequestQueue extends SimulatorElement {
-    protected static Logger logger = Logger.getLogger(RequestQueue.class.getName());
+
+protected static Logger logger = Logger.getLogger(RequestQueue.class.getName());
+
     protected ArrayList list;
     protected double youngestRequestCreationTime;
 
@@ -27,24 +27,22 @@ public class RequestQueue extends SimulatorElement {
     }
 
     protected void addRequestFromAgent(Request request) {
-        int number = request.getNumber();
-        ListIterator it = this.list.listIterator();
-        Request r = null;
+        int number        = request.getNumber();
+        ListIterator it   = this.list.listIterator();
+        Request r         = null;
         boolean shouldAdd = true;
         while (it.hasNext()) {
-            r = (Request) it.next();
+            r = (Request)it.next();
             if (r.isFromAgent()) {
                 if (r.getNumber() < number) {
                     it.remove();
                     shouldAdd = true;
-                } else {
+                } else
                     shouldAdd = false;
-                }
             }
         }
-        if (shouldAdd) {
+        if (shouldAdd)
             this.list.add(request);
-        }
     }
 
     public void updateYoungestCreationTime(Request request) {
@@ -54,21 +52,21 @@ public class RequestQueue extends SimulatorElement {
         //        } else if (tmp < this.youngestRequestCreationTime) {
         //            this.youngestRequestCreationTime = tmp;
         //        }
-        Request r = null;
-        double tmp = -1;
+        Request r       = null;
+        double tmp      = -1;
         ListIterator it = this.list.listIterator();
         while (it.hasNext()) {
-            r = (Request) it.next();
+            r = (Request)it.next();
             if (tmp == -1) {
-                tmp = r.getCreationTime();
+            	tmp = r.getCreationTime();
             } else if (r.getCreationTime() < tmp) {
                 tmp = r.getCreationTime();
             }
         }
         if (tmp == -1) {
-            this.youngestRequestCreationTime = 0;
+        	this.youngestRequestCreationTime = 0;
         } else {
-            this.youngestRequestCreationTime = tmp;
+        	this.youngestRequestCreationTime = tmp;
         }
     }
 
@@ -77,9 +75,9 @@ public class RequestQueue extends SimulatorElement {
      */
     public Request removeRequestFromAgent() {
         ListIterator it = this.list.listIterator();
-        Request r = null;
+        Request r       = null;
         while (it.hasNext()) {
-            r = (Request) it.next();
+            r = (Request)it.next();
             if (r.isFromAgent()) {
                 it.remove();
                 this.updateYoungestCreationTime(r);
@@ -94,9 +92,9 @@ public class RequestQueue extends SimulatorElement {
      */
     public Request removeRequestFromSource() {
         ListIterator it = this.list.listIterator();
-        Request r = null;
+        Request r       = null;
         while (it.hasNext()) {
-            r = (Request) it.next();
+            r = (Request)it.next();
             if (!r.isFromAgent()) {
                 it.remove();
                 this.updateYoungestCreationTime(r);
@@ -116,30 +114,31 @@ public class RequestQueue extends SimulatorElement {
 
     public boolean hasRequestFromAgent() {
         ListIterator it = this.list.listIterator();
-        Request r = null;
+        Request r       = null;
         while (it.hasNext()) {
-            r = (Request) it.next();
+            r = (Request)it.next();
             if (r.isFromAgent()) {
                 return true;
             }
         }
         return false;
     }
-
+    
     public Request getRequestFromAgent() {
-        ListIterator it = this.list.listIterator();
-        Request r = null;
+    	 ListIterator it = this.list.listIterator();
+        Request r       = null;
         while (it.hasNext()) {
-            r = (Request) it.next();
+            r = (Request)it.next();
             if (r.isFromAgent()) {
                 return r;
             }
         }
         return null;
+    	
     }
-
+    
     public double getYoungestCreationTime() {
-        return this.youngestRequestCreationTime;
+    	return this.youngestRequestCreationTime;
     }
 
     public void update(double time) {
@@ -147,10 +146,10 @@ public class RequestQueue extends SimulatorElement {
 
     public String toString() {
         StringBuffer tmp = new StringBuffer();
-        ListIterator it = this.list.listIterator();
-        Request r = null;
+        ListIterator it  = this.list.listIterator();
+        Request r        = null;
         while (it.hasNext()) {
-            r = (Request) it.next();
+            r = (Request)it.next();
             tmp.append(r);
             //            if (!r.isFromAgent()) {
             //                it.remove();
@@ -161,44 +160,44 @@ public class RequestQueue extends SimulatorElement {
     }
 
     public static void main(String[] args) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Creating requestQueue");
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("Creating requestQueue");
+}
         RequestQueue rq = new RequestQueue();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Adding a request from agent");
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("Adding a request from agent");
+}
         rq.addRequest(new Request(Request.AGENT, 2));
-        if (logger.isDebugEnabled()) {
-            logger.debug("Adding a request from source");
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("Adding a request from source");
+}
         rq.addRequest(new Request(Request.SOURCE, 5));
-        if (logger.isDebugEnabled()) {
-            logger.debug("------");
-            logger.debug("Length of the list " + rq.length());
-            logger.debug(rq);
-            logger.debug("------");
-            logger.debug("Adding a request from agent, should not be added");
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("------");
+        logger.debug("Length of the list " + rq.length());
+        logger.debug(rq);
+        logger.debug("------");
+        logger.debug("Adding a request from agent, should not be added");
+}
         rq.addRequest(new Request(Request.AGENT, 1));
-        if (logger.isDebugEnabled()) {
-            logger.debug("------");
-            logger.debug("Length of the list " + rq.length());
-            logger.debug(rq);
-            logger.debug("------");
-            logger.debug("Adding a request from agent, should be added");
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("------");
+        logger.debug("Length of the list " + rq.length());
+        logger.debug(rq);
+        logger.debug("------");
+        logger.debug("Adding a request from agent, should be added");
+}
         rq.addRequest(new Request(Request.AGENT, 7));
-        if (logger.isDebugEnabled()) {
-            logger.debug("------");
-            logger.debug("Length of the list " + rq.length());
-            logger.debug(rq);
-            logger.debug("------");
-            logger.debug("Removing request from agent");
-            logger.debug("Request is " + rq.removeRequestFromAgent());
-            logger.debug("Removing request fromm source");
-            logger.debug("Request is " + rq.removeRequestFromSource());
-            logger.debug("Length of the list " + rq.length());
-        }
+if (logger.isDebugEnabled()) {
+        logger.debug("------");
+        logger.debug("Length of the list " + rq.length());
+        logger.debug(rq);
+        logger.debug("------");
+        logger.debug("Removing request from agent");
+        logger.debug("Request is " + rq.removeRequestFromAgent());
+        logger.debug("Removing request fromm source");
+        logger.debug("Request is " + rq.removeRequestFromSource());
+        logger.debug("Length of the list " + rq.length());
+}
     }
 }

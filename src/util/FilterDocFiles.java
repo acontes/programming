@@ -46,6 +46,7 @@ public class FilterDocFiles {
         String html = new String(b);
         html = removeMarkedLine(html);
 
+        
         if (changeImagePath) {
             html = changeImagesPath(html);
         }
@@ -54,7 +55,7 @@ public class FilterDocFiles {
         } else {
             name = "__" + file.getName();
         }
-        b = html.getBytes();
+		b = html.getBytes();
         java.io.File newFile = new java.io.File(file.getParentFile(), name);
         newFile.delete();
         java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
@@ -95,6 +96,7 @@ public class FilterDocFiles {
             int gifIndex = html.indexOf(".gif\"", currentIndex);
             if (gifIndex == -1) {
                 break;
+                
             }
             newHtml.append(html.substring(currentIndex, gifIndex));
             newHtml.append("_pdf.gif");

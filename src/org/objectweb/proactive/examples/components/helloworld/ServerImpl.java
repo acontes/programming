@@ -2,7 +2,6 @@ package org.objectweb.proactive.examples.components.helloworld;
 
 import org.objectweb.proactive.ProActive;
 
-
 /***
  * Julia: France Telecom's implementation of the Fractal API
  * Copyright (C) 2001-2002 France Telecom R&D
@@ -25,39 +24,40 @@ import org.objectweb.proactive.ProActive;
  *
  * Author: Eric Bruneton
  */
+
 public class ServerImpl implements Service, ServiceAttributes {
-    private String header = "";
-    private int count = 0;
 
-    public void print(final String msg) {
-        System.out.println(
-            "print method on server implementation object on node : " +
-            ProActive.getBodyOnThis().getNodeURL());
-        new Exception() {
-                public String toString() {
-                    return "Server: print method called";
-                }
-            }.printStackTrace();
-        System.out.println("Server: begin printing...");
-        for (int i = 0; i < count; ++i) {
-            System.out.println(header + msg);
-        }
-        System.out.println("Server: print done.");
-    }
+  private String header = "";
 
-    public String getHeader() {
-        return header;
-    }
+  private int count = 0;
 
-    public void setHeader(final String header) {
-        this.header = header;
+  public void print (final String msg) {
+  	System.out.println("print method on server implementation object on node : " + ProActive.getBodyOnThis().getNodeURL());
+    new Exception() {
+      public String toString () {
+        return "Server: print method called";
+      }
+    }.printStackTrace();
+    System.out.println("Server: begin printing...");
+    for (int i = 0; i < count; ++i) {
+      System.out.println(header + msg);
     }
+    System.out.println("Server: print done.");
+  }
 
-    public int getCount() {
-        return count;
-    }
+  public String getHeader () {
+    return header;
+  }
 
-    public void setCount(final int count) {
-        this.count = count;
-    }
+  public void setHeader (final String header) {
+    this.header = header;
+  }
+  
+  public int getCount () {
+    return count;
+  }
+
+  public void setCount (final int count) {
+    this.count = count;
+  }
 }

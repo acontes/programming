@@ -17,8 +17,14 @@ public class MonitoredJVM extends BasicMonitoredObject {
     }
 
     public MonitoredJVM(String host, String name, int depth) {
-        super(JVM, "//" + host + "/" + name);
+        super(JVM, host + "/" + name);
         this.depth = depth;
+    }
+
+    public void copyInto(BasicMonitoredObject o) {
+        super.copyInto(o);
+        MonitoredJVM jvmObject = (MonitoredJVM) o;
+        jvmObject.depth = depth;
     }
 
     public int getDepth() {

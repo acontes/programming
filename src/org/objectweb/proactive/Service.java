@@ -387,6 +387,14 @@ public class Service {
     }
 
     /**
+     * true if and only if at least one request with the given name is available
+     * @return true if a request with the given name is available, false else.
+     */
+    public boolean hasRequestToServe(String methodName) {
+        return requestQueue.hasRequest(methodName);
+    }
+
+    /**
      * Returns the number of request(s) in the queue
      * @return the number of request(s) in the queue.
      */

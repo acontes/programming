@@ -1,37 +1,36 @@
 /*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
+* ################################################################
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
+*            Concurrent computing with Security and Mobility
+*
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s):
+*
+* ################################################################
+*/
 package org.objectweb.proactive.core.body;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.BodyEventListener;
@@ -57,6 +56,7 @@ public class LocalBodyStore {
     // -- STATIC MEMBERS -----------------------------------------------
     //
     static Logger logger = Logger.getLogger(LocalBodyStore.class.getName());
+    
     private static LocalBodyStore instance = new LocalBodyStore();
 
     //
@@ -83,7 +83,7 @@ public class LocalBodyStore {
      */
     private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
     private ThreadLocal bodyPerThread = new ThreadLocal();
-    private MetaObjectFactory halfBodyMetaObjectFactory = null;
+    private MetaObjectFactory halfBodyMetaObjectFactory = null ;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -106,15 +106,15 @@ public class LocalBodyStore {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    public synchronized MetaObjectFactory getHalfBodyMetaObjectFactory() {
-        if (this.halfBodyMetaObjectFactory == null) {
-            halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
-        }
+    public  synchronized MetaObjectFactory getHalfBodyMetaObjectFactory() {
+    	
+    	if (this.halfBodyMetaObjectFactory == null) {
+			halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
+    	}
         return halfBodyMetaObjectFactory;
     }
 
-    public synchronized void setHalfBodyMetaObjectFactory(
-        MetaObjectFactory factory) {
+    public synchronized void setHalfBodyMetaObjectFactory(MetaObjectFactory factory) {
         halfBodyMetaObjectFactory = factory;
     }
 
@@ -190,6 +190,7 @@ public class LocalBodyStore {
     public void addBodyEventListener(BodyEventListener listener) {
         bodyEventProducer.addBodyEventListener(listener);
     }
+
 
     /**
      * Removes a listener of body events.

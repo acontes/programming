@@ -66,7 +66,7 @@ public abstract class Solver {
             System.out.println("getPeers(" + problems.length + ")");
             root.getPeers(problems.length);
             Object[][] daugtherPbs = new Object[problems.length][2];
-            for (int i = 0; i < problems.length; i++) {
+            for (int i = 0; i < problems.length; i++){
                 daugtherPbs[i][0] = this.root;
                 daugtherPbs[i][1] = problems[i];
             }

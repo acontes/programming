@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.future;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -261,11 +262,21 @@ public class FuturePool extends Object implements java.io.Serializable {
         futures.addAutomaticContinuation(id, creatorID, bodyDest);
     }
 
-    public synchronized void waitForReply() {
+    public synchronized void waitForReply(long timeout)
+        throws ProActiveException {
         this.newState = false;
+        // variable used to know wether the timeout has expired or not
+        int timeoutCounter = 1;
         while (!newState) {
+            timeoutCounter--;
+            // counter < 0 means that it is the second time we enter in the loop
+            // while the state has not been changed, i.e timeout has expired
+            if (timeoutCounter < 0) {
+                throw new ProActiveException(
+                    "Timeout expired while waiting for future update");
+            }
             try {
-                wait();
+                wait(timeout);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

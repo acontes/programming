@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.body.future;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 
 
@@ -49,6 +50,16 @@ import org.objectweb.proactive.core.UniqueID;
 public interface Future extends LocalFuture {
     public boolean isAwaited();
 
+    /**
+     * Blocks the calling thread until the future object is available or the timeout expires
+     * @param timeout
+     * @throws ProActiveException if the timeout expires
+     */
+    public void waitFor(long timeout) throws ProActiveException;
+
+    /**
+     * Blocks the calling thread until the future object is available.
+     */
     public void waitFor();
 
     public Throwable getRaisedException();

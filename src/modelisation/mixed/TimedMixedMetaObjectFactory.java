@@ -52,8 +52,8 @@ public class TimedMixedMetaObjectFactory extends MixedLocationMetaObjectFactory 
                 isOneWay, sequenceID, server);
         }
     }
+     // end inner class TimedRequestWithLocationServerFactory
 
-    // end inner class TimedRequestWithLocationServerFactory
     protected static class TimedMigrationManagerFactoryImpl
         implements MigrationManagerFactory, java.io.Serializable {
         public TimedMigrationManagerFactoryImpl() {
@@ -63,16 +63,13 @@ public class TimedMixedMetaObjectFactory extends MixedLocationMetaObjectFactory 
         public MigrationManager newMigrationManager() {
             System.out.println(
                 "TimedMixedMetaObjectFactory creating migrationManager");
-            System.out.println("TimedMixedMetaObjectFactory ttl = " +
-                System.getProperty("modelisation.ttl"));
-            System.out.println("TimedMixedMetaObjectFactory ttu = " +
-                System.getProperty("modelisation.maxMigrations"));
+            System.out.println("TimedMixedMetaObjectFactory ttl = " + System.getProperty("modelisation.ttl"));
+            System.out.println("TimedMixedMetaObjectFactory ttu = " + System.getProperty("modelisation.maxMigrations"));
             return new TimedMigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer(),
                 Double.parseDouble(System.getProperty("modelisation.ttl")),
                 Integer.parseInt(System.getProperty(
                         "modelisation.maxMigrations")));
         }
     }
-
-    // end inner class MigrationManagerFactoryImpl
+     // end inner class MigrationManagerFactoryImpl
 }

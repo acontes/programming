@@ -1,7 +1,6 @@
 package modelisation.mixed;
 
 import modelisation.ModelisationBench;
-
 import modelisation.statistics.ExponentialLaw;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
@@ -19,23 +18,24 @@ public class Bench extends ModelisationBench
         super();
     }
 
-    //    public static AgentWithExponentialMigrationMixed startExponentialAgent(
-    //        double d, Node[] nodes, String nodeName, long lifeTime) {
-    //        AgentWithExponentialMigrationMixed agent = null;
-    //        Object[] args = new Object[3];
-    //        args[0] = new Double(d);
-    //        args[1] = nodes;
-    //        args[2] = new Long(lifeTime);
-    //        System.out.println("NODES SIZE = " + nodes.length);
-    //        try {
-    //            agent = (AgentWithExponentialMigrationMixed) ProActive.newActive(AgentWithExponentialMigrationMixed.class.getName(),
-    //                    args, NodeFactory.getNode(nodeName), null,
-    //                    TimedMixedMetaObjectFactory.newInstance());
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //        }
-    //        return agent;
-    //    }
+//    public static AgentWithExponentialMigrationMixed startExponentialAgent(
+//        double d, Node[] nodes, String nodeName, long lifeTime) {
+//        AgentWithExponentialMigrationMixed agent = null;
+//        Object[] args = new Object[3];
+//        args[0] = new Double(d);
+//        args[1] = nodes;
+//        args[2] = new Long(lifeTime);
+//        System.out.println("NODES SIZE = " + nodes.length);
+//        try {
+//            agent = (AgentWithExponentialMigrationMixed) ProActive.newActive(AgentWithExponentialMigrationMixed.class.getName(),
+//                    args, NodeFactory.getNode(nodeName), null,
+//                    TimedMixedMetaObjectFactory.newInstance());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return agent;
+//    }
+
     public static AgentWithExponentialMigrationMixed startExponentialAgent(
         double d, Node[] nodes, long lifeTime) {
         AgentWithExponentialMigrationMixed agent = null;
@@ -148,7 +148,7 @@ public class Bench extends ModelisationBench
         Object[] param = new Object[] { agent, expo, benchTime };
         try {
             bench = (Bench) ProActive.newActive(Bench.class.getName(), param,
-                    (Node) null, null, TimedMixedMetaObjectFactory.newInstance());
+                   (Node)  null, null, TimedMixedMetaObjectFactory.newInstance());
         } catch (Exception e) {
             e.printStackTrace();
         }

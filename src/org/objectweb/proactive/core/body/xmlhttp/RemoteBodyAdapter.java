@@ -88,7 +88,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      * The port of the Runntime where the body is located
      */
     protected int port;
-    private static Logger logger = ProActive.xmlLogger;
+    private static Logger logger =  Logger.getLogger("XML_HTTP");
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -499,7 +499,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         return reply.processMessage();
     }
 
-    public HashMap getHandlersLevel() throws ProActiveException {
+    public HashMap getHandlersLevel() {
         String methodName = "getHandlersLevel";
         ArrayList paramsList = new ArrayList();
 
@@ -523,8 +523,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         sendRequest(req);
     }
 
-    public Handler unsetExceptionHandler(Class exception)
-        throws ProActiveException {
+    public Handler unsetExceptionHandler(Class exception) {
         String methodName = "unsetExceptionHandler";
         ArrayList paramsList = new ArrayList();
 
@@ -539,8 +538,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class)
      */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws ProActiveException {
+    public void setExceptionHandler(Handler handler, Class exception) {
         // TODO Auto-generated method stub
     }
 
@@ -551,4 +549,21 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         // TODO Auto-generated method stub
         return null;
     }
+
+    // TODO TODO
+
+    /** 
+     * Clear the local map of handlers
+     */
+    public void clearHandlersLevel() throws java.io.IOException {
+    }
+
+    /**
+     * Get information about the handlerizable object
+     * @return
+     */
+    public String getHandlerizableInfo() throws java.io.IOException {
+	return "TODO";
+    }
+
 }

@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.p2p.core.service;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
@@ -40,17 +41,18 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.p2p.core.service.KnownTable.KnownTableElement;
 
-import java.io.Serializable;
-
-
 /**
  * @author Alexandre di Costanzo
- *
+ *  
  */
 public class Updater implements RunActive, Serializable {
+
     protected static Logger logger = Logger.getLogger(Updater.class.getName());
+
     private KnownTable knownTable = null;
+
     private P2PServiceImpl service = null;
+
     private String serviceName = null;
 
     public Updater() {
@@ -75,21 +77,23 @@ public class Updater implements RunActive, Serializable {
                 // Host responds ??
                 if (!ping(element.getP2PService())) {
                     if (logger.isInfoEnabled()) {
-                        logger.info("No reply from " + element.getKey());
+                        logger.info("No reply from "+element.getKey());
                     }
-                    this.service.unregisterP2PService((String) element.getKey());
+                    this.service
+                            .unregisterP2PService((String) element.getKey());
                     continue;
                 }
 
                 long currentTime = System.currentTimeMillis();
                 if ((currentTime + P2PService.TTU) >= element.getLastUpdate()) {
                     // Register
-                    element.getP2PService().registerP2PService(this.service.getServiceName(),
-                        this.service, this.service.getLoad(), false);
+                    element.getP2PService().registerP2PService(
+                            this.service.getServiceName(), this.service,
+                            this.service.getLoad(), false);
                 } else {
                     // Unregister
                     if (logger.isInfoEnabled()) {
-                        logger.info("TTU expired for " + element.getKey());
+                        logger.info("TTU expired for "+element.getKey());
                     }
                     this.service.unregisterP2PService(element.getP2PService());
                 }
@@ -98,17 +102,18 @@ public class Updater implements RunActive, Serializable {
             // How many peers ?
             if (this.knownTable.size() < P2PService.NOA) {
                 try {
-                    ProActiveRuntime[] newFriends = this.service.getProActiveJVMs(P2PService.NOA,
-                            1);
+                    ProActiveRuntime[] newFriends = this.service
+                            .getProActiveJVMs(P2PService.NOA, 1);
 
                     for (int i = 0; i < newFriends.length; i++) {
                         String url = newFriends[i].getURL();
-                        P2PService remote = P2PServiceImpl.getRemoteP2PService(url.replaceFirst(
-                                    "PA_JVM.*", ""));
+                        P2PService remote = P2PServiceImpl
+                                .getRemoteP2PService(url.replaceFirst(
+                                        "PA_JVM.*", ""));
                         if (url.compareTo(this.serviceName) != 0) {
                             int load = remote.getLoad();
                             this.service.registerP2PService(url, remote, load,
-                                false);
+                                    false);
                         }
                     }
                 } catch (NodeException e) {

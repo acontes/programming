@@ -45,7 +45,7 @@ public class ProActiveXMLUtils {
     private static final String PROACTIVE_ERROR = "Error";
     private static int tries = 0;
   
-    private static transient Logger logger = ProActive.xmlLogger;
+    private static transient Logger logger = Logger.getLogger("XML_HTTP");
     /**
     *
     * @param o
@@ -141,7 +141,7 @@ public class ProActiveXMLUtils {
         String action) {
         byte[] message = getMessage(obj);
         logger.info("-----------------------------------------------------");
-        logger,info(ProActiveXMLUtils.getName()+ "----------"+);
+        logger.info(ProActiveXMLUtils.getName()+ "----------");
         logger.info("-----------------------------------------------------");
         return sendMessage(url, port, message, action);
     }

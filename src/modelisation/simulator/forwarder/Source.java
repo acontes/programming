@@ -3,16 +3,21 @@ package modelisation.simulator.forwarder;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
 
-
 public class Source {
+
+
     public static final int WAITING = 0;
     public static final int COMMUNICATION = 1;
     public static final int WAITING_FOR_AGENT = 2;
     public static final int TENSIONING = 3;
+
     private int state;
+
     private double startTime;
     private double endTime;
+
     private double remainingTime;
+
     private double lambda;
     protected RandomNumberGenerator expoLambda;
 
@@ -25,24 +30,23 @@ public class Source {
     }
 
     public void waitBeforeCommunication() {
-        if (this.expoLambda == null) {
-            this.expoLambda = RandomNumberFactory.getGenerator("lambda");
-            this.expoLambda.initialize(lambda, 8936917);
-        }
-        double time = expoLambda.next() * 1000;
-
-        //        double time = 1/lambda*1000;
+      if (this.expoLambda == null) {
+                this.expoLambda = RandomNumberFactory.getGenerator("lambda");
+                this.expoLambda.initialize(lambda,  8936917);
+            }
+       double time = expoLambda.next() * 1000;
+//        double time = 1/lambda*1000;
         System.out.println("Source: calling the agent in  " + time);
         this.state = WAITING;
         this.remainingTime = time;
     }
 
+
     public void startCommunication(double startTime, double length) {
         this.state = COMMUNICATION;
         this.remainingTime = length;
         this.startTime = startTime;
-        System.out.println("Source: communication started will last   " +
-            remainingTime);
+        System.out.println("Source: communication started will last   " + remainingTime);
     }
 
     public void continueCommunication(double length) {
@@ -63,12 +67,11 @@ public class Source {
         this.state = TENSIONING;
     }
 
+
     public void endCommunication(double endTime) {
         this.state = WAITING;
         this.endTime = endTime;
-        System.out.println(
-            "TimedProxyWithLocationServer:  .............. done after " +
-            (endTime - startTime));
+        System.out.println("TimedProxyWithLocationServer:  .............. done after " + (endTime - startTime));
     }
 
     /**
@@ -87,6 +90,7 @@ public class Source {
         this.lambda = v;
     }
 
+
     /**
      * Get the value of state.
      * @return Value of state.
@@ -94,6 +98,7 @@ public class Source {
     public int getState() {
         return state;
     }
+
 
     public double getRemainingTime() {
         return this.remainingTime;
@@ -109,11 +114,24 @@ public class Source {
 
     public String toString() {
         switch (state) {
-        case WAITING:return "waiting";
-        case COMMUNICATION:return "calling agent";
-        case WAITING_FOR_AGENT:return "waiting for agent";
-        case TENSIONING:return "tensioning";
+            case WAITING:
+                {
+                    return "waiting";
+                }
+            case COMMUNICATION:
+                {
+                    return "calling agent";
+                }
+           case WAITING_FOR_AGENT:
+                {
+                    return "waiting for agent";
+                }
+            case TENSIONING:
+                {
+                    return "tensioning";
+                }
         }
         return null;
     }
+
 }

@@ -72,4 +72,6 @@ public interface VMInformation extends java.io.Serializable, Job {
      * Sets an Identifier for the process that originates this VM creation
      */
     public void setCreationProtocolID(String protocolId);
+    
+    
 }

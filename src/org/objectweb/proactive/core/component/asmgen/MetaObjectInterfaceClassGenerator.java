@@ -45,8 +45,8 @@ import java.io.Serializable;
 
 import java.lang.reflect.Method;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Vector;
 
 
 /**
@@ -127,14 +127,14 @@ public class MetaObjectInterfaceClassGenerator
             }
 
             //isPrimitive = ((ProActiveComponent) owner).getHierarchicalType().equals(ComponentParameters.PRIMITIVE);
-            interfacesToImplement = new Vector();
+            interfacesToImplement = new ArrayList();
 
             // add functional interface
             interfacesToImplement.add(Class.forName(
                     interfaceType.getFcItfSignature()));
 
             // add Serializable interface
-            interfacesToImplement.addElement(Serializable.class);
+            interfacesToImplement.add(Serializable.class);
 
             this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectClassName(fcInterfaceName,
                     interfaceType.getFcItfSignature());

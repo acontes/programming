@@ -16,7 +16,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
-
 // import org.objectweb.proactive.core.node.*;
 import java.io.IOException;
 import java.io.Serializable;

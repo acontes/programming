@@ -121,7 +121,6 @@ public class HostPanel extends AbstractDataObjectPanel
                     if (controller.isLayoutAutomatic()) {
                         return;
                     }
-
                     //ebe repaint worlpanel on host drag
                     HostPanel.this.parentDataObjectPanel.revalidate();
                     HostPanel.this.parentDataObjectPanel.repaint();

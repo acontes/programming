@@ -1,33 +1,33 @@
-/*
+/* 
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, 
  *            Concurrent computing with Security and Mobility
- *
+ * 
  * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive-support@inria.fr
- *
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *
+ *  
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *
+ *  
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
+ *  Contributor(s): 
+ * 
  * ################################################################
- */
+ */ 
 package org.objectweb.proactive.core.component.xml;
 
 import org.objectweb.fractal.api.Component;
@@ -116,18 +116,15 @@ public class ParallelCompositeComponentHandler
                         // then instantiate the component and add a stub on it to the cache
                         VirtualNode vn = deploymentDescriptor.getVirtualNode(virtualNode);
 
-                        if (vn.getNodeCount() == 0) {
-                            throw new NodeException(
-                                "no node defined for the virtual node " +
-                                vn.getName());
-                        }
-                        if (logger.isDebugEnabled()) {
-                            if (vn.getNodeCount() > 1) {
-                                logger.debug(
-                                    "creating a parallel composite component on a virtual node mapped onto several nodes will actually create the component on the first retreived node");
-                            }
-                        }
-
+						if (vn.getNodeCount() == 0) {
+						   throw new NodeException(
+							   "no node defined for the virtual node " + vn.getName());
+					   }
+					   if (logger.isDebugEnabled()) {
+						   if (vn.getNodeCount() > 1) {
+							   logger.debug("creating a parallel composite component on a virtual node mapped onto several nodes will actually create the component on the first retreived node");							
+						   }
+					   }
                         // get corresponding node (1st one if there are several nodes)
                         Node targeted_node = vn.getNode();
                         parallel = cf.newFcInstance(componentType,
@@ -142,7 +139,6 @@ public class ParallelCompositeComponentHandler
                                 controllerDescription.getName());
                         }
                     }
-
                     // add sub components
                     List sub_components_names = (List) getHandler(name)
                                                            .getResultObject();
@@ -170,6 +166,7 @@ public class ParallelCompositeComponentHandler
                     // - when a client interface of an internal component
                     // 	and a client interface of the parallel component have the same name,
                     // they are automatically bound together
+                    
                     //ProActiveInterface[] parallel_component_interfaces = (ProActiveInterface[])component.getFcInterfaces();
                     //Vector functional_interfaces_names_vector = new Vector();
                     InterfaceType[] current_component_interfaces = componentType.getFcInterfaceTypes();

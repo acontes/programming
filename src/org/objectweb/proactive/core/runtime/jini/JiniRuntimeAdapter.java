@@ -30,6 +30,12 @@
  */
 package org.objectweb.proactive.core.runtime.jini;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.rmi.RemoteException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -44,16 +50,6 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.rmi.RemoteException;
-
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
@@ -237,26 +233,26 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
             // behavior to be defined
         }
     }
-
+    
     public void addParent(String proActiveRuntimeName) {
-        try {
-            jiniRuntime.addParent(proActiveRuntimeName);
+    	try {
+    		jiniRuntime.addParent(proActiveRuntimeName);
         } catch (RemoteException re) {
-            // hum ...
-            re.printStackTrace();
+        	// hum ...
+        	re.printStackTrace();
         }
     }
 
     public String[] getParents() {
-        try {
-            return jiniRuntime.getParents();
-        } catch (RemoteException re) {
-            // hum ...
-            re.printStackTrace();
-            return new String[0];
-        }
+    	try {
+    		return jiniRuntime.getParents();
+    	} catch (RemoteException re) {
+        	// hum ...
+        	re.printStackTrace();
+        	return new String[0];
+        }	
     }
-
+    
     public void killRT(boolean softly) throws Exception {
         try {
             jiniRuntime.killRT(softly);
