@@ -1,5 +1,5 @@
 /*
- * Created on 26 juin 2004
+ * Created on 26
  *
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
@@ -7,7 +7,6 @@
 package org.objectweb.proactive.core.runtime.http;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -25,14 +24,10 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
-
 import java.io.IOException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
-
 import java.security.cert.X509Certificate;
-
 import java.util.ArrayList;
 
 
@@ -40,7 +35,9 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     private static transient Logger logger = Logger.getLogger("XML_HTTP");
     private HttpRuntimeAdapter runtimeadapter;
 
-    //private VMInformation vmInformation;
+    //this boolean is used when killing the runtime. Indeed in case of co-allocation, we avoid a second call to the runtime
+    // which is already dead
+    protected boolean alreadykilled = false;
 
     /**
      *
@@ -48,36 +45,32 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
      */
     public HttpRemoteRuntimeAdapterImpl(HttpRuntimeAdapter newruntimeadapter,
         String newurl) {
-
-     	logger.debug("URL de l'adapter = " + newurl);
-    	runtimeadapter = newruntimeadapter;
-    	runtimeadapter.url = newurl;
-    	createURL();
-    	logger.debug("New Remote XML Adapter : " + runtimeadapter.url +
-                " port = " + runtimeadapter.port);
+        logger.debug("URL de l'adapter = " + newurl);
+        runtimeadapter = newruntimeadapter;
+        runtimeadapter.url = newurl;
+        createURL();
+        logger.debug("New Remote XML Adapter : " + runtimeadapter.url +
+            " port = " + runtimeadapter.port);
     }
-    
-    public void createURL() {	
-    
-    	/* !!! */
-    	if (!runtimeadapter.url.startsWith("http:")) {
-    	  	runtimeadapter.url = "http:" + runtimeadapter.url;
+
+    public void createURL() {
+        /* !!! */
+        if (!runtimeadapter.url.startsWith("http:")) {
+            runtimeadapter.url = "http:" + runtimeadapter.url;
         }
+
         if (runtimeadapter.port == 0) {
-        	runtimeadapter.port = UrlBuilder.getPortFromUrl(runtimeadapter.url);
+            runtimeadapter.port = UrlBuilder.getPortFromUrl(runtimeadapter.url);
         }
-        try {
-			runtimeadapter.url = "http://"+UrlBuilder.getHostNameAndPortFromUrl(runtimeadapter.url);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-        runtimeadapter.vmInformation = runtimeadapter.vmInformation;
-    
+        try {
+            runtimeadapter.url = "http://" +
+                UrlBuilder.getHostNameAndPortFromUrl(runtimeadapter.url);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
-  
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
@@ -144,8 +137,6 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             Object o = sendRequest(new RuntimeRequest("killAllNodes"));
         } catch (Exception re) {
             throw new ProActiveException(re);
-
-            // behavior to be defined
         }
     }
 
@@ -157,8 +148,6 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             Object o = sendRequest(new RuntimeRequest("killNode", params));
         } catch (Exception re) {
             throw new ProActiveException(re);
-
-            // behavior to be defined
         }
     }
 
@@ -171,8 +160,6 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             Object o = sendRequest(new RuntimeRequest("createVM", params));
         } catch (Exception re) {
             throw new ProActiveException(re);
-
-            // behavior to be defined
         }
     }
 
@@ -182,26 +169,18 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
                     "getLocalNodeNames"));
         } catch (Exception re) {
             throw new ProActiveException(re);
-
-            // behavior to be defined
         }
     }
 
     public VMInformation getVMInformation() {
-        //return vmInformation;
-        if (runtimeadapter.vmInformation == null) {
-            try {
-                return (VMInformation) sendRequest(new RuntimeRequest(
-                        "getVMInformation"));
-            } catch (Exception re) {
-                //throw new ProActiveException(re);
-                re.printStackTrace();
-
-                // behavior to be defined
-            }
+        try {
+            return (VMInformation) sendRequest(new RuntimeRequest(
+                    "getVMInformation"));
+        } catch (Exception re) {
+            //throw new ProActiveException(re);
+            re.printStackTrace();
         }
 
-        //return runtimeadapter.getVMInformation();
         return null;
     }
 
@@ -231,8 +210,6 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             //runtimeadapter.register(proActiveRuntimeDist, proActiveRuntimeName, creatorID, creationProtocol, vmName);
         } catch (Exception e) {
             e.printStackTrace();
-
-            // behavior to be defined
         }
     }
 
@@ -259,24 +236,24 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     }
 
     public void killRT(boolean softly) throws Exception {
-        if (!runtimeadapter.alreadykilled) {
+        if (!alreadykilled) {
             ArrayList params = new ArrayList();
             params.add(new Boolean(softly));
 
             try {
                 sendRequest(new RuntimeRequest("killRT", params));
             } catch (HTTPRemoteException e) {
-            	// do nothing (results from distant System.exit(0))
+                // do nothing (results from distant System.exit(0))
             } catch (Exception e) {
                 throw new ProActiveException(e);
             }
         }
 
-        runtimeadapter.alreadykilled = true;
+        alreadykilled = true;
     }
 
     public String getURL() throws ProActiveException {
-    	return runtimeadapter.getStrategyURL();
+        return runtimeadapter.getStrategyURL();
     }
 
     public ArrayList getActiveObjects(String nodeName)
@@ -348,8 +325,7 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         try {
             sendRequest(new RuntimeRequest("unregisterAllVirtualNodes"));
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	e.printStackTrace();
         }
     }
 
@@ -591,6 +567,7 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             return (String[]) sendRequest(new RuntimeRequest("getParents"));
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }

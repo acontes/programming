@@ -1,12 +1,12 @@
 /*
  * Created on
  *
- * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.objectweb.proactive.core.runtime.http;
- 
+
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -29,39 +29,33 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationTargetException;
+
 import java.net.UnknownHostException;
 
 import java.security.cert.X509Certificate;
 
 import java.util.ArrayList;
-  
+
 
 public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
+    
+	private static transient Logger logger = Logger.getLogger("XML_HTTP");
     protected int port = ClassServer.getServerSocketPort();
     protected String url = ClassServer.getUrl();
-
-    //this boolean is used when killing the runtime. Indeed in case of co-allocation, we avoid a second call to the runtime
-    // which is already dead
-    protected boolean alreadykilled = false;
-
-    private static transient Logger logger = Logger.getLogger("XML_HTTP");
     private transient ProActiveRuntime runtimestrategyadapter;
-    protected VMInformation vmInformation;
 
+    //protected VMInformation vmInformation;
     public HttpRuntimeAdapter() {
-        
         runtimestrategyadapter = ProActiveRuntimeImpl.getProActiveRuntime();
 
         String host = getVMInformation().getInetAddress().getCanonicalHostName();
-        
-        //runtimeadapter.url = "http://"+host+":"+runtimeadapter.port;
-        url = UrlBuilder.buildUrl(host,"","http:",port);
-        
-        logger.debug("url adapter = " + url);
-        
-    } 
 
-    /** 
+        //runtimeadapter.url = "http://"+host+":"+runtimeadapter.port;
+        url = UrlBuilder.buildUrl(host, "", "http:", port);
+        logger.debug("url de l adapter runtime = " + url);
+    }
+
+    /**
      *
      * @param url
      */
@@ -75,34 +69,31 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, PolicyServer ps, String vname,
         String jobId) throws NodeException {
-    	
-    	if(runtimestrategyadapter instanceof ProActiveRuntime){
-    		
+        if (runtimestrategyadapter instanceof ProActiveRuntime) {
             try {
                 String nodeURL = null;
 
                 try {
                     nodeURL = buildNodeURL(nodeName);
                 } catch (UnknownHostException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
 
                 //      then take the name of the node
                 String name = UrlBuilder.getNameFromUrl(nodeURL);
                 runtimestrategyadapter.createLocalNode(name,
-                    replacePreviousBinding, ps, vname, jobId); 
-     
+                    replacePreviousBinding, ps, vname, jobId);
+
                 return nodeURL;
             } catch (NodeException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+
             return null;
-    	}
-    	else
-        return runtimestrategyadapter.createLocalNode(nodeName,
-            replacePreviousBinding, ps, vname, jobId);
+        } else {
+            return runtimestrategyadapter.createLocalNode(nodeName,
+                replacePreviousBinding, ps, vname, jobId);
+        }
     }
 
     public void killAllNodes() throws ProActiveException {
@@ -147,7 +138,6 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     public String getURL() throws ProActiveException {
-    	
         return this.url;
     }
 
@@ -204,7 +194,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         runtimestrategyadapter.setProActiveSecurityManager(ps);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCreatorCertificate()
      */
     public X509Certificate getCreatorCertificate() throws ProActiveException {
@@ -215,22 +205,22 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         return runtimestrategyadapter.getVNName(nodename);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#setDefaultNodeVirtualNodeName(java.lang.String)
      */
     public void setDefaultNodeVirtualNodeName(String s)
         throws ProActiveException {
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#updateLocalNodeVirtualName()
      */
     public void listVirtualNodes() throws ProActiveException {
-    	//  remoteProActiveRuntime.updateLocalNodeVirtualName();
-    	this.runtimestrategyadapter.listVirtualNodes();
+        //  remoteProActiveRuntime.updateLocalNodeVirtualName();
+        this.runtimestrategyadapter.listVirtualNodes();
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
      */
     public PolicyServer getNodePolicyServer(String nodeName)
@@ -238,14 +228,14 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         return runtimestrategyadapter.getNodePolicyServer(nodeName);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#enableSecurityIfNeeded()
      */
     public void enableSecurityIfNeeded() throws ProActiveException {
         runtimestrategyadapter.enableSecurityIfNeeded();
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodeCertificate(java.lang.String)
      */
     public X509Certificate getNodeCertificate(String nodeName)
@@ -290,43 +280,39 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         return runtimestrategyadapter.getJobID(nodeUrl);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addParent(java.lang.String)
      */
     public void addParent(String proActiveRuntimeName) {
-       this.runtimestrategyadapter.addParent(proActiveRuntimeName);
+        this.runtimestrategyadapter.addParent(proActiveRuntimeName);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getParents()
      */
     public String[] getParents() {
         return this.runtimestrategyadapter.getParents();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
-     */
     public SecurityContext getPolicy(SecurityContext sc)
         throws ProActiveException, SecurityNotAvailableException {
-         return this.runtimestrategyadapter.getPolicy(sc);
+        return this.runtimestrategyadapter.getPolicy(sc);
     }
-/*
+
+    /*
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
         out.defaultWriteObject();
     }*/
-
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.runtimestrategyadapter = new HttpRemoteRuntimeAdapterImpl(this,
-                this.url);
+        this.runtimestrategyadapter = new HttpRemoteRuntimeAdapterImpl(this,this.url);
     }
 
     protected String buildNodeURL(String url)
         throws java.net.UnknownHostException {
-         int i = url.indexOf('/');
+        int i = url.indexOf('/');
 
         if (i == -1) {
             //it is an url given by a descriptor
@@ -335,35 +321,29 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 
             return UrlBuilder.buildUrl(host, url, "http:", port);
         } else {
-        	
-        	i = url.indexOf('/',7);
-        	String computerName = url.substring(7,i);
-        	if(computerName.indexOf(':') == -1){
-        		//no port
-        		computerName = computerName+":"+port;
-        		url= "http://"+computerName+url.substring(i);
-        	}
-           return UrlBuilder.checkUrl(url);
+            i = url.indexOf('/', 7);
+
+            String computerName = url.substring(7, i);
+
+            if (computerName.indexOf(':') == -1) {
+                //no port
+                computerName = computerName + ":" + port;
+                url = "http://" + computerName + url.substring(i);
+            }
+
+            return UrlBuilder.checkUrl(url);
         }
-        //return UrlBuilder.checkUrl(url);
     }
 
-    public String [] getNodesNames() throws ProActiveException {
-    	
-    	if(runtimestrategyadapter instanceof ProActiveRuntime)
-    		return runtimestrategyadapter.getLocalNodeNames();
-    	else
-    		return ((HttpRemoteRuntimeAdapterImpl)runtimestrategyadapter).getNodesNames();
+    public String[] getNodesNames() throws ProActiveException {
+        if (runtimestrategyadapter instanceof ProActiveRuntime) {
+            return runtimestrategyadapter.getLocalNodeNames();
+        } else {
+            return ((HttpRemoteRuntimeAdapterImpl) runtimestrategyadapter).getNodesNames();
+        }
     }
-    
-    
-    public String getStrategyURL(){
-    	//createURL();
+
+    public String getStrategyURL() {
         return url;
-
     }
-
-   
-    
-    
 }
