@@ -168,22 +168,11 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
         try {
             o = java.rmi.Naming.lookup(url);
         } catch (java.rmi.NotBoundException e) { // there are one rmiregistry on target computer but node isn t bound
-        	
-        	//logger.info("\n------------------\n Lookup rmi NotBoundException --> test with http protocole\n------------------\n ");
-        	// if notboundexception we test with http protocol
-        	//return org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
-        	// this exception is in  http.RemoteBodyAdapter.lookup	
-        	
-        	
         	throw new java.io.IOException("The url " + url +
         	 	 " is not bound to any known object");
         }
-        /*catch (java.rmi.ConnectException e) {
-        	logger.info("\n------------------\n Lookup rmi ConnectException --> test with http protocole\n------------------\n ");
-        	// if ConnectException we test with http protocol
-        	return org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
-        }*/
-       
+        //catch (java.rmi.ConnectException e)
+
         if (o instanceof RemoteBody) {
             try {
                 return new RemoteBodyAdapter((RemoteBody) o);
