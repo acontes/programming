@@ -11,7 +11,7 @@ import java.io.IOException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
-import org.objectweb.proactive.core.runtime.xmlhttp.HttpRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.http.HttpRuntimeAdapter;
 
 
 /**

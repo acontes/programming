@@ -16,7 +16,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
+import org.objectweb.proactive.core.runtime.http.RuntimeReply;
 import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 import org.objectweb.proactive.ext.webservices.utils.ReflectRequest;

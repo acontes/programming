@@ -9,8 +9,8 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.xmlhttp.BodyRequest;
 import org.objectweb.proactive.core.body.xmlhttp.XMLHTTPMessage;
-import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
-import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeRequest;
+import org.objectweb.proactive.core.runtime.http.RuntimeReply;
+import org.objectweb.proactive.core.runtime.http.RuntimeRequest;
 
 import sun.rmi.server.MarshalInputStream;
 import sun.rmi.server.MarshalOutputStream;

@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.rmi.ClassServer;
-import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
+import org.objectweb.proactive.core.runtime.http.RuntimeReply;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 import org.objectweb.proactive.ext.security.Communication;
