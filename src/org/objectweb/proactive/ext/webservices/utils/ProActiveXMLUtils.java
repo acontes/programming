@@ -47,6 +47,8 @@ public class ProActiveXMLUtils {
     private static int tries = 0;
     public static final String ACTION_EXCEPTION = "Exception";
     private static transient Logger logger = Logger.getLogger("XML_HTTP");
+    public static final String SERVICE_REQUEST_URI = "/ProActiveHTTP";
+    public static final String SERVICE_REQUEST_CONTENT_TYPE = "application/java";
 
     /**
     *
@@ -176,7 +178,7 @@ public class ProActiveXMLUtils {
             	
             }
 
-            URL u = new URL(url);
+            URL u = new URL(url + SERVICE_REQUEST_URI);
 
             HttpURLConnection connection = (HttpURLConnection) u.openConnection();
             connection.setDoOutput(true);
@@ -184,7 +186,7 @@ public class ProActiveXMLUtils {
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Length", "" +
                 message.length);
-            connection.setRequestProperty("Content-Type", "text/xml");
+            connection.setRequestProperty("Content-Type", SERVICE_REQUEST_CONTENT_TYPE);
             connection.setRequestProperty("ProActive-Action", action);
             connection.setUseCaches(false);
 
