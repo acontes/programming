@@ -918,7 +918,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @exception java.io.IOException if the reply cannot be accepted
      */
     protected abstract void internalReceiveReply(Reply reply)
-        throws java.io.IOException;
+        throws java.io.IOException;   
 
     protected void setLocalBodyImpl(LocalBodyStrategy localBody) {
         localBodyStrategy = localBody;

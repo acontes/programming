@@ -282,9 +282,11 @@ public abstract class BodyImpl extends AbstractBody
          * before serving, which is correctly done by all methods of the Service class.
          * However, this condition is not ensured for custom calls on serve. */
         public void serve(Request request) {
+        	//System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             if (request == null) {
                 return;
             }
+            
             try {
                 messageEventProducer.notifyListeners(request,
                     MessageEvent.SERVING_STARTED, bodyID,
@@ -357,6 +359,7 @@ public abstract class BodyImpl extends AbstractBody
 					messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT, destinationBodyId, getRequestQueue().size());
 				}
 				this.getFuturePool().registerDestination(request.getSender());
+	
 				reply.send(request.getSender());
 				this.getFuturePool().removeDestination();
             } catch (java.io.IOException e) {

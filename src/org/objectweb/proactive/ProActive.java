@@ -1,7 +1,7 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
+ * ProActive: The Java(TM) library for Parallel, Distributed, 
  *            Concurrent computing with Security and Mobility
  *
  * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis

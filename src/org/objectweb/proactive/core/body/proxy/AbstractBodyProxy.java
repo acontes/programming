@@ -175,7 +175,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     protected Object reifyAsAsynchronous(MethodCall methodCall)
         throws Exception, RenegotiateSessionException {
         StubObject futureobject = null;
-
         // Creates a stub + FutureProxy for representing the result
         try {
             futureobject = (StubObject) MOP.newInstance(methodCall.getReifiedMethod()
