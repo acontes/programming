@@ -65,11 +65,7 @@ public class XMLHTTPProcess {
         String action = null;
         try {
             byte[] source = new byte[info.contentLength];
-
-            int totalRead = 0;
-            while (totalRead != source.length) {
-            	totalRead += in.read(source, totalRead, source.length - totalRead);
-            }
+            in.readFully(source);
             
             /* Get what is in the  request */
             result = ProActiveXMLUtils.unwrapp(source, info.action);

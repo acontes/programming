@@ -67,7 +67,7 @@ public class ProActiveService extends Thread {
             out = new java.io.DataOutputStream(socket.getOutputStream());
 
             // get the headers information in order to determine what is the service requested
-            java.io.DataInputStream in = new java.io.DataInputStream(socket.getInputStream());
+            HTTPInputStream in = new HTTPInputStream(new BufferedInputStream(socket.getInputStream()));
             info = getInfo(in);
             
             //If  there is no field application then it is a call to the 
@@ -138,13 +138,13 @@ public class ProActiveService extends Thread {
      * Returns the path to the class file obtained from
      * parsing the HTML header.
      */
-    private static RequestInfo getInfo(java.io.DataInputStream in)
+    private static RequestInfo getInfo(HTTPInputStream in)
         throws java.io.IOException {
         RequestInfo info = new RequestInfo();
         String line = null;
 
         do {
-            line = in.readLine();
+            line = in.getLine();
 
             if (line.startsWith("GET /")) {
                 info.path = getPath(line);
