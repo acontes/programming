@@ -36,7 +36,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 
-public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
+public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     private static transient Logger logger = Logger.getLogger("XML_HTTP");
     private HttpRuntimeAdapter runtimeadapter;
 

@@ -6,6 +6,7 @@
  */
 package org.objectweb.proactive.core.runtime.http;
  
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -16,6 +17,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.UnknownHostException;
 
 import java.security.cert.X509Certificate;
 
@@ -41,13 +44,22 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     // which is already dead
     protected boolean alreadykilled = false;
 
-    //private static transient Logger logger = ProActive.xmlLogger;
-    private transient HttpRuntimeStrategyAdapter runtimestrategyadapter;
+    private static transient Logger logger = Logger.getLogger("XML_HTTP");
+    private transient ProActiveRuntime runtimestrategyadapter;
     protected VMInformation vmInformation;
 
     public HttpRuntimeAdapter() {
-        runtimestrategyadapter = new HttpRuntimeAdapterImpl(this);
-    }
+        
+        runtimestrategyadapter = ProActiveRuntimeImpl.getProActiveRuntime();
+
+        String host = getVMInformation().getInetAddress().getCanonicalHostName();
+        
+        //runtimeadapter.url = "http://"+host+":"+runtimeadapter.port;
+        url = UrlBuilder.buildUrl(host,"","http:",port);
+        
+        logger.debug("url adapter = " + url);
+        
+    } 
 
     /** 
      *
@@ -63,6 +75,32 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, PolicyServer ps, String vname,
         String jobId) throws NodeException {
+    	
+    	if(runtimestrategyadapter instanceof ProActiveRuntime){
+    		
+            try {
+                String nodeURL = null;
+
+                try {
+                    nodeURL = buildNodeURL(nodeName);
+                } catch (UnknownHostException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+
+                //      then take the name of the node
+                String name = UrlBuilder.getNameFromUrl(nodeURL);
+                runtimestrategyadapter.createLocalNode(name,
+                    replacePreviousBinding, ps, vname, jobId); 
+     
+                return nodeURL;
+            } catch (NodeException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null;
+    	}
+    	else
         return runtimestrategyadapter.createLocalNode(nodeName,
             replacePreviousBinding, ps, vname, jobId);
     }
@@ -109,7 +147,8 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     public String getURL() throws ProActiveException {
-        return runtimestrategyadapter.getURL();
+    	
+        return this.url;
     }
 
     public ArrayList getActiveObjects(String nodeName)
@@ -311,7 +350,10 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 
     public String [] getNodesNames() throws ProActiveException {
     	
-       	return runtimestrategyadapter.getNodesNames();
+    	if(runtimestrategyadapter instanceof ProActiveRuntime)
+    		return runtimestrategyadapter.getLocalNodeNames();
+    	else
+    		return ((HttpRemoteRuntimeAdapterImpl)runtimestrategyadapter).getNodesNames();
     }
     
     
