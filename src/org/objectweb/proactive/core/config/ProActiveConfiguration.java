@@ -8,8 +8,8 @@
  * Contact: proactive-support@inria.fr
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public 
- * License as published by the Free Software Foundation; either 
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
@@ -127,33 +127,32 @@ public class ProActiveConfiguration {
         loadDefaultProperties();
     }
 
-//    /**
-//     * Dump loaded properties, i.e properties found in the configuration file
-//     */
-//    public void dumpLoadedProperties() {
-//        Iterator it = loadedProperties.keySet().iterator();
-//        while (it.hasNext()) {
-//            String name = (String) it.next();
-//
-//            //            System.out.println("Name = " + name);
-//            //            System.out.println("Value = " + this.loadedProperties.get(name));
-//        }
-//    }
-//
-//    /**
-//     * Dump properties added to the system, i.e loaded properties
-//     * which were not already in the system
-//     */
-//    public void dumpAddedProperties() {
-//        Iterator it = addedProperties.keySet().iterator();
-//        while (it.hasNext()) {
-//            String name = (String) it.next();
-//
-//            //            System.out.println("Name = " + name);
-//            //            System.out.println("Value = " + this.addedProperties.get(name));
-//        }
-//    }
-
+    //    /**
+    //     * Dump loaded properties, i.e properties found in the configuration file
+    //     */
+    //    public void dumpLoadedProperties() {
+    //        Iterator it = loadedProperties.keySet().iterator();
+    //        while (it.hasNext()) {
+    //            String name = (String) it.next();
+    //
+    //            //            System.out.println("Name = " + name);
+    //            //            System.out.println("Value = " + this.loadedProperties.get(name));
+    //        }
+    //    }
+    //
+    //    /**
+    //     * Dump properties added to the system, i.e loaded properties
+    //     * which were not already in the system
+    //     */
+    //    public void dumpAddedProperties() {
+    //        Iterator it = addedProperties.keySet().iterator();
+    //        while (it.hasNext()) {
+    //            String name = (String) it.next();
+    //
+    //            //            System.out.println("Name = " + name);
+    //            //            System.out.println("Value = " + this.addedProperties.get(name));
+    //        }
+    //    }
     public static String getLocationServerClass() {
         return System.getProperty("proactive.locationserver");
     }
@@ -199,6 +198,9 @@ public class ProActiveConfiguration {
         setProperty("schema.validation", "disable");
         if (System.getProperty("log4j.configuration") == null) {
             loadLogger();
+        }
+        if (System.getProperty("proactive.communication.protocol").equals("rmi")) {
+            setProperty("proactive.rmi.port", "1099");
         }
     }
 

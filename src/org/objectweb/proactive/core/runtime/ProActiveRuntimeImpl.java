@@ -51,12 +51,17 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+
+//
 import java.io.File;
 import java.io.IOException;
+
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -215,6 +220,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         String jobId) throws NodeException {
         //Node node = new NodeImpl(this,nodeName);
         //System.out.println("node created with name "+nodeName+"on proActiveruntime "+this);
+        
         if (replacePreviousBinding) {
             if (nodeMap.get(nodeName) != null) {
                 nodeMap.remove(nodeName);
@@ -291,7 +297,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getLocalNodeNames()
      */
     public String[] getLocalNodeNames() {
-        System.out.println("get LocalNodeNames");
         int i = 0;
         String[] nodeNames;
         synchronized (nodeMap) {
@@ -317,14 +322,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) {
-    	
         //System.out.println("register in Impl");
         //System.out.println("thread"+Thread.currentThread().getName());
         //System.out.println(vmInformation.getVMID().toString());
         proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
-        
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
-            proActiveRuntimeName, creatorID, creationProtocol, vmName);
+            proActiveRuntimeDist, creatorID, creationProtocol, vmName);
     }
 
     /**
@@ -390,37 +393,36 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     public ArrayList getActiveObjects(String nodeName) {
-        // we have to clone the array otherwise modifications done on nodeMap
-        // would be reflected on the temp variable bodyArray
-        ArrayList bodyArray = (ArrayList) ((ArrayList) nodeMap.get(nodeName)).clone();
-
         //the array to return
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        for (int i = 0; i < bodyArray.size(); i++) {
-            UniqueID bodyID = (UniqueID) bodyArray.get(i);
+        ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+        synchronized (bodyList) {
+        	for (int i = 0; i < bodyList.size(); i++) {
+        		UniqueID bodyID = (UniqueID) bodyList.get(i);
 
-            //check if the body is still on this vm
-            Body body = localBodystore.getLocalBody(bodyID);
-            if (body == null) {
-                runtimeLogger.warn("body null");
-                // the body with the given ID is not any more on this ProActiveRuntime
-                // unregister it from this ProActiveRuntime
-                unregisterBody(nodeName, bodyID);
-            } else {
-                //the body is on this runtime then return adapter and class name of the reified
-                //object to enable the construction of stub-proxy couple.
-                ArrayList bodyAndObjectClass = new ArrayList(2);
+        		//check if the body is still on this vm
+        		Body body = localBodystore.getLocalBody(bodyID);
+        		if (body == null) {
+        			runtimeLogger.warn("body null");
+        			// the body with the given ID is not any more on this ProActiveRuntime
+        			// unregister it from this ProActiveRuntime
+        			unregisterBody(nodeName, bodyID);
+        		} else {
+        			//the body is on this runtime then return adapter and class name of the reified
+        			//object to enable the construction of stub-proxy couple.
+        			ArrayList bodyAndObjectClass = new ArrayList(2);
 
-                //adapter
-                bodyAndObjectClass.add(0, body.getRemoteAdapter());
-                //className
-                bodyAndObjectClass.add(1,
-                    body.getReifiedObject().getClass().getName());
-                localBodies.add(bodyAndObjectClass);
-            }
+        			//adapter
+        			bodyAndObjectClass.add(0, body.getRemoteAdapter());
+        			//className
+        			bodyAndObjectClass.add(1,
+        					body.getReifiedObject().getClass().getName());
+        			localBodies.add(bodyAndObjectClass);
+        		}
+        	}
+        	return localBodies;
         }
-        return localBodies;
     }
 
     public VirtualNode getVirtualNode(String virtualNodeName) {
@@ -452,35 +454,34 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return (String) nodeJobIdMap.get(name);
     }
 
-    public ArrayList getActiveObjects(String nodeName, String objectName) {
-        // we have to clone the array otherwise modifications done on nodeMap
-        // would be reflected on the temp variable bodyArray
-        ArrayList bodyArray = (ArrayList) ((ArrayList) nodeMap.get(nodeName)).clone();
-
+    public ArrayList getActiveObjects(String nodeName, String className) {
         //the array to return
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        for (int i = 0; i < bodyArray.size(); i++) {
-            UniqueID bodyID = (UniqueID) bodyArray.get(i);
+    	ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+        synchronized (bodyList) {
+        	for (int i = 0; i < bodyList.size(); i++) {
+        		UniqueID bodyID = (UniqueID) bodyList.get(i);
 
-            //check if the body is still on this vm
-            Body body = localBodystore.getLocalBody(bodyID);
-            if (body == null) {
-                runtimeLogger.warn("body null");
-                // the body with the given ID is not any more on this ProActiveRuntime
-                // unregister it from this ProActiveRuntime
-                unregisterBody(nodeName, bodyID);
-            } else {
-                String objectClass = body.getReifiedObject().getClass().getName();
+        		//check if the body is still on this vm
+        		Body body = localBodystore.getLocalBody(bodyID);
+        		if (body == null) {
+        			runtimeLogger.warn("body null");
+        			// the body with the given ID is not any more on this ProActiveRuntime
+        			// unregister it from this ProActiveRuntime
+        			unregisterBody(nodeName, bodyID);
+        		} else {
+        			String objectClass = body.getReifiedObject().getClass().getName();
 
-                // if the reified object is of the specified type
-                // return the body adapter 
-                if (objectClass.equals((String) objectName)) {
-                    localBodies.add(body.getRemoteAdapter());
-                }
-            }
+        			// if the reified object is of the specified type
+        			// return the body adapter 
+        			if (objectClass.equals((String) className)) {
+        				localBodies.add(body.getRemoteAdapter());
+        			}
+        		}
+        	}
+        	return localBodies;
         }
-        return localBodies;
     }
 
     /**
@@ -490,8 +491,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ConstructorCall bodyConstructorCall, boolean isLocal)
         throws ConstructorCallExecutionFailedException, 
             java.lang.reflect.InvocationTargetException {
-      	
-    	//  System.out.println("XXXXXX creating body on " + this.getURL());
+        //  System.out.println("XXXXXX creating body on " + this.getURL());
         //   ProActiveConfiguration.getConfiguration().dumpAddedProperties();
         Body localBody = (Body) bodyConstructorCall.execute();
 
@@ -605,7 +605,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
-
         synchronized (bodyList) {
             if (!bodyList.contains(bodyID)) {
                 //System.out.println("in registerbody id = "+ bodyID.toString());
@@ -673,7 +672,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             //                Integer.toString(new java.security.SecureRandom().nextInt()) +
             //                "_" + hostName;
             String random = Integer.toString(ProActiveRuntimeImpl.getNextInt());
-            this.name = "PA_JVM" + random + "_" + hostName;
+            if (System.getProperty("proactive.runtime.name") != null) {
+                this.name = System.getProperty("proactive.runtime.name");
+                if (this.name.indexOf("PA_JVM") < 0) {
+                    logger.warn(
+                        "WARNING !!! The name of a ProActiveRuntime MUST contain PA_JVM string \n" +
+                        "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
+                }
+            } else {
+                this.name = "PA_JVM" + random + "_" + hostName;
+            }
             if (System.getProperty("proactive.jobid") != null) {
                 this.jobId = System.getProperty("proactive.jobid");
             } else {
@@ -896,17 +904,4 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public String getJobID() {
         return vmInformation.getJobID();
     }
-    
-    public String [] getNodesNames () {
-    	String [] nodesNames = new String [nodeMap.size()];
-    	Enumeration e = nodeMap.keys();
-    	int i=0;
-    	while (e.hasMoreElements()) {
-    		nodesNames[i++] = (String)e.nextElement();
-    	}
-    	return nodesNames;
-    }
-    
-   
-    
 }

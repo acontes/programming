@@ -33,11 +33,17 @@ package org.objectweb.proactive.ic2d.gui.util;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
 import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.NodeExploration;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 
 import java.awt.Component;
-import java.rmi.RemoteException;
+
+import java.util.Iterator;
+
+import javax.swing.DefaultListModel;
 
 
 public class DialogUtils {
@@ -53,55 +59,41 @@ public class DialogUtils {
                                                    .getCanonicalHostName();
         } catch (java.net.UnknownHostException e) {
         }
-        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
-                "Please enter the name or the IP of the host to monitor :", // Object message,
-                "Adding a host to monitor", // String title,
-                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
-                null, // Icon icon,
-                null, // Object[] selectionValues,
-                initialHostValue // Object initialSelectionValue)
-            );
-        if ((result == null) || (!(result instanceof String))) {
+
+        //	calling dlg for host or ip and depth control
+        RMIHostDialog rmihostdialog = RMIHostDialog.showRMIHostDialog((javax.swing.JFrame) parentComponent,
+                initialHostValue);
+
+        if (!rmihostdialog.isButtonOK()) {
             return;
         }
-        String host = (String) result;
+        rmihostdialog.setButtonOK(false);
+        String host = rmihostdialog.getJTextFieldHostIp();
         try {
-            worldObject.addHostObject(host, "rmi");
+            // ebe associated host listed
+            DataAssociation asso = new DataAssociation();
+
+            DefaultListModel skippedObjects = new DefaultListModel();
+
+            NodeExploration explorator = new NodeExploration(asso,
+                    skippedObjects, logger);
+            explorator.setMaxDepth(rmihostdialog.getJTextFielddepth());
+            explorator.startExploration();
+            explorator.exploreHost(host, 1099);
+            explorator.endExploration();
+            Iterator it = asso.getHosts().iterator(); // iterator de MonitoredHost
+            while (it.hasNext()) {
+                MonitoredHost Monitoredhost = (MonitoredHost) it.next();
+
+                String tmphost = Monitoredhost.getFullName();
+                System.out.println(tmphost);
+                worldObject.addHostObject(tmphost, "rmi");
+            }
         } catch (java.rmi.RemoteException e) {
             logger.log("Cannot create the RMI Host " + host, e);
         }
     }
 
-    public static void openNewHTTPHostDialog(
-            java.awt.Component parentComponent, WorldObject worldObject,
-            IC2DMessageLogger logger) {
-            String initialHostValue = "localhost";
-            try {
-                initialHostValue = java.net.InetAddress.getLocalHost()
-                                                       .getCanonicalHostName();
-            } catch (java.net.UnknownHostException e) {
-            }
-            Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
-                    "Please enter the name or the IP of the host to monitor :", // Object message,
-                    "Adding a host to monitor", // String title,
-                    javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
-                    null, // Icon icon,
-                    null, // Object[] selectionValues,
-                    initialHostValue // Object initialSelectionValue)
-                );
-            if ((result == null) || (!(result instanceof String))) {
-                return;
-            }
-            String host = (String) result;
-            System.out.println("host " + host);
-            try {
-				worldObject.addHostObject(host, "http");
-			} catch (RemoteException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-        }
-    
     public static void openNewIbisHostDialog(
         java.awt.Component parentComponent, WorldObject worldObject,
         IC2DMessageLogger logger) {
@@ -164,8 +156,6 @@ public class DialogUtils {
         worldObject.addHosts(host);
     }
 
-   
-    
     public static void openNewNodeDialog(java.awt.Component parentComponent,
         WorldObject worldObject, IC2DMessageLogger logger) {
         Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,

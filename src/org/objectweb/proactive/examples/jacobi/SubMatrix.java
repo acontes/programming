@@ -38,9 +38,7 @@ import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 
-/**
- * @author Laurent Baduel
- */
+
 public class SubMatrix {
 
 	/** Default width value of a submatrix */
@@ -75,7 +73,7 @@ public class SubMatrix {
 	private SubMatrix east; 
 
 	/** A ProActive reference to this */
-	private SubMatrix me;
+	private SubMatrix asyncRefToMe;
 
 	/** The neighbors submatix */
 	private SubMatrix neighbors;
@@ -296,11 +294,11 @@ public class SubMatrix {
 			e.printStackTrace();
 		}
 		
-		this.me = (SubMatrix) ProActive.getStubOnThis();
-		this.north = (SubMatrix) topology.up(me);
-		this.south = (SubMatrix) topology.down(me);
-		this.west = (SubMatrix) topology.left(me);
-		this.east = (SubMatrix) topology.right(me);
+		this.asyncRefToMe = (SubMatrix) ProActive.getStubOnThis();
+		this.north = (SubMatrix) topology.up(this.asyncRefToMe);
+		this.south = (SubMatrix) topology.down(this.asyncRefToMe);
+		this.west = (SubMatrix) topology.left(this.asyncRefToMe);
+		this.east = (SubMatrix) topology.right(this.asyncRefToMe);
 		
 		try {
 			this.neighbors = (SubMatrix) ProActiveGroup.newGroup(SubMatrix.class.getName()); }
@@ -341,7 +339,7 @@ public class SubMatrix {
 			neighborsGroup.add(this.east);
 			this.east.setWestBorder(this.buildEastBorder());
 		}
-		neighborsGroup.add(this.me);
+		neighborsGroup.add(this.asyncRefToMe);
 	}
 
 	/**
@@ -467,7 +465,7 @@ public class SubMatrix {
 	public void compute () {
 		this.buildNeighborhood();
 		ProSPMD.barrier("InitDone");
-		this.me.loop();
+		this.asyncRefToMe.loop();
 	}
 
 	/**
@@ -480,15 +478,15 @@ public class SubMatrix {
 		// synchronization to be sure that all submatrix have exchanged borders
 		ProSPMD.barrier("SynchronizationWithNeighbors"+this.iterationsToStop, this.neighbors);
 		// compute the border values
-		this.me.borderCompute();
+		this.asyncRefToMe.borderCompute();
+		// send the borders to neighbors
+		this.asyncRefToMe.sendBordersToNeighbors();
 		// decrement the iteration counter
 		this.iterationsToStop--;
-		// send the borders to neighbors
-		this.sendBordersToNeighbors();
 		// continue or stop ?
 		if ((this.iterationsToStop > 0) && (this.minDiff > Jacobi.MINDIFF)) {
-			this.me.exchange();
-			this.me.loop();
+			this.asyncRefToMe.exchange();
+			this.asyncRefToMe.loop();
 		}
 		else {
 			System.out.println("[" + this.name + "] Computation over :\n      " +

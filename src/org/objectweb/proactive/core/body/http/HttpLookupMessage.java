@@ -6,14 +6,12 @@
  */
 package org.objectweb.proactive.core.body.http;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
+
 
 /**
  * @author vlegrand
- *
+ * 
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */

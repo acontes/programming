@@ -247,7 +247,11 @@ public class DataAssociation implements JobMonitorConstants {
 
         return res;
     }
-
+    
+    public MonitoredObjectSet getHosts() {
+        return list(HOST, null);
+    }
+    
     public MonitoredObjectSet getValues(BasicMonitoredObject from, int to,
         Set constraints) {
         int key = from.getKey();
@@ -316,7 +320,7 @@ public class DataAssociation implements JobMonitorConstants {
             Iterator iter = desc.iterator();
             while (iter.hasNext()) {
                 BasicMonitoredObject childObject = (BasicMonitoredObject) iter.next();
-                t.doSomething(childObject);
+                traverse(childObject, t);
             }
         }
     }

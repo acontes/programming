@@ -111,10 +111,22 @@ public void moveTo(String destination_node) {
   the transfers.</p>
   <h2>1.3.4. Execution</h2>
 <p>- start several nodes using the <code>startnode</code> script.</p>
+<pre>windows>cd scripts/windows
+				startNode.bat //localhost/n1
+				startNode.bat //localhost/n2
+linux>cd scripts/linux
+ 		./startNode.sh //localhost/n1
+ 		./startNode.sh //localhost/n2
+</pre>
 <p>- compile and run the program (run MigratableHelloClient), passing in parameter the urls of the nodes 
-you'd 
-  like the agent to migrate to.</p>
-<p>- don't forget to set the security permissions</p>
+you'd like the agent to migrate to.</p>
+<pre>cd compile
+windows>build.bat examples
+linux>build examples
+cd ..</pre>
+
+<code>linux>java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.MigratableHelloClient //localhost/n1 //localhost/n2</code><br><br>
+<code>windows>java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.MigratableHelloClient //localhost/n1 //localhost/n2</code>
 <p>- observe the instance of MigratableHello migrating :</p>
 <p>&nbsp;</p>
 <p><img src="../pics/hello/agent_execution.gif"></p>

@@ -30,10 +30,11 @@
  */
 package org.objectweb.proactive;
 
+
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -114,6 +115,7 @@ public class ProActive {
     /**
      * Declaration of the handler manager with a default policy
      */
+
     // static public HandlerManager handlerManager;
 
     static {
@@ -215,40 +217,75 @@ public class ProActive {
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newActive(String classname,
-        Object[] constructorParameters, Node node, Active activity,
-        MetaObjectFactory factory)
-        throws ActiveObjectCreationException, NodeException {
-        //using default proactive node
-        if (node == null) {
-            node = NodeFactory.getDefaultNode();
-        }
-
-        if (factory == null) {
-            factory = ProActiveMetaObjectFactory.newInstance();
-        }
-
-        try {
-        	Object stub = createStubObject(classname, constructorParameters, node, activity, factory);
-        	Handler handler;
-        	if ((handler = HandlerManager.isHandlerAssociatedToProxyObject(stub.getClass())) != null) {
-        		try {
-        			((org.objectweb.proactive.core.mop.StubObject) stub).getProxy().setExceptionHandler(handler, NonFunctionalException.class);
-        		} catch (IOException e) {
-        			logger.debug("Cannot add automatic handler to object of class " + stub.getClass());
-        			e.printStackTrace();
-        		}
-        	}
-        	return stub;
-        } catch (MOPException e) {
-            Throwable t = e;
-
-            if (e.getTargetException() != null) {
-                t = e.getTargetException();
+            Object[] constructorParameters, Node node, Active activity,
+            MetaObjectFactory factory)
+            throws ActiveObjectCreationException, NodeException {
+            //using default proactive node
+            if (node == null) {
+                node = NodeFactory.getDefaultNode();
             }
 
-            throw new ActiveObjectCreationException(t);
+            if (factory == null) {
+                factory = ProActiveMetaObjectFactory.newInstance();
+            }
+
+            try {
+                // create stub object
+                Object stub = createStubObject(classname, constructorParameters,
+                        node, activity, factory);
+                HashMap handlermap;
+
+                // AHA : Associate handler to proxy automatically
+                if ((handlermap = HandlerManager.isHandlerAssociatedToProxyObject(
+                                classname)) != null) {
+                    Set keyset = handlermap.keySet();
+                    while (keyset.iterator().hasNext()) {
+                        NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
+                                                                                    .next();
+                        try {
+                            ((org.objectweb.proactive.core.mop.StubObject) stub).getProxy()
+                             .setExceptionHandler((Handler) handlermap.get(
+                                    nfe.getClass()), nfe.getClass());
+                        } catch (IOException e) {
+                            logger.debug(
+                                "[NFE_ERROR] Cannot associate handler automatically with object of class " +
+                                stub.getClass());
+                        }
+                    }
+                }
+
+                // AHA : Associate handler to body automatically
+                if ((handlermap = HandlerManager.isHandlerAssociatedToProxyObject(
+                                classname)) != null) {
+                    Set keyset = handlermap.keySet();
+                    while (keyset.iterator().hasNext()) {
+                        NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
+                                                                                    .next();
+                        try {
+                            ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) stub)
+                             .getProxy()).getBody().getRemoteAdapter()
+                             .setExceptionHandler((Handler) handlermap.get(
+                                    nfe.getClass()), nfe.getClass());
+                        } catch (IOException e) {
+                            logger.debug(
+                                "[NFE_ERROR] Cannot associate handler automatically with object of class " +
+                                stub.getClass());
+                        }
+                    }
+                }
+
+                // Return stub of the handlerized object
+                return stub;
+            } catch (MOPException e) {
+                Throwable t = e;
+
+                if (e.getTargetException() != null) {
+                    t = e.getTargetException();
+                }
+
+                throw new ActiveObjectCreationException(t);
+            }
         }
-    }
 
     /**
      * Creates a new set of active objects based on classname attached to the given virtualnode.
@@ -260,10 +297,10 @@ public class ProActive {
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
      */
-    public static Object newActive(String classname,
+    public static Object newActiveAsGroup(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
-        return ProActive.newActive(classname, constructorParameters,
+        return ProActive.newActiveAsGroup(classname, constructorParameters,
             virtualnode, null, null);
     }
 
@@ -282,7 +319,7 @@ public class ProActive {
      * @throws NodeException if the virtualnode was null
      *
      */
-    public static Object newActive(String classname,
+    public static Object newActiveAsGroup(String classname,
         Object[] constructorParameters, VirtualNode virtualnode,
         Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
@@ -1711,7 +1748,7 @@ public class ProActive {
                     return handler;
                 } catch (Exception e) {
                     if (loggerNFE.isDebugEnabled()) {
-                    	loggerNFE.debug("[NFE_ERROR] Removing handler [" +
+                        loggerNFE.debug("[NFE_ERROR] Removing handler [" +
                             handler.getClass().getName() +
                             "] from FUTURE level failed");
                     }

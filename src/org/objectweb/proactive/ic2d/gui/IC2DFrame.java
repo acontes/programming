@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ic2d.gui;
 
 import org.globus.ogce.gui.gram.gui.SubmitJobPanel;
@@ -46,6 +46,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorFrame;
 import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
+import org.objectweb.proactive.ic2d.gui.util.RMIHostDialog;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
@@ -57,7 +58,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
     RuntimeRegistrationEventListener {
     private static final int DEFAULT_WIDTH = 850;
     private static final int DEFAULT_HEIGHT = 600;
-    private static final String HOME = System.getProperty("user.home");
     private int options;
     private IC2DPanel ic2dPanel;
     private IC2DObject ic2dObject;
@@ -72,6 +72,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
     private javax.swing.JFrame fileChooserFrame;
     private ExternalProcess externalProcess;
     private ProActiveRuntimeImpl proActiveRuntimeImpl;
+    private static final String HOME = System.getProperty("user.home");
+    private int depthMonitor = 10;
     private javax.swing.JFrame jobMonitorFrame;
 
     //
@@ -91,7 +93,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         activeObjectFilter = new ActiveObjectFilter();
         controller = new MyController();
         communicationRecorder = new ActiveObjectCommunicationRecorder();
-
         MessagePanel messagePanel = new MessagePanel("Messages");
         logger = messagePanel.getMessageLogger();
         ic2dObject.registerLogger(logger);
@@ -154,10 +155,9 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         String host;
 
         protocol = event.getProtocol();
-        proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
+        proActiveRuntimeRegistered = event.getRegisteredRuntime();
         host = proActiveRuntimeRegistered.getVMInformation().getInetAddress()
                                          .getCanonicalHostName();
-
         try {
             ic2dObject.getWorldObject().addHostObject(host, protocol);
         } catch (RemoteException e) {
@@ -220,10 +220,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         final javax.swing.JFrame frame = new javax.swing.JFrame("Events lists");
         frame.setLocation(new java.awt.Point(0, DEFAULT_HEIGHT));
         frame.setSize(new java.awt.Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT / 2));
-
         java.awt.Container c = frame.getContentPane();
         c.setLayout(new java.awt.GridLayout(1, 1));
-
         javax.swing.JScrollPane scrollingEventListsPanel = new javax.swing.JScrollPane(panel);
         scrollingEventListsPanel.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         c.add(scrollingEventListsPanel);
@@ -233,35 +231,30 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                 }
             });
         frame.setVisible(true);
-
         return frame;
     }
 
     private javax.swing.JFrame createProcessesFrame() {
         final javax.swing.JFrame frame = new ProcessControlFrame();
         frame.setLocation(new java.awt.Point(DEFAULT_WIDTH, 0));
-
         // Listeners
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     frame.setVisible(!frame.isVisible());
                 }
             });
-
         return frame;
     }
 
     private JobMonitorFrame createJobMonitorFrame() {
         final JobMonitorFrame frame = new JobMonitorFrame(controller);
         frame.setLocation(new java.awt.Point(DEFAULT_WIDTH, 0));
-
         // Listeners
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     frame.setVisible(!frame.isVisible());
                 }
             });
-
         return frame;
     }
 
@@ -344,22 +337,10 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         {
             javax.swing.JMenuItem b = new javax.swing.JMenuItem(
-                    "Monitor a new JINI host");
+                    "Monitor a new JINI Hosts");
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         DialogUtils.openNewJINIHostDialog(IC2DFrame.this,
-                            ic2dObject.getWorldObject(), logger);
-                    }
-                });
-            monitoringMenu.add(b);
-        }
-
-        {
-            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
-                    "Monitor a new HTTP Host");
-            b.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        DialogUtils.openNewHTTPHostDialog(IC2DFrame.this,
                             ic2dObject.getWorldObject(), logger);
                     }
                 });
@@ -394,7 +375,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.setToolTipText("Filter active objects");
             monitoringMenu.add(b);
         }
-
         monitoringMenu.addSeparator();
         // Display the legend 
         {
@@ -407,7 +387,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.setToolTipText("Display the legend");
             monitoringMenu.add(b);
         }
-
         monitoringMenu.addSeparator();
         // exit 
         {
@@ -419,8 +398,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                 });
             monitoringMenu.add(b);
         }
-
         menuBar.add(monitoringMenu);
+
         //	//Deploy
         //	   javax.swing.JMenu DeployMenu = new javax.swing.JMenu("Deploy");
         //		   {
@@ -435,13 +414,26 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         //		   DeployMenu.add(b);
         //		   }   
         //	menuBar.add(DeployMenu);
+        //ebe 20/08/2004  control menu
+        javax.swing.JMenu controlMenu = new javax.swing.JMenu("Control");
+        // Add depth control menu
+        {
+            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
+                    "Set depth Control...");
+            b.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        RMIHostDialog.openSetDepthControlDialog(IC2DFrame.this);
+                    }
+                });
+            controlMenu.add(b);
+        }
+        menuBar.add(controlMenu);
         //
         // look and feel 
         //
         {
             javax.swing.JMenu lookMenu = new javax.swing.JMenu("Look & feel");
             javax.swing.UIManager.LookAndFeelInfo[] infos = javax.swing.UIManager.getInstalledLookAndFeels();
-
             for (int i = 0; i < infos.length; i++) {
                 javax.swing.AbstractAction a = new javax.swing.AbstractAction(infos[i].getName(),
                         null) {
@@ -459,12 +451,10 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                             }
                         }
                     };
-
                 a.putValue("frame", this);
                 a.putValue("class", infos[i].getClassName());
                 lookMenu.add(a);
             }
-
             menuBar.add(lookMenu);
         }
 
@@ -472,7 +462,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         // Window
         //
         javax.swing.JMenu windowMenu = new javax.swing.JMenu("Window");
-
         {
             javax.swing.JMenuItem b = new javax.swing.JMenuItem(
                     "Hide/Show EventsList windows");
@@ -524,14 +513,12 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         // Globus
         //
         javax.swing.JMenu globusMenu = new javax.swing.JMenu("Globus");
-
         {
             javax.swing.JMenuItem b = new javax.swing.JMenuItem(
                     "Start a new Node with Globus");
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         SubmitJobPanel.main(new String[0]);
-
                         //		if (fileChooserFrame.isVisible()) {
                         //		    fileChooserFrame.hide();
                         //		} else {
