@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo
-echo --- ClientServer : Server ---------------------------------
+echo --- MiniDescrClient ---------------------------------------------
 
 workingDir=`dirname $0`
 . $workingDir/env.sh
