@@ -69,17 +69,17 @@ public class FileProcess implements ServerProcess {
         if (codebases == null) {
             try {
 				// reading from resources in the classpath
-				b = getBytesFromResource(info.path);
+				b = getBytesFromResource(info.getClassFileName());
 			} catch (IOException e) {
-		        throw new ClassNotFoundException("Cannot find class " + info.path, e);
+		        throw new ClassNotFoundException("Cannot find class " + info.getClassFileName(), e);
 			}
         } else {
             for (int i = 0; i < codebases.length; i++) {
                 try {
                     if (codebases[i].isDirectory()) {
-                        b = getBytesFromDirectory(info.path, codebases[i]);
+                        b = getBytesFromDirectory(info.getClassFileName(), codebases[i]);
                     } else {
-                        b = getBytesFromArchive(info.path, codebases[i]);
+                        b = getBytesFromArchive(info.getClassFileName(), codebases[i]);
                     }
                 } catch (java.io.IOException e) {
                 }
@@ -92,14 +92,14 @@ public class FileProcess implements ServerProcess {
         // try to get the class as a generated stub
         // generate it if necessary
         b = org.objectweb.proactive.core.mop.MOPClassLoader.getMOPClassLoader()
-                                                           .getClassData(info.path);
+                                                           .getClassData(info.getClassFileName());
         if (b != null) {
             return b;
         }
 
         // COMPONENTS
         // try to get the class as a generated component interface reference
-        b = RepresentativeInterfaceClassGenerator.getClassData(info.path);
+        b = RepresentativeInterfaceClassGenerator.getClassData(info.getClassFileName());
 
         if (b != null) {
             return b;
@@ -107,7 +107,7 @@ public class FileProcess implements ServerProcess {
 
         // COMPONENTS
         // try to get the class as a generated component interface reference
-        b = MetaObjectInterfaceClassGenerator.getClassData(info.path);
+        b = MetaObjectInterfaceClassGenerator.getClassData(info.getClassFileName());
         if (b != null) {
             return b;
         }
@@ -116,7 +116,7 @@ public class FileProcess implements ServerProcess {
         //    System.out.println("ClassServer sent class " + info.path +
         //        " successfully");
         //}
-        throw new ClassNotFoundException("Cannot find class " + info.path);
+        throw new ClassNotFoundException("Cannot find class " + info.getClassFileName());
     }
 
     //

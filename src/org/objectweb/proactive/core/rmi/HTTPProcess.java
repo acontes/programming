@@ -42,7 +42,7 @@ import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 /**
  * @author vlegrand
  */
-public class XMLHTTPProcess {
+public class HTTPProcess {
     protected DataInputStream in;
     protected RequestInfo info;
 
@@ -51,7 +51,7 @@ public class XMLHTTPProcess {
      * @param in
      * @param info
      */
-    public XMLHTTPProcess(DataInputStream in, RequestInfo info) {
+    public HTTPProcess(DataInputStream in, RequestInfo info) {
         this.info = info;
         this.in = in;
     }
@@ -64,11 +64,11 @@ public class XMLHTTPProcess {
         byte[] replyMessage = null;
         String action = null;
         try {
-            byte[] source = new byte[info.contentLength];
+            byte[] source = new byte[info.getContentLength()];
             in.readFully(source);
             
             /* Get what is in the  request */
-            result = ProActiveXMLUtils.unwrapp(source, info.action);
+            result = ProActiveXMLUtils.unwrapp(source, info.getAction());
             Object returnedObject = null;
             if (result instanceof HttpMessage ) {
                 returnedObject = ( (HttpMessage) result).processMessage();

@@ -32,11 +32,11 @@ package org.objectweb.proactive.core.rmi;
 
 import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import java.net.Socket;
-
-import java.util.Hashtable;
 
 
 /**
@@ -58,61 +58,61 @@ public class ProActiveService extends Thread {
     }
 
     public void run() {
-        Hashtable table = new Hashtable();
         HTTPInputStream in = null;
         DataOutputStream out = null;
-        RequestInfo info = null;
+        RequestInfo info = new RequestInfo();
 
-        String headers = "";
-        String statusLine;
+        String responseHeaders = "";
+        String statusLine = null;
         String contentType;
         byte[] bytes = null;
 
         try {
             out = new java.io.DataOutputStream(socket.getOutputStream());
 
-            // get the headers information in order to determine what is the service requested
+            // Get the headers information in order to determine what is the requested service
             in = new HTTPInputStream(new BufferedInputStream(
                         socket.getInputStream()));
 
-            
+
+// Process several requests in a row if needed (HTTP/1.1 persistent connection)
+process_request: 
             while (true) {
                 try {
-                    info = getInfo(in);
+                    info.read(in);
 
-                    if (info == null) {
-                        break;
+                    if (!info.isBegun()) {
+                        break process_request; // connection was closed by the client
                     }
-
-                    //If  there is no field application then it is a call to the 
-                    if ((info.application != null) &&
-                            (info.application.indexOf("xml") > -1)) {
-                        // ProActive Request via HTTP
-                        XMLHTTPProcess process = new XMLHTTPProcess(in, info);
+                    // else we successfully read the request information
+                    
+                    // If  there is no field ClassFileName then it is a call to the
+                    // ProActive Request via HTTP
+                    if (info.getClassFileName() == null) {
+                        HTTPProcess process = new HTTPProcess(in, info);
                         MSG msg = process.getBytes();
+                        String actionType = msg.getAction();
                         bytes = msg.getMessage();
 
                         statusLine = "HTTP/1.1 200 OK";
                         contentType = "text/xml";
-                        headers = "ProActive-Action: " + msg.getAction() +
+                        responseHeaders = "ProActive-Action: " + actionType +
                             "\r\n";
-                    } else if (info.path != null) {
+                    } else {
                         // ClassServer request
                         FileProcess fp = new FileProcess(paths, info);
                         bytes = fp.getBytes();
                         statusLine = "HTTP/1.1 200 OK";
                         contentType = "application/java";
-                    } else {
-                        throw new ClassNotFoundException("No path specified");
                     }
-                } catch (Exception e) { // IOException and ClassNotFoundException
-
-                    if ((info != null) && (info.path != null)) {
-                        logger.info("!!! ClassServer failed to load class " +
-                            info.path);
-                    }
-
-                    statusLine = "HTTP/1.1 400 " + e.getMessage();
+                } catch (ClassNotFoundException e) {
+                    logger.info("ClassServer failed to load class " +
+                        info.getClassFileName());
+                    statusLine = "HTTP/1.1 404 " + e.getMessage();
+                    contentType = "text/plain";
+                    bytes = new byte[0];
+                } catch (IOException e) { // Including HTTPRemoteException & co
+                    statusLine = "HTTP/1.1 500 " + e.getMessage();
                     contentType = "text/plain";
 
                     // Time-consuming and not very useful:
@@ -132,7 +132,7 @@ public class ProActiveService extends Thread {
                 int a = bytes.length;
                 String b = "Content-Length: " + bytes.length + "\r\n";
                 out.writeBytes("Content-Type: " + contentType + "\r\n");
-                out.writeBytes(headers);
+                out.writeBytes(responseHeaders);
                 out.writeBytes("\r\n");
                 out.write(bytes);
                 out.flush();
@@ -144,7 +144,7 @@ public class ProActiveService extends Thread {
         } finally {
             try {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Fermeture de la socket " + this.socket);
+                    logger.debug("Closing socket " + this.socket);
                 }
 
                 out.close();
@@ -154,115 +154,5 @@ public class ProActiveService extends Thread {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Returns the path to the class file obtained from
-     * parsing the HTML header.
-     */
-    private static RequestInfo getInfo(HTTPInputStream in)
-        throws java.io.IOException {
-        RequestInfo info = new RequestInfo();
-        String line = null;
-
-        do {
-            line = in.getLine();
-
-            if (line == null) {
-                return null;
-            } else if (line.startsWith("GET /")) {
-                info.path = getPath(line);
-            } else if (line.startsWith("Content-Type:")) {
-                info.application = getApplication(line);
-            } else if (line.startsWith("ProActive-Action:")) {
-                info.action = getAction(line);
-            } else if (line.startsWith("Content-Length:")) {
-                info.contentLength = Integer.parseInt(getContentLength(line));
-            }
-        } while ((line.length() != 0) && (line.charAt(0) != '\r') &&
-                (line.charAt(0) != '\n'));
-
-        if (info.path != null) {
-            return info;
-        }
-
-        if (info.application.equals("application/soap+xml") ||
-                info.application.substring(0, 8).equals("text/xml")) {
-            return info;
-        } else {
-            info.application = null;
-
-            // --End FL
-            throw new java.io.IOException("Malformed Header");
-        }
-    }
-
-    /**
-     * Returns an array of bytes containing the bytecodes for
-     * the class represented by the argument <b>path</b>.
-     * The <b>path</b> is a dot separated class name with
-     * the ".class" extension removed.
-     *
-     * @return the bytecodes for the class
-     * @exception ClassNotFoundException if the class corresponding
-     * to <b>path</b> could not be loaded.
-     * @exception java.io.IOException if error occurs reading the class
-     */
-
-    //protected  byte[] getBytes(String path)
-    //  throws java.io.IOException, ClassNotFoundException;
-
-    /**
-     * Returns the path to the class file obtained from
-     * parsing the HTML header.
-     * @param line the GET item starting by "GET /"
-     */
-    private static String getPath(String line) {
-        // extract class from GET line
-        line = line.substring(5, line.length() - 1).trim();
-
-        int index = line.indexOf(".class ");
-
-        if (index != -1) {
-            return line.substring(0, index).replace('/', '.');
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Returns the application type obtained from
-     * parsing the HTTP header.
-     * @param line the GET item starting by "Content-Type:"
-     */
-    private static String getApplication(String line) {
-        return line.substring(13, line.length()).trim();
-    }
-
-    /**
-     * Returns the application type obtained from
-     * parsing the HTTP header.
-     * @param line the GET item starting by "Content-Type:"
-     */
-    private static String getAction(String line) {
-        return line.substring(17, line.length()).trim();
-    }
-
-    /**
-     * Returns the application type obtained from
-     * parsing the HTTP header.
-     * @param line the GET item starting by "Content-Type:"
-     */
-    private static String getContentLength(String line) {
-        return line.substring(15, line.length()).trim();
-    }
-
-    /**
-     * Returns the path to the class file obtained from
-     * parsing the HTML header.
-     * @param line the GET item starting by "Host:"
-     */
-    private static String getHost(String line) {
-        return line.substring(5, line.length() - 1).trim();
     }
 }
