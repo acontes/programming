@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.runtime.xmlhttp;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -63,13 +62,13 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         //registered at the url given in parameter.
         //In fact it oly consists with the creation of an adapter 
         //with the specified url;
-        ProActiveRuntime remoteProActiveRuntime = new RuntimeStrategyAdapter(s);
+        ProActiveRuntime remoteProActiveRuntime = new HttpRuntimeAdapter(s);
 //      distant
         return remoteProActiveRuntime;
     }
 
-    private RuntimeStrategyAdapter createRuntimeAdapter() {
+    private HttpRuntimeAdapter createRuntimeAdapter() {
 //    	 local
-    	return new RuntimeStrategyAdapter();
+    	return new HttpRuntimeAdapter();
     }
 }

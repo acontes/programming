@@ -13,14 +13,14 @@ package org.objectweb.proactive.core.runtime.xmlhttp;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class RuntimeReply implements java.io.Serializable {
-
+    
 	private Object returnedObject;
 
-	public RuntimeReply () {
+	public RuntimeReply () { 
 		new RuntimeReply (null);
 	}
 	
-	public RuntimeReply (Object o) {
+	public RuntimeReply (Object o) { 
 		this.returnedObject = o;
 	}
 
