@@ -152,8 +152,8 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
             urn = urn.substring(urn.lastIndexOf('/'));
 
-            XMLHTTPLookupMessage message = new XMLHTTPLookupMessage(urn);
-            message = (XMLHTTPLookupMessage) ProActiveXMLUtils.sendMessage(url,
+            HttpLookupMessage message = new HttpLookupMessage(urn);
+            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
                     port, message, ProActiveXMLUtils.MESSAGE);
 
             return (UniversalBody) message.processMessage();
@@ -194,11 +194,11 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         try {
             //logger.debug("Receive Request " + request.getMethodName());
             //long start = System.currentTimeMillis();
-            XMLHTTPRequest xmlReq = new XMLHTTPRequest(request, this.bodyID);
+        	HttpRequest xmlReq = new HttpRequest(request, this.bodyID);
 
             String rep = (String) ProActiveXMLUtils.sendMessage(url, port,
                     xmlReq, ProActiveXMLUtils.MESSAGE);
-
+ 
             //long end = System.currentTimeMillis();
             //long time = end - start;
             //System.out.println("execution in " + time);
@@ -215,7 +215,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         try {
             logger.debug("Receive Reply " + reply.getResult());
 
-            XMLHTTPReply xmlReply = new XMLHTTPReply(reply, this.bodyID);
+            HttpReply xmlReply = new HttpReply(reply, this.bodyID);
             String rep = (String) ProActiveXMLUtils.sendMessage(this.url,
                     this.port, xmlReply, ProActiveXMLUtils.MESSAGE);
         } catch (IOException e) {

@@ -15,12 +15,12 @@ import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class XMLHTTPLookupMessage implements XMLHTTPMessage {
+public class HttpLookupMessage implements HttpMessage {
 
 	private String urn;
 	private Object returnedObject;  
-	
-	public XMLHTTPLookupMessage (String urn) {    
+	 
+	public HttpLookupMessage (String urn) {    
 		this.urn = urn;
 	}
 

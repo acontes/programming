@@ -21,12 +21,12 @@ import java.io.IOException;
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class XMLHTTPRequest implements XMLHTTPMessage {
+public class HttpRequest implements HttpMessage {
     private Request request;
     private UniqueID IdBody;
  
 
-    public XMLHTTPRequest(Request request, UniqueID idBody) {
+    public HttpRequest(Request request, UniqueID idBody) {
         this.request = request;
         this.IdBody = idBody;
     }

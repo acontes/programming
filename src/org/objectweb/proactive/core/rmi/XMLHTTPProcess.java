@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.rmi;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.objectweb.proactive.core.body.http.XMLHTTPMessage;
+import org.objectweb.proactive.core.body.http.HttpMessage;
 import org.objectweb.proactive.core.runtime.http.RuntimeReply;
 import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
@@ -70,8 +70,8 @@ public class XMLHTTPProcess {
             /* Get what is in the  request */
             result = ProActiveXMLUtils.unwrapp(source, info.action);
             Object returnedObject = null;
-            if (result instanceof XMLHTTPMessage ) {
-                returnedObject = ( (XMLHTTPMessage) result).processMessage();
+            if (result instanceof HttpMessage ) {
+                returnedObject = ( (HttpMessage) result).processMessage();
                 if (returnedObject != null) {
                 	replyMessage = ProActiveXMLUtils.getMessage(returnedObject);//, ProActiveXMLUtils.MESSAGE);
                 	action = ProActiveXMLUtils.MESSAGE;

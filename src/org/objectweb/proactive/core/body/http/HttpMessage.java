@@ -14,7 +14,7 @@ import java.io.Serializable;
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public interface XMLHTTPMessage extends Serializable{
+public interface HttpMessage extends Serializable{
 	
 		public Object  processMessage ();
 }
