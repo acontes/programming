@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -12,7 +13,6 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -180,47 +180,49 @@ public class ProActiveXMLUtils {
             connection.setRequestProperty("ProActive-Action", action);
             connection.setUseCaches(false);
 
-            try {
-                connection.connect();
-            } catch (ConnectException e) {
-                e.printStackTrace();
-            }
+            connection.connect();
 
             BufferedOutputStream out = new BufferedOutputStream(connection.getOutputStream());
             out.write(message);
             out.flush();
             out.close();
 
-            BufferedInputStream in = null;
+            DataInputStream in = null;
             
             try {
-            	in = new BufferedInputStream(connection.getInputStream());
+            	in = new DataInputStream(new BufferedInputStream(connection.getInputStream()));
             } catch (java.net.ConnectException e) {
-                
+            	System.err.println("Could not connect to " + url);
+                e.printStackTrace();
                 return null;
             }
             
             byte[] b = new byte[connection.getContentLength()];
             
-            int totalRead = 0;
-            while (totalRead != b.length) {
-            	totalRead = in.read(b, totalRead, b.length - totalRead);
-            }
+            //int totalRead = 0;
+            //while (totalRead != b.length) {
+            //	totalRead = in.read(b, totalRead, b.length - totalRead);
+            //}
+            in.readFully(b);
             
             try {
                 Object rep = ProActiveXMLUtils.unwrapp(b,
                         connection.getHeaderField("ProActive-Action"));
 
                 return rep;
-            } catch (ProActiveException e1) {
-                e1.printStackTrace();
+            } catch (ProActiveException e) {
+                e.printStackTrace();
             }
+        } catch (ConnectException e) {
+            e.printStackTrace();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+        	e.printStackTrace();
         }
-
         return null;
     }
 
