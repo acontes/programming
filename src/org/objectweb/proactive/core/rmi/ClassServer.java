@@ -32,8 +32,6 @@ package org.objectweb.proactive.core.rmi;
 
 import org.apache.log4j.Logger;
 
-import org.objectweb.proactive.core.group.threadpool.ThreadPool;
-
 import java.net.UnknownHostException;
 
 
@@ -43,41 +41,19 @@ public class ClassServer implements Runnable {
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 20;
     protected static int MAX_RETRY = 50;
     private static java.util.Random random = new java.util.Random();
-    private java.net.ServerSocket server = null;
     protected static int port;
     protected static String hostname;
-    protected ThreadPool threadPool = new ThreadPool(100);
-    protected String paths;
 
     static {
-    	
-    	String newport = System.getProperty("proactive.http.port");
-    	if ( newport != null ) {
-    		DEFAULT_SERVER_BASE_PORT = Integer.valueOf(newport).intValue();
-    	}	
-    } 
-    
-    //
-    // -- PUBLIC METHODS -----------------------------------------------
-    //
-    public static boolean isPortAlreadyBound(int port) {
-        java.net.Socket socket = null;
-        try {
-            socket = new java.net.Socket(java.net.InetAddress.getLocalHost(),
-                    port);
-            // if we can connect to the port it means the server already exists
-            return true;
-        } catch (java.io.IOException e) {
-            return false;
-        } finally {
-            try {
-                if (socket != null) {
-                    socket.close();
-                }
-            } catch (java.io.IOException e) {
-            }
+        String newport = System.getProperty("proactive.http.port");
+
+        if (newport != null) {
+            DEFAULT_SERVER_BASE_PORT = Integer.valueOf(newport).intValue();
         }
     }
+
+    private java.net.ServerSocket server = null;
+    protected String paths;
 
     /**
      * Constructs a ClassServer that listens on a random port. The port number
@@ -98,16 +74,20 @@ public class ClassServer implements Runnable {
      */
     protected ClassServer(int port_, String paths) throws java.io.IOException {
         this.paths = paths;
+
         if (port_ == 0) {
             port = boundServerSockect(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);
         }
+
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
+
         if (logger.isInfoEnabled()) {
             logger.info("port = " + port);
         }
+
         printMessage();
         newListener();
     }
@@ -120,20 +100,47 @@ public class ClassServer implements Runnable {
         this(0, paths);
     }
 
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
+    public static boolean isPortAlreadyBound(int port) {
+        java.net.Socket socket = null;
+
+        try {
+            socket = new java.net.Socket(java.net.InetAddress.getLocalHost(),
+                    port);
+
+            // if we can connect to the port it means the server already exists
+            return true;
+        } catch (java.io.IOException e) {
+            return false;
+        } finally {
+            try {
+                if (socket != null) {
+                    socket.close();
+                }
+            } catch (java.io.IOException e) {
+            }
+        }
+    }
+
     private void printMessage() {
         if (logger.isDebugEnabled()) {
             logger.debug(
                 "To use this ClassFileServer set the property java.rmi.server.codebase to http://" +
                 hostname + ":" + port + "/");
         }
+
         if (this.paths == null) {
             logger.info(
                 " --> This ClassFileServer is reading resources from classpath");
         } else {
             logger.info(
                 " --> This ClassFileServer is reading resources from the following paths");
+
             //for (int i = 0; i < codebases.length; i++) {
             logger.info(paths);
+
             //codebases[i].getAbsolutePath());
         }
     }
@@ -154,6 +161,7 @@ public class ClassServer implements Runnable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -170,11 +178,13 @@ public class ClassServer implements Runnable {
         while (true) {
             try {
                 socket = server.accept();
+
                 ProActiveService service = (new ProActiveService(socket, paths));
-               service.start();
+                service.start();
             } catch (java.io.IOException e) {
                 System.out.println("Class Server died: " + e.getMessage());
                 e.printStackTrace();
+
                 return;
             } finally {
             }
@@ -190,11 +200,13 @@ public class ClassServer implements Runnable {
         for (int i = 0; i < numberOfTry; i++) {
             try {
                 server = new java.net.ServerSocket(basePortNumber);
+
                 return basePortNumber;
             } catch (java.io.IOException e) {
                 basePortNumber += random.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
             }
         }
+
         throw new java.io.IOException(
             "ClassServer cannot create a ServerSocket after " + numberOfTry +
             " attempts !!!");
