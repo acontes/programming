@@ -9,27 +9,40 @@ package org.objectweb.proactive.core.body.xmlhttp;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
+import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
+import org.objectweb.proactive.ext.webservices.utils.ReflectRequest;
 
 
 /**
  * @author jerome
  *
  */
-public class BodyRequest implements Serializable
+public class BodyRequest extends ReflectRequest implements Serializable
 {
     private static Logger logger = Logger.getLogger("XML_HTTP");
     private String methodName;
     private ArrayList parameters = new ArrayList();
     private UniqueID oaid;
-    private Body body;
+    private Body body = null;
 
+    private static HashMap hMapMethods;
+    
+    static {
+    	
+     	hMapMethods = getHashMapReflect(Body.class);
+    	
+    }
+    
     public BodyRequest(String newmethodName, ArrayList newparameters, UniqueID newoaid) {
         this.methodName = newmethodName;
         this.parameters = newparameters;
@@ -45,27 +58,16 @@ public class BodyRequest implements Serializable
         		if(body == null )
         		     this.body = ProActiveXMLUtils.getBody(this.oaid);
         		
-                Class[] classes = new Class[parameters.size()];
-                //Remplissage du tableau des types:
-                for (int i = 0; i < parameters.size(); i++) {
-                    classes[i] = parameters.get(i).getClass();
-                }
-                try {
-						result = body.getClass().getMethod(methodName, classes).invoke(body,parameters.toArray());
-				} catch (InvocationTargetException e) {
-					throw (Exception) e.getCause();					
+        		Method m = getProActiveRuntimeMethod(methodName,parameters, hMapMethods.get(methodName));
+    			try {
+					result = m.invoke(body, parameters.toArray());
 				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new HTTPRemoteException("Error during reflexion", e);
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NoSuchMethodException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new HTTPRemoteException("Error during reflexion", e);
+				} catch (InvocationTargetException e) {
+					throw (Exception) e.getCause();	
+					//throw new HTTPRemoteException("Error during reflexion", e);
 				}
             
             return new RuntimeReply(result);

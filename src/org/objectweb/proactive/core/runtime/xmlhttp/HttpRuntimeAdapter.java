@@ -272,11 +272,11 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         throws ProActiveException, SecurityNotAvailableException {
          return this.runtimestrategyadapter.getPolicy(sc);
     }
-
+/*
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
         out.defaultWriteObject();
-    }
+    }*/
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {

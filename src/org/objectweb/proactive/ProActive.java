@@ -619,21 +619,24 @@ public class ProActive {
 
         if (body instanceof RemoteBodyAdapter) {
             RemoteBodyAdapter.register((RemoteBodyAdapter) body, url);
-            if (logger.isInfoEnabled()) {
-                logger.info("Success at binding url " + url);
-            }
-        } else {
-            if (body instanceof IbisRemoteBodyAdapter) {
-                IbisRemoteBodyAdapter.register((IbisRemoteBodyAdapter) body, url);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Success at binding url " + url);
-                }
-            } else {
-                throw new java.io.IOException(
-                    "Cannot reconize the type of this UniversalBody: " +
-                    body.getClass().getName());
-            }
+        } 
+        else if (body instanceof IbisRemoteBodyAdapter) {
+        	IbisRemoteBodyAdapter.register((IbisRemoteBodyAdapter) body, url);
+        }	
+        else if (body instanceof org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter) {
+        	org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter.register(
+        			(org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter) body, url);
+        } 
+        else {
+        	throw new java.io.IOException(
+        			"Cannot reconize the type of this UniversalBody: " +
+					body.getClass().getName());
         }
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Success at binding url " + url);
+        }
+
     }
 
     /**
@@ -665,8 +668,12 @@ public class ProActive {
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
         if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
-            b = IbisRemoteBodyAdapter.lookup(url);
-        } else {
+            b = IbisRemoteBodyAdapter.lookup(url); 
+        }
+        else if ("http".equals(System.getProperty("proactive.communication.protocol"))) {
+        	b = org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter.lookup(url);
+        } 	
+        else {
             b = RemoteBodyAdapter.lookup(url);
         }
 
