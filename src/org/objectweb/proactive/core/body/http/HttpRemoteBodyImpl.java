@@ -56,7 +56,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 import org.objectweb.proactive.ext.webservices.utils.HTTPUnexpectedException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
-
+ 
 public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
 
     private static Logger logger = Logger.getLogger("XML_HTTP");
