@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -99,11 +100,10 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         this.url = ClassServer.getUrl();
         this.port = ClassServer.getServerSocketPort();
         
-    //    this.url=this.url+":"+this.port;
-        
-            
-    }
+        this.url=this.url+":"+this.port;  
 
+    }
+  
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
@@ -146,9 +146,11 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
             url = urn;
 
+
             if (urn.lastIndexOf(":") > 4) {
-                port = Integer.parseInt(urn.substring(urn.lastIndexOf(':'),
-                            urn.lastIndexOf(':') + 5));
+                port = UrlBuilder.getPortFromUrl(urn);
+//				port = Integer.parseInt(urn.substring(urn.lastIndexOf(':'),
+  //                          urn.lastIndexOf(':') + 5));
             }
 
             urn = urn.substring(urn.lastIndexOf('/'));

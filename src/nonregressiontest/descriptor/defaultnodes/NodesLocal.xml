@@ -13,7 +13,7 @@
 		<mapping>
 			<map virtualNode="Dispatcher">
 				<jvmSet>
-					<currentJVM protocol="rmi"/>
+					<currentJVM protocol="http"/>
 				</jvmSet>
 			</map>
 			<map virtualNode="Dispatcher1">

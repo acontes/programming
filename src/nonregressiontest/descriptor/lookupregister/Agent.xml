@@ -6,7 +6,7 @@
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
-		<register virtualNode="Agent" protocol="rmi"/>
+		<register virtualNode="Agent" protocol="http"/>
 		<mapping>
 			<map virtualNode="Agent">
 				<jvmSet>

@@ -29,6 +29,7 @@ import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 import java.io.IOException;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.UnknownHostException;
 
 import java.security.cert.X509Certificate;
 
@@ -57,26 +58,22 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
     }
     
     public void createURL() {	
-    	
+    
+    	/* !!! */
     	if (!runtimeadapter.url.startsWith("http:")) {
-    		runtimeadapter.url = "http:" + runtimeadapter.url;
+    	  	runtimeadapter.url = "http:" + runtimeadapter.url;
         }
-
-        int index = runtimeadapter.url.lastIndexOf(':');
-
-        if (index > 4) {
-        	runtimeadapter.port = Integer.parseInt(runtimeadapter.url.substring(index +
-                        1, index + 5));
-        	//runtimeadapter.url = runtimeadapter.url.substring(0, index);
+        if (runtimeadapter.port == 0) {
+        	runtimeadapter.port = UrlBuilder.getPortFromUrl(runtimeadapter.url);
         }
+        try {
+			runtimeadapter.url = "http://"+UrlBuilder.getHostNameAndPortFromUrl(runtimeadapter.url);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-      // index = runtimeadapter.url.lastIndexOf('/');
-
-     //   if (index > 6) {
-      //  	runtimeadapter.url = runtimeadapter.url.substring(0, index);
-     //   }
-
-        //vmInformation = runtimeadapter.vmInformation;
+        runtimeadapter.vmInformation = runtimeadapter.vmInformation;
     
     }
 

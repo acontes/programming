@@ -5,7 +5,7 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.objectweb.proactive.core.runtime.xmlhttp;
-
+ 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -287,7 +287,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 
     protected String buildNodeURL(String url)
         throws java.net.UnknownHostException {
-        int i = url.indexOf('/');
+         int i = url.indexOf('/');
 
         if (i == -1) {
             //it is an url given by a descriptor
@@ -306,6 +306,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         	}
            return UrlBuilder.checkUrl(url);
         }
+        //return UrlBuilder.checkUrl(url);
     }
 
     public String [] getNodesNames() throws ProActiveException {

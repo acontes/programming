@@ -146,14 +146,18 @@ public class ProActiveXMLUtils {
     public static Object sendMessage(String url, int port, byte[] message,
         String action) throws Exception, HTTPRemoteException {
         try {
+        	String nodename = null;
+        	   
             if (!url.startsWith("http:")) {
                 url = "http:" + url;
             }
 
             int lastIndex = url.lastIndexOf(":");
 
-            if (url.lastIndexOf('/') > 6) {
-                url = url.substring(0, url.lastIndexOf('/'));
+            int lastslash = url.lastIndexOf('/');
+            if ( lastslash > 6) {
+            	nodename = url.substring(lastslash);
+            	url = url.substring(0, lastslash);
             }
 
             if (port == 0) {
@@ -165,6 +169,11 @@ public class ProActiveXMLUtils {
                 //    	 	url = url.substring(0,lastIndex);
                 //    	 else
                 url = url + ":" + port;
+            }
+            
+            if(nodename != null ){
+            	url = url + nodename;
+            	
             }
 
             URL u = new URL(url);

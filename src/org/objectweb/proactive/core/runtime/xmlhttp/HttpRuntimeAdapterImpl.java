@@ -46,9 +46,10 @@ public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
         remoteProActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
 
         String host = getVMInformation().getInetAddress().getCanonicalHostName();
-        String name = getVMInformation().getName();
-        runtimeadapter.url = UrlBuilder.buildUrl(host, name, "http:",
-                runtimeadapter.port);
+        
+        //runtimeadapter.url = "http://"+host+":"+runtimeadapter.port;
+        runtimeadapter.url = UrlBuilder.buildUrl(host,"","http:",runtimeadapter.port);
+        
         logger.debug("url adapter = " + runtimeadapter.url);
     }
 
@@ -71,8 +72,8 @@ public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
             //      then take the name of the node
             String name = UrlBuilder.getNameFromUrl(nodeURL);
             remoteProActiveRuntime.createLocalNode(name,
-                replacePreviousBinding, ps, vname, jobId);
-
+                replacePreviousBinding, ps, vname, jobId); 
+ 
             return nodeURL;
         } catch (NodeException e) {
             // TODO Auto-generated catch block
