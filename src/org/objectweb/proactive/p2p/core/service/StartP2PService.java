@@ -31,13 +31,8 @@
  */
 package org.objectweb.proactive.p2p.core.service;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
@@ -45,6 +40,13 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import java.util.Vector;
 
 
 /**
@@ -54,41 +56,80 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
  *
  */
 public class StartP2PService {
-    private boolean noRegister = true;
+    private static String DEFAULT_ACQUISITION_METHOD = "rmi:";
+    private static String DEFAULT_PORT_NUMBER = "9301"; // echo ProActive | tr 'a-zA-Z' 'A-Za-z' | sum
     static Logger logger = Logger.getLogger(StartP2PService.class.getName());
     protected String acquisitionMethod;
     protected String portNumber;
     protected Vector serverList;
     protected P2PServiceImpl p2pService;
 
-    public StartP2PService(String[] args) {
-        if (args.length == 3) {
-            this.noRegister = false;
-            this.serverList = parser(args[2]);
-        }
-        this.acquisitionMethod = args[0];
-        if (!this.acquisitionMethod.endsWith(";")) {
+    public StartP2PService(String fileUrl) {
+        this(new Vector());
+        parser(fileUrl);
+    }
+
+    public StartP2PService(String acquisitionMethod, String portNumber,
+        Vector serverList) {
+        this.acquisitionMethod = acquisitionMethod;
+        if (!this.acquisitionMethod.endsWith(":")) {
             this.acquisitionMethod += ":";
         }
-        this.portNumber = args[1];
+        this.portNumber = portNumber;
+        this.serverList = serverList;
+    }
+
+    public StartP2PService(Vector serverList) {
+        this(DEFAULT_ACQUISITION_METHOD, DEFAULT_PORT_NUMBER, serverList);
+    }
+
+    private static void usage() {
+        System.out.println(
+            "StartP2PService [acquisitionMethod [portNumber]] [-s Server]... [-f ServerListFile]");
+        System.exit(1);
+    }
+
+    private static boolean isOption(String arg) {
+        return arg.equals("-s") || arg.equals("-f");
+    }
+
+    private void handleCommandLine(String[] args) {
+        int beginServers = 0;
+
+        if ((args.length > 0) && !isOption(args[0])) {
+            acquisitionMethod = args[0];
+            beginServers++;
+            if (!acquisitionMethod.endsWith(":")) {
+                acquisitionMethod += ":";
+            }
+
+            if ((args.length > 1) && !isOption(args[1])) {
+                portNumber = args[1];
+                beginServers++;
+            }
+        }
+
+        for (int i = beginServers; i < args.length; i += 2) {
+            if (isOption(args[i]) && (args.length > (i + 1))) {
+                if (args[i].equals("-f")) {
+                    parser(args[i + 1]);
+                } else {
+                    serverList.add(args[i + 1]);
+                }
+            } else {
+                usage();
+            }
+        }
     }
 
     /**
-     * Usage: java org.objectweb.proactive.p2p.daemon.P2PProActiveRuntime
-     * acquisitionMethod portNumber [Servers List File]
+     * Usage: java org.objectweb.proactive.p2p.core.service.StartP2PService
+     * [acquisitionMethod [portNumber]] [-s Server]... [-f ServerListFile]
      *
      * @param args
      *            acquisitionMethod portNumber Servers List File
      */
     public static void main(String[] args) {
-        if ((args.length != 3) && (args.length != 2)) {
-            System.err.println(
-                "Usage: java org.objectweb.proactive.p2p.daemon.P2PProActiveRuntime acquisitionMethod portNumber [Servers List File]");
-            logger.error(
-                "Usage: java org.objectweb.proactive.p2p.daemon.P2PProActiveRuntime acquisitionMethod portNumber [Servers List File]");
-            System.exit(69);
-        }
-
         ProActiveConfiguration.load();
 
         try {
@@ -103,11 +144,9 @@ public class StartP2PService {
         } catch (java.net.UnknownHostException e) {
             e.printStackTrace();
         }
-        StartP2PService toto = new StartP2PService(args);
-        toto.start();
-        while (true) {
-            ;
-        }
+        StartP2PService service = new StartP2PService(new Vector());
+        service.handleCommandLine(args);
+        service.start();
 
         // Tests:
         // Test getProActiveJVMS
@@ -161,6 +200,7 @@ public class StartP2PService {
             System.setProperty("proactive." +
                 this.acquisitionMethod.replace(':', ' ').trim() + ".port",
                 this.portNumber);
+
             ProActiveRuntime paRuntime = RuntimeFactory.getProtocolSpecificRuntime(this.acquisitionMethod);
 
             // Node Creation
@@ -168,16 +208,21 @@ public class StartP2PService {
                     false, null, paRuntime.getVMInformation().getName(),
                     paRuntime.getJobID());
 
-            // P2PServie Active Object Creation
-            Object[] params = new Object[3];
+            // P2PService Active Object Creation
+            Object[] params = new Object[2];
             params[0] = this.acquisitionMethod;
             params[1] = this.portNumber;
-            params[2] = paRuntime;
+            //            params[2] = paRuntime;
             this.p2pService = (P2PServiceImpl) ProActive.newActive(P2PServiceImpl.class.getName(),
                     params, url);
 
+            if (logger.isInfoEnabled()) {
+                logger.info(
+                    "/////////////////////////////  STARTING P2P SERVICE //////////////////////////////");
+            }
+
             // Record the ProActiveRuntime in other from Servers List File
-            if (!this.noRegister) {
+            if (!serverList.isEmpty()) {
                 ((P2PServiceImpl) this.p2pService).registerP2PServices(this.serverList);
             }
         } catch (NodeException e) {
@@ -196,14 +241,13 @@ public class StartP2PService {
      *            URL of the file.
      * @return a vector with all hosts.
      */
-    private static Vector parser(String fileURL) {
-        Vector list = new Vector();
+    private void parser(String fileURL) {
         try {
             FileReader serverList = new FileReader(fileURL);
             BufferedReader in = new BufferedReader(serverList);
             String line;
             while ((line = in.readLine()) != null) {
-                list.add(line);
+                this.serverList.add(line);
             }
             in.close();
         } catch (FileNotFoundException e) {
@@ -211,7 +255,6 @@ public class StartP2PService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return list;
     }
 
     /**
