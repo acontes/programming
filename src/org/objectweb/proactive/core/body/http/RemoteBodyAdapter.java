@@ -175,14 +175,11 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         if (!(o instanceof RemoteBodyAdapter)) {
             return false;
         }
-
         RemoteBodyAdapter rba = (RemoteBodyAdapter) o;
-
-        //return remoteBodyStrategy.equals(rba.remoteBodyStrategy);
-        return (url.equals(rba.getURL()) && bodyID.equals(rba.getBodyID())) &&
-		(port == rba.getPort());
-        
-        //return remoteBodyStrategy.equals(o);
+        return remoteBodyStrategy.equals(rba.remoteBodyStrategy);
+       //return (url.equals(rba.getURL()) && bodyID.equals(rba.getBodyID())) &&
+		//(port == rba.getPort());       
+       
     }
 
     public void receiveRequest(Request request)
@@ -374,7 +371,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     public UniqueID getBodyID() {
     	return this.bodyID;
     }
-    
+      
     public int getPort() {
         return this.port;
     }
@@ -387,8 +384,8 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     
     
     public int hashCode() {
-        return bodyID.hashCode();//jobID
-        //remoteBodyStrategy
+        //return bodyID.hashCode();//jobID
+        return remoteBodyStrategy.hashCode();
         
     }
     

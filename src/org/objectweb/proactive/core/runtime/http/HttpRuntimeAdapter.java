@@ -19,6 +19,7 @@ import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
@@ -346,4 +347,27 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     public String getStrategyURL() {
         return url;
     }
+    
+    
+    
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof HttpRuntimeAdapter)) {
+            return false;
+        }
+        HttpRuntimeAdapter runtimeadapter = (HttpRuntimeAdapter) o;
+        return runtimestrategyadapter.equals(runtimeadapter.runtimestrategyadapter);
+    }
+
+    public int hashCode() {
+        return runtimestrategyadapter.hashCode();
+    }
+    
+    
+    
+    
+    
+    
+    
+    
 }

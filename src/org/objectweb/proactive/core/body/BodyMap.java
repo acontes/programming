@@ -131,11 +131,11 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     }
 
     public synchronized UniversalBody getBody(UniqueID id) {
-        Object o;
-
-        synchronized (idToBodyMap) {
-            o = idToBodyMap.get(id);
-        }
+        Object o = null;
+        if(id != null)
+        	synchronized (idToBodyMap) {
+        		o = idToBodyMap.get(id);
+        	}
 
         return (UniversalBody) o;
     }
@@ -146,7 +146,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
  
     public java.util.Iterator bodiesIterator() {
         return idToBodyMap.values().iterator();
-    } 
+    }  
 
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
