@@ -188,14 +188,8 @@ public class ProActiveXMLUtils {
 
             DataInputStream in = null;
 
-            try {
-                in = new DataInputStream(new BufferedInputStream(
-                            connection.getInputStream()));
-            } catch (java.net.ConnectException e) {
-                logger.info("Could not connect to " + url);
-
-                return null;
-            }
+            in = new DataInputStream(new BufferedInputStream(
+                        connection.getInputStream()));
 
             int a = connection.getContentLength();
             byte[] b = new byte[connection.getContentLength()];

@@ -266,7 +266,7 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
             try {
                 sendRequest(new RuntimeRequest("killRT", params));
             } catch (HTTPRemoteException e) {
-                throw e;
+            	// do nothing (results from distant System.exit(0))
             } catch (Exception e) {
                 throw new ProActiveException(e);
             }
