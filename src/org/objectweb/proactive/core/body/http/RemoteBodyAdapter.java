@@ -178,8 +178,10 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
         RemoteBodyAdapter rba = (RemoteBodyAdapter) o;
 
-        return remoteBodyStrategy.equals(rba.remoteBodyStrategy);
-
+        //return remoteBodyStrategy.equals(rba.remoteBodyStrategy);
+        return (url.equals(rba.getURL()) && bodyID.equals(rba.getBodyID())) &&
+		(port == rba.getPort());
+        
         //return remoteBodyStrategy.equals(o);
     }
 
@@ -369,10 +371,10 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         return remoteBodyStrategy.getHandlerizableInfo();
     }
 
-    //    public UniqueID getBodyID() {
-    //    	return this.bodyID;
-    //    	
-    //    }
+    public UniqueID getBodyID() {
+    	return this.bodyID;
+    }
+    
     public int getPort() {
         return this.port;
     }

@@ -537,18 +537,18 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             throw new HTTPUnexpectedException("Unexpected exception", e);
         }
     }
-
-    //    public boolean equals(Object o) {
-    //        if (!(o instanceof RemoteBodyAdapter)) {
-    //            return false; 
-    //        } 
-    //
-    //        RemoteBodyAdapter rba = (RemoteBodyAdapter) o;
-    //
-    //        return (remoteBodyAdapter.url.equals(rba.getURL()) && remoteBodyAdapter.bodyID.equals(rba.getBodyID())) &&
-    //        		(remoteBodyAdapter.port == rba.getPort());
-    //    }
+/*
+    public boolean equals(Object o) {
+    	if (!(o instanceof HttpRemoteBodyImpl)) {
+    		return false; 
+    	} 
     
+    	HttpRemoteBodyImpl rba = (HttpRemoteBodyImpl) o;
+    
+    	return (remoteBodyAdapter.url.equals(rba.getURL()) && remoteBodyAdapter.bodyID.equals(rba.getBodyID())) &&
+		(remoteBodyAdapter.port == rba.getPort());
+    }
+    */
     public UniversalBody getRemoteAdapter() {
         return remoteBodyAdapter.getRemoteAdapter();
     }
