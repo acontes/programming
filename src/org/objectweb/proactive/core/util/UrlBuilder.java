@@ -72,6 +72,7 @@ public class UrlBuilder {
     //	
     public static String buildUrl(String host, String name, String protocol,
         int port) {
+        protocol = checkProtocol(protocol);
         String noProtocolUrl = buildUrl(host, name, port);
         if (protocol.equals(Constants.DEFAULT_PROTOCOL_IDENTIFIER)) {
             return noProtocolUrl;
@@ -89,9 +90,15 @@ public class UrlBuilder {
      * @param protocol
      * @return an Url built from properties
      */
-    public static String buildUrlFromProperties(String host, String name,
-        String protocol) {
-        String port = System.getProperty("proactive.rmi.port");
+    public static String buildUrlFromProperties(String host, String name) {
+        String port = null;
+        String protocol = System.getProperty("proactive.communication.protocol");
+        if(protocol.equals("rmi") || protocol.equals("ibis")){
+            port = System.getProperty("proactive.rmi.port");
+        }
+        if(protocol.equals("http")){
+            port = System.getProperty("proactive.http.port");
+        }
         if (checkProtocol(protocol).equals("jini:") || (port == null)) {
             return buildUrl(host, name, protocol);
         } else {
@@ -219,7 +226,11 @@ public class UrlBuilder {
             String validUrl = checkUrl(url);
             int n = validUrl.indexOf("//");
             int m = validUrl.lastIndexOf("/");
-            return getPortNumber(validUrl.substring(n + 2, m));
+            if (m == (n + 1)) {
+                return getPortNumber(validUrl.substring(n + 2));
+            } else {
+                return getPortNumber(validUrl.substring(n + 2, m));
+            }
         } catch (java.net.UnknownHostException e) {
             e.printStackTrace();
             return DEFAULT_REGISTRY_PORT;
@@ -240,9 +251,17 @@ public class UrlBuilder {
     //	}
     private static String buildUrl(String host, String name, int port) {
         if (port == DEFAULT_REGISTRY_PORT) {
-            return "//" + host + "/" + name;
+            if (name.equals("")) {
+                return "//" + host;
+            } else {
+                return "//" + host + "/" + name;
+            }
         } else {
-            return "//" + host + ":" + port + "/" + name;
+            if (name.equals("")) {
+                return "//" + host + ":" + port;
+            } else {
+                return "//" + host + ":" + port + "/" + name;
+            }
         }
     }
 
@@ -265,7 +284,8 @@ public class UrlBuilder {
                     } else if (name.indexOf("/") < 0) {
                         // there is a port and no name, it is a host url
                         return buildHostUrl("//" +
-                            hostInetAddress.getCanonicalHostName(), protocol);
+                            hostInetAddress.getCanonicalHostName() + name,
+                            protocol);
                     }
 
                     //port is define, extract port and build url
@@ -311,6 +331,7 @@ public class UrlBuilder {
      */
     private static String buildHostUrl(String urlToRead, String protocol)
         throws UnknownHostException {
+        protocol = checkProtocol(protocol);
         String urlTemp;
         String hostname = getHostFromUrl(urlToRead.substring(2,
                     urlToRead.length()));
