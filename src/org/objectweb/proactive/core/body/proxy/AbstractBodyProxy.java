@@ -155,6 +155,10 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         try {
             sendRequest(methodCall, null);
         } catch (java.io.IOException e) {
+        	
+        	System.out.println("iiiiiiiiiiiiiiiiiiiiiiiicccccccccccccccccccccccccciiiiiiiiiiiiiiiiiiiiiiii\n");
+			e.printStackTrace();
+        	
             // old stuff
             // throw new MethodCallExecutionFailedException("Exception occured in reifyAsOneWay while sending request for methodcall ="+methodCall.getName(), e);
             // Create a non functional exception encapsulating the network exception

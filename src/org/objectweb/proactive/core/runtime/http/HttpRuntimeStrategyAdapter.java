@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.objectweb.proactive.core.runtime.xmlhttp;
+package org.objectweb.proactive.core.runtime.http;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

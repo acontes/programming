@@ -52,7 +52,7 @@ public class BodyRequest extends ReflectRequest implements Serializable
     public RuntimeReply process() throws Exception {
        
         		Object result = null;
-
+ 
         		
         		if(body == null )
         		     this.body = ProActiveXMLUtils.getBody(this.oaid);

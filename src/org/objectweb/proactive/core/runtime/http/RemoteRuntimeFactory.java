@@ -28,7 +28,7 @@
  *
  * ################################################################
  **/
-package org.objectweb.proactive.core.runtime.xmlhttp;
+package org.objectweb.proactive.core.runtime.http;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;

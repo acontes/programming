@@ -141,11 +141,8 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         try {
         	
             String url;
-
             int port = ClassServer.DEFAULT_SERVER_BASE_PORT;
-
             url = urn;
-
 
             if (urn.lastIndexOf(":") > 4) {
                 port = UrlBuilder.getPortFromUrl(urn);
@@ -170,7 +167,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     // ------------------------------------------
     public boolean equals(Object o) {
         if (!(o instanceof RemoteBodyAdapter)) {
-            return false;
+            return false; 
         }
 
         RemoteBodyAdapter rba = (RemoteBodyAdapter) o;
