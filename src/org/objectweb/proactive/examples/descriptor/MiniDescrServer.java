@@ -21,7 +21,7 @@ public class MiniDescrServer {
         VirtualNode virtualnode = null;
 
         ProActiveDescriptor pad = null;
-        logger.info("-+-+-+-+-+-+-+- MiniDescrClient launched -+-+-+-+-+-+-+-");
+        logger.info("-+-+-+-+-+-+-+- MiniDescrServer launched -+-+-+-+-+-+-+-");
 
         try {
             pad = ProActive.getProactiveDescriptor(location);

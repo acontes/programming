@@ -1,7 +1,7 @@
 package org.objectweb.proactive.examples.descriptor;
 
 public class MiniDescrActive {
-	public Message getComputerInfo() {
+	public Message getComputerInfo(){
 		try {
 			return new Message(java.net.InetAddress.getLocalHost() + "");
 		}

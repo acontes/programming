@@ -1,8 +1,7 @@
 package org.objectweb.proactive.examples.descriptor;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
@@ -10,6 +9,9 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+
+import java.io.IOException;
+
 
 /**
  *
@@ -32,34 +34,57 @@ public class MiniDescrClient {
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
+
         virtualnode.activate();
 
+        Node[] nodes = null;
+
         try {
-            Node[] nodes = virtualnode.getNodes();
-            Object[] param = null;
+            nodes = virtualnode.getNodes();
 
             for (int i = 0; i < nodes.length; i++) {
-            	for (int j = 0; j < 100; j++) {
-            		MiniDescrActive desc = (MiniDescrActive)ProActive.newActive(MiniDescrActive.class.getName(), param, nodes[i]);
-            		for (int k = 0; k < 10; k++) {
-            			Message msg = desc.getComputerInfo();
-            			logger.info("-+-+-+-+-+-+-+- " + msg + " -+-+-+-+-+-+-+-");
-            		}
-            	}
+                for (int j = 0; j < 1; j++) {
+                    new Thread(new Bomber(nodes[i])).start();
+                }
             }
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
+        } catch (NodeException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
     }
 
-
     public static void main(String[] args) throws IOException {
-    	if (args.length < 1)
-    		new MiniDescrClient(MiniDescrClient.class.getResource("minidescriptor_client.xml").getPath());
-    	else
-    		new MiniDescrClient(args[0]);
-    	System.exit(0);
+        if (args.length < 1) {
+            new MiniDescrClient(MiniDescrClient.class.getResource(
+                    "minidescriptor_client.xml").getPath());
+        } else {
+            new MiniDescrClient(args[0]);
+        }
+    }
+
+    class Bomber implements Runnable {
+        Node n;
+
+        Bomber(Node n) {
+            this.n = n;
+        }
+
+        public void run() {
+            try {
+                MiniDescrActive desc = (MiniDescrActive) ProActive.newActive(MiniDescrActive.class.getName(),
+                        null, n);
+
+                for (int k = 0; k < 20; k++) {
+                    Message msg = desc.getComputerInfo();
+                    logger.info("-+-+-+-+-+-+-+- " + msg + " -+-+-+-+-+-+-+-");
+                }
+            } catch (ActiveObjectCreationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NodeException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -6,11 +6,11 @@
 	   </virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
-		<register virtualNode="MiniVNServer" protocol="http"/>
+		<register virtualNode="MiniVNServer" protocol="rmi"/>
 		<mapping>
 			<map virtualNode="MiniVNServer">
 				<jvmSet>
-					<currentJVM protocol="http"/>
+					<currentJVM protocol="rmi"/>
 				</jvmSet>
 			</map>
 		</mapping>
