@@ -48,8 +48,10 @@ public class ClassServer implements Runnable {
         String newport = System.getProperty("proactive.http.port");
 
         if (newport != null) {
-            DEFAULT_SERVER_BASE_PORT = Integer.valueOf(newport).intValue();
+        	DEFAULT_SERVER_BASE_PORT = Integer.valueOf(newport).intValue();
         }
+        else
+        	DEFAULT_SERVER_BASE_PORT = 2222;
     }
 
     private java.net.ServerSocket server = null;
@@ -85,7 +87,7 @@ public class ClassServer implements Runnable {
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
 
         if (logger.isInfoEnabled()) {
-            logger.info("port = " + port);
+            logger.info("http server port = " + port);
         }
 
         printMessage();
@@ -172,7 +174,7 @@ public class ClassServer implements Runnable {
      * if the class is not found or the response was malformed).
      */
     public void run() {
-        java.net.Socket socket = null;
+        java.net.Socket socket = null;   
 
         // accept a connection
         while (true) {

@@ -6,6 +6,8 @@
  */
 package org.objectweb.proactive.core.body.http;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
@@ -27,14 +29,23 @@ public class HttpLookupMessage implements HttpMessage {
 	public Object processMessage() {
 		if (this.urn != null) {
 			UniversalBody ub = RemoteBodyAdapter.getBodyFromUrn(urn);
-			if (ub != null)
-			this.returnedObject = ub;
-		else
-			this.returnedObject = ProActiveXMLUtils.NO_SUCH_OBJECT;
+			if (ub != null)		
+				this.returnedObject = ub;
+		/*	else {	// urn body is not found in http we search in rmi 	
+				try {
+					this.returnedObject = org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter.lookup(urn);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (this.returnedObject == null) // urn body is no found
+					this.returnedObject = ProActiveXMLUtils.NO_SUCH_OBJECT;	
+			}	*/	
+	
 		this.urn = null;
-		
 		return this;
-		} else {
+		}
+		else { 
 			return this.returnedObject;
 		}
 	}

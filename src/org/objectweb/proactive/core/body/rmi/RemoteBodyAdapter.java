@@ -8,7 +8,7 @@
  * Contact: proactive-support@inria.fr
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
+ * modify it under the terms of the GNU Lesser General Public 
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
  *
@@ -161,16 +161,29 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      * @exception java.io.IOException if the remote body cannot be found under the given url
      *      or if the object found is not of type RemoteBody
      */
-    public static UniversalBody lookup(String url) throws java.io.IOException {
+    public static UniversalBody lookup(String url) throws java.io.IOException {  
         Object o = null;
 
         // Try if URL is the address of a RemoteBody
         try {
             o = java.rmi.Naming.lookup(url);
-        } catch (java.rmi.NotBoundException e) {
-            throw new java.io.IOException("The url " + url +
-                " is not bound to any known object");
+        } catch (java.rmi.NotBoundException e) { // there are one rmiregistry on target computer but node isn t bound
+        	
+        	//logger.info("\n------------------\n Lookup rmi NotBoundException --> test with http protocole\n------------------\n ");
+        	// if notboundexception we test with http protocol
+        	//return org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
+        	// this exception is in  http.RemoteBodyAdapter.lookup	
+        	
+        	
+        	throw new java.io.IOException("The url " + url +
+        	 	 " is not bound to any known object");
         }
+        /*catch (java.rmi.ConnectException e) {
+        	logger.info("\n------------------\n Lookup rmi ConnectException --> test with http protocole\n------------------\n ");
+        	// if ConnectException we test with http protocol
+        	return org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
+        }*/
+       
         if (o instanceof RemoteBody) {
             try {
                 return new RemoteBodyAdapter((RemoteBody) o);

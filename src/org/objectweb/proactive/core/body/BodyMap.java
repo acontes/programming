@@ -81,21 +81,19 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      * block if it already exists until it is removed
      */
     public synchronized void putBody(UniqueID id, UniversalBody b) {
-        synchronized (idToBodyMap) {
-            while (idToBodyMap.get(id) != null) {
+    	while (idToBodyMap.get(id) != null) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+    	idToBodyMap.put(id, b);
 
-            idToBodyMap.put(id, b);
-
-            if (hasListeners()) {
+    	if (hasListeners()) {
                 notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
             }
-        }
+    
     }
 
     /**
@@ -103,24 +101,23 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      * erase any previous entry
      */
     public synchronized void updateBody(UniqueID id, UniversalBody b) {
-        synchronized (idToBodyMap) {
-            idToBodyMap.put(id, b);
+               idToBodyMap.put(id, b);
 
             if (hasListeners()) {
                 notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
             }
-        }
+   
     }
 
     public synchronized void removeBody(UniqueID id) {
-        synchronized (idToBodyMap) {
+
             UniversalBody b = (UniversalBody) idToBodyMap.remove(id);
             notifyAll();
 
             if ((b != null) && hasListeners()) {
                 notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
             }
-        }
+
     }
 
     public synchronized int size() {
@@ -132,9 +129,9 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     public synchronized UniversalBody getBody(UniqueID id) {
         Object o = null;
         if(id != null)
-        	synchronized (idToBodyMap) {
+
         		o = idToBodyMap.get(id);
-        	}
+
 
         return (UniversalBody) o;
     }
@@ -150,7 +147,6 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
 
-        synchronized (idToBodyMap) {
             sb.append(" -- BodyMap ------- \n");
 
             java.util.Set entrySet = idToBodyMap.entrySet();
@@ -161,7 +157,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
                 sb.append(entry.getKey()).append("  body = ")
                   .append(entry.getValue()).append("\n");
             }
-        }
+        
 
         return sb.toString();
     }
@@ -197,7 +193,6 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      */
     public synchronized void readExternal(java.io.ObjectInput in)
         throws java.io.IOException, ClassNotFoundException {
-        synchronized (idToBodyMap) {
             int size = in.readInt();
 
             for (int i = 0; i < size; i++) {
@@ -205,7 +200,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
                 UniversalBody remoteBody = (UniversalBody) in.readObject();
                 idToBodyMap.put(id, remoteBody);
             }
-        }
+
     }
 
     /**
@@ -215,7 +210,6 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      */
     public synchronized void writeExternal(java.io.ObjectOutput out)
         throws java.io.IOException {
-        synchronized (idToBodyMap) {
             int size = idToBodyMap.size();
             out.writeInt(size);
 
@@ -234,7 +228,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
                     out.writeObject(value);
                 }
             }
-        }
+
     }
 
     //
