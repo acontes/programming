@@ -37,10 +37,14 @@ public class BodyRequest implements Serializable
         this.body = ProActiveXMLUtils.getBody(this.oaid);
     }
 
-    public RuntimeReply process() throws ProActiveException {
+    public RuntimeReply process() throws Exception {
        
         		Object result = null;
 
+        		
+        		if(body == null )
+        		     this.body = ProActiveXMLUtils.getBody(this.oaid);
+        		
                 Class[] classes = new Class[parameters.size()];
                 //Remplissage du tableau des types:
                 for (int i = 0; i < parameters.size(); i++) {
@@ -48,10 +52,8 @@ public class BodyRequest implements Serializable
                 }
                 try {
 						result = body.getClass().getMethod(methodName, classes).invoke(body,parameters.toArray());
-				} catch (InvocationTargetException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					
+				} catch (InvocationTargetException e) {
+					throw (Exception) e.getCause();					
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
