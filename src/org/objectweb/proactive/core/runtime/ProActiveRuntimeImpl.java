@@ -51,17 +51,12 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-
-//
 import java.io.File;
 import java.io.IOException;
-
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -913,4 +908,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     	}
     	return nodesNames;
     }
+    
+   
+    
 }

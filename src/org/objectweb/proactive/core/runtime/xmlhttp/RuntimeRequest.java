@@ -29,18 +29,20 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.webservices.utils.KeyHashMapMethod;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import java.security.cert.X509Certificate;
 
 import java.util.ArrayList;
-
-
+import java.util.HashMap;
+ 
 /**
  * @author vlegrand
  *
@@ -54,161 +56,75 @@ public class RuntimeRequest implements Serializable {
     private ArrayList paramsTypes;
     private UniqueID oaid;
 
-    public RuntimeRequest(String methodName) {
-        this.methodName = methodName;
+    private static HashMap hMapMethods;
+    private static ProActiveRuntimeImpl runtime;
+    
+    static {
+    	
+    	// init the hashmap, that contains all the methods of  ProActiveRuntimeImpl 
+        // in 'Object' (value) and the name of funtions in key 
+        // (Warning two functions can t have the same name (for now)) 
+        runtime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+       	Method [] allmethods = runtime.getClass().getMethods();
+       	int numberOfMethods = allmethods.length;
+       	hMapMethods = new HashMap(numberOfMethods);
+		for(int i=0;i<numberOfMethods;i++) {
+			
+			String methodname = allmethods[i].getName();
+			if(hMapMethods.containsKey(methodname)) {
+				
+				Object obj = hMapMethods.get(methodname);
+				
+				if( ! ( obj instanceof ArrayList) ){
+					ArrayList array = new ArrayList();
+					array.add((Method)obj);
+					array.add(allmethods[i]);
+					hMapMethods.put(methodname,array);
+				}
+				else {
+					((ArrayList)obj).add(allmethods[i]);
+					hMapMethods.put(methodname,(ArrayList)obj);
+				}
+			} 
+			else 
+				hMapMethods.put(methodname,allmethods[i]);
+		}     	
+	
+    	
+    }
+    
+    public RuntimeRequest(String newmethodName) {
+        this.methodName = newmethodName;
+       	
+    }
+    
+   
+    public RuntimeRequest(String newmethodName, ArrayList newparameters) {
+        this(newmethodName);
+        this.parameters = newparameters;
     }
 
-    public RuntimeRequest(String methodName, ArrayList parameters) {
-        this.methodName = methodName;
-        this.parameters = parameters;
+    public RuntimeRequest(String newmethodName, ArrayList newparameters,
+        ArrayList mewparamsTypes) {
+        this(newmethodName,newparameters);
+        this.paramsTypes = mewparamsTypes;
     }
 
-    public RuntimeRequest(String methodName, ArrayList parameters,
-        ArrayList paramsTypes) {
-        this.methodName = methodName;
-        this.parameters = parameters;
-        this.paramsTypes = paramsTypes;
-    }
-
-    public RuntimeRequest(String methodName, ArrayList parameters, UniqueID oaid) {
-        this.methodName = methodName;
-        this.parameters = parameters;
-        //  this.paramsTypes = paramsTypes;
-        this.oaid = oaid;
+    public RuntimeRequest(String newmethodName, ArrayList newparameters, UniqueID newoaid) {
+        this(newmethodName,newparameters);
+        this.oaid = newoaid;
     }
 
     public RuntimeReply process() throws ProActiveException {
         try {
-            Object[] params = parameters.toArray();
+        		Object[] params = parameters.toArray();
+        		Object result = null;
 
-            //                        Class[] classes = new Class[parameters.size()];
-            //            
-            //                       if (this.paramsTypes == null) {
-            //                            //Remplissage du tableau des types:
-            //                            for (int i = 0; i < parameters.size(); i++) {
-            //                              classes[i] = parameters.get(i).getClass();
-            //                            }
-            //                        } else {
-            //                        	Object[] tab = paramsTypes.toArray();
-            //                            for (int i = 0; i < tab.length; i++) {
-            //                               classes[i] = (Class) tab[i];
-            //                           }
-            //                        }
-            Object result = null;
-
-            if (this.oaid == null) {
-                //                if (logger.isDebugEnabled()) {
-                //                    logger.debug("-- > invoquation de la methode " +
-                //                        methodName + " ( " + parameters +
-                //                        ") sur le runtime :  " +
-                //                        (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime());
-                //                }
-                ProActiveRuntimeImpl runtime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-                if (methodName.equals("createLocalNode")) {
-                    String nodeName = (String) parameters.get(0);
-
-                    //nodeName = nodeName.substring(nodeName.indexOf('/'));
-                    result = runtime.createLocalNode(nodeName,
-                            ((Boolean) parameters.get(1)).booleanValue(),
-                            (PolicyServer) parameters.get(2),
-                            (String) parameters.get(3),
-                            (String) parameters.get(4));
-                } else if (methodName.equals("killAllNodes")) {
-                    runtime.killAllNodes();
-                } else if (methodName.equals("killNode")) {
-                    runtime.killNode((String) parameters.get(0));
-                } else if (methodName.equals("createVM")) {
-                    runtime.createVM((UniversalProcess) parameters.get(0));
-                } else if (methodName.equals("getLocalNodeNames")) {
-                    result = runtime.getLocalNodeNames();
-                } else if (methodName.equals("getVMInformation")) {
-                	
-                    result = runtime.getVMInformation();
-                    
-                } else if (methodName.equals("register")) {
-                		
-                    runtime.register((ProActiveRuntime) parameters.get(0),
-                        (String) parameters.get(1), (String) parameters.get(2),
-                        (String) parameters.get(3), (String) parameters.get(4));
-                } else if (methodName.equals("getProActiveRuntime")) {
-                    result = ProActiveRuntimeImpl.getProActiveRuntime();
-                } else if (methodName.equals("getProActiveRuntimes")) {
-                
-                    result = runtime.getProActiveRuntimes();
-                } else if (methodName.equals("killRT")) {
-                    runtime.killRT(((Boolean) parameters.get(0)).booleanValue());
-                } else if (methodName.equals("getActiveObjects")) {
-                    if (parameters.size() == 1) {
-                        result = runtime.getActiveObjects((String) parameters.get(
-                                    0));
-                    } else {
-                        result = runtime.getActiveObjects((String) parameters.get(
-                                    0), (String) parameters.get(1));
-                    }
-                } else if (methodName.equals("getVirtualNode")) {
-                    result = runtime.getVirtualNode((String) parameters.get(0));
-                } else if (methodName.equals("registerVirtualNode")) {
-                    runtime.registerVirtualNode((String) parameters.get(0),
-                        ((Boolean) parameters.get(1)).booleanValue());
-                } else if (methodName.equals("unregisterVirtualNode")) {
-                    runtime.unregisterVirtualNode((String) parameters.get(0));
-                } else if (methodName.equals("unregisterAllVirtualNodes")) {
-                    runtime.unregisterAllVirtualNodes();
-                } else if (methodName.equals("createBody")) {
-                    String nodeName = (String) parameters.get(0);
-                    System.out.println("Create Body  on " + nodeName);
-                    result = runtime.createBody((String) parameters.get(0),
-                            (ConstructorCall) parameters.get(1),
-                            ((Boolean) parameters.get(2)).booleanValue());
-                } else if (methodName.equals("receiveBody")) {
-                    result = runtime.receiveBody((String) parameters.get(0),
-                            (Body) parameters.get(1));
-                } else if (methodName.equals("getPolicyServer")) {
-                    result = runtime.getPolicyServer();
-                } else if (methodName.equals("setProActiveSecurityManager")) {
-                    runtime.setProActiveSecurityManager((ProActiveSecurityManager) parameters.get(
-                            0));
-                } else if (methodName.equals("getCreatorCertificate")) {
-                    result = runtime.getCreatorCertificate();
-                } else if (methodName.equals("getVNName")) {
-                    result = runtime.getVNName((String) parameters.get(0));
-                } else if (methodName.equals("setDefaultNodeVirtualNodeName")) {
-                    runtime.setDefaultNodeVirtualNodeName((String) parameters.get(
-                            0));
-                } else if (methodName.equals("getNodePolicyServer")) {
-                    result = runtime.getNodePolicyServer((String) parameters.get(
-                                0));
-                } else if (methodName.equals("enableSecurityIfNeeded")) {
-                    runtime.enableSecurityIfNeeded();
-                } else if (methodName.equals("getNodeCertificate")) {
-                    result = runtime.getNodeCertificate((String) parameters.get(
-                                0));
-                } else if (methodName.equals("getEntities")) {
-                    if (parameters.size() == 0) {
-                        result = runtime.getEntities();
-                    } else if ((parameters.size() == 1) &&
-                            parameters.get(0) instanceof String) {
-                        result = runtime.getEntities((String) parameters.get(0));
-                    } else if ((parameters.size() == 2) &&
-                            parameters.get(0) instanceof String) {
-                        result = runtime.getEntities((UniversalBody) parameters.get(
-                                    0));
-                    }
-                } else if (methodName.equals("getJobID")) {
-                    if (parameters.size() == 0) {
-                        result = runtime.getJobID();
-                    } else {
-                        result = runtime.getJobID((String) parameters.get(0));
-                    }
-                } else if (methodName.equals("getNodesNames")){
-                	result = runtime.getNodesNames ();
-                }
-
-                //                    Method m = runtime.getClass().getMethod(methodName, classes);;
-                //                    MethodCall mc = MethodCall.getMethodCall(m, parameters.toArray());
-                //    result = mc.execute(runtime);                
-                //                    result = runtime.getClass().getMethod(methodName, classes)
-                //                                .invoke(runtime, params);
+        		if (this.oaid == null) {
+            
+        			Method m = getProActiveRuntimeMethod(methodName,parameters);
+        			result = m.invoke(runtime, parameters.toArray());
+              
             } else {
                 //Recuperation du body sur lequel on va faire appel
                 Body body = ProActiveXMLUtils.getBody(this.oaid);
@@ -338,4 +254,36 @@ public class RuntimeRequest implements Serializable {
     public ArrayList getParameters() {
         return this.parameters;
     }
+    
+    public Method getProActiveRuntimeMethod(String methodsearch, ArrayList paramsearch){
+    	  Object mret = hMapMethods.get(methodsearch);
+    	  
+    	  if(mret instanceof ArrayList) {
+    	  	
+    	  	ArrayList allSameMethod = (ArrayList)mret;
+    	  	mret = null;
+    	  	for(int i=0;i<allSameMethod.size();i++) {
+    	  		
+    	  		Method mtest = ((Method)allSameMethod.get(i));	
+    	  		if( mtest.getParameterTypes().length == paramsearch.size() ) {
+    	  			if(mret != null ) {
+    					logger.error("----------------------------------------------------------------------------");
+    					logger.error("----- ERROR : two functions in ProActiveRuntimeImpl can t have the same name");
+    					logger.error("----- ERROR : and the same number of paramters ");
+    					logger.error("----------------------------------------------------------------------------");
+    	  				
+    	  			}
+    	  			else 
+    	  				mret = mtest;
+    	  		}
+    	  	}
+    	  	
+    	  }
+    
+    	  return (Method)mret;	
+    }
+    
+    
+   
+    
 }
