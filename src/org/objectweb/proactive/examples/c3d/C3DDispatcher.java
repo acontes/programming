@@ -1081,7 +1081,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		ProActiveConfiguration.load();
 		//if (argv.length < 1)
 		//{
-			System.err.println("salut Jer "+argv[0]);
+			//System.err.println(
 				//"Usage: java org.objectweb.proactive.examples.c3d.C3DDispatcher <engineFile> [<nodeURL>]");
 			//System.exit(0);
 		//}

@@ -100,7 +100,7 @@ public class MiniDescrClient {
             	// Create remote object on the node
                 MiniDescrActive desc = (MiniDescrActive) ProActive.newActive(MiniDescrActive.class.getName(),
                         null, node);
-
+            	
                 // Thread number trace
                 int threadNbDigits = (int) Math.ceil((Math.log(NB_THREADS + 1) / Math.log(
                         10)));
