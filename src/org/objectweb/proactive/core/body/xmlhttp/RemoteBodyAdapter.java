@@ -51,7 +51,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
 import org.objectweb.proactive.ext.webservices.utils.HTTPUnexpectedException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
