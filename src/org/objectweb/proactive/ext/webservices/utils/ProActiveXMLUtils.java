@@ -248,13 +248,13 @@ public class ProActiveXMLUtils {
 
             return message;
         } else if (action.equals(RUNTIME_REQUEST)) {
-        	RuntimeReply reply1 = null;
+        	RuntimeReply reply = null;
         	if( obj instanceof RuntimeRequest ){
         		RuntimeRequest rr = (RuntimeRequest) obj;
-        		reply1 = rr.process();
+        		reply = rr.process();
         	}else	{
         		BodyRequest rr = (BodyRequest) obj;
-        		reply1 = rr.process();
+        		reply = rr.process();
         	
         	}
 
