@@ -6,7 +6,7 @@
 	   </virtualNodesAcquisition>
 	</componentDefinition>
 	<deployment>
-		<lookup virtualNode="MiniVNServer" host="localhost:2016" protocol="http"/>
+		<lookup virtualNode="MiniVNServer" host="localhost:2026" protocol="http"/>
 	</deployment>
 
 	<infrastructure>

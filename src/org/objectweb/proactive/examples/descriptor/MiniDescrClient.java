@@ -43,7 +43,7 @@ public class MiniDescrClient {
             nodes = virtualnode.getNodes();
 
             for (int i = 0; i < nodes.length; i++) {
-                for (int j = 0; j < 1; j++) {
+                for (int j = 0; j < 10; j++) {
                     new Thread(new Bomber(nodes[i])).start();
                 }
             }
@@ -74,7 +74,7 @@ public class MiniDescrClient {
                 MiniDescrActive desc = (MiniDescrActive) ProActive.newActive(MiniDescrActive.class.getName(),
                         null, n);
 
-                for (int k = 0; k < 20; k++) {
+                for (int k = 0; k < 10; k++) {
                     Message msg = desc.getComputerInfo();
                     logger.info("-+-+-+-+-+-+-+- " + msg + " -+-+-+-+-+-+-+-");
                 }

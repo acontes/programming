@@ -130,21 +130,18 @@ public class ProActiveService extends Thread {
             // If there is an error when writing the reply,
         	// nothing can be told to the caller...
             e.printStackTrace();
+        } finally {
+            try {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Fermeture de la socket " + this.socket);
+                }
+         	
+                socket.close();
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
         }
         return;
-
-        //} catch (java.io.IOException e) {
-        //} finally {
-        //    try {
-        //        if (logger.isDebugEnabled()) {
-        //            logger.debug("Fermeture de la socket " + this.socket);
-        //        }
-        // 	
-        //        socket.close();
-        //    } catch (java.io.IOException e) {
-        //        //e.printStackTrace();
-        //    }
-        //}
     }
 
     /**
