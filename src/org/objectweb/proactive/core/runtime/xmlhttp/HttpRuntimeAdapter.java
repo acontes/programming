@@ -189,8 +189,8 @@ public class HttpRuntimeAdapter implements ProActiveRuntime,
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#updateLocalNodeVirtualName()
      */
     public void listVirtualNodes() throws ProActiveException {
-        // vide !!!!
     	//  remoteProActiveRuntime.updateLocalNodeVirtualName();
+    	this.runtimestrategyadapter.listVirtualNodes();
     }
 
     /* (non-Javadoc)
@@ -245,7 +245,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime,
      * @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
-        return vmInformation.getJobID();
+        return runtimestrategyadapter.getJobID();
     }
 
     /**
@@ -261,16 +261,14 @@ public class HttpRuntimeAdapter implements ProActiveRuntime,
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addParent(java.lang.String)
      */
     public void addParent(String proActiveRuntimeName) {
-    	// vide !!!
+       this.runtimestrategyadapter.addParent(proActiveRuntimeName);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getParents()
      */
     public String[] getParents() {
-        // vide !!!
-    	// TODO Auto-generated method stub
-        return null;
+        return this.runtimestrategyadapter.getParents();
     }
 
     /* (non-Javadoc)
@@ -278,9 +276,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime,
      */
     public SecurityContext getPolicy(SecurityContext sc)
         throws ProActiveException, SecurityNotAvailableException {
-        // vide !!!!
-    	// TODO Auto-generated method stub
-        return null;
+         return this.runtimestrategyadapter.getPolicy(sc);
     }
     
     private void writeObject(java.io.ObjectOutputStream out)
@@ -314,7 +310,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime,
     
     public String [] getNodesNames() throws ProActiveException {
     	
-    	return runtimestrategyadapter.getNodesNames();
+       	return runtimestrategyadapter.getNodesNames();
     }
     
 }

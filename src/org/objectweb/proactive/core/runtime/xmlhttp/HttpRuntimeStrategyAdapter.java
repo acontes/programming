@@ -19,12 +19,14 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 
 
 
-public interface HttpRuntimeStrategyAdapter {
+public interface HttpRuntimeStrategyAdapter extends ProActiveRuntime {
 	
     
     public String createLocalNode(String nodeName,
@@ -144,14 +146,14 @@ public interface HttpRuntimeStrategyAdapter {
     
     public String [] getNodesNames() throws ProActiveException;
     
-/*
+
     public void addParent(String proActiveRuntimeName) ;
 
    
     public String[] getParents() ;
   
     public SecurityContext getPolicy(SecurityContext sc) throws ProActiveException, SecurityNotAvailableException;
-*/
+
 
 }
 

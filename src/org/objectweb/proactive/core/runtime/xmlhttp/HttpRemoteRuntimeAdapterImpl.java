@@ -21,6 +21,8 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter  {
@@ -309,7 +311,7 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
     public void unregisterVirtualNode(String virtualNodeName)
         throws ProActiveException {
      
-        String methodName = "'unregisterVirtualNode";
+        String methodName = "unregisterVirtualNode";
         ArrayList params = new ArrayList();
         params.add(virtualNodeName);
 
@@ -366,7 +368,7 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
     public void setProActiveSecurityManager(ProActiveSecurityManager ps)
         throws ProActiveException {
       
-        String methodName = "'setProActiveSecurityManager";
+        String methodName = "setProActiveSecurityManager";
         ArrayList params = new ArrayList();
         params.add(ps);
 
@@ -379,7 +381,7 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
      */
     public X509Certificate getCreatorCertificate() throws ProActiveException {
      
-        String methodName = "'getCreatorCertificate";
+        String methodName = "getCreatorCertificate";
         RuntimeRequest req = new RuntimeRequest(methodName);
         Object o = sendRequest(req);
 
@@ -388,7 +390,7 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
 
     public String getVNName(String nodename) throws ProActiveException {
      
-        String methodName = "'getVNName";
+        String methodName = "getVNName";
         ArrayList params = new ArrayList();
         params.add(nodename);
 
@@ -526,7 +528,76 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
     	
     }
     
+    /**
+     * @see org.objectweb.proactive.Job#getJobID()
+     */
+    public String getJobID() {
+    	String methodName = "getJobID";
+        RuntimeRequest req = new RuntimeRequest(methodName);
+        Object o=null;
+		try {
+			o = sendRequest(req);
+		} catch (ProActiveException e) {
+			e.printStackTrace();
+		}
+		return (String) o;
+    }
   
+   ///////////////
+    public void addParent(String proActiveRuntimeName) {
+    	
+    	String methodName = "addParent";
+        ArrayList params = new ArrayList();
+        params.add(proActiveRuntimeName);
+
+        RuntimeRequest req = new RuntimeRequest(methodName, params);
+        try {
+			sendRequest(req);
+		} catch (ProActiveException e) {
+			e.printStackTrace();
+		}
+      
+    }
+    
+    public String[] getParents() {
+    	
+    	String methodName = "getParents";
+        RuntimeRequest req = new RuntimeRequest(methodName);
+        Object o=null;
+		try {
+			o = sendRequest(req);
+		} catch (ProActiveException e) {
+			e.printStackTrace();
+		}
+		return (String[]) o;
+
+    }
+ 
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws ProActiveException, SecurityNotAvailableException {
+    	   
+    	String methodName = "getPolicy";
+    		ArrayList params = new ArrayList();
+           params.add(sc);
+
+           RuntimeRequest req = new RuntimeRequest(methodName, params);
+           Object o = sendRequest(req);
+
+           return (SecurityContext) o;
+    }
+
+    public void listVirtualNodes() throws ProActiveException {
+    	//  remoteProActiveRuntime.updateLocalNodeVirtualName();
+        String methodName = "listVirtualNodes";
+        RuntimeRequest req = new RuntimeRequest(methodName);
+        sendRequest(req);
+    }
+    
+    
+    
+    
+    
+    
 }
 
 	

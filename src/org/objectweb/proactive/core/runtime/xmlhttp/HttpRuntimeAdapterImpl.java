@@ -30,6 +30,8 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 
@@ -41,15 +43,12 @@ public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
 	
 	ProActiveRuntime remoteProActiveRuntime;
 	
-	
-	
-	
 	public HttpRuntimeAdapterImpl (HttpRuntimeAdapter newruntimeadapter) {
 
 	   	runtimeadapter = newruntimeadapter;
 	   	remoteProActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
 	   	
-	   	
+	   	 
         String host = getVMInformation().getInetAddress().getCanonicalHostName();
         String name = getVMInformation().getName();
         runtimeadapter.url = UrlBuilder.buildUrl(host, name, "http:", runtimeadapter.port);
@@ -329,7 +328,7 @@ public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
 
     
     public String getJobID() {
-        return runtimeadapter.vmInformation.getJobID();
+        return remoteProActiveRuntime.getJobID();
     }
 
    
@@ -344,4 +343,34 @@ public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
     	 return remoteProActiveRuntime.getLocalNodeNames();
     
     }
+    
+    
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addParent(java.lang.String)
+     */
+    public void addParent(String proActiveRuntimeName) {
+    	remoteProActiveRuntime.addParent(proActiveRuntimeName);
+    }
+    
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getParents()
+     */
+    public String[] getParents() {
+        return this.remoteProActiveRuntime.getParents();
+    }
+ 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws ProActiveException, SecurityNotAvailableException {
+         return this.getPolicy(sc);
+    }
+
+    public void listVirtualNodes() throws ProActiveException {
+    	//  remoteProActiveRuntime.updateLocalNodeVirtualName();
+    	this.remoteProActiveRuntime.listVirtualNodes();
+    }
+    
 }
