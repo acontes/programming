@@ -11,7 +11,7 @@ import java.io.IOException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
-import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeStrategyAdapter;
+import org.objectweb.proactive.core.runtime.xmlhttp.HttpRuntimeAdapter;
 
 
 /**
@@ -35,7 +35,7 @@ public class HttpHostNodeFinder implements HostNodeFinder {
 		System.out.println("recherche des noeuds http sur : " + host);
 		if (!host.startsWith("//"))
 			host = "//" + host;
-		RuntimeStrategyAdapter adapter = new RuntimeStrategyAdapter(host);
+		HttpRuntimeAdapter adapter = new HttpRuntimeAdapter(host);
 		try {
 			String [] list = adapter.getNodesNames();
 			
