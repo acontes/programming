@@ -333,7 +333,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                 } else if ("http".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Factory is xmlhttp");
+                        logger.debug("Factory is http");
                     }
 
                     return new org.objectweb.proactive.core.body.http.RemoteBodyAdapter(body);

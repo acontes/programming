@@ -65,7 +65,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 	private transient UniversalBody remoteBodyStrategy ;
 	
 	/**
-     * an Hashtable containing all the xmlhttp  adapters registered. They can be retrieved
+     * an Hashtable containing all the http  adapters registered. They can be retrieved
      * thanks to the ProActive.lookupActive method
      */
     protected static transient Hashtable urnBodys = new Hashtable();
