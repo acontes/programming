@@ -384,4 +384,13 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         in.defaultReadObject();
         this.remoteBodyStrategy = new HttpRemoteBodyImpl(this);
     }
+    
+    
+    public int hashCode() {
+        return bodyID.hashCode();//jobID
+        //remoteBodyStrategy
+        
+    }
+    
+    
 }

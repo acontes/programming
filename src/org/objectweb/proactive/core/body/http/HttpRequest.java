@@ -34,9 +34,26 @@ public class HttpRequest implements HttpMessage {
 
 
     public Object  processMessage() {
-        try {
+    	if (this.request != null) {
+    	try {
         	Body body = ProActiveXMLUtils.getBody(IdBody);
-        	if (this.request != null) 
+
+        	///////////// multyiple migrastion bug
+        	for(int i=0;i<100;i++){
+        		if(body == null){
+        			body = ProActiveXMLUtils.getBody(IdBody);
+        		}
+        		else
+        			break;
+        			
+        		if( (i%3) == 0)
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+        		
+       	}	 
                 body.receiveRequest(this.request);
           
         } catch (IOException e) {
@@ -46,6 +63,7 @@ public class HttpRequest implements HttpMessage {
        
             e.printStackTrace();
         }
+    	}
         return null;
     }
 }

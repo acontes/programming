@@ -259,7 +259,7 @@ public class ProActiveXMLUtils {
         		BodyRequest rr = (BodyRequest) obj;
         		reply = rr.process();
         	
-        	}
+        	} 
 
             return reply;
         } else if (action.equals(RUNTIME_REPLY)) {
@@ -287,7 +287,7 @@ public class ProActiveXMLUtils {
     public static Body getBody(UniqueID id) {
         LocalBodyStore bodyStore = LocalBodyStore.getInstance();
 
-        //System.out.println(bodyStore.getLocalBodies());
+        
         Body body = bodyStore.getLocalBody(id);
 
         if (body == null) {

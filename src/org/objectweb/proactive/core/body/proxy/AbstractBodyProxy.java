@@ -155,8 +155,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         try {
             sendRequest(methodCall, null);
         } catch (java.io.IOException e) {
-        	
-        	System.out.println("iiiiiiiiiiiiiiiiiiiiiiiicccccccccccccccccccccccccciiiiiiiiiiiiiiiiiiiiiiii\n");
+ 
 			e.printStackTrace();
         	
             // old stuff
