@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.http;
 
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -51,26 +52,31 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.webservices.utils.HTTPUnexpectedException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
+
 import java.io.IOException;
 import java.io.Serializable;
+
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 
 
 public class RemoteBodyAdapter implements UniversalBody, Serializable {
-
-	private transient UniversalBody remoteBodyStrategy ;
-	
-	/**
-     * an Hashtable containing all the http  adapters registered. They can be retrieved
-     * thanks to the ProActive.lookupActive method
-     */
+    /**
+    * an Hashtable containing all the http  adapters registered. They can be retrieved
+    * thanks to the ProActive.lookupActive method
+    */
     protected static transient Hashtable urnBodys = new Hashtable();
     private static Logger logger = Logger.getLogger("XML_HTTP");
 
+    /**
+    * Cache the jobID locally for speed
+    */
+    protected String jobID;
+    private transient UniversalBody remoteBodyStrategy;
 
     /**
      * The unique  ID of the body
@@ -86,7 +92,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      * The port of the Runntime where the body is located
      */
     protected int port;
-    
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -94,17 +100,16 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     public RemoteBodyAdapter(UniversalBody body) throws ProActiveException {
-    	//distant
-    	 this.bodyID = body.getID();
-         this.url = ClassServer.getUrl();
-         this.port = ClassServer.getServerSocketPort();
-         
-         this.url=this.url+":"+this.port;  
-    	
-    	remoteBodyStrategy =  body;
+        //distant
+        this.bodyID = body.getID();
+        this.url = ClassServer.getUrl();
+        this.port = ClassServer.getServerSocketPort();
 
+        this.url = this.url + ":" + this.port;
+
+        remoteBodyStrategy = body;
     }
-  
+
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
@@ -140,15 +145,15 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      */
     public static UniversalBody lookup(String urn) throws java.io.IOException {
         try {
-        	
             String url;
             int port = ClassServer.DEFAULT_SERVER_BASE_PORT;
             url = urn;
 
             if (urn.lastIndexOf(":") > 4) {
                 port = UrlBuilder.getPortFromUrl(urn);
-//				port = Integer.parseInt(urn.substring(urn.lastIndexOf(':'),
-  //                          urn.lastIndexOf(':') + 5));
+
+                //				port = Integer.parseInt(urn.substring(urn.lastIndexOf(':'),
+                //                          urn.lastIndexOf(':') + 5));
             }
 
             urn = urn.substring(urn.lastIndexOf('/'));
@@ -167,17 +172,24 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     // ------------------------------------------
     public boolean equals(Object o) {
-    	return remoteBodyStrategy.equals(o);
+        if (!(o instanceof RemoteBodyAdapter)) {
+            return false;
+        }
+
+        RemoteBodyAdapter rba = (RemoteBodyAdapter) o;
+
+        return remoteBodyStrategy.equals(rba.remoteBodyStrategy);
+
+        //return remoteBodyStrategy.equals(o);
     }
 
     public void receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
-    
-    	remoteBodyStrategy.receiveRequest(request);
+        remoteBodyStrategy.receiveRequest(request);
     }
 
     public void receiveReply(Reply reply) throws IOException {
-    	remoteBodyStrategy.receiveReply(reply);
+        remoteBodyStrategy.receiveReply(reply);
     }
 
     public String getURL() {
@@ -189,7 +201,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     public String getNodeURL() {
-    	return 	remoteBodyStrategy.getNodeURL();
+        return remoteBodyStrategy.getNodeURL();
     }
 
     public UniqueID getID() {
@@ -198,7 +210,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     public void updateLocation(UniqueID id, UniversalBody body)
         throws IOException {
-        remoteBodyStrategy.updateLocation(id,body);
+        remoteBodyStrategy.updateLocation(id, body);
     }
 
     public UniversalBody getRemoteAdapter() {
@@ -206,7 +218,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     public void enableAC() throws IOException {
-    	remoteBodyStrategy.enableAC();
+        remoteBodyStrategy.enableAC();
     }
 
     public void disableAC() throws IOException {
@@ -215,14 +227,14 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     public void setImmediateService(String methodName)
         throws IOException {
-    	remoteBodyStrategy.setImmediateService(methodName);	
+        remoteBodyStrategy.setImmediateService(methodName);
     }
 
     public void initiateSession(int type, UniversalBody body)
         throws IOException, CommunicationForbiddenException, 
             AuthenticationException, RenegotiateSessionException, 
             SecurityNotAvailableException {
-    	remoteBodyStrategy.initiateSession(type,body);	
+        remoteBodyStrategy.initiateSession(type, body);
     }
 
     public void terminateSession(long sessionID)
@@ -232,13 +244,12 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        
-            return remoteBodyStrategy.getCertificate();
+        return remoteBodyStrategy.getCertificate();
     }
 
     public Policy getPolicyFrom(X509Certificate certificate)
         throws SecurityNotAvailableException, IOException {
-    	return remoteBodyStrategy.getPolicyFrom(certificate);
+        return remoteBodyStrategy.getPolicyFrom(certificate);
     }
 
     public long startNewSession(Communication policy)
@@ -250,39 +261,42 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     public ConfidentialityTicket negociateKeyReceiverSide(
         ConfidentialityTicket confidentialityTicket, long sessionID)
         throws SecurityNotAvailableException, KeyExchangeException, IOException {
-        return remoteBodyStrategy.negociateKeyReceiverSide(confidentialityTicket,sessionID);
+        return remoteBodyStrategy.negociateKeyReceiverSide(confidentialityTicket,
+            sessionID);
     }
 
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
-       return remoteBodyStrategy.getPublicKey();
+        return remoteBodyStrategy.getPublicKey();
     }
 
     public byte[] randomValue(long sessionID, byte[] cl_rand)
         throws SecurityNotAvailableException, Exception {
-        return remoteBodyStrategy.randomValue(sessionID,cl_rand);
+        return remoteBodyStrategy.randomValue(sessionID, cl_rand);
     }
 
     public byte[][] publicKeyExchange(long sessionID,
         UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
         byte[] sig_code) throws SecurityNotAvailableException, Exception {
-        return remoteBodyStrategy.publicKeyExchange(sessionID,distantBody,my_pub,my_cert,sig_code);
+        return remoteBodyStrategy.publicKeyExchange(sessionID, distantBody,
+            my_pub, my_cert, sig_code);
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
         throws SecurityNotAvailableException, Exception {
-             return remoteBodyStrategy.secretKeyExchange(sessionID,tmp,tmp1,tmp2,tmp3,tmp4);
+        return remoteBodyStrategy.secretKeyExchange(sessionID, tmp, tmp1, tmp2,
+            tmp3, tmp4);
     }
 
     public Communication getPolicyTo(String type, String from, String to)
         throws SecurityNotAvailableException, IOException {
-    	return remoteBodyStrategy.getPolicyTo(type,from,to);
+        return remoteBodyStrategy.getPolicyTo(type, from, to);
     }
 
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
-    	return remoteBodyStrategy.getPolicy(securityContext);
+        return remoteBodyStrategy.getPolicy(securityContext);
     }
 
     public String getVNName() throws SecurityNotAvailableException, IOException {
@@ -291,7 +305,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
-    	return remoteBodyStrategy.getCertificateEncoded();
+        return remoteBodyStrategy.getCertificateEncoded();
     }
 
     public ArrayList getEntities()
@@ -305,36 +319,46 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     public HashMap getHandlersLevel() throws java.io.IOException {
-return remoteBodyStrategy.getHandlersLevel();	
+        return remoteBodyStrategy.getHandlersLevel();
     }
-/*
-    public void setExceptionHandler(Class handler, Class exception)
-        throws IOException { 
 
-    	logger.info("\n\n---------------------------------------\n-------- Comprend pas\n----------------------\n\n");
-    	//        remoteBodyStrategy.setExceptionHandler(handler, exception);
-    }
-*/
+    /*
+        public void setExceptionHandler(Class handler, Class exception)
+            throws IOException {
+
+                logger.info("\n\n---------------------------------------\n-------- Comprend pas\n----------------------\n\n");
+                //        remoteBodyStrategy.setExceptionHandler(handler, exception);
+        }
+    */
     public Handler unsetExceptionHandler(Class exception)
         throws IOException {
-      return remoteBodyStrategy.unsetExceptionHandler(exception);
+        return remoteBodyStrategy.unsetExceptionHandler(exception);
     }
 
-    public void setExceptionHandler(Handler handler, Class exception) {
-        // TODO Auto-generated method stub
+    public void setExceptionHandler(Handler handler, Class exception)
+        throws IOException {
+        remoteBodyStrategy.setExceptionHandler(handler, exception);
     }
 
     public String getJobID() {
-        // TODO Auto-generated method stub
-        return null;
-    }  
+        if (jobID == null) {
+            //try {
+            jobID = remoteBodyStrategy.getJobID();
 
-    // TODO TODO
+            //} catch (HTTPRemoteException e) {
+            //	e.printStackTrace();
+            //	return "";
+            //}
+        }
+
+        return jobID;
+    }
 
     /**
      * Clear the local map of handlers
      */
     public void clearHandlersLevel() throws java.io.IOException {
+        remoteBodyStrategy.clearHandlersLevel();
     }
 
     /**
@@ -342,22 +366,20 @@ return remoteBodyStrategy.getHandlersLevel();
      * @return
      */
     public String getHandlerizableInfo() throws java.io.IOException {
-        return "TODO";
+        return remoteBodyStrategy.getHandlerizableInfo();
     }
-    
-    public UniqueID getBodyID() {
-    	return this.bodyID;
-    	
-    }
-    
+
+    //    public UniqueID getBodyID() {
+    //    	return this.bodyID;
+    //    	
+    //    }
     public int getPort() {
-    	return this.port;
+        return this.port;
     }
- 
+
     private void readObject(java.io.ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    	this.remoteBodyStrategy = new HttpRemoteBodyImpl(this);
+        throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.remoteBodyStrategy = new HttpRemoteBodyImpl(this);
     }
-    
 }
