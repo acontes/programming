@@ -19,8 +19,7 @@ import org.objectweb.proactive.core.node.NodeException;
 public class MiniDescrClient {
     static Logger logger = Logger.getLogger(MiniDescrClient.class);
     private static final int NB_THREADS = 10;
-    private static final int NB_CALLS_PER_THREAD = 10;
-    MiniDescrActive minidesca = null;
+    private static final int NB_CALLS_PER_THREAD = 109;
 
     public MiniDescrClient(String location) {
         VirtualNode virtualnode = null;
@@ -45,7 +44,7 @@ public class MiniDescrClient {
 
             for (int i = 0; i < nodes.length; i++) {
                 for (int j = 0; j < NB_THREADS; j++) {
-                    bombs[j] = new Bomber(nodes[i]);
+                    bombs[j] = new Bomber(j, nodes[i]);
                     bombs[j].start();
 
                     // Use this line instead to make sequential calls
@@ -80,10 +79,20 @@ public class MiniDescrClient {
     }
 
     class Bomber extends Thread {
+        int no;
         Node node;
 
-        Bomber(Node node) {
+        Bomber(int no, Node node) {
+            this.no = no;
             this.node = node;
+        }
+
+        void appendZeros(StringBuffer buf, int n, int maxDigits) {
+            int nbZeros = maxDigits -
+                (int) Math.ceil((Math.log(n + 1) / Math.log(10)));
+
+            for (int i = 0; i < nbZeros; i++)
+                buf.append('0');
         }
 
         public void run() {
@@ -91,9 +100,31 @@ public class MiniDescrClient {
                 MiniDescrActive desc = (MiniDescrActive) ProActive.newActive(MiniDescrActive.class.getName(),
                         null, node);
 
+                int threadNbDigits = (int) Math.ceil((Math.log(NB_THREADS + 1) / Math.log(
+                            10)));
+                int callsNbDigits = (int) Math.ceil((Math.log(NB_CALLS_PER_THREAD +
+                            1) / Math.log(10)));
+
+                String threadTrace;
+
+                {
+                    StringBuffer buf = new StringBuffer();
+                    buf.append("Thread No");
+                    appendZeros(buf, no + 1, threadNbDigits);
+                    buf.append(no + 1);
+                    buf.append(" & Call No");
+                    threadTrace = buf.toString();
+                }
+
                 for (int k = 0; k < NB_CALLS_PER_THREAD; k++) {
                     Message msg = desc.getComputerInfo();
-                    logger.info("-+-+-+-+-+-+-+- " + msg + " -+-+-+-+-+-+-+-");
+                    StringBuffer buf = new StringBuffer(threadTrace);
+                    appendZeros(buf, k + 1, callsNbDigits);
+                    buf.append(k + 1);
+                    buf.append(" -+-+-+-+-+-+-+- ");
+                    buf.append(msg);
+                    buf.append(" -+-+-+-+-+-+-+-");
+                    logger.info(buf.toString());
                 }
             } catch (ActiveObjectCreationException e) {
                 // TODO Auto-generated catch block
