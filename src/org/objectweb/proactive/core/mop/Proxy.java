@@ -30,12 +30,14 @@
 */ 
 package org.objectweb.proactive.core.mop;
 
+import org.objectweb.proactive.core.exceptions.Handlerizable;
+
 
 /**
  * The proxy interface
  * This interface only defines one method.
  */
-public interface Proxy {
+public interface Proxy extends Handlerizable {
 
   /**
    * Reifies a method call invoked on the object
