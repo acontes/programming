@@ -192,8 +192,7 @@ public class ProActiveXMLUtils {
             try {
             	in = new DataInputStream(new BufferedInputStream(connection.getInputStream()));
             } catch (java.net.ConnectException e) {
-            	System.err.println("Could not connect to " + url);
-                e.printStackTrace();
+            	logger.info("Could not connect to " + url);
                 return null;
             }
             
