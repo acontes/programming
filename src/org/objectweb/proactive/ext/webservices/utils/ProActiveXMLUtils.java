@@ -7,6 +7,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.xmlhttp.BodyRequest;
 import org.objectweb.proactive.core.body.xmlhttp.XMLHTTPMessage;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeRequest;
@@ -247,8 +248,15 @@ public class ProActiveXMLUtils {
 
             return message;
         } else if (action.equals(RUNTIME_REQUEST)) {
-            RuntimeRequest rr = (RuntimeRequest) obj;
-            RuntimeReply reply = rr.process();
+        	RuntimeReply reply1 = null;
+        	if( obj instanceof RuntimeRequest ){
+        		RuntimeRequest rr = (RuntimeRequest) obj;
+        		reply1 = rr.process();
+        	}else	{
+        		BodyRequest rr = (BodyRequest) obj;
+        		reply1 = rr.process();
+        	
+        	}
 
             return reply;
         } else if (action.equals(RUNTIME_REPLY)) {
