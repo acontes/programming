@@ -173,10 +173,11 @@ public class ProActiveXMLUtils {
                 url = url + ":" + port;
             }
             
-            if(nodename != null ){
-            	url = url + nodename;
-            	
-            }
+            // Nodename is never used on the server
+            //if(nodename != null ){
+            //	url = url + nodename;
+            //	
+            //}
 
             URL u = new URL(url + SERVICE_REQUEST_URI);
 
