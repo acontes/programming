@@ -12,14 +12,14 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 /**
- *
+ * Sends a bunch of parallel requests to a given virtual node
  *
  * @author Jerome+Sylvain
  */
 public class MiniDescrClient {
     static Logger logger = Logger.getLogger(MiniDescrClient.class);
     private static final int NB_THREADS = 10;
-    private static final int NB_CALLS_PER_THREAD = 109;
+    private static final int NB_CALLS_PER_THREAD = 10;
 
     public MiniDescrClient(String location) {
         VirtualNode virtualnode = null;
@@ -97,16 +97,14 @@ public class MiniDescrClient {
 
         public void run() {
             try {
+            	// Create remote object on the node
                 MiniDescrActive desc = (MiniDescrActive) ProActive.newActive(MiniDescrActive.class.getName(),
                         null, node);
 
+                // Thread number trace
                 int threadNbDigits = (int) Math.ceil((Math.log(NB_THREADS + 1) / Math.log(
-                            10)));
-                int callsNbDigits = (int) Math.ceil((Math.log(NB_CALLS_PER_THREAD +
-                            1) / Math.log(10)));
-
+                        10)));
                 String threadTrace;
-
                 {
                     StringBuffer buf = new StringBuffer();
                     buf.append("Thread No");
@@ -116,8 +114,12 @@ public class MiniDescrClient {
                     threadTrace = buf.toString();
                 }
 
+                int callsNbDigits = (int) Math.ceil((Math.log(NB_CALLS_PER_THREAD +
+                        1) / Math.log(10)));
                 for (int k = 0; k < NB_CALLS_PER_THREAD; k++) {
+                	// Call remote object
                     Message msg = desc.getComputerInfo();
+                    // Call number trace
                     StringBuffer buf = new StringBuffer(threadTrace);
                     appendZeros(buf, k + 1, callsNbDigits);
                     buf.append(k + 1);
