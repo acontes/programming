@@ -1,24 +1,12 @@
 package org.objectweb.proactive.ext.webservices.utils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.UnknownHostException;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.xmlhttp.XMLHTTPMessage;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeRequest;
@@ -26,9 +14,21 @@ import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeRequest;
 import sun.rmi.server.MarshalInputStream;
 import sun.rmi.server.MarshalOutputStream;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.UnknownHostException;
+
 
 public class ProActiveXMLUtils {
-	public static final String MESSAGE = "Message";
+    public static final String MESSAGE = "Message";
     public static final String RUNTIME_REQUEST = "RuntimeRequest";
     public static final String RUNTIME_REPLY = "RuntimeReply";
     public static final String PROACTIVE_MESSAGE = "ProActiveMessage";
@@ -44,8 +44,9 @@ public class ProActiveXMLUtils {
     private static final String PROACTIVE_LOOKUP_RESULT = "LookupResult";
     private static final String PROACTIVE_ERROR = "Error";
     private static int tries = 0;
-  
+    public static final String ACTION_EXCEPTION = "Exception";
     private static transient Logger logger = Logger.getLogger("XML_HTTP");
+
     /**
     *
     * @param o
@@ -73,6 +74,7 @@ public class ProActiveXMLUtils {
         }
 
         result = new String(buffer);
+
         return buffer;
     }
 
@@ -84,7 +86,7 @@ public class ProActiveXMLUtils {
     public static Object deserializeObject(byte[] buffer) {
         Object o = null;
         MarshalInputStream in = null;
-        
+
         try {
             in = new MarshalInputStream(new ByteArrayInputStream(buffer));
             o = in.readObject();
@@ -120,17 +122,13 @@ public class ProActiveXMLUtils {
     }
 
     public static String getName() {
-		
-			try {
-				
-					return java.net.InetAddress.getLocalHost()+"";   
-			}
-				catch(Exception e){
-					return "java.net.InetAddress.getLocalHost() IMPOSSIBLE";   
-				}
-			}
-		
-    
+        try {
+            return java.net.InetAddress.getLocalHost() + "";
+        } catch (Exception e) {
+            return "java.net.InetAddress.getLocalHost() IMPOSSIBLE";
+        }
+    }
+
     /**
      *
      * @param url
@@ -138,15 +136,15 @@ public class ProActiveXMLUtils {
      * @param action
      */
     public static Object sendMessage(String url, int port, Object obj,
-        String action) {
+        String action) throws Exception, HTTPRemoteException {
         byte[] message = getMessage(obj);
+
         return sendMessage(url, port, message, action);
     }
 
     public static Object sendMessage(String url, int port, byte[] message,
-        String action) {
-
-    	try {
+        String action) throws Exception, HTTPRemoteException {
+        try {
             if (!url.startsWith("http:")) {
                 url = "http:" + url;
             }
@@ -174,8 +172,8 @@ public class ProActiveXMLUtils {
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Length",
-                "" + message.length);
+            connection.setRequestProperty("Content-Length", "" +
+                message.length);
             connection.setRequestProperty("Content-Type", "text/xml");
             connection.setRequestProperty("ProActive-Action", action);
             connection.setUseCaches(false);
@@ -188,41 +186,36 @@ public class ProActiveXMLUtils {
             out.close();
 
             DataInputStream in = null;
-            
+
             try {
-            	in = new DataInputStream(new BufferedInputStream(connection.getInputStream()));
+                in = new DataInputStream(new BufferedInputStream(
+                            connection.getInputStream()));
             } catch (java.net.ConnectException e) {
-            	logger.info("Could not connect to " + url);
+                logger.info("Could not connect to " + url);
+
                 return null;
             }
-            
+
+            int a = connection.getContentLength();
             byte[] b = new byte[connection.getContentLength()];
-            
+
             //int totalRead = 0;
             //while (totalRead != b.length) {
             //	totalRead = in.read(b, totalRead, b.length - totalRead);
             //}
             in.readFully(b);
-            
-            try {
-                Object rep = ProActiveXMLUtils.unwrapp(b,
-                        connection.getHeaderField("ProActive-Action"));
 
-                return rep;
-            } catch (ProActiveException e) {
-                e.printStackTrace();
-            }
+            Object rep = ProActiveXMLUtils.unwrapp(b,
+                    connection.getHeaderField("ProActive-Action"));
+
+            return rep;
         } catch (ConnectException e) {
-            e.printStackTrace();
+            throw new HTTPRemoteException("Error while connecting the remote host", e);
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new HTTPRemoteException("Unknowm remote host", e);
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (Exception e) {
-        	e.printStackTrace();
+            throw new HTTPRemoteException("Error during connection with remote host", e);
         }
-        return null;
     }
 
     /**
@@ -232,47 +225,47 @@ public class ProActiveXMLUtils {
      * @throws ProActiveException
      */
     public static Object unwrapp(byte[] msg, String action)
-        throws ProActiveException {
+        throws Exception {
         //InputStream in = new ByteArrayInputStream(msg);
-
-        Request paRequest = null;
-        Reply paReply = null;
-        Body body = null;
-
+        //Request paRequest = null;
+        //Reply paReply = null;
+        //Body body = null;
         //parser = new ProActiveXMLParser(in);
-		Object[] result;
-		String msg_ = new String(msg);
-		
-		//            try {
-		//                result = (Object[]) parser.getResultObject();
-		//            } catch (SAXException e1) {
-		//                throw new ProActiveException(e1.getMessage());
-		//            }
-		//String action = (String) result[0];
-		//String objectValue = (String) result[1];
-		Object obj = deserializeObject(msg);
+        //Object[] result;
+        //String msg_ = new String(msg);
+        //            try {
+        //                result = (Object[]) parser.getResultObject();
+        //            } catch (SAXException e1) {
+        //                throw new ProActiveException(e1.getMessage());
+        //            }
+        //String action = (String) result[0];
+        //String objectValue = (String) result[1];
+        Object obj = deserializeObject(msg);
 
-		if (action.equals(MESSAGE)) {
-		    XMLHTTPMessage message = (XMLHTTPMessage) obj;
+        if (action.equals(MESSAGE)) {
+            XMLHTTPMessage message = (XMLHTTPMessage) obj;
 
-		    return message;
-		} else if (action.equals(RUNTIME_REQUEST)) {
-		    RuntimeRequest rr = (RuntimeRequest) obj;
-		    RuntimeReply reply = rr.process();
+            return message;
+        } else if (action.equals(RUNTIME_REQUEST)) {
+            RuntimeRequest rr = (RuntimeRequest) obj;
+            RuntimeReply reply = rr.process();
 
-		    return reply;
-		} else if (action.equals(RUNTIME_REPLY)) {
-		    return (RuntimeReply) obj;
-		} else if (action.equals(PROACTIVE_LOOKUP_RESULT)) {
-		    //System.out.println("ub = " + obj.getClass());
+            return reply;
+        } else if (action.equals(RUNTIME_REPLY)) {
+            return (RuntimeReply) obj;
+        } else if (action.equals(PROACTIVE_LOOKUP_RESULT)) {
+            //System.out.println("ub = " + obj.getClass());
+            if (obj instanceof UniversalBody) {
+                return (UniversalBody) obj;
+            } else {
+                throw new HTTPRemoteException("Transfered class is not an instance of UniversalBody", new ProActiveException(
+                        (String) obj));
+            }
+        } else if (action.equals(ACTION_EXCEPTION)) {
+            throw (Exception) obj;
+        }
 
-		    if (obj instanceof UniversalBody) {
-		        return (UniversalBody) obj;
-		    } else {
-		        throw new ProActiveException((String) obj);
-		    }
-		}
-		return null;
+        return null;
     }
 
     /**
@@ -282,6 +275,7 @@ public class ProActiveXMLUtils {
      */
     public static Body getBody(UniqueID id) {
         LocalBodyStore bodyStore = LocalBodyStore.getInstance();
+
         //System.out.println(bodyStore.getLocalBodies());
         Body body = bodyStore.getLocalBody(id);
 

@@ -64,11 +64,15 @@ public class FileProcess implements ServerProcess {
      * @exception ClassNotFoundException if the class corresponding
      * to <b>path</b> could not be loaded.
      */
-    public byte[] getBytes() throws IOException {
+    public byte[] getBytes() throws ClassNotFoundException {
         byte[] b = null;
         if (codebases == null) {
-            // reading from resources in the classpath
-            b = getBytesFromResource(info.path);
+            try {
+				// reading from resources in the classpath
+				b = getBytesFromResource(info.path);
+			} catch (IOException e) {
+		        throw new ClassNotFoundException("Cannot find class " + info.path, e);
+			}
         } else {
             for (int i = 0; i < codebases.length; i++) {
                 try {
@@ -108,12 +112,11 @@ public class FileProcess implements ServerProcess {
             return b;
         }
 
-        if (info.path != null) {
-            System.out.println("ClassServer sent class " + info.path +
-                " successfully");
-        }
-
-        throw new IOException("Cannot find class " + info.path);
+        //if (info.path != null) {
+        //    System.out.println("ClassServer sent class " + info.path +
+        //        " successfully");
+        //}
+        throw new ClassNotFoundException("Cannot find class " + info.path);
     }
 
     //

@@ -33,9 +33,9 @@ package org.objectweb.proactive.core.rmi;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.xmlhttp.XMLHTTPMessage;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
+import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 
@@ -87,9 +87,11 @@ public class XMLHTTPProcess {
                 action = ProActiveXMLUtils.OK;
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ProActiveException e) {
-            e.printStackTrace();
+        	replyMessage = ProActiveXMLUtils.getMessage(new HTTPRemoteException("Error before calling the remove method", e));
+        	action = ProActiveXMLUtils.ACTION_EXCEPTION;
+        } catch (Exception e) {
+        	replyMessage = ProActiveXMLUtils.getMessage(e);
+        	action = ProActiveXMLUtils.ACTION_EXCEPTION;
         }
         
         return new MSG(replyMessage, action);

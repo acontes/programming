@@ -27,9 +27,9 @@
  *  Contributor(s):
  *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.rmi;
- 
+
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -48,9 +48,9 @@ import java.util.Hashtable;
  * For example, when a request for a class file incomes, the thread calls the FileProcess.
  */
 public class ProActiveService extends Thread {
+    protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
     private final Socket socket;
     private String paths;
-    protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
 
     public ProActiveService(Socket socket, String paths) {
         this.socket = socket;
@@ -61,77 +61,90 @@ public class ProActiveService extends Thread {
         Hashtable table = new Hashtable();
         java.io.DataOutputStream out = null;
         RequestInfo info = null;
-        String contentType = "";
+        
+        String headers = "";
+        String statusLine;
+        String contentType;
         byte[] bytes = null;
+
         try {
             out = new java.io.DataOutputStream(socket.getOutputStream());
 
             // get the headers information in order to determine what is the service requested
-            HTTPInputStream in = new HTTPInputStream(new BufferedInputStream(socket.getInputStream()));
+            HTTPInputStream in = new HTTPInputStream(new BufferedInputStream(
+                        socket.getInputStream()));
             info = getInfo(in);
-            
+
             //If  there is no field application then it is a call to the 
             if ((info.application != null) &&
                     (info.application.indexOf("xml") > -1)) {
+                // ProActive Request via HTTP
                 XMLHTTPProcess process = new XMLHTTPProcess(in, info);
                 MSG msg = process.getBytes();
                 bytes = msg.getMessage();
-                contentType = "Content-Type: text/xml\r\n"
-                	+ "ProActive-Action: " + msg.getAction() + "\r\n"
-					+ "\r\n";
-                
-                out.writeBytes("HTTP/1.0 200 OK\r\n");
-                out.writeBytes("Content-Length: " + bytes.length + "\r\n");
-                out.writeBytes(contentType);
-                out.write(bytes);
-                out.flush();
-                out.close();
+
+                statusLine = "HTTP/1.1 200 OK";
+                contentType = "text/xml";
+                headers = "ProActive-Action: " + msg.getAction() + "\r\n";
             } else if (info.path != null) {
+                // ClassServer request
                 FileProcess fp = new FileProcess(paths, info);
-
                 bytes = fp.getBytes();
-                contentType = "Content-Type: application/java\r\n\r\n";
-                out.write("HTTP/1.0 200 OK\r\n".getBytes());
-                out.writeBytes("Content-Length: " + bytes.length + "\r\n");
-                out.write(contentType.getBytes());
-                out.write(bytes);
-
-                out.flush();
-                out.close();
+                statusLine = "HTTP/1.1 200 OK";
+                contentType = "application/java";
             } else {
-                return;
+                throw new ClassNotFoundException("No path specified");
             }
-
-
-
-            return;
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            // write out error response
-            e.printStackTrace();
-            if (info.path != null) {
-                System.out.println("!!! ClassServer failed to load class " +
+        } catch (Exception e) { // IOException and ClassNotFoundException
+            if (info != null && info.path != null) {
+                logger.info("!!! ClassServer failed to load class " +
                     info.path);
             }
 
-            try {
-                out.writeBytes("HTTP/1.0 400 " + e.getMessage() + "\r\n");
-                out.writeBytes("Content-Type: text/html\r\n\r\n");
-                out.flush();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        } finally {
-            try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Fermeture de la socket " + this.socket);
-                }
+            statusLine = "HTTP/1.1 400 " + e.getMessage();
+            contentType = "text/plain";
 
-                socket.close();
-            } catch (java.io.IOException e) {
-            }
+            // Time-consuming and not very useful:
+            // StringBuffer buf = new StringBuffer();
+            // StackTraceElement[] trace = e.getStackTrace();
+            // for (int i = 0; i < trace.length; i++) {
+            // 	buf.append(trace[i].toString());
+            // 	buf.append("\n");
+            // }
+            // bytes = buf.toString().getBytes();
+            bytes = new byte[0];
         }
+
+        try {
+            out.writeBytes(statusLine + "\r\n");
+            out.writeBytes("Content-Length: " + bytes.length + "\r\n");
+            int a = bytes.length;
+            String b = "Content-Length: " + bytes.length + "\r\n";
+            out.writeBytes("Content-Type: " + contentType + "\r\n");
+            out.writeBytes(headers);
+            out.writeBytes("\r\n");
+            out.write(bytes);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            // If there is an error when writing the reply,
+        	// nothing can be told to the caller...
+            e.printStackTrace();
+        }
+        return;
+
+        //} catch (java.io.IOException e) {
+        //} finally {
+        //    try {
+        //        if (logger.isDebugEnabled()) {
+        //            logger.debug("Fermeture de la socket " + this.socket);
+        //        }
+        // 	
+        //        socket.close();
+        //    } catch (java.io.IOException e) {
+        //        //e.printStackTrace();
+        //    }
+        //}
     }
 
     /**
@@ -153,12 +166,13 @@ public class ProActiveService extends Thread {
             } else if (line.startsWith("Content-Type:")) {
                 info.application = getApplication(line);
             } else if (line.startsWith("ProActive-Action:")) {
-               info.action = getAction(line);
+                info.action = getAction(line);
             } else if (line.startsWith("Content-Length:")) {
                 info.contentLength = Integer.parseInt(getContentLength(line));
             }
         } while ((line.length() != 0) && (line.charAt(0) != '\r') &&
                 (line.charAt(0) != '\n'));
+
         if (info.path != null) {
             return info;
         }
@@ -168,6 +182,7 @@ public class ProActiveService extends Thread {
             return info;
         } else {
             info.application = null;
+
             // --End FL
             throw new java.io.IOException("Malformed Header");
         }
@@ -196,7 +211,9 @@ public class ProActiveService extends Thread {
     private static String getPath(String line) {
         // extract class from GET line
         line = line.substring(5, line.length() - 1).trim();
+
         int index = line.indexOf(".class ");
+
         if (index != -1) {
             return line.substring(0, index).replace('/', '.');
         } else {

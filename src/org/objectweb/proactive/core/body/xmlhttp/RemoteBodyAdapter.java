@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
+
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -50,6 +51,7 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.webservices.utils.HTTPUnexpectedException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 import java.io.IOException;
@@ -64,12 +66,12 @@ import java.util.Hashtable;
 
 
 public class RemoteBodyAdapter implements UniversalBody, Serializable {
-
     /**
      * an Hashtable containing all the xmlhttp  adapters registered. They can be retrieved
      * thanks to the ProActive.lookupActive method
      */
     protected static transient Hashtable urnBodys = new Hashtable();
+    private static Logger logger = Logger.getLogger("XML_HTTP");
 
     /**
      * The unique  ID of the body
@@ -85,7 +87,6 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      * The port of the Runntime where the body is located
      */
     protected int port;
-    private static Logger logger =  Logger.getLogger("XML_HTTP");
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -109,7 +110,8 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      * @param urn The urn of the body (in fact his url + his name)
      * @exception java.io.IOException if the remote body cannot be registered
      */
-    public static void register(RemoteBodyAdapter paBody, String urn) {
+    public static void register(RemoteBodyAdapter paBody, String urn)
+        throws java.io.IOException {
         urn = urn.substring(urn.lastIndexOf('/'));
         urnBodys.put(urn, paBody);
 
@@ -122,7 +124,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      * Unregisters an active object previously registered into the bodys table
      * @param url the urn under which the active object has been registered
      */
-    public static void unregister(String urn) {
+    public static void unregister(String urn) throws java.io.IOException {
         urnBodys.put(urn, null);
     }
 
@@ -131,24 +133,31 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      * @param urn the urn (in fact its url + name)  the remote Body is registered to
      * @return a UniversalBody
      */
-    public static UniversalBody lookup(String urn) {
-        String url;
+    public static UniversalBody lookup(String urn) throws java.io.IOException {
+        try {
+            String url;
 
-        int port = ClassServer.DEFAULT_SERVER_BASE_PORT;
+            int port = ClassServer.DEFAULT_SERVER_BASE_PORT;
 
-        url = urn;
+            url = urn;
 
-        if (urn.lastIndexOf(":") > 4) {
-            port = Integer.parseInt(urn.substring(urn.lastIndexOf(':'),
-                        urn.lastIndexOf(':') + 5));
+            if (urn.lastIndexOf(":") > 4) {
+                port = Integer.parseInt(urn.substring(urn.lastIndexOf(':'),
+                            urn.lastIndexOf(':') + 5));
+            }
+
+            urn = urn.substring(urn.lastIndexOf('/'));
+
+            XMLHTTPLookupMessage message = new XMLHTTPLookupMessage(urn);
+            message = (XMLHTTPLookupMessage) ProActiveXMLUtils.sendMessage(url,
+                    port, message, ProActiveXMLUtils.MESSAGE);
+
+            return (UniversalBody) message.processMessage();
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
         }
-
-        urn = urn.substring(urn.lastIndexOf('/'));
-
-        XMLHTTPLookupMessage message = new XMLHTTPLookupMessage(urn);
-        message = (XMLHTTPLookupMessage) ProActiveXMLUtils.sendMessage(url,
-                port, message, ProActiveXMLUtils.MESSAGE);
-        return (UniversalBody) message.processMessage();
     }
 
     // ------------------------------------------
@@ -156,38 +165,60 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         if (!(o instanceof RemoteBodyAdapter)) {
             return false;
         }
-        String methodName = "equals";
-        XMLHTTPMessage msg = new XMLHTTPMethodCallMessage("equals",
-                new Object[] { o }, new Class[] { o.getClass() }, this.bodyID);
-        return ((Boolean) sendRequest(msg)).booleanValue();
+
+        RemoteBodyAdapter rba = (RemoteBodyAdapter) o;
+
+        //String methodName = "equals";
+        //XMLHTTPMessage msg = new XMLHTTPMethodCallMessage("equals",
+        //        new Object[] { o }, new Class[] { o.getClass() }, this.bodyID);
+        //return ((Boolean) sendRequest(msg)).booleanValue();
+        return (url.equals(rba.url) && bodyID.equals(rba.bodyID) &&
+        (port == rba.port));
     }
 
-    public int hashCode() {
-        return 0;
-    }
+    /* If necessary, uncomment. The RMI version uses the default hashCode() */
 
+    //public int hashCode() {
+    //	// Receipe from http://deptinfo.unice.fr/~grin/messupports/java/HeritageTA6.pdf
+    //    return (((((port + 17) * 37) + bodyID.hashCode() + 17) * 37) + url.hashCode() + 17) * 37;
+    //}
     //
     // -- implements UniversalBody -----------------------------------------------
     //
     public void receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
-        logger.debug("Receive Request " + request.getMethodName());
-        long start = System.currentTimeMillis();
+        try {
+            //logger.debug("Receive Request " + request.getMethodName());
+            //long start = System.currentTimeMillis();
+            XMLHTTPRequest xmlReq = new XMLHTTPRequest(request, this.bodyID);
 
-        XMLHTTPRequest xmlReq = new XMLHTTPRequest(request, this.bodyID);
+            String rep = (String) ProActiveXMLUtils.sendMessage(url, port,
+                    xmlReq, ProActiveXMLUtils.MESSAGE);
 
-        String rep = (String) ProActiveXMLUtils.sendMessage(url, port, xmlReq,
-                ProActiveXMLUtils.MESSAGE);
-        long end = System.currentTimeMillis();
-        long time = end - start;
-        System.out.println("execution in " + time);
+            //long end = System.currentTimeMillis();
+            //long time = end - start;
+            //System.out.println("execution in " + time);
+        } catch (RenegotiateSessionException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public void receiveReply(Reply reply) throws IOException {
-        logger.debug("Receive Reply " + reply.getResult());
-        XMLHTTPReply xmlReply = new XMLHTTPReply(reply, this.bodyID);
-        String rep = (String) ProActiveXMLUtils.sendMessage(this.url,
-                this.port, xmlReply, ProActiveXMLUtils.MESSAGE);
+        try {
+            logger.debug("Receive Reply " + reply.getResult());
+
+            XMLHTTPReply xmlReply = new XMLHTTPReply(reply, this.bodyID);
+            String rep = (String) ProActiveXMLUtils.sendMessage(this.url,
+                    this.port, xmlReply, ProActiveXMLUtils.MESSAGE);
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public String getURL() {
@@ -199,15 +230,12 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     public String getNodeURL() {
-        String methodName = "getNodeURL";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        Object result = sendRequest(req);
-
-        return (String) result;
+        try {
+            return (String) sendRequest(new BodyRequest("getNodeURL",
+                    new ArrayList(), this.bodyID));
+        } catch (Exception e) {
+            return "cannot contact the body to get the nodeURL";
+        }
     }
 
     public UniqueID getID() {
@@ -216,17 +244,19 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     public void updateLocation(UniqueID id, UniversalBody body)
         throws IOException {
-        String methodName = "updateLocation";
-        ArrayList paramsList = new ArrayList();
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(id);
+            paramsList.add(body);
+            sendRequest(new BodyRequest("updateLocation", paramsList,
+                    this.bodyID));
 
-        paramsList.add(id);
-        paramsList.add(body);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        sendRequest(req);
-        System.out.println("end update Location");
+            //System.out.println("end update Location");
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public UniversalBody getRemoteAdapter() {
@@ -234,171 +264,204 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     public void enableAC() throws IOException {
-        String methodName = "enableAC";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-        sendRequest(req);
+        try {
+            sendRequest(new BodyRequest("enableAC", new ArrayList(),
+                    this.bodyID));
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public void disableAC() throws IOException {
-        String methodName = "disableAC";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        sendRequest(req);
+        try {
+            sendRequest(new BodyRequest("disableAC", new ArrayList(),
+                    this.bodyID));
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public void setImmediateService(String methodName)
         throws IOException {
-        String methodName_ = "setImmediateService";
-        ArrayList paramsList = new ArrayList();
-
-        paramsList.add(methodName);
-
-        BodyRequest req = new BodyRequest(methodName_, paramsList,
-                this.bodyID);
-
-        sendRequest(req);
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(methodName);
+            sendRequest(new BodyRequest("setImmediateService", paramsList,
+                    this.bodyID));
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public void initiateSession(int type, UniversalBody body)
         throws IOException, CommunicationForbiddenException, 
             AuthenticationException, RenegotiateSessionException, 
             SecurityNotAvailableException {
-        String methodName = "initiateSession";
-        ArrayList paramsList = new ArrayList();
-
-        paramsList.add(new Integer(type));
-        paramsList.add(body);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        sendRequest(req);
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(new Integer(type));
+            paramsList.add(body);
+            sendRequest(new BodyRequest("initiateSession", paramsList,
+                    this.bodyID));
+        } catch (CommunicationForbiddenException e) {
+            throw e;
+        } catch (AuthenticationException e) {
+            throw e;
+        } catch (RenegotiateSessionException e) {
+            throw e;
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public void terminateSession(long sessionID)
         throws IOException, SecurityNotAvailableException {
-        String methodName = "terminateSession";
-        ArrayList paramsList = new ArrayList();
-
-        paramsList.add(new Long(sessionID));
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        sendRequest(req);
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(new Long(sessionID));
+            sendRequest(new BodyRequest("terminateSession", paramsList,
+                    this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        String methodName = "getCertificate";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (X509Certificate) sendRequest(req);
+        try {
+            return (X509Certificate) sendRequest(new BodyRequest(
+                    "getCertificate", new ArrayList(), this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public Policy getPolicyFrom(X509Certificate certificate)
         throws SecurityNotAvailableException, IOException {
-        String methodName = "getPolicyFrom";
-        ArrayList paramsList = new ArrayList();
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(certificate);
 
-        paramsList.add(certificate);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (Policy) sendRequest(req);
+            return (Policy) sendRequest(new BodyRequest("getPolicyFrom",
+                    paramsList, this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, IOException, 
             RenegotiateSessionException {
-        String methodName = "startNewSession";
-        ArrayList paramsList = new ArrayList();
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(policy);
 
-        paramsList.add(policy);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return ((Long) sendRequest(req)).longValue();
+            return ((Long) sendRequest(new BodyRequest("startNewSession",
+                    paramsList, this.bodyID))).longValue();
+        } catch (RenegotiateSessionException e) {
+            throw e;
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public ConfidentialityTicket negociateKeyReceiverSide(
         ConfidentialityTicket confidentialityTicket, long sessionID)
         throws SecurityNotAvailableException, KeyExchangeException, IOException {
-        String methodName = "negociateKeyReceiverSide";
-        ArrayList paramsList = new ArrayList();
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(confidentialityTicket);
+            paramsList.add(new Long(sessionID));
 
-        paramsList.add(confidentialityTicket);
-        paramsList.add(new Long(sessionID));
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (ConfidentialityTicket) sendRequest(req);
+            return (ConfidentialityTicket) sendRequest(new BodyRequest(
+                    "negociateKeyReceiverSide", paramsList, this.bodyID));
+        } catch (KeyExchangeException e) {
+            throw e;
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
-        String methodName = "getPublicKey";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (PublicKey) sendRequest(req);
+        try {
+            return (PublicKey) sendRequest(new BodyRequest("getPublicKey",
+                    new ArrayList(), this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public byte[] randomValue(long sessionID, byte[] cl_rand)
         throws SecurityNotAvailableException, Exception {
-        String methodName = "randomValue";
-        ArrayList paramsList = new ArrayList();
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(new Long(sessionID));
+            paramsList.add(cl_rand);
 
-        paramsList.add(new Long(sessionID));
-        paramsList.add(cl_rand);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (byte[]) sendRequest(req);
+            return (byte[]) sendRequest(new BodyRequest("randomValue",
+                    paramsList, this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public byte[][] publicKeyExchange(long sessionID,
         UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
-        byte[] sig_code)
-        throws SecurityNotAvailableException, Exception, 
-            RenegotiateSessionException {
-        String methodName = "publicKeyExchange";
+        byte[] sig_code) throws SecurityNotAvailableException, Exception {
         ArrayList paramsList = new ArrayList();
-
         paramsList.add(new Long(sessionID));
         paramsList.add(distantBody);
         paramsList.add(my_pub);
         paramsList.add(my_cert);
         paramsList.add(sig_code);
 
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (byte[][]) sendRequest(req);
+        return (byte[][]) sendRequest(new BodyRequest("publicKeyExchange",
+                paramsList, this.bodyID));
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws SecurityNotAvailableException, Exception, 
-            RenegotiateSessionException {
-        String methodName = "secretKeyExchange";
+        throws SecurityNotAvailableException, Exception {
         ArrayList paramsList = new ArrayList();
-
         paramsList.add(new Long(sessionID));
         paramsList.add(tmp);
         paramsList.add(tmp1);
@@ -406,130 +469,154 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(tmp3);
         paramsList.add(tmp4);
 
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (byte[][]) sendRequest(req);
+        return (byte[][]) sendRequest(new BodyRequest("secretKeyExchange",
+                paramsList, this.bodyID));
     }
 
     public Communication getPolicyTo(String type, String from, String to)
         throws SecurityNotAvailableException, IOException {
-        String methodName = "getPolicyTo";
-        ArrayList paramsList = new ArrayList();
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(type);
+            paramsList.add(from);
+            paramsList.add(to);
 
-        paramsList.add(type);
-        paramsList.add(from);
-        paramsList.add(to);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (Communication) sendRequest(req);
+            return (Communication) sendRequest(new BodyRequest(
+                    "getPolicyTo", paramsList, this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
-        String methodName = "getPolicy";
-        ArrayList paramsList = new ArrayList();
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(securityContext);
 
-        paramsList.add(securityContext);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-        return (SecurityContext) sendRequest(req);
+            return (SecurityContext) sendRequest(new BodyRequest(
+                    "getPolicy", paramsList, this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public String getVNName() throws SecurityNotAvailableException, IOException {
-        String methodName = "getVNName";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (String) sendRequest(req);
+        try {
+            return (String) sendRequest(new BodyRequest("getVNName",
+                    new ArrayList(), this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
-        String methodName = "getCertificateEncoded";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (byte[]) sendRequest(req);
+        try {
+            return (byte[]) sendRequest(new BodyRequest(
+                    "getCertificateEncoded", new ArrayList(), this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public ArrayList getEntities()
         throws SecurityNotAvailableException, IOException {
-        String methodName = "getEntities";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (ArrayList) sendRequest(req);
+        try {
+            return (ArrayList) sendRequest(new BodyRequest("getEntities",
+                    new ArrayList(), this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager()
         throws SecurityNotAvailableException, IOException {
-        String methodName = "getProActiveSecurityManager";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (ProActiveSecurityManager) sendRequest(req);
+        try {
+            return (ProActiveSecurityManager) sendRequest(new BodyRequest(
+                    "getProActiveSecurityManager", new ArrayList(), this.bodyID));
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
-    private Object sendRequest(BodyRequest req) {
+    private Object sendRequest(BodyRequest req) throws Exception {
         RuntimeReply reply = (RuntimeReply) ProActiveXMLUtils.sendMessage(this.url,
                 this.port, req, ProActiveXMLUtils.RUNTIME_REQUEST);
 
         return reply.getReturnedObject();
     }
 
-    private Object sendRequest(XMLHTTPMessage msg) {
-        XMLHTTPMessage reply = (XMLHTTPMessage) ProActiveXMLUtils.sendMessage(this.url,
-                this.port, msg, ProActiveXMLUtils.RUNTIME_REQUEST);
+//    private Object sendRequest(XMLHTTPMessage msg) throws Exception {
+//        XMLHTTPMessage reply = (XMLHTTPMessage) ProActiveXMLUtils.sendMessage(this.url,
+//                this.port, msg, ProActiveXMLUtils.RUNTIME_REQUEST);
+//
+//        return reply.processMessage();
+//    }
 
-        return reply.processMessage();
-    }
-
-    public HashMap getHandlersLevel() {
-        String methodName = "getHandlersLevel";
-        ArrayList paramsList = new ArrayList();
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (HashMap) sendRequest(req);
+    public HashMap getHandlersLevel() throws java.io.IOException {
+        try {
+            return (HashMap) sendRequest(new BodyRequest(
+                    "getHandlersLevel", new ArrayList(), this.bodyID));
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     public void setExceptionHandler(Class handler, Class exception)
-        throws ProActiveException {
-        String methodName = "setExceptionHandler";
-        ArrayList paramsList = new ArrayList();
-
-        paramsList.add(handler);
-        paramsList.add(exception);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        sendRequest(req);
+        throws IOException {
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(handler);
+            paramsList.add(exception);
+            sendRequest(new BodyRequest("setExceptionHandler", paramsList,
+                    this.bodyID));
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
-    public Handler unsetExceptionHandler(Class exception) {
-        String methodName = "unsetExceptionHandler";
-        ArrayList paramsList = new ArrayList();
+    public Handler unsetExceptionHandler(Class exception)
+        throws IOException {
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(exception);
 
-        paramsList.add(exception);
-
-        BodyRequest req = new BodyRequest(methodName, paramsList,
-                this.bodyID);
-
-        return (Handler) sendRequest(req);
+            return (Handler) sendRequest(new BodyRequest(
+                    "unsetExceptionHandler", paramsList, this.bodyID));
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
     }
 
     /* (non-Javadoc)
@@ -549,7 +636,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     // TODO TODO
 
-    /** 
+    /**
      * Clear the local map of handlers
      */
     public void clearHandlersLevel() throws java.io.IOException {
@@ -560,7 +647,6 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      * @return
      */
     public String getHandlerizableInfo() throws java.io.IOException {
-	return "TODO";
+        return "TODO";
     }
-
 }

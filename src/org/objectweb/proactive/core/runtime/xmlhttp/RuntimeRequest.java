@@ -6,15 +6,16 @@
  */
 package org.objectweb.proactive.core.runtime.xmlhttp;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
- 
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
+
 /**
  * @author vlegrand
  *
@@ -75,12 +76,12 @@ public class RuntimeRequest implements Serializable {
     }
 
     public RuntimeRequest(String newmethodName, ArrayList newparameters,
-        ArrayList mewparamsTypes) {
+        ArrayList newparamsTypes) {
         this(newmethodName,newparameters);
-        this.paramsTypes = mewparamsTypes;
+        this.paramsTypes = newparamsTypes;
     }
 
-    public RuntimeReply process() throws ProActiveException {
+    public RuntimeReply process() throws Exception {
        
         		Object[] params = parameters.toArray();
         		Object result = null;
@@ -89,19 +90,13 @@ public class RuntimeRequest implements Serializable {
         			try {
 						result = m.invoke(runtime, parameters.toArray());
 					} catch (IllegalArgumentException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new HTTPRemoteException("Error during reflexion", e);
 					} catch (IllegalAccessException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new HTTPRemoteException("Error during reflexion", e);
 					} catch (InvocationTargetException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new HTTPRemoteException("Error during reflexion", e);
 					}
-                          
             return new RuntimeReply(result);
-      
-     
     }
 
     public String getMethodName() {

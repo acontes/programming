@@ -6,6 +6,8 @@
  */
 package org.objectweb.proactive.core.runtime.xmlhttp;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
@@ -14,6 +16,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
+import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
@@ -31,7 +35,7 @@ public interface HttpRuntimeStrategyAdapter extends ProActiveRuntime {
     
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, PolicyServer ps, String vname,
-        String jobId);
+        String jobId) throws NodeException;
     
    
     public void killAllNodes() throws ProActiveException ;
@@ -40,7 +44,7 @@ public interface HttpRuntimeStrategyAdapter extends ProActiveRuntime {
     public void killNode(String nodeName) throws ProActiveException ;
     
     public void createVM(UniversalProcess remoteProcess)
-        throws ProActiveException ;
+        throws ProActiveException, IOException ;
     
     public String[] getLocalNodeNames() throws ProActiveException ;
     
@@ -56,7 +60,7 @@ public interface HttpRuntimeStrategyAdapter extends ProActiveRuntime {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
     throws ProActiveException;
 
-    public void killRT(boolean softly) throws ProActiveException ;
+    public void killRT(boolean softly) throws ProActiveException, Exception ;
     
 
     public String getURL() throws ProActiveException;
@@ -80,7 +84,7 @@ public interface HttpRuntimeStrategyAdapter extends ProActiveRuntime {
     
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ProActiveException ;
+        throws ProActiveException, ConstructorCallExecutionFailedException, InvocationTargetException ;
 
     public UniversalBody receiveBody(String nodeName, Body body)
         throws ProActiveException ;
@@ -147,10 +151,10 @@ public interface HttpRuntimeStrategyAdapter extends ProActiveRuntime {
     public String [] getNodesNames() throws ProActiveException;
     
 
-    public void addParent(String proActiveRuntimeName) ;
+    public void addParent(String proActiveRuntimeName);
 
    
-    public String[] getParents() ;
+    public String[] getParents();
   
     public SecurityContext getPolicy(SecurityContext sc) throws ProActiveException, SecurityNotAvailableException;
 
