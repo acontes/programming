@@ -15,8 +15,6 @@ import java.io.Serializable;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public interface XMLHTTPMessage extends Serializable{
-
-		
 	
 		public Object  processMessage ();
 }

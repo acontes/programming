@@ -32,17 +32,14 @@ package org.objectweb.proactive.core.body.xmlhttp;
 
 import org.apache.log4j.Logger;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
-import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeRequest;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;

@@ -7,11 +7,8 @@
 package org.objectweb.proactive.core.runtime.xmlhttp;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

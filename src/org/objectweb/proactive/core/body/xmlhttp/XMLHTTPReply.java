@@ -11,7 +11,6 @@ import java.io.IOException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 /**
