@@ -84,7 +84,6 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         synchronized (idToBodyMap) {
             while (idToBodyMap.get(id) != null) {
                 try {
-                    System.out.println("J attend");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
