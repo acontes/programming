@@ -6,15 +6,8 @@
  */
 package org.objectweb.proactive.core.runtime.xmlhttp;
 
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
-
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -23,7 +16,6 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
-
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
@@ -33,25 +25,30 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import java.io.IOException;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.net.UnknownHostException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
-	
-	private HttpRuntimeAdapter runtimeadapter;
-	
-	private static transient Logger logger = Logger.getLogger("XML_HTTP");
-	
-	ProActiveRuntime remoteProActiveRuntime;
-	
-	public HttpRuntimeAdapterImpl (HttpRuntimeAdapter newruntimeadapter) {
+    private static transient Logger logger = Logger.getLogger("XML_HTTP");
+    private HttpRuntimeAdapter runtimeadapter;
+    ProActiveRuntime remoteProActiveRuntime;
 
-	   	runtimeadapter = newruntimeadapter;
-	   	remoteProActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-	   	
-	   	 
+    public HttpRuntimeAdapterImpl(HttpRuntimeAdapter newruntimeadapter) {
+        runtimeadapter = newruntimeadapter;
+        remoteProActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
+
         String host = getVMInformation().getInetAddress().getCanonicalHostName();
         String name = getVMInformation().getName();
-        runtimeadapter.url = UrlBuilder.buildUrl(host, name, "http:", runtimeadapter.port);
+        runtimeadapter.url = UrlBuilder.buildUrl(host, name, "http:",
+                runtimeadapter.port);
         logger.debug("url adapter = " + runtimeadapter.url);
     }
 
@@ -61,297 +58,207 @@ public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, PolicyServer ps, String vname,
         String jobId) {
-
-    try {
-    	  String nodeURL = null;
         try {
-            nodeURL = runtimeadapter.buildNodeURL(nodeName);
-        } catch (UnknownHostException e1) {
+            String nodeURL = null;
+
+            try {
+                nodeURL = runtimeadapter.buildNodeURL(nodeName);
+            } catch (UnknownHostException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+
+            //      then take the name of the node
+            String name = UrlBuilder.getNameFromUrl(nodeURL);
+            remoteProActiveRuntime.createLocalNode(name,
+                replacePreviousBinding, ps, vname, jobId);
+
+            return nodeURL;
+        } catch (NodeException e) {
             // TODO Auto-generated catch block
-            e1.printStackTrace();
+            e.printStackTrace();
         }
-    	
-    	
-//      then take the name of the node
-        String name = UrlBuilder.getNameFromUrl(nodeURL);
-		remoteProActiveRuntime.createLocalNode(name,replacePreviousBinding,ps,
-			        			vname,jobId);
-		return nodeURL;
-	} catch (NodeException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	return null;
+
+        return null;
     }
 
-   
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
     public void killAllNodes() throws ProActiveException {
-    	
-    		remoteProActiveRuntime.killAllNodes();
-    	
+        remoteProActiveRuntime.killAllNodes();
     }
 
     public void killNode(String nodeName) throws ProActiveException {
-        
-                   
-                        remoteProActiveRuntime.killNode(nodeName);
-                 
+        remoteProActiveRuntime.killNode(nodeName);
     }
 
     public void createVM(UniversalProcess remoteProcess)
         throws ProActiveException {
-
-                  try {
-                       remoteProActiveRuntime.createVM(remoteProcess);
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-        
-                 
-                }
-    
+        try {
+            remoteProActiveRuntime.createVM(remoteProcess);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     public String[] getLocalNodeNames() throws ProActiveException {
-          
-                    return remoteProActiveRuntime.getLocalNodeNames();
-             
-       
-        
+        return remoteProActiveRuntime.getLocalNodeNames();
     }
 
     public VMInformation getVMInformation() {
-     
-    
-    		return remoteProActiveRuntime.getVMInformation();
-    	
-    	
+        return remoteProActiveRuntime.getVMInformation();
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) {
-    	
-    	remoteProActiveRuntime.register( proActiveRuntimeDist,
-    	         proActiveRuntimeName,  creatorID,  creationProtocol,
-		         vmName);
+        remoteProActiveRuntime.register(proActiveRuntimeDist,
+            proActiveRuntimeName, creatorID, creationProtocol, vmName);
     }
 
     public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException {
-               
-                    return remoteProActiveRuntime.getProActiveRuntimes();
-             
-        
+        return remoteProActiveRuntime.getProActiveRuntimes();
     }
 
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws ProActiveException {
-        
-                    return remoteProActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
-              
-      
+        return remoteProActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
     public void killRT(boolean softly) throws ProActiveException {
-        
-                   
-                        try {
-							remoteProActiveRuntime.killRT(softly);
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							//e.printStackTrace();
-							throw new ProActiveException();
-						}
-                  
-       
+        try {
+            remoteProActiveRuntime.killRT(softly);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new ProActiveException(e);
+        }
     }
-    
 
     public String getURL() throws ProActiveException {
-        return runtimeadapter.url + ":" + runtimeadapter.port + "/" + getVMInformation().getName() + "/";
+        return runtimeadapter.url + ":" + runtimeadapter.port + "/" +
+        getVMInformation().getName() + "/";
     }
 
     public ArrayList getActiveObjects(String nodeName)
         throws ProActiveException {
-     
-                    return remoteProActiveRuntime.getActiveObjects(nodeName);
-        
-     
+        return remoteProActiveRuntime.getActiveObjects(nodeName);
     }
 
     public ArrayList getActiveObjects(String nodeName, String objectName)
         throws ProActiveException {
-        
-                    return remoteProActiveRuntime.getActiveObjects(nodeName, objectName);
-       
+        return remoteProActiveRuntime.getActiveObjects(nodeName, objectName);
     }
 
     public VirtualNode getVirtualNode(String virtualNodeName)
         throws ProActiveException {
-      
-                    return remoteProActiveRuntime.getVirtualNode(virtualNodeName);
-       
+        return remoteProActiveRuntime.getVirtualNode(virtualNodeName);
     }
 
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) throws ProActiveException {
-       
-                    remoteProActiveRuntime.registerVirtualNode(virtualNodeName,
-					    replacePreviousBinding);
-        
-        
-      
+        remoteProActiveRuntime.registerVirtualNode(virtualNodeName,
+            replacePreviousBinding);
     }
 
     public void unregisterVirtualNode(String virtualNodeName)
         throws ProActiveException {
-        
-                    remoteProActiveRuntime.unregisterVirtualNode(virtualNodeName);
-      
-       
-       
+        remoteProActiveRuntime.unregisterVirtualNode(virtualNodeName);
     }
 
     public void unregisterAllVirtualNodes() throws ProActiveException {
-       
-                    remoteProActiveRuntime.unregisterAllVirtualNodes();
-       
+        remoteProActiveRuntime.unregisterAllVirtualNodes();
     }
 
     public UniversalBody createBody(String nodeName,
-    		 ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-    throws ProActiveException {
-    		
-      try {
-		return remoteProActiveRuntime.createBody(nodeName,bodyConstructorCall, isNodeLocal);
-	} catch (ConstructorCallExecutionFailedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	
-	} catch (InvocationTargetException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	return null;
+        ConstructorCall bodyConstructorCall, boolean isNodeLocal)
+        throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.createBody(nodeName,
+                bodyConstructorCall, isNodeLocal);
+        } catch (ConstructorCallExecutionFailedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public UniversalBody receiveBody(String nodeName, Body body)
         throws ProActiveException {
-       
-                    return remoteProActiveRuntime.receiveBody(nodeName, body);
-        
+        return remoteProActiveRuntime.receiveBody(nodeName, body);
     }
 
     // SECURITY 
     public PolicyServer getPolicyServer() throws ProActiveException {
-        
-                    return remoteProActiveRuntime.getPolicyServer();
-       
-      
+        return remoteProActiveRuntime.getPolicyServer();
     }
 
     public void setProActiveSecurityManager(ProActiveSecurityManager ps)
         throws ProActiveException {
-        
-                  remoteProActiveRuntime.setProActiveSecurityManager(ps);
-      
+        remoteProActiveRuntime.setProActiveSecurityManager(ps);
     }
 
-   
     public X509Certificate getCreatorCertificate() throws ProActiveException {
-      
-                   return remoteProActiveRuntime.getCreatorCertificate();
-      
-       
+        return remoteProActiveRuntime.getCreatorCertificate();
     }
 
     public String getVNName(String nodename) throws ProActiveException {
-       
-                    return remoteProActiveRuntime.getVNName(nodename);
-      
-     
+        return remoteProActiveRuntime.getVNName(nodename);
     }
 
-   
     public void setDefaultNodeVirtualNodeName(String s)
         throws ProActiveException {
-       
-                    remoteProActiveRuntime.setDefaultNodeVirtualNodeName(s);
-       
+        remoteProActiveRuntime.setDefaultNodeVirtualNodeName(s);
     }
-   
+
     public PolicyServer getNodePolicyServer(String nodeName)
         throws ProActiveException {
-        
-                  return remoteProActiveRuntime.getNodePolicyServer(nodeName);
-          
-  
+        return remoteProActiveRuntime.getNodePolicyServer(nodeName);
     }
 
-   
     public void enableSecurityIfNeeded() throws ProActiveException {
-       
-                    remoteProActiveRuntime.enableSecurityIfNeeded();
-       
+        remoteProActiveRuntime.enableSecurityIfNeeded();
     }
 
-   
     public X509Certificate getNodeCertificate(String nodeName)
         throws ProActiveException {
-        
-                    return remoteProActiveRuntime.getNodeCertificate(nodeName);
-        
+        return remoteProActiveRuntime.getNodeCertificate(nodeName);
     }
 
-   
     public ArrayList getEntities(String nodeName) throws ProActiveException {
-        
-                    return remoteProActiveRuntime.getEntities(nodeName);
-      
+        return remoteProActiveRuntime.getEntities(nodeName);
     }
 
- 
     public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {
-        
-                    return remoteProActiveRuntime.getEntities(uBody);
-       
+        return remoteProActiveRuntime.getEntities(uBody);
     }
 
-    
     public ArrayList getEntities() throws ProActiveException {
-      
-                   return remoteProActiveRuntime.getEntities();
-     
+        return remoteProActiveRuntime.getEntities();
     }
 
-    
     public String getJobID() {
         return remoteProActiveRuntime.getJobID();
     }
 
-   
     public String getJobID(String nodeUrl) throws ProActiveException {
-      
-                  return remoteProActiveRuntime.getJobID(nodeUrl);
-       
+        return remoteProActiveRuntime.getJobID(nodeUrl);
     }
-	
-    public String [] getNodesNames() throws ProActiveException {
-    	
-    	 return remoteProActiveRuntime.getLocalNodeNames();
-    
+
+    public String[] getNodesNames() throws ProActiveException {
+        return remoteProActiveRuntime.getLocalNodeNames();
     }
-    
-    
+
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addParent(java.lang.String)
      */
     public void addParent(String proActiveRuntimeName) {
-    	remoteProActiveRuntime.addParent(proActiveRuntimeName);
+        remoteProActiveRuntime.addParent(proActiveRuntimeName);
     }
-    
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getParents()
@@ -359,18 +266,17 @@ public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
     public String[] getParents() {
         return this.remoteProActiveRuntime.getParents();
     }
- 
+
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
      */
     public SecurityContext getPolicy(SecurityContext sc)
         throws ProActiveException, SecurityNotAvailableException {
-         return this.getPolicy(sc);
+        return this.getPolicy(sc);
     }
 
     public void listVirtualNodes() throws ProActiveException {
-    	//  remoteProActiveRuntime.updateLocalNodeVirtualName();
-    	this.remoteProActiveRuntime.listVirtualNodes();
+        //  remoteProActiveRuntime.updateLocalNodeVirtualName();
+        this.remoteProActiveRuntime.listVirtualNodes();
     }
-    
 }

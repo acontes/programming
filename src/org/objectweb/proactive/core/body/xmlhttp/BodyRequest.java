@@ -10,9 +10,9 @@ package org.objectweb.proactive.core.body.xmlhttp;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.runtime.xmlhttp.RuntimeReply;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
