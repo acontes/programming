@@ -490,7 +490,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ConstructorCall bodyConstructorCall, boolean isLocal)
         throws ConstructorCallExecutionFailedException, 
             java.lang.reflect.InvocationTargetException {
-        //  System.out.println("XXXXXX creating body on " + this.getURL());
+      	
+    	//  System.out.println("XXXXXX creating body on " + this.getURL());
         //   ProActiveConfiguration.getConfiguration().dumpAddedProperties();
         Body localBody = (Body) bodyConstructorCall.execute();
 

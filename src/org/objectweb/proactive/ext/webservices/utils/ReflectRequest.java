@@ -56,7 +56,7 @@ public abstract class ReflectRequest {
     
     
     protected Method getProActiveRuntimeMethod(String methodsearch, ArrayList paramsearch,Object hashobjet){
-  	  
+  	      	
     	Object mret =  hashobjet;
   	  
   	  if(mret instanceof ArrayList) {
@@ -109,13 +109,21 @@ public abstract class ReflectRequest {
   	 		mret=allSameMethod.get(0);
   	 	else {
 	  				
-				logger.error("----------------------------------------------------------------------------");
-				logger.error("----- ERROR : two functions in ProActiveRuntimeImpl can t have the same name");
-				logger.error("----- ERROR : and the same type of paramters (Extends Implements)");
-				logger.error("----- search   : "+methodsearch+" nb param "+paramsearch.size());
-				logger.error("----------------------------------------------------------------------------");
+			logger.error("----------------------------------------------------------------------------");
+			logger.error("----- ERROR : two functions in ProActiveRuntimeImpl can t have the same name");
+			logger.error("----- ERROR : and the same type of paramters (Extends Implements)");
+			logger.error("----- search   : "+methodsearch+" nb param "+paramsearch.size());
+			logger.error("----------------------------------------------------------------------------");
 			
   	 	}
+  	  }
+  	  else if ( mret == null ) {
+  	  	
+		logger.error("----------------------------------------------------------------------------");
+		logger.error("----- ERROR : no method (invoke) find ");
+		logger.error("----- search   : "+methodsearch+" nb param "+paramsearch.size());
+		logger.error("----------------------------------------------------------------------------");
+  	  	
   	  }
   
   	  return (Method)mret;	
