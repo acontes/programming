@@ -19,7 +19,6 @@ import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
-import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
