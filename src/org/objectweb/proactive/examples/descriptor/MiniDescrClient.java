@@ -107,10 +107,10 @@ public class MiniDescrClient {
                 String threadTrace;
                 {
                     StringBuffer buf = new StringBuffer();
-                    buf.append("Thread No");
+                    buf.append("Thread #");
                     appendZeros(buf, no + 1, threadNbDigits);
                     buf.append(no + 1);
-                    buf.append(" & Call No");
+                    buf.append(", Call #");
                     threadTrace = buf.toString();
                 }
 
