@@ -59,9 +59,10 @@ public class ProActiveService extends Thread {
 
     public void run() {
         Hashtable table = new Hashtable();
-        java.io.DataOutputStream out = null;
+        HTTPInputStream in = null;
+        DataOutputStream out = null;
         RequestInfo info = null;
-        
+
         String headers = "";
         String statusLine;
         String contentType;
@@ -71,77 +72,88 @@ public class ProActiveService extends Thread {
             out = new java.io.DataOutputStream(socket.getOutputStream());
 
             // get the headers information in order to determine what is the service requested
-            HTTPInputStream in = new HTTPInputStream(new BufferedInputStream(
+            in = new HTTPInputStream(new BufferedInputStream(
                         socket.getInputStream()));
-            info = getInfo(in);
 
-            //If  there is no field application then it is a call to the 
-            if ((info.application != null) &&
-                    (info.application.indexOf("xml") > -1)) {
-                // ProActive Request via HTTP
-                XMLHTTPProcess process = new XMLHTTPProcess(in, info);
-                MSG msg = process.getBytes();
-                bytes = msg.getMessage();
+            
+            while (true) {
+                try {
+                    info = getInfo(in);
 
-                statusLine = "HTTP/1.1 200 OK";
-                contentType = "text/xml";
-                headers = "ProActive-Action: " + msg.getAction() + "\r\n";
-            } else if (info.path != null) {
-                // ClassServer request
-                FileProcess fp = new FileProcess(paths, info);
-                bytes = fp.getBytes();
-                statusLine = "HTTP/1.1 200 OK";
-                contentType = "application/java";
-            } else {
-                throw new ClassNotFoundException("No path specified");
+                    if (info == null) {
+                        break;
+                    }
+
+                    //If  there is no field application then it is a call to the 
+                    if ((info.application != null) &&
+                            (info.application.indexOf("xml") > -1)) {
+                        // ProActive Request via HTTP
+                        XMLHTTPProcess process = new XMLHTTPProcess(in, info);
+                        MSG msg = process.getBytes();
+                        bytes = msg.getMessage();
+
+                        statusLine = "HTTP/1.1 200 OK";
+                        contentType = "text/xml";
+                        headers = "ProActive-Action: " + msg.getAction() +
+                            "\r\n";
+                    } else if (info.path != null) {
+                        // ClassServer request
+                        FileProcess fp = new FileProcess(paths, info);
+                        bytes = fp.getBytes();
+                        statusLine = "HTTP/1.1 200 OK";
+                        contentType = "application/java";
+                    } else {
+                        throw new ClassNotFoundException("No path specified");
+                    }
+                } catch (Exception e) { // IOException and ClassNotFoundException
+
+                    if ((info != null) && (info.path != null)) {
+                        logger.info("!!! ClassServer failed to load class " +
+                            info.path);
+                    }
+
+                    statusLine = "HTTP/1.1 400 " + e.getMessage();
+                    contentType = "text/plain";
+
+                    // Time-consuming and not very useful:
+                    // StringBuffer buf = new StringBuffer();
+                    // StackTraceElement[] trace = e.getStackTrace();
+                    // for (int i = 0; i < trace.length; i++) {
+                    // 	buf.append(trace[i].toString());
+                    // 	buf.append("\n");
+                    // }
+                    // bytes = buf.toString().getBytes();
+                    bytes = new byte[0];
+                }
+
+                out.writeBytes(statusLine + "\r\n");
+                out.writeBytes("Content-Length: " + bytes.length + "\r\n");
+
+                int a = bytes.length;
+                String b = "Content-Length: " + bytes.length + "\r\n";
+                out.writeBytes("Content-Type: " + contentType + "\r\n");
+                out.writeBytes(headers);
+                out.writeBytes("\r\n");
+                out.write(bytes);
+                out.flush();
             }
-        } catch (Exception e) { // IOException and ClassNotFoundException
-            if (info != null && info.path != null) {
-                logger.info("!!! ClassServer failed to load class " +
-                    info.path);
-            }
-
-            statusLine = "HTTP/1.1 400 " + e.getMessage();
-            contentType = "text/plain";
-
-            // Time-consuming and not very useful:
-            // StringBuffer buf = new StringBuffer();
-            // StackTraceElement[] trace = e.getStackTrace();
-            // for (int i = 0; i < trace.length; i++) {
-            // 	buf.append(trace[i].toString());
-            // 	buf.append("\n");
-            // }
-            // bytes = buf.toString().getBytes();
-            bytes = new byte[0];
-        }
-
-        try {
-            out.writeBytes(statusLine + "\r\n");
-            out.writeBytes("Content-Length: " + bytes.length + "\r\n");
-            int a = bytes.length;
-            String b = "Content-Length: " + bytes.length + "\r\n";
-            out.writeBytes("Content-Type: " + contentType + "\r\n");
-            out.writeBytes(headers);
-            out.writeBytes("\r\n");
-            out.write(bytes);
-            out.flush();
-            out.close();
         } catch (IOException e) {
             // If there is an error when writing the reply,
-        	// nothing can be told to the caller...
+            // nothing can be told to the caller...
             e.printStackTrace();
         } finally {
             try {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Fermeture de la socket " + this.socket);
                 }
-         	
+
+                out.close();
+                in.close();
                 socket.close();
             } catch (java.io.IOException e) {
                 e.printStackTrace();
             }
         }
-        return;
     }
 
     /**
@@ -156,7 +168,9 @@ public class ProActiveService extends Thread {
         do {
             line = in.getLine();
 
-            if (line.startsWith("GET /")) {
+            if (line == null) {
+                return null;
+            } else if (line.startsWith("GET /")) {
                 info.path = getPath(line);
             } else if (line.startsWith("Host:")) {
                 info.host = getHost(line);
