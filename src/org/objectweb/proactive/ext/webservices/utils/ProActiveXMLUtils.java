@@ -140,9 +140,6 @@ public class ProActiveXMLUtils {
     public static Object sendMessage(String url, int port, Object obj,
         String action) {
         byte[] message = getMessage(obj);
-        logger.info("-----------------------------------------------------");
-        logger.info(ProActiveXMLUtils.getName()+ "----------");
-        logger.info("-----------------------------------------------------");
         return sendMessage(url, port, message, action);
     }
 
