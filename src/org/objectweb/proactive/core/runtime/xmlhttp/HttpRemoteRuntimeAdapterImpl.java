@@ -46,38 +46,41 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
      * @param url
      */
     public HttpRemoteRuntimeAdapterImpl(HttpRuntimeAdapter newruntimeadapter,
-        String url) {
-        logger.debug("URL de l'adapter = " + url);
+        String newurl) {
 
-        runtimeadapter = newruntimeadapter;
-
-        // this.remoteProActiveRuntime = createRemoteProActiveRuntime();
-        runtimeadapter.url = url;
-
-        if (!runtimeadapter.url.startsWith("http:")) {
-            runtimeadapter.url = "http:" + runtimeadapter.url;
+    	logger.debug("URL de l'adapter = " + newurl);
+    	runtimeadapter = newruntimeadapter;
+    	runtimeadapter.url = newurl;
+    	createURL();
+    	logger.debug("New Remote XML Adapter : " + runtimeadapter.url +
+                " port = " + runtimeadapter.port);
+    }
+    
+    public void createURL() {	
+    	
+    	if (!runtimeadapter.url.startsWith("http:")) {
+    		runtimeadapter.url = "http:" + runtimeadapter.url;
         }
 
         int index = runtimeadapter.url.lastIndexOf(':');
 
         if (index > 4) {
-            runtimeadapter.port = Integer.parseInt(runtimeadapter.url.substring(index +
+        	runtimeadapter.port = Integer.parseInt(runtimeadapter.url.substring(index +
                         1, index + 5));
-            runtimeadapter.url = runtimeadapter.url.substring(0, index);
+        	//runtimeadapter.url = runtimeadapter.url.substring(0, index);
         }
 
-        index = runtimeadapter.url.lastIndexOf('/');
+      // index = runtimeadapter.url.lastIndexOf('/');
 
-        if (index > 6) {
-            runtimeadapter.url = runtimeadapter.url.substring(0, index);
-        }
-
-        logger.debug("New Remote XML Adapter : " + runtimeadapter.url +
-            " port = " + runtimeadapter.port);
+     //   if (index > 6) {
+      //  	runtimeadapter.url = runtimeadapter.url.substring(0, index);
+     //   }
 
         //vmInformation = runtimeadapter.vmInformation;
+    
     }
 
+  
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
@@ -87,7 +90,7 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
         try {
             String methodName = "createLocalNode";
 
-            // first we build a well-formed url
+            // first we  v a well-formed url
             String nodeURL = null;
 
             nodeURL = runtimeadapter.buildNodeURL(nodeName);
@@ -276,8 +279,7 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
     }
 
     public String getURL() throws ProActiveException {
-        return runtimeadapter.url + ":" + runtimeadapter.port + "/" +
-        getVMInformation().getName() + "/";
+    	return runtimeadapter.getStrategyURL();
     }
 
     public ArrayList getActiveObjects(String nodeName)

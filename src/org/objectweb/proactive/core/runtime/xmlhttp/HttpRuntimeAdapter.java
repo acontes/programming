@@ -304,4 +304,15 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     	
        	return runtimestrategyadapter.getNodesNames();
     }
+    
+    
+    public String getStrategyURL(){
+    	//createURL();
+        return url;
+
+    }
+
+   
+    
+    
 }

@@ -136,8 +136,7 @@ public class HttpRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter {
     }
 
     public String getURL() throws ProActiveException {
-        return runtimeadapter.url + ":" + runtimeadapter.port + "/" +
-        getVMInformation().getName() + "/";
+    	return runtimeadapter.getStrategyURL();
     }
 
     public ArrayList getActiveObjects(String nodeName)
