@@ -29,7 +29,6 @@ public class RuntimeRequest implements Serializable {
     private String methodName;
     private ArrayList parameters = new ArrayList();
     private ArrayList paramsTypes;
-    private UniqueID oaid;
 
     private static HashMap hMapMethods;
     private static ProActiveRuntimeImpl runtime;
@@ -69,8 +68,7 @@ public class RuntimeRequest implements Serializable {
     }
     
     public RuntimeRequest(String newmethodName) {
-        this.methodName = newmethodName;
-       	
+        this.methodName = newmethodName;   	
     }
     
    
@@ -85,17 +83,10 @@ public class RuntimeRequest implements Serializable {
         this.paramsTypes = mewparamsTypes;
     }
 
-    public RuntimeRequest(String newmethodName, ArrayList newparameters, UniqueID newoaid) {
-        this(newmethodName,newparameters);
-        this.oaid = newoaid;
-    }
-
     public RuntimeReply process() throws ProActiveException {
        
         		Object[] params = parameters.toArray();
         		Object result = null;
-
-        		if (this.oaid == null) {
             
         			Method m = getProActiveRuntimeMethod(methodName,parameters);
         			try {
@@ -110,37 +101,7 @@ public class RuntimeRequest implements Serializable {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-              
-            } else {
-
-                Body body = ProActiveXMLUtils.getBody(this.oaid);
-
-                //Method m = body.getClass().getMethod(methodName, classes);;
-                      //result = mc.execute(body);      
-                Class[] classes = new Class[parameters.size()];
-                //Remplissage du tableau des types:
-                for (int i = 0; i < parameters.size(); i++) {
-                    classes[i] = parameters.get(i).getClass();
-                }
-                try {
-					result = body.getClass().getMethod(methodName, classes).invoke(body,parameters.toArray());
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NoSuchMethodException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            }
+                          
             return new RuntimeReply(result);
       
      

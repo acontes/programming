@@ -4,19 +4,13 @@ import java.io.File;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import javax.activation.DataHandler;
-
 import javax.xml.messaging.URLEndpoint;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPConnectionFactory;
-import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPMessage;

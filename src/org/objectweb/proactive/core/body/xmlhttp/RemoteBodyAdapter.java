@@ -205,7 +205,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "getNodeURL";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         Object result = sendRequest(req);
@@ -225,7 +225,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(id);
         paramsList.add(body);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         sendRequest(req);
@@ -240,7 +240,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "enableAC";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
         sendRequest(req);
     }
@@ -249,7 +249,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "disableAC";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         sendRequest(req);
@@ -262,7 +262,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
         paramsList.add(methodName);
 
-        RuntimeRequest req = new RuntimeRequest(methodName_, paramsList,
+        BodyRequest req = new BodyRequest(methodName_, paramsList,
                 this.bodyID);
 
         sendRequest(req);
@@ -278,7 +278,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(new Integer(type));
         paramsList.add(body);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         sendRequest(req);
@@ -291,7 +291,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
         paramsList.add(new Long(sessionID));
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         sendRequest(req);
@@ -302,7 +302,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "getCertificate";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (X509Certificate) sendRequest(req);
@@ -315,7 +315,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
         paramsList.add(certificate);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (Policy) sendRequest(req);
@@ -329,7 +329,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
         paramsList.add(policy);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return ((Long) sendRequest(req)).longValue();
@@ -344,7 +344,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(confidentialityTicket);
         paramsList.add(new Long(sessionID));
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (ConfidentialityTicket) sendRequest(req);
@@ -355,7 +355,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "getPublicKey";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (PublicKey) sendRequest(req);
@@ -369,7 +369,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(new Long(sessionID));
         paramsList.add(cl_rand);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (byte[]) sendRequest(req);
@@ -389,7 +389,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(my_cert);
         paramsList.add(sig_code);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (byte[][]) sendRequest(req);
@@ -409,7 +409,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(tmp3);
         paramsList.add(tmp4);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (byte[][]) sendRequest(req);
@@ -424,7 +424,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(from);
         paramsList.add(to);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (Communication) sendRequest(req);
@@ -437,7 +437,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
         paramsList.add(securityContext);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
         return (SecurityContext) sendRequest(req);
     }
@@ -446,7 +446,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "getVNName";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (String) sendRequest(req);
@@ -457,7 +457,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "getCertificateEncoded";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (byte[]) sendRequest(req);
@@ -468,7 +468,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "getEntities";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (ArrayList) sendRequest(req);
@@ -479,13 +479,13 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "getProActiveSecurityManager";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (ProActiveSecurityManager) sendRequest(req);
     }
 
-    private Object sendRequest(RuntimeRequest req) {
+    private Object sendRequest(BodyRequest req) {
         RuntimeReply reply = (RuntimeReply) ProActiveXMLUtils.sendMessage(this.url,
                 this.port, req, ProActiveXMLUtils.RUNTIME_REQUEST);
 
@@ -503,7 +503,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         String methodName = "getHandlersLevel";
         ArrayList paramsList = new ArrayList();
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (HashMap) sendRequest(req);
@@ -517,7 +517,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         paramsList.add(handler);
         paramsList.add(exception);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         sendRequest(req);
@@ -529,7 +529,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
         paramsList.add(exception);
 
-        RuntimeRequest req = new RuntimeRequest(methodName, paramsList,
+        BodyRequest req = new BodyRequest(methodName, paramsList,
                 this.bodyID);
 
         return (Handler) sendRequest(req);
