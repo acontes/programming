@@ -98,6 +98,10 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         this.bodyID = body.getID();
         this.url = ClassServer.getUrl();
         this.port = ClassServer.getServerSocketPort();
+        
+    //    this.url=this.url+":"+this.port;
+        
+            
     }
 
     //
@@ -135,6 +139,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      */
     public static UniversalBody lookup(String urn) throws java.io.IOException {
         try {
+        	
             String url;
 
             int port = ClassServer.DEFAULT_SERVER_BASE_PORT;
@@ -222,7 +227,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     public String getURL() {
-        return this.url;
+        return this.url/*+":"+this.port*/;
     }
 
     public static synchronized UniversalBody getBodyFromUrn(String urn) {

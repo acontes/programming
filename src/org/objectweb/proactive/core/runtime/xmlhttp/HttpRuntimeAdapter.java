@@ -296,7 +296,15 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 
             return UrlBuilder.buildUrl(host, url, "http:", port);
         } else {
-            return UrlBuilder.checkUrl(url);
+        	
+        	i = url.indexOf('/',7);
+        	String computerName = url.substring(7,i);
+        	if(computerName.indexOf(':') == -1){
+        		//no port
+        		computerName = computerName+":"+port;
+        		url= "http://"+computerName+url.substring(i);
+        	}
+           return UrlBuilder.checkUrl(url);
         }
     }
 

@@ -48,7 +48,7 @@ public class HttpRemoteRuntimeAdapterImpl implements HttpRuntimeStrategyAdapter 
     public HttpRemoteRuntimeAdapterImpl(HttpRuntimeAdapter newruntimeadapter,
         String newurl) {
 
-    	logger.debug("URL de l'adapter = " + newurl);
+     	logger.debug("URL de l'adapter = " + newurl);
     	runtimeadapter = newruntimeadapter;
     	runtimeadapter.url = newurl;
     	createURL();
