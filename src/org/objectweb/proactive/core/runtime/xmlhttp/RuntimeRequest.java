@@ -112,21 +112,80 @@ public class RuntimeRequest implements Serializable {
         return this.parameters;
     }
     
-    public Method getProActiveRuntimeMethod(String methodsearch, ArrayList paramsearch){
+    private Method getProActiveRuntimeMethod(String methodsearch, ArrayList paramsearch){
     	  Object mret = hMapMethods.get(methodsearch);
     	  
     	  if(mret instanceof ArrayList) {
     	  	
-    	  	ArrayList allSameMethod = (ArrayList)mret;
-    	  	mret = null;
-    	  	for(int i=0;i<allSameMethod.size();i++) {
+    	  	ArrayList allSameMethod = (ArrayList) ((ArrayList)mret).clone();
+    	  	
+    	  	int sameMethodSize = allSameMethod.size();
+    	  	int paramsearchsize = paramsearch.size();
+    	 	for(int i=sameMethodSize-1;i>=0;i--) {
+ 
+    	  		if( ((Method)allSameMethod.get(i)).getParameterTypes().length != paramsearchsize) 
+    	  			allSameMethod.remove(i);
+    	 	}	
+
+      		sameMethodSize = allSameMethod.size();
+    	 	if( sameMethodSize == 1)
+    	 		mret=allSameMethod.get(0);
+    	  	else { 
+
+    	  		Class [] paramtypes = null;
+    	  		boolean isgood = true, ispossible = true;
+    	  		for(int i=sameMethodSize-1;i>=0;i--)	{
+    	  			paramtypes = ((Method)allSameMethod.get(i)).getParameterTypes();
+    	  			
+    	  			for(int j=0;j<paramsearchsize;j++) {
+    	  				
+    	  				Class classtest = paramsearch.get(j).getClass();
+    	  				if( paramtypes[j] != classtest ){
+    	  					isgood = false;
+    	  					if( classtest.isAssignableFrom(paramtypes[j]) == false){
+    	  						ispossible = false;
+    	  						break;
+    	  					}
+    	  				}
+    	  			}
+    	  			if( isgood == true ){
+    	  				mret=allSameMethod.get(i);
+      					break;
+    				}
+    	  			else if( ispossible == false )
+    	  				allSameMethod.remove(i);
+    	  				
+    	  			isgood = true;
+    	  			ispossible = true;
+    	  			}
     	  		
+    	  		}		
+    	  		
+    	 	if( allSameMethod.size() == 1 )
+    	 		mret=allSameMethod.get(0);
+    	 	else {
+	  				
+				logger.error("----------------------------------------------------------------------------");
+				logger.error("----- ERROR : two functions in ProActiveRuntimeImpl can t have the same name");
+				logger.error("----- ERROR : and the same type of paramters (Extends Implements)");
+				logger.error("----- search   : "+methodsearch+" nb param "+paramsearch.size());
+				logger.error("----------------------------------------------------------------------------");
+  			
+    	 	}
+    	 		
+    	  	/*mret = null;
+    	  	for(int i=0;i<allSameMethod.size();i++) {
+    	  	
     	  		Method mtest = ((Method)allSameMethod.get(i));	
     	  		if( mtest.getParameterTypes().length == paramsearch.size() ) {
     	  			if(mret != null ) {
+    	  				
+    	  				
     					logger.error("----------------------------------------------------------------------------");
     					logger.error("----- ERROR : two functions in ProActiveRuntimeImpl can t have the same name");
     					logger.error("----- ERROR : and the same number of paramters ");
+    					logger.error("----- search   : "+methodsearch+" nb param "+paramsearch.size());
+    					logger.error("----- conflict : "+mtest.getName()+" "+((Method)mret).getName());
     					logger.error("----------------------------------------------------------------------------");
     	  				
     	  			}
@@ -134,6 +193,7 @@ public class RuntimeRequest implements Serializable {
     	  				mret = mtest;
     	  		}
     	  	}
+    	  	*/
     	  	
     	  }
     
