@@ -1,4 +1,5 @@
 package org.objectweb.proactive.examples.components.helloworld;
+
 /***
  * Julia: France Telecom's implementation of the Fractal API
  * Copyright (C) 2001-2002 France Telecom R&D
@@ -21,39 +22,41 @@ package org.objectweb.proactive.examples.components.helloworld;
  *
  * Author: Eric Bruneton
  */
-
 import org.objectweb.fractal.api.control.BindingController;
+
 import org.objectweb.proactive.ProActive;
 
+
 public class ClientImpl implements Main, BindingController {
+    private Service service;
 
-  private Service service;
-
-  public void main (final String[] args) {
-	System.out.println("main method on client implementation object on node : " + ProActive.getBodyOnThis().getNodeURL());
-    service.print("hello world");
-  }
-
-  public String[] listFc () {
-    return new String[] { "s" };
-  }
-
-  public Object lookupFc (final String cItf) {
-    if (cItf.equals("s")) {
-      return service;
+    public void main(final String[] args) {
+        System.out.println(
+            "main method on client implementation object on node : " +
+            ProActive.getBodyOnThis().getNodeURL());
+        service.print("hello world");
     }
-    return null;
-  }
 
-  public void bindFc (final String cItf, final Object sItf) {
-    if (cItf.equals("s")) {
-      service = (Service)sItf;
+    public String[] listFc() {
+        return new String[] { "s" };
     }
-  }
 
-  public void unbindFc (final String cItf) {
-    if (cItf.equals("s")) {
-      service = null;
+    public Object lookupFc(final String cItf) {
+        if (cItf.equals("s")) {
+            return service;
+        }
+        return null;
     }
-  }
+
+    public void bindFc(final String cItf, final Object sItf) {
+        if (cItf.equals("s")) {
+            service = (Service) sItf;
+        }
+    }
+
+    public void unbindFc(final String cItf) {
+        if (cItf.equals("s")) {
+            service = null;
+        }
+    }
 }

@@ -30,14 +30,15 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.security.cert.X509Certificate;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ext.security.PolicyServer;
+
+import java.security.cert.X509Certificate;
 
 
 /**
@@ -164,9 +165,9 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * It is in fact the runtime(so the jvm) on which the node is running that is killed.
      * Nodes are previously unregistered from any registry.
      * @param softly if false, all jvms created when activating this VirtualNode are killed abruptely
-	 * if true a jvm that originates the creation of  a rmi registry waits until registry is empty before
-	 * dying. To be more precise a thraed is created to ask periodically the registry if objects are still
-	 * registered.
+     * if true a jvm that originates the creation of  a rmi registry waits until registry is empty before
+     * dying. To be more precise a thraed is created to ask periodically the registry if objects are still
+     * registered.
      */
     public void killAll(boolean softly);
 
@@ -204,18 +205,20 @@ public interface VirtualNode extends java.io.Serializable, Job {
      */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException;
-        
+
     // SECURITY
-	/**
-//	   * @return creator certificate
-	   */
-	  public X509Certificate getCreatorCertificate() throws ProActiveException;
 
-	  /**
-	   * @return policy server
-	   */
-	  public PolicyServer getPolicyServer();
+    /**
+       //           * @return creator certificate
+     */
+    public X509Certificate getCreatorCertificate() throws ProActiveException;
 
-	  public void setPolicyServer(PolicyServer server);
-	  public void setPolicyFile(String file);
+    /**
+     * @return policy server
+     */
+    public PolicyServer getPolicyServer();
+
+    public void setPolicyServer(PolicyServer server);
+
+    public void setPolicyFile(String file);
 }

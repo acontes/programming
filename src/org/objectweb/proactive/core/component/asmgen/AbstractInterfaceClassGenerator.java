@@ -41,7 +41,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import java.util.List;
 import java.util.Vector;
 
 
@@ -69,7 +68,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     protected String className;
     protected String packageName;
     protected Method[] methods;
-    protected List interfacesToImplement; // contains Class object corresponding to the interfaces
+    protected Vector interfacesToImplement; // contains Class object corresponding to the interfaces
     protected ClassWriter classGenerator;
 
     // The following fields have to do with

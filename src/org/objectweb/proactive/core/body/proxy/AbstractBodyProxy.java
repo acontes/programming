@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.proxy;
 
 import org.objectweb.proactive.Body;
@@ -84,20 +84,20 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     //
 
     /**
-    * Performs operations on the Call object created by the stub, thus changing
-    * the semantics of message-passing to asynchronous message-passing with
-    * future objects
-    *
-    *
-    * The semantics of message-passing implemented by this proxy class
-    * may be definied as follows :<UL>
-    * <LI>Asynchronous message-passing
-    * <LI>Creation of future objects where possible (which leads to
-    * wait-by-necessity).
-    * <LI>Synchronous, blocking calls where futures are not available.
-    * <LI>The Call <code>methodCall</code> is passed to the skeleton for execution.
-    * </UL>
-    */
+     * Performs operations on the Call object created by the stub, thus changing
+     * the semantics of message-passing to asynchronous message-passing with
+     * future objects
+     *
+     *
+     * The semantics of message-passing implemented by this proxy class
+     * may be definied as follows :<UL>
+     * <LI>Asynchronous message-passing
+     * <LI>Creation of future objects where possible (which leads to
+     * wait-by-necessity).
+     * <LI>Synchronous, blocking calls where futures are not available.
+     * <LI>The Call <code>methodCall</code> is passed to the skeleton for execution.
+     * </UL>
+     */
     public Object reify(MethodCall methodCall) throws Throwable {
         if (methodCall.getName().equals("equals")) {
             //there is only one argument to this method
@@ -120,13 +120,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 return reifyAsAsynchronous(methodCall);
             }
             return reifyAsSynchronous(methodCall);
-        } catch (MethodCallExecutionFailedException e) {        
+        } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(e.getMessage(),
                 e.getTargetException());
         } catch (Throwable t) {
-            if (t instanceof NonFunctionalException) {
-            	throw (NonFunctionalException) t;
-            } else if (t instanceof RuntimeException) {
+            if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else if (t instanceof Error) {
                 throw (Error) t;
@@ -148,8 +146,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     }
 
     /**
-    *
-    */
+     *
+     */
     protected void reifyAsOneWay(MethodCall methodCall)
         throws Exception, RenegotiateSessionException {
         try {
@@ -159,16 +157,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // throw new MethodCallExecutionFailedException("Exception occured in reifyAsOneWay while sending request for methodcall ="+methodCall.getName(), e);
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new SendRequestCommunicationException(
-                    "Exception occured in reifyAsOneWay while sending request for methodcall = " +
+                    "Exception occured in reifyAsOneWay while sending request for methodcall =" +
                     methodCall.getName(), e);
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-            		ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
-                    "Exception occured in reifyAsOneWay while sending request for methodcall = " +
-                    methodCall.getName(), e));
+                    "Exception occured in reifyAsOneWay while sending request for methodcall =" +
+                    methodCall.getName(), e),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
     }
 
@@ -184,29 +182,29 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         } catch (MOPException e) {
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new FutureCreationException(
-                    "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
+                    "Exception occured in reifyAsAsynchronous while creating future for methodcall =" +
                     methodCall.getName(), e);
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-                    ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
-                    "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-                    methodCall.getName(), e));
+                    "Exception occured in reifyAsAsynchronous while creating future for methodcall =" +
+                    methodCall.getName(), e),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         } catch (ClassNotFoundException e) {
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new FutureCreationException(
-                    "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
+                    "Exception occured in reifyAsAsynchronous while creating future for methodcall =" +
                     methodCall.getName(), e);
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-            		ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
-                    "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-                    methodCall.getName(), e));                
+                    "Exception occured in reifyAsAsynchronous while creating future for methodcall =" +
+                    methodCall.getName(), e),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
 
         // Set the id of the body creator in the created future
@@ -221,16 +219,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while sending request for methodcall ="+methodCall.getName(), e);
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new SendRequestCommunicationException(
-                    "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
+                    "Exception occured in reifyAsAsynchronous while sending request for methodcall =" +
                     methodCall.getName(), e);
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-            		ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
-                    "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
-                    methodCall.getName(), e));
+                    "Exception occured in reifyAsAsynchronous while sending request for methodcall =" +
+                    methodCall.getName(), e),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
 
         // And return the future object
@@ -252,16 +250,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // throw new MethodCallExecutionFailedException("Exception occured in reifyAsSynchronous while sending request for methodcall ="+methodCall.getName(), e);
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new SendRequestCommunicationException(
-                    "Exception occured in reifyAsSynchronous while sending request for methodcall = " +
+                    "Exception occured in reifyAsSynchronous while sending request for methodcall =" +
                     methodCall.getName(), e);
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-            		ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
-                    "Exception occured in reifyAsSynchronous while sending request for methodcall = " +
-                    methodCall.getName(), e));
+                    "Exception occured in reifyAsSynchronous while sending request for methodcall =" +
+                    methodCall.getName(), e),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
 
         // Returns the result (exception returned is a functional one -> NFE is not needed)

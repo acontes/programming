@@ -1,6 +1,8 @@
 package org.objectweb.proactive.p2p.peerconfiguration;
-import javax.swing.SpinnerModel;
+
 import javax.swing.SpinnerListModel;
+import javax.swing.SpinnerModel;
+
 
 /**
  * This 1.4 example is used by the various SpinnerDemos.
@@ -10,14 +12,14 @@ import javax.swing.SpinnerListModel;
  * lets you optionally associate a spinner model that's
  * linked to this one, so that when a cycle occurs the
  * linked spinner model is updated.
-
  * The SpinnerDemos use the CyclingSpinnerListModel for
  * a month spinner that (in SpinnerDemo3) is tied to the
  * year spinner, so that -- for example -- when the month
  * changes from December to January, the year increases.
  */
 public class CyclingSpinnerListModel extends SpinnerListModel {
-    Object firstValue, lastValue;
+    Object firstValue;
+    Object lastValue;
     SpinnerModel linkedModel = null;
 
     public CyclingSpinnerListModel(Object[] values) {

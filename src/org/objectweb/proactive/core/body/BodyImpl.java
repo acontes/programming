@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
@@ -48,15 +47,7 @@ import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.communication.SendReplyCommunicationException;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
-import org.objectweb.proactive.core.exceptions.service.ServiceFailedCalleeNFE;
-import org.objectweb.proactive.core.exceptions.service.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
-import org.objectweb.proactive.core.util.profiling.Profiling;
-import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -109,10 +100,6 @@ public abstract class BodyImpl extends AbstractBody
     protected RequestReceiver requestReceiver;
     protected MessageEventProducerImpl messageEventProducer;
 
-    /** Used for profiling */
-    private  CompositeAverageMicroTimer timer;
-
-    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -134,6 +121,7 @@ public abstract class BodyImpl extends AbstractBody
     public BodyImpl(Object reifiedObject, String nodeURL,
         MetaObjectFactory factory, String jobId) {
         super(reifiedObject, nodeURL, factory, jobId);
+
         this.requestReceiver = factory.newRequestReceiverFactory()
                                       .newRequestReceiver();
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
@@ -142,16 +130,11 @@ public abstract class BodyImpl extends AbstractBody
                 factory.newRequestQueueFactory().newRequestQueue(bodyID),
                 factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
-    	if (Profiling.SERVICE) {
-			timer = new CompositeAverageMicroTimer("Service");
-			PAProfilerEngine.registerTimer(timer);
-		}
     }
 
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-
     //
     // -- implements MessageEventProducer -----------------------------------------------
     //
@@ -196,16 +179,10 @@ public abstract class BodyImpl extends AbstractBody
      * @exception java.io.IOException if the reply cannot be accepted
      */
     protected void internalReceiveReply(Reply reply) throws java.io.IOException {
-    	//System.out.print("Body receives Reply -> ");
         if (messageEventProducer != null) {
             messageEventProducer.notifyListeners(reply,
                 MessageEvent.REPLY_RECEIVED, bodyID);
         }
-        /*if (reply.getResult() != null) {
-        	System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
-        } else {
-        	System.out.println("Reply is : " + reply);
-        }*/
         replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
@@ -289,85 +266,34 @@ public abstract class BodyImpl extends AbstractBody
                 messageEventProducer.notifyListeners(request,
                     MessageEvent.SERVING_STARTED, bodyID,
                     getRequestQueue().size());
-                Reply reply = null;
-                try {
-                    if (Profiling.SERVICE) {
-                    	timer.setTimer("serve."+request.getMethodName());
-                    	timer.start();
+                Reply reply = request.serve(BodyImpl.this);
+                if (reply == null) {
+                    if (!isActive()) {
+                        return; //test if active in case of terminate() method otherwise eventProducer would be null
                     }
-                    reply = request.serve(BodyImpl.this);
-                    if (Profiling.SERVICE) {
-                    	//timer.setTimer("serve."+this.getMethodName());
-                    	timer.stop();
-                    }
-                } catch (ServeException e) {
-                    // Create a non functional exception encapsulating the service exception
-                    NonFunctionalException calleeNFE = new ServiceFailedCalleeNFE(
-                            "Exception occured while serving pending request = " +
-                            request.getMethodName(), e);
-
-                    // Runtime exception are not throwed anymore: node may not be stopped by the service handler
-                    Handler handler = ProActive.searchExceptionHandler(calleeNFE, this);
-                    handler.handle(calleeNFE, ProActive.getBodyOnThis().getNodeURL());
-
-                    // Create a non functional exception encapsulating the service exception
-                    NonFunctionalException callerNFE = new ServiceFailedCallerNFE(
-                            "Exception occured while serving pending request = " +
-                            request.getMethodName(), e);
-
-                    // Create a new reply that contains this NFE instead of the result
-					Reply replyAlternate = null;
-                    replyAlternate = request.serveAlternate(BodyImpl.this, callerNFE);
-                    //System.out.println("*** Reply contains " + replyAlternate.getResult().getClass());
-
-                    // Send reply and stop local node if desired
-                    // TODO : create a way to define whether or not the node must be stopped
-					if (replyAlternate == null) {
-						if (!isActive()) {
-							return; //test if active in case of terminate() method otherwise eventProducer would be null
-						}
-						messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, bodyID, getRequestQueue().size());
-						return;
-					}
-                    if (true) {
-                        UniqueID destinationBodyId = request.getSourceBodyID();
-                        if ((destinationBodyId != null) &&
-                                (messageEventProducer != null)) {
-                            messageEventProducer.notifyListeners(reply,
-                                MessageEvent.REPLY_SENT, destinationBodyId,
-                                getRequestQueue().size());
-                        }
-                        this.getFuturePool().registerDestination(request.getSender());
-						replyAlternate.send(request.getSender());
-                        this.getFuturePool().removeDestination();
-                        return;
-                        //System.exit(0);
-                    }
+                    messageEventProducer.notifyListeners(request,
+                        MessageEvent.VOID_REQUEST_SERVED, bodyID,
+                        getRequestQueue().size());
+                    return;
                 }
-                             
-				if (reply == null) {
-					if (!isActive()) {
-						return; //test if active in case of terminate() method otherwise eventProducer would be null
-					}
-					messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, bodyID, getRequestQueue().size());
-					return;
-				}
-				UniqueID destinationBodyId = request.getSourceBodyID();
-				if ((destinationBodyId != null) && (messageEventProducer != null)) {
-					messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT, destinationBodyId, getRequestQueue().size());
-				}
-				this.getFuturePool().registerDestination(request.getSender());
-				reply.send(request.getSender());
-				this.getFuturePool().removeDestination();
+                UniqueID destinationBodyId = request.getSourceBodyID();
+                if ((destinationBodyId != null) &&
+                        (messageEventProducer != null)) {
+                    messageEventProducer.notifyListeners(reply,
+                        MessageEvent.REPLY_SENT, destinationBodyId,
+                        getRequestQueue().size());
+                }
+                this.getFuturePool().registerDestination(request.getSender());
+                reply.send(request.getSender());
+                this.getFuturePool().removeDestination();
+            } catch (ServeException e) {
+                // handle error here
+                throw new ProActiveRuntimeException("Exception in serve (Still not handled) : throws killer RuntimeException",
+                    e);
             } catch (java.io.IOException e) {
-                // Create a non functional exception encapsulating the network exception
-                NonFunctionalException nfe = new SendReplyCommunicationException(
-                        "Exception occured in serve while sending reply to future = " +
-                        request.getMethodName(), e);
-
-                // Runtime exception are not throwed anymore: node may not be stopped by the service handler
-                Handler handler = ProActive.searchExceptionHandler(nfe, this);
-                handler.handle(nfe, ProActive.getBodyOnThis().getNodeURL());
+                // handle error here
+                throw new ProActiveRuntimeException("Exception in sending reply (Still not handled) : throws killer RuntimeException",
+                    e);
             }
         }
 

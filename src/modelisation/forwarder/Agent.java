@@ -1,6 +1,7 @@
 package modelisation.forwarder;
 
 import modelisation.ModelisationBench;
+
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
 
@@ -24,8 +25,6 @@ public class Agent implements org.objectweb.proactive.RunActive,
     protected long startTime;
     private int count;
     protected boolean simpleBench;
-
-
 
     public Agent() {
     }
@@ -149,7 +148,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
 
                 if (this.migrationCounter++ > SIMPLE_BENCH_MAX_MIGRATIONS) {
                     System.out.println("Bench successfully completed, exiting");
-                   // System.exit(0);
+                    // System.exit(0);
                 }
                 ProActive.migrateTo(nodes[index - 1]);
                 //System.out.println("Migration done");
@@ -197,14 +196,17 @@ public class Agent implements org.objectweb.proactive.RunActive,
         try {
             Agent agent = null;
 
-            if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+            if ("ibis".equals(System.getProperty(
+                            "proactive.communication.protocol"))) {
                 System.out.println(" USING IBIS");
                 agent = (Agent) ProActive.newActive(Agent.class.getName(),
-                        args, (Node) null, null, new NoForwarderIbisMetaObjectFactory());
+                        args, (Node) null, null,
+                        new NoForwarderIbisMetaObjectFactory());
             } else {
                 System.out.println(" USING RMI");
                 agent = (Agent) ProActive.newActive(Agent.class.getName(),
-                        args, (Node) null, null, new NoForwarderMetaObjectFactory());
+                        args, (Node) null, null,
+                        new NoForwarderMetaObjectFactory());
             }
 
             //    agent = (Agent) ProActive.newActive("modelisation.forwarder.Agent",

@@ -58,15 +58,13 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     private String acquisitionMethod;
 
     /** the port number used during the acquisition */
-        private String portNumber;
+    private String portNumber;
 
-     /** the port number used during the acquisition */
-     private String protocol;
+    /** the port number used during the acquisition */
+    private String protocol;
 
-        
     /** indiquates if this machine results from a lookup or not  */
     private boolean isAcquired = false;
-    
     private ProActiveRuntime remoteRuntime;
 
     /** the process to start in order to create the JVM */
@@ -164,16 +162,18 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     public void setAcquired(boolean isAcquired) {
         this.isAcquired = isAcquired;
     }
-	/**
-	 * @return Returns the remoteRuntime.
-	 */
-	public ProActiveRuntime getRemoteRuntime() {
-		return remoteRuntime;
-	}
-	/**
-	 * @param remoteRuntime The remoteRuntime to set.
-	 */
-	public void setRemoteRuntime(ProActiveRuntime remoteRuntime) {
-		this.remoteRuntime = remoteRuntime;
-	}
+
+    /**
+     * @return Returns the remoteRuntime.
+     */
+    public ProActiveRuntime getRemoteRuntime() {
+        return remoteRuntime;
+    }
+
+    /**
+     * @param remoteRuntime The remoteRuntime to set.
+     */
+    public void setRemoteRuntime(ProActiveRuntime remoteRuntime) {
+        this.remoteRuntime = remoteRuntime;
+    }
 }

@@ -1,42 +1,43 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package nonregressiontest;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 import org.xml.sax.SAXException;
 
 import testsuite.manager.FunctionalTestManager;
+
+import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -44,14 +45,11 @@ import testsuite.manager.FunctionalTestManager;
  *
  */
 public class MainManager extends FunctionalTestManager {
-	
-	
-	
+
     /**
      * Constructor for MainManager.
      */
     public MainManager() {
-		
         this("Main unit test manager", "Manage all unit non-regression tests");
         //logger.addAppender(new ConsoleAppender(new SimpleLayout()));
     }
@@ -73,7 +71,7 @@ public class MainManager extends FunctionalTestManager {
         throws IOException, SAXException, ClassNotFoundException, 
             InstantiationException, IllegalAccessException {
         super(xmlFile);
-		//logger.addAppender(new ConsoleAppender(new SimpleLayout()));
+        //logger.addAppender(new ConsoleAppender(new SimpleLayout()));
     }
 
     /**
@@ -92,14 +90,14 @@ public class MainManager extends FunctionalTestManager {
     }
 
     public static void main(String[] args) {
-		//removeLogfile();
+        //removeLogfile();
         ProActiveConfiguration.load();
         MainManager manager = null;
-       
+
         String path = MainManager.class.getResource(
                 "/nonregressiontest/MainManager.xml").getPath();
         File xml = new File(path);
-        
+
         try {
             manager = new MainManager(xml);
         } catch (Exception e) {
@@ -112,6 +110,4 @@ public class MainManager extends FunctionalTestManager {
             "You can see results in test.hmtl file in your ProActive directory.");
         System.exit(0);
     }
-    
-    
 }

@@ -67,8 +67,8 @@ import java.util.ArrayList;
 public class NodeImpl implements Node, Serializable {
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
+    protected String vnName;
 
-	protected String vnName;
     //
     // ----------Constructors--------------------
     //
@@ -273,26 +273,27 @@ public class NodeImpl implements Node, Serializable {
             return name;
         }
 
-		/**
-		 * @see org.objectweb.proactive.Job#getJobID()
-		 */
-		public String getJobID() {
-			return jobID;
-		}
+        /**
+         * @see org.objectweb.proactive.Job#getJobID()
+         */
+        public String getJobID() {
+            return jobID;
+        }
     }
-    
-    // SECURITY
-	/**
-	  * @return virtual node name
-	  */
-	 public String getVnName() {
-		 return vnName;
-	 }
 
-	 /**
-	  * @param string
-	  */
-	 public void setVnName(String string) {
-		 vnName = string;
-	 }
+    // SECURITY
+
+    /**
+     * @return virtual node name
+     */
+    public String getVnName() {
+        return vnName;
+    }
+
+    /**
+     * @param string
+     */
+    public void setVnName(String string) {
+        vnName = string;
+    }
 }

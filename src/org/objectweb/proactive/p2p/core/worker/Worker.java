@@ -153,7 +153,7 @@ public class Worker implements Serializable, InitActive {
             System.out.println("J'attends...");
             Body body = ProActive.getBodyOnThis();
             Service service = new Service(body);
-            System.out.println(">>>>Service"+service.getOldest());
+            System.out.println(">>>>Service" + service.getOldest());
             service.blockingServeOldest();
         }
         return this.problem.gather((Result[]) ProActiveGroup.getGroup(results)

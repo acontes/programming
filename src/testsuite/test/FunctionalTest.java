@@ -30,7 +30,6 @@
  */
 package testsuite.test;
 
-import testsuite.exception.AssertionFailedException;
 import testsuite.exception.NotStandAloneException;
 
 import testsuite.result.TestResult;
@@ -121,15 +120,10 @@ public abstract class FunctionalTest extends AbstractTest
      * @see testsuite.test.AbstractTest#runTest()
      */
     public TestResult runTest() {
-    	try {
-    		initTest();
-    	} catch(Exception e) {
-    		logger.error("Cannot initialize test", e);
-    	}
         // preconditions
-		if (logger.isDebugEnabled()){
-			logger.debug("Test Preconditions of "+this.getName());
-		}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Test Preconditions of " + this.getName());
+        }
         try {
             if (!preConditions()) {
                 if (logger.isDebugEnabled()) {
@@ -139,15 +133,9 @@ public abstract class FunctionalTest extends AbstractTest
                 return new TestResult(this, TestResult.GLOBAL_RESULT,
                     "Preconditions not verified");
             }
-            if (logger.isDebugEnabled()){
-            	logger.debug("Preconditions success in "+this.getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Preconditions success in " + this.getName());
             }
-        } catch (AssertionFailedException e) {
-        	logger.error("Failed assertion" + e);
-        	e.printStackTrace();
-        	failed=true;
-        	logger.warn(this.getName() + ": [FAILED]");
-        	return new TestResult(this, TestResult.ERROR, "An assertion failed", e);
         } catch (Exception e1) {
             logger.error("Exception in preconditions", e1);
             failed = true;
@@ -166,12 +154,6 @@ public abstract class FunctionalTest extends AbstractTest
                 logger.debug("Not executed Test : not a standalone test.");
             }
             return null;
-        } catch (AssertionFailedException e) {
-        	logger.error("Failed assertion" + e);
-        	e.printStackTrace();
-        	failed=true;
-        	logger.warn(this.getName() + ": [FAILED]");
-        	return new TestResult(this, TestResult.ERROR, "An assertion failed", e);
         } catch (RuntimeException e) {
             logger.fatal("Exception during the test", e);
             failed = true;
@@ -185,28 +167,17 @@ public abstract class FunctionalTest extends AbstractTest
         }
         failed = false;
         // postconditions
-        if (logger.isDebugEnabled()){
-        	logger.debug("Test Postconditions of "+this.getName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Test Postconditions of " + this.getName());
         }
         try {
             if (!postConditions()) {
                 logger.warn("Postconditions are not verified");
                 failed = true;
             }
-			if (logger.isDebugEnabled()){
-				 logger.debug("Postconditions success in "+this.getName());
-			 }
-	    	try {
-	    		endTest();
-	    	} catch(Exception e) {
-	    		logger.error("Cannot correctly end test", e);
-	    	}
-        } catch (AssertionFailedException e) {
-        	logger.error("Failed assertion" + e);
-        	e.printStackTrace();
-        	failed=true;
-        	logger.warn(this.getName() + ": [FAILED]");
-            return new TestResult(this, TestResult.ERROR, "An assertion failed in postconditions", e);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Postconditions success in " + this.getName());
+            }
         } catch (Exception e1) {
             logger.error("Exception in postcondition", e1);
             failed = true;

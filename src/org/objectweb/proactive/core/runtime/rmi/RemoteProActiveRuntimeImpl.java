@@ -72,8 +72,8 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String VNname, String jobId)
-        throws java.rmi.RemoteException, NodeException {
+        boolean replacePreviousBinding, PolicyServer ps, String VNname,
+        String jobId) throws java.rmi.RemoteException, NodeException {
         String nodeURL = null;
 
         //Node node;
@@ -166,13 +166,13 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public void addParent(String proActiveRuntimeName) {
-    	proActiveRuntime.addParent(proActiveRuntimeName);
+        proActiveRuntime.addParent(proActiveRuntimeName);
     }
 
     public String[] getParents() {
-    	return proActiveRuntime.getParents();
+        return proActiveRuntime.getParents();
     }
-    
+
     public void killRT(boolean softly) throws java.rmi.RemoteException {
         killAllNodes();
         unregisterAllVirtualNodes();
@@ -273,8 +273,8 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     /**
-	* @return policy server
-	*/
+     * @return policy server
+     */
     public PolicyServer getPolicyServer() throws java.rmi.RemoteException {
         return proActiveRuntime.getPolicyServer();
     }
@@ -318,12 +318,13 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.enableSecurityIfNeeded();
     }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
-	 */
-	public SecurityContext getPolicy(SecurityContext sc) throws RemoteException, SecurityNotAvailableException {
-		return proActiveRuntime.getPolicy(sc);
-	}	
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws RemoteException, SecurityNotAvailableException {
+        return proActiveRuntime.getPolicy(sc);
+    }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getNodeCertificate(java.lang.String)
@@ -360,7 +361,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
      * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getJobID(java.lang.String)
      */
     public String getJobID(String nodeUrl) throws RemoteException {
-		return proActiveRuntime.getJobID(nodeUrl);
+        return proActiveRuntime.getJobID(nodeUrl);
     }
 
     //
@@ -401,8 +402,9 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                     e.getCause().getMessage().equals("Connection refused"))) {
                 if (url.indexOf("PA_JVM") < 0) {
                     logger.info("RMIRegistry unreachable on host " +
-                        getVMInformation().getInetAddress().getCanonicalHostName() +
-                        " to unregister " + url + ". Killed anyway !!!");
+                        getVMInformation().getInetAddress()
+                            .getCanonicalHostName() + " to unregister " + url +
+                        ". Killed anyway !!!");
                 }
             }
         } catch (java.net.MalformedURLException e) {
@@ -427,7 +429,8 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         int i = url.indexOf('/');
         if (i == -1) {
             //it is an url given by a descriptor
-            String host = getVMInformation().getInetAddress().getCanonicalHostName();
+            String host = getVMInformation().getInetAddress()
+                              .getCanonicalHostName();
 
             int port = RemoteRuntimeFactory.getRegistryHelper()
                                            .getRegistryPortNumber();
@@ -464,6 +467,4 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             }
         }
     }
-
-
 }

@@ -322,7 +322,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
             return new File(path).getCanonicalPath();
         } catch (IOException e) {
             logger.error(e.getMessage());
-       		return path;
+            return path;
         }
     }
 }

@@ -84,21 +84,16 @@ public class HalfBody extends AbstractBody {
         //psm = new ProActiveSecurityManager();
         //isSecurityOn = true;
         //psm.setBody(this);
-        
-       
-   	 this.psm = factory.getProActiveSecurityManager();
-   	   if (psm != null) {
-   		   //  startDefaultProActiveSecurityManager();
-   		   isSecurityOn = (psm != null);
-   		   logger.debug("HalfBody Security is " + isSecurityOn);
-   		   psm.setBody(this);
-   		   internalBodySecurity = new InternalBodySecurity(null);  
+        this.psm = factory.getProActiveSecurityManager();
+        if (psm != null) {
+            //  startDefaultProActiveSecurityManager();
+            isSecurityOn = (psm != null);
+            logger.debug("HalfBody Security is " + isSecurityOn);
+            psm.setBody(this);
+            internalBodySecurity = new InternalBodySecurity(null);
+        }
 
-   	   }
-   	   
-        
-       // internalBodySecurity = new InternalBodySecurity(null);
-
+        // internalBodySecurity = new InternalBodySecurity(null);
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
         setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
@@ -126,7 +121,7 @@ public class HalfBody extends AbstractBody {
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
-    protected void internalReceiveRequest(Request request)
+    public void internalReceiveRequest(Request request)
         throws java.io.IOException {
         throw new ProActiveRuntimeException(
             "The method 'receiveRequest' is not implemented in class HalfBody.");
@@ -137,8 +132,7 @@ public class HalfBody extends AbstractBody {
      * @param reply the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
-    protected void internalReceiveReply(Reply reply) throws java.io.IOException {
-    	//System.out.print("Half-Body receives Reply -> ");
+    public void internalReceiveReply(Reply reply) throws java.io.IOException {
         try {
             if (reply.isCiphered()) {
                 reply.decrypt(psm);
@@ -146,11 +140,6 @@ public class HalfBody extends AbstractBody {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        /*if (reply.getResult() != null) {
-        	System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
-        } else {
-        	System.out.println("Reply is : " + reply);
-        }*/
         replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
@@ -158,7 +147,7 @@ public class HalfBody extends AbstractBody {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
-     /**
+    /**
      *  @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
@@ -166,9 +155,9 @@ public class HalfBody extends AbstractBody {
     }
 
     private static String getRuntimeJobID() {
-    	return ProActiveRuntimeImpl.getProActiveRuntime().getJobID();
+        return ProActiveRuntimeImpl.getProActiveRuntime().getJobID();
     }
-    
+
     //
     // -- inner classes -----------------------------------------------
     //

@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.p2p.core.problem;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.p2p.core.worker.Worker;
+
+import java.io.Serializable;
 
 
 /**

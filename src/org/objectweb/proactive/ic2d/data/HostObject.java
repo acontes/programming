@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
 import org.objectweb.proactive.ic2d.util.HostNodeFinder;
+import org.objectweb.proactive.ic2d.util.HttpHostNodeFinder;
 import org.objectweb.proactive.ic2d.util.IbisHostNodeFinder;
 import org.objectweb.proactive.ic2d.util.RMIHostNodeFinder;
 import org.objectweb.proactive.ic2d.util.RunnableProcessor;
@@ -61,8 +62,8 @@ public class HostObject extends AbstractDataObject {
         super(parent);
         //	Test if there is port defined, then remove it to see if hostname exists
         try {
-            String shortHostname = java.net.InetAddress.getByName(UrlBuilder.removePortFromHost(hostname))
-                                                       .getHostName();
+            String shortHostname = java.net.InetAddress.getByName(UrlBuilder.removePortFromHost(
+                        hostname)).getHostName();
 
             this.hostname = hostname;
 
@@ -73,7 +74,9 @@ public class HostObject extends AbstractDataObject {
         }
         if ("ibis".equals(protocol)) {
             this.nodeFinder = new IbisHostNodeFinder(controller);
-        } else {
+        } else if ("http".equals(protocol)) { 
+        this.nodeFinder = new HttpHostNodeFinder (controller);
+    }else {
             this.nodeFinder = new RMIHostNodeFinder(controller);
         }
     }
@@ -267,5 +270,6 @@ public class HostObject extends AbstractDataObject {
             }
         }
     }
-     // end inner class CreateNodeTask
+
+    // end inner class CreateNodeTask
 }

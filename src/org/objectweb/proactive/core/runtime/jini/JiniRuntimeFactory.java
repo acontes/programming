@@ -54,10 +54,11 @@ public class JiniRuntimeFactory extends RuntimeFactory {
 
     static {
         if (JiniRuntimeFactory.class.getClassLoader() != null) {
-        	if(logger.isDebugEnabled()){
-            logger.debug("JiniRuntimeFactory created with " +
-                JiniRuntimeFactory.class.getClassLoader().getClass().getName());
-        	}
+            if (logger.isDebugEnabled()) {
+                logger.debug("JiniRuntimeFactory created with " +
+                    JiniRuntimeFactory.class.getClassLoader().getClass()
+                                            .getName());
+            }
         }
     }
 

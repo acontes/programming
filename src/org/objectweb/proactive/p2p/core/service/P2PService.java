@@ -73,9 +73,8 @@ public interface P2PService extends Load {
      * </p>
      */
     public static final int NOA = 0;
-
     public static final int MAX_LOAD = 1;
-    
+
     /**
      * <p>
      * Allows this P2P Service on this VM to register in a list of other P2P

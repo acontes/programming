@@ -30,11 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime.rmi;
 
-import java.rmi.RemoteException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -49,6 +46,12 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import java.rmi.RemoteException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+
 
 /**
  *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate RMI-specific
@@ -60,8 +63,8 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
     static Logger logger = Logger.getLogger(RemoteProActiveRuntime.class.getName());
 
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String VNname, String jobId)
-        throws java.rmi.RemoteException, NodeException;
+        boolean replacePreviousBinding, PolicyServer ps, String VNname,
+        String jobId) throws java.rmi.RemoteException, NodeException;
 
     public void killAllNodes() throws java.rmi.RemoteException;
 
@@ -79,8 +82,8 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
     public VMInformation getVMInformation() throws java.rmi.RemoteException;
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName)
-        throws java.rmi.RemoteException;
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) throws java.rmi.RemoteException;
 
     public ProActiveRuntime[] getProActiveRuntimes()
         throws java.rmi.RemoteException;
@@ -88,10 +91,11 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws java.rmi.RemoteException;
 
-    public void addParent(String proActiveRuntimeName) throws java.rmi.RemoteException;
+    public void addParent(String proActiveRuntimeName)
+        throws java.rmi.RemoteException;
 
     public String[] getParents() throws java.rmi.RemoteException;
-    
+
     public void killRT(boolean softly) throws java.rmi.RemoteException;
 
     public String getURL() throws java.rmi.RemoteException;
@@ -113,8 +117,8 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 
     public void unregisterAllVirtualNodes() throws java.rmi.RemoteException;
 
-	public String getJobID(String nodeUrl) throws java.rmi.RemoteException;
-	
+    public String getJobID(String nodeUrl) throws java.rmi.RemoteException;
+
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
         throws java.rmi.RemoteException, 
@@ -123,60 +127,60 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 
     public UniversalBody receiveBody(String nodeName, Body body)
         throws java.rmi.RemoteException;
-	/**
-	 * @return creator certificate
-	 */
-	public X509Certificate getCreatorCertificate()
-		throws java.rmi.RemoteException;
 
-	public PolicyServer getPolicyServer() throws java.rmi.RemoteException;
+    /**
+     * @return creator certificate
+     */
+    public X509Certificate getCreatorCertificate()
+        throws java.rmi.RemoteException;
 
-	public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-		throws java.rmi.RemoteException;
+    public PolicyServer getPolicyServer() throws java.rmi.RemoteException;
 
-	public String getVNName(String Nodename) throws java.rmi.RemoteException;
+    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+        throws java.rmi.RemoteException;
 
-	/**
-	 * @param s
-	 */
-	public void setDefaultNodeVirtualNodeNAme(String s)
-		throws java.rmi.RemoteException;
+    public String getVNName(String Nodename) throws java.rmi.RemoteException;
 
-	public void updateLocalNodeVirtualName() throws RemoteException;
-	public PolicyServer getNodePolicyServer(String nodeName)throws RemoteException;
+    /**
+     * @param s
+     */
+    public void setDefaultNodeVirtualNodeNAme(String s)
+        throws java.rmi.RemoteException;
 
+    public void updateLocalNodeVirtualName() throws RemoteException;
 
-	 /**
-	  *  sets all needed modifications to enable security components
-	  * MUST be called when the descriptor is ready 
-	  */
-	 public void enableSecurityIfNeeded()throws RemoteException;
-	 
-	public X509Certificate getNodeCertificate(String nodeName) throws  RemoteException;
-	
-	/**
-	 * @param nodeName
-	 * @return returns all entities associated to the node
-	 */
-	public ArrayList getEntities(String nodeName)throws RemoteException;
+    public PolicyServer getNodePolicyServer(String nodeName)
+        throws RemoteException;
 
-	/**
-	 * @param uBody
-	 * @return returns all entities associated to the node
-	 */
-	public ArrayList getEntities(UniversalBody uBody)throws RemoteException;
+    /**
+     *  sets all needed modifications to enable security components
+     * MUST be called when the descriptor is ready
+     */
+    public void enableSecurityIfNeeded() throws RemoteException;
 
+    public X509Certificate getNodeCertificate(String nodeName)
+        throws RemoteException;
 
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(String nodeName) throws RemoteException;
 
-	/**
-	 * @return returns all entities associated to this runtime
-	 */
-	public ArrayList getEntities() throws RemoteException;
+    /**
+     * @param uBody
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(UniversalBody uBody) throws RemoteException;
 
-	/**
-	 * @param sc
-	 */
-	public SecurityContext getPolicy(SecurityContext sc) throws RemoteException,SecurityNotAvailableException;
- 
+    /**
+     * @return returns all entities associated to this runtime
+     */
+    public ArrayList getEntities() throws RemoteException;
 
+    /**
+     * @param sc
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws RemoteException, SecurityNotAvailableException;
 }

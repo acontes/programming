@@ -32,8 +32,7 @@ package org.objectweb.proactive.core.component.xml;
 
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 
 
 /**
@@ -41,10 +40,10 @@ import java.util.List;
  */
 public class ContainerElementHierarchy {
     ContainerHandlerMarker fatherHandler;
-    List childrenContainerHandlers;
+    Vector childrenContainerHandlers;
 
     public ContainerElementHierarchy() {
-        childrenContainerHandlers = new ArrayList();
+        childrenContainerHandlers = new Vector();
     }
 
     public void addFatherHandler(ContainerHandlerMarker fatherHandler) {

@@ -222,8 +222,8 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 setResultObject(value);
             }
         }
-         //end of inner class SingleValueUnmarshaller
 
+        //end of inner class SingleValueUnmarshaller
         private class JvmSetHandler extends CollectionUnmarshaller {
             protected JvmSetHandler() {
                 super(String.class);
@@ -236,14 +236,14 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 throws org.xml.sax.SAXException {
                 if (name.equals(CURRENTJVM_TAG)) {
                     String protocol = (String) activeHandler.getResultObject();
-                    vn.createNodeOnCurrentJvm(protocol);               
+                    vn.createNodeOnCurrentJvm(protocol);
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
             }
         }
-         //end of inner class JvmSetHandler
 
+        //end of inner class JvmSetHandler
         private class VmNameHandler extends BasicUnmarshaller {
             private VmNameHandler() {
             }
@@ -259,8 +259,8 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 }
             }
         }
-         //end of inner class VmNameHandler
 
+        //end of inner class VmNameHandler
         private class CurrentJvmHandler extends BasicUnmarshaller {
             private CurrentJvmHandler() {
             }
@@ -271,9 +271,11 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 setResultObject(protocol);
             }
         }
-         // end of inner class CurrentJvmHandler
+
+        // end of inner class CurrentJvmHandler
     }
-     // end inner class MapHandler
+
+    // end inner class MapHandler
 
     /**
      * This class receives jvm events
@@ -315,25 +317,28 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             public void startContextElement(String name, Attributes attributes)
                 throws org.xml.sax.SAXException {
                 String runtimeURL = attributes.getValue("url");
+
                 //String portNumber = attributes.getValue("port");
                 if (runtimeURL != null) {
-                	
-                	String protocol = UrlBuilder.getProtocol(runtimeURL);
-                	String url = UrlBuilder.removeProtocol(runtimeURL,protocol);
-                	proActiveDescriptor.registerProcess(currentVM, (String) runtimeURL);
-                	ProActiveRuntime proActiveRuntimeRegistered = null;
-					try {
-						proActiveRuntimeRegistered = RuntimeFactory.getRuntime(url,protocol);
-					} catch (ProActiveException e) {
-						e.printStackTrace();
-					}
-					currentVM.setAcquired(true);
-                	currentVM.setRemoteRuntime(proActiveRuntimeRegistered);
-                	//currentVM.setAcquisitionMethod(acquisitionMethod);
+                    String protocol = UrlBuilder.getProtocol(runtimeURL);
+                    String url = UrlBuilder.removeProtocol(runtimeURL, protocol);
+                    proActiveDescriptor.registerProcess(currentVM,
+                        (String) runtimeURL);
+                    ProActiveRuntime proActiveRuntimeRegistered = null;
+                    try {
+                        proActiveRuntimeRegistered = RuntimeFactory.getRuntime(url,
+                                protocol);
+                    } catch (ProActiveException e) {
+                        e.printStackTrace();
+                    }
+                    currentVM.setAcquired(true);
+                    currentVM.setRemoteRuntime(proActiveRuntimeRegistered);
+                    //currentVM.setAcquisitionMethod(acquisitionMethod);
                 }
-////               if (portNumber != null) {
-/////                    currentVM.setPortNumber(portNumber);
-////                }
+
+                ////               if (portNumber != null) {
+                /////                    currentVM.setPortNumber(portNumber);
+                ////                }
             }
         }
 

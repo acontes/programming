@@ -2,6 +2,7 @@ package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
 import java.util.Map;
 
+
 public class MonitoredVN extends BasicMonitoredObject {
     static protected int lastID = 0;
     static protected Map prettyNames;
@@ -18,5 +19,3 @@ public class MonitoredVN extends BasicMonitoredObject {
         super(VN, fullname);
     }
 }
-
-

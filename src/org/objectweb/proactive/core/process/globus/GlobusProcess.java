@@ -28,11 +28,10 @@
  *
  * ################################################################
  */
-
 /**
  * @author rquilici
  *
- * This class represents a Globus Process. 
+ * This class represents a Globus Process.
  */
 package org.objectweb.proactive.core.process.globus;
 

@@ -71,7 +71,7 @@ public class TestNodes extends FunctionalTest {
      *
      */
     public TestNodes() {
-        super("Default deployment descriptor",
+        super(" Default deployment descriptor",
             " Test reading a descriptor file to create nodes needed by other tests.");
     }
 
@@ -124,11 +124,7 @@ public class TestNodes extends FunctionalTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        //killNodes();
-    }
-    
-    public void uponEndOfGroupOfTests() throws Exception {
-    	killNodes();
+        killNodes();
     }
 
     public static void killNodes() throws ProActiveException {

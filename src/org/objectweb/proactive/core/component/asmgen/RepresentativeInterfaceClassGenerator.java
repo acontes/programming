@@ -47,9 +47,9 @@ import java.io.Serializable;
 
 import java.lang.reflect.Method;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Vector;
 
 
 /**
@@ -128,17 +128,17 @@ public class RepresentativeInterfaceClassGenerator
 
             //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
             //                                                    .equals(ComponentParameters.PRIMITIVE);
-            interfacesToImplement = new ArrayList();
+            interfacesToImplement = new Vector();
 
             // add functional interface
             interfacesToImplement.add(Class.forName(
                     interfaceType.getFcItfSignature()));
 
             // add Serializable interface
-            interfacesToImplement.add(Serializable.class);
+            interfacesToImplement.addElement(Serializable.class);
 
             // add StubObject, so we can set the proxy
-            interfacesToImplement.add(StubObject.class);
+            interfacesToImplement.addElement(StubObject.class);
 
             this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(fcInterfaceName,
                     interfaceType.getFcItfSignature());
@@ -371,7 +371,7 @@ public class RepresentativeInterfaceClassGenerator
             pushInt(cv, i);
 
             // Loads the generatedClassName of the class onto the stack
-            String s = ((Class) interfacesToImplement.get(i)).getName();
+            String s = ((Class) interfacesToImplement.elementAt(i)).getName();
             cv.visitLdcInsn(s);
 
             // Performs the call to Class.forName

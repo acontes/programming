@@ -296,6 +296,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getLocalNodeNames()
      */
     public String[] getLocalNodeNames() {
+        System.out.println("get LocalNodeNames");
         int i = 0;
         String[] nodeNames;
         synchronized (nodeMap) {
@@ -321,13 +322,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) {
+    	
         //System.out.println("register in Impl");
         //System.out.println("thread"+Thread.currentThread().getName());
         //System.out.println(vmInformation.getVMID().toString());
         proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
+        
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
             proActiveRuntimeName, creatorID, creationProtocol, vmName);
-        
     }
 
     /**
@@ -606,7 +608,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
+        
+        System.out.println("nodeName = " + nodeName  + " Map = " + nodeMap);
+         
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+
         synchronized (bodyList) {
             if (!bodyList.contains(bodyID)) {
                 //System.out.println("in registerbody id = "+ bodyID.toString());
@@ -896,5 +902,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     public String getJobID() {
         return vmInformation.getJobID();
+    }
+    
+    public String [] getNodesNames () {
+    	String [] nodesNames = new String [nodeMap.size()];
+    	Enumeration e = nodeMap.keys();
+    	int i=0;
+    	while (e.hasMoreElements()) {
+    		nodesNames[i++] = (String)e.nextElement();
+    	}
+    	return nodesNames;
     }
 }

@@ -43,19 +43,18 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 
 import org.xml.sax.SAXException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 
 
 /**
  * @author Matthieu Morel
  */
 public class ComponentTypeHandler extends AbstractUnmarshallerDecorator {
-    List interfaceTypes;
+    Vector interfaceTypes;
     String typeName;
 
     public ComponentTypeHandler() {
-        interfaceTypes = new ArrayList();
+        interfaceTypes = new Vector();
         addHandler(ComponentsDescriptorConstants.PROVIDES_TAG,
             new ProvidesHandler());
         addHandler(ComponentsDescriptorConstants.REQUIRES_TAG,
@@ -67,7 +66,7 @@ public class ComponentTypeHandler extends AbstractUnmarshallerDecorator {
      * occurence
      */
     public void reset() {
-        interfaceTypes.clear();
+        interfaceTypes.removeAllElements();
         typeName = null;
     }
 
@@ -84,7 +83,7 @@ public class ComponentTypeHandler extends AbstractUnmarshallerDecorator {
     public Object getResultObject() throws SAXException {
         try {
             // return a (typeName / ComponentType instance) couple.
-            ((ArrayList) interfaceTypes).trimToSize();
+            interfaceTypes.trimToSize();
             InterfaceType[] itf_types = (InterfaceType[]) interfaceTypes.toArray(new InterfaceType[interfaceTypes.size()]);
             return new Object[] {
                 typeName,

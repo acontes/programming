@@ -30,11 +30,35 @@
  */
 package org.objectweb.proactive.ext.security;
 
+import org.apache.log4j.Logger;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.BodyImpl;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.examples.garden.Flower;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationTicket;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationTicketProperty;
+import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.crypto.RandomLongGenerator;
+import org.objectweb.proactive.ext.security.crypto.Session;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import org.xml.sax.SAXException;
+
+import sun.rmi.server.MarshalOutputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -52,6 +76,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -62,27 +87,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.BodyImpl;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.examples.garden.Flower;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationTicket;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationTicketProperty;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.crypto.RandomLongGenerator;
-import org.objectweb.proactive.ext.security.crypto.Session;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-import org.xml.sax.SAXException;
-
-import sun.rmi.server.MarshalOutputStream;
 
 
 /**
@@ -108,6 +112,7 @@ public class ProActiveSecurityManager implements Serializable {
     /* Active object certificate */
     protected X509Certificate certificate;
     protected byte[] encodedCertificate;
+
     /* Active Object private Key */
     protected PrivateKey privateKey;
 
@@ -389,9 +394,6 @@ public class ProActiveSecurityManager implements Serializable {
 
         distantBody = distantBody.getRemoteAdapter();
 
-        
-
-        
         /*
            // get runtime Policy Server if exists
            try {
@@ -542,11 +544,7 @@ public class ProActiveSecurityManager implements Serializable {
                 distantBodyPolicy);
 
         //scDistant.setProposedPolicy(resultPolicy);
-        
-       //distantBody.getPolicy(scDistant);
-        
-
-
+        //distantBody.getPolicy(scDistant);
         long sessionID = 0;
         try {
             sessionID = distantBody.startNewSession(resultPolicy);
@@ -637,7 +635,6 @@ public class ProActiveSecurityManager implements Serializable {
      */
     public byte[][] encrypt(long sessionID, Object object) {
         Session session = (Session) sessions.get(new Long(sessionID));
-
 
         if (session != null) {
             try {
@@ -1528,18 +1525,14 @@ public class ProActiveSecurityManager implements Serializable {
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
         //	privateKeyEncoded = privateKey.getEncoded();
-   
         try {
-        	if (certificate != null ) {
-           encodedCertificate = certificate.getEncoded();
-            
-        	}
+            if (certificate != null) {
+                encodedCertificate = certificate.getEncoded();
+            }
         } catch (CertificateEncodingException e) {
             e.printStackTrace();
-        } 
-    	out.defaultWriteObject();
-
-   
+        }
+        out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -1558,14 +1551,14 @@ public class ProActiveSecurityManager implements Serializable {
         //decodePrivateKey();
         randomLongGenerator = new RandomLongGenerator();
 
-        
         if (encodedCertificate != null) {
-        certificate = ProActiveSecurity.decodeCertificate(encodedCertificate);
+            certificate = ProActiveSecurity.decodeCertificate(encodedCertificate);
 
-        this.certificate = policyServer.getCertificate();
-        this.privateKey = policyServer.getPrivateKey();
-        this.publicKey = certificate.getPublicKey();
+            this.certificate = policyServer.getCertificate();
+            this.privateKey = policyServer.getPrivateKey();
+            this.publicKey = certificate.getPublicKey();
         }
+
         //    logger.info("creating randomgenerator " + randomLongGenerator);
         //    logger.info("Security Manager restarted");
     }

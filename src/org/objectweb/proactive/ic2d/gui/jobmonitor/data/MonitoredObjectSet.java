@@ -1,27 +1,19 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
-import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.*;
 
 
 public class MonitoredObjectSet {
     private TreeMap map;
-    private BasicMonitoredObject parent;
-
-    public MonitoredObjectSet(BasicMonitoredObject parent) {
-        this.map = new TreeMap();
-        this.parent = parent;
-    }
 
     public MonitoredObjectSet() {
-        this(null);
+        map = new TreeMap();
     }
 
     public BasicMonitoredObject add(BasicMonitoredObject o) {
         BasicMonitoredObject orig = (BasicMonitoredObject) map.get(o);
         if (orig == null) {
             map.put(o, o);
-            o.addReference(this);
         } else {
             o.copyInto(orig);
             o = orig;
@@ -56,11 +48,6 @@ public class MonitoredObjectSet {
         o = (BasicMonitoredObject) map.get(o);
         if (o != null) {
             map.remove(o);
-            o.removeReference(this);
         }
-    }
-
-    public BasicMonitoredObject getParent() {
-        return parent;
     }
 }

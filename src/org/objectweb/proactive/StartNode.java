@@ -1,36 +1,37 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/ 
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive;
 
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -40,9 +41,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
 import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
-import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
-import org.objectweb.proactive.core.util.profiling.Profiling;
-import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
 
 
 /**
@@ -70,7 +68,7 @@ import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
  */
 public class StartNode {
     public static final int DEFAULT_CLASSFILE_SERVER_PORT = 2001;
-    static Logger logger ;
+    static Logger logger;
     protected static final int DEFAULT_PORT = 1099;
     protected static final int MAX_RETRY = 3;
     protected static final String NO_REBIND_OPTION_NAME = "-noRebind";
@@ -78,6 +76,10 @@ public class StartNode {
     protected static final String NO_REGISTRY_OPTION_NAME = "-noRegistry";
     protected static final String MULTICAST_LOCATOR_NAME = "-multicastLocator";
 
+    //    private static final String FS = System.getProperty("file.separator");
+    //    private static final String XML_LOCATION = System.getProperty("user.dir") +
+    //        FS + ".." + FS + ".." + FS + "descriptors" + FS +
+    //        "RemoteGlobusSetup.xml";
     protected boolean noClassServer = false;
     protected boolean noRebind = false;
     protected boolean noRegistry = false;
@@ -87,8 +89,8 @@ public class StartNode {
     protected String nodeURL;
 
     static {
-    	ProActiveConfiguration.load();
-		logger = Logger.getLogger(StartNode.class.getName());
+        ProActiveConfiguration.load();
+        logger = Logger.getLogger(StartNode.class.getName());
         if (logger.isDebugEnabled()) {
             logger.debug("Loading ProActive class");
         }
@@ -99,7 +101,7 @@ public class StartNode {
                 logger.fatal("Loading of ProActive class FAILED");
             }
             e.printStackTrace();
-			System.exit(1);
+            System.exit(1);
         }
     }
 
@@ -121,14 +123,14 @@ public class StartNode {
         }
 
         /*
-        // debug
-        System.out.println("Node name = "+nodeURL);
-        if (noRebind)
-          System.out.println(" - NoRebind");
-        if (noClassServer)
-          System.out.println(" - No ClassServer");
-        else System.out.println("ClassServer classpath = "+classpath);
-        */
+           // debug
+           System.out.println("Node name = "+nodeURL);
+           if (noRebind)
+             System.out.println(" - NoRebind");
+           if (noClassServer)
+             System.out.println(" - No ClassServer");
+           else System.out.println("ClassServer classpath = "+classpath);
+         */
     }
 
     //
@@ -151,12 +153,29 @@ public class StartNode {
      *               java org.objectweb.proactive.StartNode //localhost/node2 -noClassServer -noRebind<br>
      */
     public static void main(String[] args) {
-            try {
-                new StartNode(args).run();
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.fatal(e.toString());
-            }
+        //        if ((args.length != 0) && (args[0].compareTo("-g") == 0)) {
+        //            try {
+        //                //ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file://Z:/test/ProActive/classes/GlobusSetupWithRlogin.xml");
+        //                ProActiveDescriptor pad = ProActive.getProactiveDescriptor(
+        //                        "file:" + XML_LOCATION);
+        //                ExternalProcess rLoginProcess = pad.getProcess("rLoginProcess");
+        //                JVMProcess jvmProcess = (JVMProcess) pad.getProcess("globusJVM");
+        //                jvmProcess.setParameters(args[1]);
+        //                //pad.activateMappings();
+        //                rLoginProcess.startProcess();
+        //                //gp.startNodeWithGlobus(args[1]);
+        //            } catch (Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        } else {
+        try {
+            new StartNode(args).run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.fatal(e.toString());
+        }
+
+        //}
     }
 
     //
@@ -180,6 +199,7 @@ public class StartNode {
         if (noClassServer) {
             return;
         }
+
         // look for classpath
         for (int i = start; i < args.length; i++) {
             String s = args[i];
@@ -190,16 +210,16 @@ public class StartNode {
         }
     }
 
-//    /**
-//     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-//     * sets the properties needed for the node creation
-//     */
-//    protected void setProperties() {
-//        //  System.setProperty("sun.rmi.dgc.checkInterval","400");
-//        //  System.setProperty("java.rmi.dgc.leaseValue","800");
-//        //  System.setProperty("sun.rmi.dgc.cleanInterval","400");
-//        //  System.setProperty("sun.rmi.dgc.client.gcInterval","400");
-//    }
+    /**
+     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
+     * sets the properties needed for the node creation
+     */
+    protected void setProperties() {
+        //  System.setProperty("sun.rmi.dgc.checkInterval","400");
+        //  System.setProperty("java.rmi.dgc.leaseValue","800");
+        //  System.setProperty("sun.rmi.dgc.cleanInterval","400");
+        //  System.setProperty("sun.rmi.dgc.client.gcInterval","400");
+    }
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -214,9 +234,11 @@ public class StartNode {
                 if (nodeURL == null) {
                     node = NodeFactory.getDefaultNode();
                 } else {
-                	//TODO allow start alone node with security parameters 
-                    node = NodeFactory.createNode(nodeURL, !noRebind,null,null);
+                    //TODO allow start alone node with security parameters 
+                    node = NodeFactory.createNode(nodeURL, !noRebind, null, null);
                 }
+
+                //System.out.println("nodeurl "+node.getNodeInformation().getURL());
                 logger.info("OK. Node " + node.getNodeInformation().getName() +
                     " is created in VM id=" + UniqueID.getCurrentVMID());
                 break;
@@ -231,11 +253,14 @@ public class StartNode {
                     } catch (InterruptedException e2) {
                     }
                 }
-                 // end if
+
+                // end if
             }
-             // try
+
+            // try
         }
-         // end while
+
+        // end while
     }
 
     /**
@@ -244,27 +269,18 @@ public class StartNode {
      * helper methods
      */
     protected void run() throws java.io.IOException, NodeException {
-        //setProperties();
+        setProperties();
         // set options on node factory
         RemoteRuntimeFactory.setShouldCreateClassServer(!noClassServer);
         RemoteRuntimeFactory.setShouldCreateRegistry(!noRegistry);
         RemoteRuntimeFactory.setRegistryPortNumber(registryPortNumber);
         if (RuntimeFactory.JINI_ENABLED) {
             JiniRuntimeFactory.setMulticastLocator(multicastLocator);
+            // System.out.println("jini not yet implemented");
         }
-  
-        AverageMicroTimer mt = null;
-        if (Profiling.STARTNODE) {
-        	mt = new AverageMicroTimer("StartNode");
-        	PAProfilerEngine.registerTimer(mt);
-        	mt.start();
-        }
+
         // create node
         createNode(nodeURL, noRebind);
-        if (Profiling.STARTNODE) {
-        	mt.stop();
-        //	mt.dump();
-        }
     }
 
     /**
@@ -308,7 +324,8 @@ public class StartNode {
     private void printUsage() {
         String localhost = "localhost";
         try {
-            localhost = java.net.InetAddress.getLocalHost().getCanonicalHostName();
+            localhost = java.net.InetAddress.getLocalHost()
+                                            .getCanonicalHostName();
         } catch (java.net.UnknownHostException e) {
             logger.error("InetAddress failed: " + e.getMessage());
             e.printStackTrace();
@@ -343,4 +360,5 @@ public class StartNode {
             MULTICAST_LOCATOR_NAME);
     }
 }
- // end class
+
+// end class

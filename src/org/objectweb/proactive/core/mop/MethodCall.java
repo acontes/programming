@@ -30,14 +30,16 @@
  */
 package org.objectweb.proactive.core.mop;
 
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.ObjectToByteConverter;
 
 import sun.rmi.server.MarshalInputStream;
+import sun.rmi.server.MarshalOutputStream;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 
 /**
@@ -131,16 +133,15 @@ public class MethodCall implements java.io.Serializable {
         if ((serializedEffectiveArguments == null) &&
                 (effectiveArguments != null)) {
             try {
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//
-//                //  ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-//                MarshalOutputStream objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
-//                objectOutputStream.writeObject(effectiveArguments);
-//                objectOutputStream.flush();
-//                objectOutputStream.close();
-//                byteArrayOutputStream.close();
-//                serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
-            	 serializedEffectiveArguments = ObjectToByteConverter.convert(effectiveArguments);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+                //  ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+                MarshalOutputStream objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
+                objectOutputStream.writeObject(effectiveArguments);
+                objectOutputStream.flush();
+                objectOutputStream.close();
+                byteArrayOutputStream.close();
+                serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -328,7 +329,7 @@ public class MethodCall implements java.io.Serializable {
      *        Executes the instance method call represented by this object.
      *
      * @param targetObject        the Object the method is called on
-     * @throws MethodCallExecutionFailedException thrown if the reflection of the
+     * @throws MethodCallExecutionFailedException thrown if the refleciton of the
      * call failed.
      * @throws InvocationTargetException thrown if the execution of the reified
      * method terminates abruptly by throwing an exception. The exception
@@ -374,15 +375,7 @@ public class MethodCall implements java.io.Serializable {
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException(
                 "Access rights to the method denied: " + e);
-        } catch (IllegalArgumentException e) {
-            throw new MethodCallExecutionFailedException(
-                "Arguments for the method " + this.getName() +
-                " are invalids: " + e);
-        } /*catch (InvocationTargetException e) {
-            throw new MethodCallExecutionFailedException(
-                "Target for invocation of " + this.getName() +
-                " is invalid: " + e);
-        }*/
+        }
     }
 
     protected void finalize() {

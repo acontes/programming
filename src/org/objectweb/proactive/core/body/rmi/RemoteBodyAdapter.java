@@ -343,40 +343,32 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
         return proxiedRemoteBody.getEntities();
     }
 
-	//====================
     // Implements Handlerizable
-	//====================
-	
-	/**
-	 * Get information about the handlerizable object
-	 * @return information about the handlerizable object
-	 */
-	public String getHandlerizableInfo() throws java.io.IOException {
-		return proxiedRemoteBody.getHandlerizableInfo();
-	}
 
     /** Give a reference to a local map of handlers
      * @return A reference to a map of handlers
      */
-    public HashMap getHandlersLevel() throws java.io.IOException {
+    public HashMap getHandlersLevel() throws ProActiveException {
+        try {
             HashMap map = proxiedRemoteBody.getHandlersLevel();
             return map;
+        } catch (java.io.IOException e) {
+            throw new ProActiveException(e.getMessage(), e);
+        }
     }
 
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-		proxiedRemoteBody.clearHandlersLevel();
-	}
-	
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      */
     public void setExceptionHandler(Handler handler, Class exception)
-        throws java.io.IOException {
+        throws ProActiveException {
+        try {
             proxiedRemoteBody.setExceptionHandler(handler, exception);
+        } catch (java.io.IOException e) {
+            System.out.println("ERROR : " + e.getMessage());
+            throw new ProActiveException(e.getMessage(), e);
+        }
     }
 
     /** Remove a handler from the table of the Handlerizable Object
@@ -384,9 +376,13 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      * @return The removed handler or null
      */
     public Handler unsetExceptionHandler(Class exception)
-        throws java.io.IOException {
+        throws ProActiveException {
+        try {
             Handler handler = proxiedRemoteBody.unsetExceptionHandler(exception);
             return handler;
+        } catch (java.io.IOException e) {
+            throw new ProActiveException(e.getMessage(), e);
+        }
     }
 
     //

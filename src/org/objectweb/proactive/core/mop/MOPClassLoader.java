@@ -73,10 +73,10 @@ public class MOPClassLoader extends URLClassLoader {
         return MOPClassLoader.mopCl;
     }
 
-  public MOPClassLoader(){
-  	super(new URL[] {});
-  }
-    
+    public MOPClassLoader() {
+        super(new URL[] {  });
+    }
+
     /**
      * Get the bytecode of a stub given its name. If the stub can not be found
      * the cache, the MOPClassLoader tries to generate it.
@@ -219,9 +219,15 @@ public class MOPClassLoader extends URLClassLoader {
                         "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
                 }
 
-                // We use introspection to invoke the defineClass method to avoid the normal 
-                // class Access checking. This method is supposed to be protected which means 
-                // we should not be accessing it but the access policy file allows us to access it freely.
+                // System.out.println ("Classfile created with length "+data.length);
+                // Now, try to define the class
+                // We use the method defineClass, as redefined in class SecureClassLoader,
+                // so that we can specify a SourceCode object
+                //                    Class c = this.defineClass(name, data, 0, data.length, this.getClass().getProtectionDomain().getCodeSource());
+                //   this.getParent().findClass("toto");
+                //		    Class c = this.getParent().defineClass(name, data, 0, data.length, this.getClass().getProtectionDomain());
+                // The following code invokes defineClass on the parent classloader by Reflection
+                //	System.out.println("XXXXXXXXXXXXXXX");
                 try {
                     Class clc = Class.forName("java.lang.ClassLoader");
                     Class[] argumentTypes = new Class[5];
@@ -263,7 +269,6 @@ public class MOPClassLoader extends URLClassLoader {
         }
     }
 }
-
 
 //=======
 //	

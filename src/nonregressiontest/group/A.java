@@ -95,9 +95,8 @@ public class A implements InitActive, RunActive, EndActive,
     public A asynchronousCallException() throws Exception {
         throw new Exception();
     }
-    
-	public void invokeBarrier() {
-		ProSPMD.barrier("MyBarrier");
-	}
 
+    public void invokeBarrier() {
+        ProSPMD.barrier("MyBarrier");
+    }
 }

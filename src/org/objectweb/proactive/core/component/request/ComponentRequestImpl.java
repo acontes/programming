@@ -39,8 +39,6 @@ import org.objectweb.fractal.api.control.AttributeController;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.api.control.NameController;
-import org.objectweb.fractal.api.control.SuperController;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -51,7 +49,6 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
-import org.objectweb.proactive.core.component.controller.ProActiveSuperController;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
@@ -105,14 +102,6 @@ public class ComponentRequestImpl extends RequestImpl
             } else if (target_class.equals(ComponentParametersController.class)) {
                 result = methodCall.execute(((ComponentBodyImpl) targetBody).getProActiveComponent()
                                              .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER));
-            } else if (target_class.equals(NameController.class)) {
-                result = methodCall.execute(((ComponentBodyImpl) targetBody).getProActiveComponent()
-                                             .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER));
-                // this controller also implements NameController
-            } else if (target_class.equals(SuperController.class) ||
-                    target_class.equals(ProActiveSuperController.class)) {
-                result = methodCall.execute(((ComponentBodyImpl) targetBody).getProActiveComponent()
-                                             .getFcInterface(Constants.SUPER_CONTROLLER));
             } else if (target_class.equals(AttributeController.class)) {
                 // directly invoke on reified object, as AttributeController is only defined on primitive components
                 result = methodCall.execute(targetBody.getReifiedObject());
@@ -195,12 +184,9 @@ public class ComponentRequestImpl extends RequestImpl
     public boolean isControllerRequest() {
         Class declaring_class = methodCall.getReifiedMethod().getDeclaringClass();
         return (declaring_class.equals(ComponentParametersController.class) ||
-        declaring_class.equals(NameController.class) ||
         declaring_class.equals(ContentController.class) ||
         declaring_class.equals(BindingController.class) ||
         declaring_class.equals(LifeCycleController.class) ||
-        declaring_class.equals(ProActiveSuperController.class) ||
-        declaring_class.equals(SuperController.class) ||
         declaring_class.equals(Interface.class));
     }
 }

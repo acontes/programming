@@ -33,10 +33,14 @@ package testsuite.timer.micro;
 import testsuite.timer.Timeable;
 
 
+/**
+ * @author Alexandre di Costanzo
+ *
+ */
 public class MicroTimer implements Timeable {
 
     static {
-        System.loadLibrary("MicroTimer");
+        System.loadLibrary("Testsuite_timer_micro_MicroTimer");
     }
 
     private long[] cumulatedTime;
