@@ -10,8 +10,6 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
-import java.io.IOException;
-
 
 /**
  *
@@ -47,11 +45,11 @@ public class MiniDescrClient {
 
             for (int i = 0; i < nodes.length; i++) {
                 for (int j = 0; j < NB_THREADS; j++) {
-                    bombs[j] = new Thread(new Bomber(nodes[i]));
-                    // bombs[j].start();
+                    bombs[j] = new Bomber(nodes[i]);
+                    bombs[j].start();
 
                     // Use this line instead to make sequential calls
-                    bombs[j].run();
+                    // bombs[j].run();
                 }
             }
 
@@ -69,7 +67,7 @@ public class MiniDescrClient {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         if (args.length < 1) {
             new MiniDescrClient(MiniDescrClient.class.getResource(
                     "minidescriptor_client.xml").getPath());
@@ -81,17 +79,17 @@ public class MiniDescrClient {
         System.exit(0);
     }
 
-    class Bomber implements Runnable {
-        Node n;
+    class Bomber extends Thread {
+        Node node;
 
-        Bomber(Node n) {
-            this.n = n;
+        Bomber(Node node) {
+            this.node = node;
         }
 
         public void run() {
             try {
                 MiniDescrActive desc = (MiniDescrActive) ProActive.newActive(MiniDescrActive.class.getName(),
-                        null, n);
+                        null, node);
 
                 for (int k = 0; k < NB_CALLS_PER_THREAD; k++) {
                     Message msg = desc.getComputerInfo();
@@ -102,6 +100,9 @@ public class MiniDescrClient {
                 e.printStackTrace();
             } catch (NodeException e) {
                 // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("Error during remote call: ");
                 e.printStackTrace();
             }
         }
