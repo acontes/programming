@@ -603,9 +603,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
-        
-        System.out.println("nodeName = " + nodeName  + " Map = " + nodeMap);
-         
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
 
         synchronized (bodyList) {
