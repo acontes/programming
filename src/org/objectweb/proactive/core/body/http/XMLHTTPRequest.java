@@ -4,7 +4,7 @@
  * To change the template for this generated file go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-package org.objectweb.proactive.core.body.xmlhttp;
+package org.objectweb.proactive.core.body.http;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;

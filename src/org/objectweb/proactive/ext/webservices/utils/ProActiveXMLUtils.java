@@ -7,8 +7,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.xmlhttp.BodyRequest;
-import org.objectweb.proactive.core.body.xmlhttp.XMLHTTPMessage;
+import org.objectweb.proactive.core.body.http.BodyRequest;
+import org.objectweb.proactive.core.body.http.XMLHTTPMessage;
 import org.objectweb.proactive.core.runtime.http.RuntimeReply;
 import org.objectweb.proactive.core.runtime.http.RuntimeRequest;
 

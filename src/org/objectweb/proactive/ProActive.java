@@ -623,9 +623,9 @@ public class ProActive {
         else if (body instanceof IbisRemoteBodyAdapter) {
         	IbisRemoteBodyAdapter.register((IbisRemoteBodyAdapter) body, url);
         }	
-        else if (body instanceof org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter) {
-        	org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter.register(
-        			(org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter) body, url);
+        else if (body instanceof org.objectweb.proactive.core.body.http.RemoteBodyAdapter) {
+        	org.objectweb.proactive.core.body.http.RemoteBodyAdapter.register(
+        			(org.objectweb.proactive.core.body.http.RemoteBodyAdapter) body, url);
         } 
         else {
         	throw new java.io.IOException(
@@ -671,7 +671,7 @@ public class ProActive {
             b = IbisRemoteBodyAdapter.lookup(url); 
         }
         else if ("http".equals(System.getProperty("proactive.communication.protocol"))) {
-        	b = org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter.lookup(url);
+        	b = org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
         } 	
         else {
             b = RemoteBodyAdapter.lookup(url);

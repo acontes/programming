@@ -4,7 +4,7 @@
  * To change the template for this generated file go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-package org.objectweb.proactive.core.body.xmlhttp;
+package org.objectweb.proactive.core.body.http;
 
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
@@ -20,7 +20,7 @@ public class XMLHTTPLookupMessage implements XMLHTTPMessage {
 	private String urn;
 	private Object returnedObject;  
 	
-	public XMLHTTPLookupMessage (String urn) {
+	public XMLHTTPLookupMessage (String urn) {    
 		this.urn = urn;
 	}
 

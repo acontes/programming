@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.xmlhttp;
+package org.objectweb.proactive.core.body.http;
 
 import org.apache.log4j.Logger;
 

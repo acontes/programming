@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.xmlhttp;
+package org.objectweb.proactive.core.body.http;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -53,7 +53,7 @@ public class RemoteXMLBodyFactory extends ProActiveMetaObjectFactory
         java.io.Serializable {
         public UniversalBody newRemoteBody(UniversalBody body) {
             try {
-                return new org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter(body);
+                return new org.objectweb.proactive.core.body.http.RemoteBodyAdapter(body);
             } catch (ProActiveException e) {
                 throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
                     e);

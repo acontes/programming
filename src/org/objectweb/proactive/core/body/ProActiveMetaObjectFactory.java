@@ -336,7 +336,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                         logger.debug("Factory is xmlhttp");
                     }
 
-                    return new org.objectweb.proactive.core.body.xmlhttp.RemoteBodyAdapter(body);
+                    return new org.objectweb.proactive.core.body.http.RemoteBodyAdapter(body);
                 } else {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is rmi");

@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.rmi;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.objectweb.proactive.core.body.xmlhttp.XMLHTTPMessage;
+import org.objectweb.proactive.core.body.http.XMLHTTPMessage;
 import org.objectweb.proactive.core.runtime.http.RuntimeReply;
 import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
