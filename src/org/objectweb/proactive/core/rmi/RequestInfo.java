@@ -35,6 +35,5 @@ public class RequestInfo {
     protected String application;
     protected int contentLength;
     protected String path;
-    protected String host;
     protected String action;
 }

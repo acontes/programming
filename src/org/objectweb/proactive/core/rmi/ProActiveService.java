@@ -172,8 +172,6 @@ public class ProActiveService extends Thread {
                 return null;
             } else if (line.startsWith("GET /")) {
                 info.path = getPath(line);
-            } else if (line.startsWith("Host:")) {
-                info.host = getHost(line);
             } else if (line.startsWith("Content-Type:")) {
                 info.application = getApplication(line);
             } else if (line.startsWith("ProActive-Action:")) {
