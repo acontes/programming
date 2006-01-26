@@ -30,8 +30,12 @@
  */
 package org.objectweb.proactive.core.component.gen;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
 /**
@@ -104,5 +108,43 @@ public class Utils {
         // just a way to have an identifier (possibly not unique ... but readable)
         return (getMetaObjectClassName(functionalInterfaceName,
             javaInterfaceName) + OUTPUT_INTERCEPTOR_SUFFIX);
+    }
+
+    public static Class defineClass(final String className,
+        final byte[] bytes) {
+        // The following code invokes defineClass on the current thread classloader by reflection
+        try {
+            Class clc = Class.forName("java.lang.ClassLoader");
+            Class[] argumentTypes = new Class[4];
+            argumentTypes[0] = className.getClass();
+            argumentTypes[1] = bytes.getClass();
+            argumentTypes[2] = Integer.TYPE;
+            argumentTypes[3] = Integer.TYPE;
+    
+            Method method = clc.getDeclaredMethod("defineClass", argumentTypes);
+            method.setAccessible(true);
+    
+            Object[] effectiveArguments = new Object[4];
+            effectiveArguments[0] = className;
+            effectiveArguments[1] = bytes;
+            effectiveArguments[2] = new Integer(0);
+            effectiveArguments[3] = new Integer(bytes.length);
+    
+            return (Class) method.invoke(Thread.currentThread()
+                                               .getContextClassLoader(),
+                effectiveArguments);
+        } catch (ClassNotFoundException cnfe) {
+            //cat.error(cnfe.toString());
+            throw new ProActiveRuntimeException(cnfe.toString());
+        } catch (NoSuchMethodException nsme) {
+            nsme.printStackTrace();
+    
+            //cat.error(nsme.toString());
+            throw new ProActiveRuntimeException(nsme.toString());
+        } catch (IllegalAccessException iae) {
+            throw new ProActiveRuntimeException(iae.toString());
+        } catch (InvocationTargetException ite) {
+            throw new ProActiveRuntimeException(ite.toString());
+        }
     }
 }

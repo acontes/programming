@@ -58,6 +58,7 @@ import org.objectweb.proactive.core.component.controller.ComponentParametersCont
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -124,13 +125,14 @@ public class ProActiveComponentRepresentativeImpl
             for (int j = 0; j < interface_types.length; j++) {
                 Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
                                                                                      .generateFunctionalInterface(interface_types[j].getFcItfName(),
-                        this, interface_types[j]);
+                        this, (ProActiveInterfaceType)interface_types[j]);
 
                 // all calls are to be reified
                 fcInterfaceReferences.put(interface_reference.getFcItfName(),
                     interface_reference);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("cannot create interface references : " +
                 e.getMessage());
         }
@@ -194,7 +196,7 @@ public class ProActiveComponentRepresentativeImpl
                         });
                 currentInterface = RepresentativeInterfaceClassGenerator.instance()
                                                                         .generateControllerInterface(currentController.getFcItfName(),
-                        this, (InterfaceType) currentController.getFcItfType());
+                        this, (ProActiveInterfaceType) currentController.getFcItfType());
             } catch (Exception e) {
                 logger.error("could not create controller " +
                     controllersConfiguration.get(controllerItfName) + " : " +
@@ -234,7 +236,7 @@ public class ProActiveComponentRepresentativeImpl
             return proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
                     Class.forName(className).getDeclaredMethod(methodName,
                         parameterTypes), effectiveParameters, (String) null,
-                    false, priority));
+                    priority));
 
             // functional interface name is null
         } catch (NoSuchMethodException e) {
@@ -289,7 +291,7 @@ public class ProActiveComponentRepresentativeImpl
                         // fill in data
                         result.setFcItfName(itf.getFcItfName());
                         result.setFcItfOwner(itf.getFcItfOwner());
-                        result.setFcType(itf.getFcItfType());
+                        result.setFcType((ProActiveInterfaceType)itf.getFcItfType());
                         // set proxy
                         ((StubObject) result).setProxy(stub_on_group_of_itfs.getProxy());
                         return result;

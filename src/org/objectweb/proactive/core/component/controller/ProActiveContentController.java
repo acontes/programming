@@ -47,7 +47,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -75,7 +75,7 @@ public class ProActiveContentController extends AbstractProActiveController
     
         protected void setControllerItfType() {
             try {
-                setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
+                setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
                         ContentController.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE));
             } catch (InstantiationException e) {

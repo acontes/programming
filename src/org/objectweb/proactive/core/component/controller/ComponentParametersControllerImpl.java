@@ -38,7 +38,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 
 
 /**
@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
  * @author Matthieu Morel
  *
  */
-public class ProActiveComponentParametersController
+public class ComponentParametersControllerImpl
     extends AbstractProActiveController implements Serializable,
         ComponentParametersController {
     private ComponentParameters componentParameters;
@@ -56,13 +56,13 @@ public class ProActiveComponentParametersController
      * Constructor
      * @param owner the super controller
      */
-    public ProActiveComponentParametersController(Component owner) {
+    public ComponentParametersControllerImpl(Component owner) {
         super(owner);
     }
 
 	protected void setControllerItfType() {
 		try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.COMPONENT_PARAMETERS_CONTROLLER,
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.COMPONENT_PARAMETERS_CONTROLLER,
                     ComponentParametersController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));

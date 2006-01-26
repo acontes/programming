@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ProActiveComponentType implements ComponentType, Serializable {
+public class ProActiveComponentTypeImpl implements ComponentType, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
@@ -57,9 +57,9 @@ public class ProActiveComponentType implements ComponentType, Serializable {
     private final InterfaceType[] interfaceTypes;
 
     /**
-     * Constructor for ProActiveComponentType.
+     * Constructor for ProActiveComponentTypeImpl.
      */
-    public ProActiveComponentType(final InterfaceType[] interfaceTypes)
+    public ProActiveComponentTypeImpl(final InterfaceType[] interfaceTypes)
         throws InstantiationException {
         this.interfaceTypes = clone(interfaceTypes);
         // verifications
@@ -89,12 +89,12 @@ public class ProActiveComponentType implements ComponentType, Serializable {
     /**
      * copy constructor
      */
-    public ProActiveComponentType(final ComponentType componentType) {
+    public ProActiveComponentTypeImpl(final ComponentType componentType) {
         InterfaceType[] tempItfTypes = componentType.getFcInterfaceTypes();
         this.interfaceTypes = new InterfaceType[tempItfTypes.length];
         for (int i = 0; i < interfaceTypes.length; i++) {
             // deep copy
-            interfaceTypes[i] = new ProActiveInterfaceType(tempItfTypes[i]);
+            interfaceTypes[i] = new ProActiveInterfaceTypeImpl(tempItfTypes[i]);
         }
     }
 

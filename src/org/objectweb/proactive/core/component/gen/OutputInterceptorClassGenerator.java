@@ -52,6 +52,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
 
@@ -80,13 +81,13 @@ public class OutputInterceptorClassGenerator
         this.outputInterceptors = outputInterceptors;
         ProActiveInterface generated = generateInterface(representative.getFcItfName(),
                 representative.getFcItfOwner(),
-                (InterfaceType) representative.getFcItfType(), false, true);
+                (ProActiveInterfaceType) representative.getFcItfType(), false, true);
         ((StubObject) generated).setProxy(((StubObject) representative).getProxy());
         return generated;
     }
 
     public ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, InterfaceType interfaceType, boolean isInternal,
+        Component owner, ProActiveInterfaceType interfaceType, boolean isInternal,
         boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
@@ -229,7 +230,7 @@ public class OutputInterceptorClassGenerator
                 }
 
                 // convert the bytes into a Class
-                generated_class = defineClass(representativeClassName, bytecode);
+                generated_class = Utils.defineClass(representativeClassName, bytecode);
             }
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
@@ -266,7 +267,7 @@ public class OutputInterceptorClassGenerator
 
             body += ("org.objectweb.proactive.core.mop.MethodCall methodCall = org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
             "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-            ", parameters, interfaceName," + isFunctionalInterface + ");\n");
+            ", parameters, interfaceName);\n");
 
             // delegate to outputinterceptors
             body += "java.util.ListIterator it = outputInterceptors.listIterator();\n";

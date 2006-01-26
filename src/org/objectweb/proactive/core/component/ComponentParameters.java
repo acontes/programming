@@ -35,7 +35,7 @@ import java.util.ArrayList;
 
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveComponentType;
+import org.objectweb.proactive.core.component.type.ProActiveComponentTypeImpl;
 
 
 /** 
@@ -91,7 +91,7 @@ public class ComponentParameters implements Serializable {
      * @return a clone of this current object
      */
     public Object clone() {
-        return new ComponentParameters(new ProActiveComponentType(componentType),
+        return new ComponentParameters(new ProActiveComponentTypeImpl(componentType),
             new ControllerDescription(controllerDesc));
     }
 

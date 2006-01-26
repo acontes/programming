@@ -46,7 +46,9 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -60,30 +62,29 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveLifeCycleControllerImpl
     extends AbstractProActiveController implements ProActiveLifeCycleController,
         Serializable {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
-    private String fcState = LifeCycleController.STOPPED;
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
+    protected String fcState = LifeCycleController.STOPPED;
 
     public ProActiveLifeCycleControllerImpl(Component owner) {
         super(owner);
     }
-    
-        protected void setControllerItfType() {
-            try {
-                setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
-                        ProActiveLifeCycleController.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE));
-            } catch (InstantiationException e) {
-                throw new ProActiveRuntimeException("cannot create controller " +
-                    this.getClass().getName());
-            }
-}
 
+    protected void setControllerItfType() {
+        try {
+            setItfType(ProActiveTypeFactoryImpl.instance()
+                                               .createFcItfType(Constants.LIFECYCLE_CONTROLLER,
+                    ProActiveLifeCycleController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
+        } catch (InstantiationException e) {
+            throw new ProActiveRuntimeException("cannot create controller " +
+                this.getClass().getName());
+        }
+    }
 
-
-	/*
-     * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
-     */
+    /*
+    * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
+    */
     public String getFcState() {
         return fcState;
         //        return getRequestQueue().isStarted() ? LifeCycleController.STARTED
@@ -99,10 +100,22 @@ public class ProActiveLifeCycleControllerImpl
         try {
             //check that all mandatory client interfaces are bound
             Object[] itfs = getFcItfOwner().getFcInterfaces();
+            
             for (int i = 0; i < itfs.length; i++) {
-                InterfaceType itf_type = (InterfaceType) (((Interface) itfs[i]).getFcItfType());
+                ProActiveInterfaceType itf_type = (ProActiveInterfaceType) (((Interface) itfs[i]).getFcItfType());
                 if (itf_type.isFcClientItf() && !itf_type.isFcOptionalItf()) {
-                    if (Fractal.getBindingController(getFcItfOwner()).lookupFc(itf_type.getFcItfName()) == null) {
+                    if (itf_type.isFcMulticastItf()) {
+                        ProxyForComponentInterfaceGroup clientSideProxy = Fractive.getCollectiveInterfacesController(getFcItfOwner())
+                                                                                  .lookupFcMulticast(itf_type.getFcItfName());
+                        if (clientSideProxy.getDelegatee().isEmpty()) {
+                            throw new IllegalLifeCycleException(
+                                "compulsory multicast client interface " +
+                                itf_type.getFcItfName() + " in component " +
+                                Fractal.getNameController(getFcItfOwner())
+                                       .getFcName() + " is not bound. ");
+                        }
+                    } else if (Fractal.getBindingController(getFcItfOwner())
+                                          .lookupFc(itf_type.getFcItfName()) == null) {
                         throw new IllegalLifeCycleException(
                             "compulsory client interface " +
                             itf_type.getFcItfName() + " in component " +
@@ -111,6 +124,7 @@ public class ProActiveLifeCycleControllerImpl
                     }
                 }
             }
+
             String hierarchical_type = Fractive.getComponentParametersController(getFcItfOwner())
                                                .getComponentParameters()
                                                .getHierarchicalType();

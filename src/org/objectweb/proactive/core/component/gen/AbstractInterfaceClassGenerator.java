@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.component.gen;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -45,9 +43,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -78,21 +76,21 @@ public abstract class AbstractInterfaceClassGenerator {
 
     public ProActiveInterface generateControllerInterface(
         final String controllerInterfaceName, Component owner,
-        InterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
         return generateInterface(controllerInterfaceName, owner, interfaceType,
             false, false);
     }
 
     public ProActiveInterface generateFunctionalInterface(
         final String functionalInterfaceName, Component owner,
-        InterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
         return generateInterface(functionalInterfaceName, owner, interfaceType,
             false, true);
     }
 
     public abstract ProActiveInterface generateInterface(
         final String interfaceName, Component owner,
-        InterfaceType interfaceType, boolean isInternal,
+        ProActiveInterfaceType interfaceType, boolean isInternal,
         boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException;
 
@@ -121,44 +119,6 @@ public abstract class AbstractInterfaceClassGenerator {
                     }
                 }
             }
-        }
-    }
-
-    public static Class defineClass(final String className,
-        final byte[] bytes) {
-        // The following code invokes defineClass on the current thread classloader by reflection
-        try {
-            Class clc = Class.forName("java.lang.ClassLoader");
-            Class[] argumentTypes = new Class[4];
-            argumentTypes[0] = className.getClass();
-            argumentTypes[1] = bytes.getClass();
-            argumentTypes[2] = Integer.TYPE;
-            argumentTypes[3] = Integer.TYPE;
-
-            Method method = clc.getDeclaredMethod("defineClass", argumentTypes);
-            method.setAccessible(true);
-
-            Object[] effectiveArguments = new Object[4];
-            effectiveArguments[0] = className;
-            effectiveArguments[1] = bytes;
-            effectiveArguments[2] = new Integer(0);
-            effectiveArguments[3] = new Integer(bytes.length);
-
-            return (Class) method.invoke(Thread.currentThread()
-                                               .getContextClassLoader(),
-                effectiveArguments);
-        } catch (ClassNotFoundException cnfe) {
-            //cat.error(cnfe.toString());
-            throw new ProActiveRuntimeException(cnfe.toString());
-        } catch (NoSuchMethodException nsme) {
-            nsme.printStackTrace();
-
-            //cat.error(nsme.toString());
-            throw new ProActiveRuntimeException(nsme.toString());
-        } catch (IllegalAccessException iae) {
-            throw new ProActiveRuntimeException(iae.toString());
-        } catch (InvocationTargetException ite) {
-            throw new ProActiveRuntimeException(ite.toString());
         }
     }
 

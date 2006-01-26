@@ -148,6 +148,7 @@ public class ComponentRequestImpl extends RequestImpl
                             throw new ServeException("could not reify method call : ",
                                 e);
                         } catch (Throwable e) {
+                            e.printStackTrace();
                             throw new ServeException("could not reify method call : ",
                                 e);
                         }

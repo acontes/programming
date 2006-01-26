@@ -59,6 +59,7 @@ import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
 import org.objectweb.proactive.core.body.rmi.RmiBodyAdapter;
 import org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter;
 import org.objectweb.proactive.core.component.body.ComponentBody;
+import org.objectweb.proactive.core.component.controller.CollectiveInterfacesController;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
@@ -66,7 +67,9 @@ import org.objectweb.proactive.core.component.representative.ProActiveComponentR
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ParallelComposite;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -91,7 +94,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class Fractive implements ProActiveGenericFactory, Component, Factory {
     private static Fractive instance = null;
-    private TypeFactory typeFactory = (TypeFactory) ProActiveTypeFactory.instance();
+    private TypeFactory typeFactory = (TypeFactory) ProActiveTypeFactoryImpl.instance();
     private Type type = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
@@ -115,17 +118,30 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /**
-     * Returns the {@link org.objectweb.fractal.api.control.ContentController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.ComponenParametersController ComponenParametersController}
      * interface of the given component.
      *
      * @param component a component.
-     * @return the {@link org.objectweb.fractal.api.control.ContentController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.ComponenParametersController ComponenParametersController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
     public static ComponentParametersController getComponentParametersController(
         final Component component) throws NoSuchInterfaceException {
         return (ComponentParametersController) component.getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER);
+    }
+    
+    /**
+     * Returns the {@link org.objectweb.proactive.core.component.controller.CollectiveInterfacesController CollectiveInterfacesController}
+     * interface of the given component.
+     *
+     * @param component a component.
+     * @return the {@link org.objectweb.proactive.core.component.controller.CollectiveInterfacesController CollectiveInterfacesController}
+     *         interface of the given component.
+     * @throws NoSuchInterfaceException if there is no such interface.
+     */   public static CollectiveInterfacesController getCollectiveInterfacesController(
+            final Component component) throws NoSuchInterfaceException {
+        return (CollectiveInterfacesController) component.getFcInterface(Constants.COLLECTIVE_INTERFACES_CONTROLLER);
     }
 
     /**
@@ -142,7 +158,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         String itfName, String itfSignature, Component owner)
         throws ProActiveRuntimeException {
         try {
-            InterfaceType itf_type = ProActiveTypeFactory.instance()
+            ProActiveInterfaceType itf_type = (ProActiveInterfaceType)ProActiveTypeFactoryImpl.instance()
                                                          .createFcItfType(itfName,
                     itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
                     TypeFactory.COLLECTION);
@@ -154,6 +170,35 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 e);
         }
     }
+
+    /**
+     * Returns a generated interface reference, whose impl field is a group It
+     * is able to handle multiple bindings, and automatically adds it to a given 
+     *
+     * @param itfName the name of the interface
+     * @param itfSignature the signature of the interface
+     * @param owner the component to which this interface belongs
+     * @return ProActiveInterface the resulting collective client interface
+     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
+     */
+    public static ProActiveInterface createMulticastClientInterface(
+        String itfName, String itfSignature, Component owner)
+        throws ProActiveRuntimeException {
+        try {
+            ProActiveInterfaceType itf_type = (ProActiveInterfaceType)ProActiveTypeFactoryImpl.instance()
+                                                         .createFcItfType(itfName,
+                    itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                    ProActiveTypeFactory.MULTICAST_CARDINALITY);
+            
+            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
+                    owner);
+            return itf_ref_group;
+        } catch (Exception e) {
+            throw new ProActiveRuntimeException("Impossible to create a collective client interface ",
+                e);
+        }
+    }
+
     /**
      * Returns a generated interface reference, whose impl field is a group It
      * is able to handle multiple bindings
@@ -169,6 +214,20 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             null);
     }
     
+    /**
+     * Returns a generated interface reference, whose impl field is a group It
+     * is able to handle multiple bindings
+     *
+     * @param itfName the name of the interface
+     * @param itfSignature the signature of the interface
+     * @return ProActiveInterface the resulting collective client interface
+     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
+     */
+    public static ProActiveInterface createMulticastClientInterface(
+        String itfName, String itfSignature) throws ProActiveRuntimeException {
+        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
+            null);
+    }
     /*
      * 
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription)
@@ -298,6 +357,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             representative.setStubOnBaseObject((StubObject) ao);
             return representative;
         } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
             throw new InstantiationException(e.getMessage());
         } catch (NodeException e) {
             throw new InstantiationException(e.getMessage());

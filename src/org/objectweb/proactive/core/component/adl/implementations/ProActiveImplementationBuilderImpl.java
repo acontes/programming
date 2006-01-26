@@ -159,7 +159,7 @@ public class ProActiveImplementationBuilderImpl
             result = ((ProActiveGenericFactory)Fractal.getGenericFactory(bootstrap)).newFcInstance((ComponentType) type,
                     controllerDesc, contentDesc, deploymentVN);
         }
-        registry.addComponent(result); // the registry can handle groups
+//        registry.addComponent(result); // the registry can handle groups
 
         return result;
     }
