@@ -140,18 +140,4 @@ public class Test extends ComponentTest {
         ;
         return expectedResult.equals(result);
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-            if (test.postConditions()) {
-                System.out.println("TEST SUCCEEDED");
-            } else {
-                System.out.println("TEST FAILED");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

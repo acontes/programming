@@ -91,12 +91,4 @@ public class Test extends ComponentTest {
         return expectedResult.equals(A.message);
     }
 
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

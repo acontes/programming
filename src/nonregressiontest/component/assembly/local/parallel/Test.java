@@ -112,13 +112,4 @@ public class Test extends ComponentTest {
         pr1SubComponents = Fractal.getContentController(pr1).getFcSubComponents();
         return (Arrays.equals(pr1SubComponents, pr1_sub_components));
     }
-
-    public static void main(String[] args) {
-        //			TestOld test = new TestOld();
-        //			try {
-        //				test.action();
-        //			} catch (Exception e) {
-        //				e.printStackTrace();
-        //			}
-    }
 }

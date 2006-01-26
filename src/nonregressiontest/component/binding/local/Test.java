@@ -194,14 +194,4 @@ public class Test extends ComponentTest {
         Assertions.assertTrue((l.size() == t.length) &&
             (l.containsAll(Arrays.asList(t))));
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-            test.postConditions();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

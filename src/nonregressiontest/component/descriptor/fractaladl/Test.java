@@ -4,9 +4,15 @@
  */
 package nonregressiontest.component.descriptor.fractaladl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.util.Fractal;
 
 //import org.objectweb.fractal.adl.Registry;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.component.adl.Launcher;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -44,25 +50,40 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
-            throw new Exception("automatic continuations are not set");
+//        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
+//            throw new Exception("automatic continuations are not set");
+//        }
+//        org.objectweb.proactive.core.component.adl.Launcher.main(new String[] {
+//                "-fractal",
+//                "nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",
+//                "",
+//                Test.class.getResource(
+//                    "/nonregressiontest/component/descriptor/deploymentDescriptor.xml")
+//                          .getPath()
+//            });
+//
+//        Component c = Registry.instance().getComponent("parallel");
+        
+        Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+        Map context = new HashMap();
+        context.put("deployment-descriptor", ProActive.getProactiveDescriptor(Test.class.getResource(
+        "/nonregressiontest/component/descriptor/deploymentDescriptor.xml")
+        .getPath()));
+        Component root = (Component) f.newComponent("nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",context);
+        Fractal.getLifeCycleController(root).startFc();
+        Component[] subComponents = Fractal.getContentController(root).getFcSubComponents();
+        for (Component component : subComponents) {
+            if ("parallel".equals(Fractal.getNameController(component).getFcName())) {
+                // invoke method on composite
+                I1 i1 = (I1) component.getFcInterface("i1");
+                //I1 i1= (I1)p1.getFcInterface("i1");
+                message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
+                break;
+            }
+            
         }
-        org.objectweb.proactive.core.component.adl.Launcher.main(new String[] {
-                "-fractal",
-                "nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",
-                "",
-                Test.class.getResource(
-                    "/nonregressiontest/component/descriptor/deploymentDescriptor.xml")
-                          .getPath()
-            });
 
-        Component c = Registry.instance().getComponent("parallel");
 
-        // invoke method on composite
-        I1 i1 = (I1) c.getFcInterface("i1");
-
-        //I1 i1= (I1)p1.getFcInterface("i1");
-        message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
     }
 
     /**
@@ -75,7 +96,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        Launcher.killNodes(false);
+//        Launcher.killNodes(false);
         Registry.instance().clear();
     }
 
@@ -115,11 +136,19 @@ public class Test extends ComponentTest {
     }
 
     public static void main(String[] args) {
+        
+        System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
+        System.setProperty("java.security.policy", System.getProperty("user.dir")+"/proactive.java.policy");
+        System.setProperty("log4j.configuration", System.getProperty("user.dir")+"/proactive-log4j");
+        System.setProperty("log4j.configuration", "file:" + System.getProperty("user.dir")+"/proactive-log4j");
+        System.setProperty("nonregressiontest.descriptor.defaultnodes.file", "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
         Test test = new Test();
         try {
             test.action();
             test.postConditions();
+            System.out.println("SUCCESS!");
         } catch (Exception e) {
+            System.out.println("FAILED!");
             e.printStackTrace();
         } finally {
             try {

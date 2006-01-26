@@ -9,7 +9,7 @@ package nonregressiontest.component;
  * @author Matthieu Morel
  */
 public class PrimitiveComponentB implements I2 {
-    public final static String MESSAGE = "-->b";
+    public final static String MESSAGE = "-b-";
 
     /**
      *

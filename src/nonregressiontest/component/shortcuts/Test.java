@@ -8,6 +8,8 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ProActive;
 
+import testsuite.test.Assertions;
+
 import nonregressiontest.component.*;
 
 
@@ -27,7 +29,7 @@ public class Test extends ComponentTest {
     private Message result4;
     private Message result5;
     private Message result6;
-    private final String expectedResult = "foo-->a-->b-->a";
+    private final String expectedResult = "foo"+PrimitiveComponentA.MESSAGE+PrimitiveComponentB.MESSAGE+PrimitiveComponentA.MESSAGE;
     private Component systemWithWrappingWithShortcuts;
     private Component systemWithWrappingWithoutShortcuts;
     private Component systemWithoutWrapping;
@@ -194,32 +196,15 @@ public class Test extends ComponentTest {
         System.setProperty("proactive.components.use_shortcuts", "false");
     }
 
-    public static void main(String[] args) {
-        try {
-            Test test = new Test();
-            test.initTest();
-            test.action();
-            boolean success = test.postConditions();
-            if (success) {
-                System.out.println("Test succeeded");
-            } else {
-                System.out.println("Test failed");
-            }
-            System.exit(0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     /*
      * @see testsuite.test.AbstractTest#postConditions()
      */
     public boolean postConditions() throws Exception {
-        return (expectedResult.equals(((Message) ProActive.getFutureValue(
-                result4)).getMessage()) &&
-        expectedResult.equals(((Message) ProActive.getFutureValue(result3)).getMessage()) &&
-        expectedResult.equals(((Message) ProActive.getFutureValue(result2)).getMessage()) &&
-        expectedResult.equals(ProActive.getFutureValue(
-                ((Message) ProActive.getFutureValue(result1)).getMessage())));
+        Assertions.assertEquals(expectedResult, ((Message) ProActive.getFutureValue(result4)).getMessage());
+        Assertions.assertEquals(expectedResult, ((Message) ProActive.getFutureValue(result3)).getMessage());
+        Assertions.assertEquals(expectedResult,((Message) ProActive.getFutureValue(result2)).getMessage());
+        Assertions.assertEquals(expectedResult,((Message) ProActive.getFutureValue(result1)).getMessage());
+        return true;
+        
     }
 }

@@ -195,14 +195,4 @@ public class Test extends ComponentTest {
         
         return true;
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-            test.postConditions();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
