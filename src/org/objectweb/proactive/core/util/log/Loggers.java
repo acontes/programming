@@ -65,6 +65,7 @@ public interface Loggers {
         ".bytecodegeneration";
     static final public String COMPONENTS_ADL = COMPONENTS + ".adl";
     static final public String COMPONENTS_GUI = COMPONENTS + ".gui";
+    static final public String COMPONENTS_MULTICAST = COMPONENTS + ".multicast";
     static final public String DEPLOYMENT = "proactive.deployment";
     static final public String DEPLOYMENT_PROCESS = DEPLOYMENT + ".process";
     static final public String DEPLOYMENT_LOG = DEPLOYMENT + ".log";

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.mop;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -59,7 +60,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     // COMPONENTS added a field for the Fractal interface name 
     // (the name of the interface containing the method called)
     private String componentInterfaceName = null;
-    private boolean isFunctionalComponentMethodCall = false;
     private boolean isComponentMethodCall;
     protected static Logger componentLogger = null;
 
@@ -111,7 +111,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
 
     /**
-     * The array holding the argments of the method call
+     * The array holding the arguments of the method call
      */
     private Object[] effectiveArguments;
 
@@ -254,13 +254,12 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
-        String interfaceName, boolean isFunctional, short priority) {
+        String interfaceName, short priority) {
         MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments);
         if (MethodCall.componentLogger == null) {
             MethodCall.componentLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
         }
         mc.isComponentMethodCall = true;
-        mc.isFunctionalComponentMethodCall = isFunctional;
         mc.componentInterfaceName = interfaceName;
         mc.priority = priority;
         mc.shortcut = null;
@@ -269,9 +268,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
-        String interfaceName, boolean isFunctional) {
+        String interfaceName) {
         return MethodCall.getComponentMethodCall(reifiedMethod,
-            effectiveArguments, interfaceName, isFunctional,
+            effectiveArguments, interfaceName,
             ComponentRequest.STRICT_FIFO_PRIORITY);
     }
 
@@ -290,7 +289,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 // garbage-collecting the objects referenced in here
                 mc.componentInterfaceName = null;
                 mc.isComponentMethodCall = false;
-                mc.isFunctionalComponentMethodCall = false;
                 mc.reifiedMethod = null;
                 mc.effectiveArguments = null;
                 mc.tagsForBarrier = null;
@@ -464,6 +462,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         effectiveArguments = o;
     }
 
+    public Object[] getEffectiveArguments() {
+        return effectiveArguments;
+    }
+
     /**
      * Make a deep copy of all arguments of the constructor
      */
@@ -512,9 +514,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         StringBuffer sb = new StringBuffer();
         sb.append(reifiedMethod.getDeclaringClass().getName());
         sb.append(reifiedMethod.getName());
-        Class[] parameters = reifiedMethod.getParameterTypes();
+        Type[] parameters = reifiedMethod.getGenericParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
-            sb.append(parameters[i].getName());
+            sb.append(parameters[i].toString());
         }
         return sb.toString();
     }
