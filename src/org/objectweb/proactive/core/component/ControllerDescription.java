@@ -134,7 +134,7 @@ public class ControllerDescription implements Serializable {
         } else {
             this.controllersConfigFileLocation = controllersConfigFileLocation;
         }
-        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(controllersConfigFileLocation).getControllers();
+        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(this.controllersConfigFileLocation).getControllers();
     }
 
     /**
