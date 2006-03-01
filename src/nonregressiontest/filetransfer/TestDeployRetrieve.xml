@@ -2,12 +2,14 @@
 <!--  ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../descriptors/DescriptorSchema.xsd"-->
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/home/mleyton/ProActive/descriptors/DescriptorSchema.xsd">
 	<variables>
-		<DescriptorVariable name="PROACTIVE_HOME" value="/user/mleyton/home/ProActive"/>
-		<DescriptorVariable name="JAVA_HOME" value="/pcache/metanet/net/lib/jdk1.4.0/jdk1.4.0/linux-libc6"/>
+		<descriptorVariable name="PROACTIVE_HOME" value="/user/mleyton/home/ProActive"/>
+		<descriptorVariable name="JAVA_HOME" value="/pcache/metanet/net/lib/jdk1.4.0/jdk1.4.0/linux-libc6"/>
+		<descriptorDefaultVariable name="JVM_PROCESS" value="localJVM"/>
+		<descriptorDefaultVariable name="HOST_NAME" value="localhost"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="test" FileTransferDeploy="testDeploy" FileTransferRetrieve="testRetrieve" />
+			<virtualNode name="test" fileTransferDeploy="testDeploy" fileTransferRetrieve="testRetrieve" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -31,30 +33,30 @@
 			</jvm>			
 		</jvms>
 	</deployment>
-	<FileTransferDefinitions>
-		<FileTransfer id="testRetrieve">
+	<fileTransferDefinitions>
+		<fileTransfer id="testRetrieve">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved.dat" />
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved2.dat" />
-		</FileTransfer>
-		<FileTransfer id="testDeploy">
+		</fileTransfer>
+		<fileTransfer id="testDeploy">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed.dat" />
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed2.dat" />
-		</FileTransfer>
-	</FileTransferDefinitions>
+		</fileTransfer>
+	</fileTransferDefinitions>
 	<infrastructure>
 		<processes>
 			<processDefinition id="sshProcess">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="localhost">
-					<processReference refid="localJVM"/> <!--  change to remoteJVM when testing from eclipse to avoid "Word to long" error -->
-					<FileTransferDeploy refid="implicit">
-						<copyProtocol>pftp,scp</copyProtocol>
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="${HOST_NAME}">
+					<processReference refid="${JVM_PROCESS}"/> <!--localJVM  changed to remoteJVM when testing from eclipse to avoid "Word to long" error -->
+					<fileTransferDeploy refid="implicit">
+						<copyProtocol>rcp,pftp</copyProtocol>
 						<sourceInfo prefix="/tmp"/>
 						<destinationInfo prefix="/tmp"/>
-					</FileTransferDeploy>
-					<FileTransferRetrieve refid="implicit">
+					</fileTransferDeploy>
+					<fileTransferRetrieve refid="implicit">
 						<sourceInfo prefix="/tmp"/>
 						<destinationInfo prefix="/tmp"/>
-					</FileTransferRetrieve>
+					</fileTransferRetrieve>
 				</sshProcess>
 			</processDefinition>
 			<processDefinition id="remoteJVM">
@@ -62,7 +64,8 @@
 					<!-- javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath-->
 				<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/bin/"/>
-						<!-- absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/-->
+						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>

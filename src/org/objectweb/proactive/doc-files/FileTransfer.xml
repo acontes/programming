@@ -60,10 +60,16 @@
     <sect2 remap="h3">
       <title>API Definition</title>
 
-      <screen>import org.objectweb.proactive.tools;
+      <programlisting language="java">import org.objectweb.proactive.filetransfer;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 
-static public void <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
-static public File <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);</screen>
+static public BooleanWrapper <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
+static public BooleanWrapper <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File<emphasis
+          role="bold">[]</emphasis> source, File<emphasis role="bold">[]</emphasis> destination);
+static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);
+static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File<emphasis
+          role="bold">[]</emphasis> source, File<emphasis role="bold">[]</emphasis> destination);</programlisting>
 
       <para>These methods can be used to put and get files on a remote Node
       while the user's application is running. Note that these methods behave
@@ -90,7 +96,10 @@ static public File <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n
       <emphasis>localhost</emphasis>@<emphasis
       role="bold">localDest</emphasis>, in the same fashion.</para>
 
-      <screen>import org.objectweb.proactive.tools;
+      <programlisting language="java">import org.objectweb.proactive.filetransfer
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.FileWrapper;
+
 pad = ProActive.getProactiveDescriptor(XML_LOCATION);
 
 VirtualNode testVNode = pad.getVirtualNode("example");
@@ -99,11 +108,14 @@ Node[] examplenode = testVNode.getNodes();
 
 File localSource = new File("/local/source/path/file");
 File remoteDest = new File("/remote/destination/path/file");
-<emphasis role="bold">FileTransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
+<emphasis role="bold">BooleanWrapper bw=FileTransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
+<emphasis role="bold">bw.booleanValue();</emphasis>  //wait-by-neccessity for push to finish
 
 File remoteSource = new File("/remote/source/path/file");
 File localDest = new File("/local/destination/path/file");
-<emphasis role="bold">File filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);</emphasis></screen>
+<emphasis role="bold">FileWrapper filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);
+File files[] = filePulled.getFiles(); <emphasis>//wait-by-neccessity for pull to finish
+</emphasis></emphasis></programlisting>
     </sect2>
   </sect1>
 
@@ -136,7 +148,7 @@ File localDest = new File("/local/destination/path/file");
       at three different parts (or levels).</para>
 
       <para>The first one corresponds to the <emphasis
-      role="bold">FileTransferDefinitions</emphasis> tag, which contains a
+      role="bold">fileTransferDefinitions</emphasis> tag, which contains a
       list of FileTransfer definitions. A FileTransfer definition is a high
       level representation of the File Transfer, containing mainly the file
       names. It is created in such a way, that no low level information such
@@ -146,37 +158,37 @@ File localDest = new File("/local/destination/path/file");
 
       <para><screen>....
 &lt;/deployment&gt;
-&lt;<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
-   &lt;<emphasis role="bold">FileTransfer</emphasis> id="<emphasis role="bold">example</emphasis>"&gt;
+&lt;<emphasis role="bold">fileTransferDefinitions</emphasis>&gt;
+   &lt;<emphasis role="bold">fileTransfer</emphasis> id="<emphasis role="bold">example</emphasis>"&gt;
       &lt;<emphasis role="bold">file</emphasis> src="hello.dat" dest="world.dat"/&gt;
       &lt;<emphasis role="bold">file</emphasis> src="hello.jar" dest="world.jar"/&gt;
       &lt;<emphasis role="bold">file</emphasis> src="hello.class" dest="world.class"/&gt;
       &lt;<emphasis role="bold">dir</emphasis> src="exampledir" dest="exampledir"/&gt;
-  &lt;/<emphasis role="bold">FileTransfer</emphasis>&gt;
-  &lt;<emphasis role="bold">FileTransfer</emphasis> id="<emphasis role="bold">anotherExample</emphasis>"&gt;
+  &lt;/<emphasis role="bold">fileTransfer</emphasis>&gt;
+  &lt;<emphasis role="bold">fileTransfer</emphasis> id="<emphasis role="bold">anotherExample</emphasis>"&gt;
       ...
-  &lt;/<emphasis role="bold">FileTransfer</emphasis>&gt;
+  &lt;/<emphasis role="bold">fileTransfer</emphasis>&gt;
   ...
-&lt;/<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
+&lt;/<emphasis role="bold">fileTransferDefinitions</emphasis>&gt;
 &lt;infrastructure&gt;
 ....         </screen></para>
 
       <para>The FileTransfer definitions can be referenced through their
       names, from the <emphasis role="bold">VirtualNode</emphasis> tags using
-      two attributes:<emphasis role="bold">FileTransferDeploy</emphasis> and
-      <emphasis role="bold">FileTransferRetrieve</emphasis>. The first one,
+      two attributes:<emphasis role="bold">fileTransferDeploy</emphasis> and
+      <emphasis role="bold">fileTransferRetrieve</emphasis>. The first one,
       corresponds to the file transfer that will take place at deployment
       time, and the second one corresponds to the file transfer that the user
       will trigger once the user application is done.</para>
 
-      <para><screen>&lt;VirtualNode name="exampleVNode" <emphasis role="bold">FileTransferDeploy</emphasis>="<emphasis
+      <para><screen>&lt;virtualNode name="exampleVNode" <emphasis role="bold">fileTransferDeploy</emphasis>="<emphasis
             role="bold"><emphasis><emphasis><emphasis role="bold"><emphasis>example</emphasis></emphasis></emphasis></emphasis></emphasis>" <emphasis
-            role="bold">FileTransferRetrieve</emphasis>="<emphasis>example</emphasis>"/&gt;</screen></para>
+            role="bold">fileTransferRetrieve</emphasis>="<emphasis>example</emphasis>"/&gt;</screen></para>
 
       <para>All the low level information such as: hosts, username, protocols,
       prefix, etc... is declared inside each process. Both <emphasis
-      role="bold">FileTransferDeploy</emphasis> and <emphasis
-      role="bold">FileTransferRetrieve</emphasis> are specified separetly
+      role="bold">fileTransferDeploy</emphasis> and <emphasis
+      role="bold">fileTransferRetrieve</emphasis> are specified separetly
       using a <emphasis role="bold">refid</emphasis> attribute. The <emphasis
       role="bold">refid</emphasis> can be a direct reference to a FileTransfer
       definition, or set using the keyword <emphasis
@@ -194,24 +206,24 @@ an attribute.  This happens because FileTransfer information is process specific
 Note that the destination hostname and username can be omitted,
 and implicitly inferred from the process information. --&gt;
 
-    &lt;<emphasis role="bold">FileTransferDeploy</emphasis> refid="<emphasis
+    &lt;<emphasis role="bold">fileTransferDeploy</emphasis> refid="<emphasis
             role="bold">implicit</emphasis>"&gt; &lt;!-- referenceID or keyword "implicit" (inherit)--&gt;
       &lt;<emphasis role="bold">copyProtocol</emphasis>&gt;processDefault, rcp, scp, pft&lt;/<emphasis
             role="bold">copyProtocol</emphasis>&gt;
       &lt;<emphasis role="bold">sourceInfo</emphasis> prefix="/home/user"/&gt;
       &lt;<emphasis role="bold">destinationInfo</emphasis> prefix="/tmp" hostname="foo.org" username="smith" /&gt;
-    &lt;/<emphasis role="bold">FileTransferDeploy</emphasis>&gt;
+    &lt;/<emphasis role="bold">fileTransferDeploy</emphasis>&gt;
 
-    &lt;<emphasis role="bold">FileTransferRetrieve</emphasis> refid="example"&gt;
+    &lt;<emphasis role="bold">fileTransferRetrieve</emphasis> refid="example"&gt;
       &lt;<emphasis role="bold">sourceInfo</emphasis> prefix="/tmp"/&gt;
       &lt;<emphasis role="bold">destinatinoInfo</emphasis> prefix="/home/user"/&gt;
-    &lt;/<emphasis role="bold">FileTransferRetrieve</emphasis>&gt;
+    &lt;/<emphasis role="bold">fileTransferRetrieve</emphasis>&gt;
   &lt;/sshProcess&gt;
 &lt;/processDefinition&gt;
 </screen></para>
 
       <para>In the example above, <emphasis
-      role="bold">FileTransferDeploy</emphasis> has an implicit refid. This
+      role="bold">fileTransferDeploy</emphasis> has an implicit refid. This
       means that the File Transfer definitions used will be inherited from the
       VirtualNode. The first element shown inside this tag corresponds to
       <emphasis role="bold">copyProtocol</emphasis>. The <emphasis
@@ -231,7 +243,7 @@ and implicitly inferred from the process information. --&gt;
       <emphasis>prefix</emphasis>, <emphasis>hostname</emphasis> and
       <emphasis>username</emphasis>.</para>
 
-      <para>For <emphasis role="bold">FileTransferRetrieve</emphasis>, no
+      <para>For f<emphasis role="bold">ileTransferRetrieve</emphasis>, no
       copyProtocol needs to be specified. ProActive will use it's internal
       mechanism to transfer the files. This implies that no
       <emphasis>hostname</emphasis> or <emphasis>username</emphasis> are
@@ -313,16 +325,16 @@ and implicitly inferred from the process information. --&gt;
         trigger the retrieval of all files associated with a
         VirtualNode.</para>
 
-        <para><screen>import org.objectweb.proactive.core.descriptor.data;
+        <para><programlisting language="java">import org.objectweb.proactive.core.descriptor.data;
 
-public File[] <emphasis role="bold">VirtualNode.fileTransferRetrieve</emphasis>();</screen></para>
+public FileWrapper <emphasis role="bold">VirtualNode.fileTransferRetrieve</emphasis>();</programlisting></para>
 
         <para>This will trigger the retrieval of all the files specified in
         the descriptor, from all the nodes that were deployed using this
         virtual node using the <emphasis role="bold">pftp</emphasis>. The
         following shows an example:</para>
 
-        <screen>import org.objectweb.proactive.core.descriptor.data;
+        <programlisting language="java">import org.objectweb.proactive.core.descriptor.data;
 
 pad = ProActive.getProactiveDescriptor(XML_LOCATION);
 
@@ -332,7 +344,10 @@ Node[] examplenode = testVNode.getNodes();
 
 ...
 
-File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>();</screen>
+FileWrapper fw = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>();
+...
+File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arrive
+</programlisting>
 
         <para>As a result of calling this method an array of type File[] will
         be created, representing all the retrieved files.</para>
@@ -406,7 +421,8 @@ File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>()
       <title>How Deployment File Transfer Works</title>
 
       <figure>
-       <title>File Transfer Design</title>
+        <title>File Transfer Design</title>
+
         <mediaobject>
           <imageobject>
             <imagedata fileref="development/imgs/fileTransferDesign.png"

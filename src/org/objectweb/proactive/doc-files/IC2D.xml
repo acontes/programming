@@ -101,7 +101,7 @@
 
     <para><figure>
         <title>A 'drag-and-drop' migration allows to graphically move running
-        active objects between machines.</title>
+        active objects</title>
 
         <mediaobject>
           <imageobject>
@@ -115,7 +115,7 @@
 
       <mediaobject>
         <imageobject>
-         <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG" width="6in"/>
+         <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG" contentwidth="100" width="6in"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -294,7 +294,7 @@
 
           <mediaobject>
             <imageobject>
-               <imagedata fileref="images/launcher_menu.png" format="PNG"  width="6in"/>
+               <imagedata fileref="images/launcher_menu.png" format="PNG"  contentwidth="100" width="6in"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -310,7 +310,7 @@
 
           <mediaobject>
             <imageobject>
-               <imagedata fileref="images/launcher_frame.png" format="PNG"  width="6in"/>
+               <imagedata fileref="images/launcher_frame.png" format="PNG"  contentwidth="100" width="6in"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -331,13 +331,12 @@
     Nice France on a globus cluster and LSF cluster</para>
 
     <figure>
-      <title>C3D, deployed with JINI and RMI, between Baltimore US and Nice
-      France, on a globus cluster and LSF cluster</title>
-
+      <title>C3D, deployed with JINI and RMI, between Baltimore (USA) and Nice (France)</title>
       <mediaobject>
         <imageobject>
           <imagedata fileref="images/clusterLogo.png" format="PNG" />
         </imageobject>
+        <caption><para>This is between a globus cluster and an LSF cluster</para></caption>
       </mediaobject>
     </figure>
 

@@ -51,7 +51,7 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        if (counter == 13) {
+        if (counter == 14) {
             return true;
         } else {
             System.out.println("counter == " + counter);
@@ -81,7 +81,6 @@ public class Test extends FunctionalTest {
         } finally {
             ProActive.removeTryWithCatch();
         }
-
         /* futureRT() */
         ProActive.tryWithCatch(RuntimeException.class);
         try {
@@ -133,15 +132,15 @@ public class Test extends FunctionalTest {
 
         /* futureExc() synchronous */
         try {
-        	r.futureExc();
+            r.futureExc();
         } catch (Exception e) {
-        	if (e.getMessage().startsWith("Test")) {
+            if (e.getMessage().startsWith("Test")) {
                 good();
             } else {
                 bad();
             }
         }
-        
+
         ProActive.tryWithCatch(Exception.class);
         Exc res = r.futureExc();
         try {
@@ -154,6 +153,22 @@ public class Test extends FunctionalTest {
             }
         } finally {
             ProActive.removeTryWithCatch();
+        }
+
+        ProActive.tryWithCatch(Exception.class);
+        try {
+            r.voidExc();
+            Object f = r.futureExc();
+            ProActive.endTryWithCatch();
+        } catch (Exception e) {
+            int size = ProActive.getAllExceptions().size();
+            if (size == 2) {
+                good();
+            } else {
+                System.out.println("size: " + size);
+                bad();
+            }
+        } finally {
             ProActive.removeTryWithCatch();
         }
     }
@@ -166,12 +181,13 @@ public class Test extends FunctionalTest {
 
         /* Client */
         /* voidRT() */
-        ProActive.addNFEListenerOnAO(r, new NFEListener() {
-        	public boolean handleNFE(NonFunctionalException e) {
-        		good();
-        		return true;
-        	}
-        });
+        ProActive.addNFEListenerOnAO(r,
+            new NFEListener() {
+                public boolean handleNFE(NonFunctionalException e) {
+                    good();
+                    return true;
+                }
+            });
         r.voidRT();
 
         /* futureRT() */

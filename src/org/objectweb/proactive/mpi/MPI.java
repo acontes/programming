@@ -31,7 +31,6 @@
 package org.objectweb.proactive.mpi;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.process.ExternalProcess;
 
 
 /**
@@ -41,23 +40,13 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 public class MPI {
 
     /**
-     * API method for creating new MPISPMD object from an existing MPI Process
-     * @param  - mpiProcess
-     * @return MPISpmd - an MPISpmd object
-     */
-    public static MPISpmd createMPISPMDObject(ExternalProcess mpiProcess,
-        String name) {
-        return new MPISpmd(mpiProcess, name);
-    }
-
-    /**
      * API method for creating new MPISPMD object from an existing Virtual Node.
      * Activate the virtual node if not already activated and return and object representing
      * the MPI deployement process.
      * @param vn - the virtual node which contains a list of node on which MPI will be deployed
      * @return MPISpmd - an MPISpmd object
      */
-    public static MPISpmd createMPISPMDObject(VirtualNode vn) {
-        return new MPISpmd(vn);
+    public static MPISpmd newMPISpmd(VirtualNode vn) {
+        return (MPISpmd) new MPISpmdProxy(vn);
     }
 }

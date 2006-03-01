@@ -30,16 +30,13 @@
  */
 package org.objectweb.proactive.core.exceptions.manager;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 
 public class ExceptionMaskStack {
-
-    /* This state is used to know if the fix in the finally block is needed */
-    private static final int STATE_AFTER_PUSH = 0;
-    private static final int STATE_AFTER_POP = 1;
-    private int state;
 
     /* List of ExceptionMaskLevel, starts with the top */
     private LinkedList stack;
@@ -47,11 +44,7 @@ public class ExceptionMaskStack {
     /* The combination of all masks */
     private ExceptionMaskLevel currentExceptionMask;
 
-    /* The potential pending exception */
-    private Throwable currentException;
-
     private ExceptionMaskStack() {
-        state = STATE_AFTER_POP;
         stack = new LinkedList();
         currentExceptionMask = new ExceptionMaskLevel();
     }
@@ -75,8 +68,7 @@ public class ExceptionMaskStack {
     void push(Class[] exceptions) {
         ExceptionMaskLevel level = new ExceptionMaskLevel(this, exceptions);
         stack.add(0, level);
-        currentExceptionMask.addExceptions(level);
-        state = STATE_AFTER_PUSH;
+        currentExceptionMask.addExceptionTypes(level);
     }
 
     void pop() {
@@ -86,13 +78,6 @@ public class ExceptionMaskStack {
 
         stack.removeFirst();
         updateExceptionMask();
-        state = STATE_AFTER_POP;
-    }
-
-    void fixupPop() {
-        if (state == STATE_AFTER_PUSH) {
-            pop();
-        }
     }
 
     /* Recompute the full mask */
@@ -101,20 +86,26 @@ public class ExceptionMaskStack {
         Iterator iter = stack.iterator();
         while (iter.hasNext()) {
             ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
-            currentExceptionMask.addExceptions(level);
+            currentExceptionMask.addExceptionTypes(level);
         }
     }
 
     void throwArrivedException() {
-        if (currentException != null) {
-            Throwable exc = currentException;
-            currentException = null; // No more pending
-            ExceptionThrower.throwException(exc);
+        Collection caughtExceptions = getTopLevel().getCaughtExceptions();
+        synchronized (caughtExceptions) {
+            if (!caughtExceptions.isEmpty()) {
+                Throwable exc = (Throwable) caughtExceptions.iterator().next();
+                ExceptionThrower.throwException(exc);
+            }
         }
     }
 
     private ExceptionMaskLevel getTopLevel() {
-        return (ExceptionMaskLevel) stack.getFirst();
+        try {
+            return (ExceptionMaskLevel) stack.getFirst();
+        } catch (NoSuchElementException nsee) {
+            throw new IllegalStateException("Exception stack is empty");
+        }
     }
 
     void waitForPotentialException(boolean allLevels) {
@@ -134,7 +125,8 @@ public class ExceptionMaskStack {
         Iterator iter = stack.iterator();
         while (iter.hasNext()) {
             ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
-            if (level.catchRuntimeException() || level.isCaught(c)) {
+            if (level.catchRuntimeException() ||
+                    level.areExceptionTypesCaught(c)) {
                 return level;
             }
         }
@@ -143,33 +135,30 @@ public class ExceptionMaskStack {
     }
 
     void waitForIntersection(Class[] exceptions) {
-        if (currentExceptionMask.isCaught(exceptions)) {
+        if (currentExceptionMask.areExceptionTypesCaught(exceptions)) {
             Iterator iter = stack.iterator();
             while (iter.hasNext()) {
                 ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
-                if (level.isCaught(exceptions)) {
+                if (level.areExceptionTypesCaught(exceptions)) {
                     level.waitForPotentialException();
                 }
             }
         }
     }
 
-    /* Currently we only keep the first exception, but we could be smarter */
-    void setException(Throwable e) {
-        if (currentException == null) {
-            currentException = e;
-        }
+    boolean areExceptionTypesCaught(Class[] c) {
+        return currentExceptionMask.areExceptionTypesCaught(c);
     }
 
-    boolean isCaught(Class[] c) {
-        return currentExceptionMask.isCaught(c);
-    }
-
-    boolean isCaught(Class c) {
-        return currentExceptionMask.isCaught(c);
+    boolean isExceptionTypeCaught(Class c) {
+        return currentExceptionMask.isExceptionTypeCaught(c);
     }
 
     boolean isRuntimeExceptionHandled() {
         return currentExceptionMask.catchRuntimeException();
+    }
+
+    Collection getAllExceptions() {
+        return getTopLevel().getAllExceptions();
     }
 }
