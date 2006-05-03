@@ -30,8 +30,18 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.rmi.AlreadyBoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -53,6 +63,7 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
@@ -71,19 +82,6 @@ import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.rmi.AlreadyBoundException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Vector;
 
 
 /**
@@ -143,9 +141,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** Holds the futures for the status of the deployed files using pftp */
     private HashMap fileTransferDeployedStatus;
-    
-    private int fileBlockSize, overlapping;
-    	
+    private int fileBlockSize;
+    private int overlapping;
+
     /** index of the last node used */
     private int lastNodeIndex;
 
@@ -239,9 +237,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         fileTransferDeployedStatus = new HashMap();
         fileTransferRetrieve = new ArrayList();
         proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        fileBlockSize=org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
-        overlapping=org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
-        
+        fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
+        overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
+
         if (logger.isDebugEnabled()) {
             logger.debug("vn " + this.name + " registered on " +
                 proActiveRuntimeImpl.getVMInformation().getVMID().toString());
@@ -417,20 +415,43 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                             process = getSequentialProcessInHierarchie(process,
                                     rankOfSequentialProcess);
                         }
-                        ExternalProcess firstProcess = (ExternalProcess) ((AbstractSequentialListProcessDecorator) process).getFirstProcess();
 
-                        // build the process with the rest of hierarchie
-                        if (rankOfSequentialProcess > 0) {
-                            firstProcess = buildProcessWithHierarchie((ExternalProcess) makeDeepCopy(
-                                        deepCopy), firstProcess,
-                                    rankOfSequentialProcess);
-                        }
-                        setParameters(firstProcess, vm);
-                        try {
-                            proActiveRuntimeImpl.createVM(firstProcess);
+                        // check if the first element is a Service or a process
+                        if (((AbstractSequentialListProcessDecorator) process).isFirstElementIsService()) {
+                            UniversalService firstService = (UniversalService) ((AbstractSequentialListProcessDecorator) process).getFirstService();
+
+                            //   It is a service that is mapped to the vm.
+                            startService(firstService, vm);
                             globalTimeOut = System.currentTimeMillis() +
                                 timeout;
-                            waitForAllNodesCreation();
+                            try {
+                                waitForAllNodesCreation();
+                            } catch (NodeException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        } else {
+                            ExternalProcess firstProcess = (ExternalProcess) ((AbstractSequentialListProcessDecorator) process).getFirstProcess();
+
+                            // build the process with the rest of hierarchie
+                            if (rankOfSequentialProcess > 0) {
+                                firstProcess = buildProcessWithHierarchie((ExternalProcess) makeDeepCopy(
+                                            deepCopy), firstProcess,
+                                        rankOfSequentialProcess);
+                            }
+                            setParameters(firstProcess, vm);
+                            try {
+                                proActiveRuntimeImpl.createVM(firstProcess);
+                                globalTimeOut = System.currentTimeMillis() +
+                                    timeout;
+                                waitForAllNodesCreation();
+                            } catch (java.io.IOException e) {
+                                e.printStackTrace();
+                            } catch (NodeException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                        try {
                             ExternalProcess nextProcess = null;
 
                             // loop on each process in the sequence
@@ -570,7 +591,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 return res;
             } else {
                 res++;
-                process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
+                process = ((ExternalProcess) ((ExternalProcessDecorator) process).getTargetProcess());
             }
         }
         return -1;
@@ -587,7 +608,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 return ((GLiteProcess) process).getCpuNumber();
             } else {
                 res++;
-                process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
+                process = ((ExternalProcess) ((ExternalProcessDecorator) process).getTargetProcess());
             }
         }
         return -1;
@@ -698,10 +719,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (!createdNodes.isEmpty()) {
             node = (Node) createdNodes.get(lastNodeIndex);
             increaseNodeIndex();
-            
+
             //wait for pending file transfer
-            BooleanWrapper bw = (BooleanWrapper)fileTransferDeployedStatus.get(node.getNodeInformation().getName());
-            if(bw !=null) bw.booleanValue(); //wait-by-necessity
+            BooleanWrapper bw = (BooleanWrapper) fileTransferDeployedStatus.get(node.getNodeInformation()
+                                                                                    .getName());
+            if (bw != null) {
+                bw.booleanValue(); //wait-by-necessity
+            }
             return node;
         } else {
             throw new NodeException("Cannot get the node " + this.name);
@@ -716,9 +740,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 "Cannot return the first node, no nodes hava been created");
         }
 
-        BooleanWrapper bw = (BooleanWrapper)fileTransferDeployedStatus.get(node.getNodeInformation().getName());
-        if(bw!=null) bw.booleanValue(); //wait-by-necessity
-        
+        BooleanWrapper bw = (BooleanWrapper) fileTransferDeployedStatus.get(node.getNodeInformation()
+                                                                                .getName());
+        if (bw != null) {
+            bw.booleanValue(); //wait-by-necessity
+        }
+
         return node;
     }
 
@@ -977,7 +1004,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine virtualMachine = null;
 
         for (int i = 0; i < virtualMachines.size(); i++) {
-            if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
+            if (((VirtualMachine) virtualMachines.get(i)).getName()
+                     .equals(event.getVmName())) {
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
             }
         }
@@ -1006,7 +1034,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine virtualMachine = null;
 
         for (int i = 0; i < virtualMachines.size(); i++) {
-            if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
+            if (((VirtualMachine) virtualMachines.get(i)).getName()
+                     .equals(event.getVmName())) {
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
             }
         }
@@ -1045,10 +1074,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     registerAttempts = REGISTRATION_ATTEMPTS;
 
                     while (registerAttempts > 0) { // If there is an
-                        // AlreadyBoundException, we
-                        // will gerate an other
-                        // random node's name and
-                        // try to register it again
+                                                   // AlreadyBoundException, we
+                                                   // will gerate an other
+                                                   // random node's name and
+                                                   // try to register it again
                         nodeName = this.name +
                             Integer.toString(ProActiveRuntimeImpl.getNextInt());
                         url = buildURL(nodeHost, nodeName, protocol, port);
@@ -1295,16 +1324,15 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // when sleeping
             internalWait(tempNodeCount);
         }
-        
+
         //wait for the nodes to complete their deployment file transfer
-        Collection c =fileTransferDeployedStatus.values();
+        Collection c = fileTransferDeployedStatus.values();
         Iterator it = c.iterator();
-        while(it.hasNext()){
-        	
-        	BooleanWrapper bw = (BooleanWrapper) it.next();
-        	bw.booleanValue(); //wait-by-necessity
+        while (it.hasNext()) {
+            BooleanWrapper bw = (BooleanWrapper) it.next();
+            bw.booleanValue(); //wait-by-necessity
         }
-        
+
         return;
     }
 
@@ -1414,7 +1442,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         jvmProcess = (JVMProcess) process.getFinalProcess();
 
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
-        if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
+        if (jvmProcess.getClassname()
+                          .equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             String vnName = this.name;
 
             String localruntimeURL = null;
@@ -1543,9 +1572,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         nbCreatedNodes++;
 
         //Performe FileTransferDeploy (if needed)       
-       	BooleanWrapper bw= fileTransferDeploy(node);
-       	this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
-        			bw);
+        BooleanWrapper bw = fileTransferDeploy(node);
+        this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
+            bw);
 
         // wakes up Thread that are waiting for the node creation 
         notifyAll();
@@ -1579,6 +1608,33 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private void startService(VirtualMachine vm) {
         UniversalService service = vm.getService();
 
+        //we need to perform a deep copy. Indeed if several vm reference
+        // the same service this might lead to unexpected behaviour
+        UniversalService copyService = (UniversalService) makeDeepCopy(service);
+        vm.setService(copyService);
+
+        if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
+            int nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
+
+            // if it is a P2Pservice we must increase the node count with the number
+            // of nodes requested
+            if (nodeRequested != ((P2PDescriptorService) service).getMAX()) {
+                increaseNumberOfNodes(nodeRequested);
+
+                //nodeRequested = MAX means that the service will try to get every nodes 
+                // it can. So we can't predict how many nodes will return.
+            } else {
+                MAX_P2P = true;
+            }
+        } else {
+            //increase with 1 node
+            increaseNumberOfNodes(1);
+        }
+
+        new ServiceThread(this, vm).start();
+    }
+
+    private void startService(UniversalService service, VirtualMachine vm) {
         //we need to perform a deep copy. Indeed if several vm reference
         // the same service this might lead to unexpected behaviour
         UniversalService copyService = (UniversalService) makeDeepCopy(service);
@@ -1658,7 +1714,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
      */
-    public FileWrapper fileTransferRetrieve() throws IOException, ProActiveException {
+    public FileWrapper fileTransferRetrieve()
+        throws IOException, ProActiveException {
         Node[] nodes;
         FileWrapper fileWrapper = new FileWrapper();
         try {
@@ -1705,20 +1762,22 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             FileTransferWorkShop ftwRetrieve = eProcess.getFileTransferWorkShopRetrieve();
             FileDescription[] fd = ftwRetrieve.getAllFileDescriptions();
-            
-            File[] srcFile = new File [fd.length];
-            File[] dstFile = new File [fd.length];
+
+            File[] srcFile = new File[fd.length];
+            File[] dstFile = new File[fd.length];
             for (int j = 0; j < fd.length; j++) {
                 srcFile[j] = new File(ftwRetrieve.getAbsoluteSrcPath(fd[j]));
-                dstFile[j] = new File(ftwRetrieve.getAbsoluteDstPath(fd[j])+"-"+nodes[i].getNodeInformation().getName());
+                dstFile[j] = new File(ftwRetrieve.getAbsoluteDstPath(fd[j]) +
+                        "-" + nodes[i].getNodeInformation().getName());
             }
 
-			long init=System.currentTimeMillis();
-			fileWrapper.addFileWrapper(FileTransferService.pullFiles(nodes[i], srcFile,
-            dstFile, fileBlockSize, overlapping));
+            long init = System.currentTimeMillis();
+            fileWrapper.addFileWrapper(FileTransferService.pullFiles(nodes[i],
+                    srcFile, dstFile, fileBlockSize, overlapping));
 
-            if(FILETRANSFER_LOGGER.isDebugEnabled()){
-            	FILETRANSFER_LOGGER.debug("Returned pullFiles in:"+(System.currentTimeMillis()-init));
+            if (FILETRANSFER_LOGGER.isDebugEnabled()) {
+                FILETRANSFER_LOGGER.debug("Returned pullFiles in:" +
+                    (System.currentTimeMillis() - init));
             }
         }
 
@@ -1735,7 +1794,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      */
     private BooleanWrapper fileTransferDeploy(Node node) {
         if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
-        	DEPLOYMENT_FILETRANSFER_LOGGER.debug("File Transfer Deploy files for node" +
+            DEPLOYMENT_FILETRANSFER_LOGGER.debug(
+                "File Transfer Deploy files for node" +
                 node.getNodeInformation().getName());
         }
 
@@ -1743,21 +1803,23 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine vm = getVirtualMachine(vmName);
 
         if (vm == null) {
-        	if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
-        		DEPLOYMENT_FILETRANSFER_LOGGER.debug("No VM found with name: " + vmName +
-                " for node: " + node.getNodeInformation().getName());
-        	}
-        	return new BooleanWrapper(false);
+            if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
+                DEPLOYMENT_FILETRANSFER_LOGGER.debug("No VM found with name: " +
+                    vmName + " for node: " +
+                    node.getNodeInformation().getName());
+            }
+            return new BooleanWrapper(false);
         }
 
         //TODO We only get the VN for the first process in the chain. We should check if it is a SSH, SSH, etc...
         ExternalProcess eProcess = vm.getProcess();
         if (eProcess == null) {
-        	if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
-        		DEPLOYMENT_FILETRANSFER_LOGGER.debug("No Process linked with VM: " +
-        				vmName + " for node: " + node.getNodeInformation().getName());
-        	}
-        	return new BooleanWrapper(false);
+            if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
+                DEPLOYMENT_FILETRANSFER_LOGGER.debug(
+                    "No Process linked with VM: " + vmName + " for node: " +
+                    node.getNodeInformation().getName());
+            }
+            return new BooleanWrapper(false);
         }
 
         //if the process handled the FileTransfer we have nothing to do
@@ -1772,35 +1834,37 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         FileTransferWorkShop ftwDeploy = eProcess.getFileTransferWorkShopDeploy();
         FileDescription[] fd = ftwDeploy.getAllFileDescriptions();
         if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
-        	DEPLOYMENT_FILETRANSFER_LOGGER.debug("Transfering " + fd.length + " file(s)");
+            DEPLOYMENT_FILETRANSFER_LOGGER.debug("Transfering " + fd.length +
+                " file(s)");
         }
 
-        BooleanWrapper  bw = new BooleanWrapper(false);
-        File filesSrc[]=new File[fd.length];
-        File filesDst[]=new File[fd.length];
+        BooleanWrapper bw = new BooleanWrapper(false);
+        File[] filesSrc = new File[fd.length];
+        File[] filesDst = new File[fd.length];
         for (int j = 0; j < fd.length; j++) {
             File srcFile = new File(ftwDeploy.getAbsoluteSrcPath(fd[j]));
             File dstFile = new File(ftwDeploy.getAbsoluteDstPath(fd[j]));
-            filesSrc[j]=srcFile;
-            filesDst[j]=dstFile;
+            filesSrc[j] = srcFile;
+            filesDst[j] = dstFile;
         }
-        
+
         try {
-            bw=FileTransferService.pushFiles(node, filesSrc, filesDst, fileBlockSize, overlapping);
+            bw = FileTransferService.pushFiles(node, filesSrc, filesDst,
+                    fileBlockSize, overlapping);
         } catch (Exception e) {
-            logger.error("Unable to pushFile files to node "+ node.getNodeInformation().getName());
-            
-            if(DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()){
-            	DEPLOYMENT_FILETRANSFER_LOGGER.debug(e.getStackTrace());
+            logger.error("Unable to pushFile files to node " +
+                node.getNodeInformation().getName());
+
+            if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
+                DEPLOYMENT_FILETRANSFER_LOGGER.debug(e.getStackTrace());
             }
         }
 
         return bw;
     }
 
-	public void setFileTransferParams(int fileBlockSize, int overlapping) {
-
-		this.fileBlockSize=fileBlockSize;
-		this.overlapping=overlapping;
-	}
+    public void setFileTransferParams(int fileBlockSize, int overlapping) {
+        this.fileBlockSize = fileBlockSize;
+        this.overlapping = overlapping;
+    }
 }

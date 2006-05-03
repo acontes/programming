@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="OOSPMDJacobiexample">
   <title>SPMD PROGRAMMING</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/OOSPMDJacobiexample.html  -->
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>OO SPMD on a Jacobi example</title>
 
-    <sect2 remap="h3">
-      <title><anchor id="OOSPMDJacobiexample_html_firstglance" />1. Execution
+    <sect2 >
+      <title>Execution
       and first glance at the Jacobi code</title>
 
-      <sect3 remap="h4">
-        <title>1.1 Source files:
+      <sect3 >
+        <title>Source files:
         ProActive/src/org/objectweb/proactive/examples/jacobi</title>
 
         <para>The Jacobi example is made of two Java classes:</para>
@@ -36,8 +37,8 @@
         SubMatrix.java later on.</para>
       </sect3>
 
-      <sect3 remap="h4">
-        <title>1.2 Execution</title>
+      <sect3 >
+        <title>Execution</title>
 
         <para>ProActive examples come with scripts to easily launch the
         execution under both Unix and Windows.For Jacobi, launch:</para>
@@ -104,12 +105,11 @@
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="OOSPMDJacobiexample_html_modifs" />2. Modification
-      and compilation</title>
+    <sect2 >
+      <title> Modification and compilation</title>
 
-      <sect3 remap="h4">
-        <title>2.1 Source modification</title>
+      <sect3 >
+        <title>Source modification</title>
 
         <para>Do a simple source modification, for instance changing the
         values of the constants MINDIFF (0.00000001 for ex) and ITERATIONS in
@@ -120,8 +120,8 @@
         constants.</para>
       </sect3>
 
-      <sect3 remap="h4">
-        <title>2.2 Compilation</title>
+      <sect3 >
+        <title>Compilation</title>
 
         <para>ProActive distribution comes with scripts to easily recompile
         the provided examples:</para>
@@ -145,12 +145,12 @@
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="OOSPMDJacobiexample_html_detail" />3. Detailed
+    <sect2 >
+      <title>Detailed
       understanding of the OO SPMD Jacobi</title>
 
-      <sect3 remap="h4">
-        <title>3.1 Structure of the code</title>
+      <sect3 >
+        <title>Structure of the code</title>
 
         <para>Within the class SubMatrix.java the following methods correspond
         to a standard Jacobi implementation, and are not specific to
@@ -252,8 +252,8 @@
         written explicitly by the user, whatever the topology (2D, 3D).</para>
       </sect3>
 
-      <sect3 remap="h4">
-        <title>3.2 OO SPMD behavior</title>
+      <sect3 >
+        <title>OO SPMD behavior</title>
 
         <para>Let us detail the OO SPMD techniques and ProActive related
         methods.</para>
@@ -300,8 +300,8 @@
         this code.</para>
       </sect3>
 
-      <sect3 remap="h4">
-        <title>3.3 Adding a Method barrier for a step by step
+      <sect3 >
+        <title>Adding a Method barrier for a step by step
         execution</title>
 
         <para>Let say we would like to control step by step the execution of
@@ -311,9 +311,9 @@
         <para>In class SubMatrix.java, add a Method
         <literal>barrier()</literal> of the form:</para>
 
-        <screen>String[] st= new String[1];
+       <programlisting language="java">String[] st= new String[1];
 st[0]="keepOnGoing";
-ProSPMD.barrier(st);</screen>
+ProSPMD.barrier(st);</programlisting>
 
         <para>Do not forget to define the <literal>keepOnGoing()</literal>
         method that indeed can return void, and just be empty. Find the
@@ -326,7 +326,7 @@ ProSPMD.barrier(st);</screen>
         <literal>keepOnGoing()</literal> on the SPMD group "matrix". Here are
         samples of the code:</para>
 
-        <screen>while (true) {
+       <programlisting language="java">while (true) {
 printMessageAndWait();
 matrix.keepOnGoing();
 }
@@ -340,7 +340,7 @@ private static void printMessageAndWait() {
     try {
         d.readLine();
         } catch (Exception e) {
-}</screen>
+        }</programlisting>
 
         <para>Recompile, and execute the code. Each iteration needs to be
         activated by hitting the return key in the shell window where Jacobi
@@ -355,17 +355,19 @@ private static void printMessageAndWait() {
         <figure>
           <title>Running the Jacobi application, and viewing with IC2D</title>
 
+          <indexterm><primary>IC2D</primary><secondary>example usage</secondary></indexterm>
+
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/jacobiic2d.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
       </sect3>
 
-      <sect3 remap="h4">
-        <title>3.4 Undestanding various different kind of barriers</title>
+      <sect3 >
+        <title>Undestanding various different kind of barriers</title>
 
         <para>The group of neighbors built above is important wrt
         synchronization. Below in method "loop()", an efficient barrier is
@@ -394,7 +396,7 @@ private static void printMessageAndWait() {
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -405,7 +407,7 @@ private static void printMessageAndWait() {
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -421,18 +423,18 @@ private static void printMessageAndWait() {
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="OOSPMDJacobiexample_html_deploy" /> Virtual Nodes and
+    <sect2 >
+      <title> Virtual Nodes and
       Deployment descriptors</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Virtual Nodes</title>
 
         <para>Get back to the source code of Jacobi.java, and understand where
         and how the Virtual Nodes and Nodes are being used.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>XML Descriptors</title>
 
         <para>The XML descriptor being used is:</para>
@@ -459,12 +461,11 @@ private static void printMessageAndWait() {
           </listitem>
         </itemizedlist>
 
-        <para>A detailed presentation of XML descriptors is available in the
-        <link linkend="Descriptor_html_objectives">descriptors
-        chapter</link></para>
+        <para>A detailed presentation of XML descriptors is available in  
+        <xref linkend="Descriptor_html_objectives"/>.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Changing the descriptor</title>
 
         <para>Edit the file Matrix.xml in order to change the number of JVMs
@@ -478,7 +479,7 @@ private static void printMessageAndWait() {
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -488,11 +489,11 @@ private static void printMessageAndWait() {
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="OOSPMDJacobiexample_html_execute" />5. Execution on
+    <sect2 >
+      <title>Execution on
       several machines and Clusters</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Execution on several machines in the room</title>
 
         <para><emphasis role="bold">Explicit machine names</emphasis>
@@ -515,7 +516,7 @@ private static void printMessageAndWait() {
         can be defined, for instance in order to specify different jvm
         configurations (e.g classpath, java path,...).</para>
 
-        <screen> &lt;ProActiveDescriptor
+       <programlisting language="xml"> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;  
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
@@ -566,7 +567,7 @@ private static void printMessageAndWait() {
     &lt;/processDefinition&gt;
    &lt;/processes&gt;
   &lt;/infrastructure&gt;
- &lt;/ProActiveDescriptor&gt;</screen>
+  &lt;/ProActiveDescriptor&gt;</programlisting>
 
         <para>Modify your XML deployment file to use the current jvm (i.e the
         jvm reading the descriptor) and also to start 4 jvms on remote
@@ -575,7 +576,7 @@ private static void printMessageAndWait() {
         <para>Use IC2D to visualize the machines and the JVMs being launched
         on them.</para>
 
-        <screen> &lt;ProActiveDescriptor
+       <programlisting language="xml"> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;  
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
@@ -660,22 +661,22 @@ private static void printMessageAndWait() {
     &lt;/processDefinition&gt;
    &lt;/processes&gt;
   &lt;/infrastructure&gt;
- &lt;/ProActiveDescriptor&gt;</screen>
+  &lt;/ProActiveDescriptor&gt;</programlisting>
 
         <para>Pay attention of what happened to your previous XML deployment
         file. First of all to use the current jvm the following line was added
         just under the <emphasis role="bold">jvmSet</emphasis> tag</para>
 
-        <screen> &lt;jvmSet&gt;
+       <programlisting> &lt;jvmSet&gt;
  &lt;<emphasis role="bold">currentJvm</emphasis> /&gt;
   ...
- &lt;jvmSet&gt;</screen>
+  &lt;jvmSet&gt;</programlisting>
 
         <para>Then the jvms are not created directly using the localProcess,
         but instead using other processes named <emphasis
         role="bold">rsh_titi, rsh_toto, rsh_tata, rsh_tutu</emphasis></para>
 
-        <screen>  &lt;jvms&gt;  
+       <programlisting>  &lt;jvms&gt;  
   &lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
    &lt;creation&gt;
     &lt;processReference refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;
@@ -696,7 +697,7 @@ private static void printMessageAndWait() {
     &lt;processReference refid="<emphasis role="bold">rsh_tutu</emphasis>"/&gt;
    &lt;/creation&gt;
   &lt;/jvm&gt;
- &lt;/jvms&gt;</screen>
+  &lt;/jvms&gt;</programlisting>
 
         <para>Those processes as shown below are rsh processes. Note that it
         is <emphasis role="bold">mandatory</emphasis> for such processes to
@@ -705,7 +706,7 @@ private static void printMessageAndWait() {
         create, at deployment time, a jvm on machines titi, toto, tata, tutu,
         once connected to those machines with rsh.</para>
 
-        <screen>  &lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;  
+       <programlisting>  &lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;  
   &lt;<emphasis role="bold">jvmProcess</emphasis>
  class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
  &lt;/processDefinition&gt;
@@ -737,7 +738,7 @@ private static void printMessageAndWait() {
    &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
   /rshProcess&gt;
  &lt;/processDefinition&gt;
-</screen>
+</programlisting>
 
         <para><emphasis role="bold">Using Lists of Processes</emphasis></para>
 
@@ -749,7 +750,7 @@ private static void printMessageAndWait() {
 
         <para>Used to list the machine's name in a single process</para>
 
-        <screen> &lt;ProActiveDescriptor
+        <programlisting> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;      
   &lt;componentDefinition&gt;
@@ -795,14 +796,14 @@ private static void printMessageAndWait() {
     &lt;/processDefinition&gt;
    &lt;/processes&gt;
   &lt;/infrastructure&gt;
- &lt;/ProActiveDescriptor&gt;</screen>
+  &lt;/ProActiveDescriptor&gt;</programlisting>
 
         <para><emphasis role="bold">processList</emphasis></para>
 
         <para>Used when machine's names follow a list format, for instance
         titi1 titi2 titi3 ... titi100</para>
 
-        <screen>&lt;ProActiveDescriptor
+       <programlisting>&lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;      
   &lt;componentDefinition&gt;
@@ -849,11 +850,11 @@ private static void printMessageAndWait() {
     &lt;/processDefinition&gt;
    &lt;/processes&gt;
   &lt;/infrastructure&gt;
- &lt;/ProActiveDescriptor&gt;</screen>
+  &lt;/ProActiveDescriptor&gt;</programlisting>
       </sect3>
 
-      <sect3 remap="h4">
-        <title>5.2 Execution on Clusters</title>
+      <sect3 >
+        <title>Execution on Clusters</title>
 
         <para>If you have access to your own clusters, configure the XML
         descriptor to launch the Jacobi on them, using the appropriate
@@ -861,8 +862,8 @@ private static void printMessageAndWait() {
 
         <para>ssh, LSF, PBS, Globus, etc.</para>
 
-        <para>Have a look at <link linkend="Descriptor_html_objectives"> XML
-        Descriptors documentation</link> to get the format of the XML
+        <para>Have a look at <xref  linkend="Descriptor_html_objectives"/>
+         to get the format of the XML
         descriptor for each of the supported protocols.</para>
       </sect3>
     </sect2>

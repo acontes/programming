@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="FAQ">
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<appendix id="FAQ">
   <title>Frequently Asked Questions</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/FAQ.html  -->
-<!-- TODO: please uncomment all questions. Had been commented out when debugging ant task. -->
   <para><emphasis role="bold">Note:</emphasis> This FAQ is under construction.
-  If one of your question is not answered here, just send it at <ulink
-  url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> and
-  we'll update the FAQ.</para>
+  If one of your question is not answered here, just send it at 
+  <email>proactive@objectweb.org</email> and we'll update the FAQ.</para>
 
-  <qandaset>
-    <qandadiv>
-      <qandaentry>
+ <qandaset>
+ <qandadiv>
+   <title>Running ProActive</title>
+  
+  <qandaentry>
         <question>
           <para>How do I build ProActive from the distribution?</para>
         </question>
@@ -33,10 +33,9 @@
             </listitem>
           </itemizedlist>
 
-          <programlisting language="java">'all'       </programlisting>
-
-          <para>represents the target of the build. It will compile all
-          sources files and generate the documentation.</para>
+          <para> <literal>'all'</literal>  represents the target of the 
+          build. It will compile all sources files and generate the documentation.
+          </para>
 
           <para>If you want only to compile sources and not generate the
           documentation use</para>
@@ -105,6 +104,28 @@
       </qandaentry>
 
       <qandaentry>
+       <question>
+        <para>Why don't the examples and compilation work under Windows?</para>
+       </question>
+       
+       <indexterm><primary>Microsoft Windows</primary><secondary>Running ProActive</secondary></indexterm>
+       
+         <answer>
+        <para>It happens quite often, that the default installation
+         directory under Windows is under Program Files which contains space.
+         Then setting the JAVA_HOME environment variable to the install
+         directory, might be a problem for bat files(all windows examples,
+         and compilation are ran with bat files). To get rid of those
+         problems, the best thing is to install jdk in a directory whose name
+         does not contain spaces such as C:\java\j2sdk.... or
+         D:\java\j2sdk... and then to set the JAVA_HOME environment variable
+         accordingly: set JAVA_HOME=C:\java\j2sdk... Another solution is to
+         do a copy paste of the command defined in the bat file in the DOS
+         window.</para>
+       </answer>
+      </qandaentry>
+      
+      <qandaentry>
         <question>
           <para>Why do I get a Permission denied when trying to launch
           examples scripts under Linux?</para>
@@ -118,6 +139,251 @@
           in order to change the permissions.</para>
         </answer>
       </qandaentry>
+
+     </qandadiv>
+     <qandadiv>
+       <title>General Concepts</title>
+       
+       
+       <qandaentry>
+        <question>
+         <para>How does the node creation happen?</para>
+        </question>
+        
+        <answer>
+         <para>An active object is always attached to a node. A node
+          represents a logical entity deployed onto one JVM. When creating a
+          new active object you have to provide a URL or a reference to a
+          node. That node has to exist at the moment you create the active
+          object. It has to be launched on a local or on a remote JVM. In
+          order to be accessible from any remote JVM, a node automatically
+          registers itself in the local RMI Registry on the local machine.
+          Getting a reference to a remote node ends up doing a lookup into a
+          RMI registry. The class <literal>NodeFactory</literal> provides a
+          method <literal>getNode</literal> for doing that.</para>
+         
+         <para>In order to start a node you can use the script
+          <literal>startNode</literal> located in the
+          <literal>scripts</literal> directory in the sub-directory
+          <literal>windows</literal> or <literal>unix</literal>. At the
+          moment, <literal>startNode</literal> can only start a node on the
+          local machine. It is not possible to start a remote node using
+          startNode. The reason is that starting a node on a remote host
+          implies the use of protocol such as RSH, SSH or rLogin that are
+          platform dependant and that cannot be easily abstracted from java.
+          We are working on that area at the moment with the XML-based
+          deployment descriptor that will allow the remote creation of nodes
+          using various protocol.</para>
+         
+         <para>It is nevertheless possible to create an object on a remote
+          node once it is created. On host X you can use startNode to start a
+          new node</para>
+         
+         <screen> startNode.sh ///node1 </screen>
+         
+         <para>On host Y you can create an active object on host X</para>
+         
+         <screen>        org.objectweb.proactive.core.node.Node n = org.objectweb.proactive.core.n\
+          ode.NodeFactory.getNode('//X/node1');
+          ProActive.turnActive(myObject, n);       </screen>
+         
+         <para>You do not need to start any rmiregistry manually as they are
+          started automatically as needed.</para>
+         
+         <para>As we support other ways of registration and discovery (such
+          as Jini), getting a node can be protocol dependant. For instance,
+          the url of a node <literal>jini://host.org/node</literal> won't be
+          accessed the same way as <literal>rmi://host.org/node</literal>. The
+          class <literal>NodeFactory</literal> is able to read the protocol
+          and to use the right way to access the node.</para>
+         
+         <para>When an active object is created locally without specifying a
+          node, it is automatically attached to a default node. The default
+          node is created automatically by <emphasis
+                                                    role="bold">ProActive</emphasis> on the local JVM when a first
+          active object is created without a given node. The name of the
+          default node is generated based on a random number.</para>
+        </answer>
+       </qandaentry>
+       
+       
+       <qandaentry>
+        <question>
+         <para>How does the RMI Registry creation happen?</para>
+        </question>
+        
+        <answer>
+         <para><emphasis role="bold">ProActive</emphasis> relies on the RMI
+          Registry for registering and discovering nodes. For this reason, the
+          existence of a RMI Registry is necessary for 
+          <emphasis role="bold">ProActive</emphasis> to be used. In order to simplify
+          the deployment of <emphasis role="bold">ProActive</emphasis>
+          applications, we have included the creation of the RMI Registry with
+          the creation of nodes. Therefore, if no RMI Registry exists on the
+          local machine, <emphasis role="bold">ProActive</emphasis> will
+          automatically create one. If one exists, 
+          <emphasis role="bold">ProActive</emphasis> will automatically use it.</para>
+        </answer>
+       </qandaentry>
+       
+       
+       
+       <qandaentry>
+        <question>
+         <para>What is the class server, why do we need it?</para>
+        </question>
+        
+        <answer>
+         <para>In the RMI model, a class server is a HTTP Server able to
+          answer simple HTTP requests for getting class files. It is needed in
+          the case an object being sent to a remote location where the class
+          the object belongs to is unknown. In such case, if the property
+          <literal>java.rmi.server.codebase</literal> has been set properly to
+          an existing class server, RMI will attempt to download the missing
+          class files.</para>
+         
+         <para>Because <emphasis role="bold">ProActive</emphasis> makes use
+          of on-the-fly, in memory, generated classes (the stubs), a class
+          server is necessary for each JVM using active objects. For this
+          reason, <emphasis role="bold">ProActive</emphasis> starts
+          automatically one small class server per JVM. The launching and the
+          use of this class server is transparent to you.</para>
+        </answer>
+       </qandaentry>
+       
+       <qandaentry id="reifiableDefinition">
+        <question>
+         <para>What is a reifiable object?</para>
+        </question>
+        
+        <answer>
+         <para>An object is said to be reifiable if it meets certain
+          criterias in order to become an Active Object:</para>
+         
+         <itemizedlist>
+          <listitem>
+           <para>The object is not of primitive type</para>
+          </listitem>
+          
+          <listitem>
+           <para>The class of the object is not final</para>
+          </listitem>
+          
+          <listitem>
+           <para>The object has a constructor with no arguments</para>
+          </listitem>
+         </itemizedlist>
+        </answer>
+       </qandaentry>
+       
+       <qandaentry>
+        <question>
+         <para>What is the body of an active object? What are its local and
+          remote representations?</para>
+        </question>
+        
+        <answer>
+         <para>When created, an active object is associated with a Body that
+          is the entity managing all the non functional properties of the
+          active object. The body contains the request queue receiving all
+          reified method calls to the reified object (the object from which
+          the active object has been created). It is responsible for storing
+          pending requests and serving them according to a given
+          synchronization policy, which default behavior is FIFO.</para>
+         
+         <para>The body of the active object should be the only object able
+          to access directly the reified object. All other objects accessing
+          the active object do so through the stub-proxy couple that
+          eventually sends a request to the body. The body owns its own thread
+          that represent the activity of the active object.</para>
+         
+         <para>The body has two representations. One is local and given by
+          the interface <ulink url="../Body.xml">Body</ulink>. This is the
+          local view of the body an object can have when being in the same JVM
+          as the body. For instance, the implementation of the activity of an
+          object done through the method <literal>runActivity(Body)</literal>
+          of the interface <literal>RunActive</literal> sees the body locally
+          as it is instantiated by the body itself. The other representation,
+          given by the interface <ulink url="../core/body/UniversalBody.xml">UniversalBody</ulink>, is
+          remote. It represents the view of the body a remote object can have
+          and therefore the methods that can be invoked. That view is the one
+          used by the proxy of a remote reference to the active object to send
+          request to the body of the active object.</para>
+        </answer>
+       </qandaentry>
+       
+       <qandaentry>
+        <question>
+         <para>What is a ProActive stub?</para>
+        </question>
+        
+        <answer>
+         <para>When you create an active object from a regular object, you
+          get in return a reference on an automatically generated 
+          <emphasis role="bold">ProActive</emphasis> stub. 
+          <emphasis role="bold">ProActive</emphasis> uses 
+          <ulink url="http://asm.objectweb.org/">ASM</ulink> to generate the stub on
+          the fly. Suppose you have a class <literal>A</literal> and an
+          instance <literal>a</literal> of this class. A way to turn the
+          instance <literal>a</literal> into an active object is to use the
+          method <literal>ProActive.turnActive</literal>:</para>
+         
+         <screen>    A a = new A();
+          A activeA = (A) ProActive.turnActive(a);</screen>
+         
+         <para>In the code above, the variable <literal>a</literal> is a
+          direct reference onto the instance of <literal>A</literal> stored
+          somewhere in memory. In contrast, the variable
+          <literal>activeA</literal> is a direct reference onto an instance of
+          the generated ProActive stub for the class <literal>A</literal>. By
+          convention, the ProActive stub of a class <literal>A</literal> is a
+          class generated in memory by ProActive that inherit from
+          <literal>A</literal> and that is stored in the package
+          <literal>pa.stub</literal> as <literal>pa.stub.Stub_A</literal>. The
+          ProActive stub of a class redefines all public methods to reify them
+          through a generic proxy. The proxy changes all method calls into
+          requests that are sent to the body associated to the reified object
+          (the object pointed by <literal>a</literal> in our example).</para>
+         
+         <para>The reified object can be indifferently in the same virtual
+          machine as the active reference or in another one.</para>
+        </answer>
+       </qandaentry>
+       
+      <qandaentry>
+       <question>
+        <para>Are the call to an Active Object always asynchronous?</para>
+       </question>
+       
+       <answer>
+        <para>No. Calls to an Active Object methods are asynchronous under
+         some conditions. This is explained in
+         <xref linkend="FutureObjectCreation"/>. If for instance the
+         return type of a method call is not reifiable, you can use wrappers
+         to keep asynchronism capabilities: suppose that one of your object
+         has a method</para>
+        
+        <screen> <emphasis role="bold"> int</emphasis> getNumber() </screen>
+        
+        <para>calling this method with ProActive is sychronous since the 'int'
+         type is not reifiable. To keep the asynchronism it is advised to
+         use the classes given in the 
+         <literal>org.objectweb.proactive.core.util.wrapper</literal> 
+         package, or to create your own wrapper based on these examples. In
+         the case highlighted above, you should use</para>
+        
+        <screen> <emphasis role="bold">IntWrapper </emphasis>getNumber() </screen>
+                
+        <para>Then calling this new <literal>getNumber()</literal> method is
+         asynchronous. Remember that 
+         <emphasis role="bold">only the methods return type are concerned</emphasis>,
+         not the parameters.</para>
+       </answer>
+      </qandaentry>
+
+      </qandadiv>
+       <qandadiv>
+        <title>Exceptions</title>
 
       <qandaentry>
         <question>
@@ -156,19 +422,20 @@
 
           <para>The problem can simply be fixed by adding asm<literal>.jar</literal> in the
           <literal>CLASSPATH</literal>.</para>
+         
+         <indexterm><primary>CLASSPATH</primary><secondary>missing</secondary></indexterm>
         </answer>
       </qandaentry>
 
       
-      <!--<qandaentry>
+      <qandaentry>
        <question>
         <para>Why do I get an exception java.lang.NoClassDefFoundError about bcel?</para>
        </question>
        
        <answer>
 
-        <para>ProActive uses <ulink
-                                   url="http://jakarta.apache.org/bcel/">BCEL</ulink> for the on the
+        <para>ProActive uses <ulink url="http://jakarta.apache.org/bcel/">BCEL</ulink> for the on the
          fly generation of stub classes. The library
          <literal>bcel.jar</literal>, provided in the directory
          <literal>lib</literal> of <emphasis role="bold">ProActive</emphasis>
@@ -191,12 +458,13 @@
          at DiscoveryManager.main(DiscoveryManager.java:226)</screen>
         
         <para>The problem can simply be fixed by adding
-         <literal>bcel.jar</literal> in the
-         <literal>CLASSPATH</literal>.</para>
+         <literal>bcel.jar</literal> in the <literal>CLASSPATH</literal>.</para>
+        
+        <indexterm><primary>CLASSPATH</primary><secondary>missing</secondary></indexterm>
+
        </answer>
       </qandaentry>
-      --> 
-      <!--        
+               
       <qandaentry>
        <question>
         <para>Why do I get an exception java.security.AccessControlException
@@ -252,8 +520,8 @@
          outside <literal>java.*</literal> or <literal>sun.*</literal>
          packages.</para>
         
-        <para>See Permissions in the <ulink
-                                           url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.xml">JavaTM
+        <para>See Permissions in the 
+         <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">JavaTM
           2 SDK</ulink> to learn more about Java permissions.</para>
         
         <para>As a first approximation, in order to run your code, you can
@@ -268,275 +536,75 @@
         <screen> java -Djava.security.policy=my.policy.file MyMainClass </screen>
        </answer>
       </qandaentry>
--->
-<!--      <qandaentry>
+ 
+      <qandaentry>
        <question>
-        <para>Why don't the examples and compilation work under
-         Windows?</para>
+        <para>Why do I get an exception when using Jini?</para>
        </question>
        
        <answer>
-        <para>It happens quite often, that the default installation
-         directory under Windows is under Program Files which contains space.
-         Then setting the JAVA_HOME environment variable to the install
-         directory, might be a problem for bat files(all windows examples,
-         and compilation are ran with bat files). To get rid of those
-         problems, the best thing is to install jdk in a directory whose name
-         does not contain spaces such as C:\java\j2sdk.... or
-         D:\java\j2sdk... and then to set the JAVA_HOME environment variable
-         accordingly: set JAVA_HOME=C:\java\j2sdk... Another solution is to
-         do a copy paste of the command defined in the bat file in the DOS
-         window.</para>
+        <para>In order to get <emphasis role="bold">Jini</emphasis> working
+         properly in ProActive, you have to put in your HOME directory a copy
+         of proactive.java.policy located in ProActive/scripts/unix or
+         windows. Indeed the rmid deamon needs this file to start. If you try
+         to use Jini without this policy file, it will not work. Moreover, if
+         you did it once, make sure that there is no file called
+         machine_namejiniLockFile in your working directory. This file is
+         usefull to avoid many Service Lookup to be created by concurrent
+         threads. This file is removed automatically when a Lookup Service is
+         created. If the application failed(for instance because of the
+         policy file) it is possible that this file remains in the directory,
+         in that case if you restart the application it will not work. So
+         checkout if this file is present in your working directory, if so
+         remove it and restart the application</para>
        </answer>
-      </qandaentry>-->
-<!--      <qandaentry>
-       <question>
-        <para>How does the node creation happen?</para>
-       </question>
+      </qandaentry>
        
-       <answer>
-        <para>An active object is always attached to a node. A node
-         represents a logical entity deployed onto one JVM. When creating a
-         new active object you have to provide a URL or a reference to a
-         node. That node has to exist at the moment you create the active
-         object. It has to be launched on a local or on a remote JVM. In
-         order to be accessible from any remote JVM, a node automatically
-         registers itself in the local RMI Registry on the local machine.
-         Getting a reference to a remote node ends up doing a lookup into a
-         RMI registry. The class <literal>NodeFactory</literal> provides a
-         method <literal>getNode</literal> for doing that.</para>
-        
-        <para>In order to start a node you can use the script
-         <literal>startNode</literal> located in the
-         <literal>scripts</literal> directory in the sub-directory
-         <literal>windows</literal> or <literal>unix</literal>. At the
-         moment, <literal>startNode</literal> can only start a node on the
-         local machine. It is not possible to start a remote node using
-         startNode. The reason is that starting a node on a remote host
-         implies the use of protocol such as RSH, SSH or rLogin that are
-         platform dependant and that cannot be easily abstracted from java.
-         We are working on that area at the moment with the XML-based
-         deployment descriptor that will allow the remote creation of nodes
-         using various protocol.</para>
-        
-        <para>It is nevertheless possible to create an object on a remote
-         node once it is created. On host X you can use startNode to start a
-         new node</para>
-        
-        <screen> startNode.sh ///node1 </screen>
-        
-        <para>On host Y you can create an active object on host X</para>
-        
-        <screen>        org.objectweb.proactive.core.node.Node n = org.objectweb.proactive.core.n\
-         ode.NodeFactory.getNode('//X/node1');
-         ProActive.turnActive(myObject, n);       </screen>
-        
-        <para>You do not need to start any rmiregistry manually as they are
-         started automatically as needed.</para>
-        
-        <para>As we support other ways of registration and discovery (such
-         as Jini), getting a node can be protocol dependant. For instance,
-         the url of a node <literal>jini://host.org/node</literal> won't be
-         accessed the same way as <literal>rmi://host.org/node</literal>. The
-         class <literal>NodeFactory</literal> is able to read the protocol
-         and to use the right way to access the node.</para>
-        
-        <para>When an active object is created locally without specifying a
-         node, it is automatically attached to a default node. The default
-         node is created automatically by <emphasis
-                                                   role="bold">ProActive</emphasis> on the local JVM when a first
-         active object is created without a given node. The name of the
-         default node is generated based on a random number.</para>
-       </answer>
-      </qandaentry>-->
-      
-      <!--XXXXXXXXXXx BELOW Problematic  -->
+     
+     </qandadiv>
+       <qandadiv>
+        <title>Writing ProActive-oriented code</title>
 
-      <!--<qandaentry>
- <question>
-  <para>How does the RMI Registry creation happen?</para>
- </question>
- 
- <answer>
-  <para><emphasis role="bold">ProActive</emphasis> relies on the RMI
-   Registry for registering and discovering nodes. For this reason, the
-   existence of a RMI Registry is necessary for 
-   <emphasis role="bold">ProActive</emphasis> to be used. In order to simplify
-   the deployment of <emphasis role="bold">ProActive</emphasis>
-   applications, we have included the creation of the RMI Registry with
-   the creation of nodes. Therefore, if no RMI Registry exists on the
-   local machine, <emphasis role="bold">ProActive</emphasis> will
-   automatically create one. If one exists, 
-   <emphasis role="bold">ProActive</emphasis> will automatically use it.</para>
- </answer>
-</qandaentry>-->
+        <qandaentry>
+         <question>
+          <para>Why aren't my object's properties updated?</para>
+         </question>
+         
+         <answer>
+          <para>Suppose you have a class <literal>A</literal> with an
+           attribute <literal>a1</literal> as the example below.</para>
+          
+          <screen>    public class A {
+           public int a1;
+           public static void main(String[] args) {
+           A a = new A();
+           A activeA = (A) ProActive.turnActive(a);
+           a.a1 = 2;       // set the attribute a1 of the instance pointed by a to 2
+           activeA.a1 = 2; // !!! set the attribute a1 of the stub instance to 2
+           }
+           }</screen>
+          
+          <para>When you reference an active object, you always reference it
+           through its associated stub 
+           (see <xref linkend="ActiveObjectCreation_html_elementRole"/> for the definition of Stub). 
+           The stub class inheriting from the reified class, it
+           has also all its attributes. But those attributes are totally
+           useless as the only role of the generated stub is to reify every
+           public methods call into a request passed to the associated proxy.
+           Therefore accessing directly the attributes of an active object
+           through its active reference would result in accessing the
+           attributes of the generated stub. This is certainly not the behavior
+           one would expect.</para>
+          
+          <para>The solution to this problem is very simple: 
+           <emphasis role="bold">active object properties should only be accessed through a
+            public method</emphasis>. Otherwise, you're accessing the local
+           Stub's properties.</para>
+         </answer>
+        </qandaentry>
+        
 
-<!--XXXXXXXXXXx BELOW UNKNWONW  -->
-
-<qandaentry>
- <question>
-  <para>What is the class server, why do we need it?</para>
- </question>
- 
- <answer>
-  <para>In the RMI model, a class server is a HTTP Server able to
-   answer simple HTTP requests for getting class files. It is needed in
-   the case an object being sent to a remote location where the class
-   the object belongs to is unknown. In such case, if the property
-   <literal>java.rmi.server.codebase</literal> has been set properly to
-   an existing class server, RMI will attempt to download the missing
-   class files.</para>
-  
-  <para>Because <emphasis role="bold">ProActive</emphasis> makes use
-   of on-the-fly, in memory, generated classes (the stubs), a class
-   server is necessary for each JVM using active objects. For this
-   reason, <emphasis role="bold">ProActive</emphasis> starts
-   automatically one small class server per JVM. The launching and the
-   use of this class server is transparent to you.</para>
- </answer>
-</qandaentry>
-
-<qandaentry>
- <question>
-  <para>What is a reifiable object?</para>
- </question>
- 
- <answer>
-  <para>An object is said to be reifiable if it meets certain
-   criterias in order to become an Active Object:</para>
-  
-  <itemizedlist>
-   <listitem>
-    <para>The object is not of primitive type</para>
-   </listitem>
-   
-   <listitem>
-    <para>The class of the object is not final</para>
-   </listitem>
-   
-   <listitem>
-    <para>The object has a constructor with no arguments</para>
-   </listitem>
-  </itemizedlist>
- </answer>
-</qandaentry>
-
-<qandaentry>
- <question>
-  <para>What is the body of an active object? What are its local and
-   remote representations?</para>
- </question>
- 
- <answer>
-  <para>When created, an active object is associated with a Body that
-   is the entity managing all the non functional properties of the
-   active object. The body contains the request queue receiving all
-   reified method calls to the reified object (the object from which
-   the active object has been created). It is responsible for storing
-   pending requests and serving them according to a given
-   synchronization policy, which default behavior is FIFO.</para>
-  
-  <para>The body of the active object should be the only object able
-   to access directly the reified object. All other objects accessing
-   the active object do so through the stub-proxy couple that
-   eventually sends a request to the body. The body owns its own thread
-   that represent the activity of the active object.</para>
-  
-  <para>The body has two representations. One is local and given by
-   the interface <ulink url="../Body.xml">Body</ulink>. This is the
-   local view of the body an object can have when being in the same JVM
-   as the body. For instance, the implementation of the activity of an
-   object done through the method <literal>runActivity(Body)</literal>
-   of the interface <literal>RunActive</literal> sees the body locally
-   as it is instantiated by the body itself. The other representation,
-   given by the interface <ulink
-                                url="../core/body/UniversalBody.xml">UniversalBody</ulink>, is
-   remote. It represents the view of the body a remote object can have
-   and therefore the methods that can be invoked. That view is the one
-   used by the proxy of a remote reference to the active object to send
-   request to the body of the active object.</para>
- </answer>
-</qandaentry>
-<!-- XXXXXXXXX The above three are correct -->
-
-<!--<qandaentry>
- <question>
-  <para>What is a ProActive stub?</para>
- </question>
- 
- <answer>
-  <para>When you create an active object from a regular object, you
-   get in return a reference on an automatically generated <emphasis
-                                                                    role="bold">ProActive</emphasis> stub. <emphasis
-                                                                                role="bold">ProActive</emphasis> uses <ulink
-                                                                                url="http://asm.objectweb.org/">ASM</ulink> to generate the stub on
-   the fly. Suppose you have a class <literal>A</literal> and an
-   instance <literal>a</literal> of this class. A way to turn the
-   instance <literal>a</literal> into an active object is to use the
-   method <literal>ProActive.turnActive</literal>:</para>
-  
-  <screen>    A a = new A();
-   A activeA = (A) ProActive.turnActive(a);</screen>
-  
-  <para>In the code above, the variable <literal>a</literal> is a
-   direct reference onto the instance of <literal>A</literal> stored
-   somewhere in memory. In contrast, the variable
-   <literal>activeA</literal> is a direct reference onto an instance of
-   the generated ProActive stub for the class <literal>A</literal>. By
-   convention, the ProActive stub of a class <literal>A</literal> is a
-   class generated in memory by ProActive that inherit from
-   <literal>A</literal> and that is stored in the package
-   <literal>pa.stub</literal> as <literal>pa.stub.Stub_A</literal>. The
-   ProActive stub of a class redefines all public methods to reify them
-   through a generic proxy. The proxy changes all method calls into
-   requests that are sent to the body associated to the reified object
-   (the object pointed by <literal>a</literal> in our example).</para>
-  
-  <para>The reified object can be indifferently in the same virtual
-   machine as the active reference or in another one.</para>
- </answer>
-</qandaentry>
--->
-<qandaentry>
- <question>
-  <para>Why aren't my object's properties updated?</para>
- </question>
- 
- <answer>
-  <para>Suppose you have a class <literal>A</literal> with an
-   attribute <literal>a1</literal> as the example below.</para>
-  
-  <screen>    public class A {
-   public int a1;
-   public static void main(String[] args) {
-   A a = new A();
-   A activeA = (A) ProActive.turnActive(a);
-   a.a1 = 2;       // set the attribute a1 of the instance pointed by a to 2
-   activeA.a1 = 2; // !!! set the attribute a1 of the stub instance to 2
-   }
-   }</screen>
-  
-  <para>When you reference an active object, you always reference it
-   through its associated stub (<link
-                                     linkend="ActiveObjectCreation_html_elementRole">see definition of
-    Stub</link>). The stub class inheriting from the reified class, it
-   has also all its attributes. But those attributes are totally
-   useless as the only role of the generated stub is to reify every
-   public methods call into a request passed to the associated proxy.
-   Therefore accessing directly the attributes of an active object
-   through its active reference would result in accessing the
-   attributes of the generated stub. This is certainly not the behavior
-   one would expect.</para>
-  
-  <para>The solution to this problem is very simple: <emphasis
-                                                              role="bold">active object's properties must be accessed through a
-    public method</emphasis>. Otherwise, you're accessing the local
-   Stub's properties.</para>
- </answer>
-</qandaentry>
-
-
-<qandaentry>
+        <qandaentry>
  <question>
   <para>How can I pass a reference on an active object or the
    difference between this and ProActive.getStubOnThis()?</para>
@@ -653,8 +721,8 @@
   <para>When using instantiation based creation, any argument passed
    to the constructor of the reified object through
    <literal>ProActive.newActive</literal> is serialized and passed by
-   copy to the object. This is because the model behind <emphasis
-                                                                 role="bold">ProActive</emphasis> is uniform whether the active
+   copy to the object. This is because the model behind 
+   <emphasis role="bold">ProActive</emphasis> is uniform whether the active
    object is instantiated locally or remotely. The parameters are
    therefore guaranteed to be passed by copy to the constructor. When
    using <literal>ProActive.newActive</literal> you must make sure that
@@ -706,7 +774,7 @@
  </question>
  
  <answer>
-  <para><emphasis remap="h3" role="bold">Defining Active Object
+  <para><emphasis  role="bold">Defining Active Object
     Activity</emphasis></para>
   
   <para>When an active object is created from a given object, all
@@ -757,7 +825,7 @@
    its activity automatically without invoking the init or ending
    phases. Only the activity itself is restarted.</para>
   
-  <para><emphasis remap="h3" role="bold">Setting Active Object
+  <para><emphasis  role="bold">Setting Active Object
     Activity</emphasis></para>
   
   <para>Two ways are possible to define each of the three phases of an
@@ -817,7 +885,6 @@
 </qandaentry> 
 
 
-<!--XXXXXXXXXXXXXXXXX BELOW CORRECT        -->
       <qandaentry>
        <question>
         <para>How do I implement the custom activity of an active
@@ -825,7 +892,7 @@
        </question>
        
        <answer>
-        <para>As explained <link linkend="activity">before</link>, there are
+        <para>As explained before in <xref linkend="activity"/>, there are
          two ways to define the activity of your active object</para>
         
         <itemizedlist>
@@ -843,7 +910,7 @@
          </listitem>
         </itemizedlist>
         
-        <para><emphasis remap="h3" role="bold">Implementing the interfaces
+        <para><emphasis  role="bold">Implementing the interfaces
           directly in the class used to create the active
           object</emphasis></para>
         
@@ -877,7 +944,7 @@
          }
          }</screen>
         
-        <para><emphasis remap="h3" role="bold">Passing an object
+        <para><emphasis  role="bold">Passing an object
           implementing the interfaces when creating the active
           object</emphasis></para>
         
@@ -939,8 +1006,8 @@
         <para>The former <literal>Active</literal> interface was simply a
          marker interface allowing to change the body and/or the proxy of an
          active object. It was of no use most of the time and was made
-         obsolete with the introduction of the <ulink
-                                                     url="../core/body/MetaObjectFactory.xml">MetaObjectFactory</ulink>
+         obsolete with the introduction of the 
+         <ulink url="../core/body/MetaObjectFactory.xml">MetaObjectFactory</ulink>
          in the <emphasis role="bold">0.9.3</emphasis> release</para>
         
         <para>Up to <emphasis role="bold">ProActive 0.9.3</emphasis> the
@@ -971,50 +1038,6 @@
            <literal>runActivity</literal></para>
          </listitem>
         </itemizedlist>
-       </answer>
-      </qandaentry>
-      
-      <qandaentry>
-       <question>
-        <para>Are the call to an Active Object always asynchronous?</para>
-       </question>
-       
-       <answer>
-        <para>No. Calls to an Active Object methods are asynchronous under
-         some conditions. This is explained <ulink
-                                                  url="FutureObjectCreation.xml">here</ulink>. If for instance the
-         return type of a method call is not reifiable, you can use wrappers
-         to keep asynchronism capabilities: suppose that one of your object
-         has a method</para>
-        
-        <screen> <emphasis role="bold"> int</emphasis> getNumber() </screen>
-        
-        <para>calling this method with ProActive is sychronous since int
-         type is not reifiable. To keep the asynchronism it is advised to
-         use</para>
-        
-        <screen> <emphasis role="bold">MyInteger </emphasis>getNumber() </screen>
-        
-        <para>where</para>
-        
-        <screen> public class MyInteger{
-         protected int i;
-         public MyInteger(){
-         //empty constructor with no-args
-         }
-         
-         public MyInteger(int i){
-         this.i = i;
-         }
-         
-         public int get{
-         return i;
-         }
-         
-         }</screen>
-        
-        <para>In that case call to this method is asynchronous. Only the
-         methods return type are concerned not the parameters.</para>
        </answer>
       </qandaentry>
       
@@ -1056,13 +1079,12 @@
         
         <para>This test is never true, indeed, result_from_method is
          <emphasis role="bold">Stub--&gt;Proxy--&gt;null</emphasis> if the
-         future is not yet available or the method returns null or <emphasis
-                                                                            role="bold">Stub--&gt;Proxy--&gt;Object</emphasis> if the future is
+         future is not yet available or the method returns null or 
+         <emphasis role="bold">Stub--&gt;Proxy--&gt;Object</emphasis> if the future is
          available, but result_from_method is <emphasis role="bold">never
-          null</emphasis>. see <link
-                                    linkend="FutureObjectCreation_commonerror">Future
-          documentation</link> for more documentation about common errors to
-         avoid</para>
+          null</emphasis>. See Documentation on Futures in <xref linkend="FutureObjectCreation_commonerror"/>
+         for more documentation about common errors to
+         avoid.</para>
        </answer>
       </qandaentry>
       
@@ -1075,34 +1097,100 @@
         <para>In order to use <emphasis role="bold">Jini</emphasis> in
          ProActive you have to configure properly the deployment descriptor.
          All informations on how to configure XML deployment descriptor are
-         provided <ulink url="Descriptor.xml">here</ulink></para>
+         provided in <xref linkend="XML_Descriptors"/>.</para>
        </answer>
       </qandaentry>
       
       <qandaentry>
-       <question>
-        <para>Why do I get an exception when using Jini?</para>
-       </question>
+        <question>
+         <para>How do I make a Component version out of an Active Object
+          version?</para>
+        </question>
+        
+        <answer>
+         <para>There is such an example, in the examples/components/c3d
+          directory. The code for c3d is adapted to use components.</para>
+         
+         <para>There are several steps to cover:</para>
+         
+         <orderedlist>
+          <listitem>
+           <para>Make sure you have made interfaces for the objects which
+            are to be made components. This is needed to be able to do the
+            binding between components</para>
+          </listitem>
+          
+          <listitem>
+           <para>Replace the references to Active Object classes by their
+            interfaces</para>
+          </listitem>
+          
+          <listitem>
+           <para>Create a component wrapper for each Active Object which
+            should appear as a component. It should contain the binding
+            behavior (bindFc,unbindFc,listFc,lookupFc methods), and maybe
+            handle attribute modification.</para>
+          </listitem>
+          
+          <listitem>
+           <para>Create a main class where the compoents are created then
+            bound, or use an ADL file to do so.</para>
+          </listitem>
+         </orderedlist>
+        </answer>
+       </qandaentry>
+  
+      
+       <qandaentry>
+        <question>
+         <para>How can I use Jini in ProActive?</para>
+        </question>
+        
+        <answer>
+         <para>In order to use <emphasis role="bold">Jini</emphasis> in
+          ProActive you have to configure properly the deployment descriptor.
+          All informations on how to configure XML deployment descriptor are
+          provided in <xref linkend="XML_Descriptors"/>.</para>
+        </answer>
+       </qandaentry>
        
-       <answer>
-        <para>In order to get <emphasis role="bold">Jini</emphasis> working
-         properly in ProActive, you have to put in your HOME directory a copy
-         of proactive.java.policy located in ProActive/scripts/unix or
-         windows. Indeed the rmid deamon needs this file to start. If you try
-         to use Jini without this policy file, it will not work. Moreover, if
-         you did it once, make sure that there is no file called
-         machine_namejiniLockFile in your working directory. This file is
-         usefull to avoid many Service Lookup to be created by concurrent
-         threads. This file is removed automatically when a Lookup Service is
-         created. If the application failed(for instance because of the
-         policy file) it is possible that this file remains in the directory,
-         in that case if you restart the application it will not work. So
-         checkout if this file is present in your working directory, if so
-         remove it and restart the application</para>
-       </answer>
-      </qandaentry>
+       <qandaentry>
+        <question>
+         <para>Why is my call not asynchronous?</para>
+        </question>
+        
+        <answer>
+         <para>ProActive allows to have asynchronous code, 
+          in the following cases:</para>
+          
+          <itemizedlist>
+           <listitem>
+            <para>The return value is reifiable (see <xref linkend="reifiableDefinition"/>).
+             This is needed to ensure the creation of the Future, which is the container
+             returned (the future is used while waiting for the effective result to arrive). 
+             The returned class has to be Serializable, can not be final, and must have an empty 
+             no-arguments constructor.</para>
+           </listitem>
+          
+           <listitem>
+            <para>The return value is void. In this case, the rendez-vous is made, and
+             then the caller resumes its activity, while the receiver has now a new methodCall
+             in its queue.  </para>
+           </listitem>
+
+          </itemizedlist>
+          
+          <para>More explanations can be found in <xref linkend="FutureObjectCreation"/>.</para>
+        </answer>
+        
+       </qandaentry>
+       
       
-      <qandaentry>
+     </qandadiv>
+     <qandadiv>
+       <title>Deployment Descriptors</title>
+
+       <qandaentry>
        <question>
         <para>What is the difference between passing parameters in
          Deployment Descriptor and setting properties in ProActive
@@ -1142,44 +1230,10 @@
        </answer>
       </qandaentry>
       
-      <qandaentry>
-       <question>
-        <para>How do I make a Component version out of an Active Object
-         version?</para>
-       </question>
-       
-       <answer>
-        <para>There is such an example, in the examples/components/c3d
-         directory. The code for c3d is adapted to use components.</para>
-        
-        <para>There are several steps to cover:</para>
-        
-        <orderedlist>
-         <listitem>
-          <para>Make sure you have made interfaces for the objects which
-           are to be made components. This is needed to be able to do the
-           binding between components</para>
-         </listitem>
-         
-         <listitem>
-          <para>Replace the references to Active Object classes by their
-           interfaces</para>
-         </listitem>
-         
-         <listitem>
-          <para>Create a component wrapper for each Active Object which
-           should appear as a component. It should contain the binding
-           behavior (bindFc,unbindFc,listFc,lookupFc methods), and maybe
-           handle attribute modification.</para>
-         </listitem>
-         
-         <listitem>
-          <para>Create a main calss where the compoents are created then
-           bound, or use an ADL file to do so.</para>
-         </listitem>
-        </orderedlist>
-       </answer>
-      </qandaentry>
-     </qandadiv>
-  </qandaset>
-</chapter>
+
+    </qandadiv>
+   </qandaset>
+
+   </appendix>
+   
+  

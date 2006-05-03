@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="VariableContract">
   <title>Variable Contracts for Descriptors</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/VariableContract.html-->
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>Variable Contracts for Descriptors</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Principle</title>
 
       <para>The objective of this feature is to allow the use of variables
@@ -22,9 +23,8 @@
       Program and the Descriptor.</para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="dbdoclet.id.VariableContract_html_variableTypes"
-      xreflabel="Variable Types" />Variable Types</title>
+    <sect2  id="dbdoclet.id.VariableContract_html_variableTypes">
+      <title>    Variable Types</title>
 
       <table>
         <title>Variable Types</title>
@@ -96,7 +96,29 @@
 
               <entry>-</entry>
 
-              <entry>-</entry>
+              <entry>JavaProperty</entry>
+            </row>
+
+            <row>
+              <entry><emphasis
+              role="bold">JavaPropertyDescriptorDefault</emphasis></entry>
+
+              <entry>JavaProperty, Descriptor, Program</entry>
+
+              <entry>Program</entry>
+
+              <entry>JavaProperty, Descriptor, Program</entry>
+            </row>
+
+            <row>
+              <entry><emphasis
+              role="bold">JavaPropertyProgramDefault</emphasis></entry>
+
+              <entry>JavaProperty, Descriptor, Program</entry>
+
+              <entry>Descriptor</entry>
+
+              <entry>JavaProperty, Program, Descriptor</entry>
             </row>
           </tbody>
         </tgroup>
@@ -104,13 +126,12 @@
 
       <para>Variables can be set in more than one place. When the value is set
       on multiple places, then the definition specified in the priority column
-      will take precedence.</para>
+      will take precedence. In the priority column, items towards the left
+      have more priority.</para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="dbdoclet.id.VariableContract_html_variableTypesDesc"
-      xreflabel="Variable Types User                       Guide" />Variable
-      Types User Guide</title>
+    <sect2  id="dbdoclet.id.VariableContract_html_variableTypesDesc">
+      <title> Variable Types User Guide</title>
 
       <para>To help identify the user cases where the variable types might be
       useful, we have defined the concept of programmer and deployer. The
@@ -198,18 +219,47 @@
                 property.</para></entry>
 
                 <entry><para>When a variable will only be known at runtime
-                through the Java properties.</para></entry>
+                through the Java properties, and no default has to be provided
+                by the descriptor or the application.</para></entry>
+              </row>
+
+              <row>
+                <entry><emphasis
+                role="bold">javaPropertyDescriptorDefault</emphasis></entry>
+
+                <entry>Takes the value from the corresponding java property. A
+                default value can also be set from the descriptor or the
+                program. If no property is found, the descriptor default value
+                will override the program default value.</entry>
+
+                <entry>When the descriptor sets a default value, that can be
+                overrided at deployment using a java property.</entry>
+              </row>
+
+              <row>
+                <entry><emphasis
+                role="bold">javaPropertyProgramDefault</emphasis></entry>
+
+                <entry>Takes the value from the corresponding java property. A
+                defualt value can also be set from the program or the
+                descriptor. If no property is found, the program default value
+                will override the program default value</entry>
+
+                <entry>When the program sets a default value, than can be
+                overrided at deployment using a java property.</entry>
               </row>
             </tbody>
           </tgroup>
         </informaltable></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Variables Example</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Descriptor Variables</title>
+
+        <indexterm><primary>Descriptor Variables</primary></indexterm>
 
         <para>All variables must be set in a variable section at the beginning
         of the descriptor file in the following way:</para>
@@ -220,12 +270,16 @@
             role="bold">ProActive/dist/ProActive</emphasis>"/&gt;
          &lt;<emphasis role="bold">descriptorDefaultVariable</emphasis> name="<emphasis
             role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>" value="<emphasis
-            role="bold">4</emphasis>"/&gt;
+            role="bold">20</emphasis>"/&gt;
          &lt;<emphasis role="bold">programVariable</emphasis> name="<emphasis
-            role="bold">VIRTUAL_NODE_NAME</emphasis>" value=""/&gt;     
-         &lt;!-- Example Using java properties --&gt;
+            role="bold">VIRTUAL_NODE_NAME</emphasis>"/&gt;
          &lt;<emphasis role="bold">javaPropertyVariable</emphasis> name="<emphasis
-            role="bold">USER_HOME</emphasis>" value="<emphasis role="bold">java.home</emphasis>"/&gt;
+            role="bold">java.home</emphasis>"/&gt;
+         &lt;<emphasis role="bold">javaPropertyDescriptorDefault</emphasis> name="<emphasis
+            role="bold">host.name</emphasis>" value="<emphasis role="bold">localhost</emphasis>"/&gt; 
+         &lt;<emphasis role="bold">javaPropertyProgramDefault</emphasis> name="<emphasis
+            role="bold">priority.queue</emphasis>"/&gt; 
+
          &lt;!-- Include external variables from files--&gt;
          &lt;<emphasis role="bold">includeXMLFile</emphasis> location="<emphasis
             role="bold">file.xml</emphasis>"/&gt;
@@ -241,7 +295,7 @@
          ...</screen>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Program Variables</title>
 
         <screen>         XML_LOCATION="/home/user/descriptor.xml";
@@ -250,15 +304,20 @@
             role="bold">testnode</emphasis>", <emphasis role="bold">VariableContractType.ProgramVariable</emphasis>);
          variableContract.setVariableFromProgram( "<emphasis role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>", "<emphasis
             role="bold">10</emphasis>", <emphasis role="bold">VariableContractType.DescriptorDefaultVariable</emphasis>);
+         variableContract.setVariableFromProgram( "<emphasis role="bold">priority.queue</emphasis>", "<emphasis
+            role="bold">vip</emphasis>", <emphasis role="bold">VariableContractType.JavaPropertyProgramDefault</emphasis>);
          ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
-</screen>
+
+         //Usage example
+         VariableContract vc=pad.getVariableContract;
+         String proActiveHome=vc.getValue("PROACTIVE_HOME");</screen>
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>External Variable Definitions Files</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>XML Files</title>
 
         <para>Is built using XML property tags.</para>
@@ -277,7 +336,7 @@
 &lt;/variables&gt;                 </screen>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Properties Files</title>
 
         <para>This approach uses <ulink
@@ -300,17 +359,17 @@ NUM_NODES: 45                 </screen>
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Program Variable API</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Relevant import packages</title>
 
         <screen>import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;        </screen>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Available Variable Types</title>
 
         <itemizedlist>
@@ -338,10 +397,20 @@ import org.objectweb.proactive.core.xml.VariableContractType;        </screen>
             <para>VariableContractType.<emphasis
             role="bold">JavaPropertyVariable</emphasis></para>
           </listitem>
+
+          <listitem>
+            <para>VariableContractType.<emphasis
+            role="bold">JavaPropertyDescriptorDefault</emphasis></para>
+          </listitem>
+
+          <listitem>
+            <para>VariableContractType.<emphasis
+            role="bold">JavaPropertyProgramDefault</emphasis></para>
+          </listitem>
         </itemizedlist>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>API</title>
 
         <para>The API for setting variables from the Program is shown below.

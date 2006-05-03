@@ -50,8 +50,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
-import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
 import org.objectweb.proactive.p2p.service.node.P2PNode;
 import org.objectweb.proactive.p2p.service.node.P2PNodeAck;
@@ -94,8 +92,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 P2PConstants.PROPERTY_EXPLORING_MSG)) - 1;
     private static final long ACQ_TO = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
-    private static final boolean WITH_BALANCE = Boolean.getBoolean(P2PConstants.PROPERTY_LOAD_BAL);
-
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
      */
@@ -113,11 +109,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     private Vector waitingNodesLookup = new Vector();
     private Vector waitingMaximunNodesLookup = new Vector();
     private P2PService stubOnThis = null;
-
-    /**
-     * The load balancer reference
-     */
-    private P2PLoadBalancer p2pLoadBalancer;
 
     // For asking nodes
     private Service service = null;
@@ -280,8 +271,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     Node current = (Node) nodes.get(i);
                     if (vnName != null) {
                         try {
-                            current.getProActiveRuntime().registerVirtualNode(vnName,
-                                true);
+                            current.getProActiveRuntime()
+                                   .registerVirtualNode(vnName, true);
                         } catch (Exception e) {
                             logger.warn("Couldn't register " + vnName +
                                 " in the PAR", e);
@@ -386,29 +377,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         }
     }
 
-    /**
-     * <b>Method called on Load Balanced enviroments.</b>
-     * <p>Booking a free node.</p>
-     * @param ttl Time to live of the message, in number of hops.
-     * @param uuid UUID of the message.
-     * @param remoteService The original sender.
-     * @param numberOfNodes Number of asked nodes.
-     * @param lookup The P2P nodes lookup.
-     * @param vnName Virtual node name.
-     * @param jobId
-     * @param underloadedOnly determines if it replies with normal "askingNode" method or discard the call
-     */
-    public void askingNode(int ttl, UniversalUniqueID uuid,
-        P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
-        String vnName, String jobId, boolean underloadedOnly) {
-        if (!underloadedOnly || !amIUnderloaded(0)) {
-            return;
-        }
-
-        this.askingNode(ttl, uuid, remoteService, numberOfNodes, lookup,
-            vnName, jobId, null);
-    }
-
     /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
      * @param numberOfNodes the number of asked nodes.
      * @param nodeFamilyRegexp the regexp for the famili, null or empty String for all.
@@ -464,7 +432,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @return the number of asked nodes.
      */
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
-        return this.getNodes(numberOfNodes, null, vnName, jobId);
+        return this.getNodes(numberOfNodes, ".*", vnName, jobId);
     }
 
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName,
@@ -524,8 +492,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     public Node getANode(String vnName, String jobId, P2PService service) {
         if (service.equals(this.stubOnThis)) {
-            return this.acquaintanceManager.randomPeer().getANode(vnName,
-                jobId, service);
+            return this.acquaintanceManager.randomPeer()
+                                           .getANode(vnName, jobId, service);
         }
         P2PNode askedNode = this.nodeManager.askingNode(null);
         Node nodeAvailable = askedNode.getNode();
@@ -533,8 +501,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (nodeAvailable != null) {
             if (vnName != null) {
                 try {
-                    nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName,
-                        true);
+                    nodeAvailable.getProActiveRuntime()
+                                 .registerVirtualNode(vnName, true);
                 } catch (Exception e) {
                     logger.warn("Couldn't register " + vnName + " in the PAR", e);
                 }
@@ -544,8 +512,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             }
             return nodeAvailable;
         }
-        return this.acquaintanceManager.randomPeer().getANode(vnName, jobId,
-            service);
+        return this.acquaintanceManager.randomPeer()
+                                       .getANode(vnName, jobId, service);
     }
 
     /**
@@ -579,10 +547,10 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     }
 
     /**
-     * @return a reference to the local acquaintance manager.
+     * @return the list of current acquaintances.
      */
-    public P2PAcquaintanceManager getP2PAcquaintanceManager() {
-        return this.acquaintanceManager;
+    public Vector getAcquaintanceList() {
+        return this.acquaintanceManager.getAcquaintanceList();
     }
 
     // -------------------------------------------------------------------------
@@ -719,10 +687,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
         this.stubOnThis = (P2PService) ProActive.getStubOnThis();
 
-        if (WITH_BALANCE) {
-            this.p2pLoadBalancer = new P2PLoadBalancer(this.stubOnThis);
-        }
-
         Object[] params = new Object[1];
         params[0] = this.stubOnThis;
         try {
@@ -744,87 +708,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         } catch (NodeException e) {
             logger.fatal("Couldn't create one the managers", e);
         }
-
         logger.debug("Exiting initActivity");
     }
 
-    /*
-     * LOAD BALANCING METHODS
-     */
-
-    /**
-     * @return Answer to remote machines if I'm underloaded.
-     */
-    public boolean amIUnderloaded() {
-        return p2pLoadBalancer.AreYouUnderloaded();
-    }
-
-    /**
-     * Ask to the Load Balancer object if the state is underloaded
-     * @param ranking
-     * @return <code>true</code> if the state is underloaded, <code>false</code> else.
-     */
-    public boolean amIUnderloaded(double ranking) {
-        if (ranking >= 0) {
-            return p2pLoadBalancer.AreYouUnderloaded(ranking);
-        }
-        return p2pLoadBalancer.AreYouUnderloaded();
-    }
-
-    /**
-     * This method is remotely called by an overloaded peer, looking for a balance.
-     * @param sender the reference of the overloaded machine
-     * @param ranking the ranking of the caller
-     */
-    public void balanceWithMe(P2PService sender, double ranking) {
-        // If I'm not underloaded, I will not reply
-        if (!amIUnderloaded(ranking)) {
-            return;
-        }
-
-        P2PNode myNode = nodeManager.askingNode(true);
-
-        // If I don't have an available node, I will not reply
-        if (myNode.getNode() != null) {
-            sender.P2PloadBalance(myNode.getNode());
-        }
-    }
-
-    /**
-     * This method is remotely called by an underloaded peer, looking for a balance.
-     * @param ranking the ranking of the caller
-     * @param remoteNodeAddress the reference to the remote machine
-     */
-    public void ImStealingYou(double ranking, String remoteNodeAddress) {
-        this.p2pLoadBalancer.ImStealingYou(ranking, remoteNodeAddress);
-    }
-
-    /**
-     * This method is remotely called by an underloaded peer to start the load balancing.
-     * @param destNode is the new place for the active objects
-     */
-    public void P2PloadBalance(Node destNode) {
-        this.p2pLoadBalancer.sendActiveObjectsTo(destNode);
-    }
-
-    /**
-     * This method is called by the LoadBalancer object in order to send the
-     * balance request to its neighbors
-     * @param ranking the ranking of the caller
-     */
-    public void tellToMyNeighborsThatIWantToShareActiveObjects(double ranking) {
-        this.acquaintanceManager.chooseNneighborsAndSendTheBalanceRequest(LoadBalancingConstants.SUBSET_SIZE,
-            this.stubOnThis, ranking);
-    }
-
-    /**
-     * This method is called by the LoadBalancer object in order to start
-     * the work stealing
-     * @param ranking the ranking of the caller
-     * @param myNodeAddress addres of the local node
-     */
-    public void startStealingNeighbors(double ranking, String myNodeAddress) {
-        this.acquaintanceManager.chooseNneighborsAndStealTheirWork(LoadBalancingConstants.NEIGHBORS_TO_STEAL,
-            ranking, myNodeAddress);
-    }
 }

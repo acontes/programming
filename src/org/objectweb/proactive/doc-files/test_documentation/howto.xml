@@ -51,8 +51,8 @@ public class TestGroupCreation extends ProActiveFunctionalTest
         return getNode() != null;
     }</literal>
 </screen>
-        <para>Now we will implement the action method to create a ProActive Group with 3 Agent (see the
- Agent code at <link linkend="agent">the end of this document</link>):</para>
+        <para>Now we will implement the action method to create a ProActive Group with 3 Agent 
+         (see the Agent code at the end of this chapter - <xref linkend="agent"/>):</para>
 <screen>
 <literal>
 import org.objectweb.proactive.core.group.Group;
@@ -452,7 +452,7 @@ public class TestGroupCreation extends ProActiveFunctionalTest
           <colspec colname="c1" colwidth="100*"/>
           <tbody>
             <row>
-              <entry align="center" valign="middle"><para><emphasis role="bold"><anchor id="howto_html_agent"/>Agent.java</emphasis></para></entry>
+              <entry align="center" valign="middle"><para><emphasis role="bold">Agent.java</emphasis></para></entry>
             </row>
             <row>
               <entry><para>

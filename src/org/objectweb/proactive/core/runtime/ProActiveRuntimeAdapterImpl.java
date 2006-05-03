@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueRuntimeID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -102,9 +103,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     }
 
     protected Object readResolve() throws ObjectStreamException {
-        String prop = System.getProperty("proactive.hierarchicalRuntime");
-
-        if ((prop != null) && prop.equals("true")) {
+        if (ProActiveConfiguration.isForwarder()) {
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
             if (!partf.registeredRuntimes.containsKey(urid)) {
@@ -431,7 +430,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
      */
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ConstructorCallExecutionFailedException, 
+        throws ConstructorCallExecutionFailedException,
             InvocationTargetException, ProActiveException {
         try {
             return proActiveRuntime.createBody(nodeName, bodyConstructorCall,
@@ -575,7 +574,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException {
         try {
             return proActiveRuntime.publicKeyExchange(sessionID, myPublicKey,
@@ -643,8 +642,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     }
 
     public void launchMain(String className, String[] parameters)
-        throws ClassNotFoundException, NoSuchMethodException, 
-            ProActiveException {
+        throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
         try {
             proActiveRuntime.launchMain(className, parameters);
         } catch (IOException e) {
@@ -664,5 +662,24 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     public ProActiveDescriptor getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException {
         return proActiveRuntime.getDescriptor(url, isHierarchicalSearch);
+    }
+
+    public Object setLocalNodeProperty(String nodeName, String key, String value)
+        throws ProActiveException {
+        try {
+            return this.proActiveRuntime.setLocalNodeProperty(nodeName, key,
+                value);
+        } catch (IOException e) {
+            throw new ProActiveException(e);
+        }
+    }
+
+    public String getLocalNodeProperty(String nodeName, String key)
+        throws ProActiveException {
+        try {
+            return this.proActiveRuntime.getLocalNodeProperty(nodeName, key);
+        } catch (IOException e) {
+            throw new ProActiveException(e);
+        }
     }
 }

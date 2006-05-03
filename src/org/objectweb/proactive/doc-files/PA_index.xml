@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY contributors SYSTEM "contributors.xml">
 <!ENTITY Principles SYSTEM "Principles.xml">
 <!ENTITY Installation SYSTEM "Installation.xml">
 <!ENTITY ProActiveBasis SYSTEM "ProActiveBasis.xml">
@@ -36,25 +37,27 @@
 <!ENTITY OOSPMDJacobiexample SYSTEM "guided_tour/OOSPMDJacobiexample.xml">
 <!ENTITY nbody SYSTEM "guided_tour/nbody.xml">
 <!ENTITY conclusion SYSTEM "guided_tour/conclusion.xml">
+<!ENTITY writeDoc SYSTEM "writeProActiveDocumentation.xml">
 <!ENTITY DescriptorProcess SYSTEM "development/DescriptorProcess.xml">
 <!ENTITY devFileTransfer SYSTEM "development/AddingAFileTransferProtocol.xml">
 <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
+<!ENTITY FAQ SYSTEM "FAQ.xml">
 <!ENTITY biblio SYSTEM "biblio.xml">
+<!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
+
 ]>
 <book>
   <bookinfo>
     <title>ProActive v3.0.1 Documentation</title>
 
-    <subtitle>A comprehensive solution for Grid Computing</subtitle>
+    <subtitle>A Comprehensive Solution for Grid Computing</subtitle>
 
     <author>
       <surname>OASIS Research Team</surname>
     </author>
 
-    <corpauthor></corpauthor>
-
-    <!--   <releaseinfo role="svn">$Id$ </releaseinfo> -->
+    <corpauthor/>
 
     <copyright>
       <year>2001-2006</year>
@@ -64,7 +67,7 @@
     <legalnotice id="LegalNotice">
       <para>ProActive is a GRID Java middleware, with source code under <ulink
       url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>.
-      Copyright INRIA 2001-2006.</para>
+      </para><para>Copyright INRIA 2001-2006.</para>
     </legalnotice>
 
     <mediaobject>
@@ -74,11 +77,13 @@
     </mediaobject>
 
     
-      <revision>
+    <revhistory>  
+    <revision>
         <revnumber>3.01</revnumber>
         <date>2005-12-16</date>
       </revision>
-
+    </revhistory>
+    
     <abstract>
       <para><emphasis role="bold">ProActive</emphasis> is a <emphasis
       role="bold">GRID</emphasis> Java library for <emphasis
@@ -87,16 +92,16 @@
       role="bold">concurrent</emphasis> computing, also featuring <emphasis
       role="bold">mobility</emphasis> and <emphasis
       role="bold">security</emphasis> in a uniform framework. With a reduced
-      set of simple primitives, <emphasis role="bold">ProActive</emphasis>
+      set of simple primitives, ProActive 
       provides a comprehensive API allowing to simplify the programming of
       applications that are distributed on <emphasis role="bold">Local Area
       Network</emphasis> (LAN), on <emphasis role="bold">cluster of
       workstations</emphasis>, on <emphasis role="bold">P2P desktop
       Grids</emphasis>, or on I<emphasis role="bold">nternet Grids</emphasis>.
       The library is based on an Active Object pattern that is a uniform way
-      to encapsulate:</para>
-
-      <para><itemizedlist>
+      to encapsulate:
+      
+      <itemizedlist>
           <listitem>
             <para>a <emphasis role="bold">remotely accessible
             object</emphasis>,</para>
@@ -121,12 +126,12 @@
             <para>a <emphasis role="bold">mobile</emphasis> and potentially
             secure entity.</para>
           </listitem>
-        </itemizedlist></para>
-
-      <para>On top of those basic features, ProActive also includes <emphasis
-      role="bold">advanced</emphasis> aspects, such as:</para>
-
-      <para><itemizedlist>
+        </itemizedlist>
+       </para><para>
+     On top of those basic features, ProActive also includes <emphasis
+      role="bold">advanced</emphasis> aspects, such as:
+       
+       <itemizedlist>
           <listitem>
             <para>Typed <emphasis role="bold">Group</emphasis>
             Communications</para>
@@ -168,17 +173,16 @@
             <para><emphasis role="bold">File transfer</emphasis> capabilities
             over the <emphasis role="bold">Grid</emphasis></para>
           </listitem>
-        </itemizedlist></para>
-
-      <para><emphasis role="bold">ProActive</emphasis> is only made of
+        </itemizedlist>
+       </para><para>
+      <emphasis role="bold">ProActive</emphasis> is only made of
       standard Java classes, and requires <emphasis role="bold">no changes to
       the Java Virtual Machine</emphasis>, no preprocessing or compiler
       modification; programmers write standard Java code. Based on a simple
       Meta-Object Protocol, the library is itself extensible, making the
-      system open for adaptations and optimizations. <emphasis
-      role="bold">ProActive</emphasis> currently uses the <emphasis
-      role="bold">RMI</emphasis> Java standard library as default portable
-      transport layer.</para>
+      system open for adaptations and optimizations. ProActive
+      currently uses the <emphasis role="bold">RMI</emphasis> Java standard 
+      library as default portable transport layer.</para>
 
       <para><emphasis role="bold">ProActive</emphasis> features several
       optimizations improving performance. For instance, whenever two active
@@ -187,13 +191,13 @@
       stack. This optimization is ensured even when the co-location occurs
       after a migration of one or both of the active objects.</para>
 
-      <para><emphasis role="bold">ProActive</emphasis> and the (de facto)
+       <para><emphasis role="bold">ProActive</emphasis> and the (de facto)
       <emphasis role="bold">Standards</emphasis>: ProActive has an
       architecture that allows the library to <emphasis
       role="bold">interoperate</emphasis> with various official or de facto
-      <emphasis role="bold">standards</emphasis>:</para>
-
-      <para><itemizedlist>
+      standards:
+      
+      <itemizedlist>
           <listitem>
             <para>Web Service Exportation</para>
           </listitem>
@@ -214,22 +218,29 @@
           <listitem>
             <para>LSF, PBS, Sun Grid Engine, OAR</para>
           </listitem>
-        </itemizedlist></para>
-
-      <para>Please send us comments, suggestions, bug reports at <ulink
-      url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink>
-      Your input will be greatly appreciated.</para>
+        </itemizedlist>
+       </para>
     </abstract>
   </bookinfo>
 
-  <!-- HERE SHOULD BE INCLUDED THE PREFACE!  -->
+   &contributors;
 
   <part id="ProActiveIntroduction">
     <title>Introduction</title>
     &Principles;
-    &Installation;
+    &Installation; 
   </part>
-
+   
+ <part id="ProActiveGuidedTour">
+   <title>Guided Tour</title>
+   &guidedindex;
+   &capabilities-intro;
+   &hands_on_programming;
+   &OOSPMDJacobiexample;
+   &nbody;
+   &conclusion;
+  </part>
+  
   <part id="ProActiveProgramming">
     <title>Programming</title>
     &ProActiveBasis;
@@ -270,25 +281,16 @@
     &OSGi;
     &mpi;
    </part>
-   
+
    <part id="ProActiveTools">
     <title>User Interface and tools</title>
     &IC2D;
     &plugin;
    </part>
-   
-   <part id="ProActiveGuidedTour">
-    <title>Guided Tour</title>
-    &guidedindex;
-    &capabilities-intro;
-    &hands_on_programming;
-    &OOSPMDJacobiexample;
-    &nbody;
-    &conclusion;
-   </part>
-   
+
    <part id="ProActiveExtensions">
     <title>Extending ProActive</title>
+    &writeDoc;
     &DescriptorProcess;
     &devFileTransfer;
     &devFaultTolerance;
@@ -297,9 +299,10 @@
    
    <part id="backMattersPart">
     <title>Back matters</title>
-    <!--   Should be called appendix, anyway  -->
+    &FAQ;   
+    &referenceCard;
     &biblio;
-    <!--      &FAQ;  -->
-    <!--    XXX &WordIndex;  -->
-  </part>
-</book>
+    <index/>
+   </part> 
+
+ </book>

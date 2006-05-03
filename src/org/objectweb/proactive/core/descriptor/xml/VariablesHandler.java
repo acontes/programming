@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.xml.sax.InputSource;
 
@@ -56,10 +57,18 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         this.addHandler(VARIABLES_JAVAPROPERTY_TAG, new VariableHandler(VARIABLES_JAVAPROPERTY_TAG));
         this.addHandler(VARIABLES_PROGRAM_DEFAULT_TAG, new VariableHandler(VARIABLES_PROGRAM_DEFAULT_TAG));
         this.addHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG, new VariableHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG, new VariableHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG, new VariableHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
         
         this.addHandler(VARIABLES_INCLUDE_XML_FILE_TAG, new IncludeXMLFileHandler());
         this.addHandler(VARIABLES_INCLUDE_PROPERTY_FILE_TAG, new IncludePropertiesFileHandler());
-        
+    }
+    
+    protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    	
+    	//Once the variables have been defined, we load pending values from the javaproperties
+    	variableContract.setJavaPropertiesValues();
     }
 
     /**
@@ -113,11 +122,11 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
             String name = attributes.getValue("name");
             if (!checkNonEmpty(name)) {
                 throw new org.xml.sax.SAXException(
-                    "Tag property have no name !");
+                    "Variable has no name");
             }
 
             String value = attributes.getValue("value");
-
+            if(value==null) value="";
             // Define and set variables into the contract
             variableContract.setDescriptorVariable(name, value,varType);
         }

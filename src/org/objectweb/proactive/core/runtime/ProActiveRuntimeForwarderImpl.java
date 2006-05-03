@@ -162,6 +162,12 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         return remoteBodyForwarder;
     }
 
+    public boolean isRoot() {
+        String val = System.getProperty("proactive.hierarchicalRuntime");
+
+        return ((val != null) && val.equals("root"));
+    }
+
     //
     // --- OVERIDING SOME METHODS
     //
@@ -187,8 +193,13 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 parentRuntime.register(adapter, proActiveRuntimeName,
                     creatorID, creationProtocol, vmName);
             } else {
-                logger.warn(
-                    "setParent() as not yet be called. Cannot forward the registration");
+                if (isRoot()) {
+                    super.register(proActiveRuntimeDist, proActiveRuntimeName,
+                        creatorID, creationProtocol, vmName);
+                } else {
+                    logger.warn(
+                        "setParent() as not yet be called. Cannot forward the registration");
+                }
             }
         } catch (ProActiveException e) {
             e.printStackTrace();
@@ -203,16 +214,21 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
-        String padURL) {
-
-        /* Used only in multi-heriarchical deployment. */
-        HierarchicalProcess hp = (HierarchicalProcess) hierarchicalProcesses.get(buildKey(
-                    padURL, vmName));
-
-        if (hp != null) {
-            return hp.getHierarchicalProcess();
+        String padURL) throws ProActiveException {
+        if (this.isRoot()) {
+            return super.getProcessToDeploy(proActiveRuntimeDist, creatorID,
+                vmName, padURL);
         } else {
-            return null;
+
+            /* Used only in multi-heriarchical deployment. */
+            HierarchicalProcess hp = (HierarchicalProcess) hierarchicalProcesses.get(buildKey(
+                        padURL, vmName));
+
+            if (hp != null) {
+                return hp.getHierarchicalProcess();
+            } else {
+                return null;
+            }
         }
     }
 
@@ -232,7 +248,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     public UniversalBody createBody(UniqueRuntimeID urid, String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ProActiveException, ConstructorCallExecutionFailedException, 
+        throws ProActiveException, ConstructorCallExecutionFailedException,
             InvocationTargetException {
         if (urid == null) {
             return this.createBody(nodeName, bodyConstructorCall, isNodeLocal);
@@ -844,7 +860,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     public byte[][] publicKeyExchange(UniqueRuntimeID urid, long sessionID,
         byte[] myPublicKey, byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         if (urid == null) {
             return this.publicKeyExchange(sessionID, myPublicKey,
@@ -866,7 +882,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     public byte[] randomValue(UniqueRuntimeID urid, long sessionID,
         byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         if (urid == null) {
             return this.randomValue(sessionID, clientRandomValue);
@@ -888,7 +904,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         byte[] encodedAESKey, byte[] encodedIVParameters,
         byte[] encodedClientMacKey, byte[] encodedLockData,
         byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         if (urid == null) {
             return this.secretKeyExchange(sessionID, encodedAESKey,
@@ -911,7 +927,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     }
 
     public long startNewSession(UniqueRuntimeID urid, Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         if (urid == null) {
             return this.startNewSession(policy);
@@ -982,8 +998,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     public void launchMain(UniqueRuntimeID urid, String className,
         String[] parameters)
-        throws ClassNotFoundException, NoSuchMethodException, 
-            ProActiveException {
+        throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
         if (urid == null) {
             this.launchMain(className, parameters);
         } else {
@@ -1012,5 +1027,40 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                     ")");
             }
         }
+    }
+
+    public Object setLocalNodeProperty(UniqueRuntimeID runtimeID,
+        String nodeName, String key, String value)
+        throws ProActiveException, IOException {
+        if (runtimeID == null) {
+            return this.setLocalNodeProperty(nodeName, key, value);
+        } else {
+            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(runtimeID);
+
+            if (part != null) {
+                return part.setLocalNodeProperty(nodeName, key, value);
+            } else {
+                logger.warn("No runtime associated to this urid (" + runtimeID +
+                    ")");
+            }
+        }
+        return null;
+    }
+
+    public String getLocalNodeProperty(UniqueRuntimeID runtimeID,
+        String nodeName, String key) throws ProActiveException, IOException {
+        if (runtimeID == null) {
+            return this.getLocalNodeProperty(nodeName, key);
+        } else {
+            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(runtimeID);
+
+            if (part != null) {
+                return part.getLocalNodeProperty(nodeName, key);
+            } else {
+                logger.warn("No runtime associated to this urid (" + runtimeID +
+                    ")");
+            }
+        }
+        return null;
     }
 }

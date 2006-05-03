@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../descriptors/DescriptorSchema.xsd">
 	<variables>
-		<javaPropertyVariable name="user_name" value="user.name" />
+		<javaPropertyVariable name="user.name" />
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -27,7 +27,11 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+      					<absolutePath value="${user.name}/plop" />
+      				</classpath>
+      			</jvmProcess>	
 			</processDefinition>	
 		</processes>
 	</infrastructure>
