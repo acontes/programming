@@ -8,6 +8,9 @@ import java.util.Map;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -26,16 +29,15 @@ public class MulticastInterfacesControllerHelper {
 
     public MulticastInterfacesControllerHelper(Component owner) {
         this.owner = owner;
-        List interfaces = Arrays.asList(owner.getFcInterfaces());
-        Iterator it = interfaces.iterator();
-        while (it.hasNext()) {
-            ProActiveInterface itf = (ProActiveInterface)it.next();
-            ProActiveInterfaceType itfType = ((ProActiveInterfaceType) itf
-                                              .getFcItfType());
-
-            if (itfType.isFcMulticastItf()) {
-                addClientSideProxy(itfType.getFcItfName(),
-                                   (ProActiveInterface) itf);
+        InterfaceType[] itfTypes = ((ComponentType)owner.getFcType()).getFcInterfaceTypes();
+        for (int i = 0; i < itfTypes.length; i++) {
+			ProActiveInterfaceType type = (ProActiveInterfaceType)itfTypes[i];
+			if (type.isFcMulticastItf()) {
+                try {
+					addClientSideProxy(type.getFcItfName(),(ProActiveInterface) owner.getFcInterface(type.getFcItfName()));
+				} catch (NoSuchInterfaceException e) {
+					throw new ProActiveRuntimeException(e);
+				}
             }
         }
     }

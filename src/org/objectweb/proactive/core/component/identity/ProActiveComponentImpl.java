@@ -33,6 +33,9 @@ package org.objectweb.proactive.core.component.identity;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +61,11 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.controller.AbstractRequestHandler;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
 import org.objectweb.proactive.core.component.controller.RequestHandler;
+import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
@@ -67,6 +73,7 @@ import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -79,12 +86,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author Matthieu Morel
  */
-public class ProActiveComponentImpl implements ProActiveComponent, Interface,
+public class ProActiveComponentImpl extends AbstractRequestHandler implements ProActiveComponent, Interface,
     Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     // private ComponentParameters componentParameters;
-    private Interface[] interfaceReferences;
+//    private Interface[] interfaceReferences;
+    private Map<String, Interface> functionalItfs = new HashMap<String, Interface>();
+    private Map<String, Interface> controlItfs = new HashMap<String, Interface>();
+    private Map<String, Interface> collectionItfsMembers = new HashMap<String, Interface>();
     private Body body;
     private RequestHandler firstControllerRequestHandler;
 
@@ -118,14 +128,13 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         interface_references_list.add(this);
 
         // 2. control interfaces
-        addControllers(interface_references_list, componentParameters,
+        addControllers(componentParameters,
             component_is_primitive);
 
         // 3. external functional interfaces
-        addFunctionalInterfaces(componentParameters, component_is_primitive,
-            interface_references_list);
+        addFunctionalInterfaces(componentParameters, component_is_primitive);
         // put all in a table
-        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
+//        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
 
         if (logger.isDebugEnabled()) {
             logger.debug("created component : " +
@@ -141,8 +150,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      */
     private void addFunctionalInterfaces(
         ComponentParameters componentParameters,
-        boolean component_is_primitive,
-        ArrayList<Interface> interface_references_list) {
+        boolean component_is_primitive) {
         // ProActiveInterfaceType[] interface_types =
         // (ProActiveInterfaceType[])componentParameters.getComponentType()
         // .getFcInterfaceTypes();
@@ -155,11 +163,14 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
             for (int i = 0; i < interface_types.length; i++) {
                 ProActiveInterface itf_ref = null;
 
+                if (interface_types[i].isFcCollectionItf() ) {
+                	// members of collection itfs are created dynamically
+                	continue;
+                }
                 if (interface_types[i].isFcMulticastItf()) {
                     itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
                     //                    itf_ref = ProActiveComponentGroup.newComponentInterfaceGroup(interface_types[i],
                     //                            getFcItfOwner());
-                    interface_references_list.add(itf_ref);
                 } else {
                     // no interface generated for client itfs of primitive
                     // components
@@ -167,15 +178,17 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                             component_is_primitive)) {
                         // TODO_M multicast
 
-                        // if we have a COLLECTION CLIENT interface, we should see
-                        // the delegatee ("impl" field) as a group
-                        if (interface_types[i].isFcClientItf() &&
-                                interface_types[i].isFcCollectionItf()) {
-                            itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
-                        } // if we have a server port of a PARALLEL component, we
+//                        // if we have a COLLECTION CLIENT interface, we should see
+//                        // the delegatee ("impl" field) as a group
+//                        if (interface_types[i].isFcClientItf() &&
+//                                interface_types[i].isFcCollectionItf()) {
+//                            itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
+//                        }
+                        
+                        // if we have a server port of a PARALLEL component, we
 
                         // also create a group proxy on the delegatee field
-                        else if (componentParameters.getHierarchicalType()
+                         if (componentParameters.getHierarchicalType()
                                                         .equals(Constants.PARALLEL) &&
                                 (!interface_types[i].isFcClientItf())) {
                             // parallel component have a collective port on their
@@ -185,7 +198,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                             itf_ref = MetaObjectInterfaceClassGenerator.instance()
                                                                        .generateFunctionalInterface(interface_types[i].getFcItfName(),
                                     this, interface_types[i]);
-                            // functional interfaces are external interfaces (at
+                            // server functional interfaces are external interfaces (at
                             // least they are tagged as external)
                         }
 
@@ -201,12 +214,16 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                                 }
                             }
                         } else { // we have a composite component
+                        	itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
+                        	
                         }
-                        interface_references_list.add(itf_ref);
                     }
 
                     // non multicast client itf of primitive comp : do nothing
                 }
+                
+                functionalItfs.put(interface_types[i].getFcItfName(), itf_ref);
+                
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -219,9 +236,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         }
     }
 
-    private void addControllers(
-        ArrayList<Interface> interface_references_list,
-        ComponentParameters componentParameters, boolean isPrimitive) {
+    private void addControllers(ComponentParameters componentParameters, boolean isPrimitive) {
         ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadControllerConfiguration(componentParameters.getControllerDescription()
                                                                                                                                      .getControllersConfigFileLocation());
         Map controllers = componentConfiguration.getControllers();
@@ -318,8 +333,11 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
             }
 
             lastController = currentController;
-            interface_references_list.add(currentController);
+            controlItfs.put(currentController.getFcItfName(), currentController);
         }
+
+        // add the "component" control itfs
+        lastController.setNextHandler(this);
     }
 
     /**
@@ -370,18 +388,39 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        if (interfaceReferences != null) {
-            for (int i = 0; i < interfaceReferences.length; i++) {
-                try {
-                    if (interfaceName.equals(
-                                interfaceReferences[i].getFcItfName())) {
-                        return interfaceReferences[i];
-                    }
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    	
+    	if (interfaceName.endsWith("-controller") || interfaceName.equals("component")) {
+    		if (!controlItfs.containsKey(interfaceName)) throw new NoSuchInterfaceException(interfaceName);
+    		return (controlItfs.get(interfaceName));
+    	}
+    	if (functionalItfs.containsKey(interfaceName)) {
+    		return functionalItfs.get(interfaceName);
+    	}
+    	
+    	// a member of a collection itf?
+    	InterfaceType[] itfTypes = ((ComponentType)getFcType()).getFcInterfaceTypes();
+    	for (int i = 0; i < itfTypes.length; i++) {
+			InterfaceType type = itfTypes[i];
+			if (type.isFcCollectionItf()) {
+				if ((interfaceName.startsWith(type.getFcItfName()) && !type.getFcItfName().equals(interfaceName))) {
+					if (collectionItfsMembers.containsKey(interfaceName)) {
+						return collectionItfsMembers.get(interfaceName);
+					} else {
+//					 generate a new interface and add it to the list of members of collection its
+	        		try {
+						Interface clientItf = MetaObjectInterfaceClassGenerator.instance()
+						.generateFunctionalInterface(interfaceName,
+								this, (ProActiveInterfaceType)itfTypes[i]);
+						collectionItfsMembers.put(interfaceName, clientItf);
+						return clientItf;
+					} catch (InterfaceGenerationFailedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					}
+				}
+			}
+    	}
 
         throw new NoSuchInterfaceException(interfaceName);
     }
@@ -390,16 +429,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        ArrayList<Interface> external_interfaces = new ArrayList<Interface>(interfaceReferences.length);
-
-        for (int i = 0; i < interfaceReferences.length; i++) {
-            if (!interfaceReferences[i].isFcInternalItf()) {
-                external_interfaces.add(interfaceReferences[i]);
-            }
-        }
-
-        external_interfaces.trimToSize();
-        return external_interfaces.toArray();
+        return functionalItfs.values().toArray();
     }
 
     /*

@@ -16,14 +16,30 @@ public class Utils {
     // collection interface
     // returns the name of the collection interface otherwise
     public static String pertainsToACollectionInterface(String clientItfName, Component owner) {
-        Iterator it = Arrays.asList(owner.getFcInterfaces()).iterator();
-        while (it.hasNext()) {
-            Interface itf = (Interface)it.next();
-            ProActiveInterfaceType itfType = ((ProActiveInterfaceType)itf.getFcItfType()); 
-            if (itfType.isFcCollectionItf()) {
-                if (clientItfName.startsWith(itf.getFcItfName())) {
-                    return itf.getFcItfName();
+    	
+    	
+        InterfaceType[] itfTypes = (((ComponentType)owner.getFcType()).getFcInterfaceTypes());
+        for (int i = 0; i < itfTypes.length; i++) {
+            if (itfTypes[i].isFcCollectionItf()) {
+                if (clientItfName.startsWith(itfTypes[i].getFcItfName())) {
+                    return itfTypes[i].getFcItfName();
                 }
+            }
+        }
+        return null;
+    }
+    
+    public static InterfaceType getItfType(String itfName, Component owner) {
+    	InterfaceType[] itfTypes = (((ComponentType)owner.getFcType()).getFcInterfaceTypes());
+        for (int i = 0; i < itfTypes.length; i++) {
+            if (itfTypes[i].isFcCollectionItf()) {
+                if (itfName.startsWith(itfTypes[i].getFcItfName()) && !itfName.equals(itfTypes[i].getFcItfName())) {
+                    return itfTypes[i];
+                }
+            } else {
+            	if (itfName.equals(itfTypes[i].getFcItfName())) {
+            		return itfTypes[i];
+            	}
             }
         }
         return null;

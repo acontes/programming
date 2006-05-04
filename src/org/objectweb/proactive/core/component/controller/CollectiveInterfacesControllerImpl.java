@@ -15,6 +15,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
@@ -55,12 +56,17 @@ public class CollectiveInterfacesControllerImpl extends AbstractProActiveControl
         // this can only be done once the component is fully instantiated with all its interfaces created
         if (multicastController == null) {
             multicastController = new MulticastInterfacesControllerHelper(owner);
-            List<Object> interfaces = Arrays.asList(owner.getFcInterfaces());
-            Iterator<Object> it = interfaces.iterator();
-
-            while (it.hasNext()) {
-                addManagedInterface((ProActiveInterface) it.next());
-            }
+            InterfaceType[] itfTypes = ((ComponentType)owner.getFcType()).getFcInterfaceTypes();
+            for (int i = 0; i < itfTypes.length; i++) {
+				ProActiveInterfaceType itfType = (ProActiveInterfaceType)itfTypes[i];
+				if (itfType.isFcGatherCastItf() || itfType.isFcMulticastItf()) {
+					try {
+						addManagedInterface((ProActiveInterface) owner.getFcInterface(itfType.getFcItfName()));
+					} catch (NoSuchInterfaceException e) {
+						throw new ProActiveRuntimeException(e);
+					}
+			}
+        }
         }
     }
 

@@ -384,10 +384,10 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             }
 
             body += (
-                "myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall("
-                + "(java.lang.reflect.Method)overridenMethods[" + i + "]"
-                + ", parameters, interfaceName))"
-            );
+                    "myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall("
+                    + "(java.lang.reflect.Method)overridenMethods[" + i + "]"
+                    + ", parameters, getFcItfName()))"
+                );
 
             if (postWrap != null) {
                 body += postWrap;

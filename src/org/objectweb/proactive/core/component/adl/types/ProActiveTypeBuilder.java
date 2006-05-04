@@ -22,8 +22,9 @@ public class ProActiveTypeBuilder extends FractalTypeBuilder {
     boolean client = "client".equals(role);
     boolean optional = "optional".equals(contingency);
 
+    String checkedCardinality = (cardinality==null)?ProActiveTypeFactory.SINGLE_CARDINALITY:cardinality;
         // TODO_M should use bootstrap type factory with extended createFcItfType method
 
-        return ProActiveTypeFactoryImpl.instance().createFcItfType(name, signature, client, optional, cardinality);
+        return ProActiveTypeFactoryImpl.instance().createFcItfType(name, signature, client, optional, checkedCardinality);
     }
 }

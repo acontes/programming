@@ -208,11 +208,11 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      * @return ProActiveInterface the resulting collective client interface
      * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
      */
-    public static ProActiveInterface createCollectiveClientInterface(
-        String itfName, String itfSignature) throws ProActiveRuntimeException {
-        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
-            null);
-    }
+//    public static ProActiveInterface createCollectiveClientInterface(
+//        String itfName, String itfSignature) throws ProActiveRuntimeException {
+//        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
+//            null);
+//    }
     
     /**
      * Returns a generated interface reference, whose impl field is a group It

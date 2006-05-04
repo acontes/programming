@@ -40,6 +40,7 @@ import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
@@ -47,6 +48,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -99,26 +101,46 @@ public class ProActiveLifeCycleControllerImpl
     public void startFc() {
         try {
             //check that all mandatory client interfaces are bound
-            Object[] itfs = getFcItfOwner().getFcInterfaces();
+//            Object[] itfs = getFcItfOwner().getFcInterfaces();
+        	InterfaceType[] itfTypes = ((ComponentType)getFcItfOwner().getFcType()).getFcInterfaceTypes();
             
-            for (int i = 0; i < itfs.length; i++) {
-                ProActiveInterfaceType itf_type = (ProActiveInterfaceType) (((Interface) itfs[i]).getFcItfType());
-                if (itf_type.isFcClientItf() && !itf_type.isFcOptionalItf()) {
-                    if (itf_type.isFcMulticastItf()) {
+            for (int i = 0; i < itfTypes.length; i++) {
+                if (itfTypes[i].isFcClientItf() && !itfTypes[i].isFcOptionalItf()) {
+                	if (itfTypes[i].isFcCollectionItf()) {
+                		// look for collection members
+                		Object[] itfs = owner.getFcInterfaces();
+                		for (int j = 0; j < itfs.length; j++) {
+                			Interface itf = (Interface)itfs[j];
+                			if (itf.getFcItfName().startsWith(itfTypes[i].getFcItfName())) {
+                				if (itf.getFcItfName().equals(itfTypes[i].getFcItfName())) {
+                					throw new IllegalLifeCycleException("invalid collection interface name at runtime (suffix required)");
+                				}
+                				if (Fractal.getBindingController(owner).lookupFc(itf.getFcItfName()) == null ) {
+                					throw new IllegalLifeCycleException(
+                                            "compulsory collection client interface " +
+                                            itfTypes[i].getFcItfName() + " in component " +
+                                            Fractal.getNameController(getFcItfOwner())
+                                                   .getFcName() + " is not bound. ");
+                				}
+                				
+                			}
+						}
+                	} else
+                    if (((ProActiveInterfaceType)itfTypes[i]).isFcMulticastItf()) {
                         ProxyForComponentInterfaceGroup clientSideProxy = Fractive.getCollectiveInterfacesController(getFcItfOwner())
-                                                                                  .lookupFcMulticast(itf_type.getFcItfName());
+                                                                                  .lookupFcMulticast(itfTypes[i].getFcItfName());
                         if (clientSideProxy.getDelegatee().isEmpty()) {
                             throw new IllegalLifeCycleException(
                                 "compulsory multicast client interface " +
-                                itf_type.getFcItfName() + " in component " +
+                                itfTypes[i].getFcItfName() + " in component " +
                                 Fractal.getNameController(getFcItfOwner())
                                        .getFcName() + " is not bound. ");
                         }
-                    } else if (Fractal.getBindingController(getFcItfOwner())
-                                          .lookupFc(itf_type.getFcItfName()) == null) {
+                    } else if (((ProActiveInterfaceType)itfTypes[i]).getFcCardinality().equals(ProActiveTypeFactory.SINGLE_CARDINALITY) && Fractal.getBindingController(getFcItfOwner())
+                                          .lookupFc(itfTypes[i].getFcItfName()) == null) {
                         throw new IllegalLifeCycleException(
                             "compulsory client interface " +
-                            itf_type.getFcItfName() + " in component " +
+                            itfTypes[i].getFcItfName() + " in component " +
                             Fractal.getNameController(getFcItfOwner())
                                    .getFcName() + " is not bound. ");
                     }
