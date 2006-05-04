@@ -21,7 +21,6 @@ public class PrimitiveComponentB implements I2 {
      * @see nonregressiontest.component.creation.I2#processOutputMessage(java.lang.String)
      */
     public Message processOutputMessage(Message message) {
-        //logger.info("transferring message :" + message.toString());
         return message.append(MESSAGE);
     }
 }

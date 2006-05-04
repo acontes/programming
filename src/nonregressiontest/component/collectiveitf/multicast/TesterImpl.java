@@ -190,8 +190,14 @@ public class TesterImpl implements Tester, BindingController,
 	public Object lookupFc(String clientItfName)
 			throws NoSuchInterfaceException {
 
-		// TODO Auto-generated method stub
-		return null;
+		if ("clientItf".equals(clientItfName)) {
+			return clientItf;
+		}
+		if ("multicastClientItf".equals(clientItfName)) {
+			return multicastClientItf;
+		}
+		throw new NoSuchInterfaceException(clientItfName);
+		
 	}
 
 	/*
