@@ -386,6 +386,13 @@ public class ProActiveComponentRepresentativeImpl
                 ComponentRequest.STRICT_FIFO_PRIORITY);
         return ((Integer) result).intValue();
     }
+    
+    public String toString() {
+    	Object result = reifyCall(Object.class.getName(), "toString",
+                new Class[] {  }, new Object[] {  },
+                ComponentRequest.STRICT_FIFO_PRIORITY);
+        return ((String) result).toString();
+    }
 
     /**
      * Only valid for a single element. return null for a group.

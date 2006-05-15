@@ -55,10 +55,12 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.ClassDataCache;
+
 
 /**
  * This class generates output interceptors for intercepting outgoing functional invocations.
- * 
+ *
  * @author Matthieu Morel
  *
  */
@@ -81,14 +83,15 @@ public class OutputInterceptorClassGenerator
         this.outputInterceptors = outputInterceptors;
         ProActiveInterface generated = generateInterface(representative.getFcItfName(),
                 representative.getFcItfOwner(),
-                (ProActiveInterfaceType) representative.getFcItfType(), false, true);
+                (ProActiveInterfaceType) representative.getFcItfType(), false,
+                true);
         ((StubObject) generated).setProxy(((StubObject) representative).getProxy());
         return generated;
     }
 
     public ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, ProActiveInterfaceType interfaceType, boolean isInternal,
-        boolean isFunctionalInterface)
+        Component owner, ProActiveInterfaceType interfaceType,
+        boolean isInternal, boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
             String representativeClassName = org.objectweb.proactive.core.component.gen.Utils.getOutputInterceptorClassName(interfaceName,
@@ -218,7 +221,8 @@ public class OutputInterceptorClassGenerator
                 //                System.out.println("[JAVASSIST] generated class : " +
                 //                    representativeClassName);
                 byte[] bytecode = generatedCtClass.toBytecode();
-                RepresentativeInterfaceClassGenerator.generatedClassesCache.put(representativeClassName,
+                ClassDataCache.instance()
+                              .addClassData(representativeClassName,
                     generatedCtClass.toBytecode());
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + representativeClassName +
@@ -226,11 +230,12 @@ public class OutputInterceptorClassGenerator
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("generated classes cache is : " +
-                        generatedClassesCache.toString());
+                        ClassDataCache.instance().toString());
                 }
 
                 // convert the bytes into a Class
-                generated_class = Utils.defineClass(representativeClassName, bytecode);
+                generated_class = Utils.defineClass(representativeClassName,
+                        bytecode);
             }
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();

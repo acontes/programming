@@ -135,7 +135,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @return an list of {@link Component} interfaces of the created
      *         components. 
      * @throws InstantiationException
-     *             if the component cannot be created.
+     *             if one or several of the components cannot be created. The cause of this 
+     *             exception may contain the list of instantiation exceptions.
      */
     List newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc, Node[] nodes)
@@ -161,7 +162,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @return an list of {@link Component} interfaces of the created
      *         components.
      * @throws InstantiationException
-     *             if the component cannot be created.
+     *             if one or several of the components cannot be created. The cause of this 
+     *             exception may contain the list of instantiation exceptions.
      */
     List newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc, VirtualNode virtualNode)
@@ -185,7 +187,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @return an list of {@link Component} interfaces of the created
      *         components.
      * @throws InstantiationException
-     *             if the component cannot be created.
+     *             if one or several of the components cannot be created. The cause of this 
+     *             exception may contain the list of instantiation exceptions.
      */
     List newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
             ContentDescription[] contentDesc, Node[] nodes)

@@ -57,6 +57,7 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.ClassDataCache;
 
 
 /**
@@ -66,7 +67,8 @@ import org.objectweb.proactive.core.mop.StubObject;
  * @author Matthieu Morel
  *
  */
-public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClassGenerator {
+public class RepresentativeInterfaceClassGenerator
+    extends AbstractInterfaceClassGenerator {
     private static RepresentativeInterfaceClassGenerator instance;
 
     // this boolean for deciding of a possible indirection for the functionnal calls
@@ -76,7 +78,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
     }
 
     public static RepresentativeInterfaceClassGenerator instance() {
-
         if (instance == null) {
             return new RepresentativeInterfaceClassGenerator();
         } else {
@@ -88,7 +89,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
      * retreives the bytecode associated to the generated class of the given name
      */
     public static byte[] getClassData(String classname) {
-        byte[] b = (byte[]) getGeneratedClassesCache().get(classname);
+        byte[] b = (byte[]) ClassDataCache.instance().getClassData(classname);
 
         if (b != null) {
             return b;
@@ -96,7 +97,10 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
         if (Utils.isRepresentativeClassName(classname)) {
             // try to generate a representative
-            logger.info("Trying to generate representative class : " + classname);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Trying to generate representative class : " +
+                    classname);
+            }
             b = generateInterfaceByteCode(classname, null);
 
             if (b != null) {
@@ -107,12 +111,13 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         return null;
     }
 
-    public ProActiveInterface generateInterface(final String interfaceName, Component owner,
-        ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+    public ProActiveInterface generateInterface(final String interfaceName,
+        Component owner, ProActiveInterfaceType interfaceType,
+        boolean isInternal, boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
-
         try {
-            Class generated_class = generateInterfaceClass(interfaceType, isFunctionalInterface);
+            Class generated_class = generateInterfaceClass(interfaceType,
+                    isFunctionalInterface);
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
             reference.setFcItfName(interfaceName);
@@ -122,47 +127,43 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
             return reference;
         } catch (Exception e) {
-            throw new InterfaceGenerationFailedException(
-                    "Cannot generate representative with javassist",
-                    e);
+            e.printStackTrace();
+            throw new InterfaceGenerationFailedException("Cannot generate representative with javassist",
+                e);
         }
     }
 
     public Class generateInterfaceClass(ProActiveInterfaceType itfType,
         boolean isFunctionalInterface)
         throws NotFoundException, CannotCompileException, IOException {
-        String representativeClassName = org.objectweb.proactive.core.component.gen.Utils
-            .getMetaObjectComponentRepresentativeClassName(
-                    itfType.getFcItfName(),
-                    itfType.getFcItfSignature());
+        String representativeClassName = org.objectweb.proactive.core.component.gen.Utils.getMetaObjectComponentRepresentativeClassName(itfType.getFcItfName(),
+                itfType.getFcItfSignature());
         Class generated_class;
 
         // check whether class has already been generated
         try {
             generated_class = loadClass(representativeClassName);
         } catch (ClassNotFoundException cnfe) {
-            byte[] bytecode = generateInterfaceByteCode(representativeClassName, itfType);
+            byte[] bytecode = generateInterfaceByteCode(representativeClassName,
+                    itfType);
 
             // convert the bytes into a Class
-            generated_class = Utils.defineClass(representativeClassName, bytecode);
+            generated_class = Utils.defineClass(representativeClassName,
+                    bytecode);
         }
 
         return generated_class;
     }
 
-    public static byte[] generateInterfaceByteCode(String representativeClassName,
-        ProActiveInterfaceType itfType) {
-
+    public static byte[] generateInterfaceByteCode(
+        String representativeClassName, ProActiveInterfaceType itfType) {
         try {
-            String interfaceName = Utils.getInterfaceNameFromRepresentativeClassName(
-                        representativeClassName);
-            String interfaceSignature = Utils.getInterfaceSignatureFromRepresentativeClassName(
-                        representativeClassName);
-            boolean isFunctionalInterface = (!Utils.getInterfaceNameFromRepresentativeClassName(
-                        representativeClassName).endsWith("-controller"));
+            String interfaceName = Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName);
+            String interfaceSignature = Utils.getInterfaceSignatureFromRepresentativeClassName(representativeClassName);
+            boolean isFunctionalInterface = (!Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName)
+                                                   .endsWith("-controller"));
             CtMethod[] reifiedMethods;
             CtClass generatedCtClass = pool.makeClass(representativeClassName);
-            
 
             //this.fcInterfaceName = fcInterfaceName;
             //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
@@ -172,6 +173,11 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             // add interface to reify
             CtClass functional_itf = pool.get(interfaceSignature);
             generatedCtClass.addInterface(functional_itf);
+
+            if (functional_itf.equals(pool.get(
+                            "org.objectweb.fractal.api.control.ContentController"))) {
+                System.out.println("CONTENT CONTROLLER");
+            }
 
             interfacesToImplement.add(functional_itf);
 
@@ -185,30 +191,33 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             //interfacesToImplement.add(pool.get(StubObject.class.getName()));
             List interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
             addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
-            generatedCtClass.setSuperclass(pool.get(ProActiveInterfaceImpl.class.getName()));
+            generatedCtClass.setSuperclass(pool.get(
+                    ProActiveInterfaceImpl.class.getName()));
             JavassistByteCodeStubBuilder.createStubObjectMethods(generatedCtClass);
-            CtField interfaceNameField = new CtField(
-                        ClassPool.getDefault().get(String.class.getName()),
-                        "interfaceName",
-                        generatedCtClass);
+            CtField interfaceNameField = new CtField(ClassPool.getDefault()
+                                                              .get(String.class.getName()),
+                    "interfaceName", generatedCtClass);
             interfaceNameField.setModifiers(Modifier.STATIC);
-            generatedCtClass.addField(interfaceNameField, "\"" + interfaceName + "\"");
+            generatedCtClass.addField(interfaceNameField,
+                "\"" + interfaceName + "\"");
 
-            CtField methodsField = new CtField(
-                        pool.get("java.lang.reflect.Method[]"),
-                        "overridenMethods",
-                        generatedCtClass);
+            CtField methodsField = new CtField(pool.get(
+                        "java.lang.reflect.Method[]"), "overridenMethods",
+                    generatedCtClass);
             methodsField.setModifiers(Modifier.STATIC);
 
             generatedCtClass.addField(methodsField);
-            
+
             String bodyForImplGetterAndSetter = "{throw new org.objectweb.proactive.core.ProActiveRuntimeException(\" representative interfaces do not implement getFcItfImpl or setFcItfImpl methods\");}";
-            
-            CtMethod implGetter = CtNewMethod.make("public Object getFcItfImpl() " + bodyForImplGetterAndSetter, generatedCtClass);
+
+            CtMethod implGetter = CtNewMethod.make(
+                    "public Object getFcItfImpl() " +
+                    bodyForImplGetterAndSetter, generatedCtClass);
             generatedCtClass.addMethod(implGetter);
-            CtMethod implSetter = CtNewMethod.make("public Object setFcItfImpl() " + bodyForImplGetterAndSetter, generatedCtClass);
+            CtMethod implSetter = CtNewMethod.make(
+                    "public Object setFcItfImpl() " +
+                    bodyForImplGetterAndSetter, generatedCtClass);
             generatedCtClass.addMethod(implSetter);
-            
 
             // list all methods to implement
             Map methodsToImplement = new HashMap();
@@ -247,9 +256,8 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                 }
             }
 
-            reifiedMethods = (CtMethod[]) (
-                    methodsToImplement.values().toArray(new CtMethod[methodsToImplement.size()])
-                );
+            reifiedMethods = (CtMethod[]) (methodsToImplement.values()
+                                                             .toArray(new CtMethod[methodsToImplement.size()]));
 
             // Determines which reifiedMethods are valid for reification
             // It is the responsibility of method checkMethod in class Utils
@@ -258,7 +266,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             int initialNumberOfMethods = reifiedMethods.length;
 
             for (int i = 0; i < initialNumberOfMethods; i++) {
-
                 if (JavassistByteCodeStubBuilder.checkMethod(reifiedMethods[i])) {
                     v.addElement(reifiedMethods[i]);
                 }
@@ -269,27 +276,26 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
             reifiedMethods = validMethods;
 
-            JavassistByteCodeStubBuilder.createStaticInitializer(
-                    generatedCtClass,
-                    reifiedMethods,
-                    classesIndexer);
+            JavassistByteCodeStubBuilder.createStaticInitializer(generatedCtClass,
+                reifiedMethods, classesIndexer);
 
             createReifiedMethods(generatedCtClass, reifiedMethods, itfType);
 
-//                                    generatedCtClass.writeFile("generated/");
-//                                    System.out.println("[JAVASSIST] generated class : " +
-//                                        representativeClassName);
+            //                                    generatedCtClass.writeFile("generated/");
+            //                                    System.out.println("[JAVASSIST] generated class : " +
+            //                                        representativeClassName);
             byte[] bytecode = generatedCtClass.toBytecode();
-            RepresentativeInterfaceClassGenerator.generatedClassesCache.put(
-                    representativeClassName,
-                    generatedCtClass.toBytecode());
+            ClassDataCache.instance()
+                          .addClassData(representativeClassName,
+                generatedCtClass.toBytecode());
 
             if (logger.isDebugEnabled()) {
                 logger.debug("added " + representativeClassName + " to cache");
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generated classes cache is : " + generatedClassesCache.toString());
+                logger.debug("generated classes cache is : " +
+                    ClassDataCache.instance().toString());
             }
 
             return bytecode;
@@ -300,22 +306,19 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         }
     }
 
-    protected static void createReifiedMethods(CtClass generatedClass, CtMethod[] reifiedMethods,
-        ProActiveInterfaceType itfType) throws NotFoundException, CannotCompileException {
-
+    protected static void createReifiedMethods(CtClass generatedClass,
+        CtMethod[] reifiedMethods, ProActiveInterfaceType itfType)
+        throws NotFoundException, CannotCompileException {
         for (int i = 0; i < reifiedMethods.length; i++) {
             CtClass[] paramTypes = reifiedMethods[i].getParameterTypes();
-            String body = ("{\nObject[] parameters = new Object[" + paramTypes.length + "];\n");
+            String body = ("{\nObject[] parameters = new Object[" +
+                paramTypes.length + "];\n");
 
             for (int j = 0; j < paramTypes.length; j++) {
-
                 if (paramTypes[j].isPrimitive()) {
-                    body += (
-                        "  parameters[" + j + "]="
-                        + JavassistByteCodeStubBuilder.wrapPrimitiveParameter(
-                                paramTypes[j],
-                                "$" + (j + 1)) + ";\n"
-                    );
+                    body += ("  parameters[" + j + "]=" +
+                    JavassistByteCodeStubBuilder.wrapPrimitiveParameter(paramTypes[j],
+                        "$" + (j + 1)) + ";\n");
                 } else {
                     body += ("  parameters[" + j + "]=$" + (j + 1) + ";\n");
                 }
@@ -326,14 +329,12 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             String preWrap = null;
 
             if (returnType != CtClass.voidType) {
-                
-                if (itfType!=null && itfType.isFcMulticastItf()) {
-                    preWrap = ProActiveGroup.class.getName()+".getGroup(";
-                    postWrap=")";
+                if ((itfType != null) && itfType.isFcMulticastItf()) {
+                    preWrap = ProActiveGroup.class.getName() + ".getGroup(";
+                    postWrap = ")";
                 } else if (!returnType.isPrimitive()) {
                     preWrap = "(" + returnType.getName() + ")";
                 } else {
-
                     //boolean, byte, char, short, int, long, float, double
                     if (returnType.equals(CtClass.booleanType)) {
                         preWrap = "((Boolean)";
@@ -383,11 +384,9 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                 }
             }
 
-            body += (
-                    "myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall("
-                    + "(java.lang.reflect.Method)overridenMethods[" + i + "]"
-                    + ", parameters, getFcItfName()))"
-                );
+            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
+            "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
+            ", parameters, getFcItfName()))");
 
             if (postWrap != null) {
                 body += postWrap;
@@ -395,15 +394,12 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
             body += ";";
             body += "\n}";
-//                     System.out.println("method : " + reifiedMethods[i].getName() +
-//                         " : \n" + body);
-            CtMethod methodToGenerate = CtNewMethod.make(
-                        reifiedMethods[i].getReturnType(),
-                        reifiedMethods[i].getName(),
-                        reifiedMethods[i].getParameterTypes(),
-                        reifiedMethods[i].getExceptionTypes(),
-                        body,
-                        generatedClass);
+            //                     System.out.println("method : " + reifiedMethods[i].getName() +
+            //                         " : \n" + body);
+            CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
+                    reifiedMethods[i].getName(),
+                    reifiedMethods[i].getParameterTypes(),
+                    reifiedMethods[i].getExceptionTypes(), body, generatedClass);
             generatedClass.addMethod(methodToGenerate);
         }
     }

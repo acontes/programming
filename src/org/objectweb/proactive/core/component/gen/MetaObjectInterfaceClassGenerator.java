@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -94,8 +95,8 @@ public class MetaObjectInterfaceClassGenerator
     }
 
     public ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, ProActiveInterfaceType interfaceType, boolean isInternal,
-        boolean isFunctionalInterface)
+        Component owner, ProActiveInterfaceType interfaceType,
+        boolean isInternal, boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
             if (ProActiveLogger.getLogger(
@@ -222,19 +223,21 @@ public class MetaObjectInterfaceClassGenerator
                 //                System.out.println("[JAVASSIST] generated class : " +
                 //                    generatedClassFullName);
                 byte[] bytecode = generatedCtClass.toBytecode();
-                RepresentativeInterfaceClassGenerator.generatedClassesCache.put(generatedClassFullName,
+                ClassDataCache.instance()
+                              .addClassData(generatedClassFullName,
                     generatedCtClass.toBytecode());
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassFullName +
                         " to cache");
                 }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generated classes cache is : " +
-                        generatedClassesCache.toString());
-                }
+                //                if (logger.isDebugEnabled()) {
+                //                    logger.debug("generated classes cache is : " +
+                //                        generatedClassesCache.toString());
+                //                }
 
                 // convert the bytes into a Class
-                generated_class = Utils.defineClass(generatedClassFullName, bytecode);
+                generated_class = Utils.defineClass(generatedClassFullName,
+                        bytecode);
             }
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();

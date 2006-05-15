@@ -46,44 +46,40 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * This class is the parent of classes for generating component interfaces. It provides utility methods that are used in subclasses.
- * 
+ *
  * @author Matthieu Morel
  *
  */
 public abstract class AbstractInterfaceClassGenerator {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION);
     protected static ClassPool pool = ClassPool.getDefault();
-    protected static Hashtable generatedClassesCache = new Hashtable();
-
-    /**
-     * Returns the generatedClassesCache.
-     * @return a Map acting as a cache for generated classes
-     */
-    static Map getGeneratedClassesCache() {
-        return generatedClassesCache;
-    }
 
     protected Class loadClass(final String className)
         throws ClassNotFoundException {
         // try to fetch the class from the default class loader
-        return Thread.currentThread().getContextClassLoader().loadClass(className);
+        return Thread.currentThread().getContextClassLoader()
+                     .loadClass(className);
     }
 
     public ProActiveInterface generateControllerInterface(
         final String controllerInterfaceName, Component owner,
-        ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        ProActiveInterfaceType interfaceType)
+        throws InterfaceGenerationFailedException {
         return generateInterface(controllerInterfaceName, owner, interfaceType,
             false, false);
     }
 
     public ProActiveInterface generateFunctionalInterface(
         final String functionalInterfaceName, Component owner,
-        ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        ProActiveInterfaceType interfaceType)
+        throws InterfaceGenerationFailedException {
         return generateInterface(functionalInterfaceName, owner, interfaceType,
             false, true);
     }
@@ -126,6 +122,6 @@ public abstract class AbstractInterfaceClassGenerator {
      * retreives the bytecode associated to the generated class of the given name
      */
     public static byte[] getClassData(String classname) {
-        return (byte[]) getGeneratedClassesCache().get(classname);
+        return (byte[]) ClassDataCache.instance().getClassData(classname);
     }
 }

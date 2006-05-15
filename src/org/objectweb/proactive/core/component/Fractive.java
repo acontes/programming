@@ -31,11 +31,19 @@
 package org.objectweb.proactive.core.component;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingException;
 
@@ -61,6 +69,9 @@ import org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.controller.CollectiveInterfacesController;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
+import org.objectweb.proactive.core.component.controller.ProActiveContentController;
+import org.objectweb.proactive.core.component.exceptions.InstantiationExceptionListException;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
@@ -71,6 +82,7 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -130,7 +142,21 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         final Component component) throws NoSuchInterfaceException {
         return (ComponentParametersController) component.getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER);
     }
-    
+
+    /**
+     * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveContentController ProActiveContentController}
+     * interface of the given component.
+     *
+     * @param component a component.
+     * @return the {@link org.objectweb.proactive.core.component.controller.ProActiveContentController ProActiveContentController}
+     *         interface of the given component.
+     * @throws NoSuchInterfaceException if there is no such interface.
+     */
+    public static ProActiveContentController getProActiveContentController(
+        final Component component) throws NoSuchInterfaceException {
+        return (ProActiveContentController) component.getFcInterface(Constants.CONTENT_CONTROLLER);
+    }
+
     /**
      * Returns the {@link org.objectweb.proactive.core.component.controller.CollectiveInterfacesController CollectiveInterfacesController}
      * interface of the given component.
@@ -139,14 +165,15 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      * @return the {@link org.objectweb.proactive.core.component.controller.CollectiveInterfacesController CollectiveInterfacesController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
-     */   public static CollectiveInterfacesController getCollectiveInterfacesController(
-            final Component component) throws NoSuchInterfaceException {
+     */
+    public static CollectiveInterfacesController getCollectiveInterfacesController(
+        final Component component) throws NoSuchInterfaceException {
         return (CollectiveInterfacesController) component.getFcInterface(Constants.COLLECTIVE_INTERFACES_CONTROLLER);
     }
 
     /**
      * Returns a generated interface reference, whose impl field is a group It
-     * is able to handle multiple bindings, and automatically adds it to a given 
+     * is able to handle multiple bindings, and automatically adds it to a given
      *
      * @param itfName the name of the interface
      * @param itfSignature the signature of the interface
@@ -158,8 +185,8 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         String itfName, String itfSignature, Component owner)
         throws ProActiveRuntimeException {
         try {
-            ProActiveInterfaceType itf_type = (ProActiveInterfaceType)ProActiveTypeFactoryImpl.instance()
-                                                         .createFcItfType(itfName,
+            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
+                                                                                               .createFcItfType(itfName,
                     itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
                     TypeFactory.COLLECTION);
             ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
@@ -173,7 +200,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
 
     /**
      * Returns a generated interface reference, whose impl field is a group It
-     * is able to handle multiple bindings, and automatically adds it to a given 
+     * is able to handle multiple bindings, and automatically adds it to a given
      *
      * @param itfName the name of the interface
      * @param itfSignature the signature of the interface
@@ -185,11 +212,11 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         String itfName, String itfSignature, Component owner)
         throws ProActiveRuntimeException {
         try {
-            ProActiveInterfaceType itf_type = (ProActiveInterfaceType)ProActiveTypeFactoryImpl.instance()
-                                                         .createFcItfType(itfName,
+            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
+                                                                                               .createFcItfType(itfName,
                     itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
                     ProActiveTypeFactory.MULTICAST_CARDINALITY);
-            
+
             ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
                     owner);
             return itf_ref_group;
@@ -208,12 +235,13 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      * @return ProActiveInterface the resulting collective client interface
      * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
      */
-//    public static ProActiveInterface createCollectiveClientInterface(
-//        String itfName, String itfSignature) throws ProActiveRuntimeException {
-//        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
-//            null);
-//    }
-    
+
+    //    public static ProActiveInterface createCollectiveClientInterface(
+    //        String itfName, String itfSignature) throws ProActiveRuntimeException {
+    //        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
+    //            null);
+    //    }
+
     /**
      * Returns a generated interface reference, whose impl field is a group It
      * is able to handle multiple bindings
@@ -228,8 +256,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         return Fractive.createCollectiveClientInterface(itfName, itfSignature,
             null);
     }
+
     /*
-     * 
+     *
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription)
      */
     public Component newFcInstance(Type type,
@@ -239,7 +268,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
-     * 
+     *
      * @see org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(org.objectweb.fractal.api.Type, java.lang.Object, java.lang.Object)
      */
     public Component newFcInstance(Type type, Object controllerDesc,
@@ -290,7 +319,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
-     * 
+     *
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription, org.objectweb.proactive.core.node.Node)
      */
     public Component newFcInstance(Type type,
@@ -360,12 +389,13 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             e.printStackTrace();
             throw new InstantiationException(e.getMessage());
         } catch (NodeException e) {
+            e.printStackTrace();
             throw new InstantiationException(e.getMessage());
         }
     }
-    
+
     /*
-     * 
+     *
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription, org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
     public Component newFcInstance(Type type,
@@ -428,7 +458,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
-     * 
+     *
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription[], org.objectweb.proactive.core.node.Node[])
      */
     public List newFcInstanceAsList(Type type,
@@ -438,25 +468,62 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             Component components = ProActiveComponentGroup.newComponentRepresentativeGroup((ComponentType) type,
                     controllerDesc);
             List componentsList = ProActiveGroup.getGroup(components);
+
+            // initialize list to correct size
+            //            for (int i = 0; i < nodes.length; i++) {
+            //                componentsList.add(null);
+            //            }
             if (Constants.PRIMITIVE.equals(controllerDesc.getHierarchicalType())) {
                 if (contentDesc.length > 1) { // cyclic
-                    // node
-                    // + 1
-                    // instance
-                    // per
-                    // node
-                    // task = instantiate a component with a different name
-                    // on each of the node mapped to the given virtual node
+                                              // node
+                                              // + 1
+                                              // instance
+                                              // per
+                                              // node
+                                              // task = instantiate a component with a different name
+                                              // on each of the node mapped to the given virtual node
                     String original_component_name = controllerDesc.getName();
 
+                    // TODO: reuse pool for whole class ?
+                    ExecutorService threadPool = Executors.newCachedThreadPool();
+
+                    List<InstantiationException> exceptions = new Vector<InstantiationException>();
+
+                    Component c = new MockComponent();
+
                     for (int i = 0; i < nodes.length; i++) {
-                        // change the name of each component (add a suffix)
-                        String new_name = original_component_name +
-                            Constants.CYCLIC_NODE_SUFFIX + i;
-                        controllerDesc.setName(new_name);
-                        // change location of each component
-                        componentsList.add(newFcInstance(type, controllerDesc,
-                                contentDesc[i], nodes[i % nodes.length]));
+                        componentsList.add(c);
+                    }
+
+                    for (int i = 0; i < nodes.length; i++) {
+                        ComponentBuilderTask task = new ComponentBuilderTask(exceptions,
+                                componentsList, i, type, controllerDesc,
+                                original_component_name, contentDesc, nodes);
+                        threadPool.execute(task);
+                        //                         change the name of each component (add a suffix)
+                        //                        String new_name = original_component_name +
+                        //                            Constants.CYCLIC_NODE_SUFFIX + i;
+                        //                        controllerDesc.setName(new_name);
+                        //                        // change location of each component
+                        //                        componentsList.add(newFcInstance(type, controllerDesc,
+                        //                                contentDesc[i], nodes[i % nodes.length]));
+                    }
+                    threadPool.shutdown();
+                    try {
+                        threadPool.awaitTermination(new Integer(
+                                System.getProperty(
+                                    "components.creation.timeout")),
+                            TimeUnit.SECONDS);
+                    } catch (InterruptedException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    if (!exceptions.isEmpty()) {
+                        InstantiationException e = new InstantiationException(
+                                "Creation of some of the components failed");
+                        e.initCause(new InstantiationExceptionListException(
+                                exceptions));
+                        throw e;
                     }
                 } else {
                     // component is a parallel or a composite : it will be
@@ -470,9 +537,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             throw new InstantiationException(e.getMessage());
         }
     }
-    
+
     /*
-     * 
+     *
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription[], org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
     public List newFcInstanceAsList(Type type,
@@ -493,9 +560,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 e.getMessage());
         }
     }
-    
+
     /*
-     * 
+     *
      * @see org.objectweb.fractal.api.Component#getFcInterface(java.lang.String)
      */
     public Object getFcInterface(String itfName)
@@ -508,17 +575,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             throw new NoSuchInterfaceException(itfName);
         }
     }
-    
+
     /*
-     * 
+     *
      * @see org.objectweb.fractal.api.Component#getFcInterfaces()
      */
     public Object[] getFcInterfaces() {
         return null;
     }
-    
+
     /*
-     * 
+     *
      * @see org.objectweb.fractal.api.Component#getFcType()
      */
     public Type getFcType() {
@@ -532,16 +599,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                                 TypeFactory.class.getName(), false, false, false)
                         });
             } catch (InstantiationException e) {
-                ProActiveLogger.getLogger(Loggers.COMPONENTS).error(e.getMessage());
+                ProActiveLogger.getLogger(Loggers.COMPONENTS)
+                               .error(e.getMessage());
                 return null;
             }
         } else {
             return type;
         }
     }
-    
+
     /*
-     * 
+     *
      * @see org.objectweb.fractal.api.factory.Factory#getFcContentDesc()
      */
     public Object getFcContentDesc() {
@@ -549,7 +617,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
-     * 
+     *
      * @see org.objectweb.fractal.api.factory.Factory#getFcControllerDesc()
      */
     public Object getFcControllerDesc() {
@@ -557,7 +625,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
-     * 
+     *
      * @see org.objectweb.fractal.api.factory.Factory#getFcInstanceType()
      */
     public Type getFcInstanceType() {
@@ -565,7 +633,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
-     * 
+     *
      * @see org.objectweb.fractal.api.factory.Factory#newFcInstance()
      */
     public Component newFcInstance() throws InstantiationException {
@@ -576,7 +644,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      * Helper method for extracting the types of client interfaces from the type
      * of a component
      *
-     * @param componentType a component type 
+     * @param componentType a component type
      * @return the types of client interfaces
      */
     public static InterfaceType[] getClientInterfaceTypes(
@@ -692,5 +760,66 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         final Component component) throws NoSuchInterfaceException {
         return (ProActiveGenericFactory) component.getFcInterface(
             "generic-factory");
+    }
+
+    private static class ComponentBuilderTask implements Runnable {
+        List<InstantiationException> exceptions;
+        List<Component> targetList;
+        int indexInList;
+        Type type;
+        ControllerDescription controllerDesc;
+        ContentDescription[] contentDesc;
+        String originalName;
+        Node[] nodes;
+
+        public ComponentBuilderTask(List<InstantiationException> exceptions,
+            List<Component> targetList, int indexInList, Type type,
+            ControllerDescription controllerDesc, String originalName,
+            ContentDescription[] contentDesc, Node[] nodes) {
+            this.exceptions = exceptions;
+            this.targetList = targetList;
+            this.indexInList = indexInList;
+            this.type = type;
+            this.controllerDesc = controllerDesc;
+            this.contentDesc = contentDesc;
+            this.originalName = originalName;
+            this.nodes = nodes;
+        }
+
+        public void run() {
+            controllerDesc.setName(originalName + Constants.CYCLIC_NODE_SUFFIX +
+                indexInList);
+            Component instance;
+            try {
+                instance = Fractive.instance()
+                                   .newFcInstance(type, controllerDesc,
+                        contentDesc[indexInList],
+                        nodes[indexInList % nodes.length]);
+                //				System.out.println("[fractive] created component " + originalName + Constants.CYCLIC_NODE_SUFFIX + indexInList);
+                targetList.set(indexInList, instance);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+                //				targetList.add(null);
+                exceptions.add(e);
+            }
+        }
+    }
+
+    private static class MockComponent implements Component, Serializable {
+        public Object getFcInterface(String interfaceName)
+            throws NoSuchInterfaceException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public Object[] getFcInterfaces() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public Type getFcType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 }

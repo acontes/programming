@@ -364,7 +364,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
 
         // - whether the targeted server interface belongs to an internal
         // component
-        boolean condition2 = ((ProActiveContentController) (Fractal.getContentController(getFcItfOwner()))).isSubComponent(serverItf.getFcItfOwner());
+        boolean condition2 = ((ProActiveContentControllerImpl) (Fractal.getContentController(getFcItfOwner()))).isSubComponent(serverItf.getFcItfOwner());
 
         if (condition1 && condition2) {
             if (ProActiveGroup.isGroup(clientItf.getFcItfImpl())) {
