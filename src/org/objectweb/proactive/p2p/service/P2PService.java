@@ -211,36 +211,33 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 //        try {
             if (!this.stubOnThis.equals(service)) {
          //       if (this.acquaintanceManager.size().intValue() < this.acquaintanceManager.getMaxNOA()) {
-            Vector result =  this.acquaintanceManager.add(service);
+            Vector<String> result =  this.acquaintanceManager.add(service);
             if (result.size() == 0) {
             	//we have accepted the acquaintance request
-            	
+               service.registerAnswer(ProActive.getActiveObjectNodeUrl(this.stubOnThis),this.stubOnThis);
+            } else {
+            	service.registerAnswer(ProActive.getActiveObjectNodeUrl(this.stubOnThis), result);
             }
-            service.registerAnswer(ProActive.getActiveObjectNodeUrl(this.stubOnThis),this.stubOnThis);
-//                    if (logger.isDebugEnabled()) {
-//                        logger.debug("Remote peer localy registered: " +
-//                            ProActive.getActiveObjectNodeUrl(service));
-//                    }
-//                    System.out.println("P2PService.register() we have a new peer: " + ProActive.getActiveObjectNodeUrl(service));
-                    // Wake up all node accessor, because new peers are know
-               //     this.wakeUpEveryBody();
-//                    return null;
-//                }
-//            }
-//        } catch (Exception e) {
-//        	e.printStackTrace();
-//            logger.debug("The remote P2P service is certainly down", e);
-//        }
-//        return this.acquaintanceManager.getAcquaintancesURLs();
-            }
+          }
             //return new Vector();
     }
     
     public void registerAnswer(String s, P2PService service) {
-    	
+       this.acquaintanceManager.addFromReply(s,service);	
     }
-    
-    
+
+    /**
+     * Called by an acquaintance manager when it didn't accept
+     * our acquaintance request
+     * @param s
+     * @param v a vector of String containing urls of other 
+     */
+    public void registerAnswer(String s, Vector<String> v) {
+        //this.acquaintanceManager.add(s,service);
+    	//System.out.println("P2PService.registerAnswer() ARRRGGGHH our request was refused");
+    	this.acquaintanceManager.removeFromReply(s,v);
+    	//remove the peer from the pending requests
+     }
     
     /**
      * Just to test if the peer is alive.

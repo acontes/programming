@@ -117,7 +117,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         //        } catch (NodeException e) {
         //            logger.fatal("Couldn't create the group of exportAcquaintances", e);
         //        }
-        logger.debug("Group of exportAcquaintances succefuly created");
+        logger.debug("Group of exportAcquaintances successfuly created");
     }
 
     /**
@@ -135,22 +135,22 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             }
 
             // How many peers ?
-            if (this.acquaintances.size() < NOA) {
+            if (this.getEstimatedNumberOfAcquaintances() < NOA) {
                 // Looking for new peers
                 logger.debug("NOA is " + NOA +
                     " - Size of P2PAcquaintanceManager is " +
-                    this.acquaintances.size() +
+                    this.getEstimatedNumberOfAcquaintances() +
                     " looking for new acquaintances through prefered ones");
 
                 this.connectToPreferedAcquaintances();
             }
 
             // How many peers ?
-            if (this.acquaintances.size() < NOA) {
+            if (this.getEstimatedNumberOfAcquaintances() < NOA) {
                 // Looking for new peers
                 logger.debug("NOA is " + NOA +
                     " - Size of P2PAcquaintanceManager is " +
-                    this.acquaintances.size() +
+                    this.getEstimatedNumberOfAcquaintances() +
                     " looking for new acquaintances through exploration");
 
                 // Sending exploring message
@@ -197,7 +197,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
       
         
         
-        while ((index < size) && ((this.acquaintances.size() + awaitedReplies.size()) < NOA)) {
+        while ((index < size) && (this.getEstimatedNumberOfAcquaintances() < NOA)) {
             String peerUrl = urlAdderP2PNodeName((String) this.peers.remove(0));
             try {
                 Node distNode = NodeFactory.getNode(peerUrl);
@@ -257,10 +257,10 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @param peer the peer to add.
      * @return add succesfull
      */
-    public Vector add(P2PService peer) {
+    public Vector<String> add(P2PService peer) {
          return this.add(ProActive.getActiveObjectNodeUrl(peer),peer);
     }
-    public Vector add(String peerUrl, P2PService peer) {
+    public Vector<String> add(String peerUrl, P2PService peer) {
         boolean result = false;
         try {
             if ((this.acquaintances.size() < NOA) &&
@@ -271,7 +271,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                     logger.info("Acquaintance " + peerUrl + " " + result +
                         " added");
                 }
-                return new Vector();
+                return new Vector<String>();
             }
         } catch (Exception e) {
             this.acquaintances.remove(peer);
@@ -281,12 +281,23 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     }
     
     public void addFromReply(String url, P2PService peer) {
+    	System.out.println("P2PAcquaintanceManager.addFromReply() got a reply from " + url);
     	this.add(url,peer);
     	//and we remove it from the awaited answers
-    	
-    	System.out.println("Removing " +awaitedReplies.remove(url) + " from awaited peers");
+    	this.removeFromAwaited(url);
     }
     
+    
+    public void removeFromReply(String url, Vector<String> s) {
+    	System.out.println("P2PAcquaintanceManager.removeFromReply() " + url);
+    	//this.removeFromReply(url,s);
+    	this.removeFromAwaited(url);
+    }
+    
+    public void removeFromAwaited(String url) {
+    	System.out.println("Removing " + url + " from awaited peers");
+    	awaitedReplies.remove(url);
+    }
     
     public void remove(P2PService peer) {
         boolean result = this.acquaintances.remove(peer);
@@ -307,9 +318,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         acquaintances.dumpAcquaintances();
     }
 
-    public Vector getAcquaintancesURLs() {
+    public Vector<String> getAcquaintancesURLs() {
     
-    	return new Vector(Arrays.asList(this.acquaintances.getAcquaintancesURLs()));
+    	return new Vector<String>(Arrays.asList(this.acquaintances.getAcquaintancesURLs()));
 //        return new Vector(this.acquaintances.getAcquaintancesURLs());
     }
 
@@ -322,6 +333,11 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         return new IntMutableWrapper(this.acquaintances.size());
     }
 
+    public int getEstimatedNumberOfAcquaintances() {
+    	return this.acquaintances.size() + awaitedReplies.size(); 
+    }
+    
+    
     /**
      * Returns <tt>true</tt> if this collection contains the specified
      * element.  More formally, returns <tt>true</tt> if and only if this
@@ -387,10 +403,19 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         return false;
     }
 
-    public void setPreferedAcq(Vector v) {
+    public void setPreferedAcq(Vector<String> v) {
         this.peers = v;
     }
 
+    /**
+     * Add the given peer urls to the current 
+     * prefered acquaintances list
+     * @param v the list of acquaintances
+     */
+    public void addToPreferedAcq(Vector<String> v) {
+    	this.peers.addAll(v);
+    }
+    
     /**
       * Add the default name of the P2P Node to a specified <code>url</code>.
       * @param url  the url.
