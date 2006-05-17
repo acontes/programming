@@ -32,6 +32,7 @@ package org.objectweb.proactive.p2p.service;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
@@ -48,7 +49,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 import org.objectweb.proactive.p2p.service.messages.Message;
 import org.objectweb.proactive.p2p.service.util.NOAPowerLawGenerator;
@@ -72,6 +72,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     private P2PService acquaintancesActived = null;
     protected AcquaintancesWrapper acquaintances;
 
+    //store the name of awaited replies for setting acquaintances
+    protected HashMap<String,P2PService> awaitedReplies = new HashMap<String,P2PService>();
+    
     //list of prefered acquaintances
     private Vector<String> peers = new Vector<String>();
 
@@ -191,7 +194,10 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
 
         //while(!this.peers.isEmpty()) {
         //     for (int i = 0; i < size; i++) {
-        while ((index < size) && (this.acquaintances.size() < NOA)) {
+      
+        
+        
+        while ((index < size) && ((this.acquaintances.size() + awaitedReplies.size()) < NOA)) {
             String peerUrl = urlAdderP2PNodeName((String) this.peers.remove(0));
             try {
                 Node distNode = NodeFactory.getNode(peerUrl);
@@ -199,29 +205,31 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                 if (!peer.equals(this.localService) &&
                         !this.contains(peer).booleanValue()) {
                     // Send a message to the remote peer to register myself
-                    logger.info("P2PFirstContact.connectingPeer() ----" +
-                        peerUrl);
-                    String[] url = (String[]) peer.register(this.localService).toArray(new String[] {} );
-                    logger.info("P2PFirstContact.connectingPeer() ----" + url);
-                    //a null reply means we have been accepted
-                    if (url.length == 0) {
-                        logger.info(peerUrl +
-                            " has accepted to be our new acquaintance ");
-
-                        // Add the peer in my group of acquaintances
-                        this.add(peer);
-                    } else {
-                        logger.info(peerUrl +
-                            " refused the acquaintance request, maybe the peer is full ");
-
-                        for (int j = 0; j < url.length; j++) {
-                            logger.info("Adding " + url[j] +
-                                " as new candidate");
-                            this.peers.add(url[j]);
-                        }
-                        //put it back for later use
-                        this.peers.add(peerUrl);
-                    }
+                    logger.info("P2PAcquaintanceManager.connectingPeer() ----" +
+                         peerUrl);
+                     peer.registerRequest(this.localService);
+                     awaitedReplies.put(peerUrl, peer);
+                     //to avoid deadlocks we don't check wether the answer is positive or not
+                    
+//                    //a null reply means we have been accepted
+//                    if (url.length == 0) {
+//                        logger.info(peerUrl +
+//                            " has accepted to be our new acquaintance ");
+//
+//                        // Add the peer in my group of acquaintances
+//                        this.add(peer);
+//                    } else {
+//                        logger.info(peerUrl +
+//                            " refused the acquaintance request, maybe the peer is full ");
+//
+//                        for (int j = 0; j < url.length; j++) {
+//                            logger.info("Adding " + url[j] +
+//                                " as new candidate");
+//                            this.peers.add(url[j]);
+//                        }
+//                        //put it back for later use
+//                        this.peers.add(peerUrl);
+//                    }
                 }
             } catch (Exception e) {
                 logger.info("The peer at " + peerUrl +
@@ -250,11 +258,13 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return add succesfull
      */
     public Vector add(P2PService peer) {
+         return this.add(ProActive.getActiveObjectNodeUrl(peer),peer);
+    }
+    public Vector add(String peerUrl, P2PService peer) {
         boolean result = false;
         try {
             if ((this.acquaintances.size() < NOA) &&
                     !this.acquaintances.contains(peer)) {
-                String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
 
                 if (!peerUrl.matches(".*cannot contact the body.*")) {
                     result = this.acquaintances.add(peer, peerUrl);
@@ -269,7 +279,15 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         }
         return this.getAcquaintancesURLs();
     }
-
+    
+    public void addFromReply(String url, P2PService peer) {
+    	this.add(url,peer);
+    	//and we remove it from the awaited answers
+    	
+    	System.out.println("Removing " +awaitedReplies.remove(url) + " from awaited peers");
+    }
+    
+    
     public void remove(P2PService peer) {
         boolean result = this.acquaintances.remove(peer);
         if (result) {

@@ -207,11 +207,16 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 //        return this.acquaintanceManager.getAcquaintancesURLs();
 //    }
 
-    public Vector register(P2PService service) {
+    public void registerRequest(P2PService service) {
 //        try {
             if (!this.stubOnThis.equals(service)) {
          //       if (this.acquaintanceManager.size().intValue() < this.acquaintanceManager.getMaxNOA()) {
-              return this.acquaintanceManager.add(service);
+            Vector result =  this.acquaintanceManager.add(service);
+            if (result.size() == 0) {
+            	//we have accepted the acquaintance request
+            	
+            }
+            service.registerAnswer(ProActive.getActiveObjectNodeUrl(this.stubOnThis),this.stubOnThis);
 //                    if (logger.isDebugEnabled()) {
 //                        logger.debug("Remote peer localy registered: " +
 //                            ProActive.getActiveObjectNodeUrl(service));
@@ -228,7 +233,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 //        }
 //        return this.acquaintanceManager.getAcquaintancesURLs();
             }
-            return new Vector();
+            //return new Vector();
+    }
+    
+    public void registerAnswer(String s, P2PService service) {
+    	
     }
     
     
