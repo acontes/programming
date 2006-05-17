@@ -83,7 +83,7 @@ public class StartP2PService implements P2PConstants {
     // -------------------------------------------------------------------------
     // Class Fileds
     //--------------------------------------------------------------------------
-    private Vector peers = new Vector();
+    private Vector<String> peers = new Vector<String>();
     private P2PService p2pService = null;
 
     // -------------------------------------------------------------------------
@@ -138,7 +138,7 @@ public class StartP2PService implements P2PConstants {
      * </ul>
      * @param peers list of peers.
      */
-    public StartP2PService(Vector peers) {
+    public StartP2PService(Vector<String> peers) {
         if (peers != null) {
             this.peers.addAll(peers);
         }
@@ -427,9 +427,9 @@ public class StartP2PService implements P2PConstants {
     /**
      * Add acquisition method and port number to URL of peers.
      */
-    public static Vector checkingPeersUrl(Vector peerList) {
+    public static Vector<String> checkingPeersUrl(Vector peerList) {
         int nbUrls = peerList.size();
-        Vector newPeerList = new Vector(nbUrls);
+        Vector<String> newPeerList = new Vector<String>(nbUrls);
 
         for (int i = 0; i < nbUrls; i++) {
             String url = (String) peerList.get(i);
@@ -542,7 +542,7 @@ public class StartP2PService implements P2PConstants {
         private String multi_proc_nodes = System.getProperty(PROPERTY_MULTI_PROC_NODES);
         private String xml_path = System.getProperty(PROPERPY_XML_PATH);
         private String peerListFile = null;
-        private Vector peers = new Vector();
+        private Vector<String> peers = new Vector<String>();
         private String no_sharing = System.getProperty(PROPERTY_NO_SHARING);
     }
 }

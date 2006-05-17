@@ -119,7 +119,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         return new P2PNode(null, null);
     }
 
-    public Vector askingAllNodes(String nodeFamilyRegexp) {
+    public Vector<Node> askingAllNodes(String nodeFamilyRegexp) {
         logger.debug("Asking all nodes to the nodes manager");
         if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
                 System.getProperty("os.name").matches(nodeFamilyRegexp)) {

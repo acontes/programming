@@ -31,11 +31,11 @@
 package org.objectweb.proactive.p2p.service;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
@@ -43,15 +43,15 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
-import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
+import org.objectweb.proactive.p2p.service.messages.Message;
+import org.objectweb.proactive.p2p.service.util.NOAPowerLawGenerator;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
@@ -64,16 +64,16 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 public class P2PAcquaintanceManager implements InitActive, RunActive,
     Serializable, P2PConstants, ProActiveInternalObject {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
+
+    //    static public final int NOA = Integer.parseInt(System.getProperty(
+    //            P2PConstants.PROPERTY_NOA));
+    static public final int NOA = new NOAPowerLawGenerator(3, 7, -3).nextInt();
     private P2PService localService = null;
-    private P2PService acquaintances = null;
     private P2PService acquaintancesActived = null;
-    private Group groupOfAcquaintances = null;
-    private static final long TTU = Long.parseLong(System.getProperty(
-                P2PConstants.PROPERTY_TTU));
-    private static final int NOA = Integer.parseInt(System.getProperty(
-                P2PConstants.PROPERTY_NOA));
-    private static final int TTL = Integer.parseInt(System.getProperty(
-                P2PConstants.PROPERTY_TTL));
+    protected AcquaintancesWrapper acquaintances;
+
+    //list of prefered acquaintances
+    private Vector<String> peers = new Vector<String>();
 
     /**
      * The empty constructor for activating.
@@ -94,26 +94,26 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-        String nodeUrl = body.getNodeURL();
+        // String nodeUrl = body.getNodeURL();
+        this.acquaintances = new AcquaintancesWrapper();
 
         // Create exportAcquaintances group
-        try {
-            this.acquaintances = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
-            ProActive.addNFEListenerOnGroup(this.acquaintances,
-                FailedGroupRendezVousException.AUTO_GROUP_PURGE);
-            this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances);
-            this.acquaintancesActived = (P2PService) ProActiveGroup.turnActiveGroup(acquaintances,
-                    nodeUrl);
-        } catch (ClassNotReifiableException e) {
-            logger.fatal("Couldn't create the group of exportAcquaintances", e);
-        } catch (ClassNotFoundException e) {
-            logger.fatal("Couldn't create the group of exportAcquaintances", e);
-        } catch (ActiveObjectCreationException e) {
-            logger.fatal("Couldn't create the group of exportAcquaintances", e);
-        } catch (NodeException e) {
-            logger.fatal("Couldn't create the group of exportAcquaintances", e);
-        }
-
+        //       try {
+        //            this.acquaintances = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
+        //            ProActive.addNFEListenerOnGroup(this.acquaintances,
+        //                FailedGroupRendezVousException.AUTO_GROUP_PURGE);
+        //            this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances);
+        //          this.acquaintancesActived = (P2PService) ProActiveGroup.turnActiveGroup(acquaintances,
+        //                   nodeUrl);
+        //        } catch (ClassNotReifiableException e) {
+        //            logger.fatal("Couldn't create the group of exportAcquaintances", e);
+        //        } catch (ClassNotFoundException e) {
+        //            logger.fatal("Couldn't create the group of exportAcquaintances", e);
+        //        } catch (ActiveObjectCreationException e) {
+        //            logger.fatal("Couldn't create the group of exportAcquaintances", e);
+        //        } catch (NodeException e) {
+        //            logger.fatal("Couldn't create the group of exportAcquaintances", e);
+        //        }
         logger.debug("Group of exportAcquaintances succefuly created");
     }
 
@@ -124,38 +124,115 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         Service service = new Service(body);
 
         while (body.isActive()) {
-            if (this.groupOfAcquaintances.size() > 0) {
+            if (this.acquaintances.size() > 0) {
                 // Register the local P2P service in all exportAcquaintances
                 logger.debug("Sending heart-beat");
-                this.acquaintances.heartBeat();
+                this.acquaintances.getAcquaintances().heartBeat();
                 logger.debug("Heart-beat sent");
-
-                // How many peers ?
-                if (this.groupOfAcquaintances.size() < NOA) {
-                    // Looking for new peers
-                    logger.debug("NOA is " + NOA +
-                        " - Size of P2PAcquaintanceManager is " +
-                        this.groupOfAcquaintances.size());
-
-                    // Sending exploring message
-                    this.acquaintances.exploring(TTL, null, this.localService);
-                    logger.debug("Explorating message sent");
-                }
             }
 
-            // Waiting TTU & serving requests
-            logger.debug("Waiting for " + TTU + "ms");
-            long endTime = System.currentTimeMillis() + TTU;
-            service.blockingServeOldest(TTU);
-            while (System.currentTimeMillis() < endTime) {
-                try {
-                    service.blockingServeOldest(endTime -
-                        System.currentTimeMillis());
-                } catch (ProActiveRuntimeException e) {
-                    logger.debug("Certainly because the body is not active", e);
-                }
+            // How many peers ?
+            if (this.acquaintances.size() < NOA) {
+                // Looking for new peers
+                logger.debug("NOA is " + NOA +
+                    " - Size of P2PAcquaintanceManager is " +
+                    this.acquaintances.size() +
+                    " looking for new acquaintances through prefered ones");
+
+                this.connectToPreferedAcquaintances();
             }
-            logger.debug("End waiting");
+
+            // How many peers ?
+            if (this.acquaintances.size() < NOA) {
+                // Looking for new peers
+                logger.debug("NOA is " + NOA +
+                    " - Size of P2PAcquaintanceManager is " +
+                    this.acquaintances.size() +
+                    " looking for new acquaintances through exploration");
+
+                // Sending exploring message
+                //          System.out.println(">>>>>>>>>>>>>>>>> P2PAcquaintanceManager.runActivity()");
+                //this.acquaintances.exploring(new ExplorationMessage(TTL,UniversalUniqueID.randomUUID(),this.localService));
+                this.localService.explore();
+                logger.debug("Explorating message sent");
+            }
+
+            if (this.acquaintances.size() > NOA) {
+                //we should drop some here
+                //do we go for all at once or just one at a time?
+                logger.info("I have too many neighbors!");
+            }
+            //}
+
+            waitTTU(service);
+        }
+    }
+
+	protected void waitTTU(Service service) {
+		// Waiting TTU & serving requests
+		logger.debug("Waiting for " + P2PService.TTU + "ms");
+		long endTime = System.currentTimeMillis() + P2PService.TTU;
+		service.blockingServeOldest(P2PService.TTU);
+		while (System.currentTimeMillis() < endTime) {
+		    try {
+		        service.blockingServeOldest(endTime -
+		            System.currentTimeMillis());
+		    } catch (ProActiveRuntimeException e) {
+		        e.printStackTrace();
+		        logger.debug("Certainly because the body is not active", e);
+		    }
+		}
+		logger.debug("End waiting");
+	}
+
+    public void connectToPreferedAcquaintances() {
+        int size = this.peers.size();
+        int index = 0;
+
+        //while(!this.peers.isEmpty()) {
+        //     for (int i = 0; i < size; i++) {
+        while ((index < size) && (this.acquaintances.size() < NOA)) {
+            String peerUrl = urlAdderP2PNodeName((String) this.peers.remove(0));
+            try {
+                Node distNode = NodeFactory.getNode(peerUrl);
+                P2PService peer = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
+                if (!peer.equals(this.localService) &&
+                        !this.contains(peer).booleanValue()) {
+                    // Send a message to the remote peer to register myself
+                    logger.info("P2PFirstContact.connectingPeer() ----" +
+                        peerUrl);
+                    String[] url = (String[]) peer.register(this.localService).toArray(new String[] {} );
+                    logger.info("P2PFirstContact.connectingPeer() ----" + url);
+                    //a null reply means we have been accepted
+                    if (url.length == 0) {
+                        logger.info(peerUrl +
+                            " has accepted to be our new acquaintance ");
+
+                        // Add the peer in my group of acquaintances
+                        this.add(peer);
+                    } else {
+                        logger.info(peerUrl +
+                            " refused the acquaintance request, maybe the peer is full ");
+
+                        for (int j = 0; j < url.length; j++) {
+                            logger.info("Adding " + url[j] +
+                                " as new candidate");
+                            this.peers.add(url[j]);
+                        }
+                        //put it back for later use
+                        this.peers.add(peerUrl);
+                    }
+                }
+            } catch (Exception e) {
+                logger.info("The peer at " + peerUrl +
+                    " couldn't be contacted", e);
+                //put it back for later use
+                this.peers.add(peerUrl);
+            }
+            index++;
+        }
+        if (this.size().intValue() == 0) {
+            logger.info("No peer could be found to join the network");
         }
     }
 
@@ -167,32 +244,55 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     }
 
     /**
-     * Add a peer in the group of acquaintancesActived.
+     * Add a peer in the group of acquaintances
+     * Add only if not already present and still some space left (NOA)
      * @param peer the peer to add.
+     * @return add succesfull
      */
-    public void add(P2PService peer) {
+    public Vector add(P2PService peer) {
+        boolean result = false;
         try {
-            if (!this.groupOfAcquaintances.contains(peer)) {
+            if ((this.acquaintances.size() < NOA) &&
+                    !this.acquaintances.contains(peer)) {
                 String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
+
                 if (!peerUrl.matches(".*cannot contact the body.*")) {
-                    boolean result = this.groupOfAcquaintances.add(peer);
+                    result = this.acquaintances.add(peer, peerUrl);
                     logger.info("Acquaintance " + peerUrl + " " + result +
                         " added");
                 }
+                return new Vector();
             }
         } catch (Exception e) {
-            this.groupOfAcquaintances.remove(peer);
-            logger.debug("Problem while adding peer", e);
+            this.acquaintances.remove(peer);
+            logger.debug("Problem when adding peer", e);
         }
+        return this.getAcquaintancesURLs();
     }
 
     public void remove(P2PService peer) {
-        boolean result = this.groupOfAcquaintances.remove(peer);
+        boolean result = this.acquaintances.remove(peer);
         if (result) {
             logger.info("Peer successfully removed");
         } else {
             logger.debug("Peer not removed");
         }
+    }
+
+    public void dumpAcquaintances() {
+        //    	Iterator it = urlList.iterator();
+        //    	logger.info("***********************");
+        //     while (it.hasNext()) {
+        //    	 logger.info(it.next());
+        //     }
+        // 	logger.info("***********************");
+        acquaintances.dumpAcquaintances();
+    }
+
+    public Vector getAcquaintancesURLs() {
+    
+    	return new Vector(Arrays.asList(this.acquaintances.getAcquaintancesURLs()));
+//        return new Vector(this.acquaintances.getAcquaintancesURLs());
     }
 
     /**
@@ -201,7 +301,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return the number of elements in this group.
      */
     public IntMutableWrapper size() {
-        return new IntMutableWrapper(this.groupOfAcquaintances.size());
+        return new IntMutableWrapper(this.acquaintances.size());
     }
 
     /**
@@ -215,23 +315,73 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      *         element.
      */
     public BooleanMutableWrapper contains(P2PService service) {
-        return new BooleanMutableWrapper(this.groupOfAcquaintances.contains(
-                service));
+        return new BooleanMutableWrapper(this.acquaintances.contains(service));
     }
+
     private Random randomizer = new Random();
 
     /**
      * @return a random acquaintance reference.
      */
     public P2PService randomPeer() {
-        int random = this.randomizer.nextInt(this.groupOfAcquaintances.size());
-        return (P2PService) this.groupOfAcquaintances.get(random);
+        int random = this.randomizer.nextInt(this.acquaintances.size());
+        return (P2PService) this.acquaintances.get(random);
     }
 
     /**
      * @return the list of current acquaintances.
      */
     public Vector getAcquaintanceList() {
-        return new Vector(this.groupOfAcquaintances);
+        return new Vector(this.acquaintances.getAcquaintancesAsGroup());
+    }
+
+    public P2PService getAcquaintances() {
+        return this.acquaintances.getAcquaintances();
+    }
+
+    /**
+     * Calls the transmit() method of the message m
+     * @param m
+     */
+    public void transmit(Message m) {
+        m.transmit(this.acquaintances.getAcquaintances());
+    }
+
+    public int getMaxNOA() {
+        return NOA;
+    }
+
+    public boolean shouldBeAcquaintance(P2PService remoteService) {
+        if (this.contains(remoteService).booleanValue()) {
+            logger.debug("The remote peer is already known");
+            return false;
+        }
+        if (this.acquaintances.size() < NOA) {
+            logger.debug("NOA not reached: I should be an acquaintance");
+            return true;
+        }
+        //     int random = randomizer.nextInt(100);
+        //     if (random < EXPL_MSG) {
+        //        logger.debug("Random said: I should be an acquaintance");
+        //       return true;
+        //  }
+        logger.debug("Random said: I should not be an acquaintance");
+        return false;
+    }
+
+    public void setPreferedAcq(Vector v) {
+        this.peers = v;
+    }
+
+    /**
+      * Add the default name of the P2P Node to a specified <code>url</code>.
+      * @param url  the url.
+      * @return the <code>url</code> with the name of the P2P Node.
+      */
+    private static String urlAdderP2PNodeName(String url) {
+    	if (url.indexOf(P2P_NODE_NAME)<=0) {
+    		url += ("/" + P2P_NODE_NAME);
+    	}
+        return url;
     }
 }

@@ -55,7 +55,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
     ProActiveInternalObject {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_FIRST_CONTACT);
-    private Vector peers;
+    private Vector<String> peers;
     private P2PAcquaintanceManager acqGroup;
     private P2PService localP2pService;
 
@@ -72,8 +72,8 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
      * @param acquaintances ProActive group of acquaintances.
      * @param local local P2P service.
      */
-    public P2PFirstContact(Vector peers, P2PAcquaintanceManager acquaintances,
-        P2PService local) {
+    public P2PFirstContact(Vector<String> peers,
+        P2PAcquaintanceManager acquaintances, P2PService local) {
         this.peers = peers;
         this.acqGroup = acquaintances;
         this.localP2pService = local;
@@ -104,23 +104,53 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
      * Try to connect the peer with all peers inside list.
      */
     private void connectingPeer() {
-        for (int index = 0; index < this.peers.size(); index++) {
-            String peerUrl = urlAdderP2PNodeName((String) this.peers.get(index));
+        int size = this.peers.size();
+
+        //while(!this.peers.isEmpty()) {
+        for (int i = 0; i < size; i++) {
+            String peerUrl = urlAdderP2PNodeName((String) this.peers.remove(0));
             try {
                 Node distNode = NodeFactory.getNode(peerUrl);
                 P2PService peer = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
 
                 if (!peer.equals(this.localP2pService) &&
                         !this.acqGroup.contains(peer).booleanValue()) {
-                    // Send a message to the remote peer to record me
-                    peer.register(this.localP2pService);
-                    // Add the peer in my group of acquaintances
-                    this.acqGroup.add(peer);
+                    // Send a message to the remote peer to register myself
+                    logger.info("P2PFirstContact.connectingPeer() ----" +
+                        peerUrl);
+                   // String[] url = peer.register(this.localP2pService);
+                    String[] url =  (String[]) peer.register(this.localP2pService).toArray(new String[] {});
+
+                    logger.info("P2PFirstContact.connectingPeer() ----" + url);
+                    //a null reply means we have been accepted
+                    if (url.length == 0) {
+                        logger.info(peerUrl +
+                            " has accepted to be our new acquaintance ");
+
+                        // Add the peer in my group of acquaintances
+                        this.acqGroup.add(peer);
+                    } else {
+                        logger.info(peerUrl +
+                            " refused the acquaintance request, maybe the peer is full ");
+
+                        for (int j = 0; j < url.length; j++) {
+                            logger.info("Adding " + url[j] +
+                                " as new candidate");
+                            this.peers.add(url[j]);
+                        }
+                        //put it back for later use
+                        this.peers.add(peerUrl);
+                    }
                 }
             } catch (Exception e) {
-                logger.debug("The peer at " + peerUrl +
+                logger.info("The peer at " + peerUrl +
                     " couldn't be contacted", e);
+                //put it back for later use
+                this.peers.add(peerUrl);
             }
+        }
+        if (this.acqGroup.size().intValue() == 0) {
+            logger.info("No peer could be found to join the network");
         }
     }
 
