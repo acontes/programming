@@ -49,7 +49,7 @@
 			<unitTest exclude="no" class="nonregressiontest.descriptor.launcher.Test" />
 			<unitTest exclude="no" class="nonregressiontest.filetransfer.TestAPI" />
 			<unitTest exclude="yes" class="nonregressiontest.filetransfer.TestDeployRetrieve" />
-			<unitTest exclude="yes" class="nonregressiontest.filetransfer.TestAPINotLocal" /> 
+			<unitTest exclude="yes" class="nonregressiontest.filetransfer.TestAPINotLocal" /> <!-- Skip since it is not really a local test -->
 			<unitTest exclude="no" class="nonregressiontest.mpi.TestMPISpmd"/>
 			<unitTest exclude="no" class="nonregressiontest.group.creation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.onewaycall.Test" />
@@ -79,8 +79,9 @@
 			<unitTest exclude="no" class="nonregressiontest.component.activity.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.lookup.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.Test"/>
-			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.gather.Test"/>			
+			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.gathercast.Test"/>			
 			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.classbased.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.Test"/>
 			<unitTest exclude="yes" class="nonregressiontest.component.nfpriority.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.cic.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.pml.Test"/>
