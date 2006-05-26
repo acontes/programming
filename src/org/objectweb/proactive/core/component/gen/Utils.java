@@ -32,10 +32,17 @@ package org.objectweb.proactive.core.component.gen;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.objectweb.proactive.core.ProActiveRuntimeException;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
+import javassist.NotFoundException;
+
+import org.objectweb.proactive.core.component.representative.ItfID;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 
 
 /**
@@ -47,10 +54,11 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 public class Utils {
     public static final String GENERATED_DEFAULT_PREFIX = "Generated_";
     public static final String REPRESENTATIVE_DEFAULT_SUFFIX = "_representative";
+    public static final String GATHER_ITF_PROXY_DEFAULT_SUFFIX = "_itfProxy";
     public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = "_composite";
     public static final String OUTPUT_INTERCEPTOR_SUFFIX = "_outputInterceptor";
     public static final String STUB_DEFAULT_PACKAGE = null;
-    public static final char GEN_PACKAGE_SEPARATOR = '_';
+    public static final String GEN_PACKAGE_SEPARATOR = "_P_";
     public static final String GEN_ITF_NAME_SEPARATOR = "_I_";
     public static final String GEN_MIDDLE_SEPARATOR = "_O_";
 
@@ -68,7 +76,7 @@ public class Utils {
         tmp = tmp.replaceAll(REPRESENTATIVE_DEFAULT_SUFFIX, "");
         tmp = tmp.substring(0, tmp.indexOf(GEN_MIDDLE_SEPARATOR));
         tmp = tmp.replaceAll(GEN_ITF_NAME_SEPARATOR, "-").replace(GEN_PACKAGE_SEPARATOR,
-                '.');
+                ".");
 
         return tmp;
     }
@@ -83,7 +91,7 @@ public class Utils {
         tmp = tmp.substring(tmp.indexOf(GEN_MIDDLE_SEPARATOR) +
                 GEN_MIDDLE_SEPARATOR.length(), tmp.length());
         tmp = tmp.replaceAll(GEN_ITF_NAME_SEPARATOR, "-").replace(GEN_PACKAGE_SEPARATOR,
-                '.');
+                ".");
         return tmp;
     }
 
@@ -91,7 +99,7 @@ public class Utils {
         String functionalInterfaceName, String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ? ... but readable)
         return (GENERATED_DEFAULT_PREFIX +
-        javaInterfaceName.replace('.', GEN_PACKAGE_SEPARATOR) +
+        javaInterfaceName.replace(".", GEN_PACKAGE_SEPARATOR) +
         GEN_MIDDLE_SEPARATOR +
         functionalInterfaceName.replaceAll("-", GEN_ITF_NAME_SEPARATOR));
     }
@@ -102,6 +110,10 @@ public class Utils {
         return (getMetaObjectClassName(functionalInterfaceName,
             javaInterfaceName) + REPRESENTATIVE_DEFAULT_SUFFIX);
     }
+    
+    public static String getGatherProxyItfClassName(ProActiveInterfaceType gatherItfType) {
+        return (getMetaObjectClassName(gatherItfType.getFcItfName(), gatherItfType.getFcItfSignature()) + GATHER_ITF_PROXY_DEFAULT_SUFFIX);
+    }
 
     public static String getOutputInterceptorClassName(
         String functionalInterfaceName, String javaInterfaceName) {
@@ -111,9 +123,8 @@ public class Utils {
     }
 
     public static Class defineClass(final String className,
-        final byte[] bytes) {
+        final byte[] bytes) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         // The following code invokes defineClass on the current thread classloader by reflection
-        try {
             Class clc = Class.forName("java.lang.ClassLoader");
             Class[] argumentTypes = new Class[4];
             argumentTypes[0] = className.getClass();
@@ -133,18 +144,18 @@ public class Utils {
             return (Class) method.invoke(Thread.currentThread()
                                                .getContextClassLoader(),
                 effectiveArguments);
-        } catch (ClassNotFoundException cnfe) {
-            //cat.error(cnfe.toString());
-            throw new ProActiveRuntimeException(cnfe.toString());
-        } catch (NoSuchMethodException nsme) {
-            nsme.printStackTrace();
-    
-            //cat.error(nsme.toString());
-            throw new ProActiveRuntimeException(nsme.toString());
-        } catch (IllegalAccessException iae) {
-            throw new ProActiveRuntimeException(iae.toString());
-        } catch (InvocationTargetException ite) {
-            throw new ProActiveRuntimeException(ite.toString());
-        }
     }
+
+	public static void createItfStubObjectMethods(CtClass generatedClass) 
+	    throws CannotCompileException, NotFoundException {
+		// FIXME namespace pollution !
+	    CtField senderItfIDField = new CtField(ClassPool.getDefault().get(ItfID.class.getName()),
+	            "senderItfID", generatedClass);
+	    CtField.Initializer initializer = CtField.Initializer.byExpr("null");
+	    generatedClass.addField(senderItfIDField, initializer);
+	    CtMethod senderItfIDGetter = CtNewMethod.getter("getSenderItfID", senderItfIDField);
+	    generatedClass.addMethod(senderItfIDGetter);
+	    CtMethod senderItfIDSetter = CtNewMethod.setter("setSenderItfID", senderItfIDField);
+	    generatedClass.addMethod(senderItfIDSetter);
+	}
 }

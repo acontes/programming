@@ -165,12 +165,13 @@ public class TesterImpl implements Tester, BindingController,
 			IllegalLifeCycleException {
 
 		if (clientItfName.equals("clientItf")) {
-			if (serverItf instanceof MulticastTestItf) {
 				clientItf = (MulticastTestItf) serverItf;
-			} else {
-				throw new IllegalBindingException(clientItfName);
-			}
-		} else {
+		}
+		else if ("multicastClientItf".equals(clientItfName)) {
+			multicastClientItf = (MulticastTestItf)serverItf;
+		}
+		
+		else {
 			throw new NoSuchInterfaceException(clientItfName);
 		}
 	}

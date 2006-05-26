@@ -33,8 +33,6 @@ package org.objectweb.proactive.core.component.identity;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -63,17 +61,14 @@ import org.objectweb.proactive.core.component.config.ComponentConfigurationHandl
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.controller.AbstractRequestHandler;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
-import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
 import org.objectweb.proactive.core.component.controller.RequestHandler;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -89,7 +84,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveComponentImpl extends AbstractRequestHandler
     implements ProActiveComponent, Interface, Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    private transient Component representativeOnMyself = null;
+    private transient ProActiveComponent representativeOnMyself = null;
 
     // private ComponentParameters componentParameters;
     //    private Interface[] interfaceReferences;
@@ -285,6 +280,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                         " was specified as output interceptor in the configuration file, but it is not an output interceptor since it does not implement the OutputInterceptor interface");
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new ProActiveRuntimeException(
                     "could not create controller " +
                     controllers.get(controllerItfName) + " : " +
@@ -310,6 +306,23 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
                     continue;
                 }
+
+                //             else {
+                //                Class baseClass = getBody().getReifiedObject().getClass();
+                //                // get all fields (including inherited and private/protected ones)
+                //                List<Field> fields = Arrays.asList(baseClass.getFields());
+                //                fields.addAll(Arrays.asList(baseClass.getDeclaredFields()));
+                //                // check if has annotations
+                //                for (Iterator iter = fields.iterator(); iter.hasNext();) {
+                //                    Field field = (Field) iter.next();
+                //                    FractalBC bindingAnnotation = field.getAnnotation(FractalBC.class);
+                //                    if (bindingAnnotation == null) {
+                //                        continue;
+                //                    }
+                //                    // add to list in binding controller class
+                //                    ((ProActiveBindingControllerImpl)currentController).addClientItf(field.getName(), field);
+                //                }
+                //             }
             }
 
             if (ContentController.class.isAssignableFrom(controllerClass)) {
@@ -512,7 +525,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      * see
      * {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
      */
-    public Component getRepresentativeOnThis() {
+    public ProActiveComponent getRepresentativeOnThis() {
         // optimization : cache self reference 
         if (representativeOnMyself != null) {
             return representativeOnMyself;

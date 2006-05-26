@@ -28,41 +28,49 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.service.node;
+package org.objectweb.proactive.core.component.representative;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.core.UniqueID;
+
 
 /**
+ * Identifies the functional interface of a component by its name and the id of the body of the component
+ * it belongs to.
  *
- * @author Alexandre di Costanzo
- *
- * Created on May 19, 2005
+ * @author Matthieu Morel
  */
-public class P2PNodeAck implements Serializable {
-    private boolean bool = false;
+public class ItfID implements Serializable {
+    private String itfName;
+    private UniqueID componentBodyID;
+    boolean isClientItf = false;
 
-    /**
-     * The ProActive no arg constructor.
-     */
-    public P2PNodeAck() {
-        // empty
+    public ItfID(String itfName,
+        UniqueID componentBodyID) {
+        this.itfName = itfName;
+        this.componentBodyID = componentBodyID;
     }
 
-    /**
-     * Construct a new P2PNodeAck with the specified value.
-     * @param bool the boolean value.
-     */
-    public P2PNodeAck(boolean bool) {
-        this.bool = bool;
+    public String getItfName() {
+        return itfName;
     }
 
-    /**
-     * Returns the value of this <code>P2PNodeAck</code> object as a boolean
-     * primitive.
-     * @return the primitive <code>boolean</code> value of this object.
-     */
-    public boolean ackValue() {
-        return this.bool;
+    public UniqueID getComponentBodyID() {
+        return componentBodyID;
+    }
+
+    public int hashCode() {
+        return componentBodyID.hashCode() + itfName.hashCode();
+    }
+
+    public boolean equals(Object o) {
+        //System.out.println("Now checking for equality");
+        if (o instanceof ItfID) {
+            return (itfName.equals(((ItfID) o).itfName) &&
+            (componentBodyID.equals(((ItfID) o).componentBodyID)));
+        } else {
+            return false;
+        }
     }
 }

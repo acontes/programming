@@ -38,7 +38,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
+import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
@@ -57,16 +60,8 @@ import sun.rmi.server.MarshalInputStream;
  * @author Julien Vayssi&egrave;re
  */
 public class MethodCall implements java.io.Serializable, Cloneable {
-    // COMPONENTS added a field for the Fractal interface name 
-    // (the name of the interface containing the method called)
-    private String componentInterfaceName = null;
-    private boolean isComponentMethodCall;
-    protected static Logger componentLogger = null;
-
-    // shortcuts have to be put in the method call, as only the method call is transferred 
-    // when crossing membranesof composite components
-    protected Shortcut shortcut = null;
-    protected short priority; // non functional component requests priority
+    
+    ComponentMethodCallMetadata componentMetaData = null;
 
     //
     // --- STATIC MEMBERS -----------------------------------------------------------------------
@@ -254,23 +249,22 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
-        String interfaceName, short priority) {
+        String interfaceName, ItfID senderItfID, short priority) {
         MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments);
-        if (MethodCall.componentLogger == null) {
-            MethodCall.componentLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
-        }
-        mc.isComponentMethodCall = true;
-        mc.componentInterfaceName = interfaceName;
-        mc.priority = priority;
-        mc.shortcut = null;
+        
+        mc.componentMetaData = new ComponentMethodCallMetadata();
+        mc.componentMetaData.setComponentInterfaceName(interfaceName);
+        mc.componentMetaData.setSenderItfID(senderItfID);
+        mc.componentMetaData.setPriority(priority);
+        mc.componentMetaData.setShortcut(null);
         return mc;
     }
 
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
-        String interfaceName) {
+        String interfaceName, ItfID senderItfID ) {
         return MethodCall.getComponentMethodCall(reifiedMethod,
-            effectiveArguments, interfaceName,
+            effectiveArguments, interfaceName, senderItfID,
             ComponentRequest.STRICT_FIFO_PRIORITY);
     }
 
@@ -287,8 +281,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 // It is prefereable to do it here rather than at the moment
                 // the object is picked out of the pool, because it allows
                 // garbage-collecting the objects referenced in here
-                mc.componentInterfaceName = null;
-                mc.isComponentMethodCall = false;
+                mc.componentMetaData = null;
                 mc.reifiedMethod = null;
                 mc.effectiveArguments = null;
                 mc.tagsForBarrier = null;
@@ -334,9 +327,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     public MethodCall(MethodCall mc) {
         try {
-            this.componentInterfaceName = mc.getComponentInterfaceName();
+            this.componentMetaData = mc.componentMetaData;
             this.reifiedMethod = mc.getReifiedMethod();
-            this.isComponentMethodCall = mc.isComponentMethodCall;
             if (mc.serializedEffectiveArguments == null) {
                 serializedEffectiveArguments = null;
             } else {
@@ -416,11 +408,13 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             reifiedMethod.setAccessible(true);
         }
         try {
+            targetObject = ProActive.getFutureValue(targetObject);
             return reifiedMethod.invoke(targetObject, effectiveArguments);
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException(
                 "Access rights to the method denied: " + e);
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             throw new MethodCallExecutionFailedException(
                 "Arguments for the method " + this.getName() +
                 " are invalids: " + e);
@@ -471,22 +465,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     public void makeDeepCopyOfArguments() throws java.io.IOException {
         effectiveArguments = (Object[]) Utils.makeDeepCopy(effectiveArguments);
-    }
-
-    /**
-     * accessor for the name ot the invoked Fractal interface
-     * @return the name of the invoked Fractal interface
-     */
-    public String getComponentInterfaceName() {
-        return componentInterfaceName;
-    }
-
-    /**
-     * setter for the functional name of the invoked Fractal interface
-     * @param string the functional name of the invoked Fractal interface
-     */
-    public void setComponentInterfaceName(String string) {
-        componentInterfaceName = string;
     }
 
     //
@@ -747,37 +725,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             return "FixWrapper: " + encapsulated.toString();
         }
     }
-
-    public Shortcut getShortcut() {
-        return shortcut;
-    }
-
-    public void shortcutNotification(UniversalBody sender,
-        UniversalBody intermediate) {
-        if (shortcut == null) {
-            // store only first sender?
-            shortcut = new Shortcut(getComponentInterfaceName(), sender,
-                    intermediate);
-        } else {
-            shortcut.updateDestination(intermediate);
-            if (componentLogger.isDebugEnabled()) {
-                componentLogger.debug(
-                    "added shortcut : shortcutCounter is now " +
-                    shortcut.length());
-            }
-        }
-    }
-
-    public boolean isComponentMethodCall() {
-        return isComponentMethodCall;
-    }
-
-    public boolean isComponentMethodCallOnComponent() {
-        return (isComponentMethodCall && (componentInterfaceName == null));
-    }
-
-    public short getPriority() {
-        return priority;
+    
+    public ComponentMethodCallMetadata getComponentMetadata() {
+        return componentMetaData;
     }
 
     // end inner class FixWrapper

@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -41,6 +42,8 @@ import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -53,6 +56,7 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     implements Interface, Serializable, ProActiveController {
     private boolean isInternal = true;
     private InterfaceType interfaceType;
+    protected static Logger controllerLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
     /**
      * Constructor for AbstractProActiveController.
@@ -65,8 +69,16 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     }
 
     /*
+     * @see org.objectweb.proactive.core.component.controller.ProActiveController#init()
+     */
+    public void init() {
+        // controllers requiring initialization *after* all controllers are instantiated should override this method
+    }
+
+    /*
      * see {@link org.objectweb.fractal.api.Interface#isFcInternalItf()}
      */
+
     /*
      * @see org.objectweb.proactive.core.component.controller.ProActiveController#isFcInternalItf()
      */
@@ -77,6 +89,7 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     /*
      * see {@link org.objectweb.fractal.api.Interface#getFcItfName()}
      */
+
     /*
      * @see org.objectweb.proactive.core.component.controller.ProActiveController#getFcItfName()
      */
@@ -87,6 +100,7 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     /*
      * see {@link org.objectweb.fractal.api.Interface#getFcItfType()}
      */
+
     /*
      * @see org.objectweb.proactive.core.component.controller.ProActiveController#getFcItfType()
      */
@@ -99,7 +113,8 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
      */
     protected void checkLifeCycleIsStopped() throws IllegalLifeCycleException {
         try {
-            if (!((LifeCycleController) getFcItfOwner().getFcInterface(Constants.LIFECYCLE_CONTROLLER)).getFcState()
+            if (!((LifeCycleController) getFcItfOwner()
+                      .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).getFcState()
                       .equals(LifeCycleController.STOPPED)) {
                 throw new IllegalLifeCycleException(
                     "this control operation should be performed while the component is stopped");
@@ -113,6 +128,6 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     protected void setItfType(InterfaceType itfType) {
         this.interfaceType = itfType;
     }
-    
+
     protected abstract void setControllerItfType();
 }

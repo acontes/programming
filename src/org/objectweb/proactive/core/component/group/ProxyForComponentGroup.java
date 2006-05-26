@@ -1,14 +1,21 @@
-package org.objectweb.proactive.core.group;
+package org.objectweb.proactive.core.component.group;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.group.ProActiveComponentGroup;
+import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
-
+/**
+ * An extension of the standard group proxy for handling groups of components.
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public class ProxyForComponentGroup extends ProxyForGroup {
     protected ComponentType componentType;
     protected ControllerDescription controllerDesc;
@@ -54,5 +61,41 @@ public class ProxyForComponentGroup extends ProxyForGroup {
             e.printStackTrace();
             return null;
         }
+    }
+
+    
+    /**
+     * @return Returns the componentType.
+     */
+    public ComponentType getComponentType() {
+    
+        return componentType;
+    }
+
+    
+    /**
+     * @param componentType The componentType to set.
+     */
+    public void setComponentType(ComponentType componentType) {
+    
+        this.componentType = componentType;
+    }
+
+    
+    /**
+     * @return Returns the controllerDesc.
+     */
+    public ControllerDescription getControllerDesc() {
+    
+        return controllerDesc;
+    }
+
+    
+    /**
+     * @param controllerDesc The controllerDesc to set.
+     */
+    public void setControllerDesc(ControllerDescription controllerDesc) {
+    
+        this.controllerDesc = controllerDesc;
     }
 }

@@ -4,9 +4,6 @@ import java.util.List;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.ContentController;
-import org.objectweb.fractal.api.control.IllegalContentException;
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.proactive.core.component.exceptions.ContentControllerExceptionListException;
 
 

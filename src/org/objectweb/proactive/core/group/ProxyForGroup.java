@@ -101,7 +101,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     transient protected ThreadPool threadpool;
 
     /** Used for profiling */
-    private CompositeAverageMicroTimer timer;
+    protected CompositeAverageMicroTimer timer;
 
     /* ----------------------- CONSTRUCTORS ----------------------- */
     public ProxyForGroup(String nameOfClass)
@@ -1260,6 +1260,33 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     
     protected void redistributeParameters(MethodCall mc) {
         // nothing here
+    }
+
+    
+    /**
+     * @return Returns the className.
+     */
+    public String getClassName() {
+    
+        return className;
+    }
+
+    
+    /**
+     * @return Returns the memberList.
+     */
+    public Vector getMemberList() {
+    
+        return memberList;
+    }
+
+    
+    /**
+     * @param className The className to set.
+     */
+    public void setClassName(String className) {
+    
+        this.className = className;
     }
 
 }

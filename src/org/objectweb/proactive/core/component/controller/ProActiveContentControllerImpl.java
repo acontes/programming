@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -61,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of ContentController (@see org.objectweb.fractal.api.control.ContentController).
+ * Implementation of {@link org.objectweb.fractal.api.control.ContentController content controller}
  *
  * @author Matthieu Morel
  *
@@ -152,6 +151,15 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
             // pb is that the subComponent might not be stopped
             try {
                 // could not do this invocation on a group (non reifiable return type)
+            	if (ProActiveGroup.isGroup(subComponent)) {
+            		try {
+						addFcSubComponent(ProActiveGroup.getGroup(subComponent));
+					} catch (ContentControllerExceptionListException e) {
+						e.printStackTrace();
+						throw new IllegalContentException("problem adding a list of component to a composite : " + e.getMessage());
+					}
+            		return;
+            	}
                 if (Fractal.getSuperController(subComponent)
                                .getFcSuperComponents().length != 0) {
                     throw new IllegalContentException(

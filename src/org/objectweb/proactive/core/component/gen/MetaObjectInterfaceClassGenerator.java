@@ -95,13 +95,13 @@ public class MetaObjectInterfaceClassGenerator
     }
 
     public ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, ProActiveInterfaceType interfaceType,
-        boolean isInternal, boolean isFunctionalInterface)
+        Component owner, ProActiveInterfaceType interfaceType, boolean isInternal,
+        boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
             if (ProActiveLogger.getLogger(
-                        Loggers.COMPONENTS_BYTECODE_GENERATION).isDebugEnabled()) {
-                ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION)
+                        Loggers.COMPONENTS_GEN_ITFS).isDebugEnabled()) {
+                ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS)
                                .debug("generating metaobject interface reference");
             }
 
@@ -223,21 +223,19 @@ public class MetaObjectInterfaceClassGenerator
                 //                System.out.println("[JAVASSIST] generated class : " +
                 //                    generatedClassFullName);
                 byte[] bytecode = generatedCtClass.toBytecode();
-                ClassDataCache.instance()
-                              .addClassData(generatedClassFullName,
+                ClassDataCache.instance().addClassData(generatedClassFullName,
                     generatedCtClass.toBytecode());
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassFullName +
                         " to cache");
                 }
-                //                if (logger.isDebugEnabled()) {
-                //                    logger.debug("generated classes cache is : " +
-                //                        generatedClassesCache.toString());
-                //                }
+                if (logger.isDebugEnabled()) {
+                    logger.debug("generated classes cache is : " +
+                        ClassDataCache.instance().toString());
+                }
 
                 // convert the bytes into a Class
-                generated_class = Utils.defineClass(generatedClassFullName,
-                        bytecode);
+                generated_class = Utils.defineClass(generatedClassFullName, bytecode);
             }
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();

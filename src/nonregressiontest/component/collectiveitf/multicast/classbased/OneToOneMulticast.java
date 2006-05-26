@@ -2,11 +2,11 @@ package nonregressiontest.component.collectiveitf.multicast.classbased;
 
 import java.util.List;
 
-import org.objectweb.proactive.core.component.type.annotations.collective.ClassDispatchMetadata;
-import org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatchMetadata;
-import org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatchMode;
-
 import nonregressiontest.component.collectiveitf.multicast.WrappedInteger;
+
+import org.objectweb.proactive.core.component.type.annotations.multicast.ClassDispatchMetadata;
+import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata;
+import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
 
 // only testing one mode
 @ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.ONE_TO_ONE))

@@ -73,7 +73,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener,
     private int xCenter = SIZE / 2; // the center of the display
     private int yCenter = SIZE / 2;
 
-    // gui
+    // defaultGui
     private JButton kill;
     private JComboBox listVMs = new JComboBox();
     private JComboBox protocol;

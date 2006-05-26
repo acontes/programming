@@ -5,6 +5,8 @@
 package nonregressiontest.component.descriptor.fractaladl;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.fractal.adl.Factory;
@@ -16,17 +18,19 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.component.adl.Launcher;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
+import nonregressiontest.component.I1Multicast;
 import nonregressiontest.component.Message;
 import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
 
 
 /**
- * For a graphical representation, open the MessagePassingExample.fractal with the fractal gui
+ * For a graphical representation, open the MessagePassingExample.fractal with the fractal defaultGui
  *
  * This test verifies the parsing and building of a component system using a customized Fractal ADL,
  * and tests new features such as exportation of virtual nodes and cardinality of virtual nodes.
@@ -36,7 +40,7 @@ import nonregressiontest.component.PrimitiveComponentB;
  */
 public class Test extends ComponentTest {
     public static String MESSAGE = "-->m";
-    private Message message;
+    private List<Message> messages;
 
     //ComponentsCache componentsCache;
     ProActiveDescriptor deploymentDescriptor;
@@ -66,18 +70,23 @@ public class Test extends ComponentTest {
         
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
-        context.put("deployment-descriptor", ProActive.getProactiveDescriptor(Test.class.getResource(
-        "/nonregressiontest/component/descriptor/deploymentDescriptor.xml")
-        .getPath()));
+        deploymentDescriptor = ProActive.getProactiveDescriptor(Test.class.getResource(
+                "/nonregressiontest/component/descriptor/deploymentDescriptor.xml").getPath());
+        context.put("deployment-descriptor",deploymentDescriptor);
         Component root = (Component) f.newComponent("nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",context);
         Fractal.getLifeCycleController(root).startFc();
         Component[] subComponents = Fractal.getContentController(root).getFcSubComponents();
         for (Component component : subComponents) {
             if ("parallel".equals(Fractal.getNameController(component).getFcName())) {
                 // invoke method on composite
-                I1 i1 = (I1) component.getFcInterface("i1");
+                I1Multicast i1Multicast  = (I1Multicast) component.getFcInterface("i1");
                 //I1 i1= (I1)p1.getFcInterface("i1");
-                message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
+                messages =  i1Multicast.processInputMessage(new Message(MESSAGE));
+
+                for (Iterator iter = messages.iterator(); iter.hasNext();) {
+					Message element = (Message) iter.next();
+					element.append(MESSAGE);
+				}
                 break;
             }
             
@@ -98,6 +107,7 @@ public class Test extends ComponentTest {
     public void endTest() throws Exception {
 //        Launcher.killNodes(false);
         Registry.instance().clear();
+        deploymentDescriptor.killall(false);
     }
 
     public boolean postConditions() throws Exception {
@@ -106,19 +116,22 @@ public class Test extends ComponentTest {
         //        		message.printToStream(System.out);
         //        		System.out.println("-------------------------------------------------");
         StringBuffer resulting_msg = new StringBuffer();
-        int nb_messages = append(resulting_msg, message);
+        Object futureValue = ProActive.getFutureValue(messages);
+        Message m = (Message)((Group)futureValue).getGroupByType();
+//        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
+        int nb_messages = append(resulting_msg, m);
+        
 
-        //System.out.println("*** received " + nb_messages + "  : " +
-        //    resulting_msg.toString());
-        //System.out.println("***" + resulting_msg.toString());
+//        System.out.println("*** received " + nb_messages + "  : " +
+//            resulting_msg.toString());
+//        System.out.println("***" + resulting_msg.toString());
         // this --> primitiveC --> primitiveA --> primitiveB--> primitiveA --> primitiveC --> this  (message goes through parallel and composite components)
         String single_message = Test.MESSAGE + PrimitiveComponentA.MESSAGE +
             PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE +
             Test.MESSAGE;
 
-        // there should be 6 messages with the current configuration
-        return resulting_msg.toString().equals(single_message + single_message +
-            single_message + single_message + single_message + single_message);
+        // there should be 4 messages with the current configuration
+        return resulting_msg.toString().equals(single_message + single_message + single_message + single_message);
     }
 
     private int append(StringBuffer buffer, Message message) {
@@ -137,16 +150,19 @@ public class Test extends ComponentTest {
 
     public static void main(String[] args) {
         
-        System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
-        System.setProperty("java.security.policy", System.getProperty("user.dir")+"/proactive.java.policy");
-        System.setProperty("log4j.configuration", System.getProperty("user.dir")+"/proactive-log4j");
-        System.setProperty("log4j.configuration", "file:" + System.getProperty("user.dir")+"/proactive-log4j");
-        System.setProperty("nonregressiontest.descriptor.defaultnodes.file", "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
+//        System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
+//        System.setProperty("java.security.policy", System.getProperty("user.dir")+"/proactive.java.policy");
+//        System.setProperty("log4j.configuration", System.getProperty("user.dir")+"/proactive-log4j");
+//        System.setProperty("log4j.configuration", "file:" + System.getProperty("user.dir")+"/proactive-log4j");
+//        System.setProperty("nonregressiontest.descriptor.defaultnodes.file", "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
         Test test = new Test();
         try {
             test.action();
-            test.postConditions();
-            System.out.println("SUCCESS!");
+            if (test.postConditions() ) {
+            	System.out.println("SUCCESS!");
+            } else {
+            	System.out.println("FAILED!");
+            }
         } catch (Exception e) {
             System.out.println("FAILED!");
             e.printStackTrace();

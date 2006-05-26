@@ -102,6 +102,14 @@ public class ContentDescription {
     public String getClassName() {
         return className;
     }
+    
+    /**
+     * setter for the classname
+     * @param the name of the class
+     */
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
     /**
      * getter for the constructor parameters

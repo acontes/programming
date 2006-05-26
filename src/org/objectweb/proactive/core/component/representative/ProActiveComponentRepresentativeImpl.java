@@ -45,7 +45,6 @@ import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
@@ -57,7 +56,6 @@ import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
-import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
@@ -128,6 +126,7 @@ public class ProActiveComponentRepresentativeImpl
         try {
             for (int j = 0; j < interface_types.length; j++) {
             	if (!interface_types[j].isFcCollectionItf()) {
+            		
             		// itfs members of collection itfs are dynamically generated
                 Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
                                                                                      .generateFunctionalInterface(interface_types[j].getFcItfName(),
@@ -136,7 +135,8 @@ public class ProActiveComponentRepresentativeImpl
                 // all calls are to be reified
                 fcInterfaceReferences.put(interface_reference.getFcItfName(),
                     interface_reference);
-            	}
+            	} 
+            	
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -145,12 +145,6 @@ public class ProActiveComponentRepresentativeImpl
         }
     }
 
-    /**
-     * @param componentType
-     * @param hierarchicalType
-     * @param controllersConfigFileLocation
-     * @return
-     */
     private void addControllers(ComponentType componentType,
         String controllersConfigFileLocation) {
         if (controllersConfigFileLocation == null) {
@@ -162,11 +156,6 @@ public class ProActiveComponentRepresentativeImpl
         addControllers(componentType, controllersConfiguration);
     }
 
-    /**
-     * @param componentType
-     * @param hierarchicalType
-     * @param controllersConfiguration
-     */
     private void addControllers(ComponentType componentType,
         Map controllersConfiguration) {
         // create the interface references tables
@@ -243,7 +232,7 @@ public class ProActiveComponentRepresentativeImpl
         try {
             return proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
                     Class.forName(className).getDeclaredMethod(methodName,
-                        parameterTypes), effectiveParameters, (String) null,
+                        parameterTypes), effectiveParameters, (String) null, null,
                     priority));
 
             // functional interface name is null
@@ -387,12 +376,6 @@ public class ProActiveComponentRepresentativeImpl
         return ((Integer) result).intValue();
     }
     
-    public String toString() {
-    	Object result = reifyCall(Object.class.getName(), "toString",
-                new Class[] {  }, new Object[] {  },
-                ComponentRequest.STRICT_FIFO_PRIORITY);
-        return ((String) result).toString();
-    }
 
     /**
      * Only valid for a single element. return null for a group.
@@ -417,7 +400,7 @@ public class ProActiveComponentRepresentativeImpl
     /*
      * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
      */
-    public Component getRepresentativeOnThis() {
+    public ProActiveComponent getRepresentativeOnThis() {
         return this;
     }
 
@@ -435,7 +418,6 @@ public class ProActiveComponentRepresentativeImpl
         stubOnBaseObject = stub;
     }
 
-
     private boolean isPrimitive() {
         return Constants.PRIMITIVE.equals(hierarchicalType);
     }
@@ -446,6 +428,5 @@ public class ProActiveComponentRepresentativeImpl
 
 	public void _terminateAOImmediatly(Proxy proxy) {
 	}
-	
 	
 }

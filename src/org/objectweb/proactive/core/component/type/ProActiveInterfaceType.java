@@ -7,21 +7,21 @@ public interface ProActiveInterfaceType extends InterfaceType {
     /**
      * Returns the cardinality of this interface. The possible cardinalities are :
      * <ul>
-     *  <li> {@link ProActiveTypeFactory#SINGLE_CARDINALITY SINGLE}</li>
-     *  <li> {@link ProActiveTypeFactory#COLLECTION_CARDINALITY COLLECTION}</li>
-     *  <li> {@link ProActiveTypeFactory#MULTICAST_CARDINALITY MULTICAST}</li>
-     *  <li> {@link ProActiveTypeFactory#GATHERCAST_CARDINALITY GATHERCAST}</li>
+     *  <li> {@link ProActiveTypeFactory#SINGLETON_CARDINALITY singleton}</li>
+     *  <li> {@link ProActiveTypeFactory#COLLECTION_CARDINALITY collection}</li>
+     *  <li> {@link ProActiveTypeFactory#MULTICAST_CARDINALITY multicast}</li>
+     *  <li> {@link ProActiveTypeFactory#GATHER_CARDINALITY gathercast}</li>
      *  </ul>
      *
      * @return the cardinality of the interface
      */
     public String getFcCardinality();
     
-    public boolean isFcSingleItf();
+    public boolean isFcSingletonItf();
     
     public boolean isFcMulticastItf();
     
-    public boolean isFcGatherCastItf();
+    public boolean isFcGathercastItf();
     
     
 

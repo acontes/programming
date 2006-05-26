@@ -57,9 +57,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
 //            	Class serverSideItfClass = Class.forName(sItf.getSignature());
                 if (!clientSideItfClass.isAssignableFrom(serverSideItfClass)) {
                     // check if multicast interface
-                    if (cItf.getCardinality()
-                            .equals(ProActiveTypeInterface.MULTICAST_CARDINALITY)) {
-
+                    if (ProActiveTypeInterface.MULTICAST_CARDINALITY.equals(cItf.getCardinality())) {
 
                         Method[] clientSideItfMethods = clientSideItfClass.getMethods();
                         Method[] serverSideItfMethods = serverSideItfClass.getMethods();

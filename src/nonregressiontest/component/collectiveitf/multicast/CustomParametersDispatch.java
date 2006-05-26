@@ -2,12 +2,13 @@ package nonregressiontest.component.collectiveitf.multicast;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
-import org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch;
+import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch;
 
 
 public class CustomParametersDispatch implements ParamDispatch {
@@ -15,7 +16,7 @@ public class CustomParametersDispatch implements ParamDispatch {
     /*
        * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#dispatch(java.lang.Object, int)
        */
-    public Map<Integer, Object> dispatch(Object inputParameter, int nbOutputReceivers)
+    public List<Object> dispatch(Object inputParameter, int nbOutputReceivers)
         throws ParameterDispatchException {
 
         if (!(inputParameter instanceof List)
@@ -25,8 +26,8 @@ public class CustomParametersDispatch implements ParamDispatch {
                     "needs a List of (at least 1) WrappedInteger elements");
         }
 
-        Map<Integer, Object> result = new HashMap<Integer, Object>(1);
-        result.put(0, (WrappedInteger)((List) inputParameter).get(0));
+        List<Object> result = new ArrayList<Object>();
+        result.add((WrappedInteger)((List) inputParameter).get(0));
         return result;
     }
 

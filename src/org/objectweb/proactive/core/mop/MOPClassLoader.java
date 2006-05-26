@@ -78,8 +78,10 @@ public class MOPClassLoader extends URLClassLoader {
         byte[] cb = null;
         cb = (byte[]) classDataCache.get(classname);
         if (cb == null) {
-            logger.info(
-                "MOPClassLoader: class not found, trying to generate it");
+        	if (logger.isDebugEnabled()) {
+        		logger.debug(
+                	"MOPClassLoader: class not found, trying to generate it");
+        	}
             try {
                 this.loadClass(classname);
             } catch (ClassNotFoundException e) {
@@ -191,7 +193,6 @@ public class MOPClassLoader extends URLClassLoader {
                 //    e.printStackTrace();
                 String classname = Utils.convertStubClassNameToClassName(name);
 
-                //ASM is now the default bytecode manipulator
                 byte[] data = null;
 //                if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
 //                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);

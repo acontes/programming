@@ -29,8 +29,12 @@
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveNameController</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.CollectiveInterfacesController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.CollectiveInterfacesControllerImpl</implementation>
+            <interface>org.objectweb.proactive.core.component.controller.MulticastController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.MulticastControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.GathercastController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.GathercastControllerImpl</implementation>
         </controller>
     </controllers>
     

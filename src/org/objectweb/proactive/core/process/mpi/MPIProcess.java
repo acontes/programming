@@ -51,8 +51,6 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
      * Firsts parameters
      */
     private static final long serialVersionUID = 1L;
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     protected static final String DEFAULT_HOSTSFILENAME_PATH = ".machinefile";
     protected static final String DEFAULT_MPICOMMAND_PATH = "/usr/bin/mpirun";
     protected static final String DEFAULT_FILE_LOCATION = System.getProperty(
@@ -98,15 +96,12 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
     protected String buildMPICommand() {
         StringBuffer mpiSubCommand = new StringBuffer();
         mpiSubCommand.append(this.command_path).append(" ");
-
-        mpiSubCommand.append("-machinefile").append(" ");
         if (remotePath != null) {
-            mpiSubCommand.append(remotePath).append("/");
-        } else {
-            mpiSubCommand.append(localPath).append("/");
+        	mpiSubCommand.append("-machinefile").append(" ");
+        	mpiSubCommand.append(remotePath).append("/"); 
+        	mpiSubCommand.append(this.hostsFileName).append(" ");
+        	mpiSubCommand.append("-nolocal").append(" ");
         }
-        mpiSubCommand.append(this.hostsFileName).append(" ");
-        mpiSubCommand.append("-nolocal").append(" ");
 
         mpiSubCommand.append("-np").append(" ");
         mpiSubCommand.append(this.hostsNumber).append(" ");
@@ -127,8 +122,8 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
         if (remotePath != null) {
             ft.addFile(localPath + "/" + hostsFileName,
                 remotePath + "/" + hostsFileName);
-            // System.out.println(localPath + "/" + hostsFileName + " --> " +
-            //                     remotePath + "/" + hostsFileName);
+            //    System.out.println(localPath + "/" + hostsFileName + " --> " +
+            //                        remotePath + "/" + hostsFileName);
         }
 
         //        System.out.println(localPath + "/" + hostsFileName + " --> " +

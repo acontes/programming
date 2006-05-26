@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -80,7 +79,7 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
                                               isOptional,
                                               (isCollection
                                                ? ProActiveTypeFactory.COLLECTION_CARDINALITY
-                                               : ProActiveTypeFactory.SINGLE_CARDINALITY));
+                                               : ProActiveTypeFactory.SINGLETON_CARDINALITY));
     }
 
     /*

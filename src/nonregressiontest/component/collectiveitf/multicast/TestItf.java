@@ -1,10 +1,5 @@
 package nonregressiontest.component.collectiveitf.multicast;
 
-import org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatchMetadata;
-import org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatchMode;
-import org.objectweb.proactive.core.component.type.annotations.collective.MethodDispatchMetadata;
-
-import java.util.List;
 
 /**
  * @author Matthieu Morel

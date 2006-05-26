@@ -7,10 +7,10 @@ import org.objectweb.fractal.api.type.TypeFactory;
 
 public interface ProActiveTypeFactory extends TypeFactory {
     
-    public static final String SINGLE_CARDINALITY="single";
+    public static final String SINGLETON_CARDINALITY="singleton";
     public static final String COLLECTION_CARDINALITY="collection";
     public static final String MULTICAST_CARDINALITY = "multicast";
-    public static final String GATHERCAST_CARDINALITY = "gathercast";
+    public static final String GATHER_CARDINALITY = "gathercast";
 
     /**
      * Creates an interface type.

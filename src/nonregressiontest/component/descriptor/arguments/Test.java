@@ -64,4 +64,10 @@ public class Test extends ComponentTest {
     private Component getDummy() {
         return dummy;
     }
+    
+    
+    public static void main(String[] args) throws Throwable {
+    	Test t = new Test();
+    	t.action();
+    }
 }

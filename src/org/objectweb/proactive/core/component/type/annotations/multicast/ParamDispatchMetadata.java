@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.component.type.annotations.collective;
+package org.objectweb.proactive.core.component.type.annotations.multicast;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

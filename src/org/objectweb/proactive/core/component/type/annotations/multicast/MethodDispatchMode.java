@@ -1,8 +1,7 @@
-package org.objectweb.proactive.core.component.type.annotations.collective;
+package org.objectweb.proactive.core.component.type.annotations.multicast;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.Map;
+import java.util.List;
 
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 
@@ -13,9 +12,9 @@ public enum MethodDispatchMode implements MethodDispatch, Serializable {BROADCAS
     /*
      * @see org.objectweb.proactive.core.component.type.annotations.collective.MethodDispatch#dispatch(java.lang.Object[], int)
      */
-    public Map<Integer, Object>[] dispatch(Object[] inputParameters, int nbOutputReceivers) throws ParameterDispatchException {
+    public List<Object>[] dispatch(Object[] inputParameters, int nbOutputReceivers) throws ParameterDispatchException {
 
-        Map<Integer, Object>[] result = new Map[inputParameters.length];
+        List<Object>[] result = new List[inputParameters.length];
         for (int i=0; i<inputParameters.length; i++) {
             switch (this) {
             case BROADCAST:

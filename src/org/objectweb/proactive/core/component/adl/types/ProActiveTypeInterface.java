@@ -23,7 +23,6 @@
 
 package org.objectweb.proactive.core.component.adl.types;
 
-import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.types.TypeInterface;
 
 /**
@@ -32,4 +31,5 @@ import org.objectweb.fractal.adl.types.TypeInterface;
 
 public interface ProActiveTypeInterface extends TypeInterface {
   String MULTICAST_CARDINALITY = "multicast";
+  String GATHER_CARDINALITY = "gathercast";
 }

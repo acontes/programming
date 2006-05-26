@@ -1,17 +1,40 @@
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
-import org.objectweb.proactive.core.component.type.annotations.collective.*;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.lang.reflect.ParameterizedType;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
+import org.objectweb.proactive.core.component.type.annotations.multicast.ClassDispatchMetadata;
+import org.objectweb.proactive.core.component.type.annotations.multicast.MethodDispatchMetadata;
+import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch;
+import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata;
+import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
 
 /**
+ * This class is a utility class for checking that a method invocation can be
+ * passed from a client multicast interface to a connected server interface.<br>
+ * <p>
+ * A request can be transferred from a client multicast interface to a server
+ * interface if there is a match between the signature of the invoked method in
+ * the (annotated) multicast interface and a method in the server interface.
+ * 
  * @author Matthieu Morel
+ * 
  */
 public class MulticastBindingChecker {
+    
+    /**
+     * client method List<A> foo (B, List<C>) throws E; <br>
+     * must be matched by <br>
+     * server method A foo(B, C (or list<C>, depending on the dispatch mode) ) throws E;
+     * @param clientSideMethod
+     * @param serverSideMethods
+     * @return
+     * @throws ParameterDispatchException
+     * @throws NoSuchMethodException
+     */
     public static Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods) throws ParameterDispatchException, NoSuchMethodException {
         Method result = null;
         Type clientSideReturnType = clientSideMethod.getGenericReturnType();
@@ -29,9 +52,14 @@ public class MulticastBindingChecker {
 
             // 2. check return types
             if (!(clientSideReturnType == Void.TYPE)) {
-                Class clientSideTypeArgument = (Class) ((ParameterizedType) clientSideMethod.getGenericReturnType()).getActualTypeArguments()[0];
-
-                if (!(clientSideTypeArgument.isAssignableFrom(
+            	Type cType = ((ParameterizedType) clientSideMethod.getGenericReturnType()).getActualTypeArguments()[0];
+            	Class clientSideReturnTypeArgument = null; 
+            	if (cType instanceof ParameterizedType) { 
+            		clientSideReturnTypeArgument = (Class)((ParameterizedType)cType).getRawType();
+            	} else {
+            		clientSideReturnTypeArgument = (Class) cType;	
+            	}
+                if (!(clientSideReturnTypeArgument.isAssignableFrom(
                             serverSideMethod.getReturnType()))) {
                     continue serverSideMethodsLoop;
                 }
@@ -45,14 +73,9 @@ public class MulticastBindingChecker {
             Type[] serverSideParametersTypes = serverSideMethod.getGenericParameterTypes();
 
             for (int i=0; i<serverSideMethod.getGenericParameterTypes().length; i++) {
-                try {
                     if (!(paramDispatchModes[i].match(clientSideParametersTypes[i], serverSideParametersTypes[i]))) {
                         continue serverSideMethodsLoop;
                     }
-                } catch (NullPointerException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
             }
 
             // 4. check exception types
@@ -85,6 +108,12 @@ public class MulticastBindingChecker {
         return result;
     }
 
+    /**
+     * Returns the parameter dispatch mode specified by a {@link ParamDispatchMetadata ParamDispatchMetadata} annotation
+     * @param a annotation
+     * @return the parameters dipatch mode
+     * @throws ParameterDispatchException 
+     */
     public static ParamDispatch getParamDispatchMode(ParamDispatchMetadata a)
         throws ParameterDispatchException {
         ParamDispatch mode = null;
@@ -100,12 +129,12 @@ public class MulticastBindingChecker {
             } catch (InstantiationException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                    ((CustomParamDispatch) a).mode(),
+                    ((ParamDispatchMetadata) a).customMode(),
                     e);
             } catch (IllegalAccessException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                    ((CustomParamDispatch) a).mode(),
+                    ((ParamDispatchMetadata) a).customMode(),
                     e);
             }
         }
@@ -113,6 +142,12 @@ public class MulticastBindingChecker {
         return mode;
     }
 
+    /**
+     * Returns the dispatch modes for the parameters of a method, as specified for each annotated parameter
+     * @param matchingMethodInClientInterface a method of a multicast interface
+     * @return an array of dispatch modes (default for non-annotated parameters is broadcast)
+     * @throws ParameterDispatchException
+     */
     public static ParamDispatch[] getDispatchModes(Method matchingMethodInClientInterface) throws ParameterDispatchException {
         ParamDispatch[] result = new ParamDispatch[matchingMethodInClientInterface.getParameterTypes().length];
 

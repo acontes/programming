@@ -75,11 +75,11 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                 if (object instanceof ProActiveComponentRepresentative) {
                     // delegate to the corresponding interface
                     Object target;
-                    if (mc.getComponentInterfaceName() == null) {
+                    if (mc.getComponentMetadata().getComponentInterfaceName() == null) {
                         // a call on the Component interface
                         target = object;
                     } else {
-                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentInterfaceName());
+                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentMetadata().getComponentInterfaceName());
                     }
                     this.proxyGroup.addToListOfResult(memberListOfResultGroup,
                         this.mc.execute(target), this.index);

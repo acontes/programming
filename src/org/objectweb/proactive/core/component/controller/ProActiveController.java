@@ -60,4 +60,6 @@ public interface ProActiveController {
      * see {@link org.objectweb.fractal.api.Interface#getFcItfType()}
      */
     public abstract Type getFcItfType();
+    
+    public void init();
 }

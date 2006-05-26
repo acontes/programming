@@ -94,10 +94,10 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                         if (object instanceof ProActiveComponentRepresentative) {
                             // delegate to the corresponding interface
                             Object target;
-                            if (mc.isComponentMethodCallOnComponent()) {
+                            if (mc.getComponentMetadata() !=null) {
                                 target = object;
                             } else {
-                                target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentInterfaceName());
+                                target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentMetadata().getComponentInterfaceName());
                             }
                             this.mc.execute(target);
                         } else {
@@ -107,7 +107,8 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                 } else {
                     if (object instanceof ProActiveComponentRepresentative) {
                         // delegate to the corresponding interface
-                        Object target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentInterfaceName());
+                        Object target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentMetadata().getComponentInterfaceName());
+                        // TODO : possible optimization? (just reify, avoid execution)
                         this.mc.execute(target);
                     } else {
                         ((StubObject) object).getProxy().reify(this.mc);

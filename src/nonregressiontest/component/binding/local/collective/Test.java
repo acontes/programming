@@ -199,16 +199,10 @@ public class Test extends ComponentTest {
         Fractal.getLifeCycleController(pB6).startFc();
         ((I1)pE.getFcInterface("i1")).processInputMessage(new Message(""));
         Message expected = new Message("composite-"+PrimitiveComponentB.MESSAGE);
-        System.out.println("\n\n");
         Message m1 = ((I2)c1.getFcInterface("i2-server-01")).processOutputMessage(new Message("composite-"));
-        System.out.println("m1 = " + m1);
         Message m2 = ((I2)c1.getFcInterface("i2-server-02")).processOutputMessage(new Message("composite-"));
-        System.out.println("m2 = " + m2);
-        System.out.println("#1");
         Assertions.assertEquals(new Message("composite-"+PrimitiveComponentB.MESSAGE).toString(), ProActive.getFutureValue(m1).toString());
-        System.out.println("#2");
         Assertions.assertEquals(new Message("composite-"+PrimitiveComponentB.MESSAGE).toString(), ProActive.getFutureValue(m2).toString());
-        System.out.println("#3");
     }
 
     /**

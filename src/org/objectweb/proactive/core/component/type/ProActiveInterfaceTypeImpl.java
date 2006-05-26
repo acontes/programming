@@ -82,7 +82,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         if(itfType.isFcCollectionItf()) {
             cardinality = ProActiveTypeFactory.COLLECTION_CARDINALITY;
         } else {
-            cardinality = ProActiveTypeFactory.SINGLE_CARDINALITY;
+            cardinality = ProActiveTypeFactory.SINGLETON_CARDINALITY;
         }
     }
     
@@ -180,20 +180,20 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     }
     
     public boolean isFcCollective() {
-        return (ProActiveTypeFactory.GATHERCAST_CARDINALITY.equals(cardinality)
+        return (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality)
                  || (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)));
     }
 
-    public boolean isFcGatherCastItf() {
-        return ProActiveTypeFactory.GATHERCAST_CARDINALITY.equals(cardinality);
+    public boolean isFcGathercastItf() {
+        return ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality);
     }
 
     public boolean isFcMulticastItf() {
         return ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality);
     }
 
-    public boolean isFcSingleItf() {
-        return ProActiveTypeFactory.SINGLE_CARDINALITY.equals(cardinality);
+    public boolean isFcSingletonItf() {
+        return ProActiveTypeFactory.SINGLETON_CARDINALITY.equals(cardinality);
     }
     
     /*

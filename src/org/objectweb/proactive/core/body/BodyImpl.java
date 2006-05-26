@@ -454,7 +454,7 @@ public abstract class BodyImpl extends AbstractBody
                     BodyImpl.this, future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
-            if (methodCall.isComponentMethodCall()) {
+            if (methodCall.getComponentMetadata()!=null) {
                 request = new ComponentRequestImpl((RequestImpl) request);
             }
             if (future != null) {
@@ -472,23 +472,24 @@ public abstract class BodyImpl extends AbstractBody
             }
         }
 
-        //
-        // -- PROTECTED METHODS -----------------------------------------------
-        //
-
         /**
          * Returns a unique identifier that can be used to tag a future, a request
          * @return a unique identifier that can be used to tag a future, a request.
          */
-        private synchronized long getNextSequenceID() {
+        public synchronized long getNextSequenceID() {
             return ++absoluteSequenceID;
         }
+
+        //
+        // -- PROTECTED METHODS -----------------------------------------------
+        //
+
         
         /**
-         * Test if the MethodName of the request is "terminateAO" or "terminateAOImmediatly".
+         * Test if the MethodName of the request is "terminateAO" or "terminateAOImmediately".
          * If true, AbstractBody.terminate() is called
          * @param request The request to serve 
-         * @return true if the name of the method is "terminateAO" or "terminateAOImmediatly".
+         * @return true if the name of the method is "terminateAO" or "terminateAOImmediately".
          */
         private boolean isTerminateAORequest(Request request) {
         	boolean terminateRequest = (request.getMethodName()).startsWith("_terminateAO");
@@ -543,6 +544,15 @@ public abstract class BodyImpl extends AbstractBody
             UniversalBody destinationBody) throws java.io.IOException {
             throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
         }
+
+        /*
+         * @see org.objectweb.proactive.core.body.LocalBodyStrategy#getNextSequenceID()
+         */
+        public long getNextSequenceID() {
+            return 0;
+        }
+
+        
     }
 
     // end inner class LocalInactiveBody

@@ -61,11 +61,12 @@ public interface Loggers {
     static final public String COMPONENTS_CONTROLLERS = COMPONENTS + ".controllers";
     static final public String COMPONENTS_REQUESTS = COMPONENTS + ".requests";
     static final public String COMPONENTS_ACTIVITY = COMPONENTS + ".activity";
-    static final public String COMPONENTS_BYTECODE_GENERATION = COMPONENTS +
-        ".bytecodegeneration";
+    static final public String COMPONENTS_GEN_ITFS = COMPONENTS +".gen.interface";
+    static final public String COMPONENTS_GEN_ANNOTATION = COMPONENTS +".gen.annotation";
     static final public String COMPONENTS_ADL = COMPONENTS + ".adl";
     static final public String COMPONENTS_GUI = COMPONENTS + ".gui";
     static final public String COMPONENTS_MULTICAST = COMPONENTS + ".multicast";
+    static final public String COMPONENTS_GATHERCAST = COMPONENTS + ".gathercast";
     static final public String DEPLOYMENT = "proactive.deployment";
     static final public String DEPLOYMENT_PROCESS = DEPLOYMENT + ".process";
     static final public String DEPLOYMENT_LOG = DEPLOYMENT + ".log";

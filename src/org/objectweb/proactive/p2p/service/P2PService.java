@@ -42,17 +42,21 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
 import org.objectweb.proactive.p2p.service.node.P2PNode;
-import org.objectweb.proactive.p2p.service.node.P2PNodeAck;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -92,6 +96,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 P2PConstants.PROPERTY_EXPLORING_MSG)) - 1;
     private static final long ACQ_TO = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
+
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
      */
@@ -291,7 +296,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 // Asking node available?
                 Node nodeAvailable = askedNode.getNode();
                 if (nodeAvailable != null) {
-                    P2PNodeAck nodeAck = null;
+                    IntWrapper nodeAck;
 
                     try {
                         nodeAck = lookup.giveNode(nodeAvailable,
@@ -328,7 +333,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     }
 
                     // Waiting ACK or NACK
-                    if (nodeAck.ackValue()) {
+                    if (nodeAck.intValue() > -1) {
                         // Setting vnInformation and JobId
                         if (vnName != null) {
                             try {
@@ -343,8 +348,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                             nodeAvailable.getNodeInformation().setJobID(jobId);
                         }
                         numberOfNodes = (numberOfNodes == MAX_NODE) ? MAX_NODE
-                                                                    : (numberOfNodes -
-                            1);
+                                                                    : nodeAck.intValue();
                         logger.info("Giving 1 node to vn: " + vnName);
                     } else {
                         // It's a NACK node
@@ -433,43 +437,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
         return this.getNodes(numberOfNodes, ".*", vnName, jobId);
-    }
-
-    public P2PNodeLookup getNodes(int numberOfNodes, String vnName,
-        String jobId, boolean onlyUnderloaded) {
-        Object[] params = new Object[5];
-        params[0] = new Integer(numberOfNodes);
-        params[1] = this.stubOnThis;
-        params[2] = vnName;
-        params[3] = jobId;
-        params[4] = new Boolean(onlyUnderloaded);
-
-        P2PNodeLookup lookup = null;
-        try {
-            lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
-                    params, this.p2pServiceNode);
-            ProActive.enableAC(lookup);
-            this.waitingNodesLookup.add(lookup);
-        } catch (ActiveObjectCreationException e) {
-            logger.fatal("Couldn't create an active lookup", e);
-            return null;
-        } catch (NodeException e) {
-            logger.fatal("Couldn't connect node to creat", e);
-            return null;
-        } catch (IOException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Couldn't enable AC for a nodes lookup", e);
-            }
-        }
-
-        if (logger.isInfoEnabled()) {
-            if (numberOfNodes != MAX_NODE) {
-                logger.info("Asking for" + numberOfNodes + " nodes");
-            } else {
-                logger.info("Asking for maxinum nodes");
-            }
-        }
-        return lookup;
     }
 
     /**
@@ -711,4 +678,16 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         logger.debug("Exiting initActivity");
     }
 
+    /**
+     * @return the P2PService of this local JVM.
+     * @throws Exception no P2PService in this local JVM.
+     */
+    public static P2PService getLocalP2PService() throws Exception {
+        UniversalBody body = (UniversalBody) ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getActiveObjects(P2P_NODE_NAME,
+                P2PService.class.getName()).get(0);
+        return (P2PService) MOP.newInstance(P2PService.class.getName(),
+            (Object[]) null, Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
+            new Object[] { body });
+    }
 }

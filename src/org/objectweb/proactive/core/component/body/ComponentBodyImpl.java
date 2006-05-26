@@ -115,6 +115,9 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     public ProActiveComponentImpl getProActiveComponentImpl() {
         return (ProActiveComponentImpl)componentIdentity;
     }
+    
+    
+    
 
     /**
      * overrides the @link{Body#isActive()} method :
@@ -166,6 +169,14 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
             shortcutsOnThis = new HashMap();
         }
         shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
+    }
+
+    /*
+     * @see org.objectweb.proactive.core.body.AbstractBody#serve(org.objectweb.proactive.core.body.request.Request)
+     */
+    
+    public long getNextSequenceID() {
+        return localBodyStrategy.getNextSequenceID();
     }
 
 }

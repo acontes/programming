@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.component;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 
 
 /**
