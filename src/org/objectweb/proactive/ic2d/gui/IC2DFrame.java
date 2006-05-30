@@ -32,7 +32,7 @@ package org.objectweb.proactive.ic2d.gui;
 
 import javax.swing.JFrame;
 
-import org.objectweb.proactive.ic2d.controller.IC2DController;
+import org.objectweb.proactive.ic2d.controller.IC2DListener;
 
 public class IC2DFrame  extends JFrame {
 
@@ -56,7 +56,7 @@ public class IC2DFrame  extends JFrame {
 		/* sets the frame's dimensions */
 		this.setSize(new java.awt.Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		
-		this.addWindowListener(new IC2DController());
+		this.addWindowListener(new IC2DListener());
 	}
 	
 }
