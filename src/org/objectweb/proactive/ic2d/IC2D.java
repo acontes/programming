@@ -30,7 +30,12 @@
  */
 package org.objectweb.proactive.ic2d;
 
+
+import org.objectweb.proactive.ic2d.controller.DataObjectController;
+import org.objectweb.proactive.ic2d.controller.IC2DListener;
+import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.IC2DFrame;
+import org.objectweb.proactive.ic2d.gui.WorldPanel;
 
 /**
  * <p>
@@ -47,17 +52,32 @@ import org.objectweb.proactive.ic2d.gui.IC2DFrame;
  *
  */
 public class IC2D {
-
+	
 	/**
 	 * TODO comment
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO finish
-
-		IC2DFrame frame = new IC2DFrame();
 		
+		// The main frame
+		IC2DFrame frame = new IC2DFrame();
+		frame.addWindowListener(new IC2DListener());
+		
+		/*----- Model View Controller -----*/
+		
+		// The model
+		WorldObject model = new WorldObject();
+
+		// Controller
+		DataObjectController controller = new DataObjectController();
+		
+		// The view
+		WorldPanel view = new WorldPanel(model);
+		view.setController(controller);
+		
+		
+		/*---------------------------------*/
+		frame.add(view);
 		frame.setVisible(true);
 	}
-
 }
