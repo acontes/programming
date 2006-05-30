@@ -37,12 +37,14 @@ import java.awt.Frame;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.swing.JPanel;
+
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 
 /**
  * A panel for the representation of a DataObject
  */
-public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
+public abstract class AbstractDataObjectPanel  extends JPanel{
 	
 	//
 	// -- CONSTANTS -----------------------------------------------
@@ -75,7 +77,7 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
 	/** The parent's frame */
 	protected Frame parentFrame;
 	/** The object's childs */
-	private HashMap childs;
+	private HashMap children;
 	
 	/** The object's font */
 	protected Font defaultFont;
@@ -95,7 +97,7 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
      */
 	private AbstractDataObjectPanel(String name) {
 		this.name = name;
-		this.childs = new java.util.HashMap();
+		this.children = new HashMap();
 		setSize(minimumSize);
 		setToolTipText(name);
 	}
@@ -105,8 +107,7 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
 	 * @param parentDataObjectPanel
 	 * @param name
 	 */
-	public AbstractDataObjectPanel(
-			AbstractDataObjectPanel parentDataObjectPanel, String name) {
+	public AbstractDataObjectPanel(AbstractDataObjectPanel parentDataObjectPanel, String name) {
 		this(name);
 		this.parent = parentDataObjectPanel;
 		
@@ -119,8 +120,7 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
 	 * @param parentFrame
 	 * @param name
 	 */
-	public AbstractDataObjectPanel(
-			Frame parentFrame, String name) {
+	public AbstractDataObjectPanel(Frame parentFrame, String name) {
 		this(name);
 		this.parentFrame = parentFrame;
 		
@@ -156,8 +156,8 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
      * Returns an iterator over the object's childs
      * @return an iterator over the object's childs
      */
-    public Iterator childsIterator() {
-        return childs.values().iterator();
+    public Iterator childrenIterator() {
+        return children.values().iterator();
     }
     
     /**
@@ -177,8 +177,8 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
             return;
         }
         isDestroyed = true;
-        destroyCollection(childsIterator());
-        childs.clear();
+        destroyCollection(childrenIterator());
+        children.clear();
         parent = null;
     }
     
@@ -200,7 +200,7 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
      */
     protected synchronized AbstractDataObjectPanel getChild(
         AbstractDataObject key) {
-        return (AbstractDataObjectPanel) childs.get(key);
+        return (AbstractDataObjectPanel) children.get(key);
     }
     
  
@@ -215,7 +215,7 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
         if (isDestroyed) {
             return;
         }
-        childs.put(key, child);
+        children.put(key, child);
     }
     
     
@@ -224,8 +224,7 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
      * @param key
      * @param child
      */
-    protected synchronized void addChild(AbstractDataObject key,
-        AbstractDataObjectPanel child) {
+    protected synchronized void addChild(String key, AbstractDataObjectPanel child) {
         putChild(key, child);
         add(child);
         revalidate();
@@ -238,7 +237,7 @@ public abstract class AbstractDataObjectPanel  extends javax.swing.JPanel{
      */
     protected synchronized AbstractDataObjectPanel removeChild(
         AbstractDataObject key) {
-        AbstractDataObjectPanel panel = (AbstractDataObjectPanel) childs.remove(key);
+        AbstractDataObjectPanel panel = (AbstractDataObjectPanel) children.remove(key);
         if (panel != null) {
             panel.destroy();
             remove(panel);
