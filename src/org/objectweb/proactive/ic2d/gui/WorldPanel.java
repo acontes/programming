@@ -30,10 +30,13 @@
  */
 package org.objectweb.proactive.ic2d.gui;
 
+import java.util.EventListener;
+
 import org.objectweb.proactive.ic2d.data.WorldObject;
 
 public class WorldPanel extends AbstractDataObjectPanel{
 	
+	/** The Object corresponding to this graphical interface (the model) */
 	private WorldObject worldObject;
 	
 	//
@@ -42,6 +45,7 @@ public class WorldPanel extends AbstractDataObjectPanel{
 	
 	public WorldPanel(AbstractDataObjectPanel parentPanel, WorldObject worldObject){
 		super(parentPanel, "WorldObject");
+		
 		this.worldObject = worldObject;
 	}
 	
@@ -52,6 +56,11 @@ public class WorldPanel extends AbstractDataObjectPanel{
 	public void destroyObject() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	
+	public void setListener(EventListener listener) {
+		//TODO
 	}
 	
 }
