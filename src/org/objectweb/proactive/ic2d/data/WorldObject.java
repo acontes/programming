@@ -44,14 +44,21 @@ public class WorldObject extends AbstractDataObject {
 	 * TODO comment
 	 * @param parent
 	 */
-	public WorldObject(IC2DObject parent) {
-        super(parent);
+	public WorldObject() {
+        super(null);
     }
 	
 	
     //
     // -- PUBLICS METHODS -----------------------------------------------
     //
+	
+	
+	public String getKey() {
+		// A WorldObject doesn't need a key because it is the only son of IC2DObject.
+		return "WorldObject";
+	}
+	
 	
 	/**
 	 * TODO comment
@@ -93,17 +100,5 @@ public class WorldObject extends AbstractDataObject {
     // -- PROTECTED METHOD -----------------------------------------------
     //
     
-    /**
-     * TODO comment
-     * @return 
-     */
-    protected IC2DObject getTypedParent() {
-        return (IC2DObject) parent;
-    }
 
-
-	protected String getKey() {
-		// A WorldObject doesn't need a key because it is the only son of IC2DObject.
-		return "WorldObject";
-	}
 }
