@@ -56,6 +56,11 @@ public class HostObject extends AbstractDataObject {
     // -- PUBLIC METHODS -----------------------------------------------
     //
 	
+	public String getKey() {
+		return hostname+":"+os;
+	}
+	
+	
 	/**
 	 * Destroys this object
 	 */
@@ -63,12 +68,23 @@ public class HostObject extends AbstractDataObject {
 		getTypedParent().removeHostObject(hostname);
 	}
 	
+	
 	/**
 	 * @return Name of this Host
 	 */
 	public String getHostName(){
 		return hostname;
 	}
+	
+	
+	/**
+	 * Return the host's operating system
+	 * @return a string representation of the host's operating system
+	 */
+	public String getOperatingSystem() {
+        return os;
+    }
+	
 	
 	/**
 	 * Returns a string representing this host
@@ -88,8 +104,5 @@ public class HostObject extends AbstractDataObject {
         return (WorldObject) parent;
     }
 
-    
-	protected String getKey() {
-		return hostname+":"+os;
-	}
+   
 }
