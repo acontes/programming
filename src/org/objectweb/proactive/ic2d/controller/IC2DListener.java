@@ -3,7 +3,7 @@ package org.objectweb.proactive.ic2d.controller;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class IC2DController extends WindowAdapter {
+public class IC2DListener extends WindowAdapter {
 
 	public void windowClosing(WindowEvent e) {
 		System.exit(0);
