@@ -18,9 +18,10 @@ import org.objectweb.proactive.core.component.controller.MulticastBindingControl
 import testsuite.test.Assertions;
 
 
-public class TesterImpl implements Tester, MulticastBindingController {
+public class TesterImpl implements Tester, BindingController {
     
-    MulticastTestItf clientItf;
+
+	MulticastTestItf clientItf;
 
     OneToOneMulticast oneToOneMulticastClientItf = null;
     BroadcastMulticast broadcastMulticastClientItf = null;
@@ -54,30 +55,44 @@ public class TesterImpl implements Tester, MulticastBindingController {
 
     }
 
-    public Object getMulticastFcItfRef(String itfName)
-            throws NoSuchInterfaceException {
 
-        if ("oneToOneMulticastClientItf".equals(itfName)) {
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
+        if ("oneToOneMulticastClientItf".equals (clientItfName) && (serverItf instanceof OneToOneMulticast)) {
+            oneToOneMulticastClientItf = (OneToOneMulticast)serverItf;
+        } else  
+        if ("broadcastMulticastClientItf".equals (clientItfName) && (serverItf instanceof BroadcastMulticast)) {
+            broadcastMulticastClientItf = (BroadcastMulticast)serverItf;
+        } else {
+        throw new ProActiveRuntimeException("cannot find multicast interface " + clientItfName);
+        }
+		
+	}
+
+	public String[] listFc() {
+		return new String[] {"oneToOneMulticastClientItf", "broadcastMulticastClientItf"};
+	}
+
+	public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
+        if ("oneToOneMulticastClientItf".equals(clientItfName)) {
             return oneToOneMulticastClientItf;
         }
-        if ("broadcastMulticastClientItf".equals(itfName)) {
+        if ("broadcastMulticastClientItf".equals(clientItfName)) {
             return broadcastMulticastClientItf;
         }
-        throw new NoSuchInterfaceException(itfName);
-    
-    }
+        throw new NoSuchInterfaceException(clientItfName);
 
-    public void setMulticastFcItfRef(String itfName, Object itfRef) {
+	}
 
-        if ("oneToOneMulticastClientItf".equals (itfName) && (itfRef instanceof OneToOneMulticast)) {
-            oneToOneMulticastClientItf = (OneToOneMulticast)itfRef;
+	public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
+        if ("oneToOneMulticastClientItf".equals (clientItfName) ) {
+            oneToOneMulticastClientItf = null;
         } else  
-        if ("broadcastMulticastClientItf".equals (itfName) && (itfRef instanceof BroadcastMulticast)) {
-            broadcastMulticastClientItf = (BroadcastMulticast)itfRef;
+        if ("broadcastMulticastClientItf".equals (clientItfName) ) {
+            broadcastMulticastClientItf = null;
         } else {
-        throw new ProActiveRuntimeException("cannot find multicast interface " + itfName);
+        throw new ProActiveRuntimeException("cannot find multicast interface " + clientItfName);
         }
-
-    }
+		
+	}
 
 }

@@ -99,9 +99,6 @@ public class GatherRequestsQueue {
         }
         requests.put(clientItfID, request);
 
-        if (isFull()) {
-            timeoutTimer.cancel();
-        }
 
         // evaluate timeout
         if (timeoutTimer == null) {
@@ -117,8 +114,13 @@ public class GatherRequestsQueue {
 			}
             timeoutTimer.schedule(new TimeoutTask(this), timeout);
         }
+        
+        if (isFull() ) {
+            timeoutTimer.cancel();
+        }
 
-        if (((System.currentTimeMillis() - creationTime) * 1000) > timeout) {
+
+        if (((System.currentTimeMillis() - creationTime) / 1000) > timeout) {
             // we need to check this for small timeouts because timer runs concurrently
             timedout = true;
             addFutureForGatheredRequest(null);
@@ -168,7 +170,7 @@ public class GatherRequestsQueue {
                 futuresHandler.setFutureOfGatheredInvocation(new FutureResult(
                         null,
                         new GathercastTimeoutException(
-                            "timeout reached before invocations from all clients were received for gather invocation (method " +
+                            "timeout of " + timeout + " reached before invocations from all clients were received for gather invocation (method " +
                             itfTypeInvokedMethod.toGenericString() +
                             " on gather interface " + serverItfName), null));
             }

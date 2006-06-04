@@ -140,14 +140,14 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
 
             // ensure multicast interface of primitive component is initialized
             if (isPrimitive()) {
-                MulticastBindingController userMulticastBindingController = (MulticastBindingController) ((ProActiveComponent) owner).getReferenceOnBaseObject();
+                BindingController userBindingController = (BindingController) ((ProActiveComponent) owner).getReferenceOnBaseObject();
 
-                if ((userMulticastBindingController.getMulticastFcItfRef(
+                if ((userBindingController.lookupFc(
                             clientItfName) == null) ||
                         !(ProActiveGroup.isGroup(
-                            userMulticastBindingController.getMulticastFcItfRef(
+                            userBindingController.lookupFc(
                                 clientItfName)))) {
-                    userMulticastBindingController.setMulticastFcItfRef(clientItfName,
+                    userBindingController.bindFc(clientItfName,
                         owner.getFcInterface(clientItfName));
                 }
             }
@@ -335,43 +335,22 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
                     .bindFcMulticast(clientItfName, sItf);
             return;
         }
+        
 
         if (isPrimitive()) {
             // binding operation is delegated
             ProActiveInterfaceType sItfType = ((ProActiveInterfaceType) sItf.getFcItfType());
-            if (sItfType.isFcGathercastItf()) {
-                // add an adaptor proxy for matching interface types
-                Class clientItfClass = null;
-                try {
-                    InterfaceType[] cItfTypes = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
-                    for (int i = 0; i < cItfTypes.length; i++) {
-                        if (clientItfName.equals(cItfTypes[i].getFcItfName())) {
-                            clientItfClass = Class.forName(cItfTypes[i].getFcItfSignature());
-                        }
-                    }
-                    if (clientItfClass == null) {
-                        throw new ProActiveRuntimeException(
-                            "could not find type of client interface " +
-                            clientItfName);
-                    }
-                } catch (ClassNotFoundException e) {
-                    throw new ProActiveRuntimeException(
-                        "cannot find client interface class for client interface : " +
-                        clientItfName);
-                }
-                ProActiveInterface itfProxy = (ProActiveInterface) Proxy.newProxyInstance(Thread.currentThread()
-                                                                                                .getContextClassLoader(),
-                        new Class[] { ProActiveInterface.class, clientItfClass },
-                        new GatherItfAdapterProxy(serverItf));
-                primitiveBindFc(clientItfName, itfProxy);
+
+            if (Utils.isGathercastItf(sItf)) {
+            	primitiveBindFc(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // add a callback ref in the server gather interface
-                // TODO should throw a binding event
-                Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
-                        .addedBindingOnServerItf(sItf.getFcItfName(),
-                    ((ProActiveComponent) owner).getRepresentativeOnThis(),
-                    clientItfName);
+        		// TODO should throw a binding event
+        		Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
+        		        .addedBindingOnServerItf(sItf.getFcItfName(),
+        		    ((ProActiveComponent) owner).getRepresentativeOnThis(),
+        		    clientItfName);
             } else {
-                primitiveBindFc(clientItfName, sItf);
+            	primitiveBindFc(clientItfName, sItf);
             }
             return;
         }
@@ -382,19 +361,47 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         client_itf_type = Utils.getItfType(clientItfName, owner);
 
         if (isComposite()) {
-            compositeBindFc(clientItfName, client_itf_type, sItf);
             if (Utils.isGathercastItf(sItf)) {
-                Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
-                        .addedBindingOnServerItf(sItf.getFcItfName(),
-                    (ProActiveComponent) sItf.getFcItfOwner(), clientItfName);
+            	compositeBindFc(clientItfName, client_itf_type, getGathercastAdaptor(clientItfName, serverItf, sItf));
+                // add a callback ref in the server gather interface
+        		// TODO should throw a binding event
+        		Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
+        		        .addedBindingOnServerItf(sItf.getFcItfName(),
+        		    ((ProActiveComponent) owner).getRepresentativeOnThis(),
+        		    clientItfName);
+            } else {
+            	compositeBindFc(clientItfName, client_itf_type, sItf);
             }
         }
-
-        //        else {
-        //            parallelBindFc(clientItfName, client_itf_type, sItf);
-        //            // TODO : not supported anymore?
-        //        }
     }
+
+	private ProActiveInterface getGathercastAdaptor(String clientItfName, Object serverItf, ProActiveInterface sItf) throws NoSuchInterfaceException {
+		// add an adaptor proxy for matching interface types
+		Class clientItfClass = null;
+		try {
+		    InterfaceType[] cItfTypes = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
+		    for (int i = 0; i < cItfTypes.length; i++) {
+		        if (clientItfName.equals(cItfTypes[i].getFcItfName())) {
+		            clientItfClass = Class.forName(cItfTypes[i].getFcItfSignature());
+		        }
+		    }
+		    if (clientItfClass == null) {
+		        throw new ProActiveRuntimeException(
+		            "could not find type of client interface " +
+		            clientItfName);
+		    }
+		} catch (ClassNotFoundException e) {
+		    throw new ProActiveRuntimeException(
+		        "cannot find client interface class for client interface : " +
+		        clientItfName);
+		}
+		ProActiveInterface itfProxy = (ProActiveInterface) Proxy.newProxyInstance(Thread.currentThread()
+		                                                                                .getContextClassLoader(),
+		        new Class[] { ProActiveInterface.class, clientItfClass },
+		        new GatherItfAdapterProxy(serverItf));
+		return itfProxy;
+	}
+
 
     private void primitiveBindFc(String clientItfName,
         ProActiveInterface serverItf)
@@ -409,54 +416,6 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         user_binding_controller.bindFc(clientItfName, serverItf);
     }
 
-    //    private void parallelBindFc(String clientItfName,
-    //        InterfaceType clientItfType, Interface serverItf)
-    //        throws NoSuchInterfaceException, IllegalBindingException, 
-    //            IllegalLifeCycleException {
-    //        ProActiveInterface clientItf = (ProActiveInterface) getFcItfOwner()
-    //                                                                .getFcInterface(clientItfType.getFcItfName());
-    //
-    //        // 1. parallel.serverItf -- > subcomponent.serverItf
-    //        // check :
-    //        // - whether the client interface is actually a server interface for the
-    //        // parallel component
-    //        boolean condition1 = !clientItfType.isFcClientItf();
-    //
-    //        // - whether the targeted server interface belongs to an internal
-    //        // component
-    //        boolean condition2 = ((ProActiveContentController) (Fractal.getContentController(getFcItfOwner()))).isSubComponent(serverItf.getFcItfOwner());
-    //
-    //        if (condition1 && condition2) {
-    //            if (ProActiveGroup.isGroup(clientItf.getFcItfImpl())) {
-    //                Group group = ProActiveGroup.getGroup(clientItf.getFcItfImpl());
-    //
-    //                if (clientItfType.getFcItfName().equals(clientItfName)) {
-    //                    group.add(serverItf);
-    //                } else {
-    //                    // different names and "lazy instantiation", as in the
-    //                    // Fractal2.0 spec
-    //                    group.addNamedElement(clientItfName, serverItf);
-    //                }
-    //            } else {
-    //                throw new IllegalBindingException(
-    //                    "illegal binding : server interface " + clientItfName +
-    //                    " of parallel component " +
-    //                    Fractal.getNameController(getFcItfOwner()).getFcName() +
-    //                    " should be a collective interface");
-    //            }
-    //
-    //            addBinding(new Binding(clientItf, clientItfName, serverItf));
-    //        } else if (!condition1 && !condition2) {
-    //            // 2. parallel.clientItf --> othercomponent.serverItf
-    //            // it is a standard composite binding
-    //            compositeBindFc(clientItfName, clientItfType, serverItf);
-    //        } else {
-    //            throw new IllegalBindingException("illegal binding of " +
-    //                Fractal.getNameController(getFcItfOwner()).getFcName() + '.' +
-    //                clientItfName);
-    //        }
-    //    }
-    //
     /*
      * binding method enforcing Interface type for the server interface, for
      * composite components

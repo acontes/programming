@@ -14,8 +14,8 @@ import com.sun.mail.handlers.multipart_mixed;
 
 import testsuite.test.Assertions;
 
-public class TesterImpl implements Tester, BindingController,
-		MulticastBindingController {
+public class TesterImpl implements Tester, BindingController
+		 {
 
 	MulticastTestItf clientItf;
 
@@ -211,28 +211,6 @@ public class TesterImpl implements Tester, BindingController,
 
 	}
 
-	/*
-	 * @see org.objectweb.proactive.core.component.controller.MulticastBindingController#getMulticastFcItfRef(java.lang.String)
-	 */
-	public Object getMulticastFcItfRef(String itfName)
-			throws NoSuchInterfaceException {
 
-		return multicastClientItf;
-	}
-
-	/*
-	 * @see org.objectweb.proactive.core.component.controller.MulticastBindingController#setMulticastFcItfRef(java.lang.String,
-	 *      java.lang.Object)
-	 */
-	public void setMulticastFcItfRef(String itfName, Object itfRef) {
-
-		if ("multicastClientItf".equals(itfName)
-				&& (itfRef instanceof MulticastTestItf)) {
-			multicastClientItf = (MulticastTestItf) itfRef;
-		} else {
-			throw new ProActiveRuntimeException(
-					"cannot find multicast interface " + itfName);
-		}
-	}
 
 }
