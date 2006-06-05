@@ -265,15 +265,16 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         throws NoSuchInterfaceException {
         // TODO_M update for conformance to the Fractal spec in case of
         // collective interfaces
-        if (!existsBinding(clientItfName)) {
-            return null;
-        } else {
             if (isPrimitive()) {
                 return ((BindingController) ((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject()).lookupFc(clientItfName);
             } else {
-                return ((Binding) getBinding(clientItfName)).getServerInterface();
+                if (!existsBinding(clientItfName)) {
+                    return null;
+                } else {
+                    return ((Binding) getBinding(clientItfName)).getServerInterface();
+                }
             }
-        }
+        
     }
 
     /**
