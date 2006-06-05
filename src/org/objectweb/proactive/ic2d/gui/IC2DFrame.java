@@ -30,20 +30,34 @@
  */
 package org.objectweb.proactive.ic2d.gui;
 
-import javax.swing.JFrame;
+import java.awt.Dimension;
 
-import org.objectweb.proactive.ic2d.controller.IC2DListener;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+
 
 public class IC2DFrame  extends JFrame {
-
+	
+	/** The events listener */
+	private IC2DListener listener;
+	
 	/** the frame's default width and height */
 	private static final int DEFAULT_WIDTH = 850;
-    private static final int DEFAULT_HEIGHT = 600;
+	private static final int DEFAULT_HEIGHT = 600;
+	
+	/** Quit menu item */
+	private JMenuItem quitItem;
+	
+	/** Monitoring menu */
+	private JMenuItem rmiItem; //RMI menu item
+	private JMenuItem legendItem; //Legend menu item
 	
 	
 	//
-    // -- CONSTRUCTORS -----------------------------------------------
-    //
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
 	
 	/**
 	 * TODO comment
@@ -51,12 +65,78 @@ public class IC2DFrame  extends JFrame {
 	public IC2DFrame() {
 		
 		/* sets the frame's title */
-		super("IC2D - MVC");
-		
+		super("new IC2D");
+			
 		/* sets the frame's dimensions */
-		this.setSize(new java.awt.Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+		this.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+
+		this.listener = new IC2DListener(this);
 		
-		this.addWindowListener(new IC2DListener());
+		setJMenuBar(createMenuBar());
+		
+		this.addWindowListener(this.listener);
 	}
 	
+	//
+	// -- PUBLICS METHODS -----------------------------------------------
+	//
+	
+	public JMenuItem getQuitItem() {
+		return this.quitItem;
+	}
+	
+	public JMenuItem getRMIItem(){
+		return this.rmiItem;
+	}
+	
+	public JMenuItem getLegendItem() {
+		return this.legendItem;
+	}
+	
+	public static int getDefaultHeight() {
+		return DEFAULT_HEIGHT;
+	}
+	
+	//
+	// -- PRIVATE METHODS -----------------------------------------------
+	//
+	
+	private JMenuBar createMenuBar() {
+		JMenuBar menuBar = new javax.swing.JMenuBar();
+		
+		//
+		// File menu
+		//
+		JMenu fileMenu = new JMenu("File");
+		
+		this.quitItem = new JMenuItem("Quit");
+		quitItem.addActionListener(this.listener);
+		
+		fileMenu.add(quitItem);
+		menuBar.add(fileMenu);
+		
+		
+		//
+		// monitoring menu
+		//      
+		JMenu monitoringMenu = new JMenu("Monitoring");
+		
+		// RMI item
+		this.rmiItem = new JMenuItem("Monitor a new RMI host");
+		this.rmiItem.addActionListener(this.listener);
+		monitoringMenu.add(rmiItem);
+		
+		monitoringMenu.addSeparator();
+		
+		// Display the legend 
+		this.legendItem = new JMenuItem("Legend");
+		this.legendItem.setToolTipText("Display the legend");
+		this.legendItem.addActionListener(this.listener);
+		monitoringMenu.add(legendItem);
+		
+		
+		menuBar.add(monitoringMenu);
+		
+		return menuBar;
+	}
 }

@@ -30,36 +30,70 @@
  */
 package org.objectweb.proactive.ic2d.data;
 
+import java.util.List;
+
 /**
  * Holder class for the host data representation
  */
 public class HostObject extends AbstractDataObject {
 
-    /** Name of this Host (machine's name:port) */
-    protected String hostname;
+    /** Name of this Host */
+    private String hostname;
+    
+    /** Number of the port */
+    private int port;
     
     /** Name of Operating System */
-    protected String os;
+    private String os = "OS undefined";
 	
+    /** Host's protocol */
+    private int protocol;
 	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
     
-	public HostObject(WorldObject parent){
+    /**
+     * Creates a new HostObject
+     * @param parent His parent
+     * @parent hostname achine's name:port
+     * @param os Host's operating sytem
+     */
+	protected HostObject(WorldObject parent, String hostname, int port, int protocol){
 		super(parent);
-		//TODO Change the hostnane!!!
-		this.hostname = "***HostnameTEST***";
-		this.os = "***OsTEST***";
+		this.hostname = hostname;
+		this.port = port;
+		this.protocol = protocol;
 	}
 	
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-	
-	public String getKey() {
-		return hostname+":"+os;
+
+	/**
+	 * Explore the current host to discover which elements it contains.
+	 * @return A VMObject list
+	 */
+	public List explore(){
+		//TODO
+		return null;
+		
+		//Explorer explorer = new Explorer();
+		//List proActiveRuntimeList = explorer.exploreHost(this);
+		
+		//List resul = new ArrayList();
+		//for(int i=0, size=proActiveRuntimeList.size(); i < size ; i++){
+		//	
+		//}
 	}
 	
+	public String getKey() {
+		return hostname+":"+port;
+	}
+	
+	
+	public String getFullName(){
+		return hostname+":"+port+":"+os;
+	}
 	
 	/**
 	 * Destroys this object
@@ -76,6 +110,12 @@ public class HostObject extends AbstractDataObject {
 		return hostname;
 	}
 	
+	/**
+	 * @return Number of the port
+	 */
+	public int getPort(){
+		return this.port;
+	}
 	
 	/**
 	 * Return the host's operating system
@@ -85,12 +125,19 @@ public class HostObject extends AbstractDataObject {
         return os;
     }
 	
+	/**
+	 * Retuens the host's protocol
+	 * @return The host's protocol
+	 */
+	public int getProtocol(){
+		return this.protocol;
+	}
 	
 	/**
 	 * Returns a string representing this host
 	 */
     public String toString() {
-        return "Host: " + hostname + "\n" + super.toString();
+        return "Host: " + hostname+":"+ port + "\n" + super.toString();
     }
     
     //

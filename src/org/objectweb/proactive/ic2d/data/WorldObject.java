@@ -41,8 +41,7 @@ public class WorldObject extends AbstractDataObject {
     //
     
 	/**
-	 * TODO comment
-	 * @param parent
+	 * Create a new WorldObject
 	 */
 	public WorldObject() {
         super(null);
@@ -60,12 +59,19 @@ public class WorldObject extends AbstractDataObject {
 	}
 	
 	
+	public String getFullName(){
+		return "WorldObject";
+	}
+	
 	/**
-	 * TODO comment
-	 * @param host
+	 * Creates a new HostObject
+	 * @param hostname machine's name:port
+	 * @param os Operating System
 	 */
-	public void addHostObject(HostObject host) {
-		this.putChild(host.getHostName(), host); //TODO a verifier
+	public HostObject addHostObject(String hostname, int port, int protocol) {
+		HostObject host = new HostObject(this, hostname, port, protocol);
+		this.putChild(host.getKey(), host);
+		return host;
     }
 	
 	
