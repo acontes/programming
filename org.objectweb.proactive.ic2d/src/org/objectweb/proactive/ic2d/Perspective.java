@@ -35,6 +35,8 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class Perspective implements IPerspectiveFactory {
 
+	public static final String ID = "org.objectweb.proactive.ic2d.Perspective";
+	
 	public void createInitialLayout(IPageLayout layout) {
 	}
 }

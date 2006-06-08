@@ -4,6 +4,7 @@
 
    <extension
          id="application"
+         name="%applicationName"
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
@@ -12,14 +13,28 @@
       </application>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectives">
-   </extension>
-   <extension
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
             application="org.objectweb.proactive.ic2d.application"
             name="product"/>
    </extension>
-
+   <extension
+         id="org.objectweb.proactive.ic2d.Perspective"
+         name="toto"
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.objectweb.proactive.ic2d.Perspective"
+            fixed="false"
+            id="org.objectweb.proactive.ic2d.Perspective"
+            name="Default"/>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="ic2d.product"
+            name="product"/>
+   </extension>
+   
 </plugin>
