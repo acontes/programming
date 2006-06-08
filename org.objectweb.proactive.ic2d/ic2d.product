@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.1"?>
+
+<product name="product" id="org.objectweb.proactive.ic2d.product" application="org.objectweb.proactive.ic2d.application" useFeatures="false">
+
+   <configIni use="default"/>
+
+   <launcherArgs>
+   </launcherArgs>
+
+   <windowImages/>
+
+   <splash location="org.objectweb.proactive.ic2d"/>
+
+   <launcher>
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <plugins>
+      <plugin id="org.eclipse.core.commands"/>
+      <plugin id="org.eclipse.core.expressions"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.help"/>
+      <plugin id="org.eclipse.jface"/>
+      <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.swt"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86"/>
+      <plugin id="org.eclipse.ui"/>
+      <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.objectweb.proactive.ic2d"/>
+      <plugin id="org.objectweb.proactive.ic2d.monitoring"/>
+   </plugins>
+
+</product>
