@@ -20,8 +20,8 @@
             name="product"/>
    </extension>
    <extension
-         id="org.objectweb.proactive.ic2d.Perspective"
-         name="toto"
+         id="org.objectweb.proactive.ic2d.perspectives"
+         name="Default"
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.objectweb.proactive.ic2d.Perspective"

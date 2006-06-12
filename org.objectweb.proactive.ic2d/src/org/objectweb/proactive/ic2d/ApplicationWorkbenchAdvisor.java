@@ -37,8 +37,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
-	private static final String PERSPECTIVE_ID = "org.objectweb.proactive.ic2d";
-
+	
     public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
         return new ApplicationWorkbenchWindowAdvisor(configurer);
     }
@@ -51,7 +50,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     
     
 	public String getInitialWindowPerspectiveId() {
-		//return Perspective.ID;
-		return PERSPECTIVE_ID;
+		return Perspective.ID;
 	}
 }
