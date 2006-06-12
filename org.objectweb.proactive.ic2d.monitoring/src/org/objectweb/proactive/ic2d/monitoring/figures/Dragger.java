@@ -39,13 +39,14 @@ public class Dragger extends MouseMotionListener.Stub implements MouseListener {
 			Dimension delta = p.getDifference(last);
 			last = p;
 			AbstractFigure f = ((AbstractFigure)e.getSource());
+
 			f.setBounds(f.getBounds().getTranslated(delta.width, delta.height));
 		}
 		else{
 			if(p==null)
-				;//System.err.println("Ooups p est null");
+				System.err.println("Ooups p est null");
 			if(last==null)
-				;//System.err.println("Ooups last est null");
+				System.err.println("Ooups last est null");
 		}
 	}
 }

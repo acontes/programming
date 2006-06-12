@@ -11,7 +11,7 @@ public class HostFigure extends AbstractRectangleFigure{
     // -- CONSTRUCTOR -----------------------------------------------
     //
 	public HostFigure(String text, int xPos, int yPos) {
-		super(text,BorderLayout.TOP,xPos,yPos,160,260);
+		super(null,text,BorderLayout.TOP,xPos,yPos,160,120);
 		new Dragger(this);
 	}
 
@@ -24,4 +24,9 @@ public class HostFigure extends AbstractRectangleFigure{
 		backgroundColor = new Color(device, 208, 208, 208);
 		shadowColor = new Color(device, 230, 230, 230);
 	}
+
+	public String toString() {
+		return "Host";
+	}
+
 }

@@ -6,20 +6,21 @@ import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 public abstract class AbstractRectangleFigure extends AbstractFigure{
-
-    //
-    // -- CONSTRUCTOR -----------------------------------------------
-    //
-	protected AbstractRectangleFigure(String text, Integer posText, int posX, int posY, int width, int length){
-		super(text,posText, posX, posY, width, length);
+	
+	//
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
+	protected AbstractRectangleFigure(AbstractRectangleFigure parent, String text, Integer posText, int posX, int posY, int width, int height){
+		super(parent, text,posText, posX, posY, width, height);
 	}
 	
-	protected AbstractRectangleFigure(String text, Integer textPos, int width, int length){
-		this(text, textPos,0, 0, width, length);
+	protected AbstractRectangleFigure(AbstractRectangleFigure parent, String text, Integer textPos, int width, int height){
+		this(parent,text, textPos,0, 0, width, height);
 	}
-    //
-    // -- PUBLIC METHOD ---------------------------------------------
-    //
+	
+	//
+	// -- PUBLIC METHOD ---------------------------------------------
+	//
 	public ConnectionAnchor getAnchor() {
 		return new ChopboxAnchor(this) {
 			protected Rectangle getBox()
@@ -30,19 +31,20 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 		};
 	}
 	
-    //
-    // -- PROTECTED METHOD --------------------------------------------
-    //
+	//
+	// -- PROTECTED METHOD --------------------------------------------
+	//
 	protected void paintIC2DFigure(Graphics graphics) {
 		// Inits
-		Rectangle bounds = getBounds().getCopy().resize(-7, -9)/*.translate(4, 4)*/;
+		Rectangle bounds = getBounds().getCopy().resize(-5, -9)/*.translate(4, 0)*/;
 		final int round = 25;
 		final int sround = 30;
 		
 		// Shadow
-		graphics.setBackgroundColor(this.shadowColor);
-		graphics.fillRoundRectangle(bounds.getTranslated(4, 4), round, sround);
-		
+		if(showShadow){
+			graphics.setBackgroundColor(this.shadowColor);
+			graphics.fillRoundRectangle(bounds.getTranslated(4, 4), round, sround);
+		}
 		// Drawings
 		graphics.setForegroundColor(this.borderColor);
 		graphics.setBackgroundColor(this.backgroundColor);

@@ -10,8 +10,9 @@ public class VMFigure extends AbstractRectangleFigure{
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
-	public VMFigure(String text) {
-		super(text,BorderLayout.TOP,145,220);
+	public VMFigure(HostFigure parent, String text) {
+		super(parent, text,BorderLayout.TOP,145,50);
+		addMouseMotionListener(new VMListener());
 	}
 
     //
@@ -22,5 +23,9 @@ public class VMFigure extends AbstractRectangleFigure{
 		borderColor = new Color(device, 140, 200, 225);
 		backgroundColor = new Color(device, 240, 240, 240);
 		shadowColor = new Color(device, 230, 230, 230);
+	}
+
+	public String toString() {
+		return "VM";
 	}
 }

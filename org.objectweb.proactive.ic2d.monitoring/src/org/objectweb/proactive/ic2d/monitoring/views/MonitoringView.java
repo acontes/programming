@@ -39,73 +39,52 @@ public class MonitoringView extends ViewPart {
 		this.panel = new Figure();
 		this.lws.setContents(panel);
 		
-		/*-------- Test du host -----------*/
+		/*-------- Host test -----------*/
 		HostFigure host = new HostFigure("trans12:1099:linux", 120, 100);
 		panel.add(host);
 		/*---------------------------------*/
 		
 		
-		/*--------- Test du VM ------------*/
-		VMFigure vm = new VMFigure("VM id=11d1def534e");
-		panel.add(vm);
-		
-		host.addFigureChild(vm);
+		/*--------- VM test ------------*/
+		VMFigure vm = new VMFigure(host,"VM id=11d1def534e");
 		/*---------------------------------*/
 		
 		
-		/*-------- Test du node -----------*/
-		NodeFigure node = new NodeFigure("Node1058928077");
-		panel.add(node);
-		
-		vm.addFigureChild(node);
+		/*-------- Node test -----------*/
+		NodeFigure node = new NodeFigure(vm,"Node1058928077");
 		/*---------------------------------*/
 		
 		
-		/*-------- Test des AO ------------*/
-		AOFigure ao1 = new AOFigure("Test#1");
-		panel.add(ao1);
+		/*-------- Active object test -----*/
+		AOFigure ao1 = new AOFigure(node,"Test#1");
 		
-		node.addFigureChild(ao1);
-		
-		AOFigure ao2 = new AOFigure("Test#2");
-		panel.add(ao2);
-		
-		node.addFigureChild(ao2);
+		AOFigure ao2 = new AOFigure(node,"Test#2");
 		/*---------------------------------*/
 		
 		//////////////////////////////////////////////////////////////////////////
-		/*-------- Test du host -----------*/
+		/*-------- Host test -----------*/
 		HostFigure host2 = new HostFigure("trans10:1099:linux", 350, 100);
 		panel.add(host2);
 		/*---------------------------------*/
 		
 		
-		/*--------- Test du VM ------------*/
-		VMFigure vm2 = new VMFigure("VM id=25d7tee974a");
-		panel.add(vm2);
-		
-		host2.addFigureChild(vm2);
+		/*--------- VM test ------------*/
+		VMFigure vm2 = new VMFigure(host2,"VM id=25d7tee974a");
 		/*---------------------------------*/
 		
 		
-		/*-------- Test du node -----------*/
-		NodeFigure node2 = new NodeFigure("Node107433708");
-		panel.add(node2);
-		
-		vm2.addFigureChild(node2);
+		/*-------- Node test -----------*/
+		NodeFigure node2 = new NodeFigure(vm2,"Node107433708");
 		/*---------------------------------*/
 		
 		
-		/*-------- Test des AO ------------*/
-		AOFigure ao3 = new AOFigure("Test#3");
-		panel.add(ao3);
-		
-		node2.addFigureChild(ao3);
+		/*-------- Active object test -----*/
+		AOFigure ao3 = new AOFigure(node2,"Test#3");
 		/*---------------------------------*/
 		
 		
 		
-		/* On creer la route */
+		/* The road */
 		FanRouter router = new FanRouter();
 		router.setSeparation(40);
 

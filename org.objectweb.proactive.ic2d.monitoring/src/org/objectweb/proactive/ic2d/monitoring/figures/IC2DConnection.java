@@ -16,8 +16,8 @@ public class IC2DConnection  extends PolylineConnection{
 		
 		targetDecoration = getTargetDecoration();
 		setTargetDecoration(targetDecoration);
-		setLineWidth(2);
-		setForegroundColor(ColorConstants.blue);
+		setLineWidth(1);
+		setForegroundColor(ColorConstants.black);
 		setLineStyle(Graphics.LINE_SOLID);
 	}
 	
