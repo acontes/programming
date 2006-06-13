@@ -8,17 +8,16 @@
    >
 
    <runtime>
-      <library name="Appli1.jar">
-         <export name="*"/>
-      </library>
    </runtime>
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.draw2d"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.gef"/>
    </requires>
    <extension
-         id="appli.perspectives"
+         id="org.objectweb.proactive.ic2d.monitoring.perspectives"
          name="Perspectives"
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -27,43 +26,42 @@
             name="Monitoring"/>
    </extension>
    <extension
-         id="appli.vews"
+         id="org.objectweb.proactive.ic2d.monitoring.views"
          name="Views"
          point="org.eclipse.ui.views">
-      <category
-            id="appli.views"
-            name="Appli1Views"/>
       <view
-            category="appli.views"
+            category="org.objectweb.proactive.ic2d.monitoring.category"
             class="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
             id="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
             name="Monitoring"/>
+      <category
+            id="org.objectweb.proactive.ic2d.monitoring.category"
+            name="Monitoring category"/>
    </extension>
    <extension
+         id="org.objectweb.proactive.ic2d.monitoring.perspectiveextensions"
+         name="Monitoring perspective extensions"
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective">
-         <actionSet id="appli.actions.defaultActionSet"/>
       </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            id="appli.actions.defaultActionSet"
-            label="Test actionSet"
-            visible="false">
+            id="org.objectweb.proactive.ic2d.monitoring.actionSet"
+            label="Monitoring action set"
+            visible="true">
          <menu
-               id="appli.file.workbenchMenu"
-               label="&amp;Appli"
-               path="additions">
-            <groupMarker name="content"/>
+               id="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu"
+               label="&amp;Monitoring"
+               >
          </menu>
          <action
-               class="appli.actions.TestActionDelegate"
-               id="appli.file.Test"
-               label="Test"
-               menubarPath="appli.file.workbenchMenu/content"
-               style="push"
-               tooltip="Exits the program"/>
+               class="org.objectweb.proactive.ic2d.monitoring.actions.NewRMIHostAction"
+               id="org.objectweb.proactive.ic2d.monitoring.actions.newRMIhost"
+               label="Monitor a new RMI host"
+               menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu/content"
+               tooltip="Monitor a new RMI host"/>
       </actionSet>
    </extension>
 

@@ -101,11 +101,5 @@ public class WorldObject extends AbstractDataObject {
     public void destroyObject() {
 		destroy();
 	}
-	
-	
-	//
-    // -- PROTECTED METHOD -----------------------------------------------
-    //
-    
 
 }

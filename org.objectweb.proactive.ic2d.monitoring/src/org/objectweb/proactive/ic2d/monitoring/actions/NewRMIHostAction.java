@@ -28,29 +28,41 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.perspectives;
+package org.objectweb.proactive.ic2d.monitoring.actions;
 
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPerspectiveFactory;
-import org.objectweb.proactive.ic2d.monitoring.views.*;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.objectweb.proactive.ic2d.monitoring.dialog.MonitorNewHostDialog;
 
+public class NewRMIHostAction implements IWorkbenchWindowActionDelegate {
 
-public class MonitoringPerspective implements IPerspectiveFactory {
+	private Display display;
 	
-	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective";
 	
 	//
-	// -- PUBLIC METHODS ----------------------------------------------
+	// -- PUBLICS METHODS -----------------------------------------------
 	//
 	
-	public void createInitialLayout(IPageLayout layout) {
-		String editorArea=layout.getEditorArea();
-		layout.setEditorAreaVisible(false);
-		layout.setFixed(false);
+	public void dispose() {
+		// TODO Auto-generated method stub
 		
-		layout.addView(MonitoringView.ID, IPageLayout.LEFT,
-				0.25f, editorArea);
-		layout.addPerspectiveShortcut(ID);
-		layout.addShowViewShortcut(MonitoringView.ID);	
-	}	
+	}
+
+	public void init(IWorkbenchWindow window) {
+		// TODO Auto-generated method stub
+		this.display = window.getShell().getDisplay();
+	}
+
+	public void run(IAction action) {
+		// TODO Auto-generated method stub
+		new MonitorNewHostDialog(display);
+	}
+
+	public void selectionChanged(IAction action, ISelection selection) {
+		// TODO Auto-generated method stub
+		
+	}
 }

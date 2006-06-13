@@ -39,7 +39,7 @@ public class Protocol {
 	public static final int HTTP = 4;
 
 	/**
-	 * 
+	 * TODO
 	 * @param protocol
 	 * @return
 	 */

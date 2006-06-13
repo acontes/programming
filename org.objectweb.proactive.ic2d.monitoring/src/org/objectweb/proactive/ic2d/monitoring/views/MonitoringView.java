@@ -1,18 +1,40 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ic2d.monitoring.views;
 
-
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.EditPartFactory;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
@@ -23,48 +45,32 @@ public class MonitoringView extends ViewPart {
 	
 	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.views.MonitoringView";
 	
-	
-	private Canvas root;
-	private LightweightSystem lws;
-	private Figure panel;
-	
-	
 	/** the graphical viewer */
 	private ScrollingGraphicalViewer graphicalViewer;
 	
+	//
+	// -- PUBLIC METHODS ----------------------------------------------
+	//
+	
 	public void createPartControl(Composite parent){
-		
-		GridLayout layout = new GridLayout();
-		this.root= new Canvas(parent, SWT.BORDER);
-		this.root.setLayout(layout);
-		Device device = Display.getCurrent();
-		this.root.setBackground(new Color(device, 255,255,255));
-		this.lws = new LightweightSystem(this.root);
-		this.panel = new Figure();
-		this.lws.setContents(panel);
-		
-		
+		graphicalViewer = new ScrollingGraphicalViewer();
 		initializeGraphicalViewer();
-		getGraphicalViewer().createControl(parent);
-		getViewSite().setSelectionProvider(getGraphicalViewer());
-		getSite().setSelectionProvider(getGraphicalViewer());
+		graphicalViewer.createControl(parent);
+		getViewSite().setSelectionProvider(graphicalViewer);
+		getSite().setSelectionProvider(graphicalViewer);
+		graphicalViewer.getControl().setBackground(ColorConstants.white);
 		graphicalViewer.setContents(getContent());
 	}
-	
-	/**
-	 * Returns the <code>GraphicalViewer</code> of this editor.
-	 * @return the <code>GraphicalViewer</code>
-	 */
-	public ScrollingGraphicalViewer getGraphicalViewer(){
-		if(graphicalViewer == null)
-			graphicalViewer = new ScrollingGraphicalViewer();
-		return graphicalViewer;
-	}
+
 	
 	public void initializeGraphicalViewer(){
-		getGraphicalViewer().setRootEditPart(new ScalableFreeformRootEditPart());
-		getGraphicalViewer().setEditPartFactory(new IC2DEditPartFactory());
+		graphicalViewer.setRootEditPart(new ScalableFreeformRootEditPart());
+		graphicalViewer.setEditPartFactory(new IC2DEditPartFactory());
 	}
+	
+	//
+	// -- PROTECTED METHODS -------------------------------------------
+	//
 	
 	/**
 	 * Returns the content of this editor
@@ -87,7 +93,5 @@ public class MonitoringView extends ViewPart {
 	
 	public void setFocus() {
 		// TODO Auto-generated method stub
-	}
-	
-	
+	}	
 }
