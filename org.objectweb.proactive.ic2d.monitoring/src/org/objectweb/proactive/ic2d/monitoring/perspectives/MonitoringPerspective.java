@@ -11,12 +11,11 @@ public class MonitoringPerspective implements IPerspectiveFactory {
 	
 	public void createInitialLayout(IPageLayout layout) {
 		String editorArea=layout.getEditorArea();
-		layout.setEditorAreaVisible(false);
+		layout.setEditorAreaVisible(true);
 		layout.setFixed(false);
 		
-		layout.addView(MonitoringView.ID, IPageLayout.LEFT,
-				0.25f, editorArea);
-		
+		/*layout.addView(MonitoringView.ID, IPageLayout.LEFT,
+				0.25f, editorArea);*/
 		layout.addPerspectiveShortcut(ID);
 		layout.addShowViewShortcut(MonitoringView.ID);
 		

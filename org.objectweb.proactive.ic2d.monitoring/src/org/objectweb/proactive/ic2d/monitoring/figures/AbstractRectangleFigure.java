@@ -10,12 +10,12 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractRectangleFigure(AbstractRectangleFigure parent, String text, Integer posText, int posX, int posY, int width, int height){
-		super(parent, text,posText, posX, posY, width, height);
+	protected AbstractRectangleFigure(String text, Integer posText, int posX, int posY, int width, int height){
+		super(text,posText, posX, posY, width, height);
 	}
 	
-	protected AbstractRectangleFigure(AbstractRectangleFigure parent, String text, Integer textPos, int width, int height){
-		this(parent,text, textPos,0, 0, width, height);
+	protected AbstractRectangleFigure(String text, Integer textPos, int width, int height){
+		this(text, textPos,0, 0, width, height);
 	}
 	
 	//

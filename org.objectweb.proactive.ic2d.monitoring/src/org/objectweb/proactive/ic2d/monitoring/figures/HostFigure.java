@@ -11,7 +11,7 @@ public class HostFigure extends AbstractRectangleFigure{
     // -- CONSTRUCTOR -----------------------------------------------
     //
 	public HostFigure(String text, int xPos, int yPos) {
-		super(null,text,BorderLayout.TOP,xPos,yPos,160,120);
+		super(text,BorderLayout.TOP,xPos,yPos,160,120);
 		new Dragger(this);
 	}
 

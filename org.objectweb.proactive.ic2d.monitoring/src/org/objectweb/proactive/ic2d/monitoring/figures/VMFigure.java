@@ -10,9 +10,9 @@ public class VMFigure extends AbstractRectangleFigure{
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
-	public VMFigure(HostFigure parent, String text) {
-		super(parent, text,BorderLayout.TOP,145,50);
-		addMouseMotionListener(new VMListener());
+	public VMFigure(String text) {
+		super(text,BorderLayout.TOP,145,50);
+		//addMouseMotionListener(new VMListener());
 	}
 
     //

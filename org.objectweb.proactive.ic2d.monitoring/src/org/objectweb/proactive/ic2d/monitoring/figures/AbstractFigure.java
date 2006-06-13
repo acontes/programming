@@ -35,28 +35,31 @@ public abstract class AbstractFigure extends Figure{
 	
 	protected static boolean showShadow = false; 
 	
+		
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractFigure(AbstractFigure parent, String text, Integer posText, int xPos, int yPos, int width, int height){
+	protected AbstractFigure(String text, Integer posText, int xPos, int yPos, int width, int height){
 		super();
 		
 		this.defaultWidth = width;
 		this.defaultHeight = height;
 		
+			
 		// Add the label
 		BorderLayout layout = new BorderLayout();
 		
-	
+		
 		/*FlowLayout layout = new FlowLayout();
-		layout.setHorizontal(false);
-		layout.setMinorAlignment(FlowLayout.ALIGN_CENTER);*/
+		 layout.setHorizontal(false);
+		 layout.setMinorAlignment(FlowLayout.ALIGN_CENTER);*/
 		
 		//layout.setMinorSpacing(20);
 		
 		
 		/*layout.setHorizontalSpacing(4);
-		layout.setVerticalSpacing(4);*/
+		 layout.setVerticalSpacing(4);*/
 		setLayoutManager(layout);
 		label.setForegroundColor(ColorConstants.black);
 		add(label, posText);
@@ -67,14 +70,14 @@ public abstract class AbstractFigure extends Figure{
 		setBounds(new Rectangle(xPos, yPos, this.defaultWidth, this.defaultHeight));
 		
 		/* Add child to his parent */
-		this.parent = parent;
-		if(this.parent != null){
-			this.parent.addFigureChild(this);
-		}
+		/*this.parent = parent;
+		 if(this.parent != null){
+		 this.parent.addFigureChild(this);
+		 }*/
 	}
 	
-	protected AbstractFigure(AbstractFigure parent, String text, Integer textPos, int width, int height){
-		this(parent, text, textPos, 0, 0, width, height);
+	protected AbstractFigure(String text, Integer textPos, int width, int height){
+		this(text, textPos, 0, 0, width, height);
 	}
 	
 	//
@@ -108,7 +111,7 @@ public abstract class AbstractFigure extends Figure{
 	//
 	// -- PUBLIC METHODS ---------------------------------------------
 	//
-
+	
 	public abstract String toString();
 	
 	public abstract ConnectionAnchor getAnchor();

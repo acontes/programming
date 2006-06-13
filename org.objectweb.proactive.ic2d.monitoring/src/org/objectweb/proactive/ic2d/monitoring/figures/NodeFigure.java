@@ -10,8 +10,8 @@ public class NodeFigure extends AbstractRectangleFigure{
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
-	public NodeFigure(VMFigure parent, String text) {
-		super(parent, text,BorderLayout.TOP,130,50);
+	public NodeFigure(String text) {
+		super(text,BorderLayout.TOP,130,50);
 		addMouseMotionListener(new NodeListener());
 	}
 		
