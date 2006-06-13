@@ -171,12 +171,5 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
     }
 
-    /*
-     * @see org.objectweb.proactive.core.body.AbstractBody#serve(org.objectweb.proactive.core.body.request.Request)
-     */
-    
-    public long getNextSequenceID() {
-        return localBodyStrategy.getNextSequenceID();
-    }
 
 }
