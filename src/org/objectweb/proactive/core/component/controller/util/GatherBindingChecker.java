@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.controller.util;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -11,7 +12,7 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 
-public class GatherBindingChecker {
+public class GatherBindingChecker implements Serializable {
 
     /**
      * client method B foo (A) throws E;

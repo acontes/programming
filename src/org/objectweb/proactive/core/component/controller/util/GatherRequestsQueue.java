@@ -3,56 +3,50 @@
  */
 package org.objectweb.proactive.core.component.controller.util;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.future.FutureResult;
-import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.ServeException;
-import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.exceptions.GathercastTimeoutException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
-import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro;
-import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * This class manages a queue of requests on a gather interface: a list of reified invocations from connected client interfaces.
- * 
+ *
  * Asynchronization is provided with a third-party active object and automatic continuations.
- * 
+ *
  * A timeout exception is thrown if some of the connected client interfaces fail to send a request before the timeout; the countdown
- * is triggered right after serving the first invocation on the gathercast interface. 
- * 
+ * is triggered right after serving the first invocation on the gathercast interface.
+ *
  * @author Matthieu Morel
  *
  */
-public class GatherRequestsQueue {
+public class GatherRequestsQueue implements Serializable {
     private ProActiveComponent owner;
     private GatherFuturesHandler futuresHandler; // need a pool!
     private List<ItfID> connectedClientItfs; // consistency?
     private Map<ItfID, ComponentRequest> requests;
     private String serverItfName;
-    private Method itfTypeInvokedMethod;
+    private SerializableMethod itfTypeInvokedMethod;
     transient long creationTime = System.currentTimeMillis(); // todo do not reinitialize after deserialization
     public static final long DEFAULT_TIMEOUT = 1000000; // TODO use a proactive default property
     private Timer timeoutTimer = null;
@@ -60,7 +54,6 @@ public class GatherRequestsQueue {
     boolean thrownTimeoutException = false;
     long timeout = DEFAULT_TIMEOUT;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GATHERCAST);
-    
 
     public GatherRequestsQueue(ProActiveComponent owner, String serverItfName,
         Method itfTypeMethod, List<ItfID> connectedClientItfs) {
@@ -68,12 +61,13 @@ public class GatherRequestsQueue {
         this.serverItfName = serverItfName;
         //        this.conditionChecker = gatherConditionChecker;
         //        this.invokedMethodSignature = methodSignature;
-        itfTypeInvokedMethod = itfTypeMethod;
+        itfTypeInvokedMethod = new SerializableMethod(itfTypeMethod);
         this.connectedClientItfs = connectedClientItfs;
         try {
-        	if (logger.isDebugEnabled()) {
-				logger.debug("adding futures handler for requests on " + serverItfName + "." + itfTypeMethod.getName());
-			}
+            if (logger.isDebugEnabled()) {
+                logger.debug("adding futures handler for requests on " +
+                    serverItfName + "." + itfTypeMethod.getName());
+            }
             futuresHandler = (GatherFuturesHandler) ProActive.newActive(GatherFuturesHandler.class.getName(),
                     new Object[] { connectedClientItfs, itfTypeMethod.getName() });
         } catch (ActiveObjectCreationException e) {
@@ -99,28 +93,28 @@ public class GatherRequestsQueue {
         }
         requests.put(clientItfID, request);
 
-
         // evaluate timeout
         if (timeoutTimer == null) {
             timeoutTimer = new Timer();
-            MethodSynchro sc = itfTypeInvokedMethod.getAnnotation(MethodSynchro.class);
+            MethodSynchro sc = itfTypeInvokedMethod.getMethod().getAnnotation(MethodSynchro.class);
             if (sc != null) {
                 timeout = sc.timeout();
             } else {
                 timeout = DEFAULT_TIMEOUT;
             }
             if (logger.isDebugEnabled()) {
-				logger.debug("gather request queue timer starting with timeout = " + timeout);
-			}
+                logger.debug(
+                    "gather request queue timer starting with timeout = " +
+                    timeout);
+            }
             timeoutTimer.schedule(new TimeoutTask(this), timeout);
         }
-        
-        if (isFull() ) {
+
+        if (isFull()) {
             timeoutTimer.cancel();
         }
 
-
-        if (((System.currentTimeMillis() - creationTime) / 1000) > timeout) {
+        if (((System.currentTimeMillis() - creationTime) / 1000) >= timeout) {
             // we need to check this for small timeouts because timer runs concurrently
             timedout = true;
             addFutureForGatheredRequest(null);
@@ -128,7 +122,20 @@ public class GatherRequestsQueue {
         Object reply = futuresHandler.distribute(clientItfID);
 
         // return future result (will be computed when gather request is processed)
-        return reply;
+        	try {
+//        		System.out.println("RETURNING REPLY FOR REQUEST " + itfTypeInvokedMethod.getMethod());
+        		return reply;
+        	} finally {
+                if (isFull() ) {
+                	try {
+						finalize();
+					} catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+                }
+        }
+        
     }
 
     public ComponentRequest get(ItfID id) {
@@ -160,18 +167,21 @@ public class GatherRequestsQueue {
     }
 
     public void addFutureForGatheredRequest(FutureResult futureResult) {
+    	
         if (timedout) {
             // avoids race condition with small timeouts (result is replaced with a timeout exception)
             if (!thrownTimeoutException) {
                 if (logger.isDebugEnabled()) {
-					logger.debug("timeout reached at " + timeout + "for gather request on [" + itfTypeInvokedMethod.getName() + "]");
-				}
+                    logger.debug("timeout reached at " + timeout +
+                        "for gather request on [" +
+                        itfTypeInvokedMethod.getMethod().getName() + "]");
+                }
                 thrownTimeoutException = true;
                 futuresHandler.setFutureOfGatheredInvocation(new FutureResult(
                         null,
-                        new GathercastTimeoutException(
-                            "timeout of " + timeout + " reached before invocations from all clients were received for gather invocation (method " +
-                            itfTypeInvokedMethod.toGenericString() +
+                        new GathercastTimeoutException("timeout of " + timeout +
+                            " reached before invocations from all clients were received for gather invocation (method " +
+                            itfTypeInvokedMethod.getMethod().toGenericString() +
                             " on gather interface " + serverItfName), null));
             }
 
@@ -216,9 +226,9 @@ public class GatherRequestsQueue {
             if (!thrownTimeoutException) {
                 requestsQueue.addFutureForGatheredRequest(new FutureResult(
                         null,
-                        new GathercastTimeoutException(
-                            "timeout reached before invocations from all clients were received for gather invocation (method " +
-                            itfTypeInvokedMethod.toGenericString() +
+                        new GathercastTimeoutException("timeout of " + timeout +
+                            " reached before invocations from all clients were received for gather invocation (method " +
+                            itfTypeInvokedMethod.getMethod().toGenericString() +
                             " on gather interface " + serverItfName), null));
             }
             try {
@@ -228,4 +238,19 @@ public class GatherRequestsQueue {
             }
         }
     }
+    
+    public void migrateFuturesHandlerTo(Node node) throws MigrationException {
+    	futuresHandler.migrateTo(node);
+    }
+    
+    private void writeObject(java.io.ObjectOutputStream out)
+    throws java.io.IOException {
+//    System.out.println("writing gather requests queue");
+    out.defaultWriteObject();
+}
+    private void readObject(java.io.ObjectInputStream in)
+    throws java.io.IOException, ClassNotFoundException {
+//    System.out.println("reading gather requests queue");
+    in.defaultReadObject();
+}
 }

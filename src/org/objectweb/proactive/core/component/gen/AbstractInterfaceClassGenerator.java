@@ -43,7 +43,6 @@ import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -110,12 +109,5 @@ public abstract class AbstractInterfaceClassGenerator {
                 }
             }
         }
-    }
-
-    /**
-     * retreives the bytecode associated to the generated class of the given name
-     */
-    public static byte[] getClassData(String classname) {
-        return (byte[]) ClassDataCache.instance().getClassData(classname);
     }
 }

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.classloader;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 //import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
@@ -125,16 +124,9 @@ public class ProActiveClassLoaderHelper {
             return class_data;
         }
 
-        // 4. component representative?
-        class_data = RepresentativeInterfaceClassGenerator.getClassData(className);
+        // component-generated?
+        class_data = org.objectweb.proactive.core.component.gen.Utils.getClassData(className);
 
-        if (class_data != null) {
-            classCache.addClassData(className, class_data);
-            return class_data;
-        }
-
-        // 5. component metaobject interface?
-        class_data = MetaObjectInterfaceClassGenerator.getClassData(className);
         if (class_data != null) {
             classCache.addClassData(className, class_data);
             return class_data;

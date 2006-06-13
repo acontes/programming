@@ -41,7 +41,9 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -130,4 +132,14 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     }
 
     protected abstract void setControllerItfType();
+    
+    /**
+     * If a controller holds references to active objects which are dependent on it, it needs to
+     * trigger the migration of these active objects. This is done by overriding this method. 
+     * @param node
+     * @throws MigrationException
+     */
+    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException {
+    	// nothing by default
+    }
 }

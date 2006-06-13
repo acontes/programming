@@ -51,7 +51,6 @@ import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -971,7 +970,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         // try to get the class as a generated component interface reference
-        classData = RepresentativeInterfaceClassGenerator.getClassData(className);
+        classData = org.objectweb.proactive.core.component.gen.Utils.getClassData(className);
 
         if (classData != null) {
             ClassDataCache.instance().addClassData(className, classData);
@@ -979,14 +978,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             return classData;
         }
 
-        // try to get the class as a generated component interface reference
-        classData = MetaObjectInterfaceClassGenerator.getClassData(className);
-
-        if (classData != null) {
-            ClassDataCache.instance().addClassData(className, classData);
-
-            return classData;
-        }
 
         return null;
     }

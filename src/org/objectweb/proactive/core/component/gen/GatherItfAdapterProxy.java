@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.gen;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -7,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class GatherItfAdapterProxy implements InvocationHandler {
+public class GatherItfAdapterProxy implements InvocationHandler, Serializable {
     
         private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GATHERCAST);
     

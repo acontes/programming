@@ -219,9 +219,9 @@ public class MetaObjectInterfaceClassGenerator
 
                 createMethods(generatedCtClass, reifiedMethods, interfaceType);
 
-                //                generatedCtClass.writeFile("generated/");
-                //                System.out.println("[JAVASSIST] generated class : " +
-                //                    generatedClassFullName);
+//                                generatedCtClass.writeFile("generated/");
+//                                System.out.println("[JAVASSIST] generated class : " +
+//                                    generatedClassFullName);
                 byte[] bytecode = generatedCtClass.toBytecode();
                 ClassDataCache.instance().addClassData(generatedClassFullName,
                     generatedCtClass.toBytecode());

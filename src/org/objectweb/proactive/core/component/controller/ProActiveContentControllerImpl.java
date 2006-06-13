@@ -324,13 +324,11 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
 			this.exceptions = exceptions;
 			this.controller = controller;
 			this.component = component;
-//			System.out.println("new remove task");
 		}
 		
 		public void run() {
 			try {
 				controller.addFcSubComponent(component);
-//				System.out.println("added subcomponent");
 			} catch (IllegalContentException e) {
 				e.printStackTrace();
 				exceptions.addIllegalContentException(component, e);
@@ -354,13 +352,11 @@ private static class RemoveSubComponentTask implements Runnable {
 			this.exceptions = exceptions;
 			this.controller = controller;
 			this.component = component;
-//			System.out.println("new remove task");
 		}
 		
 		public void run() {
 			try {
 				controller.removeFcSubComponent(component);
-//				System.out.println("added component ");
 			} catch (IllegalContentException e) {
 				e.printStackTrace();
 				exceptions.addIllegalContentException(component, e);

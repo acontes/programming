@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -53,6 +54,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -61,6 +63,7 @@ import org.objectweb.proactive.core.component.config.ComponentConfigurationHandl
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.controller.AbstractRequestHandler;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.controller.ProActiveController;
 import org.objectweb.proactive.core.component.controller.RequestHandler;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
@@ -71,6 +74,7 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -89,7 +93,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     // private ComponentParameters componentParameters;
     //    private Interface[] interfaceReferences;
     private Map<String, Interface> functionalItfs = new HashMap<String, Interface>();
-    private Map<String, Interface> controlItfs = new HashMap<String, Interface>();
+    private Map<String, ProActiveController> controlItfs = new HashMap<String, ProActiveController>();
     private Map<String, Interface> collectionItfsMembers = new HashMap<String, Interface>();
     private Body body;
     private RequestHandler firstControllerRequestHandler;
@@ -128,6 +132,14 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
         // 3. external functional interfaces
         addFunctionalInterfaces(componentParameters, component_is_primitive);
+        
+        
+//        Set<String> s = controlItfs.keySet();
+//        for (Iterator iter = s.iterator(); iter.hasNext();) {
+//			String key = (String) iter.next();
+//			((AbstractProActiveController)controlItfs.get(key)).init();
+//		}
+
         // put all in a table
         //        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
         if (logger.isDebugEnabled()) {
@@ -348,6 +360,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
         // add the "component" control itfs
         lastController.setNextHandler(this);
+        
     }
 
     /**
@@ -560,5 +573,27 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
     public List<AbstractProActiveController> getOutputInterceptors() {
         return outputInterceptors;
+    }
+    
+    
+    public void migrateControllersDependentActiveObjectsTo(Node node) throws MigrationException {
+    	
+    	for (Iterator iter = controlItfs.values().iterator(); iter.hasNext();) {
+			ProActiveController controller = (ProActiveController) iter.next();
+			controller.migrateDependentActiveObjectsTo(node);
+			
+		}
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out)
+        throws java.io.IOException {
+        System.out.println("writing ProActiveComponentImpl");
+        out.defaultWriteObject();
+    }
+
+    private void readObject(java.io.ObjectInputStream in)
+        throws java.io.IOException, ClassNotFoundException {
+        System.out.println("reading ProActiveComponentImpl");
+        in.defaultReadObject();
     }
 }

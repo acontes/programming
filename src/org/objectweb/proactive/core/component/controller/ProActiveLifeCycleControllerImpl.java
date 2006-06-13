@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -127,9 +128,13 @@ public class ProActiveLifeCycleControllerImpl
                 			}
 						}
                 	} else
-                    if (((ProActiveInterfaceType)itfTypes[i]).isFcMulticastItf()) {
+                    if (((ProActiveInterfaceType)itfTypes[i]).isFcMulticastItf() && !!itfTypes[i].isFcOptionalItf()) {
                         ProxyForComponentInterfaceGroup clientSideProxy = Fractive.getMulticastController(getFcItfOwner())
                                                                                   .lookupFcMulticast(itfTypes[i].getFcItfName());
+//                        if (clientSideProxy == null) {
+//                        	System.out.println("client side proxy is null from " + ProActiveRuntimeImpl.getProActiveRuntime().getURL());
+//                        }
+
                         if (clientSideProxy.getDelegatee().isEmpty()) {
                             throw new IllegalLifeCycleException(
                                 "compulsory multicast client interface " +

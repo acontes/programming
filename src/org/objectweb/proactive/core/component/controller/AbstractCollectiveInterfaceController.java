@@ -10,6 +10,7 @@ import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.util.SerializableMethod;
 /**
  * Abstract parent class for controllers of collective interfaces
  *  
@@ -18,7 +19,12 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
  */
 public abstract class AbstractCollectiveInterfaceController extends AbstractProActiveController {
     
-    Map<String, Map<Method, Method>> matchingMethods = new HashMap<String, Map<Method,Method>>();
+    Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethods = new HashMap<String, Map<SerializableMethod,SerializableMethod>>();
+    
+    /**
+     * called after creation of all controllers and interfaces
+     */
+    public abstract void init();
 
 
     public AbstractCollectiveInterfaceController(Component owner) {
@@ -61,14 +67,14 @@ public abstract class AbstractCollectiveInterfaceController extends AbstractProA
                 throw new IllegalBindingException("incompatible binding between client interface " + clientSideItfType.getFcItfName() + " (" + clientSideItfType.getFcItfSignature() + ")  and server interface " + serverSideItfType.getFcItfName() + " ("+serverSideItfType.getFcItfSignature()+") : there is not the same number of methods (including those inherited) in both interfaces !");
             }
     
-            Map<Method, Method> matchingMethodsForThisItf = new HashMap<Method, Method>(clientSideItfMethods.length);
+            Map<SerializableMethod, SerializableMethod> matchingMethodsForThisItf = new HashMap<SerializableMethod, SerializableMethod>(clientSideItfMethods.length);
     
             for (Method method : clientSideItfMethods) {
                     Method serverSideMatchingMethod = searchMatchingMethod(method, serverSideItfMethods);
                     if (serverSideMatchingMethod == null) {
                         throw new IllegalBindingException("binding incompatibility between " + clientSideItfType.getFcItfName() + " and " + serverSideItfType.getFcItfName() + " : cannot find matching method");
                     }
-                    matchingMethodsForThisItf.put(method, serverSideMatchingMethod);
+                    matchingMethodsForThisItf.put(new SerializableMethod(method), new SerializableMethod(serverSideMatchingMethod));
             }
     
             matchingMethods.put(clientSideItfType.getFcItfName(), matchingMethodsForThisItf);

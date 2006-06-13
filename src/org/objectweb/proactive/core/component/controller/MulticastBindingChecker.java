@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.controller;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -23,7 +24,7 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
  * @author Matthieu Morel
  * 
  */
-public class MulticastBindingChecker {
+public class MulticastBindingChecker implements Serializable {
     
     /**
      * client method List<A> foo (B, List<C>) throws E; <br>

@@ -159,8 +159,16 @@ public class ComponentActivity implements RunActive, InitActive, EndActive, Seri
                     while (LifeCycleController.STOPPED.equals(
                                 Fractal.getLifeCycleController(
                                     componentBody.getProActiveComponentImpl())
-                                           .getFcState())) {
+                                           .getFcState()) ) {
                         componentService.blockingServeOldest(nfRequestFilter);
+                        if (!body.isActive()) {
+                        	// in case of a migration 
+                        	break;
+                        }
+                    }
+                    if (!body.isActive()) {
+                    	// in case of a migration 
+                    	break;
                     }
 
                     // 3.1. init object Activity

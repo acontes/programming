@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.request.Request;
@@ -57,6 +58,7 @@ import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -123,9 +125,11 @@ public class ComponentRequestImpl extends RequestImpl
 
         try {
             if (isControllerRequest()) {
+            	
                 result = ((ProActiveComponentImpl) ((ComponentBodyImpl) targetBody)
                           .getProActiveComponentImpl()).getControllerRequestHandler()
                           .handleRequest(this);
+
             } else {
                 
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
@@ -189,6 +193,7 @@ public class ComponentRequestImpl extends RequestImpl
                 methodCall.getReifiedMethod().toString() + " failed", e);
         } catch (java.lang.reflect.InvocationTargetException e) {
             exception = e.getTargetException();
+            e.printStackTrace();
 
             if (isOneWay) {
                 throw new ServeException("serve method " +
@@ -196,6 +201,7 @@ public class ComponentRequestImpl extends RequestImpl
                     exception);
             }
         }
+        
 
         return new FutureResult(result, exception, null);
     }

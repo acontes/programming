@@ -36,6 +36,10 @@
             <interface>org.objectweb.proactive.core.component.controller.GathercastController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.GathercastControllerImpl</implementation>
         </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.MigrationController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.MigrationControllerImpl</implementation>
+        </controller>
     </controllers>
     
 </componentConfiguration>

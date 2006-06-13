@@ -66,6 +66,7 @@ import org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.controller.GathercastController;
+import org.objectweb.proactive.core.component.controller.MigrationController;
 import org.objectweb.proactive.core.component.controller.MulticastController;
 import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
 import org.objectweb.proactive.core.component.controller.ProActiveContentController;
@@ -183,7 +184,21 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      */
     public static GathercastController getGathercastController(
         final Component component) throws NoSuchInterfaceException {
-        return (GathercastController) component.getFcInterface(Constants.GATHER_CONTROLLER);
+        return (GathercastController) component.getFcInterface(Constants.GATHERCAST_CONTROLLER);
+    }
+
+    /**
+     * Returns the {@link org.objectweb.proactive.core.component.controller.MigrationController MigrationController}
+     * interface of the given component.
+     *
+     * @param component a component.
+     * @return the {@link org.objectweb.proactive.core.component.controller.MigrationController MigrationController}
+     *         interface of the given component.
+     * @throws NoSuchInterfaceException if there is no such interface.
+     */
+    public static MigrationController getMigrationController(
+        final Component component) throws NoSuchInterfaceException {
+        return (MigrationController) component.getFcInterface(Constants.MIGRATION_CONTROLLER);
     }
 
     /**

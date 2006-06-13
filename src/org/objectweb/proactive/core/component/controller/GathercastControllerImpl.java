@@ -12,6 +12,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -23,6 +24,7 @@ import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.node.Node;
 
 public class GathercastControllerImpl extends AbstractCollectiveInterfaceController implements GathercastController {
     
@@ -38,8 +40,8 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
      * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#init()
      */
     public void init() {
-        
-        if (gatherRequestsHandler == null) {
+    	
+    	if (gatherRequestsHandler == null) {
             gatherRequestsHandler = new GatherRequestsQueues((ProActiveComponent)owner);
             List<Object> interfaces = Arrays.asList(owner.getFcInterfaces());
             Iterator<Object> it = interfaces.iterator();
@@ -97,7 +99,7 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(Constants.GATHER_CONTROLLER,
+                                               .createFcItfType(Constants.GATHERCAST_CONTROLLER,
                     GathercastController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
@@ -158,5 +160,25 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     public List<ItfID> getConnectedClientItfs(String serverItfName) {
         return bindingsOnServerItfs.get(serverItfName);
     }
+    
+    
+    
+    
+    @Override
+	public void migrateDependentActiveObjectsTo(Node node) throws MigrationException {
+    	if(gatherRequestsHandler!=null) {
+    		gatherRequestsHandler.migrateFuturesHandlersTo(node);
+    	}
+		
+	}
+
+	private void writeObject(java.io.ObjectOutputStream out)
+    throws java.io.IOException {
+    out.defaultWriteObject();
+}
+    private void readObject(java.io.ObjectInputStream in)
+    throws java.io.IOException, ClassNotFoundException {
+    in.defaultReadObject();
+}
     
 }

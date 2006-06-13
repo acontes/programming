@@ -88,28 +88,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         }
     }
 
-    /**
-     * retreives the bytecode associated to the generated class of the given name
-     */
-    public static byte[] getClassData(String classname) {
-        byte[] b = (byte[]) ClassDataCache.instance().getClassData(classname);
-
-        if (b != null) {
-            return b;
-        }
-
-        if (Utils.isRepresentativeClassName(classname)) {
-            // try to generate a representative
-            logger.info("Trying to generate representative class : " + classname);
-            b = generateInterfaceByteCode(classname, null);
-
-            if (b != null) {
-                return b;
-            }
-        }
-
-        return null;
-    }
 
     public ProActiveInterface generateInterface(final String interfaceName, Component owner,
         ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
@@ -315,9 +293,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                 logger.debug("added " + representativeClassName + " to cache");
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generated classes cache is : " + ClassDataCache.instance().toString());
-            }
 
             return bytecode;
         } catch (Exception e) {

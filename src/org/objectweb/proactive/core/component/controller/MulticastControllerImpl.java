@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.controller;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,12 +33,13 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class MulticastControllerImpl
-    extends AbstractCollectiveInterfaceController implements MulticastController {
+    extends AbstractCollectiveInterfaceController implements MulticastController,Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private static Logger multicastLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST);
     private Map<String, ProActiveInterface> multicastItfs = new HashMap<String, ProActiveInterface>();
@@ -199,7 +201,7 @@ public class MulticastControllerImpl
         try {
             Method matchingMethodInServerInterface = matchingMethods.get(mc.getComponentMetadata()
                                                                            .getComponentInterfaceName())
-                                                                    .get(mc.getReifiedMethod());
+                                                                    .get(new SerializableMethod(mc.getReifiedMethod())).getMethod();
 
             // now we have all dispatched parameters
             // proceed to generation of method calls
@@ -237,9 +239,11 @@ public class MulticastControllerImpl
         init();
         if (logger.isDebugEnabled()) {
             try {
+            	if (!ProActiveGroup.isGroup(serverItf.getFcItfOwner())) {
                 logger.debug("multicast binding : " + clientItfName + " to : " +
                     Fractal.getNameController(serverItf.getFcItfOwner())
                            .getFcName() + "." + serverItf.getFcItfName());
+            	}
             } catch (NoSuchInterfaceException e) {
                 e.printStackTrace();
             }

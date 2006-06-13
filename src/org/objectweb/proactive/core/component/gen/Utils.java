@@ -41,8 +41,10 @@ import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.NotFoundException;
 
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.util.ClassDataCache;
 
 
 /**
@@ -54,7 +56,7 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 public class Utils {
     public static final String GENERATED_DEFAULT_PREFIX = "Generated_";
     public static final String REPRESENTATIVE_DEFAULT_SUFFIX = "_representative";
-    public static final String GATHER_ITF_PROXY_DEFAULT_SUFFIX = "_itfProxy";
+    public static final String GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX = "_gathercastItfProxy";
     public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = "_composite";
     public static final String OUTPUT_INTERCEPTOR_SUFFIX = "_outputInterceptor";
     public static final String STUB_DEFAULT_PACKAGE = null;
@@ -66,6 +68,17 @@ public class Utils {
         return (classname.startsWith(GENERATED_DEFAULT_PREFIX) &&
         classname.endsWith(REPRESENTATIVE_DEFAULT_SUFFIX));
     }
+    
+    
+    public static boolean isMetaObjectClassName(String classname) {
+        throw new ProActiveRuntimeException("not implemented yet");
+    }
+    
+    public static boolean isGathercastProxyClassName(String classname) {
+        return (classname.startsWith(GENERATED_DEFAULT_PREFIX) &&
+        classname.endsWith(GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX));
+    }
+
 
     public static String getInterfaceSignatureFromRepresentativeClassName(
         String className) {
@@ -95,6 +108,19 @@ public class Utils {
         return tmp;
     }
 
+    public static String getInterfaceSignatureFromGathercastProxyClassName(
+            String className) {
+            if (!isGathercastProxyClassName(className)) {
+                return null;
+            }
+            String tmp = className.replaceAll(GENERATED_DEFAULT_PREFIX, "");
+            tmp = tmp.replaceAll(GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX, "");
+            tmp = tmp.substring(0, tmp.indexOf(GEN_MIDDLE_SEPARATOR));
+            tmp = tmp.replaceAll(GEN_ITF_NAME_SEPARATOR, "-").replace(GEN_PACKAGE_SEPARATOR,
+                    ".");
+            return tmp;
+        }
+
     public static String getMetaObjectClassName(
         String functionalInterfaceName, String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ? ... but readable)
@@ -112,7 +138,7 @@ public class Utils {
     }
     
     public static String getGatherProxyItfClassName(ProActiveInterfaceType gatherItfType) {
-        return (getMetaObjectClassName(gatherItfType.getFcItfName(), gatherItfType.getFcItfSignature()) + GATHER_ITF_PROXY_DEFAULT_SUFFIX);
+        return (getMetaObjectClassName(gatherItfType.getFcItfName(), gatherItfType.getFcItfSignature()) + GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX);
     }
 
     public static String getOutputInterceptorClassName(
@@ -157,5 +183,38 @@ public class Utils {
 	    generatedClass.addMethod(senderItfIDGetter);
 	    CtMethod senderItfIDSetter = CtNewMethod.setter("setSenderItfID", senderItfIDField);
 	    generatedClass.addMethod(senderItfIDSetter);
+	}
+
+	/**
+	 * retreives the bytecode associated to the generated class of the given name
+	 */
+	public static byte[] getClassData(String classname) {
+		byte[] bytecode = (byte[]) ClassDataCache.instance().getClassData(classname);
+		if (bytecode != null) {
+			return bytecode;
+		}
+        if (Utils.isRepresentativeClassName(classname)) {
+            // try to generate a representative
+//            logger.info("Trying to generate representative class : " + classname);
+            bytecode = RepresentativeInterfaceClassGenerator.generateInterfaceByteCode(classname, null);
+
+            if (bytecode != null) {
+                return bytecode;
+            }
+        }
+        
+        if (Utils.isGathercastProxyClassName(classname)) {
+            // try to generate a representative
+//            logger.info("Trying to generate representative class : " + classname);
+            bytecode = GatherInterfaceGenerator.generateInterfaceByteCode(classname);
+
+            if (bytecode != null) {
+                return bytecode;
+            }
+        }
+        
+        
+
+        return null;
 	}
 }

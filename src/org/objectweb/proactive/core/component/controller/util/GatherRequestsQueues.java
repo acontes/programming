@@ -1,16 +1,26 @@
 package org.objectweb.proactive.core.component.controller.util;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.body.proxy.AbstractProxy;
+import org.objectweb.proactive.core.body.proxy.AbstractBodyProxy.VoidFuture;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Fractive;
@@ -22,9 +32,19 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.exceptions.manager.NFEManager;
+import org.objectweb.proactive.core.exceptions.proxy.FutureCreationException;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
+import org.objectweb.proactive.core.exceptions.proxy.SendRequestCommunicationException;
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 /**
  * This class orders requests arriving to gathercast interfaces into queues.
@@ -42,28 +62,55 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class GatherRequestsQueues {
+public class GatherRequestsQueues implements Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GATHERCAST);
     // Map <serverItfName, map<signatureOfInvokedMethod, list<queuedRequests>>>
-    Map<String, Map<Method, List<GatherRequestsQueue>>> queues = new HashMap<String, Map<Method, List<GatherRequestsQueue>>>();
+    Map<String, Map<SerializableMethod, List<GatherRequestsQueue>>> queues = new HashMap<String, Map<SerializableMethod, List<GatherRequestsQueue>>>();
     ProActiveComponent owner;
-    List<GatherFuturesHandler> futuresHandlers = new ArrayList<GatherFuturesHandler>();
+//    List<GatherFuturesHandler> futuresHandlers = new ArrayList<GatherFuturesHandler>();
     List<ItfID> gatherItfs = new ArrayList<ItfID>();
     ProActiveInterfaceType[] itfTypes;
+    
+    /**
+     * migrates all existing futures handlers
+     * @param node destination node
+     * @throws MigrationException if migration failed
+     */
+    public void migrateFuturesHandlersTo(Node node) throws MigrationException {
+    	Set<String> itfNames = queues.keySet();
+    	for (Iterator iter = itfNames.iterator(); iter.hasNext();) {
+			String itfName = (String) iter.next();
+			Map<SerializableMethod, List<GatherRequestsQueue>> queuesPerNamedItf = queues.get(itfName);
+			Set<SerializableMethod> invokedMethods = queuesPerNamedItf.keySet();
+			for (Iterator iterator = invokedMethods.iterator(); iterator
+					.hasNext();) {
+				SerializableMethod method = (SerializableMethod) iterator.next();
+				List<GatherRequestsQueue> listOfQueues = queuesPerNamedItf.get(method);
+				for (Iterator iterator2 = listOfQueues.iterator(); iterator
+						.hasNext();) {
+					GatherRequestsQueue queue = (GatherRequestsQueue) iterator.next();
+					queue.migrateFuturesHandlerTo(node);
+				}
+				
+			}
+			 
+			
+		}
+    }
 
     public GatherRequestsQueues(ProActiveComponent owner) {
         this.owner = owner;
-        Object[] untypedItfs = owner.getFcInterfaces();
+        InterfaceType[] untypedItfs = ((ComponentType)owner.getFcType()).getFcInterfaceTypes();
         itfTypes = new ProActiveInterfaceType[untypedItfs.length];
         for (int i = 0; i < itfTypes.length; i++) {
-            itfTypes[i] = (ProActiveInterfaceType) ((ProActiveInterface) untypedItfs[i]).getFcItfType();
+            itfTypes[i] = (ProActiveInterfaceType)untypedItfs[i];
         }
 
         for (int i = 0; i < itfTypes.length; i++) {
             if (ProActiveTypeFactory.GATHER_CARDINALITY.equals(
                         itfTypes[i].getFcCardinality())) {
                 // add a queue for each gather itf
-                Map<Method, List<GatherRequestsQueue>> map = new HashMap<Method, List<GatherRequestsQueue>>();
+                Map<SerializableMethod, List<GatherRequestsQueue>> map = new HashMap<SerializableMethod, List<GatherRequestsQueue>>();
                 queues.put(itfTypes[i].getFcItfName(), map);
                 gatherItfs.add(new ItfID(itfTypes[i].getFcItfName(),
                         owner.getID()));
@@ -109,9 +156,10 @@ public class GatherRequestsQueues {
                 "there is no gathercast interface named " + serverItfName);
         }
 
-        Map<Method, List<GatherRequestsQueue>> map = queues.get(serverItfName);
+        Map<SerializableMethod, List<GatherRequestsQueue>> map = queues.get(serverItfName);
 
-        List<GatherRequestsQueue> list = map.get(itfTypeMethod);
+        // SerializableMethod objects are used as keys
+        List<GatherRequestsQueue> list = map.get(new SerializableMethod(itfTypeMethod));
 
         if (list == null) {
             list = new ArrayList<GatherRequestsQueue>();
@@ -119,13 +167,13 @@ public class GatherRequestsQueues {
             GatherRequestsQueue queue = new GatherRequestsQueue(owner,
                     serverItfName, itfTypeMethod, connectedClientItfs);
             list.add(queue);
-            map.put(itfTypeMethod, list);
+            map.put(new SerializableMethod(itfTypeMethod), list);
         }
 
         if (list.isEmpty()) {
             GatherRequestsQueue queue = new GatherRequestsQueue(owner,
                     serverItfName, itfTypeMethod, connectedClientItfs);
-            map.get(itfTypeMethod).add(queue);
+            map.get(new SerializableMethod(itfTypeMethod)).add(queue);
         }
 
         for (Iterator iter = list.iterator(); iter.hasNext();) {
@@ -211,11 +259,12 @@ public class GatherRequestsQueues {
                 MethodCall gatherMC = MethodCall.getComponentMethodCall(gatherMethod,
                         gatherEffectiveArguments, serverItfName,
                         new ItfID(serverItfName, owner.getID()));
-
+                long sequenceID = ((ComponentBodyImpl) ProActive.getBodyOnThis()).getNextSequenceID();
+                
                 ComponentRequest gatherRequest = new ComponentRequestImpl(gatherMC,
                         ProActive.getBodyOnThis(),
                         firstRequestsInLine.oneWayMethods(),
-                        ((ComponentBodyImpl) ProActive.getBodyOnThis()).getNextSequenceID());
+                        sequenceID);
 
                 // serve the request (do not reenqueue it)
                 if (logger.isDebugEnabled()) {
@@ -225,11 +274,13 @@ public class GatherRequestsQueues {
 
                 // handle the future for async invocations
                 if (reply != null) {
+                	reply.getResult().getResult();
                     firstRequestsInLine.addFutureForGatheredRequest(reply.getResult());
                 }
 
                 // remove the list that was just used
-                requestQueues.remove(0);
+                GatherRequestsQueue queue = requestQueues.remove(0);
+                queue= null;
             }
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
@@ -250,6 +301,63 @@ public class GatherRequestsQueues {
         }
         return null;
     }
+    
+//    protected Object reifyAsAsynchronous(MethodCall methodCall)
+//    throws Exception, RenegotiateSessionException {
+//    StubObject futureobject = null;
+//
+//    // Creates a stub + FutureProxy for representing the result
+//    try {
+//        Class returnType = methodCall.getReifiedMethod().getReturnType();
+//
+//        if (returnType.equals(java.lang.Void.TYPE)) {
+//
+//            /* A future for a void call is used to put the potential exception inside */
+//            futureobject = (StubObject) MOP.newInstance(VoidFuture.class,
+//                    null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+//        } else {
+//            futureobject = (StubObject) MOP.newInstance(returnType, null,
+//                    Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+//        }
+//    } catch (MOPException e) {
+//        // Create a non functional exception encapsulating the network exception
+//        ProxyNonFunctionalException nfe = new FutureCreationException(
+//                "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
+//                methodCall.getName(), e);
+//        e.printStackTrace();
+////        NFEManager.fireNFE(nfe, ProActive.getBodyOnThis().getRemoteAdapter());
+//    } catch (ClassNotFoundException e) {
+//        // Create a non functional exception encapsulating the network exception
+//        ProxyNonFunctionalException nfe = new FutureCreationException(
+//                "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
+//                methodCall.getName(), e);
+//        e.printStackTrace();
+////        NFEManager.fireNFE(nfe, this);
+//    }
+//
+//    // Set the id of the body creator in the created future
+//    FutureProxy fp = (FutureProxy) (futureobject.getProxy());
+//    fp.setCreatorID(owner.getID());
+//    fp.setOriginatingProxy((AbstractProxy)ProActive.getStubOnThis().getProxy());
+//
+//    try {
+//        ProActive.getBodyOnThis().sendRequest(methodCall, fp, );
+//    } catch (java.io.IOException e) {
+//        // old stuff
+//        // throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while sending request for methodcall ="+methodCall.getName(), e);
+//        // Create a non functional exception encapsulating the network exception
+//        ProxyNonFunctionalException nfe = new SendRequestCommunicationException(
+//                "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
+//                methodCall.getName(), e);
+//
+//        NFEManager.fireNFE(nfe, this);
+//    }
+//
+//    // And return the future object
+//    return futureobject;
+//}
 
+
+    
  
 }

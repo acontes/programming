@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.component;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 
@@ -41,7 +43,7 @@ import org.objectweb.proactive.core.body.MetaObjectFactory;
  *
  * @author Matthieu Morel
  */
-public class ContentDescription {
+public class ContentDescription implements Serializable {
     private String className;
     private Object[] constructorParameters;
     private Active activity;
