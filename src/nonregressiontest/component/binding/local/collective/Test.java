@@ -187,12 +187,6 @@ public class Test extends ComponentTest {
         Fractal.getBindingController(pE).bindFc("i2-02", c1.getFcInterface("i2-client-02"));
         Fractal.getBindingController(c1).bindFc("i2-client-01", pB5.getFcInterface("i2"));
         Fractal.getBindingController(c1).bindFc("i2-client-02", pB6.getFcInterface("i2"));
-        try {
-        	Fractal.getBindingController(c1).unbindFc("i2-client-01");
-        	Assertions.assertTrue(false); // make sure we do not get here
-        } catch (IllegalBindingException ignored) {
-//        	ignored.printStackTrace();
-        }
      
         Fractal.getLifeCycleController(c1).startFc();
         Fractal.getLifeCycleController(pB5).startFc();
