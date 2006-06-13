@@ -78,10 +78,10 @@
 			<unitTest exclude="no" class="nonregressiontest.component.shortcuts.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.activity.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.lookup.Test"/>
-			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.gathercast.Test"/>			
-			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.classbased.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.classbased.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.migration.Test"/>
 			<unitTest exclude="yes" class="nonregressiontest.component.nfpriority.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.cic.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.pml.Test"/>
