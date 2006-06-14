@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.dialog;
 
+import java.net.UnknownHostException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -42,17 +44,40 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 public class MonitorNewHostDialog {
-
 	
 	private Shell shell = null;
 
+	private static String defaultMaxDepth = "3";
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	
 	public MonitorNewHostDialog(Display display) {
+			
+		String initialHostValue = "localhost";
+		String port = "";
+	    
+		/* Get the machine's name */
+		try {
+			initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+		} catch (UnknownHostException e) {
+			// TODO catch this exception, and do something
+			e.printStackTrace();
+		}
+		
+		/* Load the proactive default configuration */
+		ProActiveConfiguration.load();
+		
+		/* Get the machine's port */
+		port = System.getProperty("proactive.rmi.port");
+		
+		
+		/* Init the display */
 		shell = new Shell(display, SWT.BORDER | SWT.CLOSE);
 		shell.setText("Adding host and depth to monitor");
 		shell.setSize(new Point(300, 200));
@@ -79,6 +104,7 @@ public class MonitorNewHostDialog {
 		hostLabel.setText("Name or IP :");
 		
 		Text hostText = new Text(hostGroup, SWT.BORDER);
+		hostText.setText(initialHostValue);
 		FormData hostFormData = new FormData();
 		hostFormData.top = new FormAttachment(0, -1);
 		hostFormData.left = new FormAttachment(hostLabel, 5);
@@ -92,6 +118,7 @@ public class MonitorNewHostDialog {
 		portLabel.setLayoutData(portFormData);
 		
 		Text portText = new Text(hostGroup, SWT.BORDER);
+		if(port != null) portText.setText(port);
 		FormData portFormData2 = new FormData();
 		portFormData2.top = new FormAttachment(0, -1);
 		portFormData2.left = new FormAttachment(portLabel, 5);
@@ -106,6 +133,7 @@ public class MonitorNewHostDialog {
 		depthLabel.setLayoutData(depthFormData);
 		
 		Text depthText = new Text(shell, SWT.BORDER);
+		depthText.setText(defaultMaxDepth);
 		FormData depthFormData2 = new FormData();
 		depthFormData2.top = new FormAttachment(hostGroup, 17);
 		depthFormData2.left = new FormAttachment(depthLabel, 5);
