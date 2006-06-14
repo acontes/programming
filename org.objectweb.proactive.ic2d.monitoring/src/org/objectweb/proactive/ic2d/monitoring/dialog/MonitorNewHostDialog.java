@@ -33,6 +33,8 @@ package org.objectweb.proactive.ic2d.monitoring.dialog;
 import java.net.UnknownHostException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
@@ -44,20 +46,34 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 public class MonitorNewHostDialog {
+
+	
+	private int protocol;
 	
 	private Shell shell = null;
-
+	
+	private Text hostText;
+	private Text portText;
+	private Button okButton;
+	private Button cancelButton;
+	
 	private static String defaultMaxDepth = "3";
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	
-	public MonitorNewHostDialog(Display display) {
+	public MonitorNewHostDialog(Display display, int protocol) {
+		
+		this.protocol = protocol;
+		
 			
 		String initialHostValue = "localhost";
 		String port = "";
@@ -103,7 +119,7 @@ public class MonitorNewHostDialog {
 		Label hostLabel = new Label(hostGroup, SWT.NONE);
 		hostLabel.setText("Name or IP :");
 		
-		Text hostText = new Text(hostGroup, SWT.BORDER);
+		this.hostText = new Text(hostGroup, SWT.BORDER);
 		hostText.setText(initialHostValue);
 		FormData hostFormData = new FormData();
 		hostFormData.top = new FormAttachment(0, -1);
@@ -117,7 +133,7 @@ public class MonitorNewHostDialog {
 		portFormData.left = new FormAttachment(70, 10);
 		portLabel.setLayoutData(portFormData);
 		
-		Text portText = new Text(hostGroup, SWT.BORDER);
+		this.portText = new Text(hostGroup, SWT.BORDER);
 		if(port != null) portText.setText(port);
 		FormData portFormData2 = new FormData();
 		portFormData2.top = new FormAttachment(0, -1);
@@ -146,22 +162,24 @@ public class MonitorNewHostDialog {
 		depthFormData3.top = new FormAttachment(depthLabel, 5);
 		depthLabel2.setLayoutData(depthFormData3);
 		
-		Button okButton = new Button(shell, SWT.NONE);
+		this.okButton = new Button(shell, SWT.NONE);
 		okButton.setText("OK");
+		okButton.addSelectionListener(new MonitorNewHostListener());
 		FormData okFormData = new FormData();
 		okFormData.top = new FormAttachment(depthLabel2, 20);
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
-
-		Button cancelButton = new Button(shell, SWT.NONE);
+		
+		this.cancelButton = new Button(shell, SWT.NONE);
 		cancelButton.setText("Cancel");
+		cancelButton.addSelectionListener(new MonitorNewHostListener());
 		FormData cancelFormData = new FormData();
 		cancelFormData.top = new FormAttachment(depthLabel2, 20);
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);
-
+		
 		center(display, shell);
 		
 		shell.pack();
@@ -175,7 +193,7 @@ public class MonitorNewHostDialog {
 		
 		//display.dispose(); TODO ???
 	}
-
+	
 	
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
@@ -183,10 +201,36 @@ public class MonitorNewHostDialog {
 	
 	
 	private static void center(Display display, Shell shell) {
-	    Rectangle rect = display.getClientArea();
-	    Point size = shell.getSize();
-	    int x = (rect.width - size.x) / 2;
-	    int y = (rect.height - size.y) / 2;
-	    shell.setLocation(new Point(x, y));
-	  }
+		Rectangle rect = display.getClientArea();
+		Point size = shell.getSize();
+		int x = (rect.width - size.x) / 2;
+		int y = (rect.height - size.y) / 2;
+		shell.setLocation(new Point(x, y));
+	}
+	
+	
+	//
+	// -- INNER CLASS -----------------------------------------------
+	//
+	
+	private class MonitorNewHostListener extends SelectionAdapter {
+		
+		public void widgetSelected(SelectionEvent e) {
+			if(e.widget == okButton) {
+				switch(protocol) {
+				case Protocol.RMI:
+					String hostname = hostText.getText();
+					int port = Integer.parseInt(portText.getText());
+					System.out.println("MonitorNewHostDialog : widgetSelected");
+					new HostObject(WorldObject.getInstance(), hostname, port, protocol);
+					shell.close();
+					break;
+				}
+			}
+			else if(e.widget == cancelButton) {
+				shell.close();
+			}
+		}
+		
+	}
 }
