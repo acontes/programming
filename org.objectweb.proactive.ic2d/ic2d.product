@@ -6,6 +6,7 @@
    <configIni use="default"/>
 
    <launcherArgs>
+      <vmArgs>-Djava.security.manager -Djava.security.policy=/proactive.java.policy</vmArgs>
    </launcherArgs>
 
    <windowImages/>
@@ -24,6 +25,7 @@
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.draw2d"/>
+      <plugin id="org.eclipse.gef"/>
       <plugin id="org.eclipse.help"/>
       <plugin id="org.eclipse.jface"/>
       <plugin id="org.eclipse.osgi"/>
@@ -41,6 +43,7 @@
       <plugin id="org.eclipse.ui"/>
       <plugin id="org.eclipse.ui.carbon"/>
       <plugin id="org.eclipse.ui.forms"/>
+      <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.objectweb.proactive.ic2d"/>
       <plugin id="org.objectweb.proactive.ic2d.monitoring"/>

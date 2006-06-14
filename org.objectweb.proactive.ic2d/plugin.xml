@@ -25,7 +25,6 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.objectweb.proactive.ic2d.Perspective"
-            fixed="false"
             id="org.objectweb.proactive.ic2d.Perspective"
             name="Default"/>
    </extension>

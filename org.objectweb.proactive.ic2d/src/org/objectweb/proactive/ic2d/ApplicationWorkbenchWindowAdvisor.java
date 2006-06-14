@@ -54,4 +54,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowPerspectiveBar(true);
         configurer.setTitle("IC2D");
     }
+ 
+    public void postWindowCreate() {
+    	IC2DPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell().setMaximized(true);
+    }
+    
 }
