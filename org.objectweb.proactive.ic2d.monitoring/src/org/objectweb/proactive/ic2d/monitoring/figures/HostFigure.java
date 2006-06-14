@@ -42,6 +42,7 @@ public class HostFigure extends AbstractRectangleFigure{
 	public HostFigure(String text, int xPos, int yPos) {
 		super(null,text,xPos,yPos,180);
 		new Dragger(this);
+		System.out.println("HostFigure : constructor");
 	}
 	
     //

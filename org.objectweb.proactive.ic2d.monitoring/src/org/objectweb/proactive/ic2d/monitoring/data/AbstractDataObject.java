@@ -31,26 +31,24 @@
 package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Observable;
 
 /**
  * Holder class for the host data representation
  */
-public abstract class AbstractDataObject {
+public abstract class AbstractDataObject extends Observable {
 	
-	private PropertyChangeSupport listeners;
 	
 	/** the object's name */
 	protected String abstractDataObjectName;
 	
 	/** the object's parent */
 	protected AbstractDataObject parent;
-	/** the object's children */
-	// HashMap<String, AbstractDataObject>
+	/** the object's children (HashMap<String, AbstractDataObject>) */
 	private HashMap children;
 	
 	/** true if this object has been destroyed, false otherwise */
@@ -183,6 +181,8 @@ public abstract class AbstractDataObject {
 			return;
 		}
 		children.put(key, child);
+		setChanged();
+		notifyObservers();
 	}
 	
 	/**

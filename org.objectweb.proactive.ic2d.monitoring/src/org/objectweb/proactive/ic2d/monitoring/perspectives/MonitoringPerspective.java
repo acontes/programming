@@ -32,6 +32,8 @@ package org.objectweb.proactive.ic2d.monitoring.perspectives;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ic2d.monitoring.views.*;
 
 
@@ -44,6 +46,13 @@ public class MonitoringPerspective implements IPerspectiveFactory {
 	//
 	
 	public void createInitialLayout(IPageLayout layout) {
+		try{
+			RuntimeFactory.getDefaultRuntime();
+		}
+		catch(ProActiveException e) {
+			e.printStackTrace();
+		}
+		
 		String editorArea=layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
 		layout.setFixed(false);

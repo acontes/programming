@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 import org.objectweb.proactive.ic2d.monitoring.dialog.MonitorNewHostDialog;
 
 public class NewRMIHostAction implements IWorkbenchWindowActionDelegate {
@@ -58,7 +59,7 @@ public class NewRMIHostAction implements IWorkbenchWindowActionDelegate {
 
 	public void run(IAction action) {
 		// TODO Auto-generated method stub
-		new MonitorNewHostDialog(display);
+		new MonitorNewHostDialog(display, Protocol.RMI);
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {

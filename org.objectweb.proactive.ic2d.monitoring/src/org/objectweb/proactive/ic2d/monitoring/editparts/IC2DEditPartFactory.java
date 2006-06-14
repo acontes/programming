@@ -34,6 +34,7 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class IC2DEditPartFactory implements EditPartFactory{
 	
@@ -43,7 +44,9 @@ public class IC2DEditPartFactory implements EditPartFactory{
 	//
 	
 	public EditPart createEditPart(EditPart context, Object model) {
-		if (model instanceof HostObject)
+		if (model instanceof WorldObject)
+			return new WorldEditPart((WorldObject)model);
+		else if (model instanceof HostObject)
 			return new HostEditPart((HostObject)model);
 		else if(model instanceof VMObject)
 			return new VMEditPart((VMObject)model);

@@ -36,8 +36,6 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.editparts.IC2DEditPartFactory;
 
@@ -59,7 +57,7 @@ public class MonitoringView extends ViewPart {
 		getViewSite().setSelectionProvider(graphicalViewer);
 		getSite().setSelectionProvider(graphicalViewer);
 		graphicalViewer.getControl().setBackground(ColorConstants.white);
-		graphicalViewer.setContents(getContent());
+		graphicalViewer.setContents(WorldObject.getInstance());
 	}
 
 	
@@ -71,16 +69,6 @@ public class MonitoringView extends ViewPart {
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
-	
-	/**
-	 * Returns the content of this editor
-	 * @return the model object
-	 */
-	protected Object getContent(){
-		HostObject host = new HostObject(new WorldObject(), "Essai", 0, 0);
-		VMObject vm = new VMObject(host);
-		return host;
-	}
 	
 	/**
 	 * Returns the <code>EditPartFactory</code> that the

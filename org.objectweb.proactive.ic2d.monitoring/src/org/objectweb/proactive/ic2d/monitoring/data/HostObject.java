@@ -65,6 +65,7 @@ public class HostObject extends AbstractDataObject {
 		this.port = port;
 		this.protocol = protocol;
 		this.parent.putChild(this.getKey(), this);
+		System.out.println("HostObject : constructor");
 	}
 	
     //

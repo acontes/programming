@@ -37,6 +37,8 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 public class WorldObject extends AbstractDataObject {
 
 	
+	private static WorldObject instance;
+	
 	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -44,8 +46,9 @@ public class WorldObject extends AbstractDataObject {
 	/**
 	 * Create a new WorldObject
 	 */
-	public WorldObject() {
+	private WorldObject() {
         super(null);
+        System.out.println("WorldObject : contructor");
     }
 	
 	
@@ -53,6 +56,12 @@ public class WorldObject extends AbstractDataObject {
     // -- PUBLICS METHODS -----------------------------------------------
     //
 	
+	
+	public static WorldObject getInstance() {
+		if(instance == null)
+			instance = new WorldObject();
+		return instance;
+	}
 	
 	public String getKey() {
 		// A WorldObject doesn't need a key because it is the only son of IC2DObject.
@@ -63,17 +72,6 @@ public class WorldObject extends AbstractDataObject {
 	public String getFullName(){
 		return "WorldObject";
 	}
-	
-	/**
-	 * Creates a new HostObject
-	 * @param hostname machine's name:port
-	 * @param os Operating System
-	 */
-	public HostObject addHostObject(String hostname, int port, int protocol) {
-		HostObject host = new HostObject(this, hostname, port, protocol);
-		this.putChild(host.getKey(), host);
-		return host;
-    }
 	
 	
 	/**
