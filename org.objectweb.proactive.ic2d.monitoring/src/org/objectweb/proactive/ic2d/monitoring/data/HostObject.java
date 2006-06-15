@@ -30,7 +30,10 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.rmi.RemoteException;
 import java.util.List;
+
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
 /**
@@ -50,11 +53,6 @@ public class HostObject extends AbstractDataObject {
     /** Host's protocol */
     private int protocol;
     
-    /** Exploration's depth */
-    private int depth;
-    
-    /** The Explorer */
-    private Explorer explorer;
 	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -65,38 +63,39 @@ public class HostObject extends AbstractDataObject {
      * @parent hostname machine's name
      * @param port
      * @param protocol to use
-     * @param depth exploration's depth 
-     *     */
-	public HostObject(WorldObject parent, String hostname, int port, int protocol, int depth){
+     */
+	public HostObject(WorldObject parent, String hostname, int port, int protocol){
 		super(parent);		
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
-		this.depth = depth;
 		this.parent.putChild(this.getKey(), this);
-		this.explorer = new Explorer();
-		this.explorer.exploreHost(this);
+		this.explore();
 	}
 	
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
 
+	
 	/**
-	 * Explore the current host to discover which elements it contains.
-	 * @return A VMObject list
+	 * Explores the host, in order to find all VMs known by this one
 	 */
-	public List explore(){
-		//TODO
-		return null;
-		
-		//Explorer explorer = new Explorer();
-		//List proActiveRuntimeList = explorer.exploreHost(this);
-		
-		//List resul = new ArrayList();
-		//for(int i=0, size=proActiveRuntimeList.size(); i < size ; i++){
-		//	
-		//}
+	public void explore() {
+		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(this.getProtocol());
+		List foundRuntimes = null;
+		try {
+			foundRuntimes = runtimeFinder.FindPARuntime(this);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(foundRuntimes != null){
+			for (int i = 0; i < foundRuntimes.size(); ++i) {
+				ProActiveRuntime proActiveRuntime = (ProActiveRuntime) foundRuntimes.get(i);
+				handleProActiveRuntime(this, proActiveRuntime, 1);
+			}
+		}		
 	}
 	
 	public String getKey() {
@@ -163,6 +162,16 @@ public class HostObject extends AbstractDataObject {
     protected WorldObject getTypedParent() {
         return (WorldObject) parent;
     }
-
-   
+    
+    //
+    // -- PROTECTED METHOD -----------------------------------------------
+    //
+    
+    /**
+     * TODO
+     */
+	private void handleProActiveRuntime(HostObject parent, ProActiveRuntime runtime, int depth){
+		new VMObject(parent, runtime);
+	}
+    
 }

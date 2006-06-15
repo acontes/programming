@@ -30,39 +30,57 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-import java.rmi.RemoteException;
-import java.rmi.dgc.VMID;
-import java.util.List;
+import org.objectweb.proactive.core.node.Node;
 
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+public class NodeObject extends AbstractDataObject{
 
-public class Explorer {
+	private String key;
 	
-	/** The default exploration's depth */
-	public final static int DefaultDepth = 3;
+    protected Node node;
 	
-	/* Explores the host, in order to find his VMs */
-	public void exploreHost(HostObject host){
-		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(host.getProtocol());
-		List foundRuntimes = null;
-		try {
-			foundRuntimes = runtimeFinder.FindPARuntime(host);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(foundRuntimes != null){
-			 for (int i = 0; i < foundRuntimes.size(); ++i) {
-	                ProActiveRuntime proActiveRuntime = (ProActiveRuntime) foundRuntimes.get(i);
-	                handleProActiveRuntime(host, proActiveRuntime, 1);
-	            }
-		}
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    
+	public NodeObject(VMObject parent, Node node){
+		super(parent, node.getNodeInformation().getName());
+		System.out.println("Constructor NodeObject");
+		this.node = node;
+		this.key = node.getNodeInformation().getName();
+		this.parent.putChild(this.getKey(), this);
 	}
 	
-	public void handleProActiveRuntime(HostObject parent, ProActiveRuntime runtime, int depth){
-		VMID vmid = runtime.getVMInformation().getVMID();
-		VMObject vm = new VMObject(parent, vmid);
-		//TODO Finish this method!!!
+	
+    //
+    // -- PUBLIC METHOD -----------------------------------------------
+    //
+	
+	public String getKey() {
+		return this.key;
+	}
+
+	public String getFullName() {
+		return this.key;
 	}
 	
+	public void destroyObject() {
+		// TODO Auto-generated method stub
+		
+	}
+		
+	/**
+	 * Returns the node's protocol
+	 * @return The protocol used
+	 */
+    public String getProtocol() {
+        return node.getNodeInformation().getProtocol();
+    }
+
+
+	public void explore() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

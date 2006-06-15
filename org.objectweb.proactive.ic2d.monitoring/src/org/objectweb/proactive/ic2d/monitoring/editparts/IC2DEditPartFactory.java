@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.monitoring.editparts;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
@@ -50,6 +51,8 @@ public class IC2DEditPartFactory implements EditPartFactory{
 			return new HostEditPart((HostObject)model);
 		else if(model instanceof VMObject)
 			return new VMEditPart((VMObject)model);
+		else if(model instanceof NodeObject)
+			return new NodeEditPart((NodeObject)model);
 		else
 			return null;
 	}

@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ic2d.monitoring.data.Explorer;
+import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
@@ -147,7 +147,7 @@ public class MonitorNewHostDialog {
 		depthLabel.setLayoutData(depthFormData);
 		
 		this.depthText = new Text(shell, SWT.BORDER);
-		depthText.setText(Explorer.DefaultDepth+"");
+		depthText.setText(MonitorThread.getInstance().getDepth()+"");
 		FormData depthFormData2 = new FormData();
 		depthFormData2.top = new FormAttachment(hostGroup, 17);
 		depthFormData2.left = new FormAttachment(depthLabel, 5);
@@ -219,8 +219,8 @@ public class MonitorNewHostDialog {
 				case Protocol.RMI:
 					String hostname = hostText.getText();
 					int port = Integer.parseInt(portText.getText());
-					int depth = Integer.parseInt(depthText.getText());
-					WorldObject.getInstance().addHostChild(hostname, port, protocol, depth);
+					MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
+					WorldObject.getInstance().addHostChild(hostname, port, protocol);
 					shell.close();
 					break;
 				}

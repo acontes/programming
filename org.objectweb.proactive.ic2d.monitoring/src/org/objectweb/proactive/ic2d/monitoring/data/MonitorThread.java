@@ -30,76 +30,40 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+public class MonitorThread {
 
-/**
- * Holder class for all hosts
- */
-public class WorldObject extends AbstractDataObject {
-
+	private final static int DEFAULT_DEPTH = 3;
 	
-	private static WorldObject instance;
+	/**
+	 * Singleton design pattern
+	 */
+	private static MonitorThread instance;
+	
+	private int depth;
 	
 	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    
-	/**
-	 * Create a new WorldObject
-	 */
-	private WorldObject() {
-        super(null);
-    }
-	
+    	
+	private MonitorThread(){
+		this.depth = DEFAULT_DEPTH;
+	}
 	
     //
     // -- PUBLICS METHODS -----------------------------------------------
     //
-	
-	
-	public static WorldObject getInstance() {
+		
+	public static MonitorThread getInstance(){
 		if(instance == null)
-			instance = new WorldObject();
+			instance = new MonitorThread();
 		return instance;
 	}
 	
-
-	public String getKey() {
-		// A WorldObject doesn't need a key because it is the only son of IC2DObject.
-		return "WorldObject";
+	public int getDepth(){
+		return this.depth;
 	}
 	
-	public void addHostChild(String hostname, int port, int protocol){
-		new HostObject(this, hostname, port, protocol);
-	}
-	
-	public String getFullName(){
-		return "WorldObject";
-	}
-	
-	
-	/**
-	 * TODO comment
-	 * @param hostname
-	 */
-	public void removeHostObject(String hostname) {
-        removeChild(hostname);
-    }
-	
-	
-	/**
-	 * TODO comment
-	 * @param hostname
-	 * @return
-	 */
-	public HostObject getHostObject(String hostname) {
-        return (HostObject) getChild(hostname);
-    }
-	
-	
-	/**
-	 * Destroys this object
-	 */
-    public void destroyObject() {
-		destroy();
+	public void setDepth(int depth){
+		this.depth = depth;
 	}
 }

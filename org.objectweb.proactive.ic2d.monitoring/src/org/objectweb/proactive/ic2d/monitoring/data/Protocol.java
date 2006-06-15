@@ -46,15 +46,15 @@ public class Protocol {
 	public static String getStringFromProtocol(int protocol){
 		switch (protocol) {
 		case RMI:
-			return "rmi";
+			return "rmi:";
 		case RMISSH:
-			return "rmissh";
+			return "rmissh:";
 		case IBIS:
-			return "ibis";
+			return "ibis:";
 		case JINI:
-			return "jini";
+			return "jini:";
 		case HTTP:
-			return "http";
+			return "http:";
 		default:
 			return "Protocol undefined";
 		}
