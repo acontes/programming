@@ -28,33 +28,41 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.figures;
+package org.objectweb.proactive.ic2d.monitoring.data;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.widgets.Display;
+import java.rmi.RemoteException;
+import java.rmi.dgc.VMID;
+import java.util.List;
 
-public class HostFigure extends AbstractRectangleFigure{
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+
+public class Explorer {
 	
-    //
-    // -- CONSTRUCTOR -----------------------------------------------
-    //
-	public HostFigure(String text, int xPos, int yPos) {
-		super(null,text,xPos,yPos,180);
-		new Dragger(this);
+	/** The default exploration's depth */
+	public final static int DefaultDepth = 3;
+	
+	/* Explores the host, in order to find his VMs */
+	public void exploreHost(HostObject host){
+		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(host.getProtocol());
+		List foundRuntimes = null;
+		try {
+			foundRuntimes = runtimeFinder.FindPARuntime(host);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(foundRuntimes != null){
+			 for (int i = 0; i < foundRuntimes.size(); ++i) {
+	                ProActiveRuntime proActiveRuntime = (ProActiveRuntime) foundRuntimes.get(i);
+	                handleProActiveRuntime(host, proActiveRuntime, 1);
+	            }
+		}
 	}
 	
-    //
-    // -- PROTECTED METHODS --------------------------------------------
-    //
-	protected void initColor() {
-		Device device = Display.getCurrent();
-		borderColor = new Color(device, 0, 0, 128);
-		backgroundColor = new Color(device, 208, 208, 208);
-		shadowColor = new Color(device, 230, 230, 230);
+	public void handleProActiveRuntime(HostObject parent, ProActiveRuntime runtime, int depth){
+		VMID vmid = runtime.getVMInformation().getVMID();
+		VMObject vm = new VMObject(parent, vmid);
+		//TODO Finish this method!!!
 	}
-
 	
-
-
 }

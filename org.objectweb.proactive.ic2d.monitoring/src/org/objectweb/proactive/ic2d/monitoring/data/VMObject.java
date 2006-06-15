@@ -30,15 +30,20 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.rmi.dgc.VMID;
+
 
 public class VMObject extends AbstractDataObject {
 
+	private String key;
+	
 	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
 	
-	public VMObject(HostObject parent) {
+	public VMObject(HostObject parent, VMID vmid) {
 		super(parent);
+		this.key = vmid.toString();
 		this.parent.putChild(this.getKey(), this);
 	}
 	
@@ -47,13 +52,11 @@ public class VMObject extends AbstractDataObject {
     //
 	
 	public String getKey() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.key;
 	}
 
 	public String getFullName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "VM id=" + this.key;
 	}
 	
 	public void destroyObject() {

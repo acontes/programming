@@ -44,7 +44,6 @@ public class HostEditPart extends AbstractIC2DEditPart {
 	
 	public HostEditPart(HostObject model) {
 		super(model);
-		System.out.println("HostEditPart : contructor");
 	}
 	
 	//

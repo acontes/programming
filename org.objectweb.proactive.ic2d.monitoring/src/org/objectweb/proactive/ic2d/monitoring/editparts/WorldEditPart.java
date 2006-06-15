@@ -17,7 +17,6 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 	
 	public WorldEditPart(WorldObject model) {
 		super(model);
-		System.out.println("WorldEditPart : constructor");
 	}
 	
 	//

@@ -49,6 +49,12 @@ public class HostObject extends AbstractDataObject {
 	
     /** Host's protocol */
     private int protocol;
+    
+    /** Exploration's depth */
+    private int depth;
+    
+    /** The Explorer */
+    private Explorer explorer;
 	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -56,16 +62,20 @@ public class HostObject extends AbstractDataObject {
     /**
      * Creates a new HostObject
      * @param parent His parent
-     * @parent hostname achine's name:port
-     * @param os Host's operating sytem
-     */
-	public HostObject(WorldObject parent, String hostname, int port, int protocol){
-		super(parent);
+     * @parent hostname machine's name
+     * @param port
+     * @param protocol to use
+     * @param depth exploration's depth 
+     *     */
+	public HostObject(WorldObject parent, String hostname, int port, int protocol, int depth){
+		super(parent);		
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
+		this.depth = depth;
 		this.parent.putChild(this.getKey(), this);
-		System.out.println("HostObject : constructor");
+		this.explorer = new Explorer();
+		this.explorer.exploreHost(this);
 	}
 	
     //

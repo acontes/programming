@@ -48,7 +48,6 @@ public class WorldObject extends AbstractDataObject {
 	 */
 	private WorldObject() {
         super(null);
-        System.out.println("WorldObject : contructor");
     }
 	
 	
@@ -63,11 +62,17 @@ public class WorldObject extends AbstractDataObject {
 		return instance;
 	}
 	
+
 	public String getKey() {
 		// A WorldObject doesn't need a key because it is the only son of IC2DObject.
 		return "WorldObject";
 	}
 	
+	public void addHostChild(String hostname, int port, int protocol, int depth){
+		HostObject host = new HostObject(this, hostname, port, protocol, depth);
+		this.putChild(host.getKey(), host);
+		
+	}
 	
 	public String getFullName(){
 		return "WorldObject";

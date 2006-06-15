@@ -6,7 +6,7 @@
    <configIni use="default"/>
 
    <launcherArgs>
-      <vmArgs>-Djava.security.manager -Djava.security.policy=/proactive.java.policy</vmArgs>
+      <vmArgs>-Dsun.net.spi.nameservice.provider.1=dns,sun</vmArgs>
    </launcherArgs>
 
    <windowImages/>

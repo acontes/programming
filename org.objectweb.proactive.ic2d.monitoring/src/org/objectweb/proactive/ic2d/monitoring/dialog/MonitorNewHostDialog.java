@@ -46,11 +46,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ic2d.monitoring.data.Explorer;
+import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class MonitorNewHostDialog {
 
@@ -61,10 +61,9 @@ public class MonitorNewHostDialog {
 	
 	private Text hostText;
 	private Text portText;
+	private Text depthText;
 	private Button okButton;
 	private Button cancelButton;
-	
-	private static String defaultMaxDepth = "3";
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -91,7 +90,6 @@ public class MonitorNewHostDialog {
 		
 		/* Get the machine's port */
 		port = System.getProperty("proactive.rmi.port");
-		
 		
 		/* Init the display */
 		shell = new Shell(display, SWT.BORDER | SWT.CLOSE);
@@ -148,8 +146,8 @@ public class MonitorNewHostDialog {
 		depthFormData.left = new FormAttachment(0, 20);
 		depthLabel.setLayoutData(depthFormData);
 		
-		Text depthText = new Text(shell, SWT.BORDER);
-		depthText.setText(defaultMaxDepth);
+		this.depthText = new Text(shell, SWT.BORDER);
+		depthText.setText(Explorer.DefaultDepth+"");
 		FormData depthFormData2 = new FormData();
 		depthFormData2.top = new FormAttachment(hostGroup, 17);
 		depthFormData2.left = new FormAttachment(depthLabel, 5);
@@ -221,8 +219,8 @@ public class MonitorNewHostDialog {
 				case Protocol.RMI:
 					String hostname = hostText.getText();
 					int port = Integer.parseInt(portText.getText());
-					System.out.println("MonitorNewHostDialog : widgetSelected");
-					new HostObject(WorldObject.getInstance(), hostname, port, protocol);
+					int depth = Integer.parseInt(depthText.getText());
+					WorldObject.getInstance().addHostChild(hostname, port, protocol, depth);
 					shell.close();
 					break;
 				}
@@ -231,6 +229,5 @@ public class MonitorNewHostDialog {
 				shell.close();
 			}
 		}
-		
 	}
 }

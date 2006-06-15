@@ -28,33 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.figures;
+package org.objectweb.proactive.ic2d.monitoring.data;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.widgets.Display;
+import java.rmi.RemoteException;
+import java.util.List;
 
-public class HostFigure extends AbstractRectangleFigure{
+public interface HostRTFinder {
 	
-    //
-    // -- CONSTRUCTOR -----------------------------------------------
-    //
-	public HostFigure(String text, int xPos, int yPos) {
-		super(null,text,xPos,yPos,180);
-		new Dragger(this);
-	}
+	public List FindPARuntime(HostObject host) throws RemoteException;
 	
-    //
-    // -- PROTECTED METHODS --------------------------------------------
-    //
-	protected void initColor() {
-		Device device = Display.getCurrent();
-		borderColor = new Color(device, 0, 0, 128);
-		backgroundColor = new Color(device, 208, 208, 208);
-		shadowColor = new Color(device, 230, 230, 230);
-	}
-
-	
-
-
 }
