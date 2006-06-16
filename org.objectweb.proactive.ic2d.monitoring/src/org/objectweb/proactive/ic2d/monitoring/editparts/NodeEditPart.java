@@ -46,11 +46,11 @@ public class NodeEditPart extends AbstractIC2DEditPart{
 	public NodeEditPart(NodeObject model) {
 		super(model);
 	}
+	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 
-	
 	/**
      * Convert the result of EditPart.getModel()
      * to NodeObject (the real type of the model).

@@ -30,33 +30,64 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
-import org.eclipse.gef.EditPart;
-import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
+import java.util.List;
 
-public class IC2DEditPartFactory implements EditPartFactory{
+import org.eclipse.draw2d.IFigure;
+import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
+import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
+
+public class AOEditPart extends AbstractIC2DEditPart{
+
+	//
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
 	
+	public AOEditPart(AOObject model) {
+		super(model);
+	}
 	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-	
-	public EditPart createEditPart(EditPart context, Object model) {
-		if (model instanceof WorldObject)
-			return new WorldEditPart((WorldObject)model);
-		else if (model instanceof HostObject)
-			return new HostEditPart((HostObject)model);
-		else if(model instanceof VMObject)
-			return new VMEditPart((VMObject)model);
-		else if(model instanceof NodeObject)
-			return new NodeEditPart((NodeObject)model);
-		else if(model instanceof AOObject)
-			return new AOEditPart((AOObject)model);
-		else
-			return null;
+
+	/**
+     * Convert the result of EditPart.getModel()
+     * to AOObject (the real type of the model).
+     * @return the casted model
+     */
+	public AOObject getCastedModel(){
+		return (AOObject)getModel();
 	}
+	
+	//
+	// -- PROTECTED METHODS -----------------------------------------------
+	//
+	
+ 	/**
+ 	 * Returns a new view associated
+ 	 * with the type of model object the
+ 	 * EditPart is associated with. So here, it returns a new NodeFigure.
+ 	 * @return a new NodeFigure view associated with the NodeObject model.
+ 	 */
+	protected IFigure createFigure() {
+		System.out.println("AOEditPart : createEditPart");
+		NodeFigure parent = (NodeFigure)((NodeEditPart)getParent()).getFigure();
+		return new AOFigure(parent, getCastedModel().getFullName());
+	}
+	
+	/**
+	 * Returns a List containing the children model objects.
+	 * @return the List of children
+	 */
+	protected List getModelChildren() {
+		return getCastedModel().getChildren();
+	}
+
+	protected void createEditPolicies() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }

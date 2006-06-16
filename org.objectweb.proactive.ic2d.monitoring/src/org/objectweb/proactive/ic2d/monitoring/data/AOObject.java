@@ -28,35 +28,47 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.editparts;
+package org.objectweb.proactive.ic2d.monitoring.data;
 
-import org.eclipse.gef.EditPart;
-import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
-public class IC2DEditPartFactory implements EditPartFactory{
+public class AOObject extends AbstractDataObject{
+
+	private static int id = 0;
 	
-	
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
-	
-	public EditPart createEditPart(EditPart context, Object model) {
-		if (model instanceof WorldObject)
-			return new WorldEditPart((WorldObject)model);
-		else if (model instanceof HostObject)
-			return new HostEditPart((HostObject)model);
-		else if(model instanceof VMObject)
-			return new VMEditPart((VMObject)model);
-		else if(model instanceof NodeObject)
-			return new NodeEditPart((NodeObject)model);
-		else if(model instanceof AOObject)
-			return new AOEditPart((AOObject)model);
-		else
-			return null;
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    
+	public AOObject(NodeObject parent, String className){
+		super(parent, className + "#" + counter());
+		this.parent.putChild(this.getKey(), this);
+		System.out.println("Constructor AOObject : className = "+className+", id = "+id);
 	}
+	
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
+	
+	public String getKey() {
+		return abstractDataObjectName;
+	}
+
+	public String getFullName() {
+		return abstractDataObjectName;
+	}
+
+	public void destroyObject() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+    //
+    // -- PRIVATE METHODS ---------------------------------------------
+    //
+	
+    private static synchronized int counter() {
+    	return ++id;
+    }
+	
 }

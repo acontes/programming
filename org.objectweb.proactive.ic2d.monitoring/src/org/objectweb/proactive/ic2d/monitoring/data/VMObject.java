@@ -41,13 +41,16 @@ public class VMObject extends AbstractDataObject {
 	
 	private String key;
 	
+	private ProActiveRuntime runtime;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	
 	public VMObject(HostObject parent, ProActiveRuntime runtime) {
 		super(parent);
-		this.key = runtime.getVMInformation().getVMID().toString();
+		this.runtime = runtime;
+		this.key = this.runtime.getVMInformation().getVMID().toString();
 		this.parent.putChild(this.getKey(), this);
 		this.explore(runtime);
 	}
@@ -103,10 +106,21 @@ public class VMObject extends AbstractDataObject {
 		return (HostObject) parent;
 	}
 	
+	/**
+	 * Get the ProActiveRuntime associated with this VMObject
+	 * @return The ProActiveRuntime associated with this VMObject
+	 */
+	protected ProActiveRuntime getProActiveRuntime(){
+		return this.runtime;
+	}
+	
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
 	
+	/**
+	 * TODO
+	 */
 	private void handleNode(ProActiveRuntime runtime, String nodeName){
 		HostObject parent = getTypedParent();
 		String nodeUrl = UrlBuilder.buildUrl(parent.getHostName(), nodeName,

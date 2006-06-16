@@ -30,12 +30,18 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.List;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.Node;
 
 public class NodeObject extends AbstractDataObject{
 
+	/* The node name */
 	private String key;
 	
+	/* A ProActive Node */
     protected Node node;
 	
     //
@@ -48,12 +54,28 @@ public class NodeObject extends AbstractDataObject{
 		this.node = node;
 		this.key = node.getNodeInformation().getName();
 		this.parent.putChild(this.getKey(), this);
+		this.explore();
 	}
 	
 	
     //
     // -- PUBLIC METHOD -----------------------------------------------
     //
+	
+	/**
+	 * Explores itself, in order to find all active objects known by this one
+	 */
+	public void explore(){
+		VMObject parent = getTypedParent();
+		List activeObjects = null;
+		try {
+			activeObjects = parent.getProActiveRuntime().getActiveObjects(this.key);
+		} catch (ProActiveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		handleActiveObjects(activeObjects);
+	}
 	
 	public String getKey() {
 		return this.key;
@@ -77,9 +99,39 @@ public class NodeObject extends AbstractDataObject{
     }
 
 
-	public void explore() {
-		// TODO Auto-generated method stub
-		
+	//
+	// -- PROTECTED METHOD -----------------------------------------------
+	//
+	    
+	/**
+	 * Get the typed parent
+	 * @return the typed parent
+	 */
+	protected VMObject getTypedParent() {
+		return (VMObject) parent;
+	}
+	
+    //
+	// -- PRIVATE METHOD -----------------------------------------------
+	//
+	
+	/**
+	 * TODO
+	 * @param activeObjects names' list of active objects containing in this NodeObject
+	 */
+	private void handleActiveObjects(List activeObjects){
+		for (int i = 0, size = activeObjects.size(); i < size; ++i) {
+			List aoWrapper = (List) activeObjects.get(i);
+			
+			String className = (String) aoWrapper.get(1);
+			
+			/* We don't monitor spies */
+            if (className.equalsIgnoreCase(
+                        "org.objectweb.proactive.ic2d.spy.Spy")) {
+                continue;
+            }
+            new AOObject(this,className.substring(className.lastIndexOf(".")+1));
+		}
 	}
 
 
