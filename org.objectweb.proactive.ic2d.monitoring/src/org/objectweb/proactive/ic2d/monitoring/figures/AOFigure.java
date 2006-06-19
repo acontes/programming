@@ -46,6 +46,7 @@ public class AOFigure extends AbstractFigure {
 	//
 	public AOFigure(NodeFigure parent,String text){
 		super(parent,text,BorderLayout.CENTER,120, 40);
+		System.out.println("AOFigure : constructor");
 		addMouseMotionListener(new AOListener());
 	}
 	

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.data;
+package org.objectweb.proactive.ic2d.monitoring.finder;
 
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
+import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 
 public class RMIHostRTFinder implements HostRTFinder{
 	
@@ -49,7 +50,8 @@ public class RMIHostRTFinder implements HostRTFinder{
 	// -- PUBLIC METHODS -----------------------------------------------
 	//
 	
-	public List FindPARuntime(HostObject host) throws RemoteException {
+	public List findPARuntime(HostObject host) throws RemoteException {
+		System.out.println("RMIHostRTFinder : findPARuntime");
 		/* Hook the registry */
 		Registry registry = LocateRegistry.getRegistry(host.getHostName(),host.getPort());
 		/* Gets a snapshot of the names bounds in the 'registry' */

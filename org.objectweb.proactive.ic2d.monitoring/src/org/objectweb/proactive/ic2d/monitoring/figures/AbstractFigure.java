@@ -41,6 +41,7 @@ import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 
 public abstract class AbstractFigure extends Figure{
 	
@@ -130,14 +131,18 @@ public abstract class AbstractFigure extends Figure{
 	}
 	
 	protected void addFigureChild(AbstractFigure child){
+		
 		if(this != child){
 			children.add(child);
 			child.setLocation(this.getLocation().getTranslated(shift, this.bounds.height));
+			System.out.println("AbstractFigure : addFigureChild (child.getSize = "+ child.getSize() + ")");
+			if(Display.getCurrent() == null)
+				System.out.println("AbstractFigure : addFigureChild (Display.getCurrent() == null)");;
 			this.setSize(this.getSize().width, this.getSize().height + child.getSize().height + shift);
 			if(this.parent != null)
 				this.parent.updateSize();
 			add(child);
 		}
 	}
-
+	
 }

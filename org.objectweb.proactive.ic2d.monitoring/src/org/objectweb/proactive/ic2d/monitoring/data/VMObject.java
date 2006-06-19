@@ -49,10 +49,11 @@ public class VMObject extends AbstractDataObject {
 	
 	public VMObject(HostObject parent, ProActiveRuntime runtime) {
 		super(parent);
+		System.out.println("VMObject : constructor");
 		this.runtime = runtime;
 		this.key = this.runtime.getVMInformation().getVMID().toString();
-		this.parent.putChild(this.getKey(), this);
-		this.explore(runtime);
+		this.runtime = runtime;
+		//this.explore();
 	}
 	
 	//
@@ -61,10 +62,9 @@ public class VMObject extends AbstractDataObject {
 	
 	/**
 	 * Explores a ProActiveRuntime, in order to find all nodes known by this one
-	 * @param runtime The ProActiveRuntime to explore
 	 * @param vm The VMObject corresponding to the runtime given in parameter
 	 */
-	public void explore(ProActiveRuntime runtime){
+	public void explore(){
 		String[] namesOfNodes = null;
 		try {
 			namesOfNodes = runtime.getLocalNodeNames();
@@ -74,9 +74,8 @@ public class VMObject extends AbstractDataObject {
 		}
 		for (int i = 0; i < namesOfNodes.length; ++i) {
 			String nodeName = namesOfNodes[i];
-			System.out.println("Node name : "+nodeName);
 			if (nodeName.indexOf("SpyListenerNode") == -1) {
-				handleNode(runtime, nodeName);
+				handleNode(nodeName);
 			}
 		}
 	}
@@ -87,11 +86,6 @@ public class VMObject extends AbstractDataObject {
 	
 	public String getFullName() {
 		return "VM id=" + this.key;
-	}
-	
-	public void destroyObject() {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	//
@@ -121,7 +115,8 @@ public class VMObject extends AbstractDataObject {
 	/**
 	 * TODO
 	 */
-	private void handleNode(ProActiveRuntime runtime, String nodeName){
+	private void handleNode(String nodeName){
+		System.out.println("VMObject : handleNode");
 		HostObject parent = getTypedParent();
 		String nodeUrl = UrlBuilder.buildUrl(parent.getHostName(), nodeName,
 				Protocol.getStringFromProtocol(parent.getProtocol()), parent.getPort());
@@ -133,7 +128,7 @@ public class VMObject extends AbstractDataObject {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Explorer : handleNode");
-		new NodeObject(this, node);
+		NodeObject nodeObject = new NodeObject(this, node);
+		exploreChild(nodeObject);
 	}
 }

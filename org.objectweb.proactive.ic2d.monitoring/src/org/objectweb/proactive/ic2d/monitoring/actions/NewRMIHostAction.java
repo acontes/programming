@@ -53,13 +53,11 @@ public class NewRMIHostAction implements IWorkbenchWindowActionDelegate {
 	}
 
 	public void init(IWorkbenchWindow window) {
-		// TODO Auto-generated method stub
 		this.display = window.getShell().getDisplay();
 	}
 
 	public void run(IAction action) {
-		// TODO Auto-generated method stub
-		new MonitorNewHostDialog(display, Protocol.RMI);
+		new MonitorNewHostDialog(display.getActiveShell(), Protocol.RMI);
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {

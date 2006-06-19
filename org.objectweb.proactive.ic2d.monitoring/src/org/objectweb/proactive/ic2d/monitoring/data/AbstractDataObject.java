@@ -30,10 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 
@@ -41,21 +39,17 @@ import java.util.Observable;
  * Holder class for the host data representation
  */
 public abstract class AbstractDataObject extends Observable {
-	
+
 	
 	/** the object's name */
 	protected String abstractDataObjectName;
 	
 	/** the object's parent */
 	protected AbstractDataObject parent;
-	/** the object's children (HashMap<String, AbstractDataObject>) */
-	private HashMap children;
-	
-	/** true if this object has been destroyed, false otherwise */
-	protected boolean isDestroyed;
-	/** true if this object is alive, false otherwise */
-	private boolean isAlive;
-	
+	/** the object's children which are monitored (HashMap<String, AbstractDataObject>) */
+	protected HashMap monitoredChildren;
+	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
+	protected HashMap skippedChildren;
 	
 	
 	//
@@ -88,10 +82,8 @@ public abstract class AbstractDataObject extends Observable {
 		}
 		
 		this.parent = parent;
-		this.children = new HashMap();
-		
-		this.isDestroyed = false;
-		this.isAlive = true;
+		this.monitoredChildren = new HashMap();
+		this.skippedChildren = new HashMap();
 	}
 	
 	//
@@ -114,7 +106,7 @@ public abstract class AbstractDataObject extends Observable {
 	 */
 	public String toString() {
 		return "DataObject " + abstractDataObjectName + "\n" +
-		children.toString();
+		monitoredChildren.toString();
 	}
 	
 	/**
@@ -137,35 +129,20 @@ public abstract class AbstractDataObject extends Observable {
 			return parent.getTopLevelParent();
 		}
 	}
+
 	
-	
-	/**
-	 * Returns an iterator over the object's children
-	 * @return an iterator over the object's children
-	 */
-	public Iterator childrenIterator() {
-		return children.values().iterator();
+	public void stopMonitoring() {
+		this.parent.monitoredChildren.remove(getKey());
+		this.parent.skippedChildren.put(getKey(), this);
+		setChanged();
+		notifyObservers();
 	}
 	
-	
-	public List getChildren(){
-		return new ArrayList(this.children.values());
+	public List getMonitoredChildren() {
+		return new ArrayList(monitoredChildren.values());
 	}
 	
-	/**
-	 * Destroys this object
-	 */
-	public abstract void destroyObject();
-	
-	
-	public void addPropertyChangeListener(PropertyChangeListener listener){
-		/*listeners.addPropertyChangeListener(listener);*/
-	}
-	
-	
-	public void removePropertyChangeListener(PropertyChangeListener listener){
-		/*listeners.removePropertyChangeListener(listener);*/
-	}
+	public abstract void explore();
 	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
@@ -176,73 +153,22 @@ public abstract class AbstractDataObject extends Observable {
 	 * @param key 
 	 * @param child
 	 */
-	protected synchronized void putChild(String key, AbstractDataObject child) {
-		if (isDestroyed) {
-			return;
-		}
-		children.put(key, child);
+	protected synchronized void putChild(AbstractDataObject child) {
+		monitoredChildren.put(child.getKey(), child);
 		setChanged();
 		notifyObservers();
 	}
 	
-	/**
-	 * Remove a child
-	 * @param key key of the child to remove
-	 */
-	protected synchronized AbstractDataObject removeChild(String key) {
-		AbstractDataObject o;
-		if (isDestroyed) {
-			// we are in the Iterator to destroy all children object :
-			// we don't want to remove from the collection not to
-			// have an exception from the iterator
-			o = (AbstractDataObject) children.get(key);
-		} else {
-			// we are asked to remove the child from elsewhere
-			o = (AbstractDataObject) children.remove(key);
+	
+	protected void exploreChild(AbstractDataObject child) {
+		if(skippedChildren.containsKey(child.getKey())){
+			System.out.println("AbstractDataObject : exploreChild");
+			return;
 		}
-		if (o == null) {
-			return null;
-		}
-		
-		o.destroy();
-		return o;
+		else if (!monitoredChildren.containsKey(child.getKey()))
+			this.putChild(child);
+		else //parent.monitoredChildren.containsKey(vm.getKey())
+			child = (AbstractDataObject)monitoredChildren.get(child.getKey());
+		child.explore();
 	}
-	
-	
-	/**
-	 * Destroys this object.
-	 */
-	protected synchronized boolean destroy() {
-		if (isDestroyed) {
-			return false;
-		}
-		
-		isDestroyed = true;
-		destroyCollection(childrenIterator());
-		children.clear();
-		parent = null;
-		return true;
-	}
-	
-	
-	/**
-	 * TODO comment
-	 * @param key
-	 */
-	protected synchronized AbstractDataObject getChild(String key) {
-		return (AbstractDataObject) children.get(key);
-	}
-	
-	
-	/**
-	 * Destroys all objects known by this object
-	 * @param iterator an iterator over all objects to destroy
-	 */
-	protected synchronized void destroyCollection(Iterator iterator) {
-		while (iterator.hasNext()) {
-			AbstractDataObject o = (AbstractDataObject) iterator.next();
-			o.destroyObject();
-		}
-	}
-	
 }

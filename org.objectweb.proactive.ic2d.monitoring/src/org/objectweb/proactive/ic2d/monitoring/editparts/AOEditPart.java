@@ -45,6 +45,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	
 	public AOEditPart(AOObject model) {
 		super(model);
+		System.out.println("AOEditPart : constructor");
 	}
 	
 	//
@@ -71,7 +72,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
  	 * @return a new NodeFigure view associated with the NodeObject model.
  	 */
 	protected IFigure createFigure() {
-		System.out.println("AOEditPart : createEditPart");
+		System.out.println("AOEditPart : createFigure");
 		NodeFigure parent = (NodeFigure)((NodeEditPart)getParent()).getFigure();
 		return new AOFigure(parent, getCastedModel().getFullName());
 	}
@@ -81,7 +82,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	 * @return the List of children
 	 */
 	protected List getModelChildren() {
-		return getCastedModel().getChildren();
+		return getCastedModel().getMonitoredChildren();
 	}
 
 	protected void createEditPolicies() {

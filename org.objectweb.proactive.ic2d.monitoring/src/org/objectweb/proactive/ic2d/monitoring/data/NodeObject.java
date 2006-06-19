@@ -32,8 +32,8 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.util.List;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 
 public class NodeObject extends AbstractDataObject{
@@ -50,11 +50,10 @@ public class NodeObject extends AbstractDataObject{
     
 	public NodeObject(VMObject parent, Node node){
 		super(parent, node.getNodeInformation().getName());
-		System.out.println("Constructor NodeObject");
+		System.out.println("NodeObject : constructor");
 		this.node = node;
 		this.key = node.getNodeInformation().getName();
-		this.parent.putChild(this.getKey(), this);
-		this.explore();
+		//this.explore();
 	}
 	
 	
@@ -66,6 +65,7 @@ public class NodeObject extends AbstractDataObject{
 	 * Explores itself, in order to find all active objects known by this one
 	 */
 	public void explore(){
+		System.out.println("NodeObject : explore()");
 		VMObject parent = getTypedParent();
 		List activeObjects = null;
 		try {
@@ -85,10 +85,6 @@ public class NodeObject extends AbstractDataObject{
 		return this.key;
 	}
 	
-	public void destroyObject() {
-		// TODO Auto-generated method stub
-		
-	}
 		
 	/**
 	 * Returns the node's protocol
@@ -111,6 +107,21 @@ public class NodeObject extends AbstractDataObject{
 		return (VMObject) parent;
 	}
 	
+	
+	protected void exploreChild(AbstractDataObject child) {
+		if(skippedChildren.containsKey(child.getKey())){
+			System.out.println("NodeObject : exploreChild");
+			return;
+		}
+		else if (!monitoredChildren.containsKey(child.getKey()))
+			this.putChild(child);
+		else { //parent.monitoredChildren.containsKey(vm.getKey())
+			AOObject.cancelCreation();
+			child = (AbstractDataObject)monitoredChildren.get(child.getKey());
+		}
+		child.explore();
+	}
+	
     //
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
@@ -120,8 +131,10 @@ public class NodeObject extends AbstractDataObject{
 	 * @param activeObjects names' list of active objects containing in this NodeObject
 	 */
 	private void handleActiveObjects(List activeObjects){
+		System.out.println("NodeObject : handleActiveobject");
 		for (int i = 0, size = activeObjects.size(); i < size; ++i) {
 			List aoWrapper = (List) activeObjects.get(i);
+			UniversalBody ub = (UniversalBody)aoWrapper.get(0);
 			
 			String className = (String) aoWrapper.get(1);
 			
@@ -130,7 +143,8 @@ public class NodeObject extends AbstractDataObject{
                         "org.objectweb.proactive.ic2d.spy.Spy")) {
                 continue;
             }
-            new AOObject(this,className.substring(className.lastIndexOf(".")+1));
+            AOObject ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID());
+            exploreChild(ao);
 		}
 	}
 

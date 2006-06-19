@@ -30,19 +30,23 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import org.objectweb.proactive.core.UniqueID;
 
 public class AOObject extends AbstractDataObject{
 
-	private static int id = 0;
+	private static int counter = 0;
 	
+	private UniqueID id;
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     
-	public AOObject(NodeObject parent, String className){
+	public AOObject(NodeObject parent, String className, UniqueID id){
 		super(parent, className + "#" + counter());
-		this.parent.putChild(this.getKey(), this);
-		System.out.println("Constructor AOObject : className = "+className+", id = "+id);
+		System.out.println("AOObject : constructor");
+		//this.parent.putChild(this);
+		this.id = id;
+		System.out.println("Constructor AOObject : className = "+className+", id = "+counter);
 	}
 	
     //
@@ -50,25 +54,29 @@ public class AOObject extends AbstractDataObject{
     //
 	
 	public String getKey() {
-		return abstractDataObjectName;
+		return this.id.toString();
 	}
 
 	public String getFullName() {
 		return abstractDataObjectName;
 	}
-
-	public void destroyObject() {
-		// TODO Auto-generated method stub
-		
-	}
 	
+	//
+    // -- PROTECTED METHODS ---------------------------------------------
+    //
+	
+	protected static synchronized void cancelCreation() {
+		counter--;
+	}
 	
     //
     // -- PRIVATE METHODS ---------------------------------------------
     //
 	
     private static synchronized int counter() {
-    	return ++id;
+    	return ++counter;
     }
+
+	public void explore() {/* Do nothing */}
 	
 }

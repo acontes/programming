@@ -83,7 +83,7 @@ public class VMEditPart extends AbstractIC2DEditPart {
 	 * @return the List of children
 	 */
 	protected List getModelChildren() {
-		return getCastedModel().getChildren();
+		return getCastedModel().getMonitoredChildren();
 	}
 
 	
@@ -94,10 +94,10 @@ public class VMEditPart extends AbstractIC2DEditPart {
 	 * the figure, and may also be called in response to 
 	 * notifications from the model. 
 	 */
-	protected void refreshVisuals(){ 
+/*	protected void refreshVisuals(){ 
 		//TODO
 	}
-	
+	*/
 	
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.

@@ -28,26 +28,15 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.data;
+package org.objectweb.proactive.ic2d.monitoring.finder;
 
-/**
- * Factory design pattern.
- */
-public class HostRTFinderFactory {
+import java.rmi.RemoteException;
+import java.util.List;
+
+import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+
+public interface HostRTFinder {
 	
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
+	public List findPARuntime(HostObject host) throws RemoteException;
 	
-	/**
-	 * Create a HostRTFinder corresponding to the protocol
-	 * @param protocol The protocol to use
-	 * @return A HostRTFinder
-	 */
-	public static HostRTFinder createHostRTFinder(int protocol) {
-		if (protocol == Protocol.RMI)
-			return new RMIHostRTFinder();
-		else
-			return null;
-	}
 }

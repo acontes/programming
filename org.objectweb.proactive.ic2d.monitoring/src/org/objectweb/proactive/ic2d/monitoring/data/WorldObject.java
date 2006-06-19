@@ -68,38 +68,11 @@ public class WorldObject extends AbstractDataObject {
 		return "WorldObject";
 	}
 	
-	public void addHostChild(String hostname, int port, int protocol){
-		new HostObject(this, hostname, port, protocol);
-	}
-	
 	public String getFullName(){
 		return "WorldObject";
 	}
+
+
+	public void explore() {/* Do nothing */}
 	
-	
-	/**
-	 * TODO comment
-	 * @param hostname
-	 */
-	public void removeHostObject(String hostname) {
-        removeChild(hostname);
-    }
-	
-	
-	/**
-	 * TODO comment
-	 * @param hostname
-	 * @return
-	 */
-	public HostObject getHostObject(String hostname) {
-        return (HostObject) getChild(hostname);
-    }
-	
-	
-	/**
-	 * Destroys this object
-	 */
-    public void destroyObject() {
-		destroy();
-	}
 }

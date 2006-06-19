@@ -30,40 +30,146 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-public class MonitorThread {
+import java.util.ArrayList;
+import java.util.List;
 
-	private final static int DEFAULT_DEPTH = 3;
+public class MonitorThread {
 	
-	/**
-	 * Singleton design pattern
-	 */
+	private final static int DEFAULT_DEPTH = 3;
+	private final static int DEFAULT_TTR = 30;
+	
+	/** Singleton design pattern */
 	private static MonitorThread instance;
 	
+	/** Hosts will be recursively searched up to this depth */
 	private int depth;
 	
+	/** List of hosts which are monitored (List<HostObject>) */
+	private List monitoredHosts;
+	
+	/** Thread which refresh the objects */
+	private Thread refresher;
+	/** true if we want to refresh, false otherwise */
+	private boolean refresh;
+	/** Time To Refresh (in seconds) */
+	private int ttr;
+	
 	//
-    // -- CONSTRUCTORS -----------------------------------------------
-    //
-    	
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
+	
 	private MonitorThread(){
 		this.depth = DEFAULT_DEPTH;
+		this.ttr = DEFAULT_TTR;
+		
+		this.monitoredHosts = new ArrayList();
+		
+		this.refresh = false;
+		this.refresher = new Thread(new Refresher());
 	}
 	
-    //
-    // -- PUBLICS METHODS -----------------------------------------------
-    //
-		
+	//
+	// -- PUBLICS METHODS -----------------------------------------------
+	//
+	
+	/**
+	 * TODO
+	 */
 	public static MonitorThread getInstance(){
 		if(instance == null)
 			instance = new MonitorThread();
 		return instance;
 	}
 	
+	/**
+	 * Hosts will be recursively searched up to 
+	 * the depth returned by this method.
+	 * @return depth depth used to searched up hosts
+	 */
 	public int getDepth(){
 		return this.depth;
 	}
 	
+	/**
+	 * Sets the depth used to searched up hosts.
+	 * @param depth the news depth
+	 */
 	public void setDepth(int depth){
 		this.depth = depth;
+	}
+	
+	/**
+	 * Returns the Time To Refresh (in seconds). 
+	 * @return time to refresh
+	 */
+	public int getTTR() {
+		return this.ttr;
+	}
+	
+	/**
+	 * Sets the Time To Refresh (in seconds).
+	 * @param ttr the new time to refresh
+	 */
+	public void setTTR(int ttr) {
+		this.ttr = ttr;
+	}
+	
+	/**
+	 * Begin to monitor the host specified. 
+	 * @param host the host to monitor
+	 */
+	public void addMonitoredHost(HostObject host) {
+		if(!monitoredHosts.contains(host))
+			monitoredHosts.add(host);
+		if(monitoredHosts.size() == 1)
+			startRefreshing();
+	}
+	
+	/**
+	 * Stop monitoring the host specified.
+	 * @param host the host to stop monitoring
+	 */
+	public void removeMonitoredHost(HostObject host) {
+		monitoredHosts.remove(host);
+		if(monitoredHosts.size() == 0)
+			stopRefreshing();
+	}
+	
+	//
+	// -- PRIVATE METHODS -----------------------------------------------
+	//
+	
+	private void startRefreshing() {
+		refresh = true;
+		refresher.start();
+	}
+	
+	private void stopRefreshing() {
+		refresh = false;
+	}
+	
+	private void monitor() {
+		for(int i=0 ; i<monitoredHosts.size() ; i++)
+			((HostObject)monitoredHosts.get(i)).explore();
+	}
+	
+	//
+	// -- INNER CLASS -----------------------------------------------
+	//
+	
+	private class Refresher implements Runnable {
+		
+		public void run() {
+			while(refresh) {
+				System.out.println("******* MonitorThread : run ********");
+				monitor();
+				try {
+					Thread.sleep(ttr * 1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }

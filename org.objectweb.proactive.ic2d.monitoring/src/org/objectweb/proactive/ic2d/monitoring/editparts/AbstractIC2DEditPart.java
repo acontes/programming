@@ -4,6 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 
 public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart implements Observer {
@@ -50,8 +51,12 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
 	public void update(Observable o, Object arg) {
-		refreshChildren();
-		refreshVisuals();
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run () {
+				refreshChildren();
+				refreshVisuals();		
+			}
+		});
 	}
 	
 }
