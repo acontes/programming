@@ -28,7 +28,8 @@ public class DumpACQWithCallback extends DumpAcquaintancesMessage {
                         target.getAddress().toString()),
                     (String[]) target.getAcquaintanceManager().getAcquaintancesURLs().toArray(new String[] {} ),
                     target.getAcquaintanceManager().getMaxNOA(),
-                    target.acquaintanceManager.size().intValue());
+                    target.acquaintanceManager.size().intValue(),
+                    target.acquaintanceManager.getAwaitedRepliesUrls());
 
             this.d.receiveAcqInfo(info);
         } catch (UnknownHostException e) {

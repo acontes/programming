@@ -18,6 +18,11 @@ public abstract class Message implements Serializable {
     
 	public Message() {}
 	
+	
+	public Message(int ttl) {
+		this.TTL=ttl;
+	}
+	
     public Message(int ttl, UniversalUniqueID id, P2PService sender) {
     	this.TTL = ttl;
     	this.uuid = id;

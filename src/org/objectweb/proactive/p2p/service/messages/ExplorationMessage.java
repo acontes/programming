@@ -31,11 +31,13 @@ public class ExplorationMessage extends BreadthFirstMessage
                             ProActive.getActiveObjectNodeUrl(target.stubOnThis))+ " adding " +UrlBuilder.getHostNameAndPortFromUrl(
                                     ProActive.getActiveObjectNodeUrl(this.sender)) );
                     //indeed, the peer really wants us
-                    target.registerRequest(this.sender);
+               //     target.registerRequest(this.sender);
+                   target.getAcquaintanceManager().startAcquaintanceHandShake(UrlBuilder.getHostNameAndPortFromUrl(
+                           ProActive.getActiveObjectNodeUrl(this.sender)),this.sender);
                 }
             } catch (Exception e) {
                 logger.info("Trouble with registering remote peer", e);
-                target.acquaintanceManager.remove(this.sender);
+                target.acquaintanceManager.remove(this.sender, null);
             }
         }
     }

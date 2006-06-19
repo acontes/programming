@@ -8,6 +8,7 @@ public class AcquaintanceInfo implements Serializable{
 	protected String[] acq;
 	protected int noa;
 	protected int currentNoa;
+	protected String[] awaitedReplies;
 	
 	public AcquaintanceInfo() {}
 	
@@ -23,6 +24,12 @@ public class AcquaintanceInfo implements Serializable{
 	    this.currentNoa=currentNoa;
 	}
 	
+	public AcquaintanceInfo(String sender, String[] acq, int noa, int currentNoa,String[] awaited) {
+		this(sender,acq,noa,currentNoa);
+		this.awaitedReplies= awaited;
+	}
+	
+	
 	public String[] getAcq() {
 		return acq;
 	}
@@ -37,6 +44,10 @@ public class AcquaintanceInfo implements Serializable{
 	
 	public int getCurrentNoa() {
 		return this.currentNoa;
+	}
+
+	public String[] getAwaitedReplies() {
+		return awaitedReplies;
 	}
  	
 	

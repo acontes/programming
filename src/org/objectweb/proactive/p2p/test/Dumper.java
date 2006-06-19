@@ -64,7 +64,7 @@ public class Dumper {
         String[] acq = info.getAcq();
         String source = info.getSender();
         for (int i = 0; i < acq.length; i++) {
-        	System.out.println(acq[i]);
+        	System.out.println(" Acquaintance: " +acq[i]);
         	//check that the destination is in our list 
         	//otherwise add them
         	this.addAsSender(acq[i]);
@@ -78,6 +78,13 @@ public class Dumper {
                 links.put(acq[i]+source,new Link(acq[i], source));
             }
         }
+        System.out.println("    --- Awaiting ");
+        String[] tmp = info.getAwaitedReplies();
+        for (int i = 0; i < tmp.length; i++) {
+			System.out.println(tmp[i]);
+		}
+        System.out.println("    ------------------");
+        
     	System.out.println("<<<<");
     }
 
@@ -209,7 +216,7 @@ public class Dumper {
         //            requestAcquaintances(args[0]);
         requestAcquaintances(args[0], d);
         try {
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (Exception e) {
             e.printStackTrace();
         }
