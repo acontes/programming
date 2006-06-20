@@ -33,22 +33,21 @@ package org.objectweb.proactive.ic2d.monitoring.figures;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.LayoutManager;
+import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Display;
 
 public abstract class AbstractFigure extends Figure{
 	
 	// the space between top and the first child
-	private final static int topShift = 25;
+	protected final static int topShift = 25;
 	// The space between borders and children
-	private final static int shift = 10;
+	protected final static int shift = 10;
 	
 	protected List children = new ArrayList();
 	protected AbstractFigure parent;
@@ -62,19 +61,31 @@ public abstract class AbstractFigure extends Figure{
 	
 	protected static boolean showShadow = false; 
 	
+	private LayoutManager layout;
+	
+	private LayoutManager layoutContainer;
+	
+	private Figure container;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractFigure(AbstractFigure parent, String text, Integer textPos, int width, int height){
+	protected AbstractFigure(AbstractFigure parent, LayoutManager layout, String text, int width, int height){
 		super();
+	
+		this.layout = createToolbarLayout(false);
+		this.setLayoutManager(this.layout);
 		
-		BorderLayout layout = new BorderLayout();
-		setLayoutManager(layout);
+		this.container = new Figure();
+		this.layoutContainer = layout;
+		container.setLayoutManager(this.layoutContainer);
 		
+		this.add(this.container);
+			
 		// Add the label
-		label.setForegroundColor(ColorConstants.black);
-		add(label, textPos);
-		
+		 label.setForegroundColor(ColorConstants.black);
+		 add(label);
+
 		// Initialisation
 		initColor();
 		label.setText(text);
@@ -87,14 +98,10 @@ public abstract class AbstractFigure extends Figure{
 	}
 	
 		
-	protected AbstractFigure(AbstractFigure parent, String text, Integer textPos, int x, int y, int width){
-		this(parent, text, textPos, width, topShift);
-		this.setLocation(new Point(x, y));
+	protected AbstractFigure(AbstractFigure parent, LayoutManager layout, String text, int width){
+		this(parent, layout ,text, width, topShift);
 	}
 	
-	protected AbstractFigure(AbstractFigure parent, String text, Integer textPos, int width){
-		this(parent, text, textPos, width, topShift);
-	}
 	
 	//
 	// -- PUBLIC METHODS ---------------------------------------------
@@ -111,6 +118,7 @@ public abstract class AbstractFigure extends Figure{
 		this.label.setText(title);
 	}
 	
+
 	//
 	// -- PROTECTED METHODS --------------------------------------------
 	//
@@ -121,11 +129,11 @@ public abstract class AbstractFigure extends Figure{
 	
 	/* Update his size according to his child */
 	protected void updateSize(){
-		int height = topShift;
-		for(int i=0 ; i<children.size() ; i++) {
-			height += ((AbstractFigure)children.get(i)).getSize().height + shift;
-		}
-		this.setSize(this.getSize().width, height);
+		layoutContainer.invalidate();
+		container.setSize(this.layoutContainer.getPreferredSize(container,shift, shift));
+		layout.invalidate();
+		setSize(this.layout.getPreferredSize(this,shift, shift));
+
 		if(this.parent != null)
 			this.parent.updateSize();
 	}
@@ -134,15 +142,15 @@ public abstract class AbstractFigure extends Figure{
 		
 		if(this != child){
 			children.add(child);
-			child.setLocation(this.getLocation().getTranslated(shift, this.bounds.height));
-			System.out.println("AbstractFigure : addFigureChild (child.getSize = "+ child.getSize() + ")");
-			if(Display.getCurrent() == null)
-				System.out.println("AbstractFigure : addFigureChild (Display.getCurrent() == null)");;
-			this.setSize(this.getSize().width, this.getSize().height + child.getSize().height + shift);
-			if(this.parent != null)
-				this.parent.updateSize();
-			add(child);
+			this.container.add(child);
+			this.updateSize();
 		}
 	}
 	
+	protected static ToolbarLayout createToolbarLayout(boolean horizontal){
+		IC2DToolbarLayout layout = new IC2DToolbarLayout(horizontal);
+		layout.setSpacing(10);
+		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		return layout;
+	}
 }

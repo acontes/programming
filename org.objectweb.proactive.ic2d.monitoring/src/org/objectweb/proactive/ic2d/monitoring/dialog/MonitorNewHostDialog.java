@@ -41,6 +41,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -48,11 +49,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
-public class MonitorNewHostDialog {
+
+public class MonitorNewHostDialog extends Dialog {
 
 	
 	private int protocol;
@@ -69,11 +71,12 @@ public class MonitorNewHostDialog {
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	
-	public MonitorNewHostDialog(Display display, int protocol) {
-		
+	public MonitorNewHostDialog(Shell parent, int protocol) {
+		// Pass the default styles here
+        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+        
 		this.protocol = protocol;
 		
-			
 		String initialHostValue = "localhost";
 		String port = "";
 	    
@@ -92,7 +95,8 @@ public class MonitorNewHostDialog {
 		port = System.getProperty("proactive.rmi.port");
 		
 		/* Init the display */
-		shell = new Shell(display, SWT.BORDER | SWT.CLOSE);
+		Display display = getParent().getDisplay();
+		shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
 		shell.setText("Adding host and depth to monitor");
 		shell.setSize(new Point(300, 200));
 		
@@ -220,7 +224,9 @@ public class MonitorNewHostDialog {
 					String hostname = hostText.getText();
 					int port = Integer.parseInt(portText.getText());
 					MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
-					WorldObject.getInstance().addHostChild(hostname, port, protocol);
+					shell.setVisible(false); //TODO ???
+					HostObject host = new HostObject(hostname, port, protocol);
+					MonitorThread.getInstance().addMonitoredHost(host);
 					shell.close();
 					break;
 				}

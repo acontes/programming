@@ -36,12 +36,14 @@ import org.eclipse.swt.widgets.Display;
 
 public class VMFigure extends AbstractRectangleFigure{
 
+	protected final static int DEFAULT_WIDTH = 160;
+	
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
 	
 	public VMFigure(HostFigure parent, String text) {
-		super(parent, text,160);
+		super(parent, createToolbarLayout(false),text,DEFAULT_WIDTH);
 		addMouseMotionListener(new VMListener());
 	}
 

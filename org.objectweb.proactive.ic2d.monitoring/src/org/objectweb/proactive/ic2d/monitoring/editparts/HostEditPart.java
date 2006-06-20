@@ -72,7 +72,7 @@ public class HostEditPart extends AbstractIC2DEditPart {
  	 * @return a new HostFigure view associated with the HostObject model.
  	 */
 	protected IFigure createFigure() {
-		return new HostFigure(getCastedModel().getFullName(), 10, 80);
+		return new HostFigure(getCastedModel().getFullName());
 	}
 	
 	/**

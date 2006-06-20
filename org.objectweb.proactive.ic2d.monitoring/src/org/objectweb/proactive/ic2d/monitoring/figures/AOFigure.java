@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
-import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.EllipseAnchor;
 import org.eclipse.draw2d.Graphics;
@@ -41,11 +40,13 @@ import org.eclipse.swt.widgets.Display;
 
 public class AOFigure extends AbstractFigure {
 	
+	protected final static int DEFAULT_WIDTH = 40;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	public AOFigure(NodeFigure parent,String text){
-		super(parent,text,BorderLayout.CENTER,120, 40);
+		super(parent,createToolbarLayout(false),text,120, DEFAULT_WIDTH);
 		System.out.println("AOFigure : constructor");
 		addMouseMotionListener(new AOListener());
 	}
@@ -59,11 +60,11 @@ public class AOFigure extends AbstractFigure {
 	
 	public void paintIC2DFigure(Graphics graphics){
 		// Inits
-		Rectangle bounds = getBounds().getCopy().resize(-12, -9).translate(4, 4);
+		Rectangle bounds = this.getBounds().getCopy().resize(-1, -2)/*.translate(0, -1);*/;
 		// Shadow
 		if(showShadow){
 			graphics.setBackgroundColor(shadowColor);
-			graphics.fillOval(bounds.getTranslated(4, 4));
+			graphics.fillOval(this.getBounds().getTranslated(4, 4));
 		}
 		
 		// Drawings

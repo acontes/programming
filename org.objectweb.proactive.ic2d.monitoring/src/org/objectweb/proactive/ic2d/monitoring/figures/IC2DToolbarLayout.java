@@ -30,29 +30,28 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.ToolbarLayout;
+import org.eclipse.draw2d.geometry.Dimension;
 
-public class NodeFigure extends AbstractRectangleFigure{
-		
-	protected final static int DEFAULT_WIDTH = 140;
+public class IC2DToolbarLayout extends ToolbarLayout{
+
+	//
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
 	
-    //
-    // -- CONSTRUCTOR -----------------------------------------------
-    //
-	public NodeFigure(VMFigure parent, String text) {
-		super(parent, createToolbarLayout(false), text,DEFAULT_WIDTH);
-		addMouseMotionListener(new NodeListener());
+	public IC2DToolbarLayout(boolean horizontal){
+		super(horizontal);
 	}
-		
-    //
-    // -- PROTECTED METHOD --------------------------------------------
-    //
-	protected void initColor() {
-		Device device = Display.getCurrent();
-		borderColor = new Color(device, 0, 0, 128);
-		backgroundColor = new Color(device, 208, 208, 224);
-		shadowColor = new Color(device, 230, 230, 230);
+	
+	//
+	// -- PROTECTED METHODS --------------------------------------------
+	//
+	
+	protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
+		Dimension dimension = super.calculatePreferredSize(container, wHint, hHint);
+		if(container instanceof AOFigure)
+			return dimension.expand(20,15);
+		return dimension.expand(10,0);
 	}
 }

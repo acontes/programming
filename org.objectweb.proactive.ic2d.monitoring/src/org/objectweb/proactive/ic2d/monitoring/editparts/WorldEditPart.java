@@ -3,9 +3,9 @@ package org.objectweb.proactive.ic2d.monitoring.editparts;
 import java.util.List;
 
 import org.eclipse.draw2d.FreeformLayer;
-import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
+import org.eclipse.draw2d.ToolbarLayout;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class WorldEditPart extends AbstractIC2DEditPart {
@@ -44,7 +44,10 @@ public class WorldEditPart extends AbstractIC2DEditPart {
  	 */
 	protected IFigure createFigure() {
 		FreeformLayer layer = new FreeformLayer();
-		layer.setLayoutManager(new FreeformLayout());
+		ToolbarLayout layout = new ToolbarLayout(true);
+		layout.setSpacing(50);
+		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		layer.setLayoutManager(/*new FreeformLayout()*/layout);
 		layer.setBorder(new LineBorder(1));
 		return layer;
 	}

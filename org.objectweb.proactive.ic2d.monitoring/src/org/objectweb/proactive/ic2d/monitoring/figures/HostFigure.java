@@ -36,11 +36,13 @@ import org.eclipse.swt.widgets.Display;
 
 public class HostFigure extends AbstractRectangleFigure{
 	
+	protected final static int DEFAULT_WIDTH = 180;
+	
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
-	public HostFigure(String text, int xPos, int yPos) {
-		super(null,text,xPos,yPos,180);
+	public HostFigure(String text) {
+		super(null, createToolbarLayout(true),text,DEFAULT_WIDTH);
 		new Dragger(this);
 	}
 	
@@ -53,8 +55,4 @@ public class HostFigure extends AbstractRectangleFigure{
 		backgroundColor = new Color(device, 208, 208, 208);
 		shadowColor = new Color(device, 230, 230, 230);
 	}
-
-	
-
-
 }
