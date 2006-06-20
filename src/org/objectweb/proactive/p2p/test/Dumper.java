@@ -18,38 +18,29 @@ import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
 
 public class Dumper {
     protected HashMap<String, P2PNode> senders = new HashMap<String, P2PNode>();
-    protected HashMap<String,Link> links = new HashMap<String,Link>();
-    //protected ArrayList<Link> links = new ArrayList<Link>();
+    protected HashMap<String, Link> links = new HashMap<String, Link>();
 
+    //protected ArrayList<Link> links = new ArrayList<Link>();
     private int index;
-    
+
     public Dumper() {
     }
 
-    
-    
     protected void addAsSender(AcquaintanceInfo i) {
-    	String s = i.getSender();
-    	P2PNode tmp =senders.get(s);
-	if ((tmp == null) || (tmp.getIndex() == -1)) {
-		senders.put(s, new P2PNode(s,index++,i.getCurrentNoa(),i.getNoa()));
-    		//senders.put(s,senders.size());
-//    	} else {
-//    		//so the sender has already been seen
-//    		//but maybe because it was the destination of a link
-//    		if (tmp.getIndex() == -1) {
-//    			
-//    		}
-//    	}
-	}
+        String s = i.getSender();
+        P2PNode tmp = senders.get(s);
+        if ((tmp == null) || (tmp.getIndex() == -1)) {
+            senders.put(s,
+                new P2PNode(s, index++, i.getCurrentNoa(), i.getNoa()));
+        }
     }
-    
-    
-    protected void addAsSender(String s) {
-    	if (senders.get(s) == null) {
-    		senders.put(s,new P2PNode(s));
-    	}
+
+    public void addAsSender(String s) {
+        if (senders.get(s) == null) {
+            senders.put(s, new P2PNode(s));
+        }
     }
+
     /**
      * Receive a dump from a peer
      * The sender is put in an arrayList and some Links are created
@@ -57,36 +48,42 @@ public class Dumper {
      */
     public void receiveAcqInfo(AcquaintanceInfo info) {
         //use the size of the hashmap to give each sender a unique index
-    	System.out.println(">>>>");
-    	System.out.println(info.getSender() + " current Noa =  " + info.getCurrentNoa() + " max Noa= " + info.getNoa() );
-    	this.addAsSender(info);
+        System.out.println(">>>>");
+        System.out.println(info.getSender() + " current Noa =  " +
+            info.getCurrentNoa() + " max Noa= " + info.getNoa());
+        this.addAsSender(info);
         //senders.put(info.getSender(), senders.size());
         String[] acq = info.getAcq();
         String source = info.getSender();
         for (int i = 0; i < acq.length; i++) {
-        	System.out.println(" Acquaintance: " +acq[i]);
-        	//check that the destination is in our list 
-        	//otherwise add them
-        	this.addAsSender(acq[i]);
-        	
-            //our links are considered bi-directional
-            //ie a->b and b->a will be a a<->b link
-            //so we switch source/destination based on lexical order
-            if (source.compareTo(acq[i]) <= 0) {
-                links.put(source+acq[i],new Link(source, acq[i]));
-           } else {
-                links.put(acq[i]+source,new Link(acq[i], source));
-            }
+            System.out.println(" Acquaintance: " + acq[i]);
+            //check that the destination is in our list 
+            //otherwise add them
+            this.addAsSender(acq[i]);
+            String dest = acq[i];
+
+            addLink(source, dest);
         }
         System.out.println("    --- Awaiting ");
         String[] tmp = info.getAwaitedReplies();
         for (int i = 0; i < tmp.length; i++) {
-			System.out.println(tmp[i]);
-		}
+            System.out.println(tmp[i]);
+        }
         System.out.println("    ------------------");
-        
-    	System.out.println("<<<<");
+
+        System.out.println("<<<<");
     }
+
+	public void addLink(String source, String dest) {
+		//our links are considered bi-directional
+		//ie a->b and b->a will be a a<->b link
+		//so we switch source/destination based on lexical order
+		if (source.compareTo(dest) <= 0) {
+		    links.put(source + dest, new Link(source, dest));
+		} else {
+		    links.put(dest + source, new Link(dest, source));
+		}
+	}
 
     /**
      * Dump the acqaintances list to use with Otter
@@ -94,45 +91,67 @@ public class Dumper {
      *   Node :   ? index name
      *   Link : L index sourceIndex destIndex
      */
-    public void dumpAcqForOtter() { 
-    	
-    	
+    public void dumpAcqForOtter() {
         //first indicate the number of nodes and links
         System.out.println("t " + senders.size());
         System.out.println("T " + links.size());
         //color by number of acquaintances
         System.out.println("g 1 d 2 Metric ");
         System.out.println("f 1 NOA'max NOA");
-     //   System.out.println("f 1 max NOA");
+
+        //   System.out.println("f 1 max NOA");
         //dump the nodes with their indexes
         Set<Map.Entry<String, P2PNode>> map = (Set<Map.Entry<String, P2PNode>>) senders.entrySet();
         Iterator it = map.iterator();
         while (it.hasNext()) {
             Map.Entry<String, P2PNode> entry = (Map.Entry<String, P2PNode>) it.next();
+
             // the node might have a -1 index because has never sent anything
             // we want to get rid of this
             if (entry.getValue().getIndex() == -1) {
-            	entry.getValue().setIndex(index++);
+                entry.getValue().setIndex(index++);
             }
-            System.out.println("? " + entry.getValue().getIndex() + " " + entry.getKey());
+            System.out.println("? " + entry.getValue().getIndex() + " " +
+                entry.getKey());
             //and its associated noa
-            System.out.println("v " + entry.getValue().getIndex() + " 1 " + entry.getValue().getNoa() + "'" + entry.getValue().getMaxNOA());
-           // System.out.println("v " + entry.getValue().getIndex() + " 1 " + entry.getValue().getNoa());
+            System.out.println("v " + entry.getValue().getIndex() + " 1 " +
+                entry.getValue().getNoa() + "'" + entry.getValue().getMaxNOA());
+            // System.out.println("v " + entry.getValue().getIndex() + " 1 " + entry.getValue().getNoa());
         }
 
         //now dump the links
         int i = 0;
-        
+
         Set<Map.Entry<String, Link>> map2 = (Set<Map.Entry<String, Link>>) links.entrySet();
-        
+
         it = map2.iterator();
         while (it.hasNext()) {
-        	  Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
-        	//  System.out.println("---- looking for sender " + entry.getSource());
-            System.out.println("L " + i++ + " " +senders.get(entry.getSource()).getIndex() + " " + senders.get(entry.getDestination()).getIndex());
+            Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
+            //  System.out.println("---- looking for sender " + entry.getSource());
+            System.out.println("L " + i++ + " " +
+                senders.get(entry.getSource()).getIndex() + " " +
+                senders.get(entry.getDestination()).getIndex());
         }
     }
 
+    public void dumpAsText() {
+    	   //now dump the links
+        int i = 0;
+
+        Set<Map.Entry<String, Link>> map2 = (Set<Map.Entry<String, Link>>) links.entrySet();
+
+        Iterator it = map2.iterator();
+        while (it.hasNext()) {
+            Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
+            //  System.out.println("---- looking for sender " + entry.getSource());
+            System.out.println(entry.getSource() + " <---> " + entry.getDestination());
+        }
+    }
+    
+    public HashMap getLinks() {
+    	return this.links;
+    }
+    
     public static void requestAcquaintances(String ref) {
         P2PService p2p = null;
         Node distNode = null;
@@ -167,8 +186,6 @@ public class Dumper {
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         }
-
-        
     }
 
     public static void getNodes(String ref) {
