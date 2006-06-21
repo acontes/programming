@@ -8,55 +8,7 @@
    >
 
    <runtime>
-      <library name="lib/log4j.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/ProActive.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/xercesImpl.jar">
-         <export name="*"/>
-      </library>
       <library name="classes/">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/dtdparser.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/fractal.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/fractal-adl.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/fractal-gui.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/fractal-swing.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/julia-asm.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/julia-mixins.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/julia-runtime.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/ow_deployment_scheduling.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/components/SVGGraphics.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/bouncycastle.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/javassist.jar">
-         <export name="*"/>
-      </library>
-      <library name="lib/jsch.jar">
          <export name="*"/>
       </library>
    </runtime>
@@ -65,6 +17,7 @@
       <import plugin="org.eclipse.draw2d"/>
       <import plugin="org.eclipse.gef"/>
       <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.objectweb.proactive"/>
    </requires>
    <extension
          id="org.objectweb.proactive.ic2d.monitoring.perspectives"
