@@ -132,14 +132,12 @@ public class GatherRequestsQueue implements Serializable {
 
             // return future result (will be computed when gather request is processed)
             try {
-                //        		System.out.println("RETURNING REPLY FOR REQUEST " + itfTypeInvokedMethod.getMethod());
                 return reply;
             } finally {
                 if (isFull()) {
                     try {
                         finalize();
                     } catch (Throwable e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
@@ -187,20 +185,12 @@ public class GatherRequestsQueue implements Serializable {
                         itfTypeInvokedMethod.getMethod().getName() + "]");
                 }
                 thrownTimeoutException = true;
-                try {
-                    futuresHandler.setFutureOfGatheredInvocation(new FutureResult(
-                            null,
-                            new GathercastTimeoutException("timeout of " +
-                                timeout +
-                                " reached before invocations from all clients were received for gather invocation (method " +
-                                itfTypeInvokedMethod.getMethod()
-                                                    .toGenericString() +
-                                " on gather interface " + serverItfName), null));
-                } catch (Exception e) {
-                    System.out.println(
-                        "GatherRequestsQueue.addFutureForGatheredRequest() in exception");
-                    e.printStackTrace();
-                }
+                futuresHandler.setFutureOfGatheredInvocation(new FutureResult(
+                        null,
+                        new GathercastTimeoutException("timeout of " + timeout +
+                            " reached before invocations from all clients were received for gather invocation (method " +
+                            itfTypeInvokedMethod.getMethod().toGenericString() +
+                            " on gather interface " + serverItfName), null));
             }
 
             // else ignore
@@ -210,15 +200,12 @@ public class GatherRequestsQueue implements Serializable {
                 resultsReturned = true;
                 futuresHandler.setFutureOfGatheredInvocation(futureResult);
             } else {
-                System.out.println("IGNORING!!!!!");
+                // ignore
             }
             try {
-                System.out.println(
-                    "GatherRequestsQueue.addFutureForGatheredRequest()");
                 GatherFuturesHandlerPool.instance()
                                         .returnFuturesHandler(futuresHandler);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
