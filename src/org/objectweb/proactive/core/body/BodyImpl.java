@@ -477,7 +477,7 @@ public abstract class BodyImpl extends AbstractBody
          * @return a unique identifier that can be used to tag a future, a request.
          */
         public synchronized long getNextSequenceID() {
-            return ++absoluteSequenceID;
+            return bodyID.toString().hashCode() + ++absoluteSequenceID;
         }
 
         //
