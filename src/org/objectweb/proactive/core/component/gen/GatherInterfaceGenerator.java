@@ -108,9 +108,9 @@ public class GatherInterfaceGenerator {
             
         }
 
-        repGatherItfClass.writeFile("generated/");
-        System.out.println("[JAVASSIST] generated gather interface : " +
-        		gatherProxyItfName);
+//        repGatherItfClass.writeFile("generated/");
+//        System.out.println("[JAVASSIST] generated gather interface : " +
+//        		gatherProxyItfName);
         
         byte[] bytecode = repGatherItfClass.toBytecode();
         ClassDataCache.instance().addClassData(gatherProxyItfName,

@@ -587,13 +587,13 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        System.out.println("writing ProActiveComponentImpl");
+//        System.out.println("writing ProActiveComponentImpl");
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
-        System.out.println("reading ProActiveComponentImpl");
+//        System.out.println("reading ProActiveComponentImpl");
         in.defaultReadObject();
     }
 }

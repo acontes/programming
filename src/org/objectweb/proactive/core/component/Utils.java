@@ -36,7 +36,7 @@ public class Utils {
         return null;
     }
 
-    public static InterfaceType getItfType(String itfName, Component owner) {
+    public static InterfaceType getItfType(String itfName, Component owner) throws NoSuchInterfaceException {
         InterfaceType[] itfTypes = (((ComponentType) owner.getFcType()).getFcInterfaceTypes());
         for (int i = 0; i < itfTypes.length; i++) {
             if (itfTypes[i].isFcCollectionItf()) {

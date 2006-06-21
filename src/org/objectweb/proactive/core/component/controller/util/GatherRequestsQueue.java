@@ -5,12 +5,14 @@ package org.objectweb.proactive.core.component.controller.util;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -32,7 +34,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class manages a queue of requests on a gather interface: a list of reified invocations from connected client interfaces.
  *
- * Asynchronization is provided with a third-party active object and automatic continuations.
+ * Asynchronicity is provided with a third-party active object and automatic continuations.
  *
  * A timeout exception is thrown if some of the connected client interfaces fail to send a request before the timeout; the countdown
  * is triggered right after serving the first invocation on the gathercast interface.
@@ -54,29 +56,38 @@ public class GatherRequestsQueue implements Serializable {
     boolean thrownTimeoutException = false;
     long timeout = DEFAULT_TIMEOUT;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GATHERCAST);
+    GatherFuturesHandlerPool gatherFuturesHandlerPool;
+    boolean resultsReturned = false;
+    boolean oneWayCall = true;
 
     public GatherRequestsQueue(ProActiveComponent owner, String serverItfName,
-        Method itfTypeMethod, List<ItfID> connectedClientItfs) {
+        Method itfTypeMethod, List<ItfID> connectedClientItfs, GatherFuturesHandlerPool gatherFuturesHandlerPool) {
         this.owner = owner;
         this.serverItfName = serverItfName;
         //        this.conditionChecker = gatherConditionChecker;
         //        this.invokedMethodSignature = methodSignature;
         itfTypeInvokedMethod = new SerializableMethod(itfTypeMethod);
+        this.gatherFuturesHandlerPool = gatherFuturesHandlerPool;
         this.connectedClientItfs = connectedClientItfs;
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("adding futures handler for requests on " +
                     serverItfName + "." + itfTypeMethod.getName());
             }
-            futuresHandler = (GatherFuturesHandler) ProActive.newActive(GatherFuturesHandler.class.getName(),
-                    new Object[] { connectedClientItfs, itfTypeMethod.getName() });
-        } catch (ActiveObjectCreationException e) {
+            
+            //use a pool!
+            if (!Void.TYPE.equals(itfTypeMethod.getReturnType())) {
+            	oneWayCall = false;
+
+            futuresHandler = (GatherFuturesHandler)GatherFuturesHandlerPool.instance().borrowFuturesHandler();
+            futuresHandler.setConnectedClientItfs(connectedClientItfs);
+            }
+            
+        } catch (Exception e ) {
             throw new ProActiveRuntimeException("cannot create futures handler for gather interface",
-                e);
-        } catch (NodeException e) {
-            throw new ProActiveRuntimeException("cannot create futures handler for gather interface",
-                e);
+                    e);
         }
+        
         requests = new HashMap<ItfID, ComponentRequest>();
 
         // add first request
@@ -93,6 +104,7 @@ public class GatherRequestsQueue implements Serializable {
         }
         requests.put(clientItfID, request);
 
+        if (!oneWayCall) {
         // evaluate timeout
         if (timeoutTimer == null) {
             timeoutTimer = new Timer();
@@ -135,6 +147,9 @@ public class GatherRequestsQueue implements Serializable {
 					}
                 }
         }
+        } else {
+        	return null;
+        }
         
     }
 
@@ -167,8 +182,7 @@ public class GatherRequestsQueue implements Serializable {
     }
 
     public void addFutureForGatheredRequest(FutureResult futureResult) {
-    	
-        if (timedout) {
+        if (timedout && !resultsReturned) {
             // avoids race condition with small timeouts (result is replaced with a timeout exception)
             if (!thrownTimeoutException) {
                 if (logger.isDebugEnabled()) {
@@ -177,20 +191,41 @@ public class GatherRequestsQueue implements Serializable {
                         itfTypeInvokedMethod.getMethod().getName() + "]");
                 }
                 thrownTimeoutException = true;
+                try {
                 futuresHandler.setFutureOfGatheredInvocation(new FutureResult(
                         null,
                         new GathercastTimeoutException("timeout of " + timeout +
                             " reached before invocations from all clients were received for gather invocation (method " +
                             itfTypeInvokedMethod.getMethod().toGenericString() +
                             " on gather interface " + serverItfName), null));
+                } catch (Exception e) {
+                	System.out
+							.println("GatherRequestsQueue.addFutureForGatheredRequest() in exception");
+                	e.printStackTrace();
+                }
             }
 
             // else ignore
         } else {
+        	if (!resultsReturned) {
             // this will trigger automatically the distribution of result for clients of the gather itf
+        	resultsReturned = true;
             futuresHandler.setFutureOfGatheredInvocation(futureResult);
+        	} else {
+        		System.out.println("IGNORING!!!!!");
+        	}
+        	try {
+        		System.out
+						.println("GatherRequestsQueue.addFutureForGatheredRequest()");
+				GatherFuturesHandlerPool.instance().returnFuturesHandler(futuresHandler);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
         }
         timeoutTimer.cancel();
+        
     }
 
     /**
@@ -198,6 +233,13 @@ public class GatherRequestsQueue implements Serializable {
      */
     public long getCreationTime() {
         return creationTime;
+    }
+    
+    public void returnFuturesHandlerToPool() {
+    	if (futuresHandler != null) {
+    		futuresHandler.passivate();
+    	}
+    	
     }
 
     /**
@@ -223,6 +265,7 @@ public class GatherRequestsQueue implements Serializable {
 
         public void run() {
             timedout = true;
+            if (!resultsReturned) {
             if (!thrownTimeoutException) {
                 requestsQueue.addFutureForGatheredRequest(new FutureResult(
                         null,
@@ -230,6 +273,7 @@ public class GatherRequestsQueue implements Serializable {
                             " reached before invocations from all clients were received for gather invocation (method " +
                             itfTypeInvokedMethod.getMethod().toGenericString() +
                             " on gather interface " + serverItfName), null));
+            }
             }
             try {
                 //				requestsQueue.finalize();

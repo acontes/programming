@@ -9,6 +9,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.util.SerializableMethod;
 /**
@@ -35,16 +36,16 @@ public abstract class AbstractCollectiveInterfaceController extends AbstractProA
     public void checkCompatibility(String itfName, ProActiveInterface itf) throws IllegalBindingException {
         try {
             
-            ProActiveInterfaceType clientItfType = (ProActiveInterfaceType)((ComponentType)owner.getFcType()).getFcInterfaceType(itfName);
+        	ProActiveInterfaceType clientItfType = (ProActiveInterfaceType)Utils.getItfType(itfName, owner);
             
             checkCompatibility(clientItfType,
-                (ProActiveInterfaceType) itf.getFcItfType());
+                itf);
         } catch (NoSuchInterfaceException e) {
             throw new IllegalBindingException("cannot find client interface " + itfName);
         }
     }
     
-    protected abstract Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods);
+    protected abstract Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods, boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf);
 
     /**
      * client and server interfaces must have the same methods, except that
@@ -53,8 +54,9 @@ public abstract class AbstractCollectiveInterfaceController extends AbstractProA
      * <br>
      *
      */
-    void checkCompatibility(ProActiveInterfaceType clientSideItfType, ProActiveInterfaceType serverSideItfType) throws IllegalBindingException {
+    void checkCompatibility(ProActiveInterfaceType clientSideItfType, ProActiveInterface serverSideItf) throws IllegalBindingException {
         try {
+        	ProActiveInterfaceType serverSideItfType = (ProActiveInterfaceType)serverSideItf.getFcItfType();
             Class clientSideItfClass;
             clientSideItfClass = Class.forName(clientSideItfType.getFcItfSignature());
             Class serverSideItfClass = Class.forName(serverSideItfType.getFcItfSignature());
@@ -70,7 +72,7 @@ public abstract class AbstractCollectiveInterfaceController extends AbstractProA
             Map<SerializableMethod, SerializableMethod> matchingMethodsForThisItf = new HashMap<SerializableMethod, SerializableMethod>(clientSideItfMethods.length);
     
             for (Method method : clientSideItfMethods) {
-                    Method serverSideMatchingMethod = searchMatchingMethod(method, serverSideItfMethods);
+                    Method serverSideMatchingMethod = searchMatchingMethod(method, serverSideItfMethods, clientSideItfType.isFcMulticastItf(), serverSideItfType.isFcGathercastItf(), serverSideItf);
                     if (serverSideMatchingMethod == null) {
                         throw new IllegalBindingException("binding incompatibility between " + clientSideItfType.getFcItfName() + " and " + serverSideItfType.getFcItfName() + " : cannot find matching method");
                     }

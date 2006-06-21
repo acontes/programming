@@ -22,21 +22,12 @@ public class GatherFuturesHandler implements RunActive, Serializable {
     Throwable exceptionToRaise;
     String methodName = null;
     int step = 0;
-
+    
     public GatherFuturesHandler() {
     }
-
-    public GatherFuturesHandler(List<ItfID> senders) {
-        this.senders = senders;
-    }
-
-    public GatherFuturesHandler(List<ItfID> senders, String methodName) {
-        this.senders = senders;
-        this.methodName = methodName;
-    }
-
+  
     public void setFutureOfGatheredInvocation(FutureResult future) {
-//    	System.out.println("[gather futures handler] setFutureOfGatheredInvocation");
+//            	System.out.println("[gather futures handler] setFutureOfGatheredInvocation");
         if (future.getExceptionToRaise() != null) {
             exceptionToRaise = future.getExceptionToRaise();
         } else {
@@ -48,9 +39,8 @@ public class GatherFuturesHandler implements RunActive, Serializable {
 
     // returns
     public Object distribute(ItfID sender) {
-//    	System.out.println(" distribute to " + sender.getComponentBodyID());
+        //    	System.out.println(" distribute to " + sender.getComponentBodyID());
         if (exceptionToRaise != null) {
-//                		System.out.println("[gather futures handler] distribute: throwing exception for [" + methodName + "]");
             ExceptionThrower.throwException(exceptionToRaise); // guillaume's exception thrower
         }
 
@@ -59,94 +49,55 @@ public class GatherFuturesHandler implements RunActive, Serializable {
     }
 
     public void migrateTo(Node node) throws MigrationException {
-//        System.out.println("gather futures handler migrating to " + node);
+        //        System.out.println("gather futures handler migrating to " + node);
         ProActive.migrateTo(node);
     }
 
+    public void setConnectedClientItfs(List<ItfID> connectedClientItfs) {
+        senders = connectedClientItfs;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+    
+    public void passivate() {
+        senders = null;
+        methodName = null;
+    }
+    
+    
+    
+
     // TODO a migration-compatible activity (see below)
-public void runActivity(Body body) {
-        
-//	System.out.println("\nFUTURES HANDLER ID IS " + ProActive.getBodyOnThis().getID().getUID());
+    public void runActivity(Body body) {
+        //	System.out.println("\nFUTURES HANDLER ID IS " + ProActive.getBodyOnThis().getID().getUID());
+        int incarnation = 0;
         Service service = new Service(body);
-        service.blockingServeOldest("setFutureOfGatheredInvocation");
-        int i=1;
-        for (ItfID senderID: senders) {
-//        	System.out.println("[gather futures handler] distributing sender " + i);
-            service.blockingServeOldest("distribute");
-            i++;
-        }
-        
-        
-        if (resultOfGatheredInvocation == null) {
-            // results after a timeout: ignore
-        	service.blockingServeOldest("setFutureOfGatheredInvocation");
-        }
-        // keep the object alive so that it keeps managing automatic continuations
-        service.blockingRemoveOldest();
-        
-        try {
-        	body.disableAC();
-            finalize();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        while (ProActive.getBodyOnThis().isActive()) {
+            service.blockingServeOldest("setConnectedClientItfs");
+//        	if (incarnation>0) {
+//        		System.out.println("future handler pooled for the " + incarnation + "th time");
+//        	}
+            
+            service.blockingServeOldest("setFutureOfGatheredInvocation");
+            int i = 1;
+            for (ItfID senderID : senders) {
+                service.blockingServeOldest("distribute");
+                i++;
+            }
+            
+            
+            service.blockingServeOldest("passivate");
+            
+//            incarnation++;
+            
+//        }
         }
     }
 
-    /*
-     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
-     */
-//    public void runActivity(Body body) {
-//        Service service = new Service(body);
-//        int i = 1;
-//        while (step <= senders.size()) {
-//            if (step == 0) {
-//                Request r = service.blockingRemoveOldest(new MigrateOrSetFuturesRequestFilterImpl());
-//                if ("setFutureOfGatheredInvocation".equals(r.getMethodName())) {
-//                    step++;
-//                }
-//                ProActive.getBodyOnThis().serve(r);
-//                continue;
-//            }
-//
-//            if ((step >= 1) && (step <= senders.size())) {
-//                Request r = service.blockingRemoveOldest(new MigrateOrDistributeRequestFilterImpl());
-//                if ("distribute".equals(r.getMethodName())) {
-//                    step++;
-//                }
-//                ProActive.getBodyOnThis().serve(r);
-//                i++;
-//                continue;
-//            }
-//        }
-//
-////        while (resultOfGatheredInvocation == null) {
-////            Request r = service.blockingRemoveOldest(new MigrateOrSetFuturesRequestFilterImpl());
-////            if ("setFutureOfGatheredInvocation".equals(r.getMethodName())) {
-////                //		            // results after a timeout: ignore
-////                //                	System.out.println("serving set future after a timeout");
-////                ProActive.getBodyOnThis().serve(r);
-////                break;
-////            } else {
-////                ProActive.getBodyOnThis().serve(r);
-////            }
-////        }
-//        while (resultOfGatheredInvocation == null) {
-//            // results after a timeout: ignore
-//        	service.blockingServeOldest("setFutureOfGatheredInvocation");
-//        }
-//        
-//        service.blockingRemoveOldest();
-//
-//        try {
-//            body.disableAC();
-//            finalize();
-//        } catch (Throwable e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    public static class MigrateOrSetFuturesRequestFilterImpl implements RequestFilter,
-        java.io.Serializable {
+    public static class MigrateOrSetFuturesRequestFilterImpl
+        implements RequestFilter, java.io.Serializable {
         public MigrateOrSetFuturesRequestFilterImpl() {
         }
 
@@ -156,8 +107,8 @@ public void runActivity(Body body) {
         }
     }
 
-    public static class MigrateOrDistributeRequestFilterImpl implements RequestFilter,
-        java.io.Serializable {
+    public static class MigrateOrDistributeRequestFilterImpl
+        implements RequestFilter, java.io.Serializable {
         public MigrateOrDistributeRequestFilterImpl() {
         }
 

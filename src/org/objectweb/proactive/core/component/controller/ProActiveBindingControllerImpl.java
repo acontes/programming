@@ -331,8 +331,22 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
 
         // Multicast bindings are handled here
         if (Utils.isMulticastItf(clientItfName, owner)) {
-            Fractive.getMulticastController(owner)
-                    .bindFcMulticast(clientItfName, sItf);
+        	if (Utils.isGathercastItf(sItf)) {
+//                Fractive.getMulticastController(owner)
+//                .bindFcMulticast(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
+        		// no adaptor here
+                Fractive.getMulticastController(owner)
+                .bindFcMulticast(clientItfName, sItf);
+                // add a callback ref in the server gather interface
+                // TODO should throw a binding event
+                Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
+                        .addedBindingOnServerItf(sItf.getFcItfName(),
+                    ((ProActiveComponent) owner).getRepresentativeOnThis(),
+                    clientItfName);
+        	} else {
+        		Fractive.getMulticastController(owner)
+        			.bindFcMulticast(clientItfName, sItf);
+        	}
             return;
         }
 
@@ -384,7 +398,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         try {
             InterfaceType[] cItfTypes = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
             for (int i = 0; i < cItfTypes.length; i++) {
-                if (clientItfName.equals(cItfTypes[i].getFcItfName())) {
+                if (clientItfName.equals(cItfTypes[i].getFcItfName()) || (cItfTypes[i].isFcCollectionItf() && clientItfName.startsWith(cItfTypes[i].getFcItfName()))) {
                     clientItfClass = Class.forName(cItfTypes[i].getFcItfSignature());
                 }
             }

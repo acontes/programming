@@ -79,10 +79,10 @@ public class MulticastControllerImpl
      */
     @Override
     protected Method searchMatchingMethod(Method clientSideMethod,
-        Method[] serverSideMethods) {
+        Method[] serverSideMethods, boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf) {
         try {
             return MulticastBindingChecker.searchMatchingMethod(clientSideMethod,
-                serverSideMethods);
+                serverSideMethods, serverItfIsGathercast, serverSideItf);
         } catch (ParameterDispatchException e) {
             e.printStackTrace();
             return null;
@@ -110,8 +110,8 @@ public class MulticastControllerImpl
             return false;
         }
         if (multicastItfs.containsKey(itfType.getFcItfName())) {
-            logger.error("the interface named " + itfType.getFcItfName() +
-                " is already managed by the collective interfaces controller");
+//            logger.error("the interface named " + itfType.getFcItfName() +
+//                " is already managed by the collective interfaces controller");
             return false;
         }
 
@@ -121,8 +121,8 @@ public class MulticastControllerImpl
             if (itfType.isFcMulticastItf()) {
                 multicastItfs.put(itfType.getFcItfName(), multicastItf);
             } else {
-                logger.error("the interface named " + itfType.getFcItfName() +
-                    " cannot be managed by this collective interfaces controller");
+//                logger.error("the interface named " + itfType.getFcItfName() +
+//                    " cannot be managed by this collective interfaces controller");
                 return false;
             }
         } catch (NoSuchInterfaceException e) {

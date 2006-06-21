@@ -55,8 +55,8 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     
     private boolean addManagedInterface(ProActiveInterface itf) {
         if (gatherItfs.containsKey(itf.getFcItfName())) {
-            controllerLogger.error("the interface named " + itf.getFcItfName() +
-                " is already managed by the collective interfaces controller");
+//            controllerLogger.error("the interface named " + itf.getFcItfName() +
+//                " is already managed by the collective interfaces controller");
             return false;
         }
 
@@ -67,8 +67,8 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
                 itf.getFcItfName(),
                 itf);
         } else {
-            controllerLogger.error("the interface named " + itf.getFcItfName() +
-                " cannot be managed by this collective interfaces controller");
+//            controllerLogger.error("the interface named " + itf.getFcItfName() +
+//                " cannot be managed by this collective interfaces controller");
             return false;
         }
 
@@ -76,14 +76,18 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     }
 
 
+	@Override
+	protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods, boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf) {
+		
+		return searchMatchingMethod(clientSideMethod, serverSideMethods, clientItfIsMulticast);
+	}
     
     /*
      * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#searchMatchingMethod(java.lang.reflect.Method, java.lang.reflect.Method[])
      */
-    @Override
-    protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods) {
+    protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods, boolean clientItfIsMulticast) {
       try {
-        return GatherBindingChecker.searchMatchingMethod(clientSideMethod, serverSideMethods);
+        return GatherBindingChecker.searchMatchingMethod(clientSideMethod, serverSideMethods, clientItfIsMulticast);
     } catch (ParameterDispatchException e) {
         e.printStackTrace();
     } catch (NoSuchMethodException e) {
@@ -180,5 +184,6 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     throws java.io.IOException, ClassNotFoundException {
     in.defaultReadObject();
 }
+
     
 }

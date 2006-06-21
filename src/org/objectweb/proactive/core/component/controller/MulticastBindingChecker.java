@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ClassDispatchMetadata;
 import org.objectweb.proactive.core.component.type.annotations.multicast.MethodDispatchMetadata;
@@ -32,11 +34,12 @@ public class MulticastBindingChecker implements Serializable {
      * server method A foo(B, C (or list<C>, depending on the dispatch mode) ) throws E;
      * @param clientSideMethod
      * @param serverSideMethods
+     * @param serverItfIsGathercast TODO
      * @return
      * @throws ParameterDispatchException
      * @throws NoSuchMethodException
      */
-    public static Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods) throws ParameterDispatchException, NoSuchMethodException {
+    public static Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods, boolean serverItfIsGathercast, Interface serverSideItf) throws ParameterDispatchException, NoSuchMethodException {
         Method result = null;
         Type clientSideReturnType = clientSideMethod.getGenericReturnType();
         Type[] clientSideParametersTypes = clientSideMethod.getGenericParameterTypes();
@@ -46,6 +49,16 @@ public class MulticastBindingChecker implements Serializable {
 
         serverSideMethodsLoop:
         for (Method serverSideMethod : serverSideMethods) {
+        	if (serverItfIsGathercast) {
+        		// look for corresponding method in the gather proxy itf
+        		Type[] genericParamTypes = serverSideMethod.getGenericParameterTypes();
+        		Class[] correspondingParamTypes = new Class[genericParamTypes.length];
+        		for (int i = 0; i < genericParamTypes.length; i++) {
+					ParameterizedType t = (ParameterizedType)genericParamTypes[i];
+					correspondingParamTypes[i] = (Class)t.getActualTypeArguments()[0];
+				}
+        		serverSideMethod = serverSideItf.getClass().getMethod(serverSideMethod.getName(), correspondingParamTypes);
+        	}
             // 1. check names
             if (! serverSideMethod.getName().equals(clientSideMethod.getName())) {
                 continue serverSideMethodsLoop;

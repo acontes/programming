@@ -3,7 +3,6 @@ package org.objectweb.proactive.core.component.controller.util;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,12 +14,8 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.body.proxy.AbstractProxy;
-import org.objectweb.proactive.core.body.proxy.AbstractBodyProxy.VoidFuture;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Fractive;
@@ -32,19 +27,11 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
-import org.objectweb.proactive.core.exceptions.proxy.FutureCreationException;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.proxy.SendRequestCommunicationException;
-import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 /**
  * This class orders requests arriving to gathercast interfaces into queues.
@@ -71,6 +58,8 @@ public class GatherRequestsQueues implements Serializable {
     List<ItfID> gatherItfs = new ArrayList<ItfID>();
     ProActiveInterfaceType[] itfTypes;
     
+    GatherFuturesHandlerPool gatherFuturesHandlerPool;
+    
     /**
      * migrates all existing futures handlers
      * @param node destination node
@@ -93,8 +82,6 @@ public class GatherRequestsQueues implements Serializable {
 				}
 				
 			}
-			 
-			
 		}
     }
 
@@ -133,7 +120,7 @@ public class GatherRequestsQueues implements Serializable {
         try {
             itfTypeMethod = GatherBindingChecker.searchMatchingMethod(reifiedMethod,
                     Class.forName(getItfType(serverItfName).getFcItfSignature())
-                         .getMethods());
+                         .getMethods(), false);
         } catch (Exception e1) {
             e1.printStackTrace();
             throw new ServeException("problem when analysing gather request", e1);
@@ -165,16 +152,17 @@ public class GatherRequestsQueues implements Serializable {
             list = new ArrayList<GatherRequestsQueue>();
             // new queue, and add current request
             GatherRequestsQueue queue = new GatherRequestsQueue(owner,
-                    serverItfName, itfTypeMethod, connectedClientItfs);
+                    serverItfName, itfTypeMethod, connectedClientItfs, gatherFuturesHandlerPool);
             list.add(queue);
             map.put(new SerializableMethod(itfTypeMethod), list);
         }
 
         if (list.isEmpty()) {
             GatherRequestsQueue queue = new GatherRequestsQueue(owner,
-                    serverItfName, itfTypeMethod, connectedClientItfs);
+                    serverItfName, itfTypeMethod, connectedClientItfs, gatherFuturesHandlerPool);
             map.get(new SerializableMethod(itfTypeMethod)).add(queue);
-        }
+        } 
+        
 
         for (Iterator iter = list.iterator(); iter.hasNext();) {
             GatherRequestsQueue queue = (GatherRequestsQueue) iter.next();
@@ -184,7 +172,7 @@ public class GatherRequestsQueues implements Serializable {
                     // no other queue to receive this request. create one
                     // concurrent access exception?
                     queue = new GatherRequestsQueue(owner, serverItfName,
-                            itfTypeMethod, connectedClientItfs);
+                            itfTypeMethod, connectedClientItfs, gatherFuturesHandlerPool);
                     // add the request
                     result = queue.put(senderItfID, r);
                     list.add(queue);
@@ -196,6 +184,7 @@ public class GatherRequestsQueues implements Serializable {
 
             // add this request
             result = queue.put(senderItfID, r);
+            break;
         }
         if (logger.isDebugEnabled()) {
             logger.debug("added request [" + r.getMethodName() +

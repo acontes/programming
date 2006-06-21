@@ -150,7 +150,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                 		controllerDesc = new ControllerDescription(name,
                                 Constants.PRIMITIVE);
                 	} else {
-                		System.out.println("CONTROLLER = " + controller);
+//                		System.out.println("CONTROLLER = " + controller);
                 	controllerDesc = new ControllerDescription(name,
                         Constants.PRIMITIVE, getClass().getResource(controller).getPath());
                 	}

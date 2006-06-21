@@ -20,11 +20,12 @@ public class GatherBindingChecker implements Serializable {
      *  server method List<B> foo(List<A>) throws E;
      * @param clientSideMethod
      * @param serverSideMethods
+     * @param clientItfIsMulticast TODO
      * @return
      * @throws ParameterDispatchException
      * @throws NoSuchMethodException
      */
-    public static Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods) throws ParameterDispatchException, NoSuchMethodException {
+    public static Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods, boolean clientItfIsMulticast) throws ParameterDispatchException, NoSuchMethodException {
         
         Method result = null;
         Type clientSideReturnType = clientSideMethod.getGenericReturnType();
@@ -106,8 +107,21 @@ public class GatherBindingChecker implements Serializable {
                     continue serverSideMethodsLoop;
                 }
                 
-                if (!(((Class)clientSideParametersTypes[i]).isAssignableFrom((Class)pServerParameterType.getActualTypeArguments()[0]))) {
-                    continue serverSideMethodsLoop;
+                if (clientItfIsMulticast) {
+//                	if (! (((Class)clientSideParametersTypes[i]).isAssignableFrom((Class)pServerParameterType.getRawType()))) {
+                		if (clientSideParametersTypes[i] instanceof ParameterizedType && ((Class)((ParameterizedType)clientSideParametersTypes[i]).getRawType()).isAssignableFrom(List.class)) {
+                			// we have a list<T> in the client multicast itf, that's fine
+                			if (!((Class)(((ParameterizedType)clientSideParametersTypes[i]).getActualTypeArguments()[0])).isAssignableFrom((Class)pServerParameterType.getActualTypeArguments()[0])) {
+                				continue serverSideMethodsLoop;
+                			}
+                		} else {
+                			continue serverSideMethodsLoop;
+                		}
+//                	}
+                } else {
+                	if (!(((Class)clientSideParametersTypes[i]).isAssignableFrom((Class)pServerParameterType.getActualTypeArguments()[0]))) {
+                		continue serverSideMethodsLoop;
+                	}
                 }
                 
             }
