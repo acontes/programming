@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.component.representative.ProActiveComponentR
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.examples.components.jacobi.LineData;
 
 
 /**
