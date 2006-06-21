@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
+import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.EllipseAnchor;
 import org.eclipse.draw2d.Graphics;
@@ -46,7 +47,9 @@ public class AOFigure extends AbstractFigure {
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	public AOFigure(NodeFigure parent,String text){
-		super(parent,createToolbarLayout(false),text,120, DEFAULT_WIDTH);
+		super(parent,text);
+		
+		
 		System.out.println("AOFigure : constructor");
 		addMouseMotionListener(new AOListener());
 	}
@@ -88,4 +91,8 @@ public class AOFigure extends AbstractFigure {
 		shadowColor = new Color(device, 230, 230, 230);
 	}
 	
+	protected void initFigure(){
+		setLayoutManager(new BorderLayout());
+		add(label, BorderLayout.CENTER);
+	}
 }

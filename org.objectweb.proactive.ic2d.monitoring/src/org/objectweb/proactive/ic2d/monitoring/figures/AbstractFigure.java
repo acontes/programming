@@ -33,12 +33,10 @@ package org.objectweb.proactive.ic2d.monitoring.figures;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LayoutManager;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.swt.graphics.Color;
 
@@ -61,47 +59,23 @@ public abstract class AbstractFigure extends Figure{
 	
 	protected static boolean showShadow = false; 
 	
-	private LayoutManager layout;
-	
-	private LayoutManager layoutContainer;
-	
-	private Figure container;
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractFigure(AbstractFigure parent, LayoutManager layout, String text, int width, int height){
+	protected AbstractFigure(AbstractFigure parent, String text){
 		super();
-	
-		this.layout = createToolbarLayout(false);
-		this.setLayoutManager(this.layout);
 		
-		this.container = new Figure();
-		this.layoutContainer = layout;
-		container.setLayoutManager(this.layoutContainer);
-		
-		this.add(this.container);
-			
-		// Add the label
-		 label.setForegroundColor(ColorConstants.black);
-		 add(label);
-
 		// Initialisation
+		this.label = new Label(text);
 		initColor();
-		label.setText(text);
-		this.setSize(width, height);
+		initFigure();
 		
 		/* Add child to his parent */
 		this.parent = parent;
 		if(this.parent != null)
 			this.parent.addFigureChild(this);
 	}
-	
-		
-	protected AbstractFigure(AbstractFigure parent, LayoutManager layout, String text, int width){
-		this(parent, layout ,text, width, topShift);
-	}
-	
 	
 	//
 	// -- PUBLIC METHODS ---------------------------------------------
@@ -118,10 +92,11 @@ public abstract class AbstractFigure extends Figure{
 		this.label.setText(title);
 	}
 	
-
 	//
 	// -- PROTECTED METHODS --------------------------------------------
 	//
+	
+	protected abstract void initFigure();
 	
 	protected abstract void initColor();
 	
@@ -129,11 +104,14 @@ public abstract class AbstractFigure extends Figure{
 	
 	/* Update his size according to his child */
 	protected void updateSize(){
-		layoutContainer.invalidate();
-		container.setSize(this.layoutContainer.getPreferredSize(container,shift, shift));
-		layout.invalidate();
-		setSize(this.layout.getPreferredSize(this,shift, shift));
-
+		//layoutContainer.invalidate();
+		//container.setSize(this.layoutContainer.getPreferredSize(container,shift, shift));
+		//layout.invalidate();
+		//setSize(this.layout.getPreferredSize(this,shift, shift));
+		
+		this.getLayoutManager().invalidate();
+		this.setSize(this.getLayoutManager().getPreferredSize(this,shift, shift));
+		
 		if(this.parent != null)
 			this.parent.updateSize();
 	}
@@ -142,7 +120,7 @@ public abstract class AbstractFigure extends Figure{
 		
 		if(this != child){
 			children.add(child);
-			this.container.add(child);
+			this.add(child);
 			this.updateSize();
 		}
 	}

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
+import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
@@ -42,7 +43,7 @@ public class HostFigure extends AbstractRectangleFigure{
     // -- CONSTRUCTOR -----------------------------------------------
     //
 	public HostFigure(String text) {
-		super(null, createToolbarLayout(true),text,DEFAULT_WIDTH);
+		super(null, text);
 		new Dragger(this);
 	}
 	
@@ -54,5 +55,13 @@ public class HostFigure extends AbstractRectangleFigure{
 		borderColor = new Color(device, 0, 0, 128);
 		backgroundColor = new Color(device, 208, 208, 208);
 		shadowColor = new Color(device, 230, 230, 230);
+	}
+
+	protected void initFigure() {
+		IC2DToolbarLayout layout = new IC2DToolbarLayout(true);
+		layout.setSpacing(10);
+		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		setLayoutManager(layout);
+		add(label);
 	}
 }

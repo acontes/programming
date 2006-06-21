@@ -51,7 +51,7 @@ public class IC2DToolbarLayout extends ToolbarLayout{
 	protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
 		Dimension dimension = super.calculatePreferredSize(container, wHint, hHint);
 		if(container instanceof AOFigure)
-			return dimension.expand(20,15);
+			return dimension.expand(20,10);
 		return dimension.expand(10,0);
 	}
 }

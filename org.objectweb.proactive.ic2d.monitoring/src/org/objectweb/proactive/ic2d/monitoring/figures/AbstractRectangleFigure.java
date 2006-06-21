@@ -33,7 +33,6 @@ package org.objectweb.proactive.ic2d.monitoring.figures;
 import org.eclipse.draw2d.ChopboxAnchor;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.LayoutManager;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 public abstract class AbstractRectangleFigure extends AbstractFigure{
@@ -41,8 +40,8 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractRectangleFigure(AbstractRectangleFigure parent, LayoutManager layout, String text, int width){
-		super(parent, layout, text, width);
+	protected AbstractRectangleFigure(AbstractRectangleFigure parent, String text){
+		super(parent, text);
 	}
 	
 	//

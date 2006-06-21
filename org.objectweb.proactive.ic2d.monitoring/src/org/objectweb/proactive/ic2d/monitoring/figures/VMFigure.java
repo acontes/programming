@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
+import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
@@ -43,7 +44,7 @@ public class VMFigure extends AbstractRectangleFigure{
     //
 	
 	public VMFigure(HostFigure parent, String text) {
-		super(parent, createToolbarLayout(false),text,DEFAULT_WIDTH);
+		super(parent, text);
 		addMouseMotionListener(new VMListener());
 	}
 
@@ -56,5 +57,13 @@ public class VMFigure extends AbstractRectangleFigure{
 		borderColor = new Color(device, 140, 200, 225);
 		backgroundColor = new Color(device, 240, 240, 240);
 		shadowColor = new Color(device, 230, 230, 230);
+	}
+
+	protected void initFigure() {
+		IC2DToolbarLayout layout = new IC2DToolbarLayout(false);
+		layout.setSpacing(10);
+		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		setLayoutManager(layout);
+		add(label);
 	}
 }
