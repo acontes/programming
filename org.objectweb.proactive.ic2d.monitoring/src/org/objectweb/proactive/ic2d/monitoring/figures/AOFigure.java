@@ -34,6 +34,9 @@ import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.EllipseAnchor;
 import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.LayoutManager;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
@@ -46,8 +49,8 @@ public class AOFigure extends AbstractFigure {
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	public AOFigure(NodeFigure parent,String text){
-		super(parent,text);
+	public AOFigure(String text){
+		super(text);
 		
 		
 		System.out.println("AOFigure : constructor");
@@ -63,7 +66,7 @@ public class AOFigure extends AbstractFigure {
 	
 	public void paintIC2DFigure(Graphics graphics){
 		// Inits
-		Rectangle bounds = this.getBounds().getCopy().resize(-1, -2)/*.translate(0, -1);*/;
+		Rectangle bounds = this.getBounds().getCopy().resize(-1, -2);
 		// Shadow
 		if(showShadow){
 			graphics.setBackgroundColor(shadowColor);
@@ -80,6 +83,11 @@ public class AOFigure extends AbstractFigure {
 		graphics.restoreState();
 	}
 	
+	public IFigure getContentPane() {
+		System.out.println("AOFigure : getContentPane");
+		return this;
+	}
+	
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
@@ -92,7 +100,21 @@ public class AOFigure extends AbstractFigure {
 	}
 	
 	protected void initFigure(){
-		setLayoutManager(new BorderLayout());
+		LayoutManager layout = new AOBorderLayout();
+		setLayoutManager(layout);
 		add(label, BorderLayout.CENTER);
 	}
+	
+	//
+	// -- INNER CLASS -------------------------------------------
+	//
+	
+	private class AOBorderLayout extends BorderLayout {
+		
+		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
+			return super.calculatePreferredSize(container, wHint, hHint).expand(15, 15);
+		}
+		
+	}
+	
 }

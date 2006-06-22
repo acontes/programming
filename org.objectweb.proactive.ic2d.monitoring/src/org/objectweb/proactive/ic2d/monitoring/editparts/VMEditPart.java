@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
-import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
 
 public class VMEditPart extends AbstractIC2DEditPart {
@@ -73,8 +72,7 @@ public class VMEditPart extends AbstractIC2DEditPart {
  	 * @return a new VMFigure view associated with the VMObject model.
  	 */
 	protected IFigure createFigure() {
-		HostFigure parent = (HostFigure)((HostEditPart)getParent()).getFigure();
-		return new VMFigure(parent, getCastedModel().getFullName());
+		return new VMFigure(getCastedModel().getFullName());
 	}
 	
 	

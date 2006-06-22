@@ -30,14 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.swt.graphics.Color;
 
 public abstract class AbstractFigure extends Figure{
@@ -46,9 +43,6 @@ public abstract class AbstractFigure extends Figure{
 	protected final static int topShift = 25;
 	// The space between borders and children
 	protected final static int shift = 10;
-	
-	protected List children = new ArrayList();
-	protected AbstractFigure parent;
 	
 	protected Label label = new Label();
 	
@@ -63,18 +57,13 @@ public abstract class AbstractFigure extends Figure{
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractFigure(AbstractFigure parent, String text){
+	protected AbstractFigure(String text){
 		super();
 		
 		// Initialisation
 		this.label = new Label(text);
-		initColor();
 		initFigure();
-		
-		/* Add child to his parent */
-		this.parent = parent;
-		if(this.parent != null)
-			this.parent.addFigureChild(this);
+		initColor();
 	}
 	
 	//
@@ -92,6 +81,9 @@ public abstract class AbstractFigure extends Figure{
 		this.label.setText(title);
 	}
 	
+	public abstract IFigure getContentPane();
+	
+	
 	//
 	// -- PROTECTED METHODS --------------------------------------------
 	//
@@ -102,33 +94,4 @@ public abstract class AbstractFigure extends Figure{
 	
 	protected abstract void paintIC2DFigure(Graphics graphics);
 	
-	/* Update his size according to his child */
-	protected void updateSize(){
-		//layoutContainer.invalidate();
-		//container.setSize(this.layoutContainer.getPreferredSize(container,shift, shift));
-		//layout.invalidate();
-		//setSize(this.layout.getPreferredSize(this,shift, shift));
-		
-		this.getLayoutManager().invalidate();
-		this.setSize(this.getLayoutManager().getPreferredSize(this,shift, shift));
-		
-		if(this.parent != null)
-			this.parent.updateSize();
-	}
-	
-	protected void addFigureChild(AbstractFigure child){
-		
-		if(this != child){
-			children.add(child);
-			this.add(child);
-			this.updateSize();
-		}
-	}
-	
-	protected static ToolbarLayout createToolbarLayout(boolean horizontal){
-		IC2DToolbarLayout layout = new IC2DToolbarLayout(horizontal);
-		layout.setSpacing(10);
-		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
-		return layout;
-	}
 }

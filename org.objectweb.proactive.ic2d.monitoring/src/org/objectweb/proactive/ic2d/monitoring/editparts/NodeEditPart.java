@@ -35,7 +35,6 @@ import java.util.List;
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
-import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
 
 public class NodeEditPart extends AbstractIC2DEditPart{
 
@@ -73,8 +72,7 @@ public class NodeEditPart extends AbstractIC2DEditPart{
  	 */
 	protected IFigure createFigure() {
 		System.out.println("NodeEditPart : createEditPart");
-		VMFigure parent = (VMFigure)((VMEditPart)getParent()).getFigure();
-		return new NodeFigure(parent, getCastedModel().getFullName());
+		return new NodeFigure(getCastedModel().getFullName());
 	}
 	
 	/**

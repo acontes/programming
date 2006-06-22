@@ -30,7 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
+import org.eclipse.draw2d.BorderLayout;
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ToolbarLayout;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
@@ -39,16 +43,28 @@ public class NodeFigure extends AbstractRectangleFigure{
 		
 	protected final static int DEFAULT_WIDTH = 140;
 	
+	private IFigure contentPane;
+	
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
-	public NodeFigure(VMFigure parent, String text) {
-		super(parent, text);
+	public NodeFigure(String text) {
+		super(text);
 		addMouseMotionListener(new NodeListener());
 	}
 		
+	
+	//
+    // -- PUBLIC METHOD --------------------------------------------
     //
-    // -- PROTECTED METHOD --------------------------------------------
+	
+	public IFigure getContentPane() {
+		System.out.println("NodeFigure : getContentPane");
+		return contentPane;
+	}
+	
+    //
+    // -- PROTECTED METHODS --------------------------------------------
     //
 	protected void initColor() {
 		Device device = Display.getCurrent();
@@ -58,10 +74,32 @@ public class NodeFigure extends AbstractRectangleFigure{
 	}
 
 	protected void initFigure() {
-		IC2DToolbarLayout layout = new IC2DToolbarLayout(false);
-		layout.setSpacing(5);
-		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		BorderLayout layout = new BorderLayout();
+		layout.setVerticalSpacing(5);
 		setLayoutManager(layout);
-		add(label);
+		add(label, BorderLayout.TOP);
+		
+		contentPane = new Figure();
+		ToolbarLayout contentPaneLayout = new NodeToolbarLayout();
+		contentPaneLayout.setSpacing(5);
+		contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		contentPane.setLayoutManager(contentPaneLayout);
+		add(contentPane, BorderLayout.CENTER);
+	}
+	
+	//
+    // -- INNER CLASS --------------------------------------------
+    //
+	
+	private class NodeToolbarLayout extends ToolbarLayout {
+		
+		public NodeToolbarLayout() {
+			super(false);
+		}
+		
+		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
+			return super.calculatePreferredSize(container, wHint, hHint).expand(10,15);
+		}
+		
 	}
 }

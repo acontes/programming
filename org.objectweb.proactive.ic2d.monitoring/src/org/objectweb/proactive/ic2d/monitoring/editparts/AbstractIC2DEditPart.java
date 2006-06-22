@@ -3,9 +3,11 @@ package org.objectweb.proactive.ic2d.monitoring.editparts;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
+import org.objectweb.proactive.ic2d.monitoring.figures.AbstractFigure;
 
 public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart implements Observer {
 
@@ -57,6 +59,12 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 				refreshVisuals();		
 			}
 		});
+	}
+	
+	
+	public IFigure getContentPane() {
+		System.out.println("AbstractIC2DEditpart : getContentPane");
+		return ((AbstractFigure)getFigure()).getContentPane();
 	}
 	
 }

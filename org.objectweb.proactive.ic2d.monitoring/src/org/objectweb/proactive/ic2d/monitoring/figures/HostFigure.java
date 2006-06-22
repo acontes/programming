@@ -30,7 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
+import org.eclipse.draw2d.BorderLayout;
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ToolbarLayout;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
@@ -39,12 +43,23 @@ public class HostFigure extends AbstractRectangleFigure{
 	
 	protected final static int DEFAULT_WIDTH = 180;
 	
+	private IFigure contentPane;
+	
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
 	public HostFigure(String text) {
-		super(null, text);
+		super(text);
 		new Dragger(this);
+	}
+	
+	//
+    // -- PUBLIC METHOD --------------------------------------------
+    //
+	
+	public IFigure getContentPane() {
+		System.out.println("HostFigure : getContentPane");
+		return contentPane;
 	}
 	
     //
@@ -58,10 +73,41 @@ public class HostFigure extends AbstractRectangleFigure{
 	}
 
 	protected void initFigure() {
-		IC2DToolbarLayout layout = new IC2DToolbarLayout(true);
-		layout.setSpacing(10);
-		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		BorderLayout layout = new BorderLayout();
+		//layout.setHorizontalSpacing(10);
+		//layout.setVerticalSpacing(5);
 		setLayoutManager(layout);
-		add(label);
+		add(label, BorderLayout.TOP);
+		
+		contentPane = new Figure();
+		ToolbarLayout contentPaneLayout = new HostToolbarLayout();
+		contentPaneLayout.setSpacing(10);
+		contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		//contentPaneLayout.setStretchMinorAxis(false);
+		contentPane.setLayoutManager(contentPaneLayout);
+		
+		add(contentPane, BorderLayout.CENTER);
+	}
+	
+	//
+    // -- INNER CLASS --------------------------------------------
+    //
+	
+	private class HostToolbarLayout extends ToolbarLayout {
+		
+		public HostToolbarLayout(){
+			super(true);
+		}
+		
+		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
+			return super.calculatePreferredSize(container, wHint, hHint).expand(20, 15);
+		}
+		
+		public void layout(IFigure figure) {
+			super.layout(figure);
+			figure.translate(10, 0);
+		}
+		
+		
 	}
 }

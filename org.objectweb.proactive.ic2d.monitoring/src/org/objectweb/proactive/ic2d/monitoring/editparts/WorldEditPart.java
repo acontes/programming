@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
 import java.util.List;
@@ -10,6 +40,8 @@ import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class WorldEditPart extends AbstractIC2DEditPart {
 
+	
+	private FreeformLayer layer;
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -32,6 +64,11 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 		return (WorldObject)getModel();
 	}
 	
+	public IFigure getContentPane() {
+		System.out.println("WorldEditPart : getContentPane");
+		return layer;
+	}
+	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
@@ -43,10 +80,11 @@ public class WorldEditPart extends AbstractIC2DEditPart {
  	 * @return a new FreeFormLayer view associated with the WorldObject model.
  	 */
 	protected IFigure createFigure() {
-		FreeformLayer layer = new FreeformLayer();
+		layer = new FreeformLayer();
 		ToolbarLayout layout = new ToolbarLayout(true);
 		layout.setSpacing(50);
 		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+		//layout.setStretchMinorAxis(false);
 		layer.setLayoutManager(/*new FreeformLayout()*/layout);
 		layer.setBorder(new LineBorder(1));
 		return layer;
@@ -60,19 +98,6 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 	protected List getModelChildren() {
 		return getCastedModel().getMonitoredChildren();
 	}
-	
-	
-	/**
-	 * Fills the view with data extracted from the model object 
-	 * associated with the EditPart.
-	 * This method will be called just after the creation of 
-	 * the figure, and may also be called in response to 
-	 * notifications from the model. 
-	 */
-/*	protected void refreshVisuals(){ 
-		//TODO
-	}
-	*/
 	
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.

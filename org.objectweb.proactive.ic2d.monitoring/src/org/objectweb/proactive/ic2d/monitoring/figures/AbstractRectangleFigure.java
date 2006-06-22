@@ -40,8 +40,8 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractRectangleFigure(AbstractRectangleFigure parent, String text){
-		super(parent, text);
+	protected AbstractRectangleFigure(String text){
+		super(text);
 	}
 	
 	//

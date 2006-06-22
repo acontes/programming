@@ -35,7 +35,6 @@ import java.util.List;
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
-import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 
 public class AOEditPart extends AbstractIC2DEditPart{
 
@@ -73,8 +72,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
  	 */
 	protected IFigure createFigure() {
 		System.out.println("AOEditPart : createFigure");
-		NodeFigure parent = (NodeFigure)((NodeEditPart)getParent()).getFigure();
-		return new AOFigure(parent, getCastedModel().getFullName());
+		return new AOFigure(getCastedModel().getFullName());
 	}
 	
 	/**
