@@ -32,6 +32,11 @@ public class Dumper {
         if ((tmp == null) || (tmp.getIndex() == -1)) {
             senders.put(s,
                 new P2PNode(s, index++, i.getCurrentNoa(), i.getNoa()));
+        } else {
+        	if (tmp!=null) {
+        		tmp.setMaxNOA(i.getNoa());
+        		tmp.setNoa(i.getCurrentNoa());
+        	}
         }
     }
 
@@ -150,6 +155,11 @@ public class Dumper {
     
     public HashMap getLinks() {
     	return this.links;
+    }
+    
+    
+    public HashMap getSenders() {
+    	return this.senders;
     }
     
     public static void requestAcquaintances(String ref) {

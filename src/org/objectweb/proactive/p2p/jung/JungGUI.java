@@ -2,6 +2,7 @@ package org.objectweb.proactive.p2p.jung;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,26 +12,29 @@ import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.p2p.test.Dumper;
 import org.objectweb.proactive.p2p.test.Link;
 import org.objectweb.proactive.p2p.test.P2PNode;
 
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.decorators.ConstantEdgeStringer;
 import edu.uci.ics.jung.graph.decorators.EdgeShape;
 import edu.uci.ics.jung.graph.decorators.StringLabeller;
+import edu.uci.ics.jung.graph.decorators.ToolTipFunction;
 import edu.uci.ics.jung.graph.decorators.StringLabeller.UniqueLabelException;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
-import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
 import edu.uci.ics.jung.visualization.FRLayout;
 import edu.uci.ics.jung.visualization.FadingVertexLayout;
-import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.Layout;
 import edu.uci.ics.jung.visualization.LayoutMutable;
 import edu.uci.ics.jung.visualization.PluggableRenderer;
@@ -43,7 +47,7 @@ import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
 
 
-public class JungGUI extends JFrame {
+public class JungGUI implements ToolTipFunction{
 	
 	//the time in ms we wait after a vertex has been added
 	private final int UPDATE_PAUSE = 100;
@@ -53,52 +57,85 @@ public class JungGUI extends JFrame {
     protected PluggableRenderer pr;
     protected StringLabeller sl;
     protected ConstantEdgeStringer edgesLabeller;
-    protected Integer key = new Integer(1);
+    //protected Integer key = new Integer(1);
     protected Layout layout;
     protected boolean mutable;
     
-    public JungGUI(String fileName) {
+  
+    
+    public JungGUI() {
         graph = new UndirectedSparseGraph(); //this.createGraph();
                                   
 //layout = useNonMutableLayout(graph);
-      layout = useMutableLayout(graph);
+      //layout = useMutableLayout(graph);
+        layout = useLayout(graph,0);
           
         //Layout layout = new ISOMLayout(graph);
         sl = StringLabeller.getLabeller(graph);
        edgesLabeller = new ConstantEdgeStringer(null);
+       
         pr = new PluggableRenderer();
         pr.setVertexStringer(sl);
-        //  this.createGraph();
+
+        // pr.setVertexLabelCentering(true);
         vv = new VisualizationViewer(layout, pr, new Dimension(1024, 768));
         vv.setPickSupport(new ShapePickSupport());
         pr.setEdgeShapeFunction(new EdgeShape.QuadCurve());
         vv.setBackground(Color.white);
-
+        vv.setToolTipListener(this);
         DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
         gm.setMode(Mode.PICKING);
         vv.setGraphMouse(gm);
-        this.add(new GraphZoomScrollPane(vv));
-        this.pack();
-        this.setVisible(true);
-        this.createGraphFromFile2(fileName);
-  
     }
 
-
-    public Layout useNonMutableLayout(Graph g) {
-    	this.mutable = false;
-    //	return this.useCircleLayout(g);
-    	return this.useKKLayout(g);
+  public void changeLayout(int i) {
+      Layout l = useLayout(graph,i);
+      vv.stop();
+      vv.setGraphLayout(l);
+      vv.restart();
+      
+  }
+/**
+ * Indicates which layout to use
+ * 0 : circle layout
+ * 1 : KK Layout
+ * 2 : FR Layout
+ * 3 : Spring Layout
+ * @param g
+ * @param i the number of the layout to use
+ * @return
+ */
+    public Layout useLayout(Graph g, int i) {
+    	
+    	switch (i) {
+    		case 0:	{
+    			this.mutable = false;
+    			return this.useCircleLayout(g);
+    		}
+    		case 1: {
+    			this.mutable = false;
+    			return this.useKKLayout(g);
+    		}
+    		case 2: {
+    			this.mutable = true;
+    			return this.useFRLayout(g);
+    		}
+    		case 3 : {
+    			this.mutable = true;
+    			return this.useSpringLayout(g);
+    		}
     	//return this.useFadingVertexLayout(g);
-//         return this.useTreeLayout(g);    	
+//         return this.useTreeLayout(g);
+    		default : return null;
+    	}
     }
     
-    public Layout useMutableLayout(Graph g) {
-    	this.mutable = true;
-    	return this.useSpringLayout(g);
-    //	return  this.useFRLayout(g);
-    }
-    
+//    public Layout useMutableLayout(Graph g) {
+//    	this.mutable = true;
+//    	return this.useSpringLayout(g);
+//    //	return  this.useFRLayout(g);
+//    }
+//    
 
     public LayoutMutable useFRLayout(Graph g) {
     	return new FRLayout(g);
@@ -137,21 +174,6 @@ public class JungGUI extends JFrame {
     }
     
     
-    public void createGraph() {
-        // Graph tmp = new UndirectedSparseGraph();
-        Vertex[] v = new Vertex[3];
-        for (int i = 0; i < v.length; i++) {
-            v[i] = graph.addVertex(new UndirectedSparseVertex());
-            try {
-                sl.setLabel(v[i], "Noeud " + i);
-            } catch (UniqueLabelException e) {
-                e.printStackTrace();
-            }
-        }
-        graph.addEdge(new UndirectedSparseEdge(v[0], v[1]));
-        graph.addEdge(new UndirectedSparseEdge(v[1], v[2]));
-    }
-    
     public void createGraphFromFile2(String name) {
     	Dumper dump = new Dumper();
         BufferedReader in = null;
@@ -181,6 +203,25 @@ public class JungGUI extends JFrame {
                     //reading some peer name 
                     switch (readingStatus) {
                     case 1: {
+                    	 // example of string
+                    	// "trinidad.inria.fr:2410 current Noa =  1 max Noa= 3"
+                        Pattern pattern = Pattern.compile("(.*) current .* = (.*) max Noa= (.*)");
+                        Matcher matcher = pattern.matcher(s);
+                        boolean matchFound = matcher.find();
+                        
+                        if (matchFound) {
+                            // Get all groups for this match
+                            for (int i=1; i<=matcher.groupCount(); i++) {
+                                String groupStr = matcher.group(i);
+                                System.out.println(groupStr);
+                            }
+                        }
+
+
+                    	
+                    	
+                    	
+                    	
                         s= s.substring(0, s.indexOf("current")-1);
                         dump.addAsSender(s);
                         current = s;
@@ -241,7 +282,8 @@ public class JungGUI extends JFrame {
              Map.Entry<String, P2PNode> entry = (Map.Entry<String, P2PNode>) it.next();
 
              // the node might have a -1 index because has never sent anything
-             this.addVertex(((P2PNode) entry.getValue()).getName());
+    P2PNode node = ((P2PNode) entry.getValue());
+             this.addVertex(node);
          }
     }
     
@@ -262,35 +304,52 @@ public class JungGUI extends JFrame {
             this.addEdge(source, dest);
 //            vv.repaint();
 //System.out.println("JungGUI.generateGraph()");
-            if (mutable) {
-            ((LayoutMutable) layout).update();
-            if (!vv.isVisRunnerRunning())
-                vv.init();
-            vv.repaint(); 
-            } else {
-            	vv.setGraphLayout(this.useNonMutableLayout(graph));
-            }
-             try {
-				Thread.sleep(UPDATE_PAUSE);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+          this.updateView();
              
             //            System.out.println(entry.getSource() + " <---> " + entry.getDestination());
         }
     }
     
-    protected void addVertex(String s) {
-    	   Vertex v = sl.getVertex(s);
+    protected void updateView() {
+    	//vv.suspend();
+    	if (mutable) {
+              ((LayoutMutable) layout).update();
+              if (!vv.isVisRunnerRunning())
+                  vv.init();
+              
+              } else {
+              	//vv.setGraphLayout(this.useNonMutableLayout(graph));
+            	  this.layout.restart();
+              }
+               try {
+  				Thread.sleep(UPDATE_PAUSE);
+  			} catch (InterruptedException e) {
+  				e.printStackTrace();
+  			}
+    	
+//    	  // make your changes to the graph here
+//    	 	graph.addVertex(new SparseVertex());
+//    	 
+    		//vv.unsuspend();
+    		vv.repaint();
+    	 
+    }
+    
+    protected void addVertex(P2PNode p) {
+    	String s = p.getName();
+    	   P2PUndirectedSparseVertex v = (P2PUndirectedSparseVertex) sl.getVertex(s);
          if (v == null) {
          	// we haven't seen this peer
          	System.out.println(" *** Adding peer  --" + s+"--");
-         	v = graph.addVertex(new UndirectedSparseVertex());
+         	v = (P2PUndirectedSparseVertex) graph.addVertex(new P2PUndirectedSparseVertex());
          	try {
 				sl.setLabel(v, s);
 			} catch (UniqueLabelException e) {
 				e.printStackTrace();
 			}
+			v.setMaxNOA(p.getMaxNOA());
+			v.setNoa(p.getNoa());
+			
     }
     }
     
@@ -300,12 +359,39 @@ public class JungGUI extends JFrame {
     	graph.addEdge(new UndirectedSparseEdge(current, v));
     }
     
+    public JPanel getPanel() {
+    	return this.vv;
+    }
     
-    
+    public void setRepulsionRange(int i) {
+    	System.out.println("JungGUI.setRepulsionRange() " +i);
+    	((SpringLayout) this.layout).setRepulsionRange(i);
+    }
     
     public static void main(String[] args) {
-        JungGUI gui = new JungGUI(args[0]);
-
+    	JFrame f = new JFrame();
+        JungGUI gui = new JungGUI();
+        
+   	f.add(gui.getPanel());
+        f.pack();
+        f.setVisible(true);
+        gui.createGraphFromFile2(args[0]);
         //gui.createGraphFromFile(args[0]);
     }
+
+	public String getToolTipText(Vertex v) {
+		//System.out.println("JungGUI.getToolTipText() " + v);
+	    return sl.getLabel(v)+" noa = " + ((P2PUndirectedSparseVertex)v).getNoa();
+		//return null;
+	}
+
+	public String getToolTipText(Edge e) {
+		// TODO Raccord de méthode auto-généré
+		return null;
+	}
+
+	public String getToolTipText(MouseEvent event) {
+		// TODO Raccord de méthode auto-généré
+		return null;
+	}
 }

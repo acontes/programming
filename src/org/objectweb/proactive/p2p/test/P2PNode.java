@@ -40,6 +40,12 @@ public class P2PNode {
 	public void setIndex(int i) {
 		this.index= i;
 	}
+	public void setMaxNOA(int maxNOA) {
+		this.maxNOA = maxNOA;
+	}
+	public void setNoa(int noa) {
+		this.noa = noa;
+	}
 	
 	
 	

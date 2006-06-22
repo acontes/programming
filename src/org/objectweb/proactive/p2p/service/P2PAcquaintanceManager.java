@@ -117,7 +117,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      */
     public void runActivity(Body body) {
         Service service = new Service(body);
-
+        body.getRequestQueue();
         while (body.isActive()) {
             if (this.acquaintances.size() > 0) {
                 // Register the local P2P service in all exportAcquaintances
@@ -347,6 +347,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             logger.debug("Peer not removed");
         }
     }
+
 
     protected void dropRandomPeer() {
         //pick up a random peer in the list 
