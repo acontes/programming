@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Fractal Plug-in
+Bundle-SymbolicName: fractal
+Bundle-Version: 2.0.1
+Bundle-ClassPath: fractal.jar
+Bundle-Localization: plugin
+Export-Package: org.objectweb.fractal.api,
+ org.objectweb.fractal.api.control,
+ org.objectweb.fractal.api.factory,
+ org.objectweb.fractal.api.type,
+ org.objectweb.fractal.util
+Bundle-Vendor: ObjectWeb
