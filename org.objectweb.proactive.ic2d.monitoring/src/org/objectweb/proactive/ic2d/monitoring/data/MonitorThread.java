@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class MonitorThread {
 	
@@ -43,9 +41,6 @@ public class MonitorThread {
 	
 	/** Hosts will be recursively searched up to this depth */
 	private int depth;
-	
-	/** List of hosts which are monitored (List<HostObject>) */
-	private List monitoredHosts;
 	
 	/** Thread which refresh the objects */
 	private Thread refresher;
@@ -61,8 +56,6 @@ public class MonitorThread {
 	private MonitorThread(){
 		this.depth = DEFAULT_DEPTH;
 		this.ttr = DEFAULT_TTR;
-		
-		this.monitoredHosts = new ArrayList();
 		
 		this.refresh = false;
 		this.refresher = new Thread(new Refresher());
@@ -114,45 +107,20 @@ public class MonitorThread {
 		this.ttr = ttr;
 	}
 	
-	/**
-	 * Begin to monitor the host specified. 
-	 * @param host the host to monitor
-	 */
-	public void addMonitoredHost(HostObject host) {
-		if(!monitoredHosts.contains(host))
-			monitoredHosts.add(host);
-		if(monitoredHosts.size() == 1)
-			startRefreshing();
-	}
-	
-	/**
-	 * Stop monitoring the host specified.
-	 * @param host the host to stop monitoring
-	 */
-	public void removeMonitoredHost(HostObject host) {
-		monitoredHosts.remove(host);
-		if(monitoredHosts.size() == 0)
-			stopRefreshing();
-	}
-	
 	//
-	// -- PRIVATE METHODS -----------------------------------------------
+	// -- PROTECTED METHODS -----------------------------------------------
 	//
 	
-	private void startRefreshing() {
+	protected void startRefreshing() {
 		refresh = true;
 		refresher.start();
 	}
 	
-	private void stopRefreshing() {
+	
+	protected void stopRefreshing() {
 		refresh = false;
 	}
-	
-	private void monitor() {
-		for(int i=0 ; i<monitoredHosts.size() ; i++)
-			((HostObject)monitoredHosts.get(i)).explore();
-	}
-	
+		
 	//
 	// -- INNER CLASS -----------------------------------------------
 	//
@@ -162,7 +130,7 @@ public class MonitorThread {
 		public void run() {
 			while(refresh) {
 				System.out.println("******* MonitorThread : run ********");
-				monitor();
+				WorldObject.getInstance().explore();
 				try {
 					Thread.sleep(ttr * 1000);
 				} catch (InterruptedException e) {

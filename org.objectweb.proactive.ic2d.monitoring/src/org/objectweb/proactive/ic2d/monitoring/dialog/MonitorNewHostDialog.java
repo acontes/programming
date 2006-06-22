@@ -225,8 +225,7 @@ public class MonitorNewHostDialog extends Dialog {
 					int port = Integer.parseInt(portText.getText());
 					MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
 					shell.setVisible(false); //TODO ???
-					HostObject host = new HostObject(hostname, port, protocol);
-					MonitorThread.getInstance().addMonitoredHost(host);
+					new HostObject(hostname, port, protocol);
 					shell.close();
 					break;
 				}

@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Holder class for all hosts
@@ -55,7 +58,6 @@ public class WorldObject extends AbstractDataObject {
     // -- PUBLICS METHODS -----------------------------------------------
     //
 	
-	
 	public static WorldObject getInstance() {
 		if(instance == null)
 			instance = new WorldObject();
@@ -72,7 +74,39 @@ public class WorldObject extends AbstractDataObject {
 		return "WorldObject";
 	}
 
-
-	public void explore() {/* Do nothing */}
+	public void explore() {
+		List childrenList = new ArrayList(monitoredChildren.values());
+		for(int i=0, size=childrenList.size(); i<size; i++)
+			((HostObject)childrenList.get(i)).explore();
+	}
 	
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
+	
+	/**
+	 * Add a child to this object
+	 * @param key 
+	 * @param child
+	 */
+	protected synchronized void putChild(AbstractDataObject child) {
+		monitoredChildren.put(child.getKey(), child);
+		if(monitoredChildren.size() == 1)
+			MonitorThread.getInstance().startRefreshing();
+		setChanged();
+		notifyObservers();
+	}
+    
+	
+	/**
+	 * Stop monitoring the host specified.
+	 * @param host the host to stop monitoring
+	 */
+	protected void removeChild(AbstractDataObject child) {
+		monitoredChildren.remove(child.getKey());
+		if(monitoredChildren.size() == 0)
+			MonitorThread.getInstance().stopRefreshing();
+		setChanged();
+		notifyObservers();
+	}
 }
