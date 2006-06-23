@@ -45,6 +45,20 @@ public class Dumper {
             senders.put(s, new P2PNode(s));
         }
     }
+    
+    public void addAsSender(String s, int noa, int maxNoa) {
+    	P2PNode p = senders.get(s);
+        if (p == null) {
+            p = new P2PNode(s);
+        	p.setNoa(noa);
+        	p.setMaxNOA(maxNoa);
+            senders.put(s, p);
+        } else {
+        	p.setNoa(noa);
+        	p.setMaxNOA(maxNoa);
+        }
+    }
+    
 
     /**
      * Receive a dump from a peer

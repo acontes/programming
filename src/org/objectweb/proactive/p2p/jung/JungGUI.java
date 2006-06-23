@@ -68,15 +68,16 @@ public class JungGUI implements ToolTipFunction{
                                   
 //layout = useNonMutableLayout(graph);
       //layout = useMutableLayout(graph);
-        layout = useLayout(graph,0);
+        layout = useLayout(graph,3);
           
         //Layout layout = new ISOMLayout(graph);
         sl = StringLabeller.getLabeller(graph);
        edgesLabeller = new ConstantEdgeStringer(null);
        
         pr = new PluggableRenderer();
+   //    pr = new CirclePluggableRenderer((CircleLayout) layout);
         pr.setVertexStringer(sl);
-
+        pr.setVertexPaintFunction(new NOAVertexPaintFunction());
         // pr.setVertexLabelCentering(true);
         vv = new VisualizationViewer(layout, pr, new Dimension(1024, 768));
         vv.setPickSupport(new ShapePickSupport());
@@ -123,7 +124,8 @@ public class JungGUI implements ToolTipFunction{
     		case 3 : {
     			this.mutable = true;
     			return this.useSpringLayout(g);
-    		}
+    		} 
+    		
     	//return this.useFadingVertexLayout(g);
 //         return this.useTreeLayout(g);
     		default : return null;
@@ -205,27 +207,25 @@ public class JungGUI implements ToolTipFunction{
                     case 1: {
                     	 // example of string
                     	// "trinidad.inria.fr:2410 current Noa =  1 max Noa= 3"
-                        Pattern pattern = Pattern.compile("(.*) current .* = (.*) max Noa= (.*)");
+                        Pattern pattern = Pattern.compile("(.*) current .* =  (.*) max Noa= (.*)");
                         Matcher matcher = pattern.matcher(s);
                         boolean matchFound = matcher.find();
                         
                         if (matchFound) {
                             // Get all groups for this match
-                            for (int i=1; i<=matcher.groupCount(); i++) {
-                                String groupStr = matcher.group(i);
-                                System.out.println(groupStr);
-                            }
-                        }
-
-
+                        //    for (int i=1; i<=matcher.groupCount(); i++) {
+                                s = matcher.group(1);
+                                //System.out.println(groupStr);
+                          //  }
+                        //}
                     	
                     	
                     	
-                    	
-                        s= s.substring(0, s.indexOf("current")-1);
-                        dump.addAsSender(s);
+                        //s= s.substring(0, s.indexOf("current")-1);
+                        dump.addAsSender(s, Integer.parseInt(matcher.group(2)),Integer.parseInt(matcher.group(3)));
                         current = s;
                         readingStatus = 2;
+                        }
                         break;
                     }
                     case 2: {
@@ -285,6 +285,7 @@ public class JungGUI implements ToolTipFunction{
     P2PNode node = ((P2PNode) entry.getValue());
              this.addVertex(node);
          }
+         layout.restart();
     }
     
     protected void generateGraphLinks(Dumper dump) {
@@ -319,7 +320,7 @@ public class JungGUI implements ToolTipFunction{
               
               } else {
               	//vv.setGraphLayout(this.useNonMutableLayout(graph));
-            	  this.layout.restart();
+            	 // this.layout.restart();
               }
                try {
   				Thread.sleep(UPDATE_PAUSE);
@@ -349,6 +350,7 @@ public class JungGUI implements ToolTipFunction{
 			}
 			v.setMaxNOA(p.getMaxNOA());
 			v.setNoa(p.getNoa());
+			
 			
     }
     }
