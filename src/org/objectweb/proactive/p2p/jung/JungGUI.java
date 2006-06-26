@@ -68,16 +68,20 @@ public class JungGUI implements ToolTipFunction{
                                   
 //layout = useNonMutableLayout(graph);
       //layout = useMutableLayout(graph);
-        layout = useLayout(graph,3);
+        layout = useLayout(graph,0);
           
         //Layout layout = new ISOMLayout(graph);
         sl = StringLabeller.getLabeller(graph);
        edgesLabeller = new ConstantEdgeStringer(null);
        
         pr = new PluggableRenderer();
-   //    pr = new CirclePluggableRenderer((CircleLayout) layout);
+ //      pr = new CirclePluggableRenderer((CircleLayout) layout);
         pr.setVertexStringer(sl);
         pr.setVertexPaintFunction(new NOAVertexPaintFunction());
+        
+        // Creer un GraphLabelRenderer qui retourne notre RotateLabel
+        
+        //pr.setGraphLabelRenderer()
         // pr.setVertexLabelCentering(true);
         vv = new VisualizationViewer(layout, pr, new Dimension(1024, 768));
         vv.setPickSupport(new ShapePickSupport());
@@ -307,7 +311,6 @@ public class JungGUI implements ToolTipFunction{
 //System.out.println("JungGUI.generateGraph()");
           this.updateView();
              
-            //            System.out.println(entry.getSource() + " <---> " + entry.getDestination());
         }
     }
     
@@ -383,7 +386,7 @@ public class JungGUI implements ToolTipFunction{
 
 	public String getToolTipText(Vertex v) {
 		//System.out.println("JungGUI.getToolTipText() " + v);
-	    return sl.getLabel(v)+" noa = " + ((P2PUndirectedSparseVertex)v).getNoa();
+	    return "<html> "+ sl.getLabel(v)+" <br> noa = " + ((P2PUndirectedSparseVertex)v).getNoa()+ "</html>";
 		//return null;
 	}
 
