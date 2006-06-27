@@ -167,6 +167,7 @@ public class MonitorNewHostDialog extends Dialog {
 		this.okButton = new Button(shell, SWT.NONE);
 		okButton.setText("OK");
 		okButton.addSelectionListener(new MonitorNewHostListener());
+		okButton.setFocus();
 		FormData okFormData = new FormData();
 		okFormData.top = new FormAttachment(depthLabel2, 20);
 		okFormData.left = new FormAttachment(25, 20);
@@ -216,16 +217,22 @@ public class MonitorNewHostDialog extends Dialog {
 	//
 	
 	private class MonitorNewHostListener extends SelectionAdapter {
+		String hostname;
+		int port ;
 		
 		public void widgetSelected(SelectionEvent e) {
 			if(e.widget == okButton) {
 				switch(protocol) {
 				case Protocol.RMI:
-					String hostname = hostText.getText();
-					int port = Integer.parseInt(portText.getText());
+					hostname = hostText.getText();
+					port = Integer.parseInt(portText.getText());
 					MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
-					shell.setVisible(false); //TODO ???
-					new HostObject(hostname, port, protocol);
+					new Thread(){
+						public void run(){
+							new HostObject(hostname, port, protocol);
+						}
+					}.start();
+
 					shell.close();
 					break;
 				}
