@@ -1,4 +1,4 @@
-package org.objectweb.proactive.p2p.jung;
+package org.objectweb.proactive.p2p.monitoring.jung;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -6,14 +6,14 @@ import java.awt.Graphics2D;
 
 import javax.swing.JLabel;
 
-public class RotableLabel extends JLabel{
+public class RotatableLabel extends JLabel{
 
 	protected double angle;
-	public RotableLabel() {
+	public RotatableLabel() {
 		super();
 	}
 
-        public RotableLabel( String s, double angle) 
+        public RotatableLabel( String s, double angle) 
         {
            super( s );
            this.angle = angle;
@@ -24,11 +24,14 @@ public class RotableLabel extends JLabel{
         public void paintComponent(Graphics g) {
         	System.out.println(this.getText() + " " + angle);
            Graphics2D g2d = (Graphics2D)g;
-          // g2d.translate(this.getWidth(), this.getHeight());
+//           g2d.translate(this.getWidth(), this.getHeight());
+           g2d.translate(10,10);
           // g2d.rotate( 90 - angle*360);
+ 
            g2d.rotate(3*Math.PI/2,0,0);
            g2d.drawRect(this.getX(),this.getY(),this.getHeight(),this.getWidth());
            g2d.drawString(this.getText(), 0, 0);
+        
         }
   }
 

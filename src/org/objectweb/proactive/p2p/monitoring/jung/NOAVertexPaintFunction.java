@@ -1,4 +1,4 @@
-package org.objectweb.proactive.p2p.jung;
+package org.objectweb.proactive.p2p.monitoring.jung;
 
 import java.awt.Color;
 import java.awt.Paint;
@@ -16,6 +16,7 @@ public class NOAVertexPaintFunction implements VertexPaintFunction {
 	
 	
 	public Paint getDrawPaint(Vertex v) {
+	
 		return Color.black;
 	}
 	

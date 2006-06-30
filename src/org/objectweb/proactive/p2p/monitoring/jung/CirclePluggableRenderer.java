@@ -1,4 +1,4 @@
-package org.objectweb.proactive.p2p.jung;
+package org.objectweb.proactive.p2p.monitoring.jung;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -26,7 +26,7 @@ public class CirclePluggableRenderer extends PluggableRenderer {
 	protected void labelVertex(Graphics g, Vertex v, String label, int x, int y) {
 		Graphics2D g2d = (Graphics2D) g; 
 		//Component component = prepareRenderer(graphLabelRenderer, label, isPicked(v), v);
-Component component = new RotableLabel(label,  this.layout.getCircleData(v).getAngle());
+Component component = new RotatableLabel(label,  this.layout.getCircleData(v).getAngle());
 	        Dimension d = component.getPreferredSize();
 	        
 	        int h_offset;

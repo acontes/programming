@@ -1,4 +1,4 @@
-package org.objectweb.proactive.p2p.test;
+package org.objectweb.proactive.p2p.monitoring;
 
 public class P2PNode {
 

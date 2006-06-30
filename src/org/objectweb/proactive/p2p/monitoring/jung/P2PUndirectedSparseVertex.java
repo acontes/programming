@@ -1,4 +1,4 @@
-package org.objectweb.proactive.p2p.jung;
+package org.objectweb.proactive.p2p.monitoring.jung;
 
 import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
 
