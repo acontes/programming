@@ -411,8 +411,8 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        if (interfaceName.endsWith("-controller") ||
-                interfaceName.equals("component")) {
+        if (!("attribute-controller".equals(interfaceName)) && (interfaceName.endsWith("-controller") ||
+                interfaceName.equals("component"))) {
             if (!controlItfs.containsKey(interfaceName)) {
                 throw new NoSuchInterfaceException(interfaceName);
             }
