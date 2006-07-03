@@ -33,8 +33,6 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.ic2d.monitoring.finder.HostRTFinder;
 import org.objectweb.proactive.ic2d.monitoring.finder.HostRTFinderFactory;
@@ -175,15 +173,7 @@ public class HostObject extends AbstractDataObject {
 	private void handleProActiveRuntime(ProActiveRuntime runtime){
 		System.out.println("HostObject : handleProActiveRuntime");
 		VMObject vm = null;
-		try {
-			vm = new VMObject(this, runtime);
-		} catch (ActiveObjectCreationException e) {
-			// TODO log the message
-			e.printStackTrace();
-		} catch (NodeException e) {
-			// TODO log the message
-			e.printStackTrace();
-		}
+		vm = new VMObject(this, runtime);
 		exploreChild(vm);
 	}
     

@@ -51,6 +51,7 @@ public class MonitoringPerspective implements IPerspectiveFactory {
 		layout.addView(MonitoringView.ID, IPageLayout.LEFT,
 				0.25f, editorArea);
 		layout.addPerspectiveShortcut(ID);
-		layout.addShowViewShortcut(MonitoringView.ID);	
+		layout.addShowViewShortcut(MonitoringView.ID);
+		layout.addActionSet("org.objectweb.proactive.ic2d.monitoring.actionSet");
 	}	
 }
