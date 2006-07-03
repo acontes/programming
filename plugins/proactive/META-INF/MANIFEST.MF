@@ -147,3 +147,4 @@ Export-Package: org.objectweb.proactive,
  org.objectweb.proactive.p2p.service.exception,
  org.objectweb.proactive.p2p.service.node,
  org.objectweb.proactive.p2p.service.util
+Require-Bundle: org.objectweb.proactive.lib
