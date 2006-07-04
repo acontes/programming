@@ -39,7 +39,7 @@ import java.util.Observable;
  * Holder class for the host data representation
  */
 public abstract class AbstractDataObject extends Observable {
-
+	
 	
 	/** the object's name */
 	protected String abstractDataObjectName;
@@ -57,7 +57,7 @@ public abstract class AbstractDataObject extends Observable {
 	//
 	
 	/**
-	 * TODO comment
+	 * Creates a new AbstractDataObject
 	 * @param parent the object's parent
 	 */
 	protected AbstractDataObject(AbstractDataObject parent) {
@@ -66,12 +66,12 @@ public abstract class AbstractDataObject extends Observable {
 	
 	
 	/**
-	 * TODO comment
+	 * Creates a new AbstractDataObject
 	 * @param parent the object's parent
 	 * @param abstractDataObjectName the object's name
 	 */
 	protected AbstractDataObject(AbstractDataObject parent,
-			String abstractDataObjectName) {
+			String abstractDataObjectName) {       
 		
 		//listeners = new PropertyChangeSupport(this);
 		
@@ -89,6 +89,10 @@ public abstract class AbstractDataObject extends Observable {
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
+	
+	public AbstractDataObject getChild(String key){
+		return (AbstractDataObject) monitoredChildren.get(key);
+	}
 	
 	/**
 	 * Returns the object's key. It is an unique identifier
@@ -129,8 +133,10 @@ public abstract class AbstractDataObject extends Observable {
 			return parent.getTopLevelParent();
 		}
 	}
-
 	
+	/**
+	 * Stop monitor this object
+	 */
 	public void stopMonitoring() {
 		this.parent.monitoredChildren.remove(getKey());
 		this.parent.skippedChildren.put(getKey(), this);
@@ -138,11 +144,32 @@ public abstract class AbstractDataObject extends Observable {
 		notifyObservers();
 	}
 	
+	/**
+	 * Returns the list of monitored children
+	 * @return The list of monitored children
+	 */
 	public List getMonitoredChildren() {
 		return new ArrayList(monitoredChildren.values());
 	}
 	
+	/**
+	 * Explore the current object
+	 */
 	public abstract void explore();
+	
+	/**
+	 * To know if this object is monitored
+	 * @return true if it is monitored, false otherwise
+	 */
+	public boolean isMonitored(){
+		if(parent == null)
+			return true;
+		else if(parent.monitoredChildren.get(getKey()) != null)
+			return parent.isMonitored();
+		else
+			return false;
+	}
+	
 	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
@@ -159,7 +186,10 @@ public abstract class AbstractDataObject extends Observable {
 		notifyObservers();
 	}
 	
-	
+	/**
+	 * Explore the child
+	 * @param child The child to explore
+	 */
 	protected void exploreChild(AbstractDataObject child) {
 		if(skippedChildren.containsKey(child.getKey())){
 			System.out.println("AbstractDataObject : exploreChild");
