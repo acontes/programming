@@ -88,6 +88,14 @@ public class VMObject extends AbstractDataObject {
 		return "VM id=" + this.key;
 	}
 	
+	public String toString() {
+		return "JVM " + this.getKey();
+	}
+	
+	public String getType() {
+		return "jvm";
+	}
+	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//

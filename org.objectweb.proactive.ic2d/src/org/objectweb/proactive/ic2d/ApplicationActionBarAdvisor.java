@@ -1,33 +1,3 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
 package org.objectweb.proactive.ic2d;
 
 import org.eclipse.jface.action.GroupMarker;
@@ -43,11 +13,6 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
-/**
- * An action bar advisor is responsible for creating, adding, and disposing of the
- * actions added to a workbench window. Each window will be populated with
- * new actions.
- */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	
@@ -61,12 +26,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IContributionItem perspectiveList;
 	private IContributionItem viewList;
 	
-	
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
     }
 
-    
     protected void makeActions(IWorkbenchWindow window) {
     	// Creates the actions and registers them.
         // Registering is needed to ensure that key bindings work.
@@ -85,11 +48,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         
         perspectiveList = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(window);
         viewList = ContributionItemFactory.VIEWS_SHORTLIST.create(window); 
-        
-        
     }
 
-    
     protected void fillMenuBar(IMenuManager menuBar) {
     	MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
     	MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);

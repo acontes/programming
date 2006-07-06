@@ -50,14 +50,14 @@ public class RMIHostRTFinder implements HostRTFinder{
 	// -- PUBLIC METHODS -----------------------------------------------
 	//
 	
-	public List findPARuntime(HostObject host) throws RemoteException {
+	public List<ProActiveRuntime> findPARuntime(HostObject host) throws RemoteException {
 		System.out.println("RMIHostRTFinder : findPARuntime");
 		/* Hook the registry */
 		Registry registry = LocateRegistry.getRegistry(host.getHostName(),host.getPort());
 		/* Gets a snapshot of the names bounds in the 'registry' */
 		String[] names = registry.list();
 		/* List of ProActive runtime */
-		List runtimes = new ArrayList();
+		List<ProActiveRuntime> runtimes = new ArrayList<ProActiveRuntime>();
 		
 		/* Searchs all ProActve Runtimes */
 		for (int i = 0; i < names.length; ++i) {

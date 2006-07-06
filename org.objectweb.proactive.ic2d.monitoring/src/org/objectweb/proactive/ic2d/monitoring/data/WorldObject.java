@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 /**
  * Holder class for all hosts
  */
@@ -75,9 +76,13 @@ public class WorldObject extends AbstractDataObject {
 	}
 
 	public void explore() {
-		List childrenList = new ArrayList(monitoredChildren.values());
+		List<AbstractDataObject> childrenList = new ArrayList<AbstractDataObject>(monitoredChildren.values());
 		for(int i=0, size=childrenList.size(); i<size; i++)
 			((HostObject)childrenList.get(i)).explore();
+	}
+	
+	public String getType() {
+		return "world";
 	}
 	
     //

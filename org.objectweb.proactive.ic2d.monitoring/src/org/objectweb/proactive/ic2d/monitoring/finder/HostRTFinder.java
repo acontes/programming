@@ -33,10 +33,11 @@ package org.objectweb.proactive.ic2d.monitoring.finder;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 
 public interface HostRTFinder {
 	
-	public List findPARuntime(HostObject host) throws RemoteException;
+	public List<ProActiveRuntime> findPARuntime(HostObject host) throws RemoteException;
 	
 }

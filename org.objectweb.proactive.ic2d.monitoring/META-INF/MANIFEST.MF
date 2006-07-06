@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Monitoring
+Bundle-SymbolicName: org.objectweb.proactive.ic2d.monitoring;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.objectweb.proactive.ic2d.monitoring.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.gef,
+ org.objectweb.proactive.ic2d.lib
+Eclipse-LazyStart: true
+Bundle-ClassPath: .,
+ javassist.jar,
+ ProActive.jar
+Export-Package: org.objectweb.proactive.ic2d.monitoring.data

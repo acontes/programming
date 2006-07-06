@@ -1,34 +1,5 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
 package org.objectweb.proactive.ic2d.monitoring.data;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,9 +18,9 @@ public abstract class AbstractDataObject extends Observable {
 	/** the object's parent */
 	protected AbstractDataObject parent;
 	/** the object's children which are monitored (HashMap<String, AbstractDataObject>) */
-	protected HashMap monitoredChildren;
+	protected HashMap<String, AbstractDataObject> monitoredChildren;
 	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
-	protected HashMap skippedChildren;
+	protected HashMap<String, AbstractDataObject> skippedChildren;
 	
 	
 	//
@@ -82,8 +53,8 @@ public abstract class AbstractDataObject extends Observable {
 		}
 		
 		this.parent = parent;
-		this.monitoredChildren = new HashMap();
-		this.skippedChildren = new HashMap();
+		this.monitoredChildren = new HashMap<String, AbstractDataObject>();
+		this.skippedChildren = new HashMap<String, AbstractDataObject>();
 	}
 	
 	//
@@ -109,8 +80,11 @@ public abstract class AbstractDataObject extends Observable {
 	 * Returns a string representing the object's name and children's names
 	 */
 	public String toString() {
+		return this.getFullName();
+		/*
 		return "DataObject " + abstractDataObjectName + "\n" +
 		monitoredChildren.toString();
+		*/
 	}
 	
 	/**
@@ -148,8 +122,8 @@ public abstract class AbstractDataObject extends Observable {
 	 * Returns the list of monitored children
 	 * @return The list of monitored children
 	 */
-	public List getMonitoredChildren() {
-		return new ArrayList(monitoredChildren.values());
+	public List<AbstractDataObject> getMonitoredChildren() {
+		return new ArrayList<AbstractDataObject>(monitoredChildren.values());
 	}
 	
 	/**
@@ -169,7 +143,12 @@ public abstract class AbstractDataObject extends Observable {
 		else
 			return false;
 	}
-	
+
+	/**
+	 * Returns the type of the object.
+	 * @return
+	 */
+	public abstract String getType();
 	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------

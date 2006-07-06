@@ -45,7 +45,7 @@ import org.eclipse.ui.console.MessageConsoleStream;
 /**
  * Used to log informations in a console view.
  */
-public class Console extends MessageConsole{
+public class Console extends MessageConsole {
 	
 	/**
 	 * Contains all consoles.

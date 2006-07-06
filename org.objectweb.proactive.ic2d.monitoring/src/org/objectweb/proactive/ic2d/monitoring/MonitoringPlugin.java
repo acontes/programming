@@ -23,7 +23,6 @@ public class MonitoringPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		System.out.println("MonitoringPlugin : createInitialLayout");
 		try{
 			RuntimeFactory.getDefaultRuntime();
 		}

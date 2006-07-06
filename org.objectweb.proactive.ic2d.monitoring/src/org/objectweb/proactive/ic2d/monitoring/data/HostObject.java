@@ -88,7 +88,7 @@ public class HostObject extends AbstractDataObject {
 	public void explore() {
 		System.out.println("HostObject : explore");
 		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(this.getProtocol());
-		List foundRuntimes = null;
+		List<ProActiveRuntime> foundRuntimes = null;
 		try {
 			foundRuntimes = runtimeFinder.findPARuntime(this);
 		} catch (RemoteException e) {
@@ -147,9 +147,12 @@ public class HostObject extends AbstractDataObject {
 	 * Returns a string representing this host
 	 */
     public String toString() {
-        return "Host: " + hostname+":"+ port + "\n" + super.toString();
+        return "Host " + hostname;
     }
 
+    public String getType() {
+    	return "host";
+    }
     
     //
     // -- PROTECTED METHOD -----------------------------------------------

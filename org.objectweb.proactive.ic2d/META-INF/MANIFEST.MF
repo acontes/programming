@@ -1,11 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Ic2d Plug-in
+Bundle-Name: IC2D RCP
 Bundle-SymbolicName: org.objectweb.proactive.ic2d; singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Activator: org.objectweb.proactive.ic2d.IC2DPlugin
+Bundle-Activator: org.objectweb.proactive.ic2d.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
-Eclipse-AutoStart: true
-Bundle-ClassPath: classes/
+Eclipse-LazyStart: true
