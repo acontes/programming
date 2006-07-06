@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/examples/clibwrapper_jiio.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/dtdparser.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/fractal.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/fractal-adl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/fractal-gui.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/fractal-swing.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/julia-asm.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/julia-mixins.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/julia-runtime.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/ow_deployment_scheduling.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/SVGGraphics.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="ProActive.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/dtdparser.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/fractal.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/fractal-adl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/fractal-gui.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/fractal-swing.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/julia-asm.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/julia-mixins.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/julia-runtime.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/ow_deployment_scheduling.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/comonents/SVGGraphics.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/examples/clibwrapper_jiio.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/examples/jai_codec.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/examples/jai_core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/examples/jai_imageio.jar"/>
@@ -57,7 +56,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/ws/xml-apis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bouncycastle.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsch.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar"/>

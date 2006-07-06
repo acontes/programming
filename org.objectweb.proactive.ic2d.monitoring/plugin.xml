@@ -1,73 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.0"?>
-<plugin
-   id="org.objectweb.proactive.ic2d.monitoring"
-   name="IC2D Monitoring Plug-in"
-   version="1.0.0"
-
-   >
-
-   <runtime>
-      <library name="classes/">
-         <export name="*"/>
-      </library>
-   </runtime>
-   <requires>
-      <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.draw2d"/>
-      <import plugin="org.eclipse.gef"/>
-      <import plugin="proactive"/>
-   </requires>
+<?eclipse version="3.2"?>
+<plugin>
    <extension
-         id="org.objectweb.proactive.ic2d.monitoring.perspectives"
-         name="Perspectives"
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective"
-            id="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective"
+            id="org.objectweb.proactive.ic2d.monitoring.MonitoringPerspective"
             name="Monitoring"/>
    </extension>
    <extension
-         id="org.objectweb.proactive.ic2d.monitoring.views"
-         name="Views"
          point="org.eclipse.ui.views">
+      <category
+            id="org.objectweb.proactive.ic2d.monitoring.MonitoringCategory"
+            name="Monitoring"/>
       <view
-            category="org.objectweb.proactive.ic2d.monitoring.category"
+            category="org.objectweb.proactive.ic2d.monitoring.MonitoringCategory"
             class="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
             id="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
             name="Monitoring"/>
-      <category
-            id="org.objectweb.proactive.ic2d.monitoring.category"
-            name="Monitoring category"/>
-   </extension>
-   <extension
-         id="org.objectweb.proactive.ic2d.monitoring.perspectiveextensions"
-         name="Monitoring perspective extensions"
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension targetID="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective">
-         <actionSet id="org.objectweb.proactive.ic2d.monitoring.actionSet1"/>
-      </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            id="org.objectweb.proactive.ic2d.monitoring.actionSet"
-            label="Monitoring action set"
-            >
+            id="org.objectweb.proactive.ic2d.monitoring.MonitoringActionSet"
+            label="MonitoringActionSet"
+            visible="false">
          <menu
-               id="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu"
-               label="&amp;Monitoring"
-               >
-         </menu>
+               id="org.objectweb.proactive.ic2d.monitoring.MonitoringMenu"
+               label="Monitoring"/>
          <action
                class="org.objectweb.proactive.ic2d.monitoring.actions.NewRMIHostAction"
-               id="org.objectweb.proactive.ic2d.monitoring.actions.newRMIhost"
-               label="Monitor a new RMI host"
-               menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu/content"
-               tooltip="Monitor a new RMI host"/>
+               id="org.objectweb.proactive.ic2d.monitoring.actions.NewRMIHostAction"
+               label="Monitor a new RMI Host"
+               menubarPath="org.objectweb.proactive.ic2d.monitoring.MonitoringMenu/content"
+               style="push"/>
       </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.objectweb.proactive.ic2d.monitoring.MonitoringPerspective">
+         <actionSet id="org.objectweb.proactive.ic2d.monitoring.MonitoringActionSet"/>
+         <view
+               id="org.objectweb.proactive.ic2d.monitoring.MonitoringView"
+               relationship="stack"
+               showTitle="true"/>
+         <perspectiveShortcut id="org.objectweb.proactive.ic2d.monitoring.MonitoringPerspective"/>
+         <viewShortcut id="org.objectweb.proactive.ic2d.monitoring.MonitoringView"/>
+      </perspectiveExtension>
    </extension>
 
 </plugin>

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.0"?>
+<?eclipse version="3.2"?>
 <plugin>
 
    <extension
          id="application"
-         name="%applicationName"
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
@@ -12,28 +11,26 @@
          </run>
       </application>
    </extension>
+  
    <extension
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
             application="org.objectweb.proactive.ic2d.application"
-            name="product"/>
-   </extension>
-   <extension
-         id="org.objectweb.proactive.ic2d.perspectives"
-         name="Default"
+            name="product">
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
+         <property
+               name="aboutImage"
+               value="icons/alt_about.gif"/>
+      </product>
+   </extension> <extension
          point="org.eclipse.ui.perspectives">
-      <perspective
-            class="org.objectweb.proactive.ic2d.Perspective"
-            id="org.objectweb.proactive.ic2d.Perspective"
-            name="Default"/>
+                   <perspective
+                         class="org.objectweb.proactive.ic2d.DefaultPerspective"
+                         id="org.objectweb.proactive.ic2d.DefaultPerspective"
+                         name="Default"/>
    </extension>
-   <extension
-         id="product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="ic2d.product"
-            name="product"/>
-   </extension>
-   
+
 </plugin>
