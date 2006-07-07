@@ -26,7 +26,7 @@ public class NodeObject extends AbstractDataObject{
 	private static String SPY_LISTENER_NODE_NAME = "SpyListenerNode";
 	private static Node SPY_LISTENER_NODE;
 	protected SpyListenerImpl activeSpyListener;
-	
+
 	static {
 		String currentHost;
 		try {
@@ -53,19 +53,8 @@ public class NodeObject extends AbstractDataObject{
 		System.out.println("NodeObject : constructor");
 		this.node = node;
 		this.key = node.getNodeInformation().getName();
-		try {
-			new SpyEventListenerImpl(this);
-			SpyListenerImpl spyListener = new SpyListenerImpl(new SpyEventListenerImpl(this)/*spyEventListener*/);
-			this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener,SPY_LISTENER_NODE);
-			this.spy = (Spy) ProActive.newActive(Spy.class.getName(), new Object[] { activeSpyListener }, node);
-		} 
-		catch(NodeException e1) { 
-			e1.printStackTrace();
-		}
-		catch(ActiveObjectCreationException e2) {
-			e2.printStackTrace();
-		}
 	}
+
 	//
 	// -- PUBLIC METHOD -----------------------------------------------
 	//
@@ -110,6 +99,25 @@ public class NodeObject extends AbstractDataObject{
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
+
+	/**
+	 * Adds a spy in this node
+	 */
+	protected void addSpy(){
+		try {
+			new SpyEventListenerImpl(this);
+			SpyListenerImpl spyListener = new SpyListenerImpl(new SpyEventListenerImpl(this)/*spyEventListener*/);
+			this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener,SPY_LISTENER_NODE);
+			this.spy = (Spy) ProActive.newActive(Spy.class.getName(), new Object[] { activeSpyListener }, node);
+		} 
+		catch(NodeException e1) { 
+			e1.printStackTrace();
+		}
+		catch(ActiveObjectCreationException e2) {
+			e2.printStackTrace();
+		}
+	}
+
 	/**
 	 * Get the typed parent
 	 * @return the typed parent
@@ -117,6 +125,8 @@ public class NodeObject extends AbstractDataObject{
 	protected VMObject getTypedParent() {
 		return (VMObject) parent;
 	}
+
+
 	protected void exploreChild(AbstractDataObject child) {
 		if(skippedChildren.containsKey(child.getKey())){
 			System.out.println("NodeObject : exploreChild");

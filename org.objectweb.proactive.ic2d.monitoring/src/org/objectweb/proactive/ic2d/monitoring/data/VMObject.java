@@ -116,6 +116,24 @@ public class VMObject extends AbstractDataObject {
 		return this.runtime;
 	}
 	
+	/**
+	 * Explore the child
+	 * @param child The child to explore
+	 */
+	protected void exploreChild(AbstractDataObject child) {
+		if(skippedChildren.containsKey(child.getKey())){
+			System.out.println("VMObject : exploreChild");
+			return;
+		}
+		else if (!monitoredChildren.containsKey(child.getKey())){
+			this.putChild(child);
+			((NodeObject)child).addSpy();
+		}
+		else //parent.monitoredChildren.containsKey(vm.getKey())
+			child = (AbstractDataObject)monitoredChildren.get(child.getKey());
+		child.explore();
+	}
+	
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
@@ -137,6 +155,6 @@ public class VMObject extends AbstractDataObject {
 			e.printStackTrace();
 		}
 		NodeObject nodeObject = new NodeObject(this, node);
-		exploreChild(nodeObject);
+		this.exploreChild(nodeObject);
 	}
 }

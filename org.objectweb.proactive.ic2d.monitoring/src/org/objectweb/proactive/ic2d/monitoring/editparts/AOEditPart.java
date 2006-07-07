@@ -31,8 +31,10 @@
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
 import java.util.List;
+import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 
@@ -50,14 +52,25 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-
+	
 	/**
-     * Convert the result of EditPart.getModel()
-     * to AOObject (the real type of the model).
-     * @return the casted model
-     */
-	public AOObject getCastedModel(){
-		return (AOObject)getModel();
+	 * This method is called whenever the observed object is changed.
+	 * It calls the method <code>refreshVisuals()</code>.
+	 * @param o the observable object (instance of AbstractDataObject).
+	 * @param arg an argument passed to the notifyObservers  method.
+	 */
+	public void update(Observable o, Object arg) {
+		final int value = ((Integer)arg).intValue();
+		if(arg != null && arg instanceof Integer)
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run () {
+					getCastedFigure().setState(value);
+					refreshChildren();
+					refreshVisuals();		
+				}
+			});
+		else
+			super.update(o, arg);
 	}
 	
 	//
@@ -88,5 +101,26 @@ public class AOEditPart extends AbstractIC2DEditPart{
 		
 	}
 	
+	//
+	// -- PRIVATE METHODS -----------------------------------------------
+	//
+	
+	/**
+	 * Convert the result of EditPart.getModel()
+	 * to AOObject (the real type of the model).
+	 * @return the casted model
+	 */
+	public AOObject getCastedModel(){
+		return (AOObject)getModel();
+	}
+	
+	/**
+	 * Convert the result of EditPart.getFigure()
+	 * to AOFigure (the real type of the figure).
+	 * @return the casted figure
+	 */
+	public AOFigure getCastedFigure(){
+		return (AOFigure)getFigure();
+	}
 	
 }
