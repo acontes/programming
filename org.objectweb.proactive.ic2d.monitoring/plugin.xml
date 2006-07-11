@@ -14,14 +14,14 @@
          id="org.objectweb.proactive.ic2d.monitoring.views"
          name="Views"
          point="org.eclipse.ui.views">
+      <category
+            id="org.objectweb.proactive.ic2d.monitoring.category"
+            name="Monitoring category"/>
       <view
             category="org.objectweb.proactive.ic2d.monitoring.category"
             class="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
             id="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
             name="Monitoring"/>
-      <category
-            id="org.objectweb.proactive.ic2d.monitoring.category"
-            name="Monitoring category"/>
       <view
             allowMultiple="false"
             category="org.objectweb.proactive.ic2d.monitoring.category"
@@ -35,6 +35,9 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective">
          <actionSet id="org.objectweb.proactive.ic2d.monitoring.actionSet"/>
+         <perspectiveShortcut id="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective"/>
+         <viewShortcut id="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"/>
+         <viewShortcut id="org.objectweb.proactive.ic2d.monitoring.views.Legend"/>
       </perspectiveExtension>
    </extension>
    <extension
