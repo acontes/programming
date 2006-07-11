@@ -45,13 +45,16 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.ic2d.monitoring.exceptions.HostAlreadyExistsException;
 
 
 public class MonitorNewHostDialog extends Dialog {
@@ -60,6 +63,7 @@ public class MonitorNewHostDialog extends Dialog {
 	private Protocol protocol;
 
 	private Shell shell = null;
+	private Shell parent =null;
 
 	private Text hostText;
 	private Text portText;
@@ -75,6 +79,8 @@ public class MonitorNewHostDialog extends Dialog {
 		// Pass the default styles here
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
+		this.parent = parent;
+		
 		this.protocol = protocol;
 
 		String initialHostValue = "localhost";
@@ -211,6 +217,21 @@ public class MonitorNewHostDialog extends Dialog {
 		shell.setLocation(new Point(x, y));
 	}
 
+	/**
+	 * Logs in the IC2D's console, and show a pop-up.
+	 * @param message
+	 */
+	private void displayMessage(final String message) {
+		// Print the message in the UI Thread in async mode
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				Console.getInstance("IC2D").warn(message);
+				MessageBox mb = new MessageBox(parent);
+				mb.setMessage(message);
+				mb.open();
+			}});
+
+	}
 
 	//
 	// -- INNER CLASS -----------------------------------------------
@@ -229,7 +250,11 @@ public class MonitorNewHostDialog extends Dialog {
 					MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
 					new Thread(){
 						public void run(){
-							new HostObject(hostname, port, protocol);
+							try {
+								new HostObject(hostname, port, protocol);
+							} catch (HostAlreadyExistsException e) {
+								displayMessage(e.getMessage());
+							}
 						}
 					}.start();
 

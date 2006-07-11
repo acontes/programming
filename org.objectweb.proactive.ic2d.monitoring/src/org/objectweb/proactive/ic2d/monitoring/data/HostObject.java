@@ -34,6 +34,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.ic2d.monitoring.exceptions.HostAlreadyExistsException;
 import org.objectweb.proactive.ic2d.monitoring.finder.HostRTFinder;
 import org.objectweb.proactive.ic2d.monitoring.finder.HostRTFinderFactory;
 
@@ -65,13 +66,19 @@ public class HostObject extends AbstractDataObject {
      * @parent hostname machine's name
      * @param port
      * @param protocol to use
+     * @throws HostAlreadyExistsException 
      */
-	public HostObject(String hostname, int port, Protocol protocol){
+	public HostObject(String hostname, int port, Protocol protocol) throws HostAlreadyExistsException{
 		super(WorldObject.getInstance());
 		System.out.println("HostObject : constructor");
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
+		
+		HostObject hostAlreadyExists = (HostObject) this.parent.monitoredChildren.get(this.getKey());
+		if(hostAlreadyExists != null)
+			throw new HostAlreadyExistsException(hostAlreadyExists);
+		
 		this.parent.putChild(this);
 		this.explore();
 	}
