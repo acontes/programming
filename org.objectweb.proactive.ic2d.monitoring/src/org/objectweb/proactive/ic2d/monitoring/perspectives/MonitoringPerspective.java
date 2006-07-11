@@ -32,24 +32,35 @@ package org.objectweb.proactive.ic2d.monitoring.perspectives;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 
 public class MonitoringPerspective implements IPerspectiveFactory {
 	
 	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective";
 	
+	 /** Top folder's id. */
+    public static final String FI_TOP = ID + ".topFolder";
+    /** Bottom folder's id. */
+    public static final String FI_BOTTOM = ID + ".bottomFolder";
+    /** Bottom folder's id. */
+    public static final String FI_RIGHT = ID + ".rightFolder";
+    
+	
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
 	
 	public void createInitialLayout(IPageLayout layout) {
-		String editorArea=layout.getEditorArea();
+		String editorAreaId=layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
-		layout.setFixed(false);
+		//layout.setFixed(false);
 		
+		layout.createFolder(FI_TOP,IPageLayout.TOP, 0.25f, editorAreaId );
+        
+        layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.70f, FI_TOP/*editorAreaId*/);
 		
-		layout.addView(MonitoringView.ID, IPageLayout.TOP, 0.5f, editorArea);
+		//layout.addView(MonitoringView.ID, IPageLayout.TOP, 0.5f, editorAreaId);
 		//layout.addStandaloneView(MonitoringView.ID, false, IPageLayout.TOP, 0.5f, editorArea);
-	}	
+	}
+	
 }
