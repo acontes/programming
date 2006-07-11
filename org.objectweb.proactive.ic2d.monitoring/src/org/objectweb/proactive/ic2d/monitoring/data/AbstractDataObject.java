@@ -11,10 +11,6 @@ import java.util.Observable;
  */
 public abstract class AbstractDataObject extends Observable {
 	
-	
-	/** the object's name */
-	protected String abstractDataObjectName;
-	
 	/** the object's parent */
 	protected AbstractDataObject parent;
 	/** the object's children which are monitored (HashMap<String, AbstractDataObject>) */
@@ -32,30 +28,11 @@ public abstract class AbstractDataObject extends Observable {
 	 * @param parent the object's parent
 	 */
 	protected AbstractDataObject(AbstractDataObject parent) {
-		this(parent, null);
-	}
-	
-	
-	/**
-	 * Creates a new AbstractDataObject
-	 * @param parent the object's parent
-	 * @param abstractDataObjectName the object's name
-	 */
-	protected AbstractDataObject(AbstractDataObject parent,
-			String abstractDataObjectName) {       
-		
-		//listeners = new PropertyChangeSupport(this);
-		
-		if (abstractDataObjectName == null) {
-			this.abstractDataObjectName = this.getClass().getName();
-		} else {
-			this.abstractDataObjectName = abstractDataObjectName;
-		}
-		
 		this.parent = parent;
 		this.monitoredChildren = new HashMap<String, AbstractDataObject>();
 		this.skippedChildren = new HashMap<String, AbstractDataObject>();
 	}
+
 	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------

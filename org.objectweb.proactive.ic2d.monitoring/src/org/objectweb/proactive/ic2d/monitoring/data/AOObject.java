@@ -9,6 +9,9 @@ public class AOObject extends AbstractDataObject{
 	 */
 	private int state;
 	
+	/** the object's name */
+	private String fullName;
+	
 	private static int counter = 0;
 	
 	private UniqueID id;
@@ -16,11 +19,16 @@ public class AOObject extends AbstractDataObject{
     // -- CONSTRUCTORS -----------------------------------------------
     //
     
-	public AOObject(NodeObject parent, String className, UniqueID id){
-		super(parent, className + "#" + counter());
-		System.out.println("AOObject : constructor id="+id.toString());
-		//this.parent.putChild(this);
+	public AOObject(NodeObject parent, String name, UniqueID id){
+		super(parent);
+		
+		if ( name == null) 
+			name = this.getClass().getName() ;
+		this.fullName = name + "#" + counter();
+		
 		this.id = id;
+		
+		
 		/*
 		if(((NodeObject)this.parent).spy == null)
 			System.err.println("AOObject : constructor => WARNING spy is null");
@@ -39,7 +47,7 @@ public class AOObject extends AbstractDataObject{
 	}
 
 	public String getFullName() {
-		return abstractDataObjectName;
+		return fullName;
 	}
 	
 	/**
