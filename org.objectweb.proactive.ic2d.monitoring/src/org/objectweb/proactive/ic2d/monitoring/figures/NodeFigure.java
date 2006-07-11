@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
 import org.eclipse.draw2d.BorderLayout;
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ToolbarLayout;
@@ -38,6 +39,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 
 public class NodeFigure extends AbstractRectangleFigure{
 		
@@ -45,15 +47,36 @@ public class NodeFigure extends AbstractRectangleFigure{
 	
 	private IFigure contentPane;
 	
+	public static final Color RMI_COLOR;
+	
+	static {
+		Display device = Display.getCurrent();
+		RMI_COLOR = new Color(device, 208, 208, 224);
+	}
+	
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
-	public NodeFigure(String text) {
+	
+	/**
+	 * Create a new node figure
+	 * @param text The text to display
+	 * @param protocol The protocol used
+	 */
+	public NodeFigure(String text, Protocol protocol) {
 		super(text);
 		addMouseMotionListener(new NodeListener());
+		setProtocol(protocol);
 	}
-		
 	
+	/**
+	 * Used to display the legend
+	 * @param protocol The protocol used
+	 */
+	public NodeFigure(Protocol protocol){
+		super("Node");
+		setProtocol(protocol);
+	}
 	//
     // -- PUBLIC METHOD --------------------------------------------
     //
@@ -63,13 +86,33 @@ public class NodeFigure extends AbstractRectangleFigure{
 		return contentPane;
 	}
 	
+	public void setProtocol(Protocol protocol){
+		switch(protocol) {
+		case IBIS:
+			// TODO
+		case RMI:
+			backgroundColor = RMI_COLOR;
+			break;
+		case RMISSH:
+			backgroundColor = ColorConstants.white;
+			break;
+		case JINI:
+			backgroundColor = ColorConstants.cyan;
+			break;
+		case HTTP:
+			backgroundColor = ColorConstants.orange;
+			break;
+		default:
+			// TODO
+		}
+	}
+	
     //
     // -- PROTECTED METHODS --------------------------------------------
     //
 	protected void initColor() {
 		Device device = Display.getCurrent();
 		borderColor = new Color(device, 0, 0, 128);
-		backgroundColor = new Color(device, 208, 208, 224);
 		shadowColor = new Color(device, 230, 230, 230);
 	}
 

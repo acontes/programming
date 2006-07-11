@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
 import org.eclipse.draw2d.BorderLayout;
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ToolbarLayout;
@@ -42,35 +43,69 @@ import org.eclipse.swt.widgets.Display;
 public class VMFigure extends AbstractRectangleFigure{
 
 	protected final static int DEFAULT_WIDTH = 160;
-	
+
 	private IFigure contentPane;
-	
-    //
-    // -- CONSTRUCTOR -----------------------------------------------
-    //
-	
+
+
+	public static final Color STANDARD_COLOR;
+	public static final Color GLOBUS_COLOR;
+	public static final Color NOT_RESPONDING = ColorConstants.red;
+
+	static {
+		Display device = Display.getCurrent();
+		STANDARD_COLOR = new Color(device, 240, 240, 240);
+		GLOBUS_COLOR = new Color(device, 255, 208, 208);
+	}
+	//
+	// -- CONSTRUCTOR -----------------------------------------------
+	//
+
 	public VMFigure(String text) {
 		super(text);
 		addMouseMotionListener(new VMListener());
 	}
 
+	/**
+	 * Used to display the legend
+	 */
+	public VMFigure(){
+		super("JVM");
+	}
+
 	//
-    // -- PUBLIC METHOD --------------------------------------------
-    //
-	
+	// -- PUBLIC METHOD --------------------------------------------
+	//
+
 	public IFigure getContentPane() {
 		System.out.println("VMFigure : getContentPane");
 		return contentPane;
 	}
+
 	
-    //
-    // -- PROTECTED METHOD --------------------------------------------
-    //
+	/**
+	 * To indicate that the JVM started with Globus.
+	 */
+	public void withGlobus(){
+		backgroundColor = GLOBUS_COLOR;
+		this.repaint();
+	}
 	
+	/**
+	 * To indicate that the JVM does not answer any more.
+	 */
+	public void notResponding(){
+		backgroundColor = NOT_RESPONDING;
+		this.repaint();
+	}
+	
+	//
+	// -- PROTECTED METHOD --------------------------------------------
+	//
+
 	protected void initColor() {
 		Device device = Display.getCurrent();
 		borderColor = new Color(device, 140, 200, 225);
-		backgroundColor = new Color(device, 240, 240, 240);
+		backgroundColor = STANDARD_COLOR;
 		shadowColor = new Color(device, 230, 230, 230);
 	}
 
@@ -79,7 +114,7 @@ public class VMFigure extends AbstractRectangleFigure{
 		layout.setVerticalSpacing(5);
 		setLayoutManager(layout);
 		add(label, BorderLayout.TOP);
-		
+
 		contentPane = new Figure();
 		ToolbarLayout contentPaneLayout = new VMToolbarLayout();
 		contentPaneLayout.setSpacing(10);
@@ -87,20 +122,20 @@ public class VMFigure extends AbstractRectangleFigure{
 		contentPane.setLayoutManager(contentPaneLayout);
 		add(contentPane, BorderLayout.CENTER);
 	}
-	
+
 	//
-    // -- INNER CLASS --------------------------------------------
-    //
-	
+	// -- INNER CLASS --------------------------------------------
+	//
+
 	private class VMToolbarLayout extends ToolbarLayout {
-		
+
 		public VMToolbarLayout() {
 			super(false);
 		}
-		
+
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
 			return super.calculatePreferredSize(container, wHint, hHint).expand(10,15);
 		}
-		
+
 	}
 }

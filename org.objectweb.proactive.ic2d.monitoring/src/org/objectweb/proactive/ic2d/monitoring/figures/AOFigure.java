@@ -67,12 +67,25 @@ public class AOFigure extends AbstractFigure {
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
+	
+	/**
+	 * @param text Text to display
+	 */
 	public AOFigure(String text){
 		super(text);
 
-
 		System.out.println("AOFigure : constructor");
 		addMouseMotionListener(new AOListener());
+	}
+	
+	/**
+	 * Used to display the legend
+	 * @param text 
+	 * @param state
+	 */
+	public AOFigure(String text, int state){
+		super(text);
+		this.setState(state);
 	}
 
 	//
