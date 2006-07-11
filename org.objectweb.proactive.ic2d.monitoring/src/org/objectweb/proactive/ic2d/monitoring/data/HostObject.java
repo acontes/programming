@@ -53,7 +53,7 @@ public class HostObject extends AbstractDataObject {
     private String os = "OS undefined";
 	
     /** Host's protocol */
-    private int protocol;
+    private Protocol protocol;
     
 	//
     // -- CONSTRUCTORS -----------------------------------------------
@@ -66,7 +66,7 @@ public class HostObject extends AbstractDataObject {
      * @param port
      * @param protocol to use
      */
-	public HostObject(String hostname, int port, int protocol){
+	public HostObject(String hostname, int port, Protocol protocol){
 		super(WorldObject.getInstance());
 		System.out.println("HostObject : constructor");
 		this.hostname = hostname;
@@ -136,10 +136,10 @@ public class HostObject extends AbstractDataObject {
     }
 	
 	/**
-	 * Retuens the host's protocol
+	 * Returns the host's protocol
 	 * @return The host's protocol
 	 */
-	public int getProtocol(){
+	public Protocol getProtocol(){
 		return this.protocol;
 	}
 	

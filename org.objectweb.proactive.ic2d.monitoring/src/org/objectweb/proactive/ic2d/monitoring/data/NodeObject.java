@@ -49,7 +49,7 @@ public class NodeObject extends AbstractDataObject{
 	//
 
 	public NodeObject(VMObject parent, Node node){
-		super(parent, node.getNodeInformation().getName());
+		super(parent/*, node.getNodeInformation().getName()*/);
 		System.out.println("NodeObject : constructor");
 		this.node = node;
 		this.key = node.getNodeInformation().getName();
@@ -84,8 +84,10 @@ public class NodeObject extends AbstractDataObject{
 	 * Returns the node's protocol
 	 * @return The protocol used
 	 */
-	public String getProtocol() {
-		return node.getNodeInformation().getProtocol();
+	public Protocol getProtocol() {
+		// TODO Uses the parent's protocol or the node's protocol ?
+		// return node.getNodeInformation().getProtocol();// TODO Don't forget to transform this string to a protocol
+		return ((HostObject)this.parent.parent).getProtocol();
 	}
 
 	public String toString() {

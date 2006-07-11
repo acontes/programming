@@ -30,34 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-public class Protocol {
-
-	public static final int RMI = 0;
-	public static final int RMISSH = 1;
-	public static final int IBIS = 2;
-	public static final int JINI = 3;
-	public static final int HTTP = 4;
-
-	/**
-	 * TODO
-	 * @param protocol
-	 * @return
-	 */
-	public static String getStringFromProtocol(int protocol){
-		switch (protocol) {
-		case RMI:
-			return "rmi:";
-		case RMISSH:
-			return "rmissh:";
-		case IBIS:
-			return "ibis:";
-		case JINI:
-			return "jini:";
-		case HTTP:
-			return "http:";
-		default:
-			return "Protocol undefined";
-		}
-	}
+public enum Protocol {
 	
+	RMI, RMISSH, IBIS, JINI, HTTP;
+
+	public String toString(){
+		return super.toString().toLowerCase();
+	}	
 }

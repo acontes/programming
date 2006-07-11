@@ -56,30 +56,30 @@ import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 
 public class MonitorNewHostDialog extends Dialog {
 
-	
-	private int protocol;
-	
+
+	private Protocol protocol;
+
 	private Shell shell = null;
-	
+
 	private Text hostText;
 	private Text portText;
 	private Text depthText;
 	private Button okButton;
 	private Button cancelButton;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
-	public MonitorNewHostDialog(Shell parent, int protocol) {
+
+	public MonitorNewHostDialog(Shell parent, Protocol protocol) {
 		// Pass the default styles here
-        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-        
+		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+
 		this.protocol = protocol;
-		
+
 		String initialHostValue = "localhost";
 		String port = "";
-	    
+
 		/* Get the machine's name */
 		try {
 			initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
@@ -87,26 +87,26 @@ public class MonitorNewHostDialog extends Dialog {
 			// TODO catch this exception, and do something
 			e.printStackTrace();
 		}
-		
+
 		/* Load the proactive default configuration */
 		ProActiveConfiguration.load();
-		
+
 		/* Get the machine's port */
 		port = System.getProperty("proactive.rmi.port");
-		
+
 		/* Init the display */
 		Display display = getParent().getDisplay();
 		shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
 		shell.setText("Adding host and depth to monitor");
 		shell.setSize(new Point(300, 200));
-		
-		
+
+
 		FormLayout layout = new FormLayout();
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;
 		shell.setLayout(layout);
-		
-		
+
+
 		Group hostGroup = new Group(shell, SWT.NONE);
 		hostGroup.setText("Host to monitor");
 		FormLayout hostLayout = new FormLayout();
@@ -117,10 +117,10 @@ public class MonitorNewHostDialog extends Dialog {
 		hostFormData1.left = new FormAttachment(0, 0);
 		hostFormData1.right = new FormAttachment(100, 0);
 		hostGroup.setLayoutData(hostFormData1);
-		
+
 		Label hostLabel = new Label(hostGroup, SWT.NONE);
 		hostLabel.setText("Name or IP :");
-		
+
 		this.hostText = new Text(hostGroup, SWT.BORDER);
 		hostText.setText(initialHostValue);
 		FormData hostFormData = new FormData();
@@ -128,13 +128,13 @@ public class MonitorNewHostDialog extends Dialog {
 		hostFormData.left = new FormAttachment(hostLabel, 5);
 		hostFormData.right = new FormAttachment(70, -10);
 		hostText.setLayoutData(hostFormData);
-		
+
 		Label portLabel = new Label(hostGroup, SWT.NONE);
 		portLabel.setText("Port :");
 		FormData portFormData = new FormData();
 		portFormData.left = new FormAttachment(70, 10);
 		portLabel.setLayoutData(portFormData);
-		
+
 		this.portText = new Text(hostGroup, SWT.BORDER);
 		if(port != null) portText.setText(port);
 		FormData portFormData2 = new FormData();
@@ -142,14 +142,14 @@ public class MonitorNewHostDialog extends Dialog {
 		portFormData2.left = new FormAttachment(portLabel, 5);
 		portFormData2.right = new FormAttachment(100, 0);
 		portText.setLayoutData(portFormData2);
-		
+
 		Label depthLabel = new Label(shell, SWT.NONE);
 		depthLabel.setText("Hosts will be recursively searched up to a depth of :");
 		FormData depthFormData = new FormData();
 		depthFormData.top = new FormAttachment(hostGroup, 20);
 		depthFormData.left = new FormAttachment(0, 20);
 		depthLabel.setLayoutData(depthFormData);
-		
+
 		this.depthText = new Text(shell, SWT.BORDER);
 		depthText.setText(MonitorThread.getInstance().getDepth()+"");
 		FormData depthFormData2 = new FormData();
@@ -157,13 +157,13 @@ public class MonitorNewHostDialog extends Dialog {
 		depthFormData2.left = new FormAttachment(depthLabel, 5);
 		depthFormData2.right = new FormAttachment(100, -20);
 		depthText.setLayoutData(depthFormData2);
-		
+
 		Label depthLabel2 = new Label(shell, SWT.CENTER);
 		depthLabel2.setText("You can change it there or from menu \"Control -> Set depth control\"");
 		FormData depthFormData3 = new FormData();
 		depthFormData3.top = new FormAttachment(depthLabel, 5);
 		depthLabel2.setLayoutData(depthFormData3);
-		
+
 		this.okButton = new Button(shell, SWT.NONE);
 		okButton.setText("OK");
 		okButton.addSelectionListener(new MonitorNewHostListener());
@@ -173,7 +173,7 @@ public class MonitorNewHostDialog extends Dialog {
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
-		
+
 		this.cancelButton = new Button(shell, SWT.NONE);
 		cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new MonitorNewHostListener());
@@ -182,27 +182,27 @@ public class MonitorNewHostDialog extends Dialog {
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);
-		
+
 		center(display, shell);
-		
+
 		shell.pack();
 		shell.open();
-		
-		
+
+
 		while(!shell.isDisposed()) {
 			if(!display.readAndDispatch())
 				display.sleep();
 		}
-		
+
 		//display.dispose(); TODO ???
 	}
-	
-	
+
+
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
 	//
-	
-	
+
+
 	private static void center(Display display, Shell shell) {
 		Rectangle rect = display.getClientArea();
 		Point size = shell.getSize();
@@ -210,20 +210,20 @@ public class MonitorNewHostDialog extends Dialog {
 		int y = (rect.height - size.y) / 2;
 		shell.setLocation(new Point(x, y));
 	}
-	
-	
+
+
 	//
 	// -- INNER CLASS -----------------------------------------------
 	//
-	
+
 	private class MonitorNewHostListener extends SelectionAdapter {
 		String hostname;
 		int port ;
-		
+
 		public void widgetSelected(SelectionEvent e) {
-			if(e.widget == okButton) {
+			if(e.widget == okButton) {		
 				switch(protocol) {
-				case Protocol.RMI:
+				case RMI:
 					hostname = hostText.getText();
 					port = Integer.parseInt(portText.getText());
 					MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
@@ -235,6 +235,21 @@ public class MonitorNewHostDialog extends Dialog {
 
 					shell.close();
 					break;
+				case RMISSH:
+					// TODO
+					break;
+				case IBIS:
+					// TODO
+					break;
+				case JINI:
+					// TODO
+					break;
+				case HTTP:
+					// TODO
+					break;
+				default:
+					// TODO
+
 				}
 			}
 			else if(e.widget == cancelButton) {

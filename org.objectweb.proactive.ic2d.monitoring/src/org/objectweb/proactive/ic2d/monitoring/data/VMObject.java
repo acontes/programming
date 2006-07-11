@@ -145,7 +145,7 @@ public class VMObject extends AbstractDataObject {
 		System.out.println("VMObject : handleNode");
 		HostObject parent = getTypedParent();
 		String nodeUrl = UrlBuilder.buildUrl(parent.getHostName(), nodeName,
-				Protocol.getStringFromProtocol(parent.getProtocol()), parent.getPort());
+				parent.toString()+":", parent.getPort());
 		
 		Node node = null;
 		try {

@@ -71,8 +71,8 @@ public class NodeEditPart extends AbstractIC2DEditPart{
  	 * @return a new NodeFigure view associated with the NodeObject model.
  	 */
 	protected IFigure createFigure() {
-		System.out.println("NodeEditPart : createEditPart");
-		return new NodeFigure(getCastedModel().getFullName());
+		System.out.println("NodeEditPart : createFigure");
+		return new NodeFigure(getCastedModel().getFullName(),getCastedModel().getProtocol());
 	}
 	
 	/**
