@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin
-   id="org.objectweb.proactive.ic2d.monitoring"
-   name="IC2D Monitoring Plug-in"
-   version="1.0.0"
-
-   class="org.objectweb.proactive.ic2d.monitoring.MonitoringPlugin">
-
-   <runtime>
-      <library name="classes/">
-         <export name="*"/>
-      </library>
-   </runtime>
-   <requires>
-      <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.draw2d"/>
-      <import plugin="org.eclipse.gef"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="lib"/>
-
-   </requires>
+<plugin>
    <extension
          id="org.objectweb.proactive.ic2d.monitoring.perspectives"
          name="Perspectives"
