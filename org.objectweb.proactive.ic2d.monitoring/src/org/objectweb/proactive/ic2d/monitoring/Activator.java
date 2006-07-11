@@ -4,7 +4,6 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -35,10 +34,6 @@ public class Activator extends AbstractUIPlugin {
 		// add current classpath for javassist class pool
 		ClassPool pool = ClassPool.getDefault();
 		pool.insertClassPath(new ClassClassPath(this.getClass()));
-		
-		RuntimeFactory.getDefaultRuntime();
-		
-		System.out.println("################################");
 	}
 
 	/*
