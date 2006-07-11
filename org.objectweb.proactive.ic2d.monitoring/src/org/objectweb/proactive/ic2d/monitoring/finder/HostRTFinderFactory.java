@@ -46,7 +46,7 @@ public class HostRTFinderFactory {
 	 * @param protocol The protocol to use
 	 * @return A HostRTFinder
 	 */
-	public static HostRTFinder createHostRTFinder(int protocol) {
+	public static HostRTFinder createHostRTFinder(Protocol protocol) {
 		if (protocol == Protocol.RMI)
 			return new RMIHostRTFinder();
 		else
