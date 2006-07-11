@@ -43,6 +43,12 @@
       <category
             id="org.objectweb.proactive.ic2d.monitoring.category"
             name="Monitoring category"/>
+      <view
+            allowMultiple="false"
+            category="org.objectweb.proactive.ic2d.monitoring.category"
+            class="org.objectweb.proactive.ic2d.monitoring.views.Legend"
+            id="org.objectweb.proactive.ic2d.monitoring.views.Legend"
+            name="Legend"/>
    </extension>
    <extension
          id="org.objectweb.proactive.ic2d.monitoring.perspectiveextensions"
