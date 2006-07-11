@@ -56,7 +56,7 @@ public class WorldObject extends AbstractDataObject {
 	
 	
     //
-    // -- PUBLICS METHODS -----------------------------------------------
+    // -- PUBLIC METHODS ---------------------------------------------
     //
 	
 	public static WorldObject getInstance() {
@@ -96,9 +96,10 @@ public class WorldObject extends AbstractDataObject {
 	 */
 	protected synchronized void putChild(AbstractDataObject child) {
 		monitoredChildren.put(child.getKey(), child);
-		if(monitoredChildren.size() == 1)
-			MonitorThread.getInstance().startRefreshing();
 		setChanged();
+		if(monitoredChildren.size() == 1)
+			notifyObservers("putChild");
+			//MonitorThread.getInstance().startRefreshing();
 		notifyObservers();
 	}
     
@@ -109,9 +110,10 @@ public class WorldObject extends AbstractDataObject {
 	 */
 	protected void removeChild(AbstractDataObject child) {
 		monitoredChildren.remove(child.getKey());
-		if(monitoredChildren.size() == 0)
-			MonitorThread.getInstance().stopRefreshing();
 		setChanged();
+		if(monitoredChildren.size() == 0)
+			notifyObservers("removeChild");
+			//MonitorThread.getInstance().stopRefreshing();
 		notifyObservers();
 	}
 }

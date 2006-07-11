@@ -30,41 +30,44 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.Observable;
+import java.util.Observer;
 
-public class MonitorThread {
-	
+
+public class MonitorThread implements Observer {
+
 	private final static int DEFAULT_DEPTH = 3;
 	private final static int DEFAULT_TTR = 30;
-	
+
 	/** Singleton design pattern */
 	private static MonitorThread instance;
-	
+
 	/** Hosts will be recursively searched up to this depth */
 	private int depth;
-	
+
 	/** Thread which refresh the objects */
 	private Thread refresher;
 	/** true if we want to refresh, false otherwise */
 	private boolean refresh;
 	/** Time To Refresh (in seconds) */
 	private int ttr;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	private MonitorThread(){
 		this.depth = DEFAULT_DEPTH;
 		this.ttr = DEFAULT_TTR;
-		
+
 		this.refresh = false;
 		this.refresher = new Thread(new Refresher());
 	}
-	
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-	
+
 	/**
 	 * TODO
 	 */
@@ -73,7 +76,7 @@ public class MonitorThread {
 			instance = new MonitorThread();
 		return instance;
 	}
-	
+
 	/**
 	 * Hosts will be recursively searched up to 
 	 * the depth returned by this method.
@@ -82,7 +85,7 @@ public class MonitorThread {
 	public int getDepth(){
 		return this.depth;
 	}
-	
+
 	/**
 	 * Sets the depth used to searched up hosts.
 	 * @param depth the news depth
@@ -90,7 +93,7 @@ public class MonitorThread {
 	public void setDepth(int depth){
 		this.depth = depth;
 	}
-	
+
 	/**
 	 * Returns the Time To Refresh (in seconds). 
 	 * @return time to refresh
@@ -98,7 +101,7 @@ public class MonitorThread {
 	public int getTTR() {
 		return this.ttr;
 	}
-	
+
 	/**
 	 * Sets the Time To Refresh (in seconds).
 	 * @param ttr the new time to refresh
@@ -106,27 +109,40 @@ public class MonitorThread {
 	public void setTTR(int ttr) {
 		this.ttr = ttr;
 	}
-	
+
+
+	public void update(Observable o, Object arg) {
+		if (arg != null) {
+			String method = (String)arg;
+			if(method.compareTo("putChild")==0)
+				MonitorThread.getInstance().startRefreshing();
+			else // (method.compareTo("removeChild")==0)
+				MonitorThread.getInstance().stopRefreshing();
+		}
+	}
+
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
-	
+
 	protected void startRefreshing() {
+		System.out.println("########## START ############");
 		refresh = true;
 		refresher.start();
 	}
-	
-	
+
+
 	protected void stopRefreshing() {
+		System.out.println("########## STOP ############");
 		refresh = false;
 	}
-		
+
 	//
 	// -- INNER CLASS -----------------------------------------------
 	//
-	
+
 	private class Refresher implements Runnable {
-		
+
 		public void run() {
 			while(refresh) {
 				System.out.println("******* MonitorThread : run ********");
