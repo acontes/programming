@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.perspectives;
 
+import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.eclipse.ui.console.IConsoleConstants;
+import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 
 public class MonitoringPerspective implements IPerspectiveFactory {
@@ -42,7 +45,7 @@ public class MonitoringPerspective implements IPerspectiveFactory {
     public static final String FI_TOP = ID + ".topFolder";
     /** Bottom folder's id. */
     public static final String FI_BOTTOM = ID + ".bottomFolder";
-    /** Bottom folder's id. */
+    /** Right folder's id. */
     public static final String FI_RIGHT = ID + ".rightFolder";
     
 	
@@ -55,12 +58,15 @@ public class MonitoringPerspective implements IPerspectiveFactory {
 		layout.setEditorAreaVisible(false);
 		//layout.setFixed(false);
 		
-		layout.createFolder(FI_TOP,IPageLayout.TOP, 0.25f, editorAreaId );
-        
-        layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.70f, FI_TOP/*editorAreaId*/);
+		IFolderLayout topFolder = layout.createFolder(FI_TOP,IPageLayout.TOP, 0.75f, editorAreaId );
+		//topFolder.addPlaceholder(MonitoringView.ID);
+		topFolder.addView(MonitoringView.ID);
 		
-		//layout.addView(MonitoringView.ID, IPageLayout.TOP, 0.5f, editorAreaId);
-		//layout.addStandaloneView(MonitoringView.ID, false, IPageLayout.TOP, 0.5f, editorArea);
+		//layout.createFolder(FI_RIGHT, IPageLayout.RIGHT, 0.20f, FI_TOP/*editorAreaId*/);
+        
+        IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.20f, editorAreaId);
+        //bottomFolder.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
+        bottomFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 	}
 	
 }
