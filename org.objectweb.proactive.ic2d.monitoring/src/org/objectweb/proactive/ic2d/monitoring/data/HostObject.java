@@ -79,7 +79,7 @@ public class HostObject extends AbstractDataObject {
 		if(hostAlreadyExists != null)
 			throw new HostAlreadyExistsException(hostAlreadyExists);
 		
-		this.parent.putChild(this);
+		this.parent.filterAndPutChild(this);
 		this.explore();
 	}
 	
