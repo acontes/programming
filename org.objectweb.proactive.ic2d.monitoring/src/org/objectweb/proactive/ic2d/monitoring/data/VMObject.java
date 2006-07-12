@@ -53,7 +53,6 @@ public class VMObject extends AbstractDataObject {
 		this.runtime = runtime;
 		this.key = this.runtime.getVMInformation().getVMID().toString();
 		this.runtime = runtime;
-		//this.explore();
 	}
 	
 	//
@@ -96,6 +95,10 @@ public class VMObject extends AbstractDataObject {
 		return "jvm";
 	}
 	
+	public ProActiveRuntime getRuntime() {
+		return this.runtime;
+	}
+	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
@@ -126,7 +129,7 @@ public class VMObject extends AbstractDataObject {
 			return;
 		}
 		else if (!monitoredChildren.containsKey(child.getKey())){
-			this.putChild(child);
+			this.filterAndPutChild(child);
 			((NodeObject)child).addSpy();
 		}
 		else //parent.monitoredChildren.containsKey(vm.getKey())

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 
+import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
+
 /**
  * Holder class for the host data representation
  */
@@ -132,9 +134,21 @@ public abstract class AbstractDataObject extends Observable {
 	//
 	
 	/**
-	 * Add a child to this object
-	 * @param key 
-	 * @param child
+	 * Verify if the specified child can be monitored, if it can,
+	 * add it to this object.
+	 * @param child the object to add
+	 */
+	protected void filterAndPutChild(AbstractDataObject child) {
+		if(FilterProcess.getInstance().filter(child))
+			skippedChildren.put(child.getKey(), child);
+		else
+			putChild(child);
+	}
+	
+	/**
+	 * Add a child to this object.
+	 * Warning : You musn't call this method, call filterAndPutChild.
+	 * @param child the object to add
 	 */
 	protected synchronized void putChild(AbstractDataObject child) {
 		monitoredChildren.put(child.getKey(), child);
@@ -147,12 +161,12 @@ public abstract class AbstractDataObject extends Observable {
 	 * @param child The child to explore
 	 */
 	protected void exploreChild(AbstractDataObject child) {
+		System.out.println("AbstractDataObject : exploreChild");
 		if(skippedChildren.containsKey(child.getKey())){
-			System.out.println("AbstractDataObject : exploreChild");
 			return;
 		}
 		else if (!monitoredChildren.containsKey(child.getKey()))
-			this.putChild(child);
+			this.filterAndPutChild(child);
 		else //parent.monitoredChildren.containsKey(vm.getKey())
 			child = (AbstractDataObject)monitoredChildren.get(child.getKey());
 		child.explore();

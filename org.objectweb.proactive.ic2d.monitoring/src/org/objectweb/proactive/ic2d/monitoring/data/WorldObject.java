@@ -99,7 +99,6 @@ public class WorldObject extends AbstractDataObject {
 		setChanged();
 		if(monitoredChildren.size() == 1)
 			notifyObservers("putChild");
-			//MonitorThread.getInstance().startRefreshing();
 		notifyObservers();
 	}
     
@@ -108,12 +107,11 @@ public class WorldObject extends AbstractDataObject {
 	 * Stop monitoring the host specified.
 	 * @param host the host to stop monitoring
 	 */
-	protected void removeChild(AbstractDataObject child) {
-		monitoredChildren.remove(child.getKey());
+	protected void removeChild(HostObject host) {
+		monitoredChildren.remove(host.getKey());
 		setChanged();
 		if(monitoredChildren.size() == 0)
 			notifyObservers("removeChild");
-			//MonitorThread.getInstance().stopRefreshing();
 		notifyObservers();
 	}
 }
