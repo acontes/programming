@@ -48,6 +48,7 @@ import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
 
 public class Legend extends ViewPart {
 
+	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.views.Legend";
 
 	public Legend() {
 		// TODO Auto-generated constructor stub

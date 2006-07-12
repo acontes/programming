@@ -38,6 +38,7 @@
          <perspectiveShortcut id="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective"/>
          <viewShortcut id="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"/>
          <viewShortcut id="org.objectweb.proactive.ic2d.monitoring.views.Legend"/>
+         <viewShortcut id="org.eclipse.ui.console.ConsoleView"/>
       </perspectiveExtension>
    </extension>
    <extension

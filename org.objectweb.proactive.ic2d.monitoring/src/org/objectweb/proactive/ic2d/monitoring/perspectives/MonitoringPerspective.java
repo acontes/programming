@@ -34,6 +34,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
+import org.objectweb.proactive.ic2d.monitoring.views.Legend;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 
@@ -57,13 +58,16 @@ public class MonitoringPerspective implements IPerspectiveFactory {
 		String editorAreaId=layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
 		//layout.setFixed(false);
+
+		IFolderLayout rightFolder = layout.createFolder(FI_RIGHT, IPageLayout.RIGHT, 0.80f, editorAreaId);
+        //rightFolder.addPlaceholder(Legend.ID);
+		rightFolder.addView(Legend.ID);
 		
 		IFolderLayout topFolder = layout.createFolder(FI_TOP,IPageLayout.TOP, 0.75f, editorAreaId );
 		//topFolder.addPlaceholder(MonitoringView.ID);
 		topFolder.addView(MonitoringView.ID);
+
 		
-		//layout.createFolder(FI_RIGHT, IPageLayout.RIGHT, 0.20f, FI_TOP/*editorAreaId*/);
-        
         IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.20f, editorAreaId);
         //bottomFolder.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
         bottomFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
