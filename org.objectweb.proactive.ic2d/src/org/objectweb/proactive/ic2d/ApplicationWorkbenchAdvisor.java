@@ -6,6 +6,7 @@ import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
@@ -21,6 +22,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	public String getInitialWindowPerspectiveId() {
-		return DefaultPerspective.ID;
+		return MonitoringPerspective.ID /*DefaultPerspective.ID*/;
 	}
 }
