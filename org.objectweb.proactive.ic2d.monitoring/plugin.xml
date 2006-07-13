@@ -52,29 +52,11 @@
                >
          </menu>
          <action
-               class="org.objectweb.proactive.ic2d.monitoring.actions.NewHttpHostAction"
-               id="org.objectweb.proactive.ic2d.monitoring.actions.newHTTPhost"
-               label="Monitor a new HTTP host"
-               menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu/content"
-               tooltip="Monitor a new HTTP host"/>
-         <action
-               class="org.objectweb.proactive.ic2d.monitoring.actions.NewRMIHostAction"
-               id="org.objectweb.proactive.ic2d.monitoring.actions.newRMIhost"
-               label="Monitor a new RMI host"
+               class="org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction"
+               id="org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction"
+               label="Monitor a new host"
                menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu/content"
                tooltip="Monitor a new RMI host"/>
-         <action
-               class="org.objectweb.proactive.ic2d.monitoring.actions.NewIbisHostAction"
-               id="org.objectweb.proactive.ic2d.monitoring.actions.newIBIShost"
-               label="Monitor a new Ibis host"
-               menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu/content"
-               tooltip="Monitor a new Ibis host"/>
-         <action
-               class="org.objectweb.proactive.ic2d.monitoring.actions.NewJiniHostAction"
-               id="org.objectweb.proactive.ic2d.monitoring.actions.newJINIhost"
-               label="Monitor a new JINI host"
-               menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu/content"
-               tooltip="Monitor a new JINI host"/>
       </actionSet>
    </extension>
 
