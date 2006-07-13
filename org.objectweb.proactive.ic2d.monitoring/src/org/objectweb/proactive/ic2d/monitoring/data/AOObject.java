@@ -33,6 +33,8 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 import java.util.Comparator;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 
 public class AOObject extends AbstractDataObject{
 
@@ -60,17 +62,7 @@ public class AOObject extends AbstractDataObject{
 			name = this.getClass().getName() ;
 		this.name = name;
 		this.fullName = name + "#" + counter();
-
 		this.id = id;
-
-
-		/*
-		if(((NodeObject)this.parent).spy == null)
-			System.err.println("AOObject : constructor => WARNING spy is null");
-		((NodeObject)this.parent).spy.addMessageEventListener(this.id);
-
-		System.out.println("Constructor AOObject : className = "+className+", id = "+counter);
-		 */
 	}
 
 	//
@@ -141,5 +133,18 @@ public class AOObject extends AbstractDataObject{
 			String ao2Name = (String)ao2;
 			return -(ao1Name.compareTo(ao2Name));
 		}	
+	}
+
+	@Override
+	protected void foundForTheFirstTime() {
+		Console.getInstance(Activator.CONSOLE_NAME).
+		log("AOObject "+fullName+" created based on ActiveObject "+id.toString());
+	}
+	
+	@Override
+	protected void alreadyMonitored() {
+		Console.getInstance(Activator.CONSOLE_NAME).
+		log("AOObject "+fullName+" already monitored");
+		AOObject.cancelCreation();
 	}
 }

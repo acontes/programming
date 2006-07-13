@@ -49,6 +49,9 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
+	// The console name
+	public static String CONSOLE_NAME = "Monitoring";
+	
 	/**
 	 * The constructor
 	 */
@@ -88,10 +91,6 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return plugin;
-	}
-
-	public static String getConsoleName() {
-		return "Monitoring";
 	}
 	
 }

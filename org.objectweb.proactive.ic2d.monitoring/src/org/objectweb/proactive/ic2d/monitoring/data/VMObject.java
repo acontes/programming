@@ -35,6 +35,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 
 
 public class VMObject extends AbstractDataObject {
@@ -49,7 +51,6 @@ public class VMObject extends AbstractDataObject {
 	
 	public VMObject(HostObject parent, ProActiveRuntime runtime) {
 		super(parent);
-		System.out.println("VMObject : constructor");
 		this.runtime = runtime;
 		this.key = this.runtime.getVMInformation().getVMID().toString();
 		this.runtime = runtime;
@@ -63,6 +64,7 @@ public class VMObject extends AbstractDataObject {
 	 * Explores a ProActiveRuntime, in order to find all nodes known by this one
 	 * @param vm The VMObject corresponding to the runtime given in parameter
 	 */
+	@Override
 	public void explore(){
 		String[] namesOfNodes = null;
 		try {
@@ -79,10 +81,12 @@ public class VMObject extends AbstractDataObject {
 		}
 	}
 	
+	@Override
 	public String getKey() {
 		return this.key;
 	}
 	
+	@Override
 	public String getFullName() {
 		return "VM id=" + this.key;
 	}
@@ -91,6 +95,7 @@ public class VMObject extends AbstractDataObject {
 		return "JVM " + this.getKey();
 	}
 	
+	@Override
 	public String getType() {
 		return "jvm";
 	}
@@ -119,23 +124,19 @@ public class VMObject extends AbstractDataObject {
 		return this.runtime;
 	}
 	
-	/**
-	 * Explore the child
-	 * @param child The child to explore
-	 */
-	protected void exploreChild(AbstractDataObject child) {
-		if(skippedChildren.containsKey(child.getKey())){
-			System.out.println("VMObject : exploreChild");
-			return;
-		}
-		else if (!monitoredChildren.containsKey(child.getKey())){
-			this.filterAndPutChild(child);
-			((NodeObject)child).addSpy();
-		}
-		else //parent.monitoredChildren.containsKey(vm.getKey())
-			child = (AbstractDataObject)monitoredChildren.get(child.getKey());
-		child.explore();
+	@Override
+	protected void foundForTheFirstTime() {
+		Console.getInstance(Activator.CONSOLE_NAME).
+		log("VMObject id="+key+" created based on ProActiveRuntime "+runtime.getURL());
 	}
+	
+	@Override
+	protected void alreadyMonitored() {
+		Console.getInstance(Activator.CONSOLE_NAME).
+		log("VMObject id="+key+" already monitored, check for new nodes");
+	}
+	
+
 	
 	//
 	// -- PRIVATE METHOD -----------------------------------------------

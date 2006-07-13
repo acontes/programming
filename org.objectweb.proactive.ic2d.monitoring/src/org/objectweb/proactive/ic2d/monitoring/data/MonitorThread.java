@@ -126,14 +126,12 @@ public class MonitorThread implements Observer {
 	//
 
 	protected void startRefreshing() {
-		System.out.println("########## START ############");
 		refresh = true;
 		refresher.start();
 	}
 
 
 	protected void stopRefreshing() {
-		System.out.println("########## STOP ############");
 		refresh = false;
 	}
 
@@ -145,7 +143,6 @@ public class MonitorThread implements Observer {
 
 		public void run() {
 			while(refresh) {
-				System.out.println("******* MonitorThread : run ********");
 				WorldObject.getInstance().explore();
 				try {
 					Thread.sleep(ttr * 1000);

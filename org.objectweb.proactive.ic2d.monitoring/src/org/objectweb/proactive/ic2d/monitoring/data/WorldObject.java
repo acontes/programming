@@ -65,22 +65,25 @@ public class WorldObject extends AbstractDataObject {
 		return instance;
 	}
 	
-
+	@Override
 	public String getKey() {
 		// A WorldObject doesn't need a key because it is the only son of IC2DObject.
 		return "WorldObject";
 	}
 	
+	@Override
 	public String getFullName(){
 		return "WorldObject";
 	}
 
+	@Override
 	public void explore() {
 		List<AbstractDataObject> childrenList = new ArrayList<AbstractDataObject>(monitoredChildren.values());
 		for(int i=0, size=childrenList.size(); i<size; i++)
 			((HostObject)childrenList.get(i)).explore();
 	}
 	
+	@Override
 	public String getType() {
 		return "world";
 	}
@@ -94,6 +97,7 @@ public class WorldObject extends AbstractDataObject {
 	 * @param key 
 	 * @param child
 	 */
+	@Override
 	protected synchronized void putChild(AbstractDataObject child) {
 		monitoredChildren.put(child.getKey(), child);
 		setChanged();
@@ -114,4 +118,12 @@ public class WorldObject extends AbstractDataObject {
 			notifyObservers("removeChild");
 		notifyObservers();
 	}
+
+
+	@Override
+	protected void alreadyMonitored() {/* Do nothing */}
+
+
+	@Override
+	protected void foundForTheFirstTime() {/* Do nothing */}
 }

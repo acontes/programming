@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.spy.Spy;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyEventListenerImpl;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyListenerImpl;
@@ -84,7 +86,6 @@ public class NodeObject extends AbstractDataObject{
 		super(parent/*, node.getNodeInformation().getName()*/);
 		Comparator comparator = new AOObject.AOComparator();
 		monitoredChildren = new TreeMap<String , AbstractDataObject>(comparator);
-		System.out.println("NodeObject : constructor");
 		this.node = node;
 		this.key = node.getNodeInformation().getName();
 	}
@@ -95,6 +96,7 @@ public class NodeObject extends AbstractDataObject{
 	/**
 	 * Explores itself, in order to find all active objects known by this one
 	 */
+	@Override
 	public void explore(){
 		System.out.println("NodeObject : explore()");
 		VMObject parent = getTypedParent();
@@ -107,10 +109,13 @@ public class NodeObject extends AbstractDataObject{
 		}
 		handleActiveObjects(activeObjects);
 	}
+	
+	@Override
 	public String getKey() {
 		return this.key;
 	}
 
+	@Override
 	public String getFullName() {
 		return this.key;
 	}
@@ -128,6 +133,7 @@ public class NodeObject extends AbstractDataObject{
 		return this.getKey();
 	}
 
+	@Override
 	public String getType() {
 		return "node";
 	}
@@ -161,21 +167,18 @@ public class NodeObject extends AbstractDataObject{
 	protected VMObject getTypedParent() {
 		return (VMObject) parent;
 	}
-
-
-	protected void exploreChild(AbstractDataObject child) {
-		if(skippedChildren.containsKey(child.getKey())){
-			System.out.println("NodeObject : exploreChild");
-			return;
-		}
-		else if (!monitoredChildren.containsKey(child.getKey()))
-			this.filterAndPutChild(child);
-		else { //parent.monitoredChildren.containsKey(vm.getKey())
-			AOObject.cancelCreation();
-			child = (AbstractDataObject)monitoredChildren.get(child.getKey());
-		}
-		child.explore();
+	
+	@Override
+	protected void foundForTheFirstTime() {
+		Console.getInstance(Activator.CONSOLE_NAME).log("NodeObject id="+key+" created");
+		this.addSpy();
 	}
+
+	@Override
+	protected void alreadyMonitored() {
+		Console.getInstance(Activator.CONSOLE_NAME).log("NodeObject id="+key+" already monitored, ckeck for new active objects");
+	}
+
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
@@ -192,7 +195,7 @@ public class NodeObject extends AbstractDataObject{
 			/* We don't monitor spies */
 //			if (className.equalsIgnoreCase(
 //			"org.objectweb.proactive.ic2d.spy.Spy")) {
-//				continue;
+//			continue;
 //			}
 			AOObject ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID());
 			exploreChild(ao);

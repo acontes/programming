@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-import java.rmi.RemoteException;
 import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -70,7 +69,6 @@ public class HostObject extends AbstractDataObject {
      */
 	public HostObject(String hostname, int port, Protocol protocol) throws HostAlreadyExistsException{
 		super(WorldObject.getInstance());
-		System.out.println("HostObject : constructor");
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
@@ -79,8 +77,7 @@ public class HostObject extends AbstractDataObject {
 		if(hostAlreadyExists != null)
 			throw new HostAlreadyExistsException(hostAlreadyExists);
 		
-		this.parent.filterAndPutChild(this);
-		this.explore();
+		this.parent.putChild(this);
 	}
 	
     //
@@ -92,29 +89,22 @@ public class HostObject extends AbstractDataObject {
 	 * Explores the host, in order to find all VMs known by this one
 	 * @return Virtual machines found in the host
 	 */
+	@Override
 	public void explore() {
-		System.out.println("HostObject : explore");
 		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(this.getProtocol());
-		List<ProActiveRuntime> foundRuntimes = null;
-		try {
-			foundRuntimes = runtimeFinder.findPARuntime(this);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(foundRuntimes != null){
-			for (int i = 0; i < foundRuntimes.size(); ++i) {
-				ProActiveRuntime proActiveRuntime = (ProActiveRuntime) foundRuntimes.get(i);
-				handleProActiveRuntime(proActiveRuntime);
-			}
+		List<ProActiveRuntime> foundRuntimes = runtimeFinder.findPARuntime(this);
+		for (int i = 0; i < foundRuntimes.size(); ++i) {
+			ProActiveRuntime proActiveRuntime = (ProActiveRuntime) foundRuntimes.get(i);
+			handleProActiveRuntime(proActiveRuntime);
 		}		
 	}
 	
+	@Override
 	public String getKey() {
 		return hostname+":"+port;
 	}
 	
-	
+	@Override
 	public String getFullName(){
 		return hostname+":"+port+":"+os;
 	}
@@ -157,6 +147,7 @@ public class HostObject extends AbstractDataObject {
         return "Host " + hostname;
     }
 
+    @Override
     public String getType() {
     	return "host";
     }
@@ -181,10 +172,14 @@ public class HostObject extends AbstractDataObject {
      * TODO
      */
 	private void handleProActiveRuntime(ProActiveRuntime runtime){
-		System.out.println("HostObject : handleProActiveRuntime");
-		VMObject vm = null;
-		vm = new VMObject(this, runtime);
+		VMObject vm = new VMObject(this, runtime);
 		exploreChild(vm);
 	}
+
+	@Override
+	protected void alreadyMonitored() {/* Do nothing */}
+
+	@Override
+	protected void foundForTheFirstTime() {/* Do nothing */}
     
 }

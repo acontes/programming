@@ -13,19 +13,19 @@ import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
  * Holder class for the host data representation
  */
 public abstract class AbstractDataObject extends Observable {
-	
+
 	/** the object's parent */
 	protected AbstractDataObject parent;
 	/** the object's children which are monitored (Map<String, AbstractDataObject>) */
 	protected Map<String, AbstractDataObject> monitoredChildren;
 	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
 	protected HashMap<String, AbstractDataObject> skippedChildren;
-	
-	
+
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	/**
 	 * Creates a new AbstractDataObject
 	 * @param parent the object's parent
@@ -36,26 +36,26 @@ public abstract class AbstractDataObject extends Observable {
 		this.skippedChildren = new HashMap<String, AbstractDataObject>();
 	}
 
-	
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-	
+
 	public AbstractDataObject getChild(String key){
 		return (AbstractDataObject) monitoredChildren.get(key);
 	}
-	
+
 	/**
 	 * Returns the object's key. It is an unique identifier
 	 * @return the object's key
 	 */
 	public abstract String getKey();
-	
+
 	/**
 	 * Returns the object's full name
 	 */
 	public abstract String getFullName();
-	
+
 	/**
 	 * Returns a string representing the object's name and children's names
 	 */
@@ -64,9 +64,9 @@ public abstract class AbstractDataObject extends Observable {
 		/*
 		return "DataObject " + abstractDataObjectName + "\n" +
 		monitoredChildren.toString();
-		*/
+		 */
 	}
-	
+
 	/**
 	 * Returns the object's parent
 	 * @return the object's parent
@@ -74,8 +74,8 @@ public abstract class AbstractDataObject extends Observable {
 	public AbstractDataObject getParent() {
 		return parent;
 	}
-	
-	
+
+
 	/**
 	 * Returns the top level parent
 	 * @return the top level parent
@@ -87,7 +87,7 @@ public abstract class AbstractDataObject extends Observable {
 			return parent.getTopLevelParent();
 		}
 	}
-	
+
 	/**
 	 * Stop monitor this object
 	 */
@@ -97,7 +97,7 @@ public abstract class AbstractDataObject extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	/**
 	 * Returns the list of monitored children
 	 * @return The list of monitored children
@@ -105,12 +105,12 @@ public abstract class AbstractDataObject extends Observable {
 	public List<AbstractDataObject> getMonitoredChildren() {
 		return new ArrayList<AbstractDataObject>(monitoredChildren.values());
 	}
-	
+
 	/**
 	 * Explore the current object
 	 */
 	public abstract void explore();
-	
+
 	/**
 	 * To know if this object is monitored
 	 * @return true if it is monitored, false otherwise
@@ -133,19 +133,7 @@ public abstract class AbstractDataObject extends Observable {
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
-	
-	/**
-	 * Verify if the specified child can be monitored, if it can,
-	 * add it to this object.
-	 * @param child the object to add
-	 */
-	protected void filterAndPutChild(AbstractDataObject child) {
-		if(FilterProcess.getInstance().filter(child))
-			skippedChildren.put(child.getKey(), child);
-		else
-			putChild(child);
-	}
-	
+
 	/**
 	 * Add a child to this object.
 	 * Warning : You musn't call this method, call filterAndPutChild.
@@ -156,20 +144,31 @@ public abstract class AbstractDataObject extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	/**
 	 * Explore the child
 	 * @param child The child to explore
 	 */
 	protected void exploreChild(AbstractDataObject child) {
-		System.out.println("AbstractDataObject : exploreChild");
-		if(skippedChildren.containsKey(child.getKey())){
+		if(skippedChildren.containsKey(child.getKey()))
 			return;
-		}
-		else if (!monitoredChildren.containsKey(child.getKey()))
-			this.filterAndPutChild(child);
-		else //parent.monitoredChildren.containsKey(vm.getKey())
+		if(monitoredChildren.containsKey(child.getKey())) {
 			child = (AbstractDataObject)monitoredChildren.get(child.getKey());
-		child.explore();
+			child.alreadyMonitored();
+			child.explore();
+		}
+		else { // !skippedChildren.containsKey(child.getKey()) && !monitoredChildren.containsKey(child.getKey())
+			if(FilterProcess.getInstance().filter(child))
+				skippedChildren.put(child.getKey(), child);
+			else { //child is new and must be monitored
+				putChild(child);
+				child.foundForTheFirstTime();
+				child.explore();
+			}
+		}
 	}
+	
+	protected abstract void foundForTheFirstTime();
+	
+	protected abstract void alreadyMonitored();
 }

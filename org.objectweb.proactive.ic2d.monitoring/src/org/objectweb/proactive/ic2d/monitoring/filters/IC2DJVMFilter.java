@@ -56,7 +56,7 @@ public class IC2DJVMFilter extends Filter {
 		} catch (ProActiveException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			Console.getInstance(Activator.getConsoleName()).err(e.getStackTrace().toString());
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 		} 
 		return false;
 	}

@@ -35,6 +35,6 @@ public enum Protocol {
 	RMI, RMISSH, IBIS, JINI, HTTP;
 
 	public String toString(){
-		return super.toString().toLowerCase();
+		return super.toString().toLowerCase()+":";
 	}	
 }
