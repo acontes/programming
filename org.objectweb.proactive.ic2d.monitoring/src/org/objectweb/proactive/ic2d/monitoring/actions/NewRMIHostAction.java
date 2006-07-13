@@ -49,7 +49,6 @@ public class NewRMIHostAction implements IWorkbenchWindowActionDelegate {
 	
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void init(IWorkbenchWindow window) {
@@ -62,6 +61,5 @@ public class NewRMIHostAction implements IWorkbenchWindowActionDelegate {
 
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
-		
 	}
 }
