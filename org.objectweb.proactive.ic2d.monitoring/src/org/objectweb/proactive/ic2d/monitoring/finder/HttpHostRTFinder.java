@@ -26,7 +26,7 @@ public class HttpHostRTFinder implements HostRTFinder {
 		ProActiveRuntimeAdapterImpl adapter = null;
 		try {
 			adapter = new ProActiveRuntimeAdapterImpl(new HttpProActiveRuntime(
-			        UrlBuilder.buildUrl(host.getHostName(), "", Protocol.HTTP.toString(), host.getPort())));
+			        UrlBuilder.buildUrl(host.getHostName(), "", Protocol.HTTP.toString()+":", host.getPort())));
 		} catch (ProActiveException e) {
 			// TODO Auto-generated catch block
 			console.logException(e);

@@ -33,7 +33,7 @@ public class JiniHostRTFinder implements HostRTFinder {
 		
 		LookupLocator lookup = null;
 		try {
-			lookup = new LookupLocator(Protocol.JINI.toString()+"//" + host.getHostName());
+			lookup = new LookupLocator(Protocol.JINI.toString()+"://" + host.getHostName());
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			console.err("Lookup failed:");
