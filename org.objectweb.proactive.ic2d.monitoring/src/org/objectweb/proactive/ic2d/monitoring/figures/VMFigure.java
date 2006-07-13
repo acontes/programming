@@ -76,7 +76,6 @@ public class VMFigure extends AbstractRectangleFigure{
 	//
 
 	public IFigure getContentPane() {
-		System.out.println("VMFigure : getContentPane");
 		return contentPane;
 	}
 
@@ -135,7 +134,6 @@ public class VMFigure extends AbstractRectangleFigure{
 	private class VMBorderLayout extends BorderLayout {
 		
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			System.out.println("VMBorderLayout.calculatePreferredSize()");
 			return super.calculatePreferredSize(container, wHint, hHint).expand(25,0);
 		}
 	}

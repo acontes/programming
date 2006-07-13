@@ -98,13 +98,13 @@ public class NodeObject extends AbstractDataObject{
 	 */
 	@Override
 	public void explore(){
-		System.out.println("NodeObject : explore()");
 		VMObject parent = getTypedParent();
 		List activeObjects = null;
 		try {
 			activeObjects = parent.getProActiveRuntime().getActiveObjects(this.key);
 		} catch (ProActiveException e) {
 			// TODO Auto-generated catch block
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 			e.printStackTrace();
 		}
 		handleActiveObjects(activeObjects);
@@ -187,16 +187,10 @@ public class NodeObject extends AbstractDataObject{
 	 * @param activeObjects names' list of active objects containing in this NodeObject
 	 */
 	private void handleActiveObjects(List activeObjects){
-		System.out.println("NodeObject : handleActiveobject");
 		for (int i = 0, size = activeObjects.size(); i < size; ++i) {
 			List aoWrapper = (List) activeObjects.get(i);
 			UniversalBody ub = (UniversalBody)aoWrapper.get(0);
 			String className = (String) aoWrapper.get(1);
-			/* We don't monitor spies */
-//			if (className.equalsIgnoreCase(
-//			"org.objectweb.proactive.ic2d.spy.Spy")) {
-//			continue;
-//			}
 			AOObject ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID());
 			exploreChild(ao);
 		}

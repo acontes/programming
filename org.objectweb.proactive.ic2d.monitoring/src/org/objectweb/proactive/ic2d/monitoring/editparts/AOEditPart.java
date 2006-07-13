@@ -46,7 +46,6 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	
 	public AOEditPart(AOObject model) {
 		super(model);
-		System.out.println("AOEditPart : constructor");
 	}
 	
 	//
@@ -84,7 +83,6 @@ public class AOEditPart extends AbstractIC2DEditPart{
  	 * @return a new NodeFigure view associated with the NodeObject model.
  	 */
 	protected IFigure createFigure() {
-		System.out.println("AOEditPart : createFigure");
 		return new AOFigure(getCastedModel().getFullName());
 	}
 	

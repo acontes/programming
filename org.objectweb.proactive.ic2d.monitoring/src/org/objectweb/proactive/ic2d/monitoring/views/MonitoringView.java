@@ -32,8 +32,6 @@ package org.objectweb.proactive.ic2d.monitoring.views;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.EditPartFactory;
-import org.eclipse.gef.MouseWheelHandler;
-import org.eclipse.gef.MouseWheelZoomHandler;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
@@ -41,7 +39,6 @@ import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.part.ViewPart;
@@ -50,28 +47,28 @@ import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.editparts.IC2DEditPartFactory;
 
 public class MonitoringView extends ViewPart {
-	
+
 	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.views.MonitoringView";
-	
+
 	/** the graphical viewer */
 	private ScrollingGraphicalViewer graphicalViewer;
-	
+
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
-	
+
 	public void createPartControl(Composite parent){
 		// create graphical viewer
 		graphicalViewer = new ScrollingGraphicalViewer();
 		graphicalViewer.createControl(parent);
-		
+
 		// configure the viewer
 		graphicalViewer.getControl().setBackground(ColorConstants.white);
 		graphicalViewer.setRootEditPart(new ScalableFreeformRootEditPart());
-		
+
 		// activate the viewer as selection provider for Eclipse
 		getSite().setSelectionProvider(graphicalViewer);
-		
+
 		// initialize the viewer with input
 		graphicalViewer.setEditPartFactory(new IC2DEditPartFactory());
 		WorldObject world = WorldObject.getInstance();
@@ -81,21 +78,34 @@ public class MonitoringView extends ViewPart {
 		// Adds Zoom-in and Zoom-out actions to the view's toolbar		
 		getViewSite().getActionBars().getToolBarManager().add(new ZoomIn());
 		getViewSite().getActionBars().getToolBarManager().add(new ZoomOut());
-		
-		graphicalViewer.setProperty(MouseWheelHandler.KeyGenerator.getKey(SWT.MOD1), MouseWheelZoomHandler.SINGLETON);
-		
-		
+
+		//graphicalViewer.setProperty(MouseWheelHandler.KeyGenerator.getKey(SWT.NONE), MouseWheelZoomHandler.SINGLETON);
+
+//		FigureCanvas fc = (FigureCanvas)graphicalViewer/*root.getViewer()*/.getControl();
+//
+//		if(fc != null) {
+//			fc.addListener(SWT.MouseWheel, new Listener() {
+//				public void handleEvent(Event event) {
+//					ActionRegistry registry = getActionRegistry();
+//					IAction action = registry.getAction((event.count > 0) ? 
+//							GEFActionConstants.ZOOM_IN :
+//							GEFActionConstants.ZOOM_OUT);
+//
+//					action.run();
+//				}
+//			});
+//		} 
 	}
 
-	
+
 	public void setFocus() {
 		// TODO Auto-generated method stub
 	}
-	
+
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
-	
+
 	/**
 	 * Returns the <code>EditPartFactory</code> that the
 	 * <code>GraphicalViewer</code> will use.
@@ -104,13 +114,13 @@ public class MonitoringView extends ViewPart {
 	protected EditPartFactory getEditPartFactory(){
 		return new IC2DEditPartFactory();
 	}
-	
+
 	//
 	// -- INNER CLASSES -------------------------------------------
 	//
-	
+
 	public class ZoomIn extends ZoomInAction {
-		
+
 		public ZoomIn() {
 			super(((ScalableFreeformRootEditPart)graphicalViewer.getRootEditPart()).getZoomManager());
 			this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-in-2.gif"));
@@ -128,9 +138,9 @@ public class MonitoringView extends ViewPart {
 			super.dispose();
 		}
 	}
-	
+
 	public class ZoomOut extends ZoomOutAction {
-		
+
 		public ZoomOut() {
 			super(((ScalableFreeformRootEditPart)graphicalViewer.getRootEditPart()).getZoomManager());
 			this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-out-2.gif"));
@@ -148,5 +158,5 @@ public class MonitoringView extends ViewPart {
 			super.dispose();
 		}
 	}
-	
+
 }

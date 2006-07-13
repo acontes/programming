@@ -73,8 +73,6 @@ public class AOFigure extends AbstractFigure {
 	 */
 	public AOFigure(String text){
 		super(text);
-
-		System.out.println("AOFigure : constructor");
 		addMouseMotionListener(new AOListener());
 	}
 	

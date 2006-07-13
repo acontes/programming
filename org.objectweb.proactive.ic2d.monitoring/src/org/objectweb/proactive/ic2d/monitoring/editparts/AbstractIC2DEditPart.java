@@ -63,7 +63,6 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 	
 	
 	public IFigure getContentPane() {
-		System.out.println("AbstractIC2DEditpart : getContentPane");
 		return ((AbstractFigure)getFigure()).getContentPane();
 	}
 	

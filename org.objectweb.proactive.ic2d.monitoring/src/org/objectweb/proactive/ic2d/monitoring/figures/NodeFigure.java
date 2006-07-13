@@ -82,7 +82,6 @@ public class NodeFigure extends AbstractRectangleFigure{
     //
 	
 	public IFigure getContentPane() {
-		System.out.println("NodeFigure : getContentPane");
 		return contentPane;
 	}
 	

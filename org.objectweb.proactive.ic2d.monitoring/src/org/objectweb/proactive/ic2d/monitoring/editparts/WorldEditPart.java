@@ -40,45 +40,44 @@ import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class WorldEditPart extends AbstractIC2DEditPart {
 
-	
+
 	private FreeformLayer layer;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	public WorldEditPart(WorldObject model) {
 		super(model);
 	}
-	
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-	
+
 	/**
-     * Convert the result of EditPart.getModel()
-     * to WorldObject (the real type of the model).
-     * @return the casted model
-     */
+	 * Convert the result of EditPart.getModel()
+	 * to WorldObject (the real type of the model).
+	 * @return the casted model
+	 */
 	public WorldObject getCastedModel() {
 		return (WorldObject)getModel();
 	}
-	
+
 	public IFigure getContentPane() {
-		System.out.println("WorldEditPart : getContentPane");
 		return layer;
 	}
-	
+
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
-	
- 	/**
- 	 * Returns a new view associated
- 	 * with the type of model object the
- 	 * EditPart is associated with. So here, it returns a new FreeFormLayer.
- 	 * @return a new FreeFormLayer view associated with the WorldObject model.
- 	 */
+
+	/**
+	 * Returns a new view associated
+	 * with the type of model object the
+	 * EditPart is associated with. So here, it returns a new FreeFormLayer.
+	 * @return a new FreeFormLayer view associated with the WorldObject model.
+	 */
 	protected IFigure createFigure() {
 		layer = new FreeformLayer();
 		ToolbarLayout layout = new ToolbarLayout(true);
@@ -90,7 +89,7 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 		return layer;
 	}
 
-	
+
 	/**
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
@@ -98,13 +97,26 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 	protected List getModelChildren() {
 		return getCastedModel().getMonitoredChildren();
 	}
-	
+
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
 	protected void createEditPolicies() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
+	/*@Override
+	public Object getAdapter(Class adapter) {
+		if(adapter == MouseWheelHelper.class) {
+			return new ViewportMouseWheelHelper(this) { // Classe disponible dans GEF exprès pour cela
+				public void handleMouseWheelScrolled(Event event) {
+					System.out.println("MouseWheel WorldEditPart");
+					super.handleMouseWheelScrolled(event);
+				}
+			};
+		}
+		return super.getAdapter(adapter);
+	}*/
+
 }

@@ -58,7 +58,6 @@ public class HostFigure extends AbstractRectangleFigure{
     //
 	
 	public IFigure getContentPane() {
-		System.out.println("HostFigure : getContentPane");
 		return contentPane;
 	}
 	

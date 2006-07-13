@@ -57,7 +57,7 @@ public class MonitoringPerspective implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
 		String editorAreaId=layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
-		//layout.setFixed(false);
+		layout.setFixed(false);
 
 		IFolderLayout rightFolder = layout.createFolder(FI_RIGHT, IPageLayout.RIGHT, 0.80f, editorAreaId);
         //rightFolder.addPlaceholder(Legend.ID);
