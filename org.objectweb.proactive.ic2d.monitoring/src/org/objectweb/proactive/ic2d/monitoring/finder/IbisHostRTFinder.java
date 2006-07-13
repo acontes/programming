@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.finder;
 
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import ibis.rmi.registry.LocateRegistry;
+import ibis.rmi.registry.Registry;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,17 +43,13 @@ import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 
-public class RMIHostRTFinder implements HostRTFinder{
-
-	//
-	// -- PUBLIC METHODS -----------------------------------------------
-	//
+public class IbisHostRTFinder implements HostRTFinder {
 
 	public List<ProActiveRuntime> findPARuntime(HostObject host) {
 		
 		Console console = Console.getInstance(Activator.CONSOLE_NAME);
 		
-		console.log("Exploring "+host+" with RMI on port "+host.getPort());
+		console.log("Exploring "+host+" with Ibis on port "+host.getPort());
 		/* List of ProActive runtime */
 		List<ProActiveRuntime> runtimes = new ArrayList<ProActiveRuntime>();
 		try {
@@ -77,4 +74,5 @@ public class RMIHostRTFinder implements HostRTFinder{
 		}
 		return runtimes;
 	}
+
 }

@@ -47,9 +47,17 @@ public class HostRTFinderFactory {
 	 * @return A HostRTFinder
 	 */
 	public static HostRTFinder createHostRTFinder(Protocol protocol) {
-		if (protocol == Protocol.RMI)
+		switch (protocol) {
+		case RMI:
 			return new RMIHostRTFinder();
-		else
+		case HTTP:
+			return new HttpHostRTFinder();
+		case IBIS:
+			return new IbisHostRTFinder();
+		case JINI:
+			return new JiniHostRTFinder();
+		default:
 			return null;
+		}	
 	}
 }
