@@ -35,6 +35,19 @@ public enum Protocol {
 	RMI, RMISSH, IBIS, JINI, HTTP;
 
 	public String toString(){
-		return super.toString().toLowerCase()+":";
-	}	
+		return super.toString().toLowerCase();
+	}
+	
+	public static Protocol getProtocolFromString(String s) {
+		if(s.compareTo("RMI") == 0)
+			return RMI;
+		else if(s.compareTo("RMISSH") == 0)
+			return RMISSH;
+		else if(s.compareTo("IBIS") == 0)
+			return IBIS;
+		else if(s.compareTo("JINI") == 0)
+			return JINI;
+		else // if(s.compareTo("HTTP") == 0)
+			return HTTP;
+	}
 }

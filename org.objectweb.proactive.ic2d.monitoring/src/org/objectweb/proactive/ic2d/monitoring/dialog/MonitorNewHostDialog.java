@@ -41,6 +41,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
@@ -59,9 +60,6 @@ import org.objectweb.proactive.ic2d.monitoring.exceptions.HostAlreadyExistsExcep
 
 public class MonitorNewHostDialog extends Dialog {
 
-
-	private Protocol protocol;
-
 	private Shell shell = null;
 	private Shell parent =null;
 
@@ -70,18 +68,17 @@ public class MonitorNewHostDialog extends Dialog {
 	private Text depthText;
 	private Button okButton;
 	private Button cancelButton;
+	private Combo combo;
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
-	public MonitorNewHostDialog(Shell parent, Protocol protocol) {
+	public MonitorNewHostDialog(Shell parent) {
 		// Pass the default styles here
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
 		this.parent = parent;
-		
-		this.protocol = protocol;
 
 		String initialHostValue = "localhost";
 		String port = "";
@@ -132,13 +129,13 @@ public class MonitorNewHostDialog extends Dialog {
 		FormData hostFormData = new FormData();
 		hostFormData.top = new FormAttachment(0, -1);
 		hostFormData.left = new FormAttachment(hostLabel, 5);
-		hostFormData.right = new FormAttachment(70, -10);
+		hostFormData.right = new FormAttachment(50/*70*/, -10);
 		hostText.setLayoutData(hostFormData);
 
 		Label portLabel = new Label(hostGroup, SWT.NONE);
 		portLabel.setText("Port :");
 		FormData portFormData = new FormData();
-		portFormData.left = new FormAttachment(70, 10);
+		portFormData.left = new FormAttachment(50/*70*/, 5/*10*/);
 		portLabel.setLayoutData(portFormData);
 
 		this.portText = new Text(hostGroup, SWT.BORDER);
@@ -146,8 +143,26 @@ public class MonitorNewHostDialog extends Dialog {
 		FormData portFormData2 = new FormData();
 		portFormData2.top = new FormAttachment(0, -1);
 		portFormData2.left = new FormAttachment(portLabel, 5);
-		portFormData2.right = new FormAttachment(100, 0);
+		portFormData2.right = new FormAttachment(70/*100*/, 0);
 		portText.setLayoutData(portFormData2);
+
+		Label protocolLabel = new Label(hostGroup, SWT.NONE);
+		protocolLabel.setText("Protocol :");
+		FormData protocolFormData1 = new FormData();
+		protocolFormData1.left = new FormAttachment(70, 5);
+		protocolLabel.setLayoutData(protocolFormData1);
+		
+		combo = new Combo(hostGroup,SWT.DROP_DOWN);
+		combo.add(Protocol.RMI.toString().toUpperCase());
+		combo.add(Protocol.HTTP.toString().toUpperCase());
+		combo.add(Protocol.IBIS.toString().toUpperCase());
+		combo.add(Protocol.JINI.toString().toUpperCase());
+		combo.setText("RMI");
+		FormData protocolFormData = new FormData();
+		protocolFormData.top = new FormAttachment(0, -1);
+		protocolFormData.left = new FormAttachment(protocolLabel, 5);
+		protocolFormData.right = new FormAttachment(100, 0);
+		combo.setLayoutData(protocolFormData);
 
 		Label depthLabel = new Label(shell, SWT.NONE);
 		depthLabel.setText("Hosts will be recursively searched up to a depth of :");
@@ -240,11 +255,13 @@ public class MonitorNewHostDialog extends Dialog {
 	private class MonitorNewHostListener extends SelectionAdapter {
 		String hostname;
 		int port ;
+		Protocol protocol;
 
 		public void widgetSelected(SelectionEvent e) {
 			if(e.widget == okButton) {
 				hostname = hostText.getText();
 				port = Integer.parseInt(portText.getText());
+				protocol = Protocol.getProtocolFromString((combo.getText()));
 				MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
 				new Thread(){
 					public void run(){
