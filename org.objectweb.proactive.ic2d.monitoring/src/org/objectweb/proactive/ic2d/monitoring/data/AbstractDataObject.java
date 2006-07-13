@@ -4,6 +4,7 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
@@ -15,8 +16,8 @@ public abstract class AbstractDataObject extends Observable {
 	
 	/** the object's parent */
 	protected AbstractDataObject parent;
-	/** the object's children which are monitored (HashMap<String, AbstractDataObject>) */
-	protected HashMap<String, AbstractDataObject> monitoredChildren;
+	/** the object's children which are monitored (Map<String, AbstractDataObject>) */
+	protected Map<String, AbstractDataObject> monitoredChildren;
 	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
 	protected HashMap<String, AbstractDataObject> skippedChildren;
 	

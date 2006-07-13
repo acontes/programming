@@ -30,51 +30,53 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.Comparator;
+
 import org.objectweb.proactive.core.UniqueID;
 
 public class AOObject extends AbstractDataObject{
-	
+
 	/**
 	 * State of the object (ex: WAITING_BY_NECESSITY)
 	 */
 	private int state;
-	
+
 	private String name;
-	
+
 	/** the object's name */
 	private String fullName;
-	
+
 	private static int counter = 0;
-	
+
 	private UniqueID id;
-    //
-    // -- CONSTRUCTORS -----------------------------------------------
-    //
-    
+	//
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
+
 	public AOObject(NodeObject parent, String name, UniqueID id){
 		super(parent);
-		
+
 		if ( name == null) 
 			name = this.getClass().getName() ;
 		this.name = name;
 		this.fullName = name + "#" + counter();
-		
+
 		this.id = id;
-		
-		
+
+
 		/*
 		if(((NodeObject)this.parent).spy == null)
 			System.err.println("AOObject : constructor => WARNING spy is null");
 		((NodeObject)this.parent).spy.addMessageEventListener(this.id);
-		
+
 		System.out.println("Constructor AOObject : className = "+className+", id = "+counter);
-		*/
+		 */
 	}
-	
-    //
-    // -- PUBLIC METHODS ---------------------------------------------
-    //
-	
+
+	//
+	// -- PUBLIC METHODS ---------------------------------------------
+	//
+
 	public String getKey() {
 		return this.id.toString();
 	}
@@ -82,11 +84,11 @@ public class AOObject extends AbstractDataObject{
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public String getFullName() {
 		return fullName;
 	}
-	
+
 	/**
 	 * Change the current state
 	 */
@@ -95,35 +97,49 @@ public class AOObject extends AbstractDataObject{
 		setChanged();
 		notifyObservers(new Integer(this.state));
 	}
-	
+
 	public int getState(){
 		return this.state;
 	}
-	
+
 	public String toString() {
 		return this.getFullName();
 	}
-	
+
 	public String getType() {
 		return "ao";
 	}
-	
+
 	//
-    // -- PROTECTED METHODS ---------------------------------------------
-    //
-	
+	// -- PROTECTED METHODS ---------------------------------------------
+	//
+
 	protected static synchronized void cancelCreation() {
 		counter--;
 	}
-	
-    //
-    // -- PRIVATE METHODS ---------------------------------------------
-    //
-	
-    private static synchronized int counter() {
-    	return ++counter;
-    }
+
+	//
+	// -- PRIVATE METHODS ---------------------------------------------
+	//
+
+	private static synchronized int counter() {
+		return ++counter;
+	}
 
 	public void explore() {/* Do nothing */}
-	
+
+
+	public static class AOComparator implements Comparator{
+		
+		/**
+		 * Compare two active objects.
+		 * (For Example: ao#3 and ao#5 give -1 because ao#3 has been discovered before ao#5.)
+		 * @return -1, 0, or 1 as the first argument is less than, equal to, or greater than the second.
+		 */
+		public int compare(Object ao1, Object ao2) {
+			String ao1Name = (String)ao1;
+			String ao2Name = (String)ao2;
+			return -(ao1Name.compareTo(ao2Name));
+		}	
+	}
 }

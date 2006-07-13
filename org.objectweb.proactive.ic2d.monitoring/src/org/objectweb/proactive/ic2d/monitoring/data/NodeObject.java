@@ -31,7 +31,9 @@
 package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.rmi.AlreadyBoundException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -80,6 +82,8 @@ public class NodeObject extends AbstractDataObject{
 
 	public NodeObject(VMObject parent, Node node){
 		super(parent/*, node.getNodeInformation().getName()*/);
+		Comparator comparator = new AOObject.AOComparator();
+		monitoredChildren = new TreeMap<String , AbstractDataObject>(comparator);
 		System.out.println("NodeObject : constructor");
 		this.node = node;
 		this.key = node.getNodeInformation().getName();
