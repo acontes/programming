@@ -190,10 +190,10 @@ public class NodeObject extends AbstractDataObject{
 			UniversalBody ub = (UniversalBody)aoWrapper.get(0);
 			String className = (String) aoWrapper.get(1);
 			/* We don't monitor spies */
-			if (className.equalsIgnoreCase(
-			"org.objectweb.proactive.ic2d.spy.Spy")) {
-				continue;
-			}
+//			if (className.equalsIgnoreCase(
+//			"org.objectweb.proactive.ic2d.spy.Spy")) {
+//				continue;
+//			}
 			AOObject ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID());
 			exploreChild(ao);
 		}
