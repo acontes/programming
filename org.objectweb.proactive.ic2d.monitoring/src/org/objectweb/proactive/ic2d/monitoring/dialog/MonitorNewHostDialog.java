@@ -242,44 +242,21 @@ public class MonitorNewHostDialog extends Dialog {
 		int port ;
 
 		public void widgetSelected(SelectionEvent e) {
-			if(e.widget == okButton) {		
-				switch(protocol) {
-				case RMI:
-					hostname = hostText.getText();
-					port = Integer.parseInt(portText.getText());
-					MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
-					new Thread(){
-						public void run(){
-							try {
-								new HostObject(hostname, port, protocol);
-							} catch (HostAlreadyExistsException e) {
-								displayMessage(e.getMessage());
-							}
+			if(e.widget == okButton) {
+				hostname = hostText.getText();
+				port = Integer.parseInt(portText.getText());
+				MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
+				new Thread(){
+					public void run(){
+						try {
+							new HostObject(hostname, port, protocol);
+						} catch (HostAlreadyExistsException e) {
+							displayMessage(e.getMessage());
 						}
-					}.start();
-
-					shell.close();
-					break;
-				case RMISSH:
-					// TODO
-					break;
-				case IBIS:
-					// TODO
-					break;
-				case JINI:
-					// TODO
-					break;
-				case HTTP:
-					// TODO
-					break;
-				default:
-					// TODO
-
-				}
+					}
+				}.start();
 			}
-			else if(e.widget == cancelButton) {
-				shell.close();
-			}
+			shell.close();
 		}
 	}
 }
