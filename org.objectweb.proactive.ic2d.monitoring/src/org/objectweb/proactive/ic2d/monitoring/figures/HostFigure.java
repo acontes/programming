@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class HostFigure extends AbstractRectangleFigure{
 	
-	protected final static int DEFAULT_WIDTH = 180;
+	protected final static int DEFAULT_WIDTH = 25;
 	
 	private IFigure contentPane;
 	
@@ -87,6 +87,11 @@ public class HostFigure extends AbstractRectangleFigure{
 		contentPane.setLayoutManager(contentPaneLayout);
 		
 		add(contentPane, BorderLayout.CENTER);
+	}
+
+	@Override
+	protected int getDefaultWidth() {
+		return DEFAULT_WIDTH;
 	}
 	
 	//

@@ -37,11 +37,17 @@ import org.eclipse.draw2d.geometry.Rectangle;
 
 public abstract class AbstractRectangleFigure extends AbstractFigure{
 	
+	/**
+	 * The complete title.
+	 */
+	private String title;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	protected AbstractRectangleFigure(String text){
 		super(text);
+		label.setText(getTextResized(text));
 	}
 	
 	//
@@ -60,6 +66,7 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 	//
 	// -- PROTECTED METHOD --------------------------------------------
 	//
+	
 	protected void paintIC2DFigure(Graphics graphics) {
 		// Inits
 		Rectangle bounds = getBounds().getCopy().resize(-5, -9)/*.translate(4, 0)*/;
@@ -79,5 +86,19 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 		
 		// Cleanups
 		graphics.restoreState();		
-	}	
+	}
+	
+	protected abstract int getDefaultWidth();
+	
+	/**
+	 * 
+	 * @param text
+	 * @return
+	 */
+	private String getTextResized(String text){
+		this.title = text;
+		if(text.length() > getDefaultWidth())
+			return (text.substring(0, getDefaultWidth())+"...");
+		return text;
+	}
 }

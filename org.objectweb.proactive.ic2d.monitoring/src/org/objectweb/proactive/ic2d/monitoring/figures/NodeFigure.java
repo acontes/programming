@@ -43,7 +43,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 
 public class NodeFigure extends AbstractRectangleFigure{
 		
-	protected final static int DEFAULT_WIDTH = 140;
+	protected final static int DEFAULT_WIDTH = 17;
 	
 	private IFigure contentPane;
 	
@@ -117,9 +117,10 @@ public class NodeFigure extends AbstractRectangleFigure{
 	}
 
 	protected void initFigure() {
-		BorderLayout layout = new BorderLayout();
+		BorderLayout layout = new NodeBorderLayout();
 		layout.setVerticalSpacing(5);
 		setLayoutManager(layout);
+
 		add(label, BorderLayout.TOP);
 		
 		contentPane = new Figure();
@@ -130,15 +131,28 @@ public class NodeFigure extends AbstractRectangleFigure{
 		add(contentPane, BorderLayout.CENTER);
 	}
 	
+	@Override
+	protected int getDefaultWidth() {
+		return DEFAULT_WIDTH;
+	}
+	
 	//
     // -- INNER CLASS --------------------------------------------
     //
+	
+	private class NodeBorderLayout extends BorderLayout {
+		
+		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
+			return super.calculatePreferredSize(container, wHint, hHint).expand(25,0);
+		}
+	}
 	
 	private class NodeToolbarLayout extends ToolbarLayout {
 		
 		public NodeToolbarLayout() {
 			super(false);
 		}
+
 		
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
 			return super.calculatePreferredSize(container, wHint, hHint).expand(10,15);

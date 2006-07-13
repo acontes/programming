@@ -42,10 +42,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class VMFigure extends AbstractRectangleFigure{
 
-	protected final static int DEFAULT_WIDTH = 160;
+	protected final static int DEFAULT_WIDTH = 19;
 
 	private IFigure contentPane;
-
 
 	public static final Color STANDARD_COLOR;
 	public static final Color GLOBUS_COLOR;
@@ -110,7 +109,7 @@ public class VMFigure extends AbstractRectangleFigure{
 	}
 
 	protected void initFigure() {
-		BorderLayout layout = new BorderLayout();
+		BorderLayout layout = new VMBorderLayout();
 		layout.setVerticalSpacing(5);
 		setLayoutManager(layout);
 		add(label, BorderLayout.TOP);
@@ -123,10 +122,24 @@ public class VMFigure extends AbstractRectangleFigure{
 		add(contentPane, BorderLayout.CENTER);
 	}
 
+	@Override
+	protected int getDefaultWidth() {
+		return DEFAULT_WIDTH;
+	}
+	
 	//
 	// -- INNER CLASS --------------------------------------------
 	//
 
+	
+	private class VMBorderLayout extends BorderLayout {
+		
+		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
+			System.out.println("VMBorderLayout.calculatePreferredSize()");
+			return super.calculatePreferredSize(container, wHint, hHint).expand(25,0);
+		}
+	}
+	
 	private class VMToolbarLayout extends ToolbarLayout {
 
 		public VMToolbarLayout() {
