@@ -35,6 +35,7 @@ import java.io.IOException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.Migratable;
@@ -47,8 +48,7 @@ import org.objectweb.proactive.core.node.Node;
 /**
  * The master Spy class
  */
-public class Spy implements org.objectweb.proactive.RunActive,
-ProActiveInternalObject {
+public class Spy implements RunActive, ProActiveInternalObject {
 	
 	/** Timeout between updates */
 	protected long updateFrequence = 3000;
@@ -79,6 +79,9 @@ ProActiveInternalObject {
 	}
 	
 	public void sendEventsForAllActiveObjects() {
+		
+		System.out.println(" # Spy.sendEventsForAllActiveObjects()");
+		
 		SpyEvent[] spyEvents = spyEventManager.createSpyEventForExistingBodies(LocalBodyStore.getInstance()
 				.getCurrentThreadBody());
 		notifyListener(spyEvents);

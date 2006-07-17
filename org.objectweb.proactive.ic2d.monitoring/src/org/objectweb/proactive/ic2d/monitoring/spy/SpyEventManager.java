@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.spy;
 
+import java.util.Iterator;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyMap;
@@ -145,7 +147,7 @@ public class SpyEventManager {
         knownBodies.removeBody(masterSpyID);
         SpyEvent[] spyEvents = new SpyEvent[knownBodies.size()]; // messages to send bufferized
         int i = 0;
-        java.util.Iterator bodiesIterator = knownBodies.bodiesIterator();
+        Iterator bodiesIterator = knownBodies.bodiesIterator();
         while (bodiesIterator.hasNext()) {
             Body activeObjectBody = (Body) bodiesIterator.next();
             if (activeObjectBody.isActive()) {
@@ -284,6 +286,9 @@ public class SpyEventManager {
         // -- implements BodyEventListener -----------------------------------------------
         //
         public void bodyCreated(BodyEvent event) {
+        	
+        	System.out.println("# MyBodyEventListener.bodyCreated()");
+        	
             Body body = checkBody(event.getBody());
             if (body == null) {
                 return;
@@ -296,6 +301,9 @@ public class SpyEventManager {
         }
 
         public void bodyDestroyed(BodyEvent event) {
+        	
+        	System.out.println("# MyBodyEventListener.bodyDestroyed()");
+        	
             Body body = checkBody(event.getBody());
             if (body == null) {
                 return;
@@ -307,6 +315,9 @@ public class SpyEventManager {
         }
 
         public void bodyChanged(BodyEvent event) {
+        	
+        	System.out.println("# MyBodyEventListener.bodyChanged()");
+        	
             Body body = checkBody(event.getBody());
             if (body == null) {
                 return;
@@ -319,6 +330,9 @@ public class SpyEventManager {
         }
 
         private Body checkBody(UniversalBody uBody) {
+        	
+        	System.out.println("# MyBodyEventListener.checkBody()");
+        	
             if (!(uBody instanceof Body)) {
                 return null;
             }
@@ -340,6 +354,9 @@ public class SpyEventManager {
         // -- implements RequestQueueEventListener -----------------------------------------------
         //
         public void requestQueueModified(RequestQueueEvent event) {
+        	
+        	System.out.println("# MyRequestQueueEventListener.requestQueueModified()");
+        	
             if (event.getType() == RequestQueueEvent.WAIT_FOR_REQUEST) {
                 addEvent(new SpyEvent(SpyEvent.OBJECT_WAIT_FOR_REQUEST_TYPE,
                         event.getOwnerID()));
@@ -355,11 +372,17 @@ public class SpyEventManager {
         // -- implements FutureEventListener -----------------------------------------------
         //
         public void waitingForFuture(FutureEvent event) {
+        	
+        	System.out.println("# MyFutureEventListener.waitingForFuture()");
+        	
             addEvent(new SpyFutureEvent(
                     SpyEvent.OBJECT_WAIT_BY_NECESSITY_TYPE, event));
         }
 
         public void receivedFutureResult(FutureEvent event) {
+        	
+        	System.out.println("# MyFutureEventListener.receivedFutureResult()");
+        	
             addEvent(new SpyFutureEvent(
                     SpyEvent.OBJECT_RECEIVED_FUTURE_RESULT_TYPE, event));
         }
@@ -373,6 +396,9 @@ public class SpyEventManager {
         // -- implements MessageEventListener -----------------------------------------------
         //
         public void requestSent(MessageEvent event) {
+        	
+        	System.out.println("# MyMessageEventListener.requestSent()");
+        	
             addEvent(new SpyMessageEvent(SpyEvent.REQUEST_SENT_MESSAGE_TYPE,
                     event));
             //Synchro purpose
@@ -386,15 +412,24 @@ public class SpyEventManager {
         }
 
         public void requestReceived(MessageEvent event) {
+        	
+        	System.out.println("# MyMessageEventListener.requestReceived()");
+        	
             addEvent(new SpyMessageEvent(
                     SpyEvent.REQUEST_RECEIVED_MESSAGE_TYPE, event));
         }
 
         public void replySent(MessageEvent event) {
+        	
+        	System.out.println("# MyMessageEventListener.replySent()");
+        	
             addEvent(new SpyMessageEvent(SpyEvent.REPLY_SENT_MESSAGE_TYPE, event));
         }
 
         public void replyReceived(MessageEvent event) {
+        	
+        	System.out.println("# MyMessageEventListener.replyReceived()");
+        	
             if (checkRequestSentEvent(event)) {
                 addEvent(new SpyMessageEvent(
                         SpyEvent.REPLY_RECEIVED_MESSAGE_TYPE, event));
@@ -402,11 +437,17 @@ public class SpyEventManager {
         }
 
         public void voidRequestServed(MessageEvent event) {
+        	
+        	System.out.println("# MyMessageEventListener.voidRequestServed()");
+        	
             addEvent(new SpyMessageEvent(SpyEvent.VOID_REQUEST_SERVED_TYPE,
                     event));
         }
 
         public void servingStarted(MessageEvent event) {
+        	
+        	System.out.println("# MyMessageEventListener.servingStarted()");
+        	
             addEvent(new SpyMessageEvent(SpyEvent.SERVING_STARTED_TYPE, event));
         }
     } // end inner class MyMessageEventListener

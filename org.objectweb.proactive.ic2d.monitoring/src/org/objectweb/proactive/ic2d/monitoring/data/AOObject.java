@@ -137,6 +137,9 @@ public class AOObject extends AbstractDataObject{
 
 	@Override
 	protected void foundForTheFirstTime() {
+		// Add a MessageEventListener to the spy
+		((NodeObject)this.parent).getSpy().addMessageEventListener(this.id);
+		
 		Console.getInstance(Activator.CONSOLE_NAME).
 		log("AOObject "+fullName+" created based on ActiveObject "+id.toString());
 	}

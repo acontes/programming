@@ -56,7 +56,7 @@ public class NodeObject extends AbstractDataObject{
 	/* A ProActive Node */
 	protected Node node;
 	/**  */
-	protected Spy spy;
+	private Spy spy;
 	private static String SPY_LISTENER_NODE_NAME = "SpyListenerNode";
 	private static Node SPY_LISTENER_NODE;
 	protected SpyListenerImpl activeSpyListener;
@@ -137,6 +137,10 @@ public class NodeObject extends AbstractDataObject{
 	public String getType() {
 		return "node";
 	}
+	
+	public Spy getSpy() {
+		return this.spy;
+	}
 
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
@@ -158,6 +162,9 @@ public class NodeObject extends AbstractDataObject{
 		catch(ActiveObjectCreationException e2) {
 			e2.printStackTrace();
 		}
+		
+		// Add a RequestQueueEventListener to the spy
+		this.spy.sendEventsForAllActiveObjects();
 	}
 
 	/**
