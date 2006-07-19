@@ -112,7 +112,7 @@ public class MonitorThread implements Observer {
 
 
 	public void update(Observable o, Object arg) {
-		if (arg != null) {
+		if (arg != null && arg instanceof String) {
 			String method = (String)arg;
 			if(method.compareTo("putChild")==0)
 				MonitorThread.getInstance().startRefreshing();

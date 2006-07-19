@@ -31,49 +31,89 @@
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
 import java.util.List;
+import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.VNColors;
 
 public class NodeEditPart extends AbstractIC2DEditPart{
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	public NodeEditPart(NodeObject model) {
 		super(model);
 	}
-	
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 
 	/**
-     * Convert the result of EditPart.getModel()
-     * to NodeObject (the real type of the model).
-     * @return the casted model
-     */
+	 * Convert the result of EditPart.getModel()
+	 * to NodeObject (the real type of the model).
+	 * @return the casted model
+	 */
 	public NodeObject getCastedModel(){
 		return (NodeObject)getModel();
 	}
-	
+
+	/**
+	 * This method is called whenever the observed object is changed.
+	 * It calls the method <code>refreshVisuals()</code>.
+	 * @param o the observable object (instance of AbstractDataObject).
+	 * @param arg an argument passed to the notifyObservers  method.
+	 */
+	public void update(Observable o, Object arg) {
+		if(arg != null && arg instanceof Integer) {
+			if(((Integer)arg).intValue() == State.HIGHLIGHTED) {
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run () {
+						((NodeFigure)getFigure()).
+						setHighlight(VNColors.getInstance().getColor(((NodeObject)getModel()).getVNParent().getKey()));
+						refreshVisuals();
+					}
+				});
+			}
+			else if(((Integer)arg).intValue() == State.NOT_HIGHLIGHTED) {
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run () {
+						((NodeFigure)getFigure()).setHighlight(null);
+						refreshVisuals();
+					}
+				});
+			}
+		}
+
+		else {
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run () {
+					refreshChildren();
+					refreshVisuals();		
+				}
+			});
+		}
+	}
 
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
-	
- 	/**
- 	 * Returns a new view associated
- 	 * with the type of model object the
- 	 * EditPart is associated with. So here, it returns a new NodeFigure.
- 	 * @return a new NodeFigure view associated with the NodeObject model.
- 	 */
+
+	/**
+	 * Returns a new view associated
+	 * with the type of model object the
+	 * EditPart is associated with. So here, it returns a new NodeFigure.
+	 * @return a new NodeFigure view associated with the NodeObject model.
+	 */
 	protected IFigure createFigure() {
 		return new NodeFigure(getCastedModel().getFullName(),getCastedModel().getProtocol());
 	}
-	
+
 	/**
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
@@ -81,8 +121,8 @@ public class NodeEditPart extends AbstractIC2DEditPart{
 	protected List getModelChildren() {
 		return getCastedModel().getMonitoredChildren();
 	}
-	
-	
+
+
 	/**
 	 * Fills the view with data extracted from the model object 
 	 * associated with the EditPart.
@@ -90,19 +130,19 @@ public class NodeEditPart extends AbstractIC2DEditPart{
 	 * the figure, and may also be called in response to 
 	 * notifications from the model. 
 	 */
-/*	protected void refreshVisuals(){ 
+	/*	protected void refreshVisuals(){ 
 		//TODO
 	}
-	*/
-	
+	 */
+
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
 	protected void createEditPolicies() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	
-	
+
+
+
 }

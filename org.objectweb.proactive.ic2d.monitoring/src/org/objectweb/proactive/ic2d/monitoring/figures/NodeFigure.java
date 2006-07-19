@@ -49,9 +49,12 @@ public class NodeFigure extends AbstractRectangleFigure{
 	
 	public static final Color RMI_COLOR;
 	
+	public static final Color DEFAULT_BORDER_COLOR;
+	
 	static {
 		Display device = Display.getCurrent();
 		RMI_COLOR = new Color(device, 208, 208, 224);
+		DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
 	}
 	
     //
@@ -111,7 +114,7 @@ public class NodeFigure extends AbstractRectangleFigure{
     //
 	protected void initColor() {
 		Device device = Display.getCurrent();
-		borderColor = new Color(device, 0, 0, 128);
+		borderColor = DEFAULT_BORDER_COLOR;
 		shadowColor = new Color(device, 230, 230, 230);
 	}
 
@@ -133,6 +136,11 @@ public class NodeFigure extends AbstractRectangleFigure{
 	@Override
 	protected int getDefaultWidth() {
 		return DEFAULT_WIDTH;
+	}
+	
+	@Override
+	protected Color getDefaultBorderColor() {
+		return DEFAULT_BORDER_COLOR;
 	}
 	
 	//

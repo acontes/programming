@@ -30,16 +30,64 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-public class State {
-	public static final int UNKNOWN = 0;
-	public static final int WAITING_FOR_REQUEST = 1;
-	public static final int SERVING_REQUEST = 2;
-    public static final int WAITING_BY_NECESSITY_WHILE_ACTIVE = 3;
-    public static final int WAITING_BY_NECESSITY_WHILE_SERVING = 4;
-	public static final int ACTIVE = 5;
-	public static final int MIGRATING = 6;
-	public static final int NOT_RESPONDING = 7;
+
+public class VNObject extends AbstractDataObject {
 	
-	public static final int HIGHLIGHTED = 8;
-	public static final int NOT_HIGHLIGHTED = 9;
+	private String name;
+	
+	//
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
+
+	protected VNObject(String name) {
+		super(WorldObject.getInstance());
+		this.name = name;
+	}
+
+	
+	//
+	// -- PUBLIC METHOD -----------------------------------------------
+	//
+	
+	
+	public static VNObject getInstance(String name){
+		return WorldObject.getInstance().getVirtualNode(name);
+	}
+
+	
+	@Override
+	public void explore() {/* Do nothing */}
+
+	@Override
+	public String getFullName() {
+		return name;
+	}
+
+	@Override
+	public String getKey() {
+		return name;
+	}
+
+	@Override
+	public String getType() {
+		return "vn";
+	}
+
+	
+	//
+	// -- PROTECTED METHOD -----------------------------------------------
+	//
+	
+	@Override
+	protected void alreadyMonitored() {
+		// TODO Auto-generated method stub
+
+	}
+	
+	@Override
+	protected void foundForTheFirstTime() {
+		// TODO Auto-generated method stub
+
+	}
+	
 }

@@ -31,17 +31,24 @@
 package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 
 /**
- * Holder class for all hosts
+ * Holder class for all monitored hosts and virtual nodes
  */
 public class WorldObject extends AbstractDataObject {
 
 	
 	private static WorldObject instance;
+	
+	/**
+	 * Contains all virtual nodes.
+	 */
+	private Map<String, VNObject> vnChildren;
 	
 	//
     // -- CONSTRUCTORS -----------------------------------------------
@@ -52,6 +59,7 @@ public class WorldObject extends AbstractDataObject {
 	 */
 	private WorldObject() {
         super(null);
+        vnChildren = new HashMap<String, VNObject>();
     }
 	
 	
@@ -87,6 +95,11 @@ public class WorldObject extends AbstractDataObject {
 	public String getType() {
 		return "world";
 	}
+
+	
+	public List<AbstractDataObject> getVNChildren() {
+		return new ArrayList<AbstractDataObject>(vnChildren.values());
+	}
 	
     //
     // -- PROTECTED METHODS -----------------------------------------------
@@ -119,7 +132,17 @@ public class WorldObject extends AbstractDataObject {
 		notifyObservers();
 	}
 
-
+	protected VNObject getVirtualNode(String name) {
+		VNObject virtualNode = vnChildren.get(name);
+		if(virtualNode == null){
+			virtualNode = new VNObject(name);
+			vnChildren.put(name, virtualNode);
+			setChanged();
+			notifyObservers(virtualNode);
+		}
+		return virtualNode;
+	}
+	
 	@Override
 	protected void alreadyMonitored() {/* Do nothing */}
 

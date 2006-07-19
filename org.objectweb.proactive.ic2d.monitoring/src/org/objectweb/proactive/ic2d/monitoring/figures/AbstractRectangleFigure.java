@@ -37,11 +37,6 @@ import org.eclipse.draw2d.geometry.Rectangle;
 
 public abstract class AbstractRectangleFigure extends AbstractFigure{
 	
-	/**
-	 * The complete title.
-	 */
-	private String title;
-	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -70,19 +65,22 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 	protected void paintIC2DFigure(Graphics graphics) {
 		// Inits
 		Rectangle bounds = getBounds().getCopy().resize(-5, -9)/*.translate(4, 0)*/;
-		final int round = 25;
-		final int sround = 30;
+		final int round = 15;
+		//final int sround = 30;
 		
 		// Shadow
 		if(showShadow){
 			graphics.setBackgroundColor(this.shadowColor);
-			graphics.fillRoundRectangle(bounds.getTranslated(4, 4), round, sround);
+			graphics.fillRoundRectangle(bounds.getTranslated(4, 4), round, /*s*/round);
 		}
 		// Drawings
 		graphics.setForegroundColor(this.borderColor);
 		graphics.setBackgroundColor(this.backgroundColor);
 		graphics.fillRoundRectangle(bounds, round, round);
 		graphics.drawRoundRectangle(bounds, round, round);
+		if(highlighted) {
+			graphics.drawRoundRectangle(bounds.getCopy().resize(-2, -2).translate(1, 1), round-3, round-3);
+		}
 		
 		// Cleanups
 		graphics.restoreState();		
@@ -96,7 +94,6 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 	 * @return
 	 */
 	private String getTextResized(String text){
-		this.title = text;
 		if(text.length() > getDefaultWidth())
 			return (text.substring(0, getDefaultWidth())+"...");
 		return text;

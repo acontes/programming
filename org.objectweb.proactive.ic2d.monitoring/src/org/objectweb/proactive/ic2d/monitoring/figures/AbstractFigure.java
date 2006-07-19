@@ -51,6 +51,8 @@ public abstract class AbstractFigure extends Figure{
 	protected Color backgroundColor;
 	protected Color shadowColor;
 	
+	protected boolean highlighted;
+	
 	protected static boolean showShadow = false; 
 	
 	
@@ -62,6 +64,7 @@ public abstract class AbstractFigure extends Figure{
 		
 		// Initialisation
 		this.label = new Label(text);
+		highlighted = false;
 		initFigure();
 		initColor();
 	}
@@ -84,6 +87,16 @@ public abstract class AbstractFigure extends Figure{
 	public abstract IFigure getContentPane();
 	
 	
+	public void setHighlight(Color color) {
+		this.highlighted = (color != null);
+		if(highlighted)
+			this.borderColor = color;
+		else
+			this.borderColor = getDefaultBorderColor();
+		this.repaint();
+	}
+
+	
 	//
 	// -- PROTECTED METHODS --------------------------------------------
 	//
@@ -93,5 +106,7 @@ public abstract class AbstractFigure extends Figure{
 	protected abstract void initColor();
 	
 	protected abstract void paintIC2DFigure(Graphics graphics);
+
+	protected abstract Color getDefaultBorderColor();
 	
 }

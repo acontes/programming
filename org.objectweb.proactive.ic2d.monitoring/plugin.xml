@@ -16,7 +16,7 @@
          point="org.eclipse.ui.views">
       <category
             id="org.objectweb.proactive.ic2d.monitoring.category"
-            name="Monitoring category"/>
+            name="Monitoring"/>
       <view
             category="org.objectweb.proactive.ic2d.monitoring.category"
             class="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"

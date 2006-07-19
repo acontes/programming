@@ -50,10 +50,13 @@ public class VMFigure extends AbstractRectangleFigure{
 	public static final Color GLOBUS_COLOR;
 	public static final Color NOT_RESPONDING = ColorConstants.red;
 
+	private static final Color DEFAULT_BORDER_COLOR;
+	
 	static {
 		Display device = Display.getCurrent();
 		STANDARD_COLOR = new Color(device, 240, 240, 240);
 		GLOBUS_COLOR = new Color(device, 255, 208, 208);
+		DEFAULT_BORDER_COLOR = new Color(device, 140, 200, 225);
 	}
 	//
 	// -- CONSTRUCTOR -----------------------------------------------
@@ -102,7 +105,7 @@ public class VMFigure extends AbstractRectangleFigure{
 
 	protected void initColor() {
 		Device device = Display.getCurrent();
-		borderColor = new Color(device, 140, 200, 225);
+		borderColor = DEFAULT_BORDER_COLOR;
 		backgroundColor = STANDARD_COLOR;
 		shadowColor = new Color(device, 230, 230, 230);
 	}
@@ -124,6 +127,12 @@ public class VMFigure extends AbstractRectangleFigure{
 	@Override
 	protected int getDefaultWidth() {
 		return DEFAULT_WIDTH;
+	}
+	
+	
+	@Override
+	protected Color getDefaultBorderColor() {
+		return DEFAULT_BORDER_COLOR;
 	}
 	
 	//

@@ -45,21 +45,25 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
+import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
 import org.objectweb.proactive.ic2d.monitoring.spy.Spy;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyEventListenerImpl;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyListenerImpl;
 
 public class NodeObject extends AbstractDataObject{
 
+	/* The virtual node containing this node */
+	private VNObject vnParent;
+	
 	/* The node name */
 	private String key;
 	/* A ProActive Node */
-	protected Node node;
+	private Node node;
 	/**  */
 	private Spy spy;
 	private static String SPY_LISTENER_NODE_NAME = "SpyListenerNode";
 	private static Node SPY_LISTENER_NODE;
-	protected SpyListenerImpl activeSpyListener;
+	private SpyListenerImpl activeSpyListener;
 
 	static {
 		String currentHost;
@@ -125,7 +129,7 @@ public class NodeObject extends AbstractDataObject{
 	 */
 	public Protocol getProtocol() {
 		// TODO Uses the parent's protocol or the node's protocol ?
-		// return node.getNodeInformation().getProtocol();// TODO Don't forget to transform this string to a protocol
+		// return node.getNodeInformation().getProtocol();
 		return ((HostObject)this.parent.parent).getProtocol();
 	}
 
@@ -141,7 +145,21 @@ public class NodeObject extends AbstractDataObject{
 	public Spy getSpy() {
 		return this.spy;
 	}
-
+	
+	
+	public void setHighlight(boolean highlighted) {
+		this.setChanged();
+		if (highlighted)
+			this.notifyObservers(new Integer(State.HIGHLIGHTED));
+		else
+			this.notifyObservers(new Integer(State.NOT_HIGHLIGHTED));
+	}
+	
+	
+	public VNObject getVNParent() {
+		return vnParent;
+	}
+	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
@@ -167,18 +185,28 @@ public class NodeObject extends AbstractDataObject{
 		this.spy.sendEventsForAllActiveObjects();
 	}
 
-	/**
-	 * Get the typed parent
-	 * @return the typed parent
-	 */
-	protected VMObject getTypedParent() {
-		return (VMObject) parent;
-	}
+	
 	
 	@Override
 	protected void foundForTheFirstTime() {
 		Console.getInstance(Activator.CONSOLE_NAME).log("NodeObject id="+key+" created");
 		this.addSpy();
+		
+		String vnName = null;
+		try {
+			vnName = getTypedParent().getRuntime().getVNName(node.getNodeInformation().getName());
+		} catch (ProActiveException e) {
+			// TODO Auto-generated catch block
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+			e.printStackTrace();
+		}
+		if(vnName != null) {
+			this.vnParent = VNObject.getInstance(vnName);
+			if(FilterProcess.getInstance().filter(this))
+				vnParent.skippedChildren.put(key, this);
+			else
+				vnParent.putChild(this);
+		}
 	}
 
 	@Override
@@ -189,6 +217,15 @@ public class NodeObject extends AbstractDataObject{
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
+	
+	/**
+	 * Get the typed parent
+	 * @return the typed parent
+	 */
+	private VMObject getTypedParent() {
+		return (VMObject) parent;
+	}
+	
 	/**
 	 * TODO
 	 * @param activeObjects names' list of active objects containing in this NodeObject

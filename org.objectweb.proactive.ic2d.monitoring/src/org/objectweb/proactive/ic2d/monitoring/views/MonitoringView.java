@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.monitoring.views;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.EditPartFactory;
+import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
@@ -39,6 +40,8 @@ import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.part.ViewPart;
@@ -46,34 +49,32 @@ import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.editparts.IC2DEditPartFactory;
 
+
 public class MonitoringView extends ViewPart {
 
 	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.views.MonitoringView";
 
 	/** the graphical viewer */
 	private ScrollingGraphicalViewer graphicalViewer;
-
+	
+	/** the overview outline page */
+    //private OverviewOutlinePage overviewOutlinePage;
+	
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
 
 	public void createPartControl(Composite parent){
-		// create graphical viewer
-		graphicalViewer = new ScrollingGraphicalViewer();
-		graphicalViewer.createControl(parent);
-
-		// configure the viewer
-		graphicalViewer.getControl().setBackground(ColorConstants.white);
-		graphicalViewer.setRootEditPart(new ScalableFreeformRootEditPart());
-
-		// activate the viewer as selection provider for Eclipse
-		getSite().setSelectionProvider(graphicalViewer);
-
-		// initialize the viewer with input
-		graphicalViewer.setEditPartFactory(new IC2DEditPartFactory());
-		WorldObject world = WorldObject.getInstance();
-		world.addObserver(MonitorThread.getInstance());
-		graphicalViewer.setContents(world);
+		
+		SashForm sashForm = new SashForm(parent, SWT.VERTICAL);
+        sashForm.setBackground(parent.getBackground());
+		
+        VirtualNodesGroup virtualNodesGroup = new VirtualNodesGroup(sashForm);
+        WorldObject.getInstance().addObserver(virtualNodesGroup);
+        
+		createGraphicalViewer(sashForm);
+		
+		sashForm.setWeights(new int[] { 15, 85 });
 
 		// Adds Zoom-in and Zoom-out actions to the view's toolbar		
 		getViewSite().getActionBars().getToolBarManager().add(new ZoomIn());
@@ -97,11 +98,33 @@ public class MonitoringView extends ViewPart {
 //		} 
 	}
 
+	
+    /**
+     * Returns the <code>GraphicalViewer</code> of this editor.
+     * @return the <code>GraphicalViewer</code>
+     */
+    public GraphicalViewer getGraphicalViewer() {
+        return graphicalViewer;
+    }
+    
 
 	public void setFocus() {
 		// TODO Auto-generated method stub
 	}
 
+	
+	/* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+ /*   public Object getAdapter(Class adapter) {
+    	if (adapter == IContentOutlinePage.class) {
+            return getOverviewOutlinePage();
+    	}
+    	// the super implementation handles the rest
+        return super.getAdapter(adapter);
+    }*/
+	
+	
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
@@ -115,6 +138,47 @@ public class MonitoringView extends ViewPart {
 		return new IC2DEditPartFactory();
 	}
 
+
+    /**
+     * Returns the overview for the outline view.
+     * 
+     * @return the overview
+     */
+   /* protected OverviewOutlinePage getOverviewOutlinePage() {
+        if (null == overviewOutlinePage && null != getGraphicalViewer()) {
+            RootEditPart rootEditPart = getGraphicalViewer().getRootEditPart();
+            if (rootEditPart instanceof ScalableFreeformRootEditPart) {
+                overviewOutlinePage =
+                    new OverviewOutlinePage((ScalableFreeformRootEditPart) rootEditPart);
+            }
+        }
+
+        return overviewOutlinePage;
+    }*/
+	
+    //
+	// -- PRIVATE METHODS -------------------------------------------
+	//
+    
+	private void createGraphicalViewer(Composite parent) {
+		// create graphical viewer
+		graphicalViewer = new ScrollingGraphicalViewer();
+		graphicalViewer.createControl(parent);
+
+		// configure the viewer
+		graphicalViewer.getControl().setBackground(ColorConstants.white);
+		graphicalViewer.setRootEditPart(new ScalableFreeformRootEditPart());
+
+		// activate the viewer as selection provider for Eclipse
+		getSite().setSelectionProvider(graphicalViewer);
+
+		// initialize the viewer with input
+		graphicalViewer.setEditPartFactory(new IC2DEditPartFactory());
+		WorldObject world = WorldObject.getInstance();
+		world.addObserver(MonitorThread.getInstance());
+		graphicalViewer.setContents(world);
+	}
+    
 	//
 	// -- INNER CLASSES -------------------------------------------
 	//
@@ -158,5 +222,7 @@ public class MonitoringView extends ViewPart {
 			super.dispose();
 		}
 	}
+	
+	
 
 }

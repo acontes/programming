@@ -19,7 +19,7 @@ public abstract class AbstractDataObject extends Observable {
 	/** the object's children which are monitored (Map<String, AbstractDataObject>) */
 	protected Map<String, AbstractDataObject> monitoredChildren;
 	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
-	protected HashMap<String, AbstractDataObject> skippedChildren;
+	protected Map<String, AbstractDataObject> skippedChildren;
 
 
 	//
@@ -75,18 +75,6 @@ public abstract class AbstractDataObject extends Observable {
 		return parent;
 	}
 
-
-	/**
-	 * Returns the top level parent
-	 * @return the top level parent
-	 */
-	public AbstractDataObject getTopLevelParent() {
-		if (parent == null) {
-			return this;
-		} else {
-			return parent.getTopLevelParent();
-		}
-	}
 
 	/**
 	 * Stop monitor this object

@@ -45,6 +45,13 @@ public class HostFigure extends AbstractRectangleFigure{
 	
 	private IFigure contentPane;
 	
+	private final static Color DEFAULT_BORDER_COLOR;
+	
+	static {
+		Display device = Display.getCurrent();
+		DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
+	}
+	
     //
     // -- CONSTRUCTOR -----------------------------------------------
     //
@@ -66,7 +73,7 @@ public class HostFigure extends AbstractRectangleFigure{
     //
 	protected void initColor() {
 		Device device = Display.getCurrent();
-		borderColor = new Color(device, 0, 0, 128);
+		borderColor = DEFAULT_BORDER_COLOR;
 		backgroundColor = new Color(device, 208, 208, 208);
 		shadowColor = new Color(device, 230, 230, 230);
 	}
@@ -113,5 +120,11 @@ public class HostFigure extends AbstractRectangleFigure{
 		}
 		
 		
+	}
+
+	@Override
+	protected Color getDefaultBorderColor() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

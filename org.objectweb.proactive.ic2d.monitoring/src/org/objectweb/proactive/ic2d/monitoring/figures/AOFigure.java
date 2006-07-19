@@ -54,6 +54,8 @@ public class AOFigure extends AbstractFigure {
 	public static final Color COLOR_WHEN_MIGRATING;
 	public static final Color COLOR_WHEN_NOT_RESPONDING;
 
+	private static final Color DEFAULT_BORDER_COLOR;
+	
 	static {
 		Display device = Display.getCurrent();
 		COLOR_WHEN_WAITING_FOR_REQUEST = new Color(device, 225, 225, 225);
@@ -62,6 +64,8 @@ public class AOFigure extends AbstractFigure {
 		COLOR_WHEN_SERVING_REQUEST = new Color(device, 255, 255, 255);
 		COLOR_WHEN_MIGRATING = new Color(device, 0, 0, 255);// blue
 		COLOR_WHEN_NOT_RESPONDING = new Color(device, 255, 0, 0);// red
+		
+		DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
 	}
 
 	//
@@ -99,7 +103,7 @@ public class AOFigure extends AbstractFigure {
 		// Shadow
 		if(showShadow){
 			graphics.setBackgroundColor(shadowColor);
-			graphics.fillOval(this.getBounds().getTranslated(4, 4));
+			graphics.fillOval(bounds.getTranslated(4, 4));
 		}
 
 		// Drawings
@@ -158,7 +162,7 @@ public class AOFigure extends AbstractFigure {
 	protected void initColor() {
 		Device device = Display.getCurrent();
 		
-		borderColor = new Color(device, 0, 0, 128);
+		borderColor = DEFAULT_BORDER_COLOR;
 		backgroundColor = new Color(device, 225, 225, 225);
 		shadowColor = new Color(device, 230, 230, 230);
 	}
@@ -169,6 +173,11 @@ public class AOFigure extends AbstractFigure {
 		add(label, BorderLayout.CENTER);
 	}
 
+	@Override
+	protected Color getDefaultBorderColor() {
+		return DEFAULT_BORDER_COLOR;
+	}
+	
 	//
 	// -- INNER CLASS -------------------------------------------
 	//

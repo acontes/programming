@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
@@ -85,7 +84,7 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
 		//layout.setStretchMinorAxis(false);
 		layer.setLayoutManager(/*new FreeformLayout()*/layout);
-		layer.setBorder(new LineBorder(1));
+		//layer.setBorder(new LineBorder(1));
 		return layer;
 	}
 
