@@ -3,10 +3,12 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
 
 /**
@@ -42,7 +44,7 @@ public abstract class AbstractDataObject extends Observable {
 	//
 
 	public AbstractDataObject getChild(String key){
-		return (AbstractDataObject) monitoredChildren.get(key);
+		return monitoredChildren.get(key);
 	}
 
 	/**
@@ -118,6 +120,24 @@ public abstract class AbstractDataObject extends Observable {
 	 */
 	public abstract String getType();
 	
+	/**
+	 * Find an active object.
+	 * @param id The UniqueID of the active object
+	 * @return The active object, or null.
+	 */
+    public synchronized AOObject findActiveObjectById(UniqueID id) {
+    	// We search in the monitored objects.
+        Iterator iterator = monitoredChildren.values().iterator();
+        while (iterator.hasNext()) {
+            AbstractDataObject object = (AbstractDataObject) iterator.next();
+            AOObject activeObject = object.findActiveObjectById(id);
+            if (activeObject != null) {
+                return activeObject;
+            }
+        }
+        return null;
+    }	
+	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
@@ -141,7 +161,7 @@ public abstract class AbstractDataObject extends Observable {
 		if(skippedChildren.containsKey(child.getKey()))
 			return;
 		if(monitoredChildren.containsKey(child.getKey())) {
-			child = (AbstractDataObject)monitoredChildren.get(child.getKey());
+			child = monitoredChildren.get(child.getKey());
 			child.alreadyMonitored();
 			child.explore();
 		}

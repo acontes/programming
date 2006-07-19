@@ -38,6 +38,7 @@ import java.util.TreeMap;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -146,6 +147,11 @@ public class NodeObject extends AbstractDataObject{
 		return this.spy;
 	}
 	
+	@Override
+    public synchronized AOObject findActiveObjectById(UniqueID id) {
+		return (AOObject) monitoredChildren.get(id.toString());
+	}
+	
 	
 	public void setHighlight(boolean highlighted) {
 		this.setChanged();
@@ -159,7 +165,6 @@ public class NodeObject extends AbstractDataObject{
 	public VNObject getVNParent() {
 		return vnParent;
 	}
-	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
