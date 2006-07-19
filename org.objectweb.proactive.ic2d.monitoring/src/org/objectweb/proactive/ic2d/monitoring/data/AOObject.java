@@ -35,6 +35,7 @@ import java.util.Comparator;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
+import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
 
 public class AOObject extends AbstractDataObject{
 
@@ -69,14 +70,31 @@ public class AOObject extends AbstractDataObject{
 	// -- PUBLIC METHODS ---------------------------------------------
 	//
 
+	/**
+	 * Returns the Unique ID of the active object.
+	 */
+	public UniqueID getID(){
+		return this.id;
+	}
+	
+	/**
+	 * Returns the key.
+	 */
 	public String getKey() {
 		return this.id.toString();
 	}
 
+	/**
+	 * Returns the object's name. (ex: ao)
+	 * @return
+	 */
 	public String getName() {
 		return this.name;
 	}
 
+	/**
+	 * Returns the object's full name. (ex: ao#3)
+	 */
 	public String getFullName() {
 		return fullName;
 	}
@@ -94,6 +112,15 @@ public class AOObject extends AbstractDataObject{
 		return this.state;
 	}
 
+	/**
+	 * Add a communication between two active objects.
+	 * @param 
+	 */
+	public void addCommunication(SpyMessageEvent message){
+		setChanged();
+		notifyObservers(message);
+	}
+	
 	public String toString() {
 		return this.getFullName();
 	}

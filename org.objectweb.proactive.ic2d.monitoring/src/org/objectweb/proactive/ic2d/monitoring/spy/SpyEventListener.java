@@ -60,5 +60,5 @@ public interface SpyEventListener extends ProActiveListener {
 
     public void allEventsProcessed();
 
-    public void servingStarted(UniqueID uniqueID, SpyEvent spyEvent);
+    public void servingStarted(UniqueID id, SpyEvent spyEvent);
 }

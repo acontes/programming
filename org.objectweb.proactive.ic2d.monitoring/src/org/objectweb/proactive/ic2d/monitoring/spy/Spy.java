@@ -79,9 +79,6 @@ public class Spy implements RunActive, ProActiveInternalObject {
 	}
 	
 	public void sendEventsForAllActiveObjects() {
-		
-		System.out.println(" # Spy.sendEventsForAllActiveObjects()");
-		
 		SpyEvent[] spyEvents = spyEventManager.createSpyEventForExistingBodies(LocalBodyStore.getInstance()
 				.getCurrentThreadBody());
 		notifyListener(spyEvents);
@@ -126,19 +123,15 @@ public class Spy implements RunActive, ProActiveInternalObject {
 	// -- ADD / REMOVE LISTENERS -----------------------------------------------
 	//
 	public void addMessageEventListener(UniqueID bodyId) {
-		System.out.println("# Spy : addMessageEventListener");
 		Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
 		if (body != null) {
-			System.out.println("# Spy : addMessageEventListener -> body is not null");
 			spyEventManager.addMessageEventListener(body);
 		}
 	}
 	
 	public void removeMessageEventListener(UniqueID bodyId) {
-		System.out.println("# Spy : removeMessageEventListener");
 		Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
 		if (body != null) {
-			System.out.println("# Spy : removeMessageEventListener -> body is not null");
 			spyEventManager.removeMessageEventListener(body);
 		}
 	}

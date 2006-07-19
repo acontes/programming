@@ -30,7 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.spy;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
@@ -62,13 +66,13 @@ public class SpyEventManager {
      * Log of all the RequestSent messages received
      * to perform a search when receiving a ReplyReceive
      */
-    protected java.util.LinkedList requestSentEventsList;
-    protected java.util.LinkedList replyReceivedEventsList;
+    protected LinkedList<MessageEvent> requestSentEventsList;
+    protected LinkedList<MessageEvent> replyReceivedEventsList;
 
     /**
      * Vector of pending messages
      */
-    protected java.util.List pendingSpyEvents;
+    protected List<SpyEvent> pendingSpyEvents;
     protected UniqueID masterSpyID;
 
     /**
@@ -87,11 +91,11 @@ public class SpyEventManager {
         futureEventListener = new MyFutureEventListener();
 
         // Initialises the list of pending messages
-        pendingSpyEvents = new java.util.ArrayList();
+        pendingSpyEvents = new ArrayList<SpyEvent>();
         // Initialize the list of RequestSent
-        requestSentEventsList = new java.util.LinkedList();
+        requestSentEventsList = new LinkedList<MessageEvent>();
         // Initialize the list of ReplyReceived
-        replyReceivedEventsList = new java.util.LinkedList();
+        replyReceivedEventsList = new LinkedList<MessageEvent>();
 
         lastTimeMasterSpyCheck = System.currentTimeMillis();
     }
@@ -195,7 +199,7 @@ public class SpyEventManager {
         UniqueID requestSenderID = requestSentEvent.getSourceBodyID();
         UniqueID requestReceiverID = requestSentEvent.getDestinationBodyID();
         synchronized (replyReceivedEventsList) {
-            java.util.ListIterator l = replyReceivedEventsList.listIterator();
+            ListIterator l = replyReceivedEventsList.listIterator();
             while (l.hasNext()) {
                 MessageEvent replyReceivedEvent = (MessageEvent) l.next();
                 if (sequence == replyReceivedEvent.getSequenceNumber()) {
@@ -221,7 +225,7 @@ public class SpyEventManager {
         UniqueID replySenderID = replyReceivedEvent.getSourceBodyID();
         UniqueID replyReceiverID = replyReceivedEvent.getDestinationBodyID();
         synchronized (replyReceivedEventsList) {
-            java.util.ListIterator l = requestSentEventsList.listIterator();
+            ListIterator l = requestSentEventsList.listIterator();
             while (l.hasNext()) {
                 MessageEvent requestSentEvent = (MessageEvent) l.next();
                 if (sequence == requestSentEvent.getSequenceNumber()) {
@@ -261,7 +265,7 @@ public class SpyEventManager {
         // we deregister from everybody
         removeBodyEventListener();
         synchronized (pendingSpyEvents) {
-            java.util.ListIterator l = pendingSpyEvents.listIterator();
+            ListIterator l = pendingSpyEvents.listIterator();
             while (l.hasNext()) {
                 SpyEvent event = (SpyEvent) l.next();
                 UniqueID bodyID = event.getBodyID();
@@ -397,8 +401,6 @@ public class SpyEventManager {
         //
         public void requestSent(MessageEvent event) {
         	
-        	System.out.println("# MyMessageEventListener.requestSent()");
-        	
             addEvent(new SpyMessageEvent(SpyEvent.REQUEST_SENT_MESSAGE_TYPE,
                     event));
             //Synchro purpose
@@ -413,22 +415,16 @@ public class SpyEventManager {
 
         public void requestReceived(MessageEvent event) {
         	
-        	System.out.println("# MyMessageEventListener.requestReceived()");
-        	
             addEvent(new SpyMessageEvent(
                     SpyEvent.REQUEST_RECEIVED_MESSAGE_TYPE, event));
         }
 
         public void replySent(MessageEvent event) {
         	
-        	System.out.println("# MyMessageEventListener.replySent()");
-        	
             addEvent(new SpyMessageEvent(SpyEvent.REPLY_SENT_MESSAGE_TYPE, event));
         }
 
         public void replyReceived(MessageEvent event) {
-        	
-        	System.out.println("# MyMessageEventListener.replyReceived()");
         	
             if (checkRequestSentEvent(event)) {
                 addEvent(new SpyMessageEvent(
@@ -438,15 +434,11 @@ public class SpyEventManager {
 
         public void voidRequestServed(MessageEvent event) {
         	
-        	System.out.println("# MyMessageEventListener.voidRequestServed()");
-        	
             addEvent(new SpyMessageEvent(SpyEvent.VOID_REQUEST_SERVED_TYPE,
                     event));
         }
 
         public void servingStarted(MessageEvent event) {
-        	
-        	System.out.println("# MyMessageEventListener.servingStarted()");
         	
             addEvent(new SpyMessageEvent(SpyEvent.SERVING_STARTED_TYPE, event));
         }

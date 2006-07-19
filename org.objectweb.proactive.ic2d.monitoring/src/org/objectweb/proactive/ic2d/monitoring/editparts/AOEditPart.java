@@ -37,21 +37,23 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.Connection;
+import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
 
 public class AOEditPart extends AbstractIC2DEditPart{
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	public AOEditPart(AOObject model) {
 		super(model);
 	}
-	
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-	
+
 	/**
 	 * This method is called whenever the observed object is changed.
 	 * It calls the method <code>refreshVisuals()</code>.
@@ -59,33 +61,53 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
 	public void update(Observable o, Object arg) {
-		final int value = ((Integer)arg).intValue();
-		if(arg != null && arg instanceof Integer)
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run () {
-					getCastedFigure().setState(value);
-					refreshChildren();
-					refreshVisuals();		
-				}
-			});
+		if(arg != null){
+			if(arg instanceof Integer){
+				final int value = ((Integer)arg).intValue();
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run () {
+						getCastedFigure().setState(value);
+						refreshChildren();
+						refreshVisuals();
+					}
+				});
+			}
+			else if(arg instanceof SpyMessageEvent){
+				SpyMessageEvent message = (SpyMessageEvent)arg;
+				final String source = message.getSourceBodyID().toString();
+				final String target = message.getDestinationBodyID().toString();
+			
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run () {
+						IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure();
+						if(((AOObject)getModel()).getID().toString().compareTo(source)==0)
+							Connection.addSourceConnection(panel, source, (AOFigure)getFigure(), target);
+						else
+							Connection.addTargetConnection(panel, target, (AOFigure)getFigure(), source);
+					}
+				});
+			}
+		}
 		else
 			super.update(o, arg);
 	}
-	
+
+
+
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
-	
- 	/**
- 	 * Returns a new view associated
- 	 * with the type of model object the
- 	 * EditPart is associated with. So here, it returns a new NodeFigure.
- 	 * @return a new NodeFigure view associated with the NodeObject model.
- 	 */
+
+	/**
+	 * Returns a new view associated
+	 * with the type of model object the
+	 * EditPart is associated with. So here, it returns a new NodeFigure.
+	 * @return a new NodeFigure view associated with the NodeObject model.
+	 */
 	protected IFigure createFigure() {
 		return new AOFigure(getCastedModel().getFullName());
 	}
-	
+
 	/**
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
@@ -96,13 +118,13 @@ public class AOEditPart extends AbstractIC2DEditPart{
 
 	protected void createEditPolicies() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
 	//
-	
+
 	/**
 	 * Convert the result of EditPart.getModel()
 	 * to AOObject (the real type of the model).
@@ -111,7 +133,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	public AOObject getCastedModel(){
 		return (AOObject)getModel();
 	}
-	
+
 	/**
 	 * Convert the result of EditPart.getFigure()
 	 * to AOFigure (the real type of the figure).
@@ -120,5 +142,5 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	public AOFigure getCastedFigure(){
 		return (AOFigure)getFigure();
 	}
-	
+
 }

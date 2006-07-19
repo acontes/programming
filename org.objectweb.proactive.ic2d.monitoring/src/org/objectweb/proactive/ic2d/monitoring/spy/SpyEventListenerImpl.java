@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
@@ -65,6 +66,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 		ao.setState(State.WAITING_FOR_REQUEST);
+		
 	}
 
 	public void objectWaitingByNecessity(UniqueID id, SpyEvent spyEvent) {
@@ -106,10 +108,27 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	public void requestMessageReceived(UniqueID id, SpyEvent spyEvent) {
 		System.out.println("# SpyEventListener : requestMessageReceived ,id="+getName(id));
-		AOObject ao = getActiveObject(id);
-		if(ao == null)
+		AOObject destination = nodeObject.findActiveObjectById(id);
+		if(destination == null)
 			return;
-		ao.setState(State.SERVING_REQUEST);
+		destination.setState(State.SERVING_REQUEST);
+		
+		UniqueID sourceId = ((SpyMessageEvent) spyEvent).getSourceBodyID();
+		AOObject source = WorldObject.getInstance().findActiveObjectById(sourceId);
+		
+		// We didn't find the source
+		if(source == null)
+			return;
+		
+		// We didn't find the destination
+		if(destination == null)
+			return;
+		else{
+			//Communication communication = new Communication(source, destination);
+			
+			source.addCommunication(/*communication*/(SpyMessageEvent) spyEvent);
+			destination.addCommunication(/*communication*/(SpyMessageEvent) spyEvent);
+		}
 	}
 
 	public void replyMessageReceived(UniqueID id, SpyEvent spyEvent) {
