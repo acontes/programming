@@ -36,7 +36,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -109,7 +108,7 @@ public class MonitorNewHostDialog extends Dialog {
 		layout.marginWidth = 5;
 		shell.setLayout(layout);
 
-
+		////// group "Host to monitor"
 		Group hostGroup = new Group(shell, SWT.NONE);
 		hostGroup.setText("Host to monitor");
 		FormLayout hostLayout = new FormLayout();
@@ -121,37 +120,43 @@ public class MonitorNewHostDialog extends Dialog {
 		hostFormData1.right = new FormAttachment(100, 0);
 		hostGroup.setLayoutData(hostFormData1);
 
+		// label "Name or IP"
 		Label hostLabel = new Label(hostGroup, SWT.NONE);
 		hostLabel.setText("Name or IP :");
-
+		
+		// text hostname or IP
 		this.hostText = new Text(hostGroup, SWT.BORDER);
 		hostText.setText(initialHostValue);
 		FormData hostFormData = new FormData();
 		hostFormData.top = new FormAttachment(0, -1);
 		hostFormData.left = new FormAttachment(hostLabel, 5);
-		hostFormData.right = new FormAttachment(50/*70*/, -10);
+		hostFormData.right = new FormAttachment(50, -5);
 		hostText.setLayoutData(hostFormData);
 
+		// label "Port"
 		Label portLabel = new Label(hostGroup, SWT.NONE);
 		portLabel.setText("Port :");
 		FormData portFormData = new FormData();
-		portFormData.left = new FormAttachment(50/*70*/, 5/*10*/);
+		portFormData.left = new FormAttachment(50, 5);
 		portLabel.setLayoutData(portFormData);
 
+		// text port
 		this.portText = new Text(hostGroup, SWT.BORDER);
 		if(port != null) portText.setText(port);
 		FormData portFormData2 = new FormData();
 		portFormData2.top = new FormAttachment(0, -1);
 		portFormData2.left = new FormAttachment(portLabel, 5);
-		portFormData2.right = new FormAttachment(70/*100*/, 0);
+		portFormData2.right = new FormAttachment(70, 0);
 		portText.setLayoutData(portFormData2);
 
+		// label "Protocol"
 		Label protocolLabel = new Label(hostGroup, SWT.NONE);
 		protocolLabel.setText("Protocol :");
 		FormData protocolFormData1 = new FormData();
 		protocolFormData1.left = new FormAttachment(70, 5);
 		protocolLabel.setLayoutData(protocolFormData1);
 		
+		// combo protocols
 		combo = new Combo(hostGroup,SWT.DROP_DOWN);
 		combo.add(Protocol.RMI.toString().toUpperCase());
 		combo.add(Protocol.HTTP.toString().toUpperCase());
@@ -164,37 +169,44 @@ public class MonitorNewHostDialog extends Dialog {
 		protocolFormData.right = new FormAttachment(100, 0);
 		combo.setLayoutData(protocolFormData);
 
+		// label depth
 		Label depthLabel = new Label(shell, SWT.NONE);
 		depthLabel.setText("Hosts will be recursively searched up to a depth of :");
 		FormData depthFormData = new FormData();
 		depthFormData.top = new FormAttachment(hostGroup, 20);
-		depthFormData.left = new FormAttachment(0, 20);
+		depthFormData.left = new FormAttachment(15, 0);
 		depthLabel.setLayoutData(depthFormData);
 
+		// text depth
 		this.depthText = new Text(shell, SWT.BORDER);
 		depthText.setText(MonitorThread.getInstance().getDepth()+"");
 		FormData depthFormData2 = new FormData();
 		depthFormData2.top = new FormAttachment(hostGroup, 17);
 		depthFormData2.left = new FormAttachment(depthLabel, 5);
-		depthFormData2.right = new FormAttachment(100, -20);
+		depthFormData2.right = new FormAttachment(85, 0);
 		depthText.setLayoutData(depthFormData2);
 
+		// label set depth control
 		Label depthLabel2 = new Label(shell, SWT.CENTER);
 		depthLabel2.setText("You can change it there or from menu \"Control -> Set depth control\"");
 		FormData depthFormData3 = new FormData();
 		depthFormData3.top = new FormAttachment(depthLabel, 5);
+		depthFormData3.left = new FormAttachment(8, 0);
+		//depthFormData3.right = new FormAttachment(85, 0);
 		depthLabel2.setLayoutData(depthFormData3);
 
+		// button "OK"
 		this.okButton = new Button(shell, SWT.NONE);
 		okButton.setText("OK");
 		okButton.addSelectionListener(new MonitorNewHostListener());
-		okButton.setFocus();
 		FormData okFormData = new FormData();
 		okFormData.top = new FormAttachment(depthLabel2, 20);
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
-
+		shell.setDefaultButton(okButton);
+		
+		// button "CANCEL"
 		this.cancelButton = new Button(shell, SWT.NONE);
 		cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new MonitorNewHostListener());
@@ -203,8 +215,6 @@ public class MonitorNewHostDialog extends Dialog {
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);
-
-		center(display, shell);
 
 		shell.pack();
 		shell.open();
@@ -222,15 +232,6 @@ public class MonitorNewHostDialog extends Dialog {
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
 	//
-
-
-	private static void center(Display display, Shell shell) {
-		Rectangle rect = display.getClientArea();
-		Point size = shell.getSize();
-		int x = (rect.width - size.x) / 2;
-		int y = (rect.height - size.y) / 2;
-		shell.setLocation(new Point(x, y));
-	}
 
 	/**
 	 * Logs in the IC2D's console, and show a pop-up.
