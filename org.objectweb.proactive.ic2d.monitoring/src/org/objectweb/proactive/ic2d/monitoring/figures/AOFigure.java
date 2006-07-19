@@ -65,7 +65,7 @@ public class AOFigure extends AbstractFigure {
 		COLOR_WHEN_MIGRATING = new Color(device, 0, 0, 255);// blue
 		COLOR_WHEN_NOT_RESPONDING = new Color(device, 255, 0, 0);// red
 		
-		DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
+		DEFAULT_BORDER_COLOR = new Color(device, 200, 200, 200);
 	}
 
 	//
