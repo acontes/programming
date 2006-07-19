@@ -47,6 +47,15 @@
             id="org.objectweb.proactive.ic2d.monitoring.actionSet"
             label="Monitoring action set">
          <menu
+               id="org.objectweb.proactive.ic2d.monitoring.menu.ControlMenu"
+               label="&amp;Control"/>
+         <action
+               class="org.objectweb.proactive.ic2d.monitoring.actions.ChangeTTRAction"
+               id="org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction"
+               label="Set update frequence..."
+               menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.ControlMenu/content"
+               tooltip="Change Time To Refresh"/>
+         <menu
                id="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu"
                label="&amp;Monitoring"
                >
@@ -54,7 +63,7 @@
          <action
                class="org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction"
                id="org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction"
-               label="Monitor a new host"
+               label="Monitor a new host..."
                menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu/content"
                tooltip="Monitor a new RMI host"/>
       </actionSet>

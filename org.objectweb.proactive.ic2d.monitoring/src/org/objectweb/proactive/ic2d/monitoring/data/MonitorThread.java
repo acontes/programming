@@ -33,6 +33,9 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
+
 
 public class MonitorThread implements Observer {
 
@@ -121,6 +124,10 @@ public class MonitorThread implements Observer {
 		}
 	}
 
+	public void forceRefresh() {
+		refresher.interrupt();
+	}
+	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
@@ -134,7 +141,7 @@ public class MonitorThread implements Observer {
 	protected void stopRefreshing() {
 		refresh = false;
 	}
-
+	
 	//
 	// -- INNER CLASS -----------------------------------------------
 	//
@@ -147,8 +154,7 @@ public class MonitorThread implements Observer {
 				try {
 					Thread.sleep(ttr * 1000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Console.getInstance(Activator.CONSOLE_NAME).log("Manual refresh");
 				}
 			}
 		}

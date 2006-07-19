@@ -37,7 +37,9 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -76,9 +78,14 @@ public class MonitoringView extends ViewPart {
 		
 		sashForm.setWeights(new int[] { 15, 85 });
 
+		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+		
+		// Adds refresh action to the view's toolbar		
+		toolBarManager.add(new RefreshAction());
+		
 		// Adds Zoom-in and Zoom-out actions to the view's toolbar		
-		getViewSite().getActionBars().getToolBarManager().add(new ZoomIn());
-		getViewSite().getActionBars().getToolBarManager().add(new ZoomOut());
+		toolBarManager.add(new ZoomIn());
+		toolBarManager.add(new ZoomOut());
 
 		//graphicalViewer.setProperty(MouseWheelHandler.KeyGenerator.getKey(SWT.NONE), MouseWheelZoomHandler.SINGLETON);
 
@@ -183,6 +190,19 @@ public class MonitoringView extends ViewPart {
 	// -- INNER CLASSES -------------------------------------------
 	//
 
+	
+	public class RefreshAction extends Action {
+		
+		public RefreshAction() {
+			this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
+			this.setToolTipText("Update");
+		}
+		
+		public void run() {
+			MonitorThread.getInstance().forceRefresh();
+		}
+	}
+	
 	public class ZoomIn extends ZoomInAction {
 
 		public ZoomIn() {

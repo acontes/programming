@@ -23,6 +23,7 @@ public abstract class AbstractDataObject extends Observable {
 	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
 	protected Map<String, AbstractDataObject> skippedChildren;
 
+	
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------

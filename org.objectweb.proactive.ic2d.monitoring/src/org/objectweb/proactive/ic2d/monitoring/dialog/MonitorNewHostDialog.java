@@ -35,7 +35,6 @@ import java.net.UnknownHostException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -64,10 +63,11 @@ public class MonitorNewHostDialog extends Dialog {
 
 	private Text hostText;
 	private Text portText;
+	private Combo combo;
 	private Text depthText;
 	private Button okButton;
 	private Button cancelButton;
-	private Combo combo;
+	
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -98,11 +98,11 @@ public class MonitorNewHostDialog extends Dialog {
 
 		/* Init the display */
 		Display display = getParent().getDisplay();
+		
+		/* Init the shell */
 		shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
 		shell.setText("Adding host and depth to monitor");
-		shell.setSize(new Point(300, 200));
-
-
+		//shell.setSize(new Point(300, 200));
 		FormLayout layout = new FormLayout();
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;
