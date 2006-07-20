@@ -31,8 +31,11 @@
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
 import java.util.List;
+import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
 
@@ -41,41 +44,54 @@ public class VMEditPart extends AbstractIC2DEditPart {
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	public VMEditPart(VMObject model) {
 		super(model);
 	}
-	 
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-	
-	
-    /**
-     * Convert the result of EditPart.getModel()
-     * to VMObject (the real type of the model).
-     * @return the casted model
-     */
-    public VMObject getCastedModel(){
-    	return (VMObject)getModel();
-    }
-	
-	
+
+
+	/**
+	 * Convert the result of EditPart.getModel()
+	 * to VMObject (the real type of the model).
+	 * @return the casted model
+	 */
+	public VMObject getCastedModel(){
+		return (VMObject)getModel();
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		final Object param = arg;
+
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run () {
+				if(param instanceof Integer && (Integer)param == State.NOT_RESPONDING)
+					((VMFigure)getFigure()).notResponding();
+				refreshChildren();
+				refreshVisuals();		
+			}
+		});
+	}
+
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
-	
- 	/**
- 	 * Returns a new view associated
- 	 * with the type of model object the
- 	 * EditPart is associated with. So here, it returns a new VMFigure.
- 	 * @return a new VMFigure view associated with the VMObject model.
- 	 */
+
+	/**
+	 * Returns a new view associated
+	 * with the type of model object the
+	 * EditPart is associated with. So here, it returns a new VMFigure.
+	 * @return a new VMFigure view associated with the VMObject model.
+	 */
 	protected IFigure createFigure() {
 		return new VMFigure(getCastedModel().getFullName());
 	}
-	
-	
+
+
 	/**
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
@@ -84,7 +100,7 @@ public class VMEditPart extends AbstractIC2DEditPart {
 		return getCastedModel().getMonitoredChildren();
 	}
 
-	
+
 	/**
 	 * Fills the view with data extracted from the model object 
 	 * associated with the EditPart.
@@ -92,11 +108,11 @@ public class VMEditPart extends AbstractIC2DEditPart {
 	 * the figure, and may also be called in response to 
 	 * notifications from the model. 
 	 */
-/*	protected void refreshVisuals(){ 
+	/*	protected void refreshVisuals(){ 
 		//TODO
 	}
-	*/
-	
+	 */
+
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */

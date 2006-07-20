@@ -122,7 +122,7 @@ public class NodeObject extends AbstractDataObject{
 
 	@Override
 	public String getFullName() {
-		return this.key;
+		return "Node "+this.key;
 	}
 	/**
 	 * Returns the node's protocol
@@ -185,17 +185,24 @@ public class NodeObject extends AbstractDataObject{
 		catch(ActiveObjectCreationException e2) {
 			e2.printStackTrace();
 		}
-		
-		// Add a RequestQueueEventListener to the spy
-		this.spy.sendEventsForAllActiveObjects();
 	}
 
 	
 	
 	@Override
 	protected void foundForTheFirstTime() {
-		Console.getInstance(Activator.CONSOLE_NAME).log("NodeObject id="+key+" created");
+		Console.getInstance(Activator.CONSOLE_NAME).log("NodeObject created based on node "+key);
 		this.addSpy();
+		
+		try {
+			// Add a RequestQueueEventListener to the spy
+			this.spy.sendEventsForAllActiveObjects();
+		} catch (Exception e) {
+			// TODO spy not responding
+			this.notResponding();
+			/*Console.getInstance(Activator.CONSOLE_NAME).err("NodeObject.foundForTheFirstTime() -> not responding !!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			e.printStackTrace();*/
+		}
 		
 		String vnName = null;
 		try {
@@ -217,6 +224,16 @@ public class NodeObject extends AbstractDataObject{
 	@Override
 	protected void alreadyMonitored() {
 		Console.getInstance(Activator.CONSOLE_NAME).log("NodeObject id="+key+" already monitored, ckeck for new active objects");
+		
+		try {
+			// Add a RequestQueueEventListener to the spy
+			this.spy.sendEventsForAllActiveObjects();
+		} catch (Exception e) {
+			// TODO spy not responding
+			this.notResponding();
+			/*Console.getInstance(Activator.CONSOLE_NAME).err("NodeObject.alreadyMonitored() -> not responding !!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			e.printStackTrace();*/
+		}
 	}
 
 	//

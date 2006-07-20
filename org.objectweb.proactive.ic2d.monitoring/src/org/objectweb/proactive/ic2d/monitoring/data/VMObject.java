@@ -40,26 +40,26 @@ import org.objectweb.proactive.ic2d.monitoring.Activator;
 
 
 public class VMObject extends AbstractDataObject {
-	
+
 	private String key;
-	
+
 	private ProActiveRuntime runtime;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	public VMObject(HostObject parent, ProActiveRuntime runtime) {
 		super(parent);
 		this.runtime = runtime;
-		this.key = this.runtime.getVMInformation().getVMID().toString();
+		this.key = this.runtime.getVMInformation()/*.getVMID().toString()*/.getName();
 		this.runtime = runtime;
 	}
-	
+
 	//
 	// -- PUBLIC METHOD -----------------------------------------------
 	//
-	
+
 	/**
 	 * Explores a ProActiveRuntime, in order to find all nodes known by this one
 	 * @param vm The VMObject corresponding to the runtime given in parameter
@@ -80,34 +80,34 @@ public class VMObject extends AbstractDataObject {
 			}
 		}
 	}
-	
+
 	@Override
 	public String getKey() {
 		return this.key;
 	}
-	
+
 	@Override
 	public String getFullName() {
-		return "VM id=" + this.key;
+		return "JVM " + key;
 	}
-	
+
 	public String toString() {
 		return "JVM " + this.getKey();
 	}
-	
+
 	@Override
 	public String getType() {
 		return "jvm";
 	}
-	
+
 	public ProActiveRuntime getRuntime() {
 		return this.runtime;
 	}
-	
+
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
-	
+
 	/**
 	 * Returns the parent of the VM, that's to say the host where is the VM
 	 * @return the host of this VM
@@ -115,7 +115,7 @@ public class VMObject extends AbstractDataObject {
 	protected HostObject getTypedParent() {
 		return (HostObject) parent;
 	}
-	
+
 	/**
 	 * Get the ProActiveRuntime associated with this VMObject
 	 * @return The ProActiveRuntime associated with this VMObject
@@ -123,25 +123,25 @@ public class VMObject extends AbstractDataObject {
 	protected ProActiveRuntime getProActiveRuntime(){
 		return this.runtime;
 	}
-	
+
 	@Override
 	protected void foundForTheFirstTime() {
 		Console.getInstance(Activator.CONSOLE_NAME).
 		log("VMObject id="+key+" created based on ProActiveRuntime "+runtime.getURL());
 	}
-	
+
 	@Override
 	protected void alreadyMonitored() {
 		Console.getInstance(Activator.CONSOLE_NAME).
 		log("VMObject id="+key+" already monitored, check for new nodes");
 	}
-	
 
-	
+
+
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
-	
+
 	/**
 	 * TODO
 	 */
@@ -149,7 +149,7 @@ public class VMObject extends AbstractDataObject {
 		HostObject parent = getTypedParent();
 		String nodeUrl = UrlBuilder.buildUrl(parent.getHostName(), nodeName,
 				parent.toString()+":", parent.getPort());
-		
+
 		Node node = null;
 		try {
 			node = new NodeImpl(runtime, nodeUrl,UrlBuilder.getProtocol(nodeUrl), runtime.getJobID(nodeUrl));

@@ -33,6 +33,8 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.exceptions.HostAlreadyExistsException;
 import org.objectweb.proactive.ic2d.monitoring.finder.HostRTFinder;
 import org.objectweb.proactive.ic2d.monitoring.finder.HostRTFinderFactory;
@@ -93,10 +95,14 @@ public class HostObject extends AbstractDataObject {
 	public void explore() {
 		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(this.getProtocol());
 		List<ProActiveRuntime> foundRuntimes = runtimeFinder.findPARuntime(this);
+
 		for (int i = 0; i < foundRuntimes.size(); ++i) {
 			ProActiveRuntime proActiveRuntime = (ProActiveRuntime) foundRuntimes.get(i);
 			handleProActiveRuntime(proActiveRuntime);
-		}		
+		}
+		if(monitoredChildren.size() == 0) { //we didn't find any child
+			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+getKey());
+		}
 	}
 	
 	@Override
@@ -151,6 +157,8 @@ public class HostObject extends AbstractDataObject {
     public String getType() {
     	return "host";
     }
+    
+    
     
     //
     // -- PROTECTED METHOD -----------------------------------------------

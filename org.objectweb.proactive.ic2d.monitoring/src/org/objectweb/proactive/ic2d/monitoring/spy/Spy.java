@@ -67,7 +67,7 @@ public class Spy implements RunActive, ProActiveInternalObject {
 	}
 	
 	public Spy(SpyListener spyListener) {
-		System.out.println("# Spy : constructor");
+		System.out.println("new Spy");
 		this.spyListener = spyListener;
 	}
 	
@@ -78,7 +78,7 @@ public class Spy implements RunActive, ProActiveInternalObject {
 		return updateFrequence;
 	}
 	
-	public void sendEventsForAllActiveObjects() {
+	public void sendEventsForAllActiveObjects() {		
 		SpyEvent[] spyEvents = spyEventManager.createSpyEventForExistingBodies(LocalBodyStore.getInstance()
 				.getCurrentThreadBody());
 		notifyListener(spyEvents);

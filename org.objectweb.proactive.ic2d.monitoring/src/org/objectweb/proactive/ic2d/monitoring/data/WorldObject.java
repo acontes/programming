@@ -127,8 +127,8 @@ public class WorldObject extends AbstractDataObject {
 	protected void removeChild(HostObject host) {
 		monitoredChildren.remove(host.getKey());
 		setChanged();
-		if(monitoredChildren.size() == 0)
-			notifyObservers("removeChild");
+		/*if(monitoredChildren.size() == 0)
+			notifyObservers("removeChild");*/
 		notifyObservers();
 	}
 

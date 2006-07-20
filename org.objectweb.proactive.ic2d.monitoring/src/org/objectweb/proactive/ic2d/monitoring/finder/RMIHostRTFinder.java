@@ -30,17 +30,21 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.finder;
 
+import java.rmi.ConnectException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
+import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 
 public class RMIHostRTFinder implements HostRTFinder{
 
@@ -49,31 +53,53 @@ public class RMIHostRTFinder implements HostRTFinder{
 	//
 
 	public List<ProActiveRuntime> findPARuntime(HostObject host) {
-		
+
 		Console console = Console.getInstance(Activator.CONSOLE_NAME);
-		
+
 		console.log("Exploring "+host+" with RMI on port "+host.getPort());
 		/* List of ProActive runtime */
 		List<ProActiveRuntime> runtimes = new ArrayList<ProActiveRuntime>();
+
+		Registry registry = null;
+		String[] names = null;
 		try {
 			/* Hook the registry */
-			Registry registry = LocateRegistry.getRegistry(host.getHostName(),host.getPort());
-			/* Gets a snapshot of the names bounds in the 'registry' */
-			String[] names = registry.list();
+			registry = LocateRegistry.getRegistry(host.getHostName(),host.getPort());
 
-			/* Searchs all ProActve Runtimes */
-			for (int i = 0; i < names.length; ++i) {
-				String name = names[i];
-				if (name.indexOf("PA_JVM") != -1) {
+			console.log("Listing bindings for " + registry);
+			/* Gets a snapshot of the names bounds in the 'registry' */
+			names = registry.list();
+
+		} catch (Exception e) {
+			if(e instanceof ConnectException) {
+				List<AbstractDataObject> jvms = host.getMonitoredChildren();
+				for(int i=0, size=jvms.size() ; i<size ; i++) {
+					((VMObject)jvms.get(i)).notResponding();
+				}
+				console.debug(e);
+			}
+			else
+				console.logException(e);
+			return runtimes;
+		}
+
+		/* Searchs all ProActve Runtimes */
+		for (int i = 0; i < names.length; ++i) {
+			String name = names[i];
+			if (name.indexOf("PA_JVM") != -1) {
+				try {
 					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
 					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
 					runtimes.add(proActiveRuntime);
+				} catch(Exception e) {
+					if(e instanceof ProActiveException) {
+						((VMObject)host.getChild(names[i])).notResponding();
+						console.debug(e);
+					}
+					else
+						console.logException(e);
 				}
 			}
-		}
-		catch (Exception e) {
-			console.logException(e);
-			e.printStackTrace();
 		}
 		return runtimes;
 	}

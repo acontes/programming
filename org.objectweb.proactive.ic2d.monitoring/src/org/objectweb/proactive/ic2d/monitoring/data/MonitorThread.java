@@ -154,7 +154,7 @@ public class MonitorThread implements Observer {
 				try {
 					Thread.sleep(ttr * 1000);
 				} catch (InterruptedException e) {
-					Console.getInstance(Activator.CONSOLE_NAME).log("Manual refresh");
+					Console.getInstance(Activator.CONSOLE_NAME).debug("Manual refresh");
 				}
 			}
 		}

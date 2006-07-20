@@ -165,8 +165,15 @@ public class AOObject extends AbstractDataObject{
 	@Override
 	protected void foundForTheFirstTime() {
 		// Add a MessageEventListener to the spy
-		((NodeObject)this.parent).getSpy().addMessageEventListener(this.id);
-		
+		try {
+			((NodeObject)this.parent).getSpy().addMessageEventListener(this.id);
+		} catch (Exception e) {
+			this.parent.notResponding();
+			// TODO spy not responding
+			/*Console.getInstance(Activator.CONSOLE_NAME).err("AOObject.foundForTheFirstTime() -> not responding");
+			e.printStackTrace();*/
+		}
+			
 		Console.getInstance(Activator.CONSOLE_NAME).
 		log("AOObject "+fullName+" created based on ActiveObject "+id.toString());
 	}

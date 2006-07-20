@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Observable;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
 
 /**
@@ -23,6 +25,7 @@ public abstract class AbstractDataObject extends Observable {
 	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
 	protected Map<String, AbstractDataObject> skippedChildren;
 
+	protected boolean isAlive;
 	
 
 	//
@@ -34,6 +37,7 @@ public abstract class AbstractDataObject extends Observable {
 	 * @param parent the object's parent
 	 */
 	protected AbstractDataObject(AbstractDataObject parent) {
+		this.isAlive = true;
 		this.parent = parent;
 		this.monitoredChildren = new HashMap<String, AbstractDataObject>();
 		this.skippedChildren = new HashMap<String, AbstractDataObject>();
@@ -137,7 +141,21 @@ public abstract class AbstractDataObject extends Observable {
             }
         }
         return null;
-    }	
+    }
+    
+    
+    public void notResponding() {
+    	if(isAlive) {
+			Console.getInstance(Activator.CONSOLE_NAME).warn(getFullName()+" is not responding");
+			this.isAlive = false;
+			List<AbstractDataObject> children = getMonitoredChildren();
+			for(AbstractDataObject child : children){
+				child.notResponding();
+			}
+			setChanged();
+			notifyObservers(State.NOT_RESPONDING);
+		}
+    }
 	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
@@ -159,6 +177,8 @@ public abstract class AbstractDataObject extends Observable {
 	 * @param child The child to explore
 	 */
 	protected void exploreChild(AbstractDataObject child) {
+		if(!child.isAlive)
+			return;
 		if(skippedChildren.containsKey(child.getKey()))
 			return;
 		if(monitoredChildren.containsKey(child.getKey())) {
