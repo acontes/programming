@@ -30,19 +30,25 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.eclipse.draw2d.BendpointConnectionRouter;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PolygonDecoration;
 import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.RelativeBendpoint;
 import org.eclipse.draw2d.RotatableDecoration;
+import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 public class Connection  extends PolylineConnection{
-	
+
 	/**
 	 * Symbolizes connections in waitings. The source object awaits the target object.
 	 */
@@ -53,7 +59,7 @@ public class Connection  extends PolylineConnection{
 	 */
 	private static HashMap<String, AOFigure> targets = new HashMap<String, AOFigure>();
 
-	
+
 	/**
 	 * Established connections.
 	 */
@@ -73,7 +79,6 @@ public class Connection  extends PolylineConnection{
 	 */
 	private Connection(){
 		super();
-		System.out.println("Connection.Connection()");
 		targetDecoration = getTargetDecoration();
 		setTargetDecoration(targetDecoration);
 		setLineWidth(1);
@@ -102,13 +107,11 @@ public class Connection  extends PolylineConnection{
 
 		AOFigure targetFigure = targets.get(targetID);
 		if(targetFigure!=null){
-			System.out.println("=========> Connection.addSourceConnection() merge");
 			targets.remove(targetID);
 			connections.put(sourceID, targetID);
 			connect(panel, sourceFigure, targetFigure);
 		}
 		else{
-			System.out.println("=========> Connection.addSourceConnection() NOT merge");
 			sources.put(sourceID, sourceFigure);
 		}
 	}
@@ -128,13 +131,11 @@ public class Connection  extends PolylineConnection{
 
 		AOFigure sourceFigure = sources.get(sourceID);
 		if(sourceFigure!=null){
-			System.out.println("========> Connection.addTargetConnection() merge");
 			sources.remove(sourceID);
 			connections.put(sourceID, targetID);
 			connect(panel, sourceFigure, targetFigure);
 		}
 		else{
-			System.out.println("========> Connection.addTargetConnection() NOT merge");
 			targets.put(targetID, targetFigure);
 		}
 	}
@@ -157,11 +158,11 @@ public class Connection  extends PolylineConnection{
 		}
 		return targetDecoration;
 	}
-	
+
 	//
 	// -- PRIVATE METHODS -------------------------------------------
 	//
-	
+
 	/**
 	 * Connects two figure by a connection.
 	 * @param panel The panel containing the two figures.
@@ -172,6 +173,29 @@ public class Connection  extends PolylineConnection{
 		Connection connection = new Connection();
 		connection.setSourceAnchor(source.getAnchor());
 		connection.setTargetAnchor(target.getAnchor());
+
+		BendpointConnectionRouter router = new BendpointConnectionRouter();
+
+		List<RelativeBendpoint> bendPoints = new ArrayList<RelativeBendpoint>();
+		Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width/2, source.getBounds().height/2);
+		Point targetCenter = target.getLocation().getTranslated(target.getBounds().width/2, target.getBounds().height/2);
+
+		RelativeBendpoint middle = calculPoint(connection, sourceCenter, targetCenter);
+
+		bendPoints.add(middle);
+		router.setConstraint(connection,bendPoints);
+
+		connection.setConnectionRouter(router);
+
 		panel.add(connection);
+	}
+
+	private static RelativeBendpoint calculPoint(Connection connection, Point source, Point target){
+		double distance = source.getDistance(target);
+		RelativeBendpoint point = new RelativeBendpoint(connection);
+		int value = (int)(0.05*distance);
+		value*=value;
+		point.setRelativeDimensions(new Dimension(value, 0), new Dimension(value, 0));
+		return point;
 	}
 }

@@ -79,7 +79,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
 			
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
-						IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure();
+						IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure().getParent();
 						if(((AOObject)getModel()).getID().toString().compareTo(source)==0)
 							Connection.addSourceConnection(panel, source, (AOFigure)getFigure(), target);
 						else
