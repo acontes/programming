@@ -104,6 +104,14 @@ public class VMObject extends AbstractDataObject {
 		return this.runtime;
 	}
 
+	@Override
+	public void notResponding() {
+		if(isAlive) {
+			Console.getInstance(Activator.CONSOLE_NAME).warn(getFullName()+" is not responding");
+		}
+		super.notResponding();
+	}
+	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//

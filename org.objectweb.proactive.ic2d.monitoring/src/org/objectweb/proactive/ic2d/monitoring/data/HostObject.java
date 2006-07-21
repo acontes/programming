@@ -97,7 +97,7 @@ public class HostObject extends AbstractDataObject {
 		List<ProActiveRuntime> foundRuntimes = runtimeFinder.findPARuntime(this);
 
 		for (int i = 0; i < foundRuntimes.size(); ++i) {
-			ProActiveRuntime proActiveRuntime = (ProActiveRuntime) foundRuntimes.get(i);
+			ProActiveRuntime proActiveRuntime = foundRuntimes.get(i);
 			handleProActiveRuntime(proActiveRuntime);
 		}
 		if(monitoredChildren.size() == 0) { //we didn't find any child

@@ -89,7 +89,7 @@ public class NodeObject extends AbstractDataObject{
 
 	public NodeObject(VMObject parent, Node node){
 		super(parent/*, node.getNodeInformation().getName()*/);
-		Comparator comparator = new AOObject.AOComparator();
+		Comparator<String> comparator = new AOObject.AOComparator();
 		monitoredChildren = new TreeMap<String , AbstractDataObject>(comparator);
 		this.node = node;
 		this.key = node.getNodeInformation().getName();
@@ -104,7 +104,7 @@ public class NodeObject extends AbstractDataObject{
 	@Override
 	public void explore(){
 		VMObject parent = getTypedParent();
-		List activeObjects = null;
+		List<List<Object>> activeObjects = null;
 		try {
 			activeObjects = parent.getProActiveRuntime().getActiveObjects(this.key);
 		} catch (ProActiveException e) {
@@ -252,9 +252,9 @@ public class NodeObject extends AbstractDataObject{
 	 * TODO
 	 * @param activeObjects names' list of active objects containing in this NodeObject
 	 */
-	private void handleActiveObjects(List activeObjects){
+	private void handleActiveObjects(List<List<Object>> activeObjects){
 		for (int i = 0, size = activeObjects.size(); i < size; ++i) {
-			List aoWrapper = (List) activeObjects.get(i);
+			List<Object> aoWrapper = activeObjects.get(i);
 			UniversalBody ub = (UniversalBody)aoWrapper.get(0);
 			String className = (String) aoWrapper.get(1);
 			AOObject ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID());

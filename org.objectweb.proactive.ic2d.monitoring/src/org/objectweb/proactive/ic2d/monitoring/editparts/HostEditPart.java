@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.monitoring.editparts;
 import java.util.List;
 
 import org.eclipse.draw2d.IFigure;
+import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 
@@ -79,7 +80,7 @@ public class HostEditPart extends AbstractIC2DEditPart {
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
 	 */
-	protected List getModelChildren() {
+	protected List<AbstractDataObject> getModelChildren() {
 		return getCastedModel().getMonitoredChildren();
 	}
 	

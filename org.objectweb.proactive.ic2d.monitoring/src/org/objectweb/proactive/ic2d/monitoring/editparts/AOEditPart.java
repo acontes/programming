@@ -36,6 +36,7 @@ import java.util.Observable;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
+import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.Connection;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
@@ -112,7 +113,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
 	 */
-	protected List getModelChildren() {
+	protected List<AbstractDataObject> getModelChildren() {
 		return getCastedModel().getMonitoredChildren();
 	}
 

@@ -148,16 +148,16 @@ public class AOObject extends AbstractDataObject{
 	public void explore() {/* Do nothing */}
 
 
-	public static class AOComparator implements Comparator{
+	public static class AOComparator implements Comparator<String>{
 		
 		/**
 		 * Compare two active objects.
 		 * (For Example: ao#3 and ao#5 give -1 because ao#3 has been discovered before ao#5.)
 		 * @return -1, 0, or 1 as the first argument is less than, equal to, or greater than the second.
 		 */
-		public int compare(Object ao1, Object ao2) {
-			String ao1Name = (String)ao1;
-			String ao2Name = (String)ao2;
+		public int compare(String ao1, String ao2) {
+			String ao1Name = ao1;
+			String ao2Name = ao2;
 			return -(ao1Name.compareTo(ao2Name));
 		}	
 	}

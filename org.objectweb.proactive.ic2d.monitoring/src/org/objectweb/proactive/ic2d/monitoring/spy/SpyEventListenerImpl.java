@@ -41,15 +41,15 @@ import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	private NodeObject nodeObject;
-	
+
 	public SpyEventListenerImpl(){
-		
+
 	}
-	
+
 	public SpyEventListenerImpl(NodeObject nodeObject){
 		this.nodeObject = nodeObject;
 	}
-	
+
 	public void activeObjectAdded(UniqueID id, String nodeURL, String classname, boolean isActive) {
 		// TODO Auto-generated method stub
 		System.out.println("# SpyEventListener : activeObjectAdded ,id="+getName(id));
@@ -66,7 +66,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 		ao.setState(State.WAITING_FOR_REQUEST);
-		
+
 	}
 
 	public void objectWaitingByNecessity(UniqueID id, SpyEvent spyEvent) {
@@ -76,7 +76,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 			return;
 		ao.setState((ao.getState() == State.SERVING_REQUEST)
 				?State.WAITING_BY_NECESSITY_WHILE_SERVING
-				:State.WAITING_BY_NECESSITY_WHILE_ACTIVE);
+						:State.WAITING_BY_NECESSITY_WHILE_ACTIVE);
 	}
 
 	public void objectReceivedFutureResult(UniqueID id, SpyEvent spyEvent) {
@@ -85,13 +85,13 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 		switch (ao.getState()) {
-        case State.WAITING_BY_NECESSITY_WHILE_SERVING:
-            ao.setState(State.SERVING_REQUEST);
-            break;
-        case State.WAITING_BY_NECESSITY_WHILE_ACTIVE:
-            ao.setState(State.ACTIVE);
-            break;
-        }
+		case State.WAITING_BY_NECESSITY_WHILE_SERVING:
+			ao.setState(State.SERVING_REQUEST);
+			break;
+		case State.WAITING_BY_NECESSITY_WHILE_ACTIVE:
+			ao.setState(State.ACTIVE);
+			break;
+		}
 	}
 
 	public void requestMessageSent(UniqueID id, SpyEvent spyEvent) {
@@ -112,23 +112,23 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(destination == null)
 			return;
 		destination.setState(State.SERVING_REQUEST);
-		
+
 		UniqueID sourceId = ((SpyMessageEvent) spyEvent).getSourceBodyID();
 		AOObject source = WorldObject.getInstance().findActiveObjectById(sourceId);
-		
+
 		// We didn't find the source
 		if(source == null)
 			return;
-		
+
 		// We didn't find the destination
 		if(destination == null)
 			return;
-		else{
-			//Communication communication = new Communication(source, destination);
-			
-			source.addCommunication(/*communication*/(SpyMessageEvent) spyEvent);
-			destination.addCommunication(/*communication*/(SpyMessageEvent) spyEvent);
-		}
+
+		//Communication communication = new Communication(source, destination);
+
+		source.addCommunication(/*communication*/(SpyMessageEvent) spyEvent);
+		destination.addCommunication(/*communication*/(SpyMessageEvent) spyEvent);
+
 	}
 
 	public void replyMessageReceived(UniqueID id, SpyEvent spyEvent) {
@@ -154,7 +154,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;
-        ao.setState(State.SERVING_REQUEST);
+		ao.setState(State.SERVING_REQUEST);
 	}
 
 	public String getName(UniqueID id){
@@ -165,7 +165,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 			return id.toString();
 		return ao.getFullName();
 	}
-	
+
 	public AOObject getActiveObject(UniqueID id){
 		return (AOObject) nodeObject.getChild(id.toString());
 	}

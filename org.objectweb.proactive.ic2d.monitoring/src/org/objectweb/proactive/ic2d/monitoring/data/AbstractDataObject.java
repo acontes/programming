@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Observable;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.ic2d.console.Console;
-import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
 
 /**
@@ -132,9 +130,9 @@ public abstract class AbstractDataObject extends Observable {
 	 */
     public synchronized AOObject findActiveObjectById(UniqueID id) {
     	// We search in the monitored objects.
-        Iterator iterator = monitoredChildren.values().iterator();
+        Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
         while (iterator.hasNext()) {
-            AbstractDataObject object = (AbstractDataObject) iterator.next();
+            AbstractDataObject object = iterator.next();
             AOObject activeObject = object.findActiveObjectById(id);
             if (activeObject != null) {
                 return activeObject;
@@ -146,7 +144,6 @@ public abstract class AbstractDataObject extends Observable {
     
     public void notResponding() {
     	if(isAlive) {
-			Console.getInstance(Activator.CONSOLE_NAME).warn(getFullName()+" is not responding");
 			this.isAlive = false;
 			List<AbstractDataObject> children = getMonitoredChildren();
 			for(AbstractDataObject child : children){

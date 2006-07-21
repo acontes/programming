@@ -35,6 +35,7 @@ import java.util.List;
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ToolbarLayout;
+import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class WorldEditPart extends AbstractIC2DEditPart {
@@ -93,7 +94,7 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
 	 */
-	protected List getModelChildren() {
+	protected List<AbstractDataObject> getModelChildren() {
 		return getCastedModel().getMonitoredChildren();
 	}
 
