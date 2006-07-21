@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.actions;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
@@ -37,10 +38,18 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.objectweb.proactive.ic2d.monitoring.dialog.MonitorNewHostDialog;
 
-public class NewHostAction implements IWorkbenchWindowActionDelegate {
+public class NewHostAction extends Action implements IWorkbenchWindowActionDelegate {
 
 	private Display display;
 	
+	public NewHostAction() {
+		super();
+	}
+	
+	public NewHostAction(Display display) {
+		this.display = display;
+		this.setText("Monitor a new host...");
+	}
 	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
@@ -60,5 +69,12 @@ public class NewHostAction implements IWorkbenchWindowActionDelegate {
 
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
+	}
+	
+	
+	
+	
+	public void run() {
+		new MonitorNewHostDialog(display.getActiveShell());
 	}
 }

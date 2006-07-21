@@ -31,13 +31,13 @@
 package org.objectweb.proactive.ic2d.monitoring.views;
 
 import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.EditPartFactory;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -47,6 +47,8 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.ic2d.monitoring.actions.MonitoringContextMenuProvider;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
 import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.editparts.IC2DEditPartFactory;
@@ -86,7 +88,8 @@ public class MonitoringView extends ViewPart {
 		// Adds Zoom-in and Zoom-out actions to the view's toolbar		
 		toolBarManager.add(new ZoomIn());
 		toolBarManager.add(new ZoomOut());
-
+		
+		
 		//graphicalViewer.setProperty(MouseWheelHandler.KeyGenerator.getKey(SWT.NONE), MouseWheelZoomHandler.SINGLETON);
 
 //		FigureCanvas fc = (FigureCanvas)graphicalViewer/*root.getViewer()*/.getControl();
@@ -184,24 +187,15 @@ public class MonitoringView extends ViewPart {
 		WorldObject world = WorldObject.getInstance();
 		world.addObserver(MonitorThread.getInstance());
 		graphicalViewer.setContents(world);
+		
+		ContextMenuProvider contextMenu = new MonitoringContextMenuProvider(graphicalViewer, parent.getDisplay());
+		graphicalViewer.setContextMenu(contextMenu);
+		getSite().registerContextMenu(contextMenu, graphicalViewer);
 	}
     
 	//
 	// -- INNER CLASSES -------------------------------------------
 	//
-
-	
-	public class RefreshAction extends Action {
-		
-		public RefreshAction() {
-			this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
-			this.setToolTipText("Update");
-		}
-		
-		public void run() {
-			MonitorThread.getInstance().forceRefresh();
-		}
-	}
 	
 	public class ZoomIn extends ZoomInAction {
 

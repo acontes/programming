@@ -9,8 +9,7 @@ import org.eclipse.swt.graphics.Color;
 public class VNColors {
 
 	private static final Color[] colors = 
-	{ColorConstants.darkBlue, ColorConstants.darkGreen,
-		ColorConstants.cyan, ColorConstants.orange, ColorConstants.red};
+	{ColorConstants.cyan, ColorConstants.yellow, ColorConstants.lightBlue, ColorConstants.orange, ColorConstants.green};
 	
 	private static VNColors instance;
 	
