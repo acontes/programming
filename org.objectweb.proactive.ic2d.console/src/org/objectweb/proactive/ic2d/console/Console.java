@@ -50,7 +50,7 @@ public class Console extends MessageConsole {
 	/**
 	 * Contains all consoles.
 	 */
-	private static HashMap consoles = new HashMap();
+	private static HashMap<String, Console> consoles = new HashMap<String, Console>();
 
 	/**
 	 * To know the date's format.
@@ -75,7 +75,7 @@ public class Console extends MessageConsole {
 		BLACK = new Color(device, 0, 0, 0);
 	}
 
-	private boolean debug;
+	public static boolean debug = false;
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -90,7 +90,6 @@ public class Console extends MessageConsole {
 		activate();
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
 				new IConsole[]{ this });
-		debug = false;
 	}
 
 	//
@@ -108,10 +107,6 @@ public class Console extends MessageConsole {
 			consoles.put(title, console);
 		}
 		return console;
-	}
-
-	public void setDebug(boolean b) {
-		this.debug = b;
 	}
 
 	/**
