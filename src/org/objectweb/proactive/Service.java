@@ -86,9 +86,6 @@ public class Service {
     protected Body body;
     protected BlockingRequestQueue requestQueue;
 
-    //protected ComponentRequestQueue componentRequestQueue;
-    protected RequestFilter nfRequestsFilter;
-    protected RequestFilter prioritizedNfRequestFilter;
     protected LifeCycleController lifeCycleController = null;
 
     //protected RequestFilterOnMethodName requestFilterOnMethodName = null;
@@ -104,13 +101,10 @@ public class Service {
         this.body = body;
         this.requestQueue = body.getRequestQueue();
         if (((ComponentBody) body).isComponent()) {
-            //componentRequestQueue = (ComponentRequestQueue) requestQueue;
-            nfRequestsFilter = new org.objectweb.proactive.core.component.body.RequestFilterOnComponentControllerClasses();
-            prioritizedNfRequestFilter = new PrioritizedComponentRequestFilter();
             try {
                 lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponentImpl());
             } catch (NoSuchInterfaceException e) {
-                //logger.error("could not find the life cycle controller for this component");
+                logger.error("could not find the life cycle controller for this component");
             }
         }
     }
@@ -191,14 +185,6 @@ public class Service {
      * @param timeout the timeout in ms
      */
     public void blockingServeOldest(RequestFilter requestFilter, long timeout) {
-        if (((ComponentBody) body).isComponent()) {
-            // serve prioritized NF requests first 
-            Request prioritizedNF = requestQueue.removeOldest(nfRequestsFilter);
-            while (prioritizedNF != null) {
-                serve(prioritizedNF);
-                prioritizedNF = requestQueue.removeOldest(nfRequestsFilter);
-            }
-        }
         body.serve(requestQueue.blockingRemoveOldest(requestFilter, timeout));
     }
 
