@@ -33,6 +33,7 @@ package org.objectweb.proactive;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
@@ -104,7 +105,7 @@ public class Service {
             try {
                 lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponentImpl());
             } catch (NoSuchInterfaceException e) {
-                logger.error("could not find the life cycle controller for this component");
+                throw new ProActiveRuntimeException("could not find the life cycle controller for this component");
             }
         }
     }
