@@ -60,21 +60,23 @@ public class Console extends MessageConsole {
 	/**
 	 * Some useful colors.
 	 */
-	public static final Color RED;
-	public static final Color BLUE;
-	public static final Color GREEN;
-	public static final Color GRAY;
-	public static final Color BLACK;
+	private static final Color RED;
+	private static final Color BLUE;
+	//private static final Color GREEN;
+	private static final Color GRAY;
+	private static final Color BLACK;
 
 	static {
 		Display device = Display.getCurrent();
 		RED = new Color(device, 255, 0, 0);
 		BLUE = new Color(device, 0, 0, 128);
-		GREEN = new Color(device, 180, 255, 180);
+		//GREEN = new Color(device, 180, 255, 180);
 		GRAY = new Color(device, 120, 120, 120);
 		BLACK = new Color(device, 0, 0, 0);
 	}
 
+	private boolean debug;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -88,6 +90,7 @@ public class Console extends MessageConsole {
 		activate();
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
 				new IConsole[]{ this });
+		debug = false;
 	}
 
 	//
@@ -98,7 +101,7 @@ public class Console extends MessageConsole {
 	 * Returns the console having for title 'title'
 	 * @param title The console's title
 	 */
-	public static Console getInstance(String title){
+	public static synchronized Console getInstance(String title){
 		Console console = (Console) consoles.get(title);
 		if( console == null){
 			console = new Console(title);
@@ -107,12 +110,15 @@ public class Console extends MessageConsole {
 		return console;
 	}
 
+	public void setDebug(boolean b) {
+		this.debug = b;
+	}
 
 	/**
 	 * Logs a message to the console
 	 * @param message
 	 */
-	public void log(String message){
+	public synchronized void log(String message){
 		final String text = message;
 
 		printTime();
@@ -131,7 +137,7 @@ public class Console extends MessageConsole {
 	 * Logs an warning message to the console.
 	 * @param message
 	 */
-	public void warn(String message){
+	public synchronized void warn(String message){
 		final String text = message;
 
 		printTime();
@@ -150,7 +156,7 @@ public class Console extends MessageConsole {
 	 * Logs an error message to the console.
 	 * @param message
 	 */
-	public void err(String message){
+	public synchronized void err(String message){
 		final String text = message;
 
 		printTime();
@@ -169,15 +175,27 @@ public class Console extends MessageConsole {
 	 * @param e the exception to log
 	 */
 	public synchronized void logException(Throwable e) {
-		Display.getDefault().asyncExec(new Runnable() {
+/*		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				MessageConsoleStream stream = newMessageStream();
 				stream.print("\n");
-			}});
+			}});*/
 		printTime();
 		logExceptionWhithoutTime(e, false);
+		e.printStackTrace();
 	}
 
+	
+	public synchronized void debug(String message) {
+		if(debug)
+			log(message);
+	}
+	
+	public synchronized void debug(Throwable e) {
+		if(debug)
+			logException(e);
+	}
+	
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
 	//
@@ -200,7 +218,7 @@ public class Console extends MessageConsole {
 		if(cause)
 			builder.append("Caused by: ");
 
-		builder.append(e.getMessage()+"\n");
+		builder.append(e.getClass().getName()+": "+e.getMessage()+"\n");
 		StackTraceElement[] traces = e.getStackTrace();
 		for(int i=0 ; i<traces.length ; i++)
 			builder.append("\t"+traces[i]+"\n");
