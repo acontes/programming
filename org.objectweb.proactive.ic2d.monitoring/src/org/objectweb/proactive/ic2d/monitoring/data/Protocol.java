@@ -47,7 +47,9 @@ public enum Protocol {
 			return IBIS;
 		else if(s.compareTo("JINI") == 0)
 			return JINI;
-		else // if(s.compareTo("HTTP") == 0)
+		else if(s.compareTo("HTTP") == 0)
 			return HTTP;
+		else
+			return null; // !!!
 	}
 }

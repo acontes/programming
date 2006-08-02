@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
@@ -144,7 +148,20 @@ public class VMObject extends AbstractDataObject {
 		log("VMObject id="+key+" already monitored, check for new nodes");
 	}
 
-
+	/**
+	 * Returns all ProActiveRuntimes known by this JVM.
+	 * @return a list containing all ProActiveRuntimes known by this JVM.
+	 */
+	protected List<ProActiveRuntime> getKnownRuntimes() {		
+		ProActiveRuntime[] registered = null;
+		try {
+			registered = runtime.getProActiveRuntimes();
+		} catch (ProActiveException e) {
+			// TODO Auto-generated catch block
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+		}
+		return new ArrayList<ProActiveRuntime>(Arrays.asList(registered));
+	}
 
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
@@ -163,7 +180,7 @@ public class VMObject extends AbstractDataObject {
 			node = new NodeImpl(runtime, nodeUrl,UrlBuilder.getProtocol(nodeUrl), runtime.getJobID(nodeUrl));
 		} catch (ProActiveException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 		}
 		NodeObject nodeObject = new NodeObject(this, node);
 		this.exploreChild(nodeObject);

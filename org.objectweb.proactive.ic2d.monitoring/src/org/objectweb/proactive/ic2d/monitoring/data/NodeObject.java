@@ -48,6 +48,7 @@ import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
 import org.objectweb.proactive.ic2d.monitoring.spy.Spy;
+import org.objectweb.proactive.ic2d.monitoring.spy.SpyEventListener;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyEventListenerImpl;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyListenerImpl;
 
@@ -174,16 +175,16 @@ public class NodeObject extends AbstractDataObject{
 	 */
 	protected void addSpy(){
 		try {
-			new SpyEventListenerImpl(this);
-			SpyListenerImpl spyListener = new SpyListenerImpl(new SpyEventListenerImpl(this)/*spyEventListener*/);
+			SpyEventListener spyEventListener = new SpyEventListenerImpl(this);
+			SpyListenerImpl spyListener = new SpyListenerImpl(/*new SpyEventListenerImpl(this)*/spyEventListener);
 			this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener,SPY_LISTENER_NODE);
 			this.spy = (Spy) ProActive.newActive(Spy.class.getName(), new Object[] { activeSpyListener }, node);
 		} 
-		catch(NodeException e1) { 
-			e1.printStackTrace();
+		catch(NodeException e) { 
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 		}
-		catch(ActiveObjectCreationException e2) {
-			e2.printStackTrace();
+		catch(ActiveObjectCreationException e) {
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 		}
 	}
 
@@ -200,8 +201,7 @@ public class NodeObject extends AbstractDataObject{
 		} catch (Exception e) {
 			// TODO spy not responding
 			this.notResponding();
-			/*Console.getInstance(Activator.CONSOLE_NAME).err("NodeObject.foundForTheFirstTime() -> not responding !!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			e.printStackTrace();*/
+			Console.getInstance(Activator.CONSOLE_NAME).debug(this.getFullName()+" not responding");
 		}
 		
 		String vnName = null;

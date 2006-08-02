@@ -30,9 +30,12 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.exceptions.HostAlreadyExistsException;
@@ -93,12 +96,12 @@ public class HostObject extends AbstractDataObject {
 	 */
 	@Override
 	public void explore() {
-		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(this.getProtocol());
+		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(this.protocol);
 		List<ProActiveRuntime> foundRuntimes = runtimeFinder.findPARuntime(this);
 
 		for (int i = 0; i < foundRuntimes.size(); ++i) {
 			ProActiveRuntime proActiveRuntime = foundRuntimes.get(i);
-			handleProActiveRuntime(proActiveRuntime);
+			handleProActiveRuntime(proActiveRuntime, 1);
 		}
 		if(monitoredChildren.size() == 0) { //we didn't find any child
 			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+getKey());
@@ -179,9 +182,30 @@ public class HostObject extends AbstractDataObject {
     /**
      * TODO
      */
-	private void handleProActiveRuntime(ProActiveRuntime runtime){
+	private void handleProActiveRuntime(ProActiveRuntime runtime, int depth){
 		VMObject vm = new VMObject(this, runtime);
 		exploreChild(vm);
+		
+		if(depth < MonitorThread.getInstance().getDepth()) {
+			List<ProActiveRuntime> knownRuntimes = vm.getKnownRuntimes();
+			Iterator<ProActiveRuntime> iter = knownRuntimes.iterator();
+			while (iter.hasNext()) {
+				ProActiveRuntime pr = iter.next();
+				VMInformation infos = pr.getVMInformation();
+				String hostname = infos.getHostName();
+				String url = pr.getURL();
+				int port = UrlBuilder.getPortFromUrl(url);
+				String pro = UrlBuilder.getProtocol(url);
+				Protocol protocol = Protocol.getProtocolFromString(pro.substring(0, pro.length()-1).toUpperCase());
+				HostObject host;
+				try {
+					host = new HostObject(hostname, port, protocol);
+				} catch (HostAlreadyExistsException e) {
+					host = e.getHost();
+				}
+				host.handleProActiveRuntime(pr, depth+1);
+			}
+		}
 	}
 
 	@Override
