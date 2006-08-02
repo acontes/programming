@@ -258,6 +258,10 @@ public class NodeObject extends AbstractDataObject{
 			UniversalBody ub = (UniversalBody)aoWrapper.get(0);
 			String className = (String) aoWrapper.get(1);
 			AOObject ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID());
+			if(FilterProcess.getInstance().filter(ao)) {
+				AOObject.cancelCreation();
+				return;
+			}
 			exploreChild(ao);
 		}
 	}
