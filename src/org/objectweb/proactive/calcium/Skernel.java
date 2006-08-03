@@ -35,7 +35,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -71,10 +70,10 @@ public class Skernel<T> implements Serializable{
 	}
 	
 	public synchronized T getResult() throws PanicException{
-		while(results.size()<=0 || isPaniqued()){
+		while(results.size()<=0 && !isPaniqued()){
 			try {
 				if(logger.isDebugEnabled()){
-					logger.debug("Waiting for results:"+Thread.currentThread().getId());
+					logger.debug("Thread waiting for results:"+Thread.currentThread().getId());
 				}
 				wait();
 			} catch (InterruptedException e) {
@@ -337,7 +336,7 @@ public class Skernel<T> implements Serializable{
 			}
 		}
 		
-		//4. Mark family tasks in the processing queue.
+		//4. Mark family tasks in the processing queue as tainted.
 		enumeration = processing.elements();
 		while(enumeration.hasMoreElements()){
 			Task<T> task = enumeration.nextElement();

@@ -62,18 +62,19 @@ public class FindPrimes implements Serializable{
 				.getPath();
 		
 		ResourceManager manager= 
-			new MonoThreadedManager();
-			//new MultiThreadedManager(8);
-			//new ProActiveManager(descriptor, "local");
+			//new MonoThreadedManager();
+			new MultiThreadedManager(5);
+		    //new ProActiveManager(descriptor, "local");
 		
 		Calcium<Challenge> calcium = new Calcium<Challenge>(manager, root);
 		
-		calcium.inputParameter(new Challenge(1,100,5));
-		calcium.inputParameter(new Challenge(1,640,20));
-		calcium.inputParameter(new Challenge(1,6400,100));
+		calcium.inputParameter(new Challenge(1,100,20));
+		calcium.inputParameter(new Challenge(1,640,64));
+		calcium.inputParameter(new Challenge(1,6400,300));
 		
+
 		calcium.eval();
-		
+
 		
 		try {
 			for(Challenge res = calcium.getResult(); 
@@ -87,6 +88,8 @@ public class FindPrimes implements Serializable{
 		} catch (ParameterException e) {
 			e.printStackTrace();
 		} catch (PanicException e) {
+			e.printStackTrace();
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 		

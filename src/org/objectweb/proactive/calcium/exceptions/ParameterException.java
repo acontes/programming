@@ -28,12 +28,11 @@
 package org.objectweb.proactive.calcium.exceptions;
 
 /**
- * A Fatal Exception indicates that the execution of this task can not continue,
- * and the execution of related tasks (parent, brothers, children) must also be
- * stoped.
+ * A Parameter Exception indicates that the execution of the task related with this parameter
+ * can not continue, and the execution of related tasks (parent, brothers, children) must 
+ * also be stoped.
  *  
  * @author The ProActive Team (mleyton)
- *
  */
 public class ParameterException extends RuntimeException {
 

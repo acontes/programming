@@ -62,10 +62,10 @@ public class NQueens implements Serializable{
 				.getPath();
 		//descriptor="/home/mleyton/workspace/ProActive/descriptors/examples/SSH_SGE_Example.xml";
 		ResourceManager manager= 
-			new MonoThreadedManager();
+			//new MonoThreadedManager();
 			//new MultiThreadedManager(8);
 		 	//new ProActiveThreadedManager(descriptor, "local");
-			//new ProActiveManager(descriptor, "local");
+			new ProActiveManager(descriptor, "local");
 		
 		Calcium<Board> calcium = new Calcium<Board>(manager, root);	
 		calcium.inputParameter(board);

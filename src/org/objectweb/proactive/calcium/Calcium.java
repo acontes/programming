@@ -84,7 +84,7 @@ public class Calcium<T>{
 	
 	public T getResult() throws PanicException, ParameterException{
 		
-		if(!skernel.hasResults()) {			
+		if(!skernel.hasResults() && skernel.isFinished()) {			
 			return null;
 		}
 		
