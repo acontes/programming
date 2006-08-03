@@ -35,6 +35,7 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 public abstract class AbstractFigure extends Figure{
@@ -76,6 +77,7 @@ public abstract class AbstractFigure extends Figure{
 	public abstract ConnectionAnchor getAnchor();
 	
 	public void paintFigure(Graphics graphics){
+		graphics.setAntialias(SWT.ON);
 		super.paintFigure(graphics);
 		paintIC2DFigure(graphics);
 	}
