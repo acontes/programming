@@ -9,6 +9,7 @@ import java.util.Observer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -21,9 +22,13 @@ import org.objectweb.proactive.ic2d.monitoring.figures.VNColors;
 
 public class VirtualNodesGroup implements Observer {
 
+	private static VirtualNodesGroup instance = null;
+	
 	private Group group;
 
 	private Map<Button, VNObject> buttons = new HashMap<Button, VNObject>();
+	
+	private Map<VNObject, Button> virtualNodes = new HashMap<VNObject, Button>();
 	
 	//
 	// -- CONSTRUCTOR -----------------------------------------------
@@ -43,6 +48,8 @@ public class VirtualNodesGroup implements Observer {
 		rowLayout.marginBottom = 5;
 		rowLayout.spacing = 10;
 		group.setLayout(rowLayout);
+		
+		instance = this;
 	}
 
 
@@ -60,12 +67,23 @@ public class VirtualNodesGroup implements Observer {
 					b.setText(vn.getFullName());
 					b.addSelectionListener(new VirtualNodeButtonListener());
 					buttons.put(b, vn);
+					virtualNodes.put(vn, b);
 					group.pack(true);
 				}
 			});
 		}
 	}
 
+	public static VirtualNodesGroup getInstance() {
+		return instance;
+	}
+	
+	public Color getColor(VNObject vn) {
+		if(virtualNodes.containsKey(vn))
+			return virtualNodes.get(vn).getForeground();
+		else return null;
+	}
+	
 	//
 	// -- INNER CLASSES -----------------------------------------------
 	//

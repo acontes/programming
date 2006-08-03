@@ -63,7 +63,7 @@ public class VMFigure extends AbstractRectangleFigure{
 	//
 
 	public VMFigure(String text) {
-		super(text);
+		super(text, null);
 		addMouseMotionListener(new VMListener());
 	}
 
@@ -71,7 +71,7 @@ public class VMFigure extends AbstractRectangleFigure{
 	 * Used to display the legend
 	 */
 	public VMFigure(){
-		super("JVM");
+		super();
 	}
 
 	//
@@ -143,6 +143,9 @@ public class VMFigure extends AbstractRectangleFigure{
 	private class VMBorderLayout extends BorderLayout {
 		
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
+			if(legend)
+				return super.calculatePreferredSize(container, wHint, hHint).expand(90, 5);
+			
 			return super.calculatePreferredSize(container, wHint, hHint).expand(25,0);
 		}
 	}

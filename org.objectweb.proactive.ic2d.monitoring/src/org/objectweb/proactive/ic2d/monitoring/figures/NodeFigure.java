@@ -66,9 +66,20 @@ public class NodeFigure extends AbstractRectangleFigure{
 	 * @param text The text to display
 	 * @param protocol The protocol used
 	 */
-	public NodeFigure(String text, Protocol protocol) {
-		super(text);
+	public NodeFigure(String text, Protocol protocol, Color highlight) {
+		super(text, highlight);
 		addMouseMotionListener(new NodeListener());
+		setProtocol(protocol);
+	}
+	
+	
+	/**
+	 * Create a new node figure (Used to display the legend)
+	 * @param text The text to display
+	 * @param protocol The protocol used
+	 */
+	public NodeFigure(Protocol protocol) {
+		super();
 		setProtocol(protocol);
 	}
 	
@@ -76,10 +87,10 @@ public class NodeFigure extends AbstractRectangleFigure{
 	 * Used to display the legend
 	 * @param protocol The protocol used
 	 */
-	public NodeFigure(Protocol protocol){
-		super("Node");
+	/*public NodeFigure(Protocol protocol){
+		super("Node", null);
 		setProtocol(protocol);
-	}
+	}*/
 	//
     // -- PUBLIC METHOD --------------------------------------------
     //
@@ -150,6 +161,9 @@ public class NodeFigure extends AbstractRectangleFigure{
 	private class NodeBorderLayout extends BorderLayout {
 		
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
+			if(legend)
+				return super.calculatePreferredSize(container, wHint, hHint).expand(90, 5);
+			
 			return super.calculatePreferredSize(container, wHint, hHint).expand(25,0);
 		}
 	}

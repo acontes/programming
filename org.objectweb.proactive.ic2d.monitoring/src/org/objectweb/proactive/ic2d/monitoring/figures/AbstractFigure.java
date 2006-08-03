@@ -52,20 +52,34 @@ public abstract class AbstractFigure extends Figure{
 	protected Color backgroundColor;
 	protected Color shadowColor;
 	
-	protected boolean highlighted;
+	protected Color highlight;
 	
 	protected static boolean showShadow = false; 
 	
+	protected boolean legend;
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractFigure(String text){
+	protected AbstractFigure(String text, Color highlight){
 		super();
+		
+		this.legend = false;
 		
 		// Initialisation
 		this.label = new Label(text);
-		highlighted = false;
+		this.highlight = highlight;
+		if(highlight != null)
+			this.borderColor = highlight;
+		else
+			this.borderColor = getDefaultBorderColor();
+		initFigure();
+		initColor();
+		setToolTip(new ToolTipFigure(text));
+	}
+	
+	protected AbstractFigure() {
+		this.legend = true;
 		initFigure();
 		initColor();
 	}
@@ -90,8 +104,8 @@ public abstract class AbstractFigure extends Figure{
 	
 	
 	public void setHighlight(Color color) {
-		this.highlighted = (color != null);
-		if(highlighted)
+		this.highlight = color;
+		if(highlight != null)
 			this.borderColor = color;
 		else
 			this.borderColor = getDefaultBorderColor();

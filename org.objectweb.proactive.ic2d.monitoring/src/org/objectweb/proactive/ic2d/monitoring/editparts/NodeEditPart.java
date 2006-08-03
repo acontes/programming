@@ -40,6 +40,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.VNColors;
+import org.objectweb.proactive.ic2d.monitoring.views.VirtualNodesGroup;
 
 public class NodeEditPart extends AbstractIC2DEditPart{
 
@@ -112,7 +113,8 @@ public class NodeEditPart extends AbstractIC2DEditPart{
 	 * @return a new NodeFigure view associated with the NodeObject model.
 	 */
 	protected IFigure createFigure() {
-		return new NodeFigure(getCastedModel().getFullName(),getCastedModel().getProtocol());
+		return new NodeFigure(getCastedModel().getFullName(),getCastedModel().getProtocol(), 
+				VirtualNodesGroup.getInstance().getColor(getCastedModel().getVNParent()));
 	}
 
 	/**

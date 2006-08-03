@@ -75,17 +75,16 @@ public class AOFigure extends AbstractFigure {
 	 * @param text Text to display
 	 */
 	public AOFigure(String text){
-		super(text);
+		super(text, null);
 		addMouseMotionListener(new AOListener());
 	}
 	
 	/**
-	 * Used to display the legend
-	 * @param text 
+	 * Used to display the legend.
 	 * @param state
 	 */
-	public AOFigure(String text, int state){
-		super(text);
+	public AOFigure(int state){
+		super();
 		this.setState(state);
 	}
 

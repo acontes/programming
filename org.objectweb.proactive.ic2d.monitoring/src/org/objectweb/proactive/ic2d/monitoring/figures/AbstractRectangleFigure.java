@@ -34,15 +34,24 @@ import org.eclipse.draw2d.ChopboxAnchor;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.graphics.Color;
 
 public abstract class AbstractRectangleFigure extends AbstractFigure{
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractRectangleFigure(String text){
-		super(text);
+	protected AbstractRectangleFigure(String text, Color highlight){
+		super(text, highlight);
 		label.setText(getTextResized(text));
+	}
+	
+	/**
+	 * Used to display the legend.
+	 *
+	 */
+	protected AbstractRectangleFigure() {
+		super();
 	}
 	
 	//
@@ -78,7 +87,7 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 		graphics.setBackgroundColor(this.backgroundColor);
 		graphics.fillRoundRectangle(bounds, round, round);
 		graphics.drawRoundRectangle(bounds, round, round);
-		if(highlighted) {
+		if(highlight != null) {
 			graphics.drawRoundRectangle(bounds.getCopy().resize(-2, -2).translate(1, 1), round-3, round-3);
 		}
 		

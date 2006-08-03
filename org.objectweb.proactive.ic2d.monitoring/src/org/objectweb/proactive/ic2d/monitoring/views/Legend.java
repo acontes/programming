@@ -34,6 +34,9 @@ import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -64,9 +67,13 @@ public class Legend extends ViewPart {
 		
 	    Composite child = new Composite(sc,SWT.NONE);
 	    
-	    GridLayout generalLayout = new GridLayout();
-		generalLayout.numColumns = 1;
-		child.setLayout(/*new ColumnLayout()*/generalLayout);
+	    FormLayout generalLayout = new FormLayout();
+	    generalLayout.marginHeight = 5;
+	    generalLayout.marginWidth = 5;
+	    
+//	    GridLayout generalLayout = new GridLayout();
+//		generalLayout.numColumns = 1;
+		child.setLayout(generalLayout);
 	    
 		/*--------- Active objects ---------*/
 
@@ -74,12 +81,16 @@ public class Legend extends ViewPart {
 		GridLayout aoLayout = new GridLayout();
 		aoLayout.numColumns = 2;
 		aoDef.setLayout(/*new FillLayout(SWT.VERTICAL)*/aoLayout);
-		aoDef.setText("Active objects");		
+		aoDef.setText("Active objects");
+		FormData aoDefFormData = new FormData();
+		aoDefFormData.left = new FormAttachment(0, 0);
+		aoDefFormData.right = new FormAttachment(100, 0);
+		aoDef.setLayoutData(aoDefFormData);
 
 		// Active by itself
 		
 		FigureCanvas ao1Container = new FigureCanvas(aoDef);
-		ao1Container.setContents(new AOFigure("Active Object", State.ACTIVE));
+		ao1Container.setContents(new AOFigure(State.ACTIVE));
 
 		Label ao1Text = new Label(aoDef, 0);
 		ao1Text.setText("Active by itself");
@@ -87,7 +98,7 @@ public class Legend extends ViewPart {
 		// Serving request
 		
 		FigureCanvas ao2Container = new FigureCanvas(aoDef);
-		ao2Container.setContents(new AOFigure("Active Object", State.SERVING_REQUEST));
+		ao2Container.setContents(new AOFigure(State.SERVING_REQUEST));
 	
 		Label ao2Text = new Label(aoDef, 0);
 		ao2Text.setText("Serving request");
@@ -95,7 +106,7 @@ public class Legend extends ViewPart {
 		// Waiting for request
 		
 		FigureCanvas ao3Container = new FigureCanvas(aoDef);
-		ao3Container.setContents(new AOFigure("Active Object", State.WAITING_FOR_REQUEST));
+		ao3Container.setContents(new AOFigure(State.WAITING_FOR_REQUEST));
 
 		Label ao3Text = new Label(aoDef, 0);
 		ao3Text.setText("Waiting for request");
@@ -103,7 +114,7 @@ public class Legend extends ViewPart {
 		// Waiting for result (wait by necessity)
 		
 		FigureCanvas ao4Container = new FigureCanvas(aoDef);
-		ao4Container.setContents(new AOFigure("Active Object", State.WAITING_BY_NECESSITY_WHILE_ACTIVE));
+		ao4Container.setContents(new AOFigure(State.WAITING_BY_NECESSITY_WHILE_ACTIVE));
 
 		Label ao4Text = new Label(aoDef, 0);
 		ao4Text.setText("Waiting for result\n(wait by necessity)");
@@ -112,7 +123,7 @@ public class Legend extends ViewPart {
 		// Migrating
 		
 		FigureCanvas ao5Container = new FigureCanvas(aoDef);
-		ao5Container.setContents(new AOFigure("Active Object", State.MIGRATING));
+		ao5Container.setContents(new AOFigure(State.MIGRATING));
 
 		Label ao5Text = new Label(aoDef, 0);
 		ao5Text.setText("Migrating");
@@ -126,6 +137,11 @@ public class Legend extends ViewPart {
 		requestDef.setLayout(requestLayout);
 		requestDef.setText("Pending Requests");		
 		//requestDef.setBackground(ColorConstants.white);
+		FormData requestDefFormData = new FormData();
+		requestDefFormData.top = new FormAttachment(aoDef, 0);
+		requestDefFormData.left = new FormAttachment(0, 0);
+		requestDefFormData.right = new FormAttachment(100, 0);
+		requestDef.setLayoutData(requestDefFormData);
 		
 		/*--------- Nodes ---------*/
 
@@ -133,12 +149,17 @@ public class Legend extends ViewPart {
 		GridLayout nodeLayout = new GridLayout();
 		nodeLayout.numColumns = 2;
 		nodeDef.setLayout(nodeLayout);
-		nodeDef.setText("Nodes");		
+		nodeDef.setText("Nodes");
+		FormData nodeDefFormData = new FormData();
+		nodeDefFormData.top = new FormAttachment(requestDef, 0);
+		nodeDefFormData.left = new FormAttachment(0, 0);
+		nodeDefFormData.right = new FormAttachment(100, 0);
+		nodeDef.setLayoutData(nodeDefFormData);
 		
 		// RMI Node
 		
 		FigureCanvas node1Container = new FigureCanvas(nodeDef);
-		node1Container.setContents(new NodeFigure("Node", Protocol.RMI));
+		node1Container.setContents(new NodeFigure(Protocol.RMI));
 
 		Label node1Text = new Label(nodeDef, 0);
 		node1Text.setText("RMI Node");
@@ -146,7 +167,7 @@ public class Legend extends ViewPart {
 		// HTTP Node
 		
 		FigureCanvas node2Container = new FigureCanvas(nodeDef);
-		node2Container.setContents(new NodeFigure("Node", Protocol.HTTP));
+		node2Container.setContents(new NodeFigure(Protocol.HTTP));
 
 		Label node2Text = new Label(nodeDef, 0);
 		node2Text.setText("HTTP Node");
@@ -154,7 +175,7 @@ public class Legend extends ViewPart {
 		// RMI/SSH Node
 		
 		FigureCanvas node3Container = new FigureCanvas(nodeDef);
-		node3Container.setContents(new NodeFigure("Node", Protocol.RMISSH));
+		node3Container.setContents(new NodeFigure(Protocol.RMISSH));
 
 		Label node3Text = new Label(nodeDef, 0);
 		node3Text.setText("RMI/SSH Node");
@@ -162,7 +183,7 @@ public class Legend extends ViewPart {
 		// JINI Node
 		
 		FigureCanvas node4Container = new FigureCanvas(nodeDef);
-		node4Container.setContents(new NodeFigure("Node", Protocol.JINI));
+		node4Container.setContents(new NodeFigure(Protocol.JINI));
 
 		Label node4Text = new Label(nodeDef, 0);
 		node4Text.setText("JINI Node");
@@ -173,7 +194,12 @@ public class Legend extends ViewPart {
 		GridLayout jvmLayout = new GridLayout();
 		jvmLayout.numColumns = 2;
 		jvmDef.setLayout(jvmLayout);
-		jvmDef.setText("JVMs");		
+		jvmDef.setText("JVMs");
+		FormData jvmDefFormData = new FormData();
+		jvmDefFormData.top = new FormAttachment(nodeDef, 0);
+		jvmDefFormData.left = new FormAttachment(0, 0);
+		jvmDefFormData.right = new FormAttachment(100, 0);
+		jvmDef.setLayoutData(jvmDefFormData);
 		
 		// Standard JVM
 		
@@ -199,12 +225,17 @@ public class Legend extends ViewPart {
 		GridLayout hostLayout = new GridLayout();
 		hostLayout.numColumns = 2;
 		hostDef.setLayout(hostLayout);
-		hostDef.setText("Hosts");		
+		hostDef.setText("Hosts");
+		FormData hostDefFormData = new FormData();
+		hostDefFormData.top = new FormAttachment(jvmDef, 0);
+		hostDefFormData.left = new FormAttachment(0, 0);
+		hostDefFormData.right = new FormAttachment(100, 0);
+		hostDef.setLayoutData(hostDefFormData);
 		
 		// Standard Host
 		
 		FigureCanvas hostContainer = new FigureCanvas(hostDef);
-		hostContainer.setContents(new HostFigure("Standard Host"));
+		hostContainer.setContents(new HostFigure());
 
 		Label hostText = new Label(hostDef, 0);
 		hostText.setText("Standard Host");
@@ -215,12 +246,17 @@ public class Legend extends ViewPart {
 		GridLayout noRespondingLayout = new GridLayout();
 		noRespondingLayout.numColumns = 2;
 		noRespondingDef.setLayout(nodeLayout);
-		noRespondingDef.setText("Not Responding");		
+		noRespondingDef.setText("Not Responding");	
+		FormData noRespondingDefFormData = new FormData();
+		noRespondingDefFormData.top = new FormAttachment(hostDef, 0);
+		noRespondingDefFormData.left = new FormAttachment(0, 0);
+		noRespondingDefFormData.right = new FormAttachment(100, 0);
+		noRespondingDef.setLayoutData(noRespondingDefFormData);
 		
 		// Active Object
 		
 		FigureCanvas aoNoRespondingContainer = new FigureCanvas(noRespondingDef);
-		aoNoRespondingContainer.setContents(new AOFigure("Active object", State.NOT_RESPONDING));
+		aoNoRespondingContainer.setContents(new AOFigure(State.NOT_RESPONDING));
 
 		Label aoNoRespondingText = new Label(noRespondingDef, 0);
 		aoNoRespondingText.setText("Active Object");
@@ -228,7 +264,7 @@ public class Legend extends ViewPart {
 		// JVM
 		
 		FigureCanvas jvmNoRespondingContainer = new FigureCanvas(noRespondingDef);
-		VMFigure jvmFigure = new VMFigure("JVM");
+		VMFigure jvmFigure = new VMFigure();
 		jvmFigure.notResponding();
 		jvmNoRespondingContainer.setContents(jvmFigure);
 

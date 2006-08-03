@@ -56,8 +56,16 @@ public class HostFigure extends AbstractRectangleFigure{
     // -- CONSTRUCTOR -----------------------------------------------
     //
 	public HostFigure(String text) {
-		super(text);
+		super(text, null);
 		new Dragger(this);
+	}
+	
+	/**
+	 * Used to display the legend.
+	 *
+	 */
+	public HostFigure() {
+		super();
 	}
 	
 	//
@@ -79,7 +87,7 @@ public class HostFigure extends AbstractRectangleFigure{
 	}
 
 	protected void initFigure() {
-		BorderLayout layout = new BorderLayout();
+		BorderLayout layout = new HostBorderLayout();
 		//layout.setHorizontalSpacing(10);
 		//layout.setVerticalSpacing(5);
 		setLayoutManager(layout);
@@ -100,9 +108,26 @@ public class HostFigure extends AbstractRectangleFigure{
 		return DEFAULT_WIDTH;
 	}
 	
+	@Override
+	protected Color getDefaultBorderColor() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	//
     // -- INNER CLASS --------------------------------------------
     //
+	
+	private class HostBorderLayout extends BorderLayout {
+		
+		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
+			if(legend)
+				return super.calculatePreferredSize(container, wHint, hHint).expand(100, 10);
+			
+			return super.calculatePreferredSize(container, wHint, hHint).expand(25,0);
+		}
+		
+	}
 	
 	private class HostToolbarLayout extends ToolbarLayout {
 		
@@ -111,7 +136,7 @@ public class HostFigure extends AbstractRectangleFigure{
 		}
 		
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			return super.calculatePreferredSize(container, wHint, hHint).expand(20, 15);
+			return super.calculatePreferredSize(container, wHint, hHint).expand(0, 15);
 		}
 		
 		public void layout(IFigure figure) {
@@ -120,11 +145,5 @@ public class HostFigure extends AbstractRectangleFigure{
 		}
 		
 		
-	}
-
-	@Override
-	protected Color getDefaultBorderColor() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
