@@ -35,6 +35,7 @@ import org.eclipse.draw2d.Polyline;
 import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
@@ -74,6 +75,10 @@ public class RoundedLine extends Polyline {
 	 * @param target The target
 	 */
 	private void drawArc(Graphics g, Point source, Point target){
+		
+		// Sets the anti-aliasing
+		g.setAntialias(SWT.ON);
+		
 		int xSource = source.x;
 		int ySource = source.y;
 
