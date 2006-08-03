@@ -290,7 +290,7 @@ public class SpyEventManager {
 		//
 		public void bodyCreated(BodyEvent event) {
 
-			System.out.println("# MyBodyEventListener.bodyCreated()");
+			//System.out.println("# MyBodyEventListener.bodyCreated()");
 
 			Body body = checkBody(event.getBody());
 			if (body == null) {
@@ -305,7 +305,7 @@ public class SpyEventManager {
 
 		public void bodyDestroyed(BodyEvent event) {
 
-			System.out.println("# MyBodyEventListener.bodyDestroyed()");
+			//System.out.println("# MyBodyEventListener.bodyDestroyed()");
 
 			Body body = checkBody(event.getBody());
 			if (body == null) {
@@ -319,7 +319,7 @@ public class SpyEventManager {
 
 		public void bodyChanged(BodyEvent event) {
 
-			System.out.println("# MyBodyEventListener.bodyChanged()");
+			//System.out.println("# MyBodyEventListener.bodyChanged()");
 
 			Body body = checkBody(event.getBody());
 			if (body == null) {
@@ -334,7 +334,7 @@ public class SpyEventManager {
 
 		private Body checkBody(UniversalBody uBody) {
 
-			System.out.println("# MyBodyEventListener.checkBody()");
+			//System.out.println("# MyBodyEventListener.checkBody()");
 
 			if (!(uBody instanceof Body)) {
 				return null;
@@ -358,7 +358,7 @@ public class SpyEventManager {
 		//
 		public void requestQueueModified(RequestQueueEvent event) {
 
-			System.out.println("# MyRequestQueueEventListener.requestQueueModified()");
+			//System.out.println("# MyRequestQueueEventListener.requestQueueModified()");
 
 			if (event.getType() == RequestQueueEvent.WAIT_FOR_REQUEST) {
 				addEvent(new SpyEvent(SpyEvent.OBJECT_WAIT_FOR_REQUEST_TYPE,
@@ -376,7 +376,7 @@ public class SpyEventManager {
 		//
 		public void waitingForFuture(FutureEvent event) {
 
-			System.out.println("# MyFutureEventListener.waitingForFuture()");
+			//System.out.println("# MyFutureEventListener.waitingForFuture()");
 
 			addEvent(new SpyFutureEvent(
 					SpyEvent.OBJECT_WAIT_BY_NECESSITY_TYPE, event));
@@ -384,7 +384,7 @@ public class SpyEventManager {
 
 		public void receivedFutureResult(FutureEvent event) {
 
-			System.out.println("# MyFutureEventListener.receivedFutureResult()");
+			//System.out.println("# MyFutureEventListener.receivedFutureResult()");
 
 			addEvent(new SpyFutureEvent(
 					SpyEvent.OBJECT_RECEIVED_FUTURE_RESULT_TYPE, event));
