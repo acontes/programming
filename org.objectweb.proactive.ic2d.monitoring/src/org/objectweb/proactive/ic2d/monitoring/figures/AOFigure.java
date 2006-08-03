@@ -32,7 +32,6 @@ package org.objectweb.proactive.ic2d.monitoring.figures;
 
 import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ConnectionAnchor;
-import org.eclipse.draw2d.EllipseAnchor;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LayoutManager;
@@ -93,8 +92,9 @@ public class AOFigure extends AbstractFigure {
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
+	
 	public ConnectionAnchor getAnchor() {
-		return new EllipseAnchor(this)/*ChopboxAnchor(this)*/;
+		return new /*EllipseAnchor(this)/*ChopboxAnchor(this)*/Anchor(this);
 	}
 
 	public void paintIC2DFigure(Graphics graphics){
@@ -185,7 +185,8 @@ public class AOFigure extends AbstractFigure {
 	private class AOBorderLayout extends BorderLayout {
 
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
-			return super.calculatePreferredSize(container, wHint, hHint).expand(15, 15);
+			//return super.calculatePreferredSize(container, wHint, hHint).expand(15, 15);
+			return new Dimension(100,super.calculatePreferredSize(container, wHint, hHint).expand(0, 15).height);
 		}
 
 	}

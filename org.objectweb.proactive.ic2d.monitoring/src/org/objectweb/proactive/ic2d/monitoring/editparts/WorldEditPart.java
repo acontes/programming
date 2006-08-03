@@ -34,9 +34,9 @@ import java.util.List;
 
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.ToolbarLayout;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.monitoring.figures.MonitoringLayout;
 
 public class WorldEditPart extends AbstractIC2DEditPart {
 
@@ -80,12 +80,11 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 	 */
 	protected IFigure createFigure() {
 		layer = new FreeformLayer();
-		ToolbarLayout layout = new ToolbarLayout(true);
+		MonitoringLayout layout = new MonitoringLayout(true);
 		layout.setSpacing(50);
-		layout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
-		//layout.setStretchMinorAxis(false);
-		layer.setLayoutManager(/*new FreeformLayout()*/layout);
-		//layer.setBorder(new LineBorder(1));
+		layout.setMinorAlignment(MonitoringLayout.ALIGN_CENTER_CENTER);
+		layer.setLayoutManager(layout);
+		
 		return layer;
 	}
 

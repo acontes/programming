@@ -35,19 +35,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.draw2d.BendpointConnectionRouter;
-import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.Connection;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.PolygonDecoration;
-import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RelativeBendpoint;
-import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.draw2d.geometry.PointList;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Display;
 
-public class Connection  extends PolylineConnection{
+public class AOConnection {
 
 	/**
 	 * Symbolizes connections in waitings. The source object awaits the target object.
@@ -59,38 +54,14 @@ public class Connection  extends PolylineConnection{
 	 */
 	private static HashMap<String, AOFigure> targets = new HashMap<String, AOFigure>();
 
-
 	/**
 	 * Established connections.
 	 */
 	private static HashMap<String, String> connections = new HashMap<String, String>();
 
-	/**
-	 * Decorates connection with an arrow.
-	 */
-	private RotatableDecoration targetDecoration;
-
-	//
-	// -- PUBLIC METHODS ----------------------------------------------
-	//
-
-	/**
-	 * Creates a new connection.
-	 */
-	private Connection(){
-		super();
-		targetDecoration = getTargetDecoration();
-		setTargetDecoration(targetDecoration);
-		setLineWidth(1);
-		setForegroundColor(new Color(Display.getCurrent(), 108, 108, 116));
-		setLineStyle(Graphics.LINE_SOLID);
-	}
-
-
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-
 
 	/**
 	 * If the source is the present then a connection is made. Otherwise the request is stored until the arrival of the target.
@@ -141,25 +112,6 @@ public class Connection  extends PolylineConnection{
 	}
 
 	//
-	// -- PROTECTED METHODS -------------------------------------------
-	//
-
-	/**
-	 * Returns a decoration containing an arrow.
-	 */
-	protected RotatableDecoration getTargetDecoration(){
-		if (targetDecoration == null){
-			PointList points = new PointList();
-			points.addPoint(-1, 1);
-			points.addPoint(0, 0);
-			points.addPoint(-1, -1);
-			targetDecoration = new PolygonDecoration();
-			((PolygonDecoration) targetDecoration).setTemplate(points);
-		}
-		return targetDecoration;
-	}
-
-	//
 	// -- PRIVATE METHODS -------------------------------------------
 	//
 
@@ -169,20 +121,32 @@ public class Connection  extends PolylineConnection{
 	 * @param source The source figure.
 	 * @param target The target figure.
 	 */
-	private static void connect(IFigure panel, AOFigure source, AOFigure target){
-		Connection connection = new Connection();
-		connection.setSourceAnchor(source.getAnchor());
-		connection.setTargetAnchor(target.getAnchor());
+	public static void connect(IFigure panel, AOFigure source, AOFigure target){
+
+		RoundedLineConnection connection = new RoundedLineConnection();
+		//PolylineConnection connection = new PolylineConnection();
+
+		Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width/2, source.getBounds().height/2);
+		Point targetCenter = target.getLocation().getTranslated(target.getBounds().width/2, target.getBounds().height/2);
+
+		int position = sourceCenter.getPosition(targetCenter);
+
+		Anchor sourceAnchor = (Anchor) source.getAnchor();
+		Anchor targetAnchor = (Anchor) target.getAnchor();
+
+		sourceAnchor.useRelativePosition(position);
+		targetAnchor.useRelativePosition(position);	
+
+		connection.setSourceAnchor(sourceAnchor);
+		connection.setTargetAnchor(targetAnchor);
 
 		BendpointConnectionRouter router = new BendpointConnectionRouter();
 
 		List<RelativeBendpoint> bendPoints = new ArrayList<RelativeBendpoint>();
-		Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width/2, source.getBounds().height/2);
-		Point targetCenter = target.getLocation().getTranslated(target.getBounds().width/2, target.getBounds().height/2);
 
-		RelativeBendpoint middle = calculPoint(connection, sourceCenter, targetCenter);
-
+		RelativeBendpoint middle = calculPoint(connection, sourceCenter, targetCenter, position);
 		bendPoints.add(middle);
+
 		router.setConstraint(connection,bendPoints);
 
 		connection.setConnectionRouter(router);
@@ -190,12 +154,39 @@ public class Connection  extends PolylineConnection{
 		panel.add(connection);
 	}
 
-	private static RelativeBendpoint calculPoint(Connection connection, Point source, Point target){
+
+	/**
+	 * Calculate a relative point in order to display the arc of circle
+	 * @param connection The connection
+	 * @param source The source of connection
+	 * @param target The target of connection
+	 * @position The relative position of the target to the source
+	 */
+	private static RelativeBendpoint calculPoint(Connection connection, Point source, Point target, int position){
 		double distance = source.getDistance(target);
 		RelativeBendpoint point = new RelativeBendpoint(connection);
-		int value = (int)(0.05*distance);
-		value*=value;
-		point.setRelativeDimensions(new Dimension(value, 0), new Dimension(value, 0));
+		int value = (int)(0.4*distance);
+		point.setWeight(1);
+		if(source==target){// If the source and the target are the same point
+			position=PositionConstants.NORTH;
+			value = 90;
+		}
+		switch (position) {
+		case PositionConstants.NORTH:
+			point.setRelativeDimensions(new Dimension(value, 0), new Dimension(value, 0));
+			break;
+		case PositionConstants.SOUTH:
+			point.setRelativeDimensions(new Dimension(-value, 0), new Dimension(-value, 0));
+			break;
+		case PositionConstants.EAST:
+			point.setRelativeDimensions(new Dimension(0, value/2+50), new Dimension(0, value/2+50));
+			break;
+		case PositionConstants.WEST:
+			point.setRelativeDimensions(new Dimension(0, -(value/2+50)), new Dimension(0, -(value/2+50)));
+			break;
+		default:
+			break;
+		}
 		return point;
 	}
 }

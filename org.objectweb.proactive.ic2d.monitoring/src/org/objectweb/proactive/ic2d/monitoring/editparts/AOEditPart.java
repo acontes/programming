@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
-import org.objectweb.proactive.ic2d.monitoring.figures.Connection;
+import org.objectweb.proactive.ic2d.monitoring.figures.AOConnection;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
 
 public class AOEditPart extends AbstractIC2DEditPart{
@@ -82,9 +82,9 @@ public class AOEditPart extends AbstractIC2DEditPart{
 					public void run () {
 						IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure().getParent();
 						if(((AOObject)getModel()).getID().toString().compareTo(source)==0)
-							Connection.addSourceConnection(panel, source, (AOFigure)getFigure(), target);
+							AOConnection.addSourceConnection(panel, source, (AOFigure)getFigure(), target);
 						else
-							Connection.addTargetConnection(panel, target, (AOFigure)getFigure(), source);
+							AOConnection.addTargetConnection(panel, target, (AOFigure)getFigure(), source);
 					}
 				});
 			}
