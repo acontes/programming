@@ -164,7 +164,7 @@ public class NodeFigure extends AbstractRectangleFigure{
 			if(legend)
 				return super.calculatePreferredSize(container, wHint, hHint).expand(90, 5);
 			
-			return super.calculatePreferredSize(container, wHint, hHint).expand(25,0);
+			return super.calculatePreferredSize(container, wHint, hHint).expand(15,0);
 		}
 	}
 	
@@ -176,7 +176,7 @@ public class NodeFigure extends AbstractRectangleFigure{
 
 		
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			return super.calculatePreferredSize(container, wHint, hHint).expand(10,15);
+			return super.calculatePreferredSize(container, wHint, hHint).expand(0,15);
 		}
 		
 	}

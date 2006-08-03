@@ -95,7 +95,7 @@ public class HostFigure extends AbstractRectangleFigure{
 		
 		contentPane = new Figure();
 		ToolbarLayout contentPaneLayout = new HostToolbarLayout();
-		contentPaneLayout.setSpacing(10);
+		contentPaneLayout.setSpacing(5);
 		contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
 		//contentPaneLayout.setStretchMinorAxis(false);
 		contentPane.setLayoutManager(contentPaneLayout);
@@ -124,7 +124,7 @@ public class HostFigure extends AbstractRectangleFigure{
 			if(legend)
 				return super.calculatePreferredSize(container, wHint, hHint).expand(100, 10);
 			
-			return super.calculatePreferredSize(container, wHint, hHint).expand(25,0);
+			return super.calculatePreferredSize(container, wHint, hHint).expand(10,0);
 		}
 		
 	}
@@ -136,12 +136,12 @@ public class HostFigure extends AbstractRectangleFigure{
 		}
 		
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			return super.calculatePreferredSize(container, wHint, hHint).expand(0, 15);
+			return super.calculatePreferredSize(container, wHint, hHint).expand(0, 13);
 		}
 		
 		public void layout(IFigure figure) {
 			super.layout(figure);
-			figure.translate(10, 0);
+			figure.translate(5, 0);
 		}
 		
 		
