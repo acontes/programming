@@ -37,9 +37,7 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
-import org.objectweb.proactive.ic2d.monitoring.figures.VNColors;
 import org.objectweb.proactive.ic2d.monitoring.views.VirtualNodesGroup;
 
 public class NodeEditPart extends AbstractIC2DEditPart{
@@ -72,34 +70,36 @@ public class NodeEditPart extends AbstractIC2DEditPart{
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
 	public void update(Observable o, Object arg) {
-		if(arg != null && arg instanceof Integer) {
-			if(((Integer)arg).intValue() == State.HIGHLIGHTED) {
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run () {
-						((NodeFigure)getFigure()).
-						setHighlight(VNColors.getInstance().getColor(((NodeObject)getModel()).getVNParent().getKey()));
-						refreshVisuals();
-					}
-				});
-			}
-			else if(((Integer)arg).intValue() == State.NOT_HIGHLIGHTED) {
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run () {
-						((NodeFigure)getFigure()).setHighlight(null);
-						refreshVisuals();
-					}
-				});
-			}
-		}
-
-		else {
+//		if(arg != null && arg instanceof Integer) {
+//			if(((Integer)arg).intValue() == State.HIGHLIGHTED) {
+//				Display.getDefault().asyncExec(new Runnable() {
+//					public void run () {
+//						System.out.println("NodeEditPart.update()");
+//						((NodeFigure)getFigure()).
+//						setHighlight(VNColors.getInstance().getColor(((NodeObject)getModel()).getVNParent().getKey()));
+//						refreshVisuals();
+//					}
+//				});
+//			}
+//			else if(((Integer)arg).intValue() == State.NOT_HIGHLIGHTED) {
+//				Display.getDefault().asyncExec(new Runnable() {
+//					public void run () {
+//						((NodeFigure)getFigure()).setHighlight(null);
+//						refreshVisuals();
+//					}
+//				});
+//			}
+//		}
+//
+//		else {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run () {
+					((NodeFigure)getFigure()).setHighlight(VirtualNodesGroup.getInstance().getColor(((NodeObject)getModel()).getVNParent()));
 					refreshChildren();
 					refreshVisuals();		
 				}
 			});
-		}
+//		}
 	}
 
 	//
@@ -113,8 +113,7 @@ public class NodeEditPart extends AbstractIC2DEditPart{
 	 * @return a new NodeFigure view associated with the NodeObject model.
 	 */
 	protected IFigure createFigure() {
-		return new NodeFigure(getCastedModel().getFullName(),getCastedModel().getProtocol(), 
-				VirtualNodesGroup.getInstance().getColor(getCastedModel().getVNParent()));
+		return new NodeFigure(getCastedModel().getFullName(),getCastedModel().getProtocol());
 	}
 
 	/**
