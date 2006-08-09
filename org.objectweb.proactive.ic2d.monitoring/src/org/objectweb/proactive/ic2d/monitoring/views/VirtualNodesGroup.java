@@ -21,14 +21,16 @@ import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.VNColors;
 
 public class VirtualNodesGroup implements Observer {
-
-	private static VirtualNodesGroup instance = null;
+	
+	private static VirtualNodesGroup instance;
 	
 	private Group group;
 
 	private Map<Button, VNObject> buttons = new HashMap<Button, VNObject>();
 	
 	private Map<VNObject, Button> virtualNodes = new HashMap<VNObject, Button>();
+	
+	
 	
 	//
 	// -- CONSTRUCTOR -----------------------------------------------
@@ -56,7 +58,12 @@ public class VirtualNodesGroup implements Observer {
 	//
 	// -- PUBLIC METHOD -----------------------------------------------
 	//
+	
+	public static VirtualNodesGroup getInstance() {
+		return instance;
+	}
 
+	
 	public void update(Observable o, Object arg) {
 		if(arg instanceof VNObject) {
 			final VNObject vn = (VNObject)arg;
@@ -73,15 +80,17 @@ public class VirtualNodesGroup implements Observer {
 			});
 		}
 	}
-
-	public static VirtualNodesGroup getInstance() {
-		return instance;
+	
+	public Group getGroup() {
+		return group;
 	}
 	
+	
 	public Color getColor(VNObject vn) {
-		if(virtualNodes.containsKey(vn))
-			return virtualNodes.get(vn).getForeground();
-		else return null;
+		Button b = virtualNodes.get(vn);
+		if(! b.getSelection())
+			return null;
+		return VNColors.getInstance().getColor(vn.getKey());
 	}
 	
 	//
@@ -92,6 +101,7 @@ public class VirtualNodesGroup implements Observer {
 
 		public void widgetSelected(SelectionEvent e) {
 			VNObject vn = buttons.get(e.widget);
+			System.out.println("VirtualNodeButtonListener.widgetSelected() " + vn.getFullName());
 			List<AbstractDataObject> nodes = vn.getMonitoredChildren();
 			for(int i=0, size=nodes.size() ; i<size ; i++) {
 				NodeObject node = (NodeObject)nodes.get(i);
