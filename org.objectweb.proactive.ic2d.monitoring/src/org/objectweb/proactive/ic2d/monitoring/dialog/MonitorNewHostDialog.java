@@ -102,7 +102,6 @@ public class MonitorNewHostDialog extends Dialog {
 		/* Init the shell */
 		shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
 		shell.setText("Adding host and depth to monitor");
-		//shell.setSize(new Point(300, 200));
 		FormLayout layout = new FormLayout();
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;

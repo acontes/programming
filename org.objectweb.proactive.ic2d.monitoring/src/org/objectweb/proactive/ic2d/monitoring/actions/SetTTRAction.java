@@ -30,16 +30,27 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.actions;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.objectweb.proactive.ic2d.monitoring.dialog.ChangeTTRDialog;
+import org.objectweb.proactive.ic2d.monitoring.dialog.SetTTRDialog;
 
-public class ChangeTTRAction implements IWorkbenchWindowActionDelegate {
+public class SetTTRAction extends Action implements IWorkbenchWindowActionDelegate {
 
+	public static final String SET_TTR = "Set ttr";
+	
 	private Display display;
+	
+	
+	public SetTTRAction(Display display) {
+		this.setId(SET_TTR);
+		this.display = display;
+		this.setText("Set Time To Refresh...");
+	}
+	
 	
 	public void dispose() {
 		// TODO Auto-generated method stub
@@ -51,12 +62,18 @@ public class ChangeTTRAction implements IWorkbenchWindowActionDelegate {
 	}
 
 	public void run(IAction action) {
-		new ChangeTTRDialog(display.getActiveShell());
+		new SetTTRDialog(display.getActiveShell());
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	
+	@Override
+	public void run() {
+		new SetTTRDialog(display.getActiveShell());
 	}
 
 }

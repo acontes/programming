@@ -61,18 +61,13 @@ public abstract class AbstractFigure extends Figure{
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	protected AbstractFigure(String text, Color highlight){
+	protected AbstractFigure(String text){
 		super();
 		
 		this.legend = false;
 		
 		// Initialisation
 		this.label = new Label(text);
-		this.highlight = highlight;
-		if(highlight != null)
-			this.borderColor = highlight;
-		else
-			this.borderColor = getDefaultBorderColor();
 		initFigure();
 		initColor();
 		setToolTip(new ToolTipFigure(text));

@@ -216,8 +216,11 @@ public class NodeObject extends AbstractDataObject{
 			this.vnParent = VNObject.getInstance(vnName);
 			if(FilterProcess.getInstance().filter(this))
 				vnParent.skippedChildren.put(key, this);
-			else
+			else {
 				vnParent.putChild(this);
+				this.setChanged();
+				this.notifyObservers();
+			}
 		}
 	}
 

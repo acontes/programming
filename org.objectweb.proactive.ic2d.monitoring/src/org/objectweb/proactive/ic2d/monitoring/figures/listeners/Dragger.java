@@ -28,60 +28,52 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.data;
+package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
+import org.eclipse.draw2d.geometry.Rectangle;
 
-public class VNObject extends AbstractDataObject {
+public class Dragger extends MouseMotionListener.Stub implements MouseListener {
 	
-	private String name;
+	private Figure figure;
+	private int deltaX;
+	private int deltaY;
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-
-	protected VNObject(String name) {
-		super(WorldObject.getInstance());
-		this.name = name;
+	public Dragger(IFigure figure){
+		figure.addMouseMotionListener(this);
+		figure.addMouseListener(this);
 	}
-
 	
 	//
-	// -- PUBLIC METHOD -----------------------------------------------
+	// -- PUBLIC METHODS ---------------------------------------------
 	//
 	
-	
-	public static VNObject getInstance(String name){
-		return WorldObject.getInstance().getVirtualNode(name);
+	public void mouseReleased(MouseEvent e){
+		this.figure = null;
 	}
-
 	
-	@Override
-	public void explore() {/* Do nothing */}
-
-	@Override
-	public String getFullName() {
-		return name;
+	public void mouseClicked(MouseEvent e){/*Do nothing*/}
+	
+	public void mouseDoubleClicked(MouseEvent e){/*Do nothing*/}
+	
+	public void mousePressed(MouseEvent e){
+		this.figure = ((Figure)e.getSource());
+		Rectangle rectangle = figure.getBounds();
+		this.deltaX = e.x - rectangle.x;
+		this.deltaY = e.y - rectangle.y;
 	}
-
-	@Override
-	public String getKey() {
-		return name;
+	
+	public void mouseDragged(MouseEvent e){
+		if(this.figure != null){
+			Rectangle rectangle = this.figure.getBounds();
+			this.figure.setBounds(new Rectangle(e.x - deltaX, e.y - deltaY, rectangle.width, rectangle.height));
+		}
 	}
-
-	@Override
-	public String getType() {
-		return "vn";
-	}
-
-	
-	//
-	// -- PROTECTED METHOD -----------------------------------------------
-	//
-	
-	@Override
-	protected void alreadyMonitored() { /* Do nothing*/ }
-	
-	@Override
-	protected void foundForTheFirstTime() { /* Do nothing*/ }
-	
 }

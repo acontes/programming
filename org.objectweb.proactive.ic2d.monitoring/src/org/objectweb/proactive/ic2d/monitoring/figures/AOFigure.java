@@ -41,6 +41,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
+import org.objectweb.proactive.ic2d.monitoring.figures.listeners.AOListener;
 
 public class AOFigure extends AbstractFigure {
 
@@ -75,8 +76,8 @@ public class AOFigure extends AbstractFigure {
 	 * @param text Text to display
 	 */
 	public AOFigure(String text){
-		super(text, null);
-		addMouseMotionListener(new AOListener());
+		super(text);
+		addMouseListener(new AOListener());
 	}
 	
 	/**

@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 
-public class ChangeTTRDialog extends Dialog {
+public class SetTTRDialog extends Dialog {
 
 	
 	private Shell shell = null;
@@ -53,7 +53,7 @@ public class ChangeTTRDialog extends Dialog {
 	private Button okButton;
 	private Button cancelButton;
 	
-	public ChangeTTRDialog(Shell parent) {
+	public SetTTRDialog(Shell parent) {
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		
 		/* Init the display */
@@ -61,17 +61,16 @@ public class ChangeTTRDialog extends Dialog {
 		
 		/* Init the shell */
 		shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
-		shell.setText("Set update frequence");
-		//shell.setSize(new Point(300, 400));
+		shell.setText("Set Time To Refresh");
 		FormLayout layout = new FormLayout();
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;
 		shell.setLayout(layout);
 		
 		Label titleLabel = new Label(shell, SWT.NONE);
-		titleLabel.setText("Enter the new update frequence");
+		titleLabel.setText("Please enter the new time to refresh control");
 		FormData titleLabelFormData = new FormData();
-		titleLabelFormData.left = new FormAttachment(28, 0);
+		titleLabelFormData.left = new FormAttachment(10, 0);
 		titleLabel.setLayoutData(titleLabelFormData);
 		
 		this.text = new Text(shell, SWT.BORDER);
@@ -88,19 +87,14 @@ public class ChangeTTRDialog extends Dialog {
 		secondsLabelFormData.top = new FormAttachment(titleLabel, 8);
 		secondsLabelFormData.left = new FormAttachment(text, 2);
 		secondsLabel.setLayoutData(secondsLabelFormData);
-		
-		Label commentLabel = new Label(shell, SWT.NONE);
-		commentLabel.setText("This frequence is used to search new JVM and nodes in monitored hosts.");
-		FormData commentLabelFormData = new FormData();
-		commentLabelFormData.top = new FormAttachment(text, 5);
-		commentLabel.setLayoutData(commentLabelFormData);
+
 		
 		// button "OK"
 		this.okButton = new Button(shell, SWT.NONE);
 		okButton.setText("OK");
 		okButton.addSelectionListener(new ChangeTTRListener());
 		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(commentLabel, 20);
+		okFormData.top = new FormAttachment(secondsLabel, 20);
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
@@ -111,7 +105,7 @@ public class ChangeTTRDialog extends Dialog {
 		cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new ChangeTTRListener());
 		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(commentLabel, 20);
+		cancelFormData.top = new FormAttachment(secondsLabel, 20);
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);

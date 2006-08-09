@@ -28,52 +28,36 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.figures;
+package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.MouseMotionListener;
-import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
-public class Dragger extends MouseMotionListener.Stub implements MouseListener {
-	
-	private Figure figure;
-	private int deltaX;
-	private int deltaY;
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
-	public Dragger(IFigure figure){
-		figure.addMouseMotionListener(this);
-		figure.addMouseListener(this);
+public class AOListener implements MouseListener{
+
+
+	private ActionRegistry registry;
+
+	public AOListener() {
+		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
 	}
-	
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
-	
-	public void mouseReleased(MouseEvent e){
-		this.figure = null;
+
+	public void mouseDoubleClicked(MouseEvent me) {
+		// TODO Auto-generated method stub
+
 	}
-	
-	public void mouseClicked(MouseEvent e){/*Do nothing*/}
-	
-	public void mouseDoubleClicked(MouseEvent e){/*Do nothing*/}
-	
-	public void mousePressed(MouseEvent e){
-		this.figure = ((Figure)e.getSource());
-		Rectangle rectangle = figure.getBounds();
-		this.deltaX = e.x - rectangle.x;
-		this.deltaY = e.y - rectangle.y;
-	}
-	
-	public void mouseDragged(MouseEvent e){
-		if(this.figure != null){
-			Rectangle rectangle = this.figure.getBounds();
-			this.figure.setBounds(new Rectangle(e.x - deltaX, e.y - deltaY, rectangle.width, rectangle.height));
+
+	public void mousePressed(MouseEvent me) {
+		if(me.button == 3) {
+			System.out.println("AOListener.mousePressed()");
 		}
 	}
+
+	public void mouseReleased(MouseEvent me) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

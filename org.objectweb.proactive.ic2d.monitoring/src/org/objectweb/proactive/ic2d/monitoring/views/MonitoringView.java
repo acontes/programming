@@ -33,19 +33,18 @@ package org.objectweb.proactive.ic2d.monitoring.views;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.EditPartFactory;
-import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
+import org.eclipse.gef.editparts.ZoomManager;
+import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.monitoring.actions.MonitoringContextMenuProvider;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
@@ -58,36 +57,78 @@ public class MonitoringView extends ViewPart {
 
 	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.views.MonitoringView";
 
+	private static MonitoringView instance = null; 
+	
 	/** the graphical viewer */
-	private ScrollingGraphicalViewer graphicalViewer;
+	private MonitoringViewer graphicalViewer;
 	
 	/** the overview outline page */
     //private OverviewOutlinePage overviewOutlinePage;
+	
+	
+	//
+	// -- CONSTRUCTOR ----------------------------------------------
+	//
+	
+	public MonitoringView () {
+		super();
+		instance = this;
+	}
 	
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
 
+	public static MonitoringView getInstance() {
+		return instance;
+	}
+	
+	@Override
 	public void createPartControl(Composite parent){
 		
-		SashForm sashForm = new SashForm(parent, SWT.VERTICAL);
-        sashForm.setBackground(parent.getBackground());
+		FormLayout form = new FormLayout ();
+		parent.setLayout (form);
 		
-        VirtualNodesGroup virtualNodesGroup = new VirtualNodesGroup(sashForm);
+		final int limit = 50;
+		
+		VirtualNodesGroup virtualNodesGroup = new VirtualNodesGroup(parent);
         WorldObject.getInstance().addObserver(virtualNodesGroup);
-        
-		createGraphicalViewer(sashForm);
+        FormData vnData = new FormData();
+        vnData.left = new FormAttachment (0, 0);
+		vnData.right = new FormAttachment (100, 0);
+		vnData.top = new FormAttachment (0, 0);
+		vnData.bottom = new FormAttachment (0, limit);
+		virtualNodesGroup.getGroup().setLayoutData(vnData);
 		
-		sashForm.setWeights(new int[] { 15, 85 });
-
+		createGraphicalViewer(parent);
+		
+		FormData graphicalViewerData = new FormData ();
+		graphicalViewerData.left = new FormAttachment (0, 0);
+		graphicalViewerData.right = new FormAttachment (100, 0);
+		graphicalViewerData.top = new FormAttachment (virtualNodesGroup.getGroup(), 0);
+		graphicalViewerData.bottom = new FormAttachment (100, 0);
+		graphicalViewer.getControl().setLayoutData(graphicalViewerData);
+		
+		
 		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 		
-		// Adds refresh action to the view's toolbar		
-		toolBarManager.add(new RefreshAction());
+		// Adds refresh action to the view's toolbar
+		RefreshAction toolBarRefresh = new RefreshAction();
+		toolBarManager.add(toolBarRefresh);
 		
-		// Adds Zoom-in and Zoom-out actions to the view's toolbar		
-		toolBarManager.add(new ZoomIn());
-		toolBarManager.add(new ZoomOut());
+		// Adds Zoom-in and Zoom-out actions to the view's toolbar
+		ZoomManager zoomManager = ((ScalableFreeformRootEditPart)graphicalViewer.getRootEditPart()).getZoomManager();
+		zoomManager.setZoomLevels(new double[]{0.25, 0.5, 0.75, 1.0, 1.5});
+		
+		ZoomInAction zoomIn = new ZoomInAction(zoomManager);
+		zoomIn.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-in-2.gif"));
+		graphicalViewer.getActionRegistry().registerAction(zoomIn);
+		toolBarManager.add(zoomIn);
+		
+		ZoomOutAction zoomOut = new ZoomOutAction(zoomManager);
+		zoomOut.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-out-2.gif"));
+		graphicalViewer.getActionRegistry().registerAction(zoomIn);
+		toolBarManager.add(zoomOut);
 		
 		
 		//graphicalViewer.setProperty(MouseWheelHandler.KeyGenerator.getKey(SWT.NONE), MouseWheelZoomHandler.SINGLETON);
@@ -113,7 +154,7 @@ public class MonitoringView extends ViewPart {
      * Returns the <code>GraphicalViewer</code> of this editor.
      * @return the <code>GraphicalViewer</code>
      */
-    public GraphicalViewer getGraphicalViewer() {
+    public MonitoringViewer getGraphicalViewer() {
         return graphicalViewer;
     }
     
@@ -172,12 +213,13 @@ public class MonitoringView extends ViewPart {
     
 	private void createGraphicalViewer(Composite parent) {
 		// create graphical viewer
-		graphicalViewer = new ScrollingGraphicalViewer();
+		graphicalViewer = new MonitoringViewer();
 		graphicalViewer.createControl(parent);
 
 		// configure the viewer
 		graphicalViewer.getControl().setBackground(ColorConstants.white);
-		graphicalViewer.setRootEditPart(new ScalableFreeformRootEditPart());
+		ScalableFreeformRootEditPart root = new ScalableFreeformRootEditPart();
+		graphicalViewer.setRootEditPart(root);
 
 		// activate the viewer as selection provider for Eclipse
 		getSite().setSelectionProvider(graphicalViewer);
@@ -197,46 +239,18 @@ public class MonitoringView extends ViewPart {
 	// -- INNER CLASSES -------------------------------------------
 	//
 	
-	public class ZoomIn extends ZoomInAction {
-
-		public ZoomIn() {
-			super(((ScalableFreeformRootEditPart)graphicalViewer.getRootEditPart()).getZoomManager());
-			this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-in-2.gif"));
-		}
-
-		public void init(IWorkbenchWindow window) {/*do nothing*/}
-
-		public void run(IAction action) {
-			super.run();
-		}
-
-		public void selectionChanged(IAction action, ISelection selection) {/*do nothing*/}
-
-		public void dispose() {
-			super.dispose();
-		}
-	}
-
-	public class ZoomOut extends ZoomOutAction {
-
-		public ZoomOut() {
-			super(((ScalableFreeformRootEditPart)graphicalViewer.getRootEditPart()).getZoomManager());
-			this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-out-2.gif"));
-		}
-
-		public void init(IWorkbenchWindow window) {/*do nothing*/}
-
-		public void run(IAction action) {
-			super.run();
-		}
-
-		public void selectionChanged(IAction action, ISelection selection) {/*do nothing*/}
-
-		public void dispose() {
-			super.dispose();
-		}
-	}
 	
-	
-
+	public class MonitoringViewer extends ScrollingGraphicalViewer {
+		
+		private ActionRegistry registry;
+		
+		public MonitoringViewer() {
+			this.registry = new ActionRegistry();
+		}
+		
+		public ActionRegistry getActionRegistry () {
+			return this.registry;
+		}
+		
+	}
 }

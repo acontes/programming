@@ -28,36 +28,56 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.figures;
+package org.objectweb.proactive.ic2d.monitoring.actions;
 
-import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseMotionListener;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.objectweb.proactive.ic2d.monitoring.dialog.DepthDialog;
 
-public class VMListener implements MouseMotionListener{
+public class SetDepthAction extends Action implements IWorkbenchWindowActionDelegate {
 
-	public void mouseDragged(MouseEvent arg0) {
+	public static final String SET_DEPTH = "Set depth";
+	
+	private Display display;
+	
+	public SetDepthAction() {
+		this.setId(SET_DEPTH);
+	}
+	
+	public SetDepthAction(Display display) {
+		this.display = display;
+		this.setId(SET_DEPTH);
+		this.setText("Set Depth Control...");
+	}
+	
+	
+	
+	public void dispose() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void init(IWorkbenchWindow window) {
+		this.display = window.getShell().getDisplay();
+
 	}
 
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void run(IAction action) {
+		new DepthDialog(display.getActiveShell());
 	}
 
-	public void mouseHover(MouseEvent arg0) {
+	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
-		
-	}
 
-	public void mouseMoved(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
-
+	
+	
+	@Override
+	public void run() {
+		new DepthDialog(display.getActiveShell());
+	}
 }

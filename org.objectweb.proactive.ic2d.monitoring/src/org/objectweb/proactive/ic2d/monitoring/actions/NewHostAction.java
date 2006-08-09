@@ -42,12 +42,11 @@ public class NewHostAction extends Action implements IWorkbenchWindowActionDeleg
 
 	private Display display;
 	
-	public NewHostAction() {
-		super();
-	}
+	public static final String NEW_HOST = "New host";
 	
 	public NewHostAction(Display display) {
 		this.display = display;
+		this.setId(NEW_HOST);
 		this.setText("Monitor a new host...");
 	}
 	
@@ -73,7 +72,7 @@ public class NewHostAction extends Action implements IWorkbenchWindowActionDeleg
 	
 	
 	
-	
+	@Override
 	public void run() {
 		new MonitorNewHostDialog(display.getActiveShell());
 	}

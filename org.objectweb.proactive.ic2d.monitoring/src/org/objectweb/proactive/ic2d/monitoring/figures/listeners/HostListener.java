@@ -28,60 +28,37 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.data;
+package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
+import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
-public class VNObject extends AbstractDataObject {
-	
-	private String name;
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+public class HostListener implements MouseListener {
 
-	protected VNObject(String name) {
-		super(WorldObject.getInstance());
-		this.name = name;
+	private ActionRegistry registry;
+
+	public HostListener() {
+		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
 	}
 
-	
-	//
-	// -- PUBLIC METHOD -----------------------------------------------
-	//
-	
-	
-	public static VNObject getInstance(String name){
-		return WorldObject.getInstance().getVirtualNode(name);
+	public void mouseDoubleClicked(MouseEvent me) {
+		// TODO Auto-generated method stub
+
 	}
 
-	
-	@Override
-	public void explore() {/* Do nothing */}
-
-	@Override
-	public String getFullName() {
-		return name;
+	public void mousePressed(MouseEvent me) {
+		if(me.button == 3) {
+			System.out.println("HostListener.mousePressed()");
+			registry.getAction(RefreshAction.REFRESH).setEnabled(false);
+		}
 	}
 
-	@Override
-	public String getKey() {
-		return name;
+	public void mouseReleased(MouseEvent me) {
+		// TODO Auto-generated method stub
+
 	}
 
-	@Override
-	public String getType() {
-		return "vn";
-	}
-
-	
-	//
-	// -- PROTECTED METHOD -----------------------------------------------
-	//
-	
-	@Override
-	protected void alreadyMonitored() { /* Do nothing*/ }
-	
-	@Override
-	protected void foundForTheFirstTime() { /* Do nothing*/ }
-	
 }

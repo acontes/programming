@@ -28,36 +28,36 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.monitoring.figures;
+package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 
 import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseMotionListener;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
-public class NodeListener implements MouseMotionListener{
+public class NodeListener implements MouseListener {
 
-	public void mouseDragged(MouseEvent arg0) {
+	private ActionRegistry registry;
+	
+	public NodeListener() {
+		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
+	}
+	
+	public void mouseDoubleClicked(MouseEvent me) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void mouseEntered(MouseEvent arg0) {
+	public void mousePressed(MouseEvent me) {
+		if(me.button == 3) {
+			System.out.println("NodeListener.mousePressed()");
+		}
+	}
+
+	public void mouseReleased(MouseEvent me) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void mouseHover(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void mouseMoved(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }
