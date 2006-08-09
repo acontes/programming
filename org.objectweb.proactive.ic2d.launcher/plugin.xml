@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective"
+            fixed="true"
+            icon="icons/perspective.gif"
+            id="org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective"
+            name="Launcher"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.objectweb.proactive.ic2d.launcher.actionSet1"
+            label="File Action Set"
+            visible="true">
+         <menu
+               id="org.objectweb.proactive.ic2d.launcher.Menu"
+               label="&amp;Launcher"/>
+         <action
+               class="org.objectweb.proactive.ic2d.launcher.actions.OpenFile"
+               definitionId="org.objectweb.proactive.ic2d.launcher.actions.OpenFile"
+               icon="icons/open.gif"
+               id="org.objectweb.proactive.ic2d.launcher.actions.OpenFile"
+               label="&amp;Open an XML file"
+               menubarPath="org.objectweb.proactive.ic2d.launcher.Menu/content"
+               state="true"
+               style="push"
+               toolbarPath="org.eclipse.ui.workbench.file/open.ext"
+               tooltip="Open an XML descriptor"/>
+         <action
+               class="org.objectweb.proactive.ic2d.launcher.actions.Launch"
+               definitionId="org.objectweb.proactive.ic2d.launcher.actions.Launch"
+               disabledIcon="icons/runDisabled.gif"
+               icon="icons/run.gif"
+               id="org.objectweb.proactive.ic2d.launcher.actions.Launch"
+               label="&amp;Launch the application"
+               menubarPath="org.objectweb.proactive.ic2d.launcher.Menu/content"
+               state="true"
+               style="push"
+               toolbarPath="org.eclipse.ui.workbench.file/launch.ext"
+               tooltip="Launch the application"/>
+         <action
+               class="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
+               definitionId="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
+               disabledIcon="icons/saveDisabled.gif"
+               icon="icons/save.gif"
+               id="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
+               label="&amp;Save"
+               menubarPath="org.objectweb.proactive.ic2d.launcher.Menu/content"
+               state="true"
+               style="push"
+               toolbarPath="org.eclipse.ui.workbench.file/launch.ext"
+               tooltip="Save the XML file"/>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.objectweb.proactive.ic2d.launcher.editors.xml.XMLEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="xml"
+            icon="icons/text.gif"
+            id="org.objectweb.proactive.ic2d.launcher.editors.xml.XMLEditor"
+            name="XML Editor">
+      </editor>
+   </extension>
+
+</plugin>
