@@ -93,8 +93,13 @@ public class RMIHostRTFinder implements HostRTFinder{
 					runtimes.add(proActiveRuntime);
 				} catch(Exception e) {
 					if(e instanceof ProActiveException) {
-						((VMObject)host.getChild(names[i])).notResponding();
-						console.debug(e);
+						VMObject vm = (VMObject)host.getChild(names[i]);
+						if(vm == null)
+							console.logException(e);
+						else {
+							console.debug(e);
+							((VMObject)host.getChild(names[i])).notResponding();
+						}
 					}
 					else
 						console.logException(e);
