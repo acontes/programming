@@ -40,7 +40,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
-import org.objectweb.proactive.ic2d.monitoring.figures.listeners.NodeListener;
 
 public class NodeFigure extends AbstractRectangleFigure{
 		
@@ -69,7 +68,6 @@ public class NodeFigure extends AbstractRectangleFigure{
 	 */
 	public NodeFigure(String text, Protocol protocol) {
 		super(text);
-		addMouseListener(new NodeListener());
 		setProtocol(protocol);
 	}
 	

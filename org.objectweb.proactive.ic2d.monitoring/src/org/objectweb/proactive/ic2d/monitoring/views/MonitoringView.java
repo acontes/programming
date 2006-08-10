@@ -45,12 +45,22 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.monitoring.actions.MonitoringContextMenuProvider;
+import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshHostAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshJVMAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshNodeAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.SetDepthAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.editparts.IC2DEditPartFactory;
+import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
 
 
 public class MonitoringView extends ViewPart {
@@ -219,6 +229,7 @@ public class MonitoringView extends ViewPart {
 		// configure the viewer
 		graphicalViewer.getControl().setBackground(ColorConstants.white);
 		ScalableFreeformRootEditPart root = new ScalableFreeformRootEditPart();
+		root.getFigure().addMouseListener(new WorldListener());
 		graphicalViewer.setRootEditPart(root);
 
 		// activate the viewer as selection provider for Eclipse
@@ -230,9 +241,24 @@ public class MonitoringView extends ViewPart {
 		world.addObserver(MonitorThread.getInstance());
 		graphicalViewer.setContents(world);
 		
-		ContextMenuProvider contextMenu = new MonitoringContextMenuProvider(graphicalViewer, parent.getDisplay());
+		initContextMenu(parent.getDisplay());
+		ContextMenuProvider contextMenu = new MonitoringContextMenuProvider(graphicalViewer);
 		graphicalViewer.setContextMenu(contextMenu);
 		getSite().registerContextMenu(contextMenu, graphicalViewer);
+	}
+	
+	private void initContextMenu(Display display) {
+		ActionRegistry registry = graphicalViewer.getActionRegistry();
+		
+		registry.registerAction(new NewHostAction(display));
+		registry.registerAction(new SetDepthAction(display));
+		registry.registerAction(new RefreshAction());
+		registry.registerAction(new SetTTRAction(display));
+		registry.registerAction(new RefreshHostAction());
+		registry.registerAction(new RefreshJVMAction());
+		registry.registerAction(new RefreshNodeAction());
+		registry.registerAction(new StopMonitoringAction());
+		registry.registerAction(new SetUpdateFrequenceAction(display));
 	}
     
 	//

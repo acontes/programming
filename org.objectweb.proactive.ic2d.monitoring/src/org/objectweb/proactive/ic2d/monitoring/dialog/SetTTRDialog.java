@@ -92,7 +92,7 @@ public class SetTTRDialog extends Dialog {
 		// button "OK"
 		this.okButton = new Button(shell, SWT.NONE);
 		okButton.setText("OK");
-		okButton.addSelectionListener(new ChangeTTRListener());
+		okButton.addSelectionListener(new SetTTRListener());
 		FormData okFormData = new FormData();
 		okFormData.top = new FormAttachment(secondsLabel, 20);
 		okFormData.left = new FormAttachment(25, 20);
@@ -103,7 +103,7 @@ public class SetTTRDialog extends Dialog {
 		// button "CANCEL"
 		this.cancelButton = new Button(shell, SWT.NONE);
 		cancelButton.setText("Cancel");
-		cancelButton.addSelectionListener(new ChangeTTRListener());
+		cancelButton.addSelectionListener(new SetTTRListener());
 		FormData cancelFormData = new FormData();
 		cancelFormData.top = new FormAttachment(secondsLabel, 20);
 		cancelFormData.left = new FormAttachment(50, 10);
@@ -125,7 +125,7 @@ public class SetTTRDialog extends Dialog {
 	// -- INNER CLASS -----------------------------------------------
 	//
 
-	private class ChangeTTRListener extends SelectionAdapter {
+	private class SetTTRListener extends SelectionAdapter {
 		
 		public void widgetSelected(SelectionEvent e) {
 			if(e.widget == okButton) {

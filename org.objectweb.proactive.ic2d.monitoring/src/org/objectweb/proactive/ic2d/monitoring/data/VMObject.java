@@ -101,7 +101,7 @@ public class VMObject extends AbstractDataObject {
 
 	@Override
 	public String getType() {
-		return "jvm";
+		return "JVM";
 	}
 
 	public ProActiveRuntime getRuntime() {

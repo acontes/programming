@@ -101,7 +101,6 @@ public class VirtualNodesGroup implements Observer {
 
 		public void widgetSelected(SelectionEvent e) {
 			VNObject vn = buttons.get(e.widget);
-			System.out.println("VirtualNodeButtonListener.widgetSelected() " + vn.getFullName());
 			List<AbstractDataObject> nodes = vn.getMonitoredChildren();
 			for(int i=0, size=nodes.size() ; i<size ; i++) {
 				NodeObject node = (NodeObject)nodes.get(i);

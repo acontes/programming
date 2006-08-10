@@ -44,6 +44,9 @@ public class SetTTRAction extends Action implements IWorkbenchWindowActionDelega
 	
 	private Display display;
 	
+	public SetTTRAction() {
+		super();
+	}
 	
 	public SetTTRAction(Display display) {
 		this.setId(SET_TTR);

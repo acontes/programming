@@ -37,6 +37,7 @@ import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.MonitoringLayout;
+import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
 
 public class WorldEditPart extends AbstractIC2DEditPart {
 
@@ -84,6 +85,8 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 		layout.setSpacing(50);
 		layout.setMinorAlignment(MonitoringLayout.ALIGN_CENTER_CENTER);
 		layer.setLayoutManager(layout);
+		
+		layer.addMouseListener(new WorldListener());
 		
 		return layer;
 	}

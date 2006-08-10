@@ -39,6 +39,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.listeners.JVMListener;
 
 public class VMEditPart extends AbstractIC2DEditPart {
 
@@ -67,11 +68,15 @@ public class VMEditPart extends AbstractIC2DEditPart {
 	@Override
 	public void update(Observable o, Object arg) {
 		final Object param = arg;
-
+		final VMEditPart vmEditPart = this;
+		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
 				if(param instanceof Integer && (Integer)param == State.NOT_RESPONDING)
 					((VMFigure)getFigure()).notResponding();
+				else if(param instanceof Integer && (Integer)param == State.NOT_MONITORED) {
+					((AbstractIC2DEditPart)getParent()).removeChildVisual(vmEditPart);
+				}
 				refreshChildren();
 				refreshVisuals();		
 			}
@@ -89,7 +94,9 @@ public class VMEditPart extends AbstractIC2DEditPart {
 	 * @return a new VMFigure view associated with the VMObject model.
 	 */
 	protected IFigure createFigure() {
-		return new VMFigure(getCastedModel().getFullName());
+		VMFigure figure = new VMFigure(getCastedModel().getFullName());
+		figure.addMouseListener(new JVMListener(getCastedModel()));
+		return figure;
 	}
 
 

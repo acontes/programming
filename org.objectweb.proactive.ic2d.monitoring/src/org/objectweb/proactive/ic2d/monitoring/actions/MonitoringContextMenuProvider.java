@@ -36,16 +36,12 @@ import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView.MonitoringViewer;
 
 public class MonitoringContextMenuProvider extends ContextMenuProvider {
-
-	private Display display;
 	
-	public MonitoringContextMenuProvider(EditPartViewer viewer, Display display) {
+	public MonitoringContextMenuProvider(EditPartViewer viewer) {
 		super(viewer);
-		this.display = display;
 	}
 	
 
@@ -56,39 +52,48 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
 		IAction action;
 		ActionRegistry registry = ((MonitoringViewer)this.getViewer()).getActionRegistry();
 		
-		// Refresh
-		action = registry.getAction(RefreshAction.REFRESH);
-		if(action == null) {
-			action = new RefreshAction();
-			registry.registerAction(action);
-		}
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
 		// Monitor a new host
 		action = registry.getAction(NewHostAction.NEW_HOST);
-		if (action == null) {
-			action = new NewHostAction(display);
-			registry.registerAction(action);
-		}
 		if (action.isEnabled())
 			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
 		
 		// Set depth control
 		action = registry.getAction(SetDepthAction.SET_DEPTH);
-		if (action == null) {
-			action = new SetDepthAction(display);
-			registry.registerAction(action);
-		}
+		if (action.isEnabled())
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		
+		// Refresh
+		action = registry.getAction(RefreshAction.REFRESH);
 		if (action.isEnabled())
 			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
 		
 		// Set time to refresh
 		action = registry.getAction(SetTTRAction.SET_TTR);
-		if (action == null) {
-			action = new SetTTRAction(display);
-			registry.registerAction(action);
-		}
+		if (action.isEnabled())
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		
+		// Look for new JVM
+		action = registry.getAction(RefreshHostAction.REFRESH_HOST);
+		if (action.isEnabled())
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		
+		// Look for new Nodes
+		action = registry.getAction(RefreshJVMAction.REFRESH_JVM);
+		if (action.isEnabled())
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		
+		// Look for new Active Objects
+		action = registry.getAction(RefreshNodeAction.REFRESH_NODE);
+		if (action.isEnabled())
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		
+		// Stop monitoring this ...
+		action = registry.getAction(StopMonitoringAction.STOP_MONITORING);
+		if (action.isEnabled())
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		
+		// Set update frequence...
+		action = registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE);
 		if (action.isEnabled())
 			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
 	}

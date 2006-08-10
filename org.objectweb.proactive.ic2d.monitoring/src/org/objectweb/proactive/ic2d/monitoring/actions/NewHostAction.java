@@ -44,6 +44,10 @@ public class NewHostAction extends Action implements IWorkbenchWindowActionDeleg
 	
 	public static final String NEW_HOST = "New host";
 	
+	public NewHostAction() {
+		super();
+	}
+	
 	public NewHostAction(Display display) {
 		this.display = display;
 		this.setId(NEW_HOST);

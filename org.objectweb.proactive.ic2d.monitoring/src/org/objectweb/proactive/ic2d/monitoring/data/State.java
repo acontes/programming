@@ -42,4 +42,6 @@ public class State {
 	
 	public static final int HIGHLIGHTED = 8;
 	public static final int NOT_HIGHLIGHTED = 9;
+	
+	public static final int NOT_MONITORED = 10;
 }

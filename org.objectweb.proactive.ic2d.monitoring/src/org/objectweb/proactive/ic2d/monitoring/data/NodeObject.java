@@ -166,6 +166,10 @@ public class NodeObject extends AbstractDataObject{
 	public VNObject getVNParent() {
 		return vnParent;
 	}
+	
+	public void setSpyUpdateFrequence(long updateFrequence) {
+		spy.setUpdateFrequence(updateFrequence);
+	}
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//

@@ -32,21 +32,28 @@ package org.objectweb.proactive.ic2d.monitoring.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
+import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 
-public class RefreshAction extends Action {
+public class RefreshJVMAction extends Action {
+
+	public static final String REFRESH_JVM = "Refresh JVM";
 	
-	public static final String REFRESH = "Refresh";
+	private VMObject jvm;
 	
-	public RefreshAction() {
-		this.setId(REFRESH);
+	public RefreshJVMAction() {
+		this.setId(REFRESH_JVM);
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
-		this.setText("Refresh");
-		this.setToolTipText("Refresh");
+		this.setText("Look for new Nodes");
+		this.setToolTipText("Look for new Nodes");
+	}
+	
+	public void setJVM(VMObject jvm) {
+		this.jvm = jvm;
 	}
 	
 	@Override
 	public void run() {
-		MonitorThread.getInstance().forceRefresh();
+		jvm.explore();
 	}
+	
 }

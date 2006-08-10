@@ -4,6 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
@@ -64,6 +65,10 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 	
 	public IFigure getContentPane() {
 		return ((AbstractFigure)getFigure()).getContentPane();
+	}
+
+	public void removeChildVisual(EditPart childEditPart) {
+		super.removeChildVisual(childEditPart);
 	}
 	
 }

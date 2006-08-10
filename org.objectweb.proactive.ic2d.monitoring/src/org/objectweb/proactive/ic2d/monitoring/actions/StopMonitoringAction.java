@@ -32,21 +32,29 @@ package org.objectweb.proactive.ic2d.monitoring.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
+import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 
-public class RefreshAction extends Action {
+public class StopMonitoringAction extends Action {
+
+	public static final String STOP_MONITORING = "Stop monitoring";
 	
-	public static final String REFRESH = "Refresh";
+	private AbstractDataObject object;
 	
-	public RefreshAction() {
-		this.setId(REFRESH);
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
-		this.setText("Refresh");
-		this.setToolTipText("Refresh");
+	public StopMonitoringAction() {
+		this.setId(STOP_MONITORING);
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "stop_monitoring.gif"));
+	}
+	
+	public void setObject(AbstractDataObject object) {
+		this.object = object;
+		this.setText("Stop monitoring this "+object.getType());
+		this.setToolTipText("Stop monitoring this "+object.getType());
 	}
 	
 	@Override
 	public void run() {
-		MonitorThread.getInstance().forceRefresh();
+		System.out.println("StopMonitoringAction.run() "+object.getFullName());
+		object.stopMonitoring();
 	}
+	
 }

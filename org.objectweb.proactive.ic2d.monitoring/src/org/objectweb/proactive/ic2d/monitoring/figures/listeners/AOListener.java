@@ -33,6 +33,15 @@ package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshHostAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshJVMAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.RefreshNodeAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.SetDepthAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public class AOListener implements MouseListener{
@@ -44,20 +53,39 @@ public class AOListener implements MouseListener{
 		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
 	}
 
-	public void mouseDoubleClicked(MouseEvent me) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
 
 	public void mousePressed(MouseEvent me) {
 		if(me.button == 3) {
-			System.out.println("AOListener.mousePressed()");
+			// Monitor a new host
+			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
+			
+			// Set depth control
+			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(false);
+				
+			// Refresh
+			registry.getAction(RefreshAction.REFRESH).setEnabled(false);
+			
+			// Set time to refresh
+			registry.getAction(SetTTRAction.SET_TTR).setEnabled(false);
+
+			// Look for new JVM
+			registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
+			
+			// Look for new Nodes
+			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
+			
+			// Look for new Active Objects
+			registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
+			
+			// Stop monitoring this ...
+			registry.getAction(StopMonitoringAction.STOP_MONITORING).setEnabled(false);
+			
+			// Set update frequence...
+			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
 		}
 	}
 
-	public void mouseReleased(MouseEvent me) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mouseReleased(MouseEvent me) { /* Do nothing */ }
 
 }

@@ -87,7 +87,6 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 		graphics.fillRoundRectangle(bounds, round, round);
 		graphics.drawRoundRectangle(bounds, round, round);
 		if(highlight != null) {
-			System.out.println("AbstractRectangleFigure.paintIC2DFigure() highlight!=null");
 			graphics.drawRoundRectangle(bounds.getCopy().resize(-2, -2).translate(1, 1), round-3, round-3);
 		}
 		

@@ -31,11 +31,15 @@
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
 import java.util.List;
+import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.listeners.HostListener;
 
 public class HostEditPart extends AbstractIC2DEditPart {
 	
@@ -62,6 +66,22 @@ public class HostEditPart extends AbstractIC2DEditPart {
 	}
 	
 	
+	@Override
+	public void update(Observable o, Object arg) {
+		final Object param = arg;
+		final HostEditPart hostEditPart = this;
+
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run () {
+				if(param instanceof Integer && (Integer)param == State.NOT_MONITORED) {
+					((AbstractIC2DEditPart)getParent()).removeChildVisual(hostEditPart);
+				}
+				refreshChildren();
+				refreshVisuals();		
+			}
+		});
+	}
+	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
@@ -73,7 +93,9 @@ public class HostEditPart extends AbstractIC2DEditPart {
  	 * @return a new HostFigure view associated with the HostObject model.
  	 */
 	protected IFigure createFigure() {
-		return new HostFigure(getCastedModel().getFullName());
+		HostFigure figure = new HostFigure(getCastedModel().getFullName());
+		figure.addMouseListener(new HostListener(getCastedModel()));
+		return figure;
 	}
 	
 	/**
@@ -104,7 +126,4 @@ public class HostEditPart extends AbstractIC2DEditPart {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	
-	
 }

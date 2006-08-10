@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Observable;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.filters.FilterProcess;
 
 /**
@@ -85,10 +87,11 @@ public abstract class AbstractDataObject extends Observable {
 	 * Stop monitor this object
 	 */
 	public void stopMonitoring() {
+		Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
 		this.parent.monitoredChildren.remove(getKey());
 		this.parent.skippedChildren.put(getKey(), this);
 		setChanged();
-		notifyObservers();
+		notifyObservers(State.NOT_MONITORED);
 	}
 
 	/**
@@ -178,15 +181,20 @@ public abstract class AbstractDataObject extends Observable {
 			return;
 		if(skippedChildren.containsKey(child.getKey()))
 			return;
+		
+		
 		if(monitoredChildren.containsKey(child.getKey())) {
+			
 			child = monitoredChildren.get(child.getKey());
 			child.alreadyMonitored();
 			child.explore();
 		}
 		else { // !skippedChildren.containsKey(child.getKey()) && !monitoredChildren.containsKey(child.getKey())
-			if(FilterProcess.getInstance().filter(child))
+			if(FilterProcess.getInstance().filter(child)) {
 				skippedChildren.put(child.getKey(), child);
+			}
 			else { //child is new and must be monitored
+				// System.out.println("AbstractDataObject.exploreChild() ----------");
 				putChild(child);
 				child.foundForTheFirstTime();
 				child.explore();
