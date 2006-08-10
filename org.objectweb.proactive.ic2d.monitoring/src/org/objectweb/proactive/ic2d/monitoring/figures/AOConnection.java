@@ -31,7 +31,7 @@
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.draw2d.BendpointConnectionRouter;
@@ -47,18 +47,18 @@ public class AOConnection {
 	/**
 	 * Symbolizes connections in waitings. The source object awaits the target object.
 	 */
-	private static HashMap<String, AOFigure> sources = new HashMap<String, AOFigure>();
+	private static Hashtable<String, AOFigure> sources = new Hashtable<String, AOFigure>();
 
 	/**
 	 * Symbolizes connections in waitings. The target object awaits the source object.
 	 */
-	private static HashMap<String, AOFigure> targets = new HashMap<String, AOFigure>();
+	private static Hashtable<String, AOFigure> targets = new Hashtable<String, AOFigure>();
 
 	/**
 	 * Established connections.
 	 */
-	private static HashMap<String, String> connections = new HashMap<String, String>();
-
+	private static Hashtable<String, String> connections = new Hashtable<String, String>();
+	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
@@ -71,16 +71,10 @@ public class AOConnection {
 	 * @param targetID A String representing the target.(In order to find the target)
 	 */
 	public synchronized static void addSourceConnection(IFigure panel, String sourceID, AOFigure sourceFigure, String targetID){
-		// If a connection already exists
-		String targetUsed = connections.get(sourceID);
-		if(targetUsed != null && targetUsed.compareTo(targetID) == 0)
-			return;
-
 		AOFigure targetFigure = targets.get(targetID);
 		if(targetFigure!=null){
 			targets.remove(targetID);
-			connections.put(sourceID, targetID);
-			connect(panel, sourceFigure, targetFigure);
+			connect(panel, sourceFigure, targetFigure, sourceID, targetID);
 		}
 		else{
 			sources.put(sourceID, sourceFigure);
@@ -95,16 +89,10 @@ public class AOConnection {
 	 * @param sourceID A String representing the source.(In order to find the source)
 	 */
 	public synchronized static void addTargetConnection(IFigure panel, String targetID, AOFigure targetFigure, String sourceID){
-		// If a connection already exists
-		String targetUsed = connections.get(sourceID);
-		if( targetUsed != null && targetUsed.compareTo(targetID) == 0)
-			return;
-
 		AOFigure sourceFigure = sources.get(sourceID);
 		if(sourceFigure!=null){
 			sources.remove(sourceID);
-			connections.put(sourceID, targetID);
-			connect(panel, sourceFigure, targetFigure);
+			connect(panel, sourceFigure, targetFigure, sourceID, targetID);
 		}
 		else{
 			targets.put(targetID, targetFigure);
@@ -116,13 +104,25 @@ public class AOConnection {
 	//
 
 	/**
-	 * Connects two figure by a connection.
+	 * Connects two figure by a connection, only if there isn't already a connection.
 	 * @param panel The panel containing the two figures.
 	 * @param source The source figure.
 	 * @param target The target figure.
+	 * @param sourceID The source ID.
+	 * @param targetID The target ID.
 	 */
-	public static void connect(IFigure panel, AOFigure source, AOFigure target){
-
+	public static void connect(IFigure panel, AOFigure source, AOFigure target, String sourceID, String targetID){
+		
+		synchronized (connections) {
+			String targetUsed = connections.get(sourceID+"#"+targetID);
+			// If a connection already exists
+			if(targetUsed != null && targetUsed.compareTo(targetID)==0)
+				return;
+			// Store a new connection in the Hashtable [sourceID#targetID, targetID]
+			// We used "sourceID#targetID" for the key, because a source can have several targets
+			connections.put(sourceID+"#"+targetID, targetID);
+		}	
+			
 		RoundedLineConnection connection = new RoundedLineConnection();
 		//PolylineConnection connection = new PolylineConnection();
 
@@ -160,7 +160,7 @@ public class AOConnection {
 	 * @param connection The connection
 	 * @param source The source of connection
 	 * @param target The target of connection
-	 * @position The relative position of the target to the source
+	 * @param position The relative position of the target to the source
 	 */
 	private static RelativeBendpoint calculPoint(Connection connection, Point source, Point target, int position){
 		double distance = source.getDistance(target);
