@@ -31,6 +31,7 @@
 
 package org.objectweb.proactive.ic2d.console;
 
+import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -90,6 +91,22 @@ public class Console extends MessageConsole {
 		activate();
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
 				new IConsole[]{ this });
+		
+		
+		// Add the standard output and standard error output stream to the Console.
+		MessageConsole console = new MessageConsole("System output", null);
+		
+		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
+				new IConsole[] { console });
+		
+		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(
+		console);
+		
+		MessageConsoleStream stream = console.newMessageStream();
+		System.setOut(new PrintStream(stream));
+		System.setErr(new PrintStream(stream));
+
+		
 	}
 
 	//
