@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.launcher.actions;
 
 import org.eclipse.jface.action.Action;
-import org.objectweb.proactive.core.runtime.StartRuntime;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorPart;
@@ -54,7 +53,7 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 	//
 	// -- PUBLIC METHODS ---------------------------------------------
 	//
-	
+
 	public void dispose() {
 		window = null;
 	}
@@ -78,7 +77,7 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 			Console.getInstance(Activator.CONSOLE_NAME).log(path);
 
 			Launcher launcher = null;
-			
+
 			// creates the launcher
 			try {
 				launcher = new Launcher(path);
@@ -88,10 +87,18 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 
 			// activate the launcher
 			try {
-				if(!launcher.isActivated())
-					System.out.println(Class.forName(StartRuntime.class.getName()));
-					
-					launcher.activate();
+				if(!launcher.isActivated()){
+					final Launcher l = launcher;
+					Thread thread = new Thread(new Runnable() {
+						public void run () {
+							try {
+								l.activate();
+							} catch (Exception e) {
+								Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+							}
+						}});
+					thread.start();
+				}
 			} catch (Exception e) {
 				Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 			}
@@ -101,11 +108,11 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 	public void selectionChanged(IAction action, ISelection selection) {
 		action.setEnabled(goodContext());
 	}
-	
+
 	//
 	// -- PRIVATE METHODS ---------------------------------------------
 	//
-	
+
 	/**
 	 * @return True if the Launcher perspective is open, and if a file is selected, false otherwise.
 	 */
@@ -115,7 +122,7 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 		IWorkbench workbench = window.getWorkbench();
 		IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
 		goodPerspective =  page.getPerspective().equals(reg.findPerspectiveWithId(LauncherPerspective.ID));
-		
+
 		return (goodPerspective && (page.getEditorReferences().length > 0));
 	}
 }
