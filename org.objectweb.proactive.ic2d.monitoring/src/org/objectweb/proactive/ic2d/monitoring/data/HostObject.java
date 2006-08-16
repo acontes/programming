@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -101,7 +100,7 @@ public class HostObject extends AbstractDataObject {
 
 		for (int i = 0; i < foundRuntimes.size(); ++i) {
 			ProActiveRuntime proActiveRuntime = foundRuntimes.get(i);
-			handleProActiveRuntime(proActiveRuntime, 1);
+			handleProActiveRuntime(proActiveRuntime, MonitorThread.getInstance().getDepth());
 		}
 		if(monitoredChildren.size() == 0) { //we didn't find any child
 			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+getKey());
@@ -186,11 +185,10 @@ public class HostObject extends AbstractDataObject {
 		VMObject vm = new VMObject(this, runtime);
 		exploreChild(vm);
 		
-		if(depth < MonitorThread.getInstance().getDepth()) {
+		if(depth > 0) {
 			List<ProActiveRuntime> knownRuntimes = vm.getKnownRuntimes();
-			Iterator<ProActiveRuntime> iter = knownRuntimes.iterator();
-			while (iter.hasNext()) {
-				ProActiveRuntime pr = iter.next();
+			for(int i=0, size=knownRuntimes.size() ; i<size ; i++) {
+				ProActiveRuntime pr = knownRuntimes.get(i);
 				VMInformation infos = pr.getVMInformation();
 				String hostname = infos.getHostName();
 				String url = pr.getURL();
@@ -201,9 +199,9 @@ public class HostObject extends AbstractDataObject {
 				try {
 					host = new HostObject(hostname, port, protocol);
 				} catch (HostAlreadyExistsException e) {
-					host = e.getHost();
+					continue;
 				}
-				host.handleProActiveRuntime(pr, depth+1);
+				host.handleProActiveRuntime(pr, depth-1);
 			}
 		}
 	}
