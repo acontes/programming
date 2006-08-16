@@ -1,21 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="newIC2D">
-
+    
     <title>IC2D: Interactive Control and Debugging of Distribution</title>
-
+    
+    
+    <sect1 id="checkout">
+        <title>How to checkout IC2D</title>
+        
+        <para>
+            Here is the IC2D SVN repository :
+            <emphasis role="bold">svn://scm.gforge.inria.fr/svn/proactive/branches/proactive_newIC2D</emphasis>
+        </para>
+        
+        <para>
+            You have to checkout :
+        </para>
+        <itemizedlist>
+            <listitem><para>
+                org.objectweb.proactive.ic2d
+            </para></listitem>
+            <listitem><para>
+                org.objectweb.proactive.ic2d.monitoring
+            </para></listitem>
+            <listitem><para>
+                org.objectweb.proactive.ic2d.lib
+            </para></listitem>
+            <listitem><para>
+                org.objectweb.proactive.ic2d.console
+            </para></listitem>
+            <listitem><para>
+                org.objectweb.proactive.ic2d.launcher
+            </para></listitem>
+        </itemizedlist>
+        
+        <para>
+            If you are using <emphasis role="bold">Eclipse</emphasis> and its plugin 
+            <emphasis role="bold">Subclipse</emphasis>, open the <emphasis role="bold">SVN Repository perspective</emphasis> 
+            and checkout all those folders as <emphasis role="bold">new Java projects</emphasis>.
+        </para>
+        
+        <figure id="svnRepository">
+            <title>SVN Repository</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="ic2d/images/svnRepository.png" format="PNG"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        
+        <para>
+            You'll maybe have to replace the proactive.jar file in the plugin org.objectweb.proactive.ic2d.lib, 
+            it depends on your ProActive version.
+        </para>
+        
+        <para>
+            Now, you can run IC2D clicking on the link <emphasis role="bold">Launch the product</emphasis> in
+            <emphasis role="bold">ic2d.product</emphasis> in the 
+            org.objectweb.proactive.ic2d project.
+        </para>
+        
+        <figure id="launch">
+            <title>ic2d.product</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="ic2d/images/launch.png" format="PNG"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        
+    </sect1>
+    
+    
     <sect1 id="implementAPlugin">
-
+        
         <title>How to implement a plug-in for IC2D</title>
-
+        
         <para> IC2D is a <emphasis role="bold">Rich Client Platform (RCP)</emphasis> based on the
             familiar <emphasis role="bold">Eclipse plug-in architecture</emphasis>. 
         </para>
-
+        
         <sect2 id="createAProject">
-
+            
             <title>Create a project with the plug-in project wizard</title>
-
+            
             <para> 
                 If you want to create a plug-in for IC2D, you have to use the Eclipse's 
                 <emphasis role="bold">Plug-in Development Environment (PDE)</emphasis>. This is a complete
@@ -23,29 +91,29 @@
                 perspective and several views and wizards that help you create, maintain, and
                 publish plug-ins. The PDE creates boilerplate starter code that you can use to build
                 your plug-in. This section explains how to use the <emphasis role="bold">plug-in
-                project wizard</emphasis> to create your plug-in.
+                    project wizard</emphasis> to create your plug-in.
             </para>
-
+            
             <orderedlist>
                 <listitem><para> 
                     Select <emphasis role="bold">File &gt; New &gt;
-                    Project</emphasis> from the menu bar to open the new project wizard. 
+                        Project</emphasis> from the menu bar to open the new project wizard. 
                 </para></listitem>
                 <listitem><para> 
                     Select <emphasis role="bold">Plug-in Project</emphasis> in 
                     <emphasis role="bold">Plug-in Development</emphasis>. 
                 </para></listitem>
             </orderedlist>
-
+            
             <figure id="newProject">
                 <title>Create a new project</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/ic2d/new_project.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/new_project.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-
+            
             <orderedlist continuation="continues">
                 <listitem><para> 
                     Click <emphasis role="bold">Next</emphasis>. 
@@ -69,66 +137,66 @@
                     previous versions, this is now the default.
                 </para></listitem>
             </orderedlist>
-
+            
             <figure id="newPluginProject">
                 <title>Specify name and plug-in structure</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/ic2d/new_plugin_project.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/new_plugin_project.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-
+            
             <orderedlist continuation="continues">
                 <listitem><para> 
                     Click <emphasis role="bold">Next</emphasis>.
                 </para></listitem>
                 <listitem><para> 
                     Now enter the fully qualified <emphasis role="bold">ID of the
-                    plug-in</emphasis>. By default it is the same as its project name. 
+                        plug-in</emphasis>. By default it is the same as its project name. 
                 </para></listitem>
                 <listitem><para> 
                     Accept the default values of the other options. 
                 </para></listitem>
             </orderedlist>
-
+            
             <figure id="newPluginProject2">
                 <title>Specify plug-in content</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/ic2d/new_plugin_project_2.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/new_plugin_project_2.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-
+            
             <orderedlist continuation="continues">
                 <listitem>
                     <para> Click <emphasis role="bold">Finish</emphasis>.</para>
                 </listitem>
             </orderedlist>
-
+            
         </sect2>
         <!-- createAProject -->
-
+        
         <sect2 id="pluginStructure">
-
+            
             <title>The plug-in structure</title>
-
+            
             <para> The plug-in project has the file structure illustrated in the followed figure. </para>
-
+            
             <figure id="pluginStructureScreenshot">
                 <title>The plug-in structure</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/ic2d/package_explorer.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/package_explorer.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-
+            
             <sect3 id="pluginManifest">
-
+                
                 <title>Plug-in manifest</title>
-
+                
                 <para> 
                     The plug-in manifest ties all the code and resources together. When you first
                     create a plug-in, Eclipse will create and open the manifest for you
@@ -138,46 +206,46 @@
                     modify the options stored in these files (see <xref linkend="PDEOverview"/>) 
                     but also allows you to edit the source directly. 
                 </para>
-
+                
                 <figure id="PDEOverview">
                     <title>Interface for editing the manifest and related files.</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="images/ic2d/overview.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/overview.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
-
+                
                 <sect4 id="manifestMF">
-
+                    
                     <title>MANIFEST.MF</title>
-
+                    
                     <para> The <emphasis role="bold">OSGi bundle manifest</emphasis> is stored in
                         MANIFEST.MF. OSGi is the name of a standard that Eclipse uses for
                         dynamically loading plug-ins. <xref linkend="manifestMFListing"/> shows the OSGi bundle
                         manifest generated by the plug-in wizard. Everything in this file can be
                         edited by the Manifest editor, so <emphasis role="bold">there should be no
-                        need to edit it by hand</emphasis>. However if you need to, just
+                            need to edit it by hand</emphasis>. However if you need to, just
                         double-click it in the Package Explorer to bring up the Manifest editor,
                         then click on the MANIFEST.MF tab in the editor to see and modify the
                         source. </para>
-
+                    
                     <example id="manifestMFListing">
                         <title>MANIFEST.MF</title>
                         <screen>Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Example Plug-in
-Bundle-SymbolicName: org.objectweb.proactive.ic2d.example
-Bundle-Version: 1.0.0
-Bundle-Activator: org.objectweb.proactive.ic2d.example.ExamplePlugin
-Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
-  org.eclipse.core.runtime
-Eclipse-AutoStart: true</screen>
+                            Bundle-ManifestVersion: 2
+                            Bundle-Name: Example Plug-in
+                            Bundle-SymbolicName: org.objectweb.proactive.ic2d.example
+                            Bundle-Version: 1.0.0
+                            Bundle-Activator: org.objectweb.proactive.ic2d.example.ExamplePlugin
+                            Bundle-Localization: plugin
+                            Require-Bundle: org.eclipse.ui,
+                            org.eclipse.core.runtime
+                            Eclipse-AutoStart: true</screen>
                     </example>
-
+                    
                 </sect4><!-- manifestMF -->
-
+                
                 <sect4 id="pluginXML">
                     
                     <title>plugin.xml</title>
@@ -195,16 +263,16 @@ Eclipse-AutoStart: true</screen>
             </sect3><!-- pluginManifest -->
             
             <sect3 id="pluginClass">
-                    
+                
                 <title>Plug-in class</title>
-                    
+                
                 <para>
                     The plug-in class is an optional singleton class that can be used to store 
                     global information for the plug-in. It's also a convenient place to put a 
                     few static utility functions used by other classes in the plug-in. See the listing 
                     <xref linkend="pluginClassListing"/> for the plug-in class that was created for us by the plug-in wizard.
                 </para>
-                    
+                
                 <example id="pluginClassListing">
                     <title>ExamplePlugin.java</title>
                     <programlisting lang="java"><![CDATA[package org.objectweb.proactive.ic2d.example;
@@ -262,7 +330,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
 	}
 }]]></programlisting>
                 </example>
-                    
+                
             </sect3><!-- pluginClass -->
             
             <sect3 id="buildProperties">
@@ -282,15 +350,15 @@ public class ExamplePlugin extends AbstractUIPlugin {
                 <example id="buildPropertiesListing">
                     <title>build.properties</title>
                     <screen>source.. = src/
-output.. = bin/
-bin.includes = META-INF/,\
-               .</screen>
+                        output.. = bin/
+                        bin.includes = META-INF/,\
+                        .</screen>
                 </example>
                 
             </sect3><!-- buildProperties -->
-
+            
         </sect2><!-- pluginStructure -->
-
+        
         <sect2 id="addPluginToIC2D">
             
             <title>How to add your plugin to IC2D</title>
@@ -305,7 +373,7 @@ bin.includes = META-INF/,\
                 <title>Configuration</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/ic2d/ic2d_product.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/ic2d_product.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -318,7 +386,7 @@ bin.includes = META-INF/,\
                 <title>Plug-in selection</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/ic2d/plugin_selection.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/plugin_selection.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -342,13 +410,13 @@ bin.includes = META-INF/,\
                 <title>About product Plug-ins</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/ic2d/product_plugins.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/product_plugins.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
             
         </sect2><!-- addPluginToIC2D -->
-
+        
         <sect2 id="perspectivesViewsEditors">
             
             <title>Perspectives, views and editors</title>
@@ -357,7 +425,7 @@ bin.includes = META-INF/,\
                 <title>Workbench structure</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/ic2d/workbench_decomposed.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/workbench_decomposed.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -406,7 +474,7 @@ bin.includes = META-INF/,\
                         <title>Extensions tab (no extensions)</title>
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="images/ic2d/extensions-0.png" format="PNG"/>
+                                <imagedata fileref="ic2d/images/extensions-0.png" format="PNG"/>
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -433,7 +501,7 @@ bin.includes = META-INF/,\
                         <title>Extensions tab (org.eclipse.ui.perspectives)</title>
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="images/ic2d/extensions-1.png" format="PNG"/>
+                                <imagedata fileref="ic2d/images/extensions-1.png" format="PNG"/>
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -452,7 +520,7 @@ bin.includes = META-INF/,\
                         <title>Extensions tab (Example)</title>
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="images/ic2d/extensions-2.png" format="PNG"/>
+                                <imagedata fileref="ic2d/images/extensions-2.png" format="PNG"/>
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -476,18 +544,18 @@ bin.includes = META-INF/,\
    </extension>
 </plugin>]]></programlisting>
                     </example>
-                        
+                    
                     
                 </sect4><!-- perspectives_step1 -->
                 
                 <sect4 id="perspectives_step2">
-                
+                    
                     <title>Step 2 : Define a Perspective Class for the Extension within the Plug-in</title>
-                
+                    
                     <para>
                         Now we need to define the perspective class which must implements the IPerspectiveFactory interface :
                     </para>
-                
+                    
                     <example id="examplePlugin">
                         <title>ExamplePlugin.java</title>
                         <programlisting lang="java"><![CDATA[package org.objectweb.proactive.ic2d.example;
@@ -506,11 +574,11 @@ public class ExamplePerspective implements IPerspectiveFactory {
 
 }]]></programlisting>
                     </example>
-                
+                    
                     <para>
                         You have created your first perspective !
                     </para>
-                
+                    
                 </sect4><!-- perspectives_step2 -->
                 
             </sect3><!-- perspectives -->
@@ -543,7 +611,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
                         <title>Extensions tab (org.objectweb.proactive.ic2d.example.view)</title>
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="images/ic2d/extensions-3.png" format="PNG"/>
+                                <imagedata fileref="ic2d/images/extensions-3.png" format="PNG"/>
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -563,7 +631,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
             </sect3><!-- editor -->
             
         </sect2><!-- perspectivesViewsEditors -->
-
+        
         <sect2 id="links">
             <title>Useful links</title>
             
@@ -598,7 +666,8 @@ public class ExamplePerspective implements IPerspectiveFactory {
             </itemizedlist>
             
         </sect2><!-- links -->
-
+        
     </sect1><!-- implementAPlugin -->
-
+    
 </chapter><!-- newIC2D -->
+     

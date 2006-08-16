@@ -52,7 +52,7 @@
 <!ENTITY biblio SYSTEM "biblio.xml">
 <!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
 <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
-<!ENTITY newIC2D SYSTEM "newIC2D.xml">
+<!ENTITY newIC2D SYSTEM "ic2d/newIC2D.xml">
 ]>
 <book>
  <!--
