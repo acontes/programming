@@ -238,7 +238,7 @@ public class MonitoringView extends ViewPart {
 		getSite().setSelectionProvider(graphicalViewer);
 
 		// initialize the viewer with input
-		graphicalViewer.setEditPartFactory(new IC2DEditPartFactory());
+		graphicalViewer.setEditPartFactory(getEditPartFactory());
 		WorldObject world = WorldObject.getInstance();
 		world.addObserver(MonitorThread.getInstance());
 		graphicalViewer.setContents(world);
