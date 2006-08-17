@@ -36,6 +36,7 @@ import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView.MonitoringViewer;
 
 public class MonitoringContextMenuProvider extends ContextMenuProvider {
@@ -96,6 +97,21 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
 		action = registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE);
 		if (action.isEnabled())
 			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		
+		MenuManager layoutMenu = new MenuManager("Layout");
+		
+		// Vertical Layout
+		action = registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT);
+		if(action.isEnabled())
+			layoutMenu.add(action);
+		
+		// Horizontal Layout
+		action = registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT);
+		if(action.isEnabled())
+			layoutMenu.add(action);
+		
+		if (!layoutMenu.isEmpty())
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, layoutMenu);
 	}
 
 }

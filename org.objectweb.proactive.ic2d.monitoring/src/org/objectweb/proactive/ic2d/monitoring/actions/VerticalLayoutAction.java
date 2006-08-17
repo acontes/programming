@@ -31,28 +31,28 @@
 package org.objectweb.proactive.ic2d.monitoring.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+import org.eclipse.jface.action.IAction;
+import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 
-public class RefreshHostAction extends Action {
+public class VerticalLayoutAction extends Action {
 
-	public static final String REFRESH_HOST = "Refresh host";
 	
-	private HostObject host;
+	public static final String VERTICAL_LAYOUT = "vertical layout";
 	
-	public RefreshHostAction() {
-		super("Look for new JVM", ImageDescriptor.createFromFile(RefreshHostAction.class, "refresh.gif"));
-		this.setId(REFRESH_HOST);
-		this.setToolTipText("Look for new JVM");
+	private HostFigure host;
+	
+	public VerticalLayoutAction() {
+		super("Vertical", IAction.AS_RADIO_BUTTON);
+		this.setId(VERTICAL_LAYOUT);
 	}
 	
-	public void setHost(HostObject host) {
+	public void setHost(HostFigure host) {
 		this.host = host;
 	}
 	
 	@Override
 	public void run() {
-		host.explore();
+		host.setVerticalLayout();
 	}
-	
+
 }
