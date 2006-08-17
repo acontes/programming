@@ -65,8 +65,7 @@ public class VMObject extends AbstractDataObject {
 	//
 
 	/**
-	 * Explores a ProActiveRuntime, in order to find all nodes known by this one
-	 * @param vm The VMObject corresponding to the runtime given in parameter
+	 * Explores a ProActiveRuntime, in order to find all nodes known by this one.
 	 */
 	@Override
 	public void explore(){
