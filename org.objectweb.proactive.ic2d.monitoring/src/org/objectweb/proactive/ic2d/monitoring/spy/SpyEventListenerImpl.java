@@ -34,8 +34,8 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
+import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class SpyEventListenerImpl implements SpyEventListener, Serializable{
@@ -66,7 +66,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 		ao.setState(State.WAITING_FOR_REQUEST);
-
+		ao.setRequestQueueLength(0);
 	}
 
 	public void objectWaitingByNecessity(UniqueID id, SpyEvent spyEvent) {
@@ -85,10 +85,10 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 		switch (ao.getState()) {
-		case State.WAITING_BY_NECESSITY_WHILE_SERVING:
+		case WAITING_BY_NECESSITY_WHILE_SERVING:
 			ao.setState(State.SERVING_REQUEST);
 			break;
-		case State.WAITING_BY_NECESSITY_WHILE_ACTIVE:
+		case WAITING_BY_NECESSITY_WHILE_ACTIVE:
 			ao.setState(State.ACTIVE);
 			break;
 		}
@@ -104,6 +104,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 		ao.setState(State.ACTIVE);
+		ao.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 	}
 
 	public void requestMessageReceived(UniqueID id, SpyEvent spyEvent) {
@@ -112,6 +113,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(destination == null)
 			return;
 		destination.setState(State.SERVING_REQUEST);
+		destination.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 
 		UniqueID sourceId = ((SpyMessageEvent) spyEvent).getSourceBodyID();
 		AOObject source = WorldObject.getInstance().findActiveObjectById(sourceId);
@@ -142,6 +144,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 		ao.setState(State.ACTIVE);
+		ao.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 	}
 
 	public void allEventsProcessed() {
@@ -155,6 +158,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 		ao.setState(State.SERVING_REQUEST);
+		ao.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 	}
 
 	public String getName(UniqueID id){

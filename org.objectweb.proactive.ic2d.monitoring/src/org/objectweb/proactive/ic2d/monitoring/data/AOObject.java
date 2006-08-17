@@ -44,11 +44,11 @@ public class AOObject extends AbstractDataObject{
 	 * will be "ao#3"
 	 */
 	private static int counter = 0;
-	
-	
+
+
 	/** State of the object (ex: WAITING_BY_NECESSITY) */
-	private int state;
-	
+	private State state;
+
 	/** the object's name (ex: ao) */
 	private String name;
 	/** the object's fullname (ex: ao#3) */
@@ -56,6 +56,10 @@ public class AOObject extends AbstractDataObject{
 
 	/** id used to identify the active object globally, even in case of migration */
 	private UniqueID id;
+
+	/** request queue length */
+	private int requestQueueLength; // -1 = not known
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -73,6 +77,7 @@ public class AOObject extends AbstractDataObject{
 		this.name = name;
 		this.fullName = name + "#" + counter();
 		this.id = id;
+		this.requestQueueLength = -1;
 	}
 
 	//
@@ -86,7 +91,7 @@ public class AOObject extends AbstractDataObject{
 	public UniqueID getID(){
 		return this.id;
 	}
-	
+
 	/**
 	 * Returns the object's key. It is an unique identifier.
 	 * @return the object's key
@@ -117,13 +122,13 @@ public class AOObject extends AbstractDataObject{
 	 * Change the current state
 	 * @param newState
 	 */
-	public void setState(int newState) {
+	public void setState(State newState) {
 		this.state = newState;
 		setChanged();
-		notifyObservers(new Integer(this.state));
+		notifyObservers(this.state);
 	}
 
-	public int getState(){
+	public State getState(){
 		return this.state;
 	}
 
@@ -135,14 +140,44 @@ public class AOObject extends AbstractDataObject{
 		setChanged();
 		notifyObservers(message);
 	}
-	
+
 	public String toString() {
 		return this.getFullName();
 	}
 
+	/**
+	 * Returns a string representing the type ActiveObject : "ao"
+	 * @return ao
+	 * @see AbstractDataObject#getType()
+	 */
 	public String getType() {
 		return "ao";
 	}
+
+	
+	/**
+	 * 
+	 * @param value
+	 * @see #getRequestQueueLength()
+	 */
+	public void setRequestQueueLength(int value) {
+		if (requestQueueLength != value) {
+			requestQueueLength = value;
+			System.out.println("AOObject.setRequestQueueLength() "+value);
+			this.setChanged();
+			this.notifyObservers();
+		}
+	}
+	
+	
+	/**
+	 * Returns the request queue length
+	 * @return the request queue lenght
+	 * @see #setRequestQueueLength(int)
+	 */
+	public int getRequestQueueLength() {
+        return requestQueueLength;
+    }
 
 	//
 	// -- PROTECTED METHODS ---------------------------------------------
@@ -164,7 +199,7 @@ public class AOObject extends AbstractDataObject{
 
 
 	public static class AOComparator implements Comparator<String>{
-		
+
 		/**
 		 * Compare two active objects.
 		 * (For Example: ao#3 and ao#5 give -1 because ao#3 has been discovered before ao#5.)
@@ -188,11 +223,11 @@ public class AOObject extends AbstractDataObject{
 			/*Console.getInstance(Activator.CONSOLE_NAME).err("AOObject.foundForTheFirstTime() -> not responding");
 			e.printStackTrace();*/
 		}
-			
+
 		Console.getInstance(Activator.CONSOLE_NAME).
 		log("AOObject "+fullName+" created based on ActiveObject "+id.toString());
 	}
-	
+
 	@Override
 	protected void alreadyMonitored() {
 		Console.getInstance(Activator.CONSOLE_NAME).
