@@ -32,11 +32,11 @@ package org.objectweb.proactive.ic2d.monitoring.editparts;
 
 import java.util.List;
 
+import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
-import org.objectweb.proactive.ic2d.monitoring.figures.MonitoringLayout;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
 
 public class WorldEditPart extends AbstractIC2DEditPart {
@@ -81,9 +81,12 @@ public class WorldEditPart extends AbstractIC2DEditPart {
 	 */
 	protected IFigure createFigure() {
 		layer = new FreeformLayer();
-		MonitoringLayout layout = new MonitoringLayout(true);
-		layout.setSpacing(50);
-		layout.setMinorAlignment(MonitoringLayout.ALIGN_CENTER_CENTER);
+		FlowLayout layout = new FlowLayout()/*new MonitoringLayout(true)*/;
+		layout.setMajorAlignment(FlowLayout.ALIGN_CENTER);
+		layout.setMajorSpacing(50);
+		layout.setMinorSpacing(50);
+//		layout.setSpacing(50);
+//		layout.setMinorAlignment(MonitoringLayout.ALIGN_CENTER_CENTER);
 		layer.setLayoutManager(layout);
 		
 		layer.addMouseListener(new WorldListener());
