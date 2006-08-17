@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshHostAction;
@@ -42,6 +43,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetDepthAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
@@ -92,6 +94,12 @@ public class NodeListener implements MouseListener {
 			SetUpdateFrequenceAction setUpdateFrequenceAction = (SetUpdateFrequenceAction)registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE);
 			setUpdateFrequenceAction.setNode(node);
 			setUpdateFrequenceAction.setEnabled(true);
+
+			// Vertical Layout
+			registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT).setEnabled(false);
+			
+			// Horizontal Layout
+			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
 		}
 	}
 

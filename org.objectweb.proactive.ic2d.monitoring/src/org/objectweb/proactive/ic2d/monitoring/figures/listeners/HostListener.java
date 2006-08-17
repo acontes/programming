@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshHostAction;
@@ -42,7 +43,9 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetDepthAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public class HostListener implements MouseListener {
@@ -50,10 +53,12 @@ public class HostListener implements MouseListener {
 	private ActionRegistry registry;
 
 	private HostObject host;
+	private HostFigure figure;
 	
-	public HostListener(HostObject host) {
+	public HostListener(HostObject host, HostFigure figure) {
 		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
 		this.host = host;
+		this.figure = figure;
 	}
 
 	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
@@ -90,6 +95,21 @@ public class HostListener implements MouseListener {
 			
 			// Set update frequence...
 			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
+			
+
+			// Vertical Layout
+			VerticalLayoutAction verticalLayoutAction = (VerticalLayoutAction)registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT);
+			verticalLayoutAction.setHost(figure);
+			if(figure.isVerticalLayout())
+				verticalLayoutAction.setChecked(true);
+			verticalLayoutAction.setEnabled(true);
+			
+			// Vertical Layout
+			HorizontalLayoutAction horizontalLayoutAction = (HorizontalLayoutAction)registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT);
+			horizontalLayoutAction.setHost(figure);
+			if(figure.isVerticalLayout())
+				horizontalLayoutAction.setChecked(false);
+			horizontalLayoutAction.setEnabled(true);
 		}
 	}
 
