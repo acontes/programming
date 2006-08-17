@@ -53,13 +53,14 @@ public abstract class AbstractDataObject extends Observable {
 	}
 
 	/**
-	 * Returns the object's key. It is an unique identifier
+	 * Returns the object's key. It is an unique identifier.
 	 * @return the object's key
 	 */
 	public abstract String getKey();
 
 	/**
 	 * Returns the object's full name
+	 * @return the object's full name
 	 */
 	public abstract String getFullName();
 
@@ -121,8 +122,8 @@ public abstract class AbstractDataObject extends Observable {
 	}
 
 	/**
-	 * Returns the type of the object.
-	 * @return
+	 * Returns the type of the object (ex : "ao" for AOObject).
+	 * @return the type of the object.
 	 */
 	public abstract String getType();
 	

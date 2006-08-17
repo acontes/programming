@@ -65,7 +65,6 @@ public class HostObject extends AbstractDataObject {
     
     /**
      * Creates a new HostObject
-     * @param parent His parent
      * @parent hostname machine's name
      * @param port
      * @param protocol to use
@@ -90,8 +89,7 @@ public class HostObject extends AbstractDataObject {
 
 	
 	/**
-	 * Explores the host, in order to find all VMs known by this one
-	 * @return Virtual machines found in the host
+	 * Explores the host, in order to find all VMs known by this one.
 	 */
 	@Override
 	public void explore() {

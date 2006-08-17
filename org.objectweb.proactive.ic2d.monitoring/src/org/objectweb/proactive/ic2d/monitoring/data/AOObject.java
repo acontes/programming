@@ -39,23 +39,32 @@ import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
 
 public class AOObject extends AbstractDataObject{
 
-	/**
-	 * State of the object (ex: WAITING_BY_NECESSITY)
+	/** Counter used to add a number after the name of the object
+	 * if counter=3, and if the next object's name is "ao", then it's fullname
+	 * will be "ao#3"
 	 */
+	private static int counter = 0;
+	
+	
+	/** State of the object (ex: WAITING_BY_NECESSITY) */
 	private int state;
-
+	
+	/** the object's name (ex: ao) */
 	private String name;
-
-	/** the object's name */
+	/** the object's fullname (ex: ao#3) */
 	private String fullName;
 
-	private static int counter = 0;
-
+	/** id used to identify the active object globally, even in case of migration */
 	private UniqueID id;
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
+	/**
+	 * @param parent the Node containing the active object
+	 * @param name the active object's name
+	 * @param id the active object's id
+	 */
 	public AOObject(NodeObject parent, String name, UniqueID id){
 		super(parent);
 
@@ -71,14 +80,17 @@ public class AOObject extends AbstractDataObject{
 	//
 
 	/**
-	 * Returns the Unique ID of the active object.
+	 * Returns the id of the active object.
+	 * @return the id of the active object.
 	 */
 	public UniqueID getID(){
 		return this.id;
 	}
 	
 	/**
-	 * Returns the key.
+	 * Returns the object's key. It is an unique identifier.
+	 * @return the object's key
+	 * @see AbstractDataObject#getKey()
 	 */
 	public String getKey() {
 		return this.id.toString();
@@ -86,7 +98,7 @@ public class AOObject extends AbstractDataObject{
 
 	/**
 	 * Returns the object's name. (ex: ao)
-	 * @return
+	 * @return the object's name
 	 */
 	public String getName() {
 		return this.name;
@@ -94,6 +106,8 @@ public class AOObject extends AbstractDataObject{
 
 	/**
 	 * Returns the object's full name. (ex: ao#3)
+	 * @return the object's full name.
+	 * @see AbstractDataObject#getFullName()
 	 */
 	public String getFullName() {
 		return fullName;
@@ -101,6 +115,7 @@ public class AOObject extends AbstractDataObject{
 
 	/**
 	 * Change the current state
+	 * @param newState
 	 */
 	public void setState(int newState) {
 		this.state = newState;
@@ -114,7 +129,7 @@ public class AOObject extends AbstractDataObject{
 
 	/**
 	 * Add a communication between two active objects.
-	 * @param 
+	 * @param message
 	 */
 	public void addCommunication(SpyMessageEvent message){
 		setChanged();
