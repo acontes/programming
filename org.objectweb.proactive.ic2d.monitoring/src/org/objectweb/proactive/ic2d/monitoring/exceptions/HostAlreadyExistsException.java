@@ -49,8 +49,8 @@ public class HostAlreadyExistsException extends Exception{
 	}
 	
 	/**
-	 * Returns The existing host object.
-	 * @return
+	 * Returns the host which was already monitored.
+	 * @return  the host which was already monitored.
 	 */
 	public HostObject getHost(){
 		return this.host;
