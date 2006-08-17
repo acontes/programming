@@ -56,7 +56,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 public abstract class AbstractRequestHandler implements RequestHandler,
     Serializable {
     private RequestHandler nextHandler = null;
-    protected Component owner;
+    protected ProActiveComponent owner;
 
     /*
      * @see org.objectweb.proactive.core.component.controller.RequestHandler#nextHandler()

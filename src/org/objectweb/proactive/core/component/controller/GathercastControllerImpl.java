@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -25,12 +26,14 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.SerializableMethod;
 
 public class GathercastControllerImpl extends AbstractCollectiveInterfaceController implements GathercastController {
     
     private Map<String, List<ItfID>> bindingsOnServerItfs = new HashMap<String, List<ItfID>>();
     private Map<String, ProActiveInterface> gatherItfs = new HashMap<String, ProActiveInterface>();
     private GatherRequestsQueues gatherRequestsHandler;
+	Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethods = new HashMap<String, Map<SerializableMethod,SerializableMethod>>();
 
     public GathercastControllerImpl(Component owner) {
         super(owner);
@@ -168,7 +171,13 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     
     
     
-    @Override
+    
+    
+    public void checkCompatibility(String itfName, ProActiveInterface itf) throws IllegalBindingException {
+		// not used in gathercast interfaces
+	}
+
+	@Override
 	public void migrateDependentActiveObjectsTo(Node node) throws MigrationException {
     	if(gatherRequestsHandler!=null) {
     		gatherRequestsHandler.migrateFuturesHandlersTo(node);

@@ -14,7 +14,9 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.controller.util.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
 import org.objectweb.proactive.core.group.ExceptionListException;
@@ -39,7 +41,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
     protected ProActiveInterfaceType interfaceType;
     protected Class itfSignatureClass = null;
-    protected Component owner;
+    protected ProActiveComponent owner;
     protected ProxyForComponentInterfaceGroup delegatee = null;
 
     public ProxyForComponentInterfaceGroup()
@@ -188,14 +190,9 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                 Map<MethodCall, Integer> generatedMethodCalls;
 
                 try {
-                    generatedMethodCalls = Fractive.getMulticastController(owner)
-                                                   .generateMethodCallsForDelegatee(mc,
+                    generatedMethodCalls = MulticastHelper
+                                                   .generateMethodCallsForMulticastDelegatee(owner, mc,
                             delegatee);
-                } catch (NoSuchInterfaceException e) {
-                    e.printStackTrace();
-                    throw new InvocationTargetException(e,
-                        "missing collective interfaces controller for collective interface " +
-                        interfaceType.getFcItfName());
                 } catch (ParameterDispatchException e) {
                     throw new InvocationTargetException(e,
                         "cannot dispatch invocation parameters for method " +
@@ -245,14 +242,9 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
             Map<MethodCall, Integer> generatedMethodCalls;
 
             try {
-                generatedMethodCalls = Fractive.getMulticastController(owner)
-                                               .generateMethodCallsForDelegatee(mc,
+                generatedMethodCalls = MulticastHelper
+                                               .generateMethodCallsForMulticastDelegatee(owner, mc,
                         delegatee);
-            } catch (NoSuchInterfaceException e) {
-                e.printStackTrace();
-                throw new InvocationTargetException(e,
-                    "missing collective interfaces controller for collective interface " +
-                    interfaceType.getFcItfName());
             } catch (ParameterDispatchException e) {
                 throw new InvocationTargetException(e,
                     "cannot dispatch invocation parameters for method " +
@@ -314,7 +306,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
      * @param owner The owner to set.
      */
     public void setOwner(Component owner) {
-        this.owner = owner;
+        this.owner = (ProActiveComponent)owner;
     }
 
     /**

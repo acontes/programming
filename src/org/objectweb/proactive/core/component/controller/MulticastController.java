@@ -17,22 +17,10 @@ import org.objectweb.proactive.core.mop.MethodCall;
  */
 public interface MulticastController extends CollectiveInterfaceController {
     
-	/**
-	 * Transforms an invocation on a multicast interface into a list of invocations which will be
-	 * transferred to client interfaces. These invocations are inferred from the annotations of the
-	 * multicast interface and the number of connected server interfaces.
-	 * 
-	 * @param mc method call on the multicast interface
-	 * 
-	 * @param delegatee the group delegatee which is connected to interfaces server of this multicast interface
-	 * 
-	 * @return the reified invocations to be transferred to connected server interfaces
-	 * 
-	 * @throws ParameterDispatchException if there is an error in the dispatch of the parameters
-	 */
-    public Map<MethodCall, Integer> generateMethodCallsForDelegatee(
-        MethodCall mc, ProxyForComponentInterfaceGroup delegatee)
-        throws ParameterDispatchException;
+//	
+//    public Map<MethodCall, Integer> generateMethodCallsForMulticastDelegatee(
+//        MethodCall mc, ProxyForComponentInterfaceGroup delegatee)
+//        throws ParameterDispatchException;
 
     /**
 	 * Performs a binding between a multicast client interface and a server

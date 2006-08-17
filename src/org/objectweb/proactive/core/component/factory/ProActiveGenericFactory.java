@@ -110,7 +110,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @throws InstantiationException
      *             if the component cannot be created.
      */
-    List newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
             ContentDescription[] contentDesc, VirtualNode virtualNode)
             throws InstantiationException;
 
@@ -138,7 +138,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if one or several of the components cannot be created. The cause of this 
      *             exception may contain the list of instantiation exceptions.
      */
-    List newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc, Node[] nodes)
             throws InstantiationException;
     
@@ -165,7 +165,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if one or several of the components cannot be created. The cause of this 
      *             exception may contain the list of instantiation exceptions.
      */
-    List newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc, VirtualNode virtualNode)
             throws InstantiationException;
 
@@ -190,7 +190,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if one or several of the components cannot be created. The cause of this 
      *             exception may contain the list of instantiation exceptions.
      */
-    List newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
             ContentDescription[] contentDesc, Node[] nodes)
             throws InstantiationException;
 
