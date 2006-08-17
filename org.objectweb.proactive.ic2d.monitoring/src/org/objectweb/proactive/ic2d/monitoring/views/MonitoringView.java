@@ -47,6 +47,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.MonitoringContextMenuProvider;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
@@ -57,6 +58,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetDepthAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.editparts.IC2DEditPartFactory;
@@ -259,6 +261,8 @@ public class MonitoringView extends ViewPart {
 		registry.registerAction(new RefreshNodeAction());
 		registry.registerAction(new StopMonitoringAction());
 		registry.registerAction(new SetUpdateFrequenceAction(display));
+		registry.registerAction(new VerticalLayoutAction());
+		registry.registerAction(new HorizontalLayoutAction());
 	}
     
 	//
