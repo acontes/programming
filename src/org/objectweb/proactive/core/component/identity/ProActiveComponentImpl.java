@@ -132,13 +132,12 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
         // 3. external functional interfaces
         addFunctionalInterfaces(componentParameters, component_is_primitive);
-        
-        
-//        Set<String> s = controlItfs.keySet();
-//        for (Iterator iter = s.iterator(); iter.hasNext();) {
-//			String key = (String) iter.next();
-//			((AbstractProActiveController)controlItfs.get(key)).init();
-//		}
+
+        //        Set<String> s = controlItfs.keySet();
+        //        for (Iterator iter = s.iterator(); iter.hasNext();) {
+        //			String key = (String) iter.next();
+        //			((AbstractProActiveController)controlItfs.get(key)).init();
+        //		}
 
         // put all in a table
         //        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
@@ -189,23 +188,11 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                         //                                interface_types[i].isFcCollectionItf()) {
                         //                            itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
                         //                        }
-
-                        // if we have a server port of a PARALLEL component, we
-
-                        // also create a group proxy on the delegatee field
-                        if (componentParameters.getHierarchicalType()
-                                                   .equals(Constants.PARALLEL) &&
-                                (!interface_types[i].isFcClientItf())) {
-                            // parallel component have a collective port on their
-                            // server interfaces
-                            itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
-                        } else {
-                            itf_ref = MetaObjectInterfaceClassGenerator.instance()
-                                                                       .generateFunctionalInterface(interface_types[i].getFcItfName(),
-                                    this, interface_types[i]);
-                            // server functional interfaces are external interfaces (at
-                            // least they are tagged as external)
-                        }
+                        itf_ref = MetaObjectInterfaceClassGenerator.instance()
+                                                                   .generateFunctionalInterface(interface_types[i].getFcItfName(),
+                                this, interface_types[i]);
+                        // server functional interfaces are external interfaces (at
+                        // least they are tagged as external)
 
                         // set delegation link
                         if (componentParameters.getHierarchicalType()
@@ -218,8 +205,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                                     (itf_ref).setFcItfImpl(null);
                                 }
                             }
-                        } else { // we have a composite component
-                            itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
                         }
                     }
 
@@ -360,7 +345,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
         // add the "component" control itfs
         lastController.setNextHandler(this);
-        
     }
 
     /**
@@ -411,7 +395,8 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        if (!("attribute-controller".equals(interfaceName)) && (interfaceName.endsWith("-controller") ||
+        if (!("attribute-controller".equals(interfaceName)) &&
+                (interfaceName.endsWith("-controller") ||
                 interfaceName.equals("component"))) {
             if (!controlItfs.containsKey(interfaceName)) {
                 throw new NoSuchInterfaceException(interfaceName);
@@ -574,26 +559,24 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     public List<AbstractProActiveController> getOutputInterceptors() {
         return outputInterceptors;
     }
-    
-    
-    public void migrateControllersDependentActiveObjectsTo(Node node) throws MigrationException {
-    	
-    	for (Iterator iter = controlItfs.values().iterator(); iter.hasNext();) {
-			ProActiveController controller = (ProActiveController) iter.next();
-			controller.migrateDependentActiveObjectsTo(node);
-			
-		}
+
+    public void migrateControllersDependentActiveObjectsTo(Node node)
+        throws MigrationException {
+        for (Iterator iter = controlItfs.values().iterator(); iter.hasNext();) {
+            ProActiveController controller = (ProActiveController) iter.next();
+            controller.migrateDependentActiveObjectsTo(node);
+        }
     }
 
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-//        System.out.println("writing ProActiveComponentImpl");
+        //        System.out.println("writing ProActiveComponentImpl");
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
-//        System.out.println("reading ProActiveComponentImpl");
+        //        System.out.println("reading ProActiveComponentImpl");
         in.defaultReadObject();
     }
 }
