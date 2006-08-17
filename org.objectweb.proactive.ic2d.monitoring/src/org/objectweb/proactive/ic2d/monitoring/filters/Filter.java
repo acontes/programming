@@ -39,9 +39,9 @@ public abstract class Filter {
 	}
 	
 	/**
-	 * Returns true if the object matches the filter
+	 * Returns true if the object matches the filter, false otherwise
 	 * @param object
-	 * @return
+	 * @return true if the object matches the filter, false otherwise.
 	 */
 	public abstract boolean filter(AbstractDataObject object);
 	
