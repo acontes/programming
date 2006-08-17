@@ -37,8 +37,9 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
+import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOConnection;
+import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
 
 public class AOEditPart extends AbstractIC2DEditPart{
@@ -63,11 +64,11 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	 */
 	public void update(Observable o, Object arg) {
 		if(arg != null){
-			if(arg instanceof Integer){
-				final int value = ((Integer)arg).intValue();
+			if(arg instanceof State){
+				final State state = (State)arg;
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
-						getCastedFigure().setState(value);
+						getCastedFigure().setState(state);
 						refreshChildren();
 						refreshVisuals();
 					}

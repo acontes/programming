@@ -36,8 +36,8 @@ import java.util.Observable;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
+import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.NodeListener;
 import org.objectweb.proactive.ic2d.monitoring.views.VirtualNodesGroup;
@@ -77,7 +77,7 @@ public class NodeEditPart extends AbstractIC2DEditPart{
 		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
-				if(param instanceof Integer && (Integer)param == State.NOT_MONITORED) {
+				if(param instanceof State && (State)param == State.NOT_MONITORED) {
 					((AbstractIC2DEditPart)getParent()).removeChildVisual(nodeEditPart);
 				}
 				((NodeFigure)getFigure()).setHighlight(VirtualNodesGroup.getInstance().getColor(((NodeObject)getModel()).getVNParent()));

@@ -157,9 +157,9 @@ public class NodeObject extends AbstractDataObject{
 	public void setHighlight(boolean highlighted) {
 		this.setChanged();
 		if (highlighted)
-			this.notifyObservers(new Integer(State.HIGHLIGHTED));
+			this.notifyObservers(State.HIGHLIGHTED);
 		else
-			this.notifyObservers(new Integer(State.NOT_HIGHLIGHTED));
+			this.notifyObservers(State.NOT_HIGHLIGHTED);
 	}
 	
 	

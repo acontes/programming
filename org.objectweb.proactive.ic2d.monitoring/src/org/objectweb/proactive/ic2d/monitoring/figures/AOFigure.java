@@ -84,7 +84,7 @@ public class AOFigure extends AbstractFigure {
 	 * Used to display the legend.
 	 * @param state
 	 */
-	public AOFigure(int state){
+	public AOFigure(State state){
 		super();
 		this.setState(state);
 	}
@@ -122,31 +122,31 @@ public class AOFigure extends AbstractFigure {
 	}
 
 
-	public void setState(int state){
+	public void setState(State state){
 		switch (state) {
 		// busy
-		case State.SERVING_REQUEST:
+		case SERVING_REQUEST:
 			this.backgroundColor = AOFigure.COLOR_WHEN_SERVING_REQUEST;
 			break;
 			// waiting by necessity
-		case State.WAITING_BY_NECESSITY_WHILE_ACTIVE:
-		case State.WAITING_BY_NECESSITY_WHILE_SERVING:
+		case WAITING_BY_NECESSITY_WHILE_ACTIVE:
+		case WAITING_BY_NECESSITY_WHILE_SERVING:
 			this.backgroundColor = AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY;
 			break;
 			// waiting for request
-		case State.WAITING_FOR_REQUEST:
+		case WAITING_FOR_REQUEST:
 			this.backgroundColor = AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST;
 			break;	
 			// active
-		case State.ACTIVE:
+		case ACTIVE:
 			this.backgroundColor = AOFigure.COLOR_WHEN_ACTIVE;
 			break;
 			// not responding
-		case State.NOT_RESPONDING:
+		case NOT_RESPONDING:
 			this.backgroundColor = AOFigure.COLOR_WHEN_NOT_RESPONDING;
 			break;
 			// migrate
-		case State.MIGRATING:
+		case MIGRATING:
 			this.backgroundColor = AOFigure.COLOR_WHEN_MIGRATING;
 			break;
 		default:

@@ -72,9 +72,9 @@ public class VMEditPart extends AbstractIC2DEditPart {
 		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
-				if(param instanceof Integer && (Integer)param == State.NOT_RESPONDING)
+				if(param instanceof State && (State)param == State.NOT_RESPONDING)
 					((VMFigure)getFigure()).notResponding();
-				else if(param instanceof Integer && (Integer)param == State.NOT_MONITORED) {
+				else if(param instanceof State && (State)param == State.NOT_MONITORED) {
 					((AbstractIC2DEditPart)getParent()).removeChildVisual(vmEditPart);
 				}
 				refreshChildren();
