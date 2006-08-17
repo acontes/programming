@@ -207,7 +207,7 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
 	}
 
 	/**
-	 * @see edu.mit.csail.relo.eclipse.gef.IFigure#revalidate()
+	 * 
 	 */
 	@Override
 	public void revalidate() {

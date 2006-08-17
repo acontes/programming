@@ -73,8 +73,7 @@ public class NodeFigure extends AbstractRectangleFigure{
 	
 	
 	/**
-	 * Create a new node figure (Used to display the legend)
-	 * @param text The text to display
+	 * Creates a new node figure (used to display the legend)
 	 * @param protocol The protocol used
 	 */
 	public NodeFigure(Protocol protocol) {
