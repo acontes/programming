@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.monitoring.figures;
 
 import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ConnectionAnchor;
+import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LayoutManager;
@@ -47,6 +48,9 @@ public class AOFigure extends AbstractFigure {
 
 	protected final static int DEFAULT_WIDTH = 40;
 
+	private static final Color DEFAULT_BORDER_COLOR;
+
+	// States
 	public static final Color COLOR_WHEN_WAITING_FOR_REQUEST;
 	public static final Color COLOR_WHEN_WAITING_BY_NECESSITY;
 	public static final Color COLOR_WHEN_ACTIVE;
@@ -54,8 +58,15 @@ public class AOFigure extends AbstractFigure {
 	public static final Color COLOR_WHEN_MIGRATING;
 	public static final Color COLOR_WHEN_NOT_RESPONDING;
 
-	private static final Color DEFAULT_BORDER_COLOR;
-	
+	// Request Queue length
+	public static final int NUMBER_OF_REQUESTS_FOR_SEVERAL = 5;
+	public static final int NUMBER_OF_REQUESTS_FOR_MANY = 50;
+	public static final Color COLOR_REQUEST_SINGLE;
+	public static final Color COLOR_REQUEST_SEVERAL;
+	public static final Color COLOR_REQUEST_MANY;
+	public static final int REQUEST_FIGURE_SIZE = 4;
+
+	// initialization of the colors
 	static {
 		Display device = Display.getCurrent();
 		COLOR_WHEN_WAITING_FOR_REQUEST = new Color(device, 225, 225, 225);
@@ -64,39 +75,55 @@ public class AOFigure extends AbstractFigure {
 		COLOR_WHEN_SERVING_REQUEST = new Color(device, 255, 255, 255);
 		COLOR_WHEN_MIGRATING = new Color(device, 0, 0, 255);// blue
 		COLOR_WHEN_NOT_RESPONDING = new Color(device, 255, 0, 0);// red
-		
+
 		DEFAULT_BORDER_COLOR = new Color(device, 200, 200, 200);
+
+		COLOR_REQUEST_SINGLE = new Color(device, 0, 255, 0); // green
+		COLOR_REQUEST_SEVERAL = new Color(device, 255, 0, 0); // red
+		COLOR_REQUEST_MANY = new Color(device, 150, 0, 255); // violet
 	}
+
+	/** Request queue length (used to display small square int the active object) */
+	private int requestQueueLength;
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	/**
 	 * @param text Text to display
 	 */
 	public AOFigure(String text){
 		super(text);
+		this.requestQueueLength = 0;
 		addMouseListener(new AOListener());
 	}
-	
+
 	/**
 	 * Used to display the legend.
 	 * @param state
 	 */
-	public AOFigure(State state){
+	public AOFigure(State state, int requestQueueLength){
 		super();
 		this.setState(state);
+		this.requestQueueLength = requestQueueLength;
 	}
 
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
-	
+
+	/**
+	 * @return
+	 */
 	public ConnectionAnchor getAnchor() {
 		return new /*EllipseAnchor(this)/*ChopboxAnchor(this)*/Anchor(this);
 	}
 
+	/**
+	 * @see AbstractFigure#paintIC2DFigure(Graphics)
+	 */
+	@Override
 	public void paintIC2DFigure(Graphics graphics){
 		// Inits
 		Rectangle bounds = this.getBounds().getCopy().resize(-1, -2);
@@ -112,16 +139,55 @@ public class AOFigure extends AbstractFigure {
 		graphics.fillOval(bounds);
 		graphics.drawOval(bounds);
 
+		// Paint request queue information
+		if(requestQueueLength > 0) {
+			int length = requestQueueLength;
+			int numMany = (int)Math.ceil(length / NUMBER_OF_REQUESTS_FOR_MANY);
+			length -= numMany*NUMBER_OF_REQUESTS_FOR_MANY;
+			int numSeveral = (int)Math.ceil(length / NUMBER_OF_REQUESTS_FOR_SEVERAL);
+			length -= numSeveral*NUMBER_OF_REQUESTS_FOR_SEVERAL;
+			int numSingle = length;
+			if (numSingle > 0) {
+				int requestQueueX = bounds.x + ((bounds.width - (6 * numSingle)) / 2) + 2;
+				int requestQueueY = bounds.y + 4;
+				graphics.setBackgroundColor(COLOR_REQUEST_SINGLE);
+				for (int i = 0; i < numSingle; i++) {
+					graphics.fillRectangle(requestQueueX + (i * 6), requestQueueY, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
+				}
+			}
+			if (numSeveral > 0) {
+				int requestQueueX = bounds.x + ((bounds.width - (6 * (numSeveral + numMany))) / 2) + 2;
+				int requestQueueY = bounds.y + bounds.height - 6;
+				graphics.setBackgroundColor(COLOR_REQUEST_SEVERAL);
+				for (int i = 0; i < numSeveral; i++)
+					graphics.fillRectangle(requestQueueX + (i * 6), requestQueueY, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
+			}
+			if (numMany > 0) {
+				int requestQueueX = bounds.x + ((bounds.width - (6 * (numSeveral + numMany))) / 2) + 
+				(6 * numSeveral) + 2;
+				int requestQueueY = bounds.y + bounds.height - 6;
+				graphics.setBackgroundColor(COLOR_REQUEST_MANY);
+				for (int i = 0; i < numMany; i++)
+					graphics.fillRectangle(requestQueueX + (i * 6), requestQueueY, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
+			}
+		}
+
 		// Cleanups
 		graphics.restoreState();
 	}
 
+	/**
+	 * @return
+	 */
 	public IFigure getContentPane() {
 		System.out.println("AOFigure : getContentPane");
 		return this;
 	}
 
-
+	/**
+	 * 
+	 * @param state
+	 */
 	public void setState(State state){
 		switch (state) {
 		// busy
@@ -155,40 +221,87 @@ public class AOFigure extends AbstractFigure {
 		this.repaint();
 	}
 
+
+	/**
+	 * 
+	 * @param length
+	 */
+	public void setRequestQueueLength(int length) {
+		this.requestQueueLength = length;
+	}
+
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
 
+	/**
+	 * 
+	 * @see AbstractFigure#initColor()
+	 */
+	@Override
 	protected void initColor() {
 		Device device = Display.getCurrent();
-		
+
 		borderColor = DEFAULT_BORDER_COLOR;
 		backgroundColor = new Color(device, 225, 225, 225);
 		shadowColor = new Color(device, 230, 230, 230);
 	}
 
+	/**
+	 * 
+	 * @see AbstractFigure#initFigure()
+	 */
+	@Override
 	protected void initFigure(){
 		LayoutManager layout = new AOBorderLayout();
 		setLayoutManager(layout);
 		add(label, BorderLayout.CENTER);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	@Override
 	protected Color getDefaultBorderColor() {
 		return DEFAULT_BORDER_COLOR;
 	}
-	
+
 	//
 	// -- INNER CLASS -------------------------------------------
 	//
 
 	private class AOBorderLayout extends BorderLayout {
 
+		@Override
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
 			//return super.calculatePreferredSize(container, wHint, hHint).expand(15, 15);
 			return new Dimension(100,super.calculatePreferredSize(container, wHint, hHint).expand(0, 15).height);
 		}
-
 	}
+	
+	
+	public class RequestQueueFigure extends Figure {
 
+		private Color color;
+		
+		public RequestQueueFigure(Color color) {
+			this.color = color;
+			setLayoutManager(new RequestQueueLayout());
+		}
+		
+		public void paintFigure(Graphics graphics) {
+			super.paintFigure(graphics);
+			graphics.setBackgroundColor(color);
+			graphics.fillRectangle(bounds.x, bounds.y, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
+			graphics.restoreState();
+		}
+		
+		class RequestQueueLayout extends BorderLayout {
+			@Override
+			protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
+				return new Dimension(REQUEST_FIGURE_SIZE,REQUEST_FIGURE_SIZE);
+			}
+		}
+	}
 }

@@ -110,8 +110,8 @@ public class NodeObject extends AbstractDataObject{
 			activeObjects = parent.getProActiveRuntime().getActiveObjects(this.key);
 		} catch (ProActiveException e) {
 			// TODO Auto-generated catch block
-			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
-			e.printStackTrace();
+			notResponding();
+			Console.getInstance(Activator.CONSOLE_NAME).debug(e);
 		}
 		handleActiveObjects(activeObjects);
 	}

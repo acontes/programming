@@ -38,7 +38,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
-public abstract class AbstractFigure extends Figure{
+public abstract class AbstractFigure extends Figure {
 	
 	// the space between top and the first child
 	protected final static int topShift = 25;

@@ -157,15 +157,14 @@ public class AOObject extends AbstractDataObject{
 	
 	/**
 	 * 
-	 * @param value
+	 * @param length
 	 * @see #getRequestQueueLength()
 	 */
-	public void setRequestQueueLength(int value) {
-		if (requestQueueLength != value) {
-			requestQueueLength = value;
-			System.out.println("AOObject.setRequestQueueLength() "+value);
+	public void setRequestQueueLength(int length) {
+		if (requestQueueLength != length) {
+			requestQueueLength = length;
 			this.setChanged();
-			this.notifyObservers();
+			this.notifyObservers(new Integer(length));
 		}
 	}
 	

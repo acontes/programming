@@ -62,7 +62,7 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 		});
 	}
 	
-	
+	@Override
 	public IFigure getContentPane() {
 		return ((AbstractFigure)getFigure()).getContentPane();
 	}

@@ -64,6 +64,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
 	 */
 	public void update(Observable o, Object arg) {
 		if(arg != null){
+			// State updated
 			if(arg instanceof State){
 				final State state = (State)arg;
 				Display.getDefault().asyncExec(new Runnable() {
@@ -74,6 +75,7 @@ public class AOEditPart extends AbstractIC2DEditPart{
 					}
 				});
 			}
+			// Add communication
 			else if(arg instanceof SpyMessageEvent){
 				SpyMessageEvent message = (SpyMessageEvent)arg;
 				final String source = message.getSourceBodyID().toString();
@@ -86,6 +88,17 @@ public class AOEditPart extends AbstractIC2DEditPart{
 							AOConnection.addSourceConnection(panel, source, (AOFigure)getFigure(), target);
 						else
 							AOConnection.addTargetConnection(panel, target, (AOFigure)getFigure(), source);
+					}
+				});
+			}
+			// Request queue length has changed
+			else if(arg instanceof Integer) {
+				final int length  = ((Integer)arg).intValue();
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run () {
+						((AOFigure)getFigure()).setRequestQueueLength(length);
+						refreshChildren();
+						refreshVisuals();
 					}
 				});
 			}

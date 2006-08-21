@@ -179,7 +179,9 @@ public class VMObject extends AbstractDataObject {
 			node = new NodeImpl(runtime, nodeUrl,UrlBuilder.getProtocol(nodeUrl), runtime.getJobID(nodeUrl));
 		} catch (ProActiveException e) {
 			// TODO Auto-generated catch block
-			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+//			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+			notResponding();
+			Console.getInstance(Activator.CONSOLE_NAME).debug(e);
 		}
 		NodeObject nodeObject = new NodeObject(this, node);
 		this.exploreChild(nodeObject);

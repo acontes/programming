@@ -42,8 +42,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
@@ -59,28 +59,26 @@ public class Legend extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-			
+
 		parent.setLayout(new FillLayout());
-				
-		 // Create the ScrolledComposite to scroll horizontally and vertically
-	    ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		
-	    Composite child = new Composite(sc,SWT.NONE);
-	    
-	    FormLayout generalLayout = new FormLayout();
-	    generalLayout.marginHeight = 5;
-	    generalLayout.marginWidth = 5;
-	    
-//	    GridLayout generalLayout = new GridLayout();
-//		generalLayout.numColumns = 1;
+
+		// Create the ScrolledComposite to scroll horizontally and vertically
+		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+
+		Composite child = new Composite(sc,SWT.NONE);
+
+		FormLayout generalLayout = new FormLayout();
+		generalLayout.marginHeight = 5;
+		generalLayout.marginWidth = 5;
+
 		child.setLayout(generalLayout);
-	    
+
 		/*--------- Active objects ---------*/
 
 		Group aoDef = new Group(child, 0);
 		GridLayout aoLayout = new GridLayout();
 		aoLayout.numColumns = 2;
-		aoDef.setLayout(/*new FillLayout(SWT.VERTICAL)*/aoLayout);
+		aoDef.setLayout(aoLayout);
 		aoDef.setText("Active objects");
 		FormData aoDefFormData = new FormData();
 		aoDefFormData.left = new FormAttachment(0, 0);
@@ -88,42 +86,42 @@ public class Legend extends ViewPart {
 		aoDef.setLayoutData(aoDefFormData);
 
 		// Active by itself
-		
+
 		FigureCanvas ao1Container = new FigureCanvas(aoDef);
-		ao1Container.setContents(new AOFigure(State.ACTIVE));
+		ao1Container.setContents(new AOFigure(State.ACTIVE, 0));
 
 		Label ao1Text = new Label(aoDef, 0);
 		ao1Text.setText("Active by itself");
 
 		// Serving request
-		
+
 		FigureCanvas ao2Container = new FigureCanvas(aoDef);
-		ao2Container.setContents(new AOFigure(State.SERVING_REQUEST));
-	
+		ao2Container.setContents(new AOFigure(State.SERVING_REQUEST, 0));
+
 		Label ao2Text = new Label(aoDef, 0);
 		ao2Text.setText("Serving request");
 
 		// Waiting for request
-		
+
 		FigureCanvas ao3Container = new FigureCanvas(aoDef);
-		ao3Container.setContents(new AOFigure(State.WAITING_FOR_REQUEST));
+		ao3Container.setContents(new AOFigure(State.WAITING_FOR_REQUEST, 0));
 
 		Label ao3Text = new Label(aoDef, 0);
 		ao3Text.setText("Waiting for request");
 
 		// Waiting for result (wait by necessity)
-		
+
 		FigureCanvas ao4Container = new FigureCanvas(aoDef);
-		ao4Container.setContents(new AOFigure(State.WAITING_BY_NECESSITY_WHILE_ACTIVE));
+		ao4Container.setContents(new AOFigure(State.WAITING_BY_NECESSITY_WHILE_ACTIVE, 0));
 
 		Label ao4Text = new Label(aoDef, 0);
 		ao4Text.setText("Waiting for result\n(wait by necessity)");
 		ao4Text.setSize(ao4Text.getSize().x/2, ao4Text.getSize().y);
 
 		// Migrating
-		
+
 		FigureCanvas ao5Container = new FigureCanvas(aoDef);
-		ao5Container.setContents(new AOFigure(State.MIGRATING));
+		ao5Container.setContents(new AOFigure(State.MIGRATING, 0));
 
 		Label ao5Text = new Label(aoDef, 0);
 		ao5Text.setText("Migrating");
@@ -143,6 +141,62 @@ public class Legend extends ViewPart {
 		requestDefFormData.right = new FormAttachment(100, 0);
 		requestDef.setLayoutData(requestDefFormData);
 		
+		FigureCanvas requestContainer = new FigureCanvas(requestDef);
+		AOFigure pendingRequestFigure = new AOFigure(State.SERVING_REQUEST, 64);
+		requestContainer.setContents(pendingRequestFigure);
+		
+		Composite requestLabels = new Composite(requestDef, 0);
+		FormLayout requestLayout2 = new FormLayout();
+		requestLabels.setLayout(requestLayout2);
+		
+		Label requestLabel = new Label(requestLabels, 0);
+		requestLabel.setText("Pending requests :");
+		FormData requestLabelData = new FormData();
+//		requestLabelData.top = new FormAttachment(0, 0);
+//		requestLabelData.left = new FormAttachment(0, 0);
+		requestLabel.setLayoutData(requestLabelData);
+		
+		FigureCanvas singleRequestCanvas = new FigureCanvas(requestLabels);
+		singleRequestCanvas.setContents(pendingRequestFigure.new RequestQueueFigure(AOFigure.COLOR_REQUEST_SINGLE));
+		FormData singleRequestData = new FormData();
+		singleRequestData.top = new FormAttachment(requestLabel, 8);
+		singleRequestCanvas.setLayoutData(singleRequestData);
+		
+		Label singleRequest = new Label(requestLabels, 0);
+		singleRequest.setText("1");
+		FormData singleRequestData2 = new FormData();
+		singleRequestData2.top = new FormAttachment(requestLabel, 0);
+		singleRequestData2.left = new FormAttachment(singleRequestCanvas, 4);
+		singleRequest.setLayoutData(singleRequestData2);
+		
+		FigureCanvas severalRequestCanvas = new FigureCanvas(requestLabels);
+		severalRequestCanvas.setContents(pendingRequestFigure.new RequestQueueFigure(AOFigure.COLOR_REQUEST_SEVERAL));
+		FormData severalRequestData = new FormData();
+		severalRequestData.top = new FormAttachment(requestLabel, 8);
+		severalRequestData.left =  new FormAttachment(singleRequest, 20);
+		severalRequestCanvas.setLayoutData(severalRequestData);
+		
+		Label severalRequest = new Label(requestLabels, 0);
+		severalRequest.setText(AOFigure.NUMBER_OF_REQUESTS_FOR_SEVERAL+"");
+		FormData severalRequestData2 = new FormData();
+		severalRequestData2.top = new FormAttachment(requestLabel, 0);
+		severalRequestData2.left =  new FormAttachment(severalRequestCanvas, 4);
+		severalRequest.setLayoutData(severalRequestData2);
+		
+		FigureCanvas manyRequestCanvas = new FigureCanvas(requestLabels);
+		manyRequestCanvas.setContents(pendingRequestFigure.new RequestQueueFigure(AOFigure.COLOR_REQUEST_MANY));
+		FormData manyRequestData = new FormData();
+		manyRequestData.top = new FormAttachment(requestLabel, 8);
+		manyRequestData.left =  new FormAttachment(severalRequest, 20);
+		manyRequestCanvas.setLayoutData(manyRequestData);
+		
+		Label manyRequest = new Label(requestLabels, 0);
+		manyRequest.setText(AOFigure.NUMBER_OF_REQUESTS_FOR_MANY+"");
+		FormData manyRequestData2 = new FormData();
+		manyRequestData2.top = new FormAttachment(requestLabel, 0);
+		manyRequestData2.left =  new FormAttachment(manyRequestCanvas, 4);
+		manyRequest.setLayoutData(manyRequestData2);
+
 		/*--------- Nodes ---------*/
 
 		Group nodeDef = new Group(child, 0);
@@ -155,39 +209,39 @@ public class Legend extends ViewPart {
 		nodeDefFormData.left = new FormAttachment(0, 0);
 		nodeDefFormData.right = new FormAttachment(100, 0);
 		nodeDef.setLayoutData(nodeDefFormData);
-		
+
 		// RMI Node
-		
+
 		FigureCanvas node1Container = new FigureCanvas(nodeDef);
 		node1Container.setContents(new NodeFigure(Protocol.RMI));
 
 		Label node1Text = new Label(nodeDef, 0);
 		node1Text.setText("RMI Node");
-		
+
 		// HTTP Node
-		
+
 		FigureCanvas node2Container = new FigureCanvas(nodeDef);
 		node2Container.setContents(new NodeFigure(Protocol.HTTP));
 
 		Label node2Text = new Label(nodeDef, 0);
 		node2Text.setText("HTTP Node");
-		
+
 		// RMI/SSH Node
-		
+
 		FigureCanvas node3Container = new FigureCanvas(nodeDef);
 		node3Container.setContents(new NodeFigure(Protocol.RMISSH));
 
 		Label node3Text = new Label(nodeDef, 0);
 		node3Text.setText("RMI/SSH Node");
-		
+
 		// JINI Node
-		
+
 		FigureCanvas node4Container = new FigureCanvas(nodeDef);
 		node4Container.setContents(new NodeFigure(Protocol.JINI));
 
 		Label node4Text = new Label(nodeDef, 0);
 		node4Text.setText("JINI Node");
-		
+
 		/*--------- JVMs ---------*/
 
 		Group jvmDef = new Group(child, 0);
@@ -200,17 +254,17 @@ public class Legend extends ViewPart {
 		jvmDefFormData.left = new FormAttachment(0, 0);
 		jvmDefFormData.right = new FormAttachment(100, 0);
 		jvmDef.setLayoutData(jvmDefFormData);
-		
+
 		// Standard JVM
-		
+
 		FigureCanvas jvm1Container = new FigureCanvas(jvmDef);
 		jvm1Container.setContents(new VMFigure());
 
 		Label jvm1Text = new Label(jvmDef, 0);
 		jvm1Text.setText("Standard JVM");
-		
+
 		// JVM started with Globus
-		
+
 		FigureCanvas jvm2Container = new FigureCanvas(jvmDef);
 		VMFigure jvm2Figure = new VMFigure();
 		jvm2Figure.withGlobus();
@@ -218,7 +272,7 @@ public class Legend extends ViewPart {
 
 		Label jvm2Text = new Label(jvmDef, 0);
 		jvm2Text.setText("JVM started with Globus");
-		
+
 		/*--------- Hosts ---------*/
 
 		Group hostDef = new Group(child, 0);
@@ -231,15 +285,15 @@ public class Legend extends ViewPart {
 		hostDefFormData.left = new FormAttachment(0, 0);
 		hostDefFormData.right = new FormAttachment(100, 0);
 		hostDef.setLayoutData(hostDefFormData);
-		
+
 		// Standard Host
-		
+
 		FigureCanvas hostContainer = new FigureCanvas(hostDef);
 		hostContainer.setContents(new HostFigure());
 
 		Label hostText = new Label(hostDef, 0);
 		hostText.setText("Standard Host");
-		
+
 		/*--------- Hosts ---------*/
 
 		Group noRespondingDef = new Group(child, 0);
@@ -252,17 +306,17 @@ public class Legend extends ViewPart {
 		noRespondingDefFormData.left = new FormAttachment(0, 0);
 		noRespondingDefFormData.right = new FormAttachment(100, 0);
 		noRespondingDef.setLayoutData(noRespondingDefFormData);
-		
+
 		// Active Object
-		
+
 		FigureCanvas aoNoRespondingContainer = new FigureCanvas(noRespondingDef);
-		aoNoRespondingContainer.setContents(new AOFigure(State.NOT_RESPONDING));
+		aoNoRespondingContainer.setContents(new AOFigure(State.NOT_RESPONDING, 0));
 
 		Label aoNoRespondingText = new Label(noRespondingDef, 0);
 		aoNoRespondingText.setText("Active Object");
-		
+
 		// JVM
-		
+
 		FigureCanvas jvmNoRespondingContainer = new FigureCanvas(noRespondingDef);
 		VMFigure jvmFigure = new VMFigure();
 		jvmFigure.notResponding();
@@ -270,22 +324,22 @@ public class Legend extends ViewPart {
 
 		Label jvmNoRespondingText = new Label(noRespondingDef, 0);
 		jvmNoRespondingText.setText("JVM");
-		
-		
-		
+
+
+
 		/* --------------------------------*/
-		
-	    // Set the child as the scrolled content of the ScrolledComposite
-	    sc.setContent(child);
 
-	    // Set the minimum size
-	    child.setSize(child.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-	    sc.setMinSize(child.getSize().x, child.getSize().y);
+		// Set the child as the scrolled content of the ScrolledComposite
+		sc.setContent(child);
 
-	    // Expand both horizontally and vertically
-	    sc.setExpandHorizontal(true);
-	    sc.setExpandVertical(true);
-		
+		// Set the minimum size
+		child.setSize(child.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		sc.setMinSize(child.getSize().x, child.getSize().y);
+
+		// Expand both horizontally and vertically
+		sc.setExpandHorizontal(true);
+		sc.setExpandVertical(true);
+
 	}
 
 

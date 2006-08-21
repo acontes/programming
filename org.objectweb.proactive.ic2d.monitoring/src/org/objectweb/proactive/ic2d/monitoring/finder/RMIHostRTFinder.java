@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.monitoring.finder;
 
 import java.rmi.ConnectException;
+import java.rmi.ConnectIOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class RMIHostRTFinder implements HostRTFinder{
 			names = registry.list();
 
 		} catch (Exception e) {
-			if(e instanceof ConnectException) {
+			if(e instanceof ConnectException || e instanceof ConnectIOException) {
 				List<AbstractDataObject> jvms = host.getMonitoredChildren();
 				for(int i=0, size=jvms.size() ; i<size ; i++) {
 					((VMObject)jvms.get(i)).notResponding();
