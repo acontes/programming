@@ -51,6 +51,11 @@ public class SpyListenerImpl implements SpyListener{
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    
+    /**
+     * Terminate the body of the "Spylistener". After this call the body is no more alive and no more active
+     * although the active thread is not interrupted. The body is unuseable after this call.
+     */
     public void terminate() {
         Body body = ProActive.getBodyOnThis();
         if (body != null) {
