@@ -59,6 +59,7 @@ public class Skernel<T> implements Serializable{
 	private Vector<Task<T>> results; //Finished root-tasks
 	private Hashtable<Task<T>,Task<T>> processing; //Tasks being processed at this moment
 	private PanicException panicException;
+	private Hashtable<T, TaskStats> taskStats;
 	
 	public Skernel(){
 		this.ready= new PriorityQueue<Task<T>>();
@@ -67,6 +68,7 @@ public class Skernel<T> implements Serializable{
 		this.processing=new Hashtable<Task<T>,Task<T>>();
 		this.stats=new Statistics();
 		this.panicException=null;
+		this.taskStats = new Hashtable<T, TaskStats>();
 	}
 	
 	public synchronized T getResult() throws PanicException{
@@ -88,6 +90,9 @@ public class Skernel<T> implements Serializable{
 		}
 			
 		Task<T> resultTask=results.remove(0);
+		
+		taskStats.put(resultTask.getObject(),resultTask.getStats());
+		
 		if(resultTask.hasException()){
 			//Only runtime exception can be found here
 			throw (RuntimeException)resultTask.getException(); 
@@ -305,6 +310,10 @@ public class Skernel<T> implements Serializable{
 	public synchronized Statistics getStats(){
 		stats.setReadyQueueLength(ready.size());
 		return stats;
+	}
+	
+	public synchronized TaskStats getStats(T param){
+		return taskStats.get(param);
 	}
 	
 	private void deleteTaskFamilyFromQueues(Task<T> blackSheepTask){

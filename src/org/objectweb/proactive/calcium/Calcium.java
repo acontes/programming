@@ -97,6 +97,7 @@ public class Calcium<T>{
 		if(skernel.isFinished()){
 			manager.finish();
 		}
+		
 		return res;
 	}
 	
@@ -106,5 +107,9 @@ public class Calcium<T>{
 
 	public Statistics getStats(){
 		return skernel.getStats();
+	}
+	
+	public TaskStats getStats(T param){
+		return skernel.getStats(param);
 	}
 }

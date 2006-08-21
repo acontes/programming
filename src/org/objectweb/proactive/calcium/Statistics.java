@@ -83,17 +83,18 @@ public class Statistics implements java.io.Serializable{
 	
 	public synchronized void increaseSolvedTasks(Task<?> task){
 		solvedNumberTasks++;
-		computationTime+=task.getComputationTime();
+		TaskStats taskStats=task.getStats();
+		computationTime+=taskStats.getComputationTime();
 
 		if(task.isRootTask()){
 			solvedRootTasks++;
 			
-			maxWallTime = Math.max(maxWallTime, task.getWallTime());
-			minWallTime = Math.min(minWallTime, task.getWallTime());
+			maxWallTime = Math.max(maxWallTime, taskStats.getWallTime());
+			minWallTime = Math.min(minWallTime, taskStats.getWallTime());
 		}
 		
-		maxCompTime = Math.max(maxCompTime, task.getComputationTime());
-		minCompTime = Math.min(minCompTime, task.getComputationTime());
+		maxCompTime = Math.max(maxCompTime, taskStats.getComputationTime());
+		minCompTime = Math.min(minCompTime, taskStats.getComputationTime());
 	}
 
 	public long getComputationTime(){

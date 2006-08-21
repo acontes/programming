@@ -63,12 +63,12 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	private T object;
 	private int id;
 	private int priority; //higher number, higher priority
+	private boolean isTainted;
+	private boolean isDummy;
+	private TaskStats stats;
+	
 	//The program stack. Higher indexed elements are served first (LIFO).
 	private Vector<Instruction<T>> stack;
-	private boolean isDummy;
-	private boolean isTainted;
-	private long computationTime; //accumulated of computation time used for this task
-	private long initTime, finitTime;
 	
 	/*
 	 * Children (sub task) state queues (not preserved by Rebirth)
@@ -91,9 +91,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		this.familyId=familyId;
 		
 		isDummy=false;
-		computationTime=0;
-		initTime=System.currentTimeMillis();
-		finitTime=0;
+		stats = new TaskStats();
 		stack=new Vector<Instruction<T>>();
 		
 		childrenReady=new Vector<Task<T>>();
@@ -119,10 +117,12 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	public Task<T> reBirth(T object){
 		Task<T> newMe = new Task<T>(object,id, priority,parentId, familyId);
 		newMe.setStack(this.stack);
-		newMe.computationTime=this.computationTime;
+		
 		newMe.isDummy=this.isDummy;
 		newMe.isTainted=this.isTainted;
-		newMe.initTime=this.initTime;
+		
+		newMe.stats=this.stats;
+		
 		return newMe;
 	}
 	
@@ -329,21 +329,6 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		return this.familyId==this.id;
 	}
 	
-	public void addComputationTime(long time){
-		computationTime+=time;
-	}
-	
-	public long getComputationTime(){
-		return computationTime;
-	}
-	
-	public long getWallTime(){
-		if(finitTime==0){
-			return System.currentTimeMillis()-initTime;
-		}
-		return finitTime-initTime;
-	}
-	
 	@Override
 	public String toString(){
 		return this.familyId+"/"+parentId+"."+this.id;
@@ -397,6 +382,10 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	}
 	
 	public void markFinishTime(){
-		finitTime=System.currentTimeMillis();
+		stats.markFinishTime();
+	}
+	
+	public TaskStats getStats(){
+		return stats;
 	}
 }

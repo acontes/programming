@@ -98,13 +98,13 @@ public class Interpreter implements Serializable {
 			
 			//If child tasks are present, that's all folks (for now)
 			if(task.hasReadyChildTask()){
-				task.addComputationTime(getCurrenTime()-init);
+				task.getStats().addComputationTime(getCurrenTime()-init);
 				return task;
 			}
 		}//while
 
 		//The task is finished
-		task.addComputationTime(getCurrenTime()-init);
+		task.getStats().addComputationTime(getCurrenTime()-init);
 		return task;
 	}
 	

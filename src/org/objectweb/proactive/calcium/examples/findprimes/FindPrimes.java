@@ -84,6 +84,8 @@ public class FindPrimes implements Serializable{
 					System.out.print(i+" ");
 				}
 				System.out.println();
+				
+				System.out.println(calcium.getStats(res));
 			}
 		} catch (ParameterException e) {
 			e.printStackTrace();
