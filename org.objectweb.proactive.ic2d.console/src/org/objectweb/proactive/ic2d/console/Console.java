@@ -31,17 +31,21 @@
 
 package org.objectweb.proactive.ic2d.console;
 
-import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
+import org.apache.log4j.WriterAppender;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Used to log informations in a console view.
@@ -94,19 +98,28 @@ public class Console extends MessageConsole {
 		
 		
 		// Add the standard output and standard error output stream to the Console.
-		MessageConsole console = new MessageConsole("System output", null);
-		
-		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
-				new IConsole[] { console });
-		
-		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(
-		console);
-		
-		MessageConsoleStream stream = console.newMessageStream();
-		System.setOut(new PrintStream(stream));
-		System.setErr(new PrintStream(stream));
+//		MessageConsole console = new MessageConsole("System output", null);
+//		
+//		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(
+//		console);
+//		
+//		MessageConsoleStream stream = console.newMessageStream();
+//		System.setOut(new PrintStream(stream));
+//		System.setErr(new PrintStream(stream));
 
 		
+		// log4j output in the console
+		MessageConsole log4jConsole = new MessageConsole("log4j", null);
+		
+		MessageConsoleStream log4jStream = log4jConsole.newMessageStream();
+		
+		Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
+		WriterAppender app = new WriterAppender(new SimpleLayout(), log4jStream);
+		logger.addAppender(app);
+		
+		
+		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
+				new IConsole[] { /*console,*/ log4jConsole });
 	}
 
 	//
