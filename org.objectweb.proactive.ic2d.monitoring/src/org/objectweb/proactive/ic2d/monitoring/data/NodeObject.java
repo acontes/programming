@@ -170,6 +170,13 @@ public class NodeObject extends AbstractDataObject{
 	public void setSpyUpdateFrequence(long updateFrequence) {
 		spy.setUpdateFrequence(updateFrequence);
 	}
+	
+	@Override
+	public void stopMonitoring() {
+		destroySpy();
+		super.stopMonitoring();
+	}
+	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
@@ -192,7 +199,15 @@ public class NodeObject extends AbstractDataObject{
 		}
 	}
 
-	
+	/**
+	 * Destroys the spy of node.
+	 */
+	protected synchronized void destroySpy(){
+		this.spy.terminate();
+		this.activeSpyListener.terminate();
+		this.spy = null;
+		this.activeSpyListener = null;
+	}
 	
 	@Override
 	protected void foundForTheFirstTime() {
@@ -212,7 +227,6 @@ public class NodeObject extends AbstractDataObject{
 		try {
 			vnName = getTypedParent().getRuntime().getVNName(node.getNodeInformation().getName());
 		} catch (ProActiveException e) {
-			// TODO Auto-generated catch block
 			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 			e.printStackTrace();
 		}
