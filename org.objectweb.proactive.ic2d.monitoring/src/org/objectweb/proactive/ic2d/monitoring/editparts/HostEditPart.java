@@ -69,12 +69,13 @@ public class HostEditPart extends AbstractIC2DEditPart {
 	@Override
 	public void update(Observable o, Object arg) {
 		final Object param = arg;
-		final HostEditPart hostEditPart = this;
+//		final HostEditPart hostEditPart = this;
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
 				if(param instanceof State && (State)param == State.NOT_MONITORED) {
-					((AbstractIC2DEditPart)getParent()).removeChildVisual(hostEditPart);
+					deactivate();
+//					((AbstractIC2DEditPart)getParent()).removeChildVisual(hostEditPart);
 				}
 				refreshChildren();
 				refreshVisuals();		

@@ -73,12 +73,13 @@ public class NodeEditPart extends AbstractIC2DEditPart{
 	 */
 	public void update(Observable o, Object arg) {
 		final Object param = arg;
-		final NodeEditPart nodeEditPart = this;
+//		final NodeEditPart nodeEditPart = this;
 		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
 				if(param instanceof State && (State)param == State.NOT_MONITORED) {
-					((AbstractIC2DEditPart)getParent()).removeChildVisual(nodeEditPart);
+					deactivate();
+//					((AbstractIC2DEditPart)getParent()).removeChildVisual(nodeEditPart);
 				}
 				((NodeFigure)getFigure()).setHighlight(VirtualNodesGroup.getInstance().getColor(((NodeObject)getModel()).getVNParent()));
 				refreshChildren();

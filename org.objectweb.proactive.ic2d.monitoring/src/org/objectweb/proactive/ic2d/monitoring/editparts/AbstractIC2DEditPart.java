@@ -3,6 +3,7 @@ package org.objectweb.proactive.ic2d.monitoring.editparts;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
@@ -42,8 +43,11 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 	 * tree, the method deactivate() is called.
 	 */
 	public void deactivate(){
-		if (isActive())
+		if (isActive()) {
 			((AbstractDataObject)getModel()).deleteObserver(this);
+			((Figure)getFigure()).removeAll();
+			getFigure().getParent().remove(getFigure());
+		}
 		super.deactivate();
 	}
 
