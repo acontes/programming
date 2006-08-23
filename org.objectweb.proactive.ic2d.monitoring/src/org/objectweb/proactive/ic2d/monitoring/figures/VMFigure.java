@@ -143,7 +143,7 @@ public class VMFigure extends AbstractRectangleFigure{
 		
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
 			if(legend)
-				return super.calculatePreferredSize(container, wHint, hHint).expand(90, 5);
+				return super.calculatePreferredSize(container, wHint, hHint).expand(/*90*/50, /*5*/0);
 			
 			return super.calculatePreferredSize(container, wHint, hHint).expand(5,0);
 		}
