@@ -40,6 +40,9 @@ import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
+	public final static boolean DEFAULT_IS_MONITORING = true;
+	private static boolean isMonitoring = DEFAULT_IS_MONITORING;
+	
 	private NodeObject nodeObject;
 
 	public SpyEventListenerImpl(){
@@ -50,6 +53,14 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		this.nodeObject = nodeObject;
 	}
 
+	public static void SetMonitoring(boolean monitoring){
+		isMonitoring = monitoring;
+	}
+	
+	public static boolean isMonitoring(){
+		return isMonitoring;
+	}
+	
 	public void activeObjectAdded(UniqueID id, String nodeURL, String classname, boolean isActive) {
 		// TODO Auto-generated method stub
 		//System.out.println("# SpyEventListener : activeObjectAdded ,id="+getName(id));
@@ -62,6 +73,8 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	public void objectWaitingForRequest(UniqueID id, SpyEvent spyEvent) {
 		//System.out.println("# SpyEventListener : objectWaitingForRequest ,id="+getName(id));
+		if(!isMonitoring)
+			return;
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;
@@ -71,6 +84,8 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	public void objectWaitingByNecessity(UniqueID id, SpyEvent spyEvent) {
 		//System.out.println("# SpyEventListener : objectWaitingBynecessity ,id="+getName(id));
+		if(!isMonitoring)
+			return;
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;
@@ -81,6 +96,8 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	public void objectReceivedFutureResult(UniqueID id, SpyEvent spyEvent) {
 		//System.out.println("# SpyEventListener : objectReceveidFutureResult ,id="+getName(id));
+		if(!isMonitoring)
+			return;
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;
@@ -96,10 +113,14 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	public void requestMessageSent(UniqueID id, SpyEvent spyEvent) {
 		//System.out.println("# SpyEventListener : requestMessageSent ,id="+getName(id));
+		if(!isMonitoring)
+			return;
 	}
 
 	public void replyMessageSent(UniqueID id, SpyEvent spyEvent) {
 		//System.out.println("# SpyEventListener : replyMessageSent ,id="+getName(id));
+		if(!isMonitoring)
+			return;
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;
@@ -109,6 +130,8 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	public void requestMessageReceived(UniqueID id, SpyEvent spyEvent) {
 		//System.out.println("# SpyEventListener : requestMessageReceived ,id="+getName(id));
+		if(!isMonitoring)
+			return;
 		AOObject destination = nodeObject.findActiveObjectById(id);
 		if(destination == null)
 			return;
@@ -134,12 +157,16 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 	}
 
 	public void replyMessageReceived(UniqueID id, SpyEvent spyEvent) {
+		if(!isMonitoring)
+			return;
 		// TODO Auto-generated method stub
 		//System.out.println("# SpyEventListener : replyMessageReceived ,id="+getName(id));
 	}
 
 	public void voidRequestServed(UniqueID id, SpyEvent spyEvent) {
 		//System.out.println("# SpyEventListener :  voidRequestServed ,id="+getName(id));
+		if(!isMonitoring)
+			return;
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;
@@ -148,12 +175,16 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 	}
 
 	public void allEventsProcessed() {
+		if(!isMonitoring)
+			return;
 		// TODO Auto-generated method stub
 		//System.out.println("# SpyEventListener : allEventsProcessed");
 	}
 
 	public void servingStarted(UniqueID id, SpyEvent spyEvent) {
 		//System.out.println("# SpyEventListener : servingStarted ,id="+getName(id));
+		if(!isMonitoring)
+			return;
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;

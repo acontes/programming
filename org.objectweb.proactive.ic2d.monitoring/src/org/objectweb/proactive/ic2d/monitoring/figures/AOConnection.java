@@ -37,13 +37,14 @@ import java.util.List;
 import org.eclipse.draw2d.BendpointConnectionRouter;
 import org.eclipse.draw2d.Connection;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RelativeBendpoint;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 public class AOConnection {
-
+	
 	/**
 	 * Symbolizes connections in waitings. The source object awaits the target object.
 	 */
@@ -57,7 +58,7 @@ public class AOConnection {
 	/**
 	 * Established connections.
 	 */
-	private static Hashtable<String, String> connections = new Hashtable<String, String>();
+	private static Hashtable<String, RoundedLineConnection> connections = new Hashtable<String, RoundedLineConnection>();
 	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
@@ -112,19 +113,21 @@ public class AOConnection {
 	 * @param targetID The target ID.
 	 */
 	public static void connect(IFigure panel, AOFigure source, AOFigure target, String sourceID, String targetID){
-		
+		RoundedLineConnection connection = null;
+		//PolylineConnection connection = new PolylineConnection();
 		synchronized (connections) {
-			String targetUsed = connections.get(sourceID+"#"+targetID);
+			connection = connections.get(sourceID+"#"+targetID);
+			//String targetUsed = .getTargetName();
 			// If a connection already exists
-			if(targetUsed != null && targetUsed.compareTo(targetID)==0)
+			if(connection != null){
+				connection.addOneCommunication();
 				return;
+			}
 			// Store a new connection in the Hashtable [sourceID#targetID, targetID]
 			// We used "sourceID#targetID" for the key, because a source can have several targets
-			connections.put(sourceID+"#"+targetID, targetID);
-		}	
-			
-		RoundedLineConnection connection = new RoundedLineConnection();
-		//PolylineConnection connection = new PolylineConnection();
+			connection = new RoundedLineConnection();
+			connections.put(sourceID+"#"+targetID, connection);
+		}
 
 		Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width/2, source.getBounds().height/2);
 		Point targetCenter = target.getLocation().getTranslated(target.getBounds().width/2, target.getBounds().height/2);

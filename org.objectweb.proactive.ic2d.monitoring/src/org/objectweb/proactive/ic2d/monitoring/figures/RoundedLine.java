@@ -44,6 +44,50 @@ import org.eclipse.swt.widgets.Display;
  */
 public class RoundedLine extends Polyline {
 
+	public static final DrawingStyle DEFAULT_STYLE = DrawingStyle.FILAIRE;
+	public static final boolean DEFAULT_DISPLAY_TOPOLOGY = true;
+	
+    private static final int MAX_STROKE_WIDTH_RATIO = 12;
+    private static final int MAX_STROKE_WIDTH_PROPORTIONAL = 80;
+    
+    private float communicationCounter = 1;
+    private static float maxCommunicationCounter = 1;
+    
+	private static DrawingStyle drawingStyle = DEFAULT_STYLE;;
+	private static boolean displayTopology = DEFAULT_DISPLAY_TOPOLOGY;
+	
+	//
+	// -- PUBLIC METHODS -------------------------------------------
+	//
+	
+	/**
+	 * Change the drawing style
+	 */
+	public static void setDrawingStyle(DrawingStyle newDrawingStyle) {
+		drawingStyle = newDrawingStyle;
+	}
+	
+	/**
+	 * To choose if you want to show the topology.
+	 */
+	public static void setDisplayTopology(boolean show){
+		displayTopology = show;
+	}
+	
+	public void addOneCommunication(){
+		communicationCounter++;
+		if(communicationCounter > maxCommunicationCounter)
+			maxCommunicationCounter = communicationCounter;
+		if(drawingStyle!=DrawingStyle.FILAIRE)
+			getParent().repaint();
+	}
+	
+	/**
+	 * Indicates if the topology must be displayed.
+	 */
+	public static boolean displayTopology(){
+		return displayTopology;
+	}
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
@@ -53,21 +97,37 @@ public class RoundedLine extends Polyline {
 	 */
 	@Override
 	protected void outlineShape(Graphics g) {
+		if(!displayTopology)
+			return;
 		PointList pointList = getPoints();
 		Point source = pointList.getFirstPoint();
 		Point target = pointList.getLastPoint();
 
-		//setLineWidth(2);
 		setForegroundColor(new Color(Display.getCurrent(), 108, 108, 116));
 		setLineStyle(Graphics.LINE_SOLID);
 
 		drawArc(g, source, target);
 	}
 
+	protected int drawingStyleSize(){       
+		switch (drawingStyle) {
+		case FILAIRE:
+			return 1;
+		case PROPORTIONAL:
+			if (maxCommunicationCounter > MAX_STROKE_WIDTH_PROPORTIONAL)
+				return (int) ((MAX_STROKE_WIDTH_PROPORTIONAL / maxCommunicationCounter)*communicationCounter+1);
+			else
+				return (int) (communicationCounter + 1);
+		case RATIO:
+			return (int) ((MAX_STROKE_WIDTH_RATIO / maxCommunicationCounter)*communicationCounter+1);
+		}
+		return 1;
+	}
+	
 	//
 	// -- PRIVATED METHODS -------------------------------------------
 	//
-	
+
 	/**
 	 * Draw an arc between the source and the target
 	 * @param g The graphics
@@ -76,9 +136,11 @@ public class RoundedLine extends Polyline {
 	 */
 	private void drawArc(Graphics g, Point source, Point target){
 		
+		g.setLineWidth(drawingStyleSize());
+		
 		// Sets the anti-aliasing
 		g.setAntialias(SWT.ON);
-		
+
 		int xSource = source.x;
 		int ySource = source.y;
 
@@ -111,5 +173,14 @@ public class RoundedLine extends Polyline {
 				g.drawLine(source, target);
 			}
 		}
+	}
+		
+	/**
+	 * Represents the different types of drawing
+	 */
+	public enum DrawingStyle {
+		PROPORTIONAL,
+		RATIO,
+		FILAIRE,
 	}
 }

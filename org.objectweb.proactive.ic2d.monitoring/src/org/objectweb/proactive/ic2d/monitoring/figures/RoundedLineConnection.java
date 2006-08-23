@@ -55,6 +55,10 @@ import org.eclipse.swt.widgets.Display;
  */
 public class RoundedLineConnection extends RoundedLine implements Connection, AnchorListener {
 
+	// Use to display the topology
+	private boolean oldState;
+	private ConnectionAnchor endAnchorSave;
+	
 	/**
 	 * The connection anchors
 	 */
@@ -74,7 +78,7 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
 	 * Decorates connection with an arrow.
 	 */
 	private RotatableDecoration targetDecoration;
-
+	
 	{
 		setLayoutManager(new DelegatingLayout());
 		addPoint(new Point(0, 0));
@@ -87,10 +91,10 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
 	
 	public RoundedLineConnection(){
 		super();
-		setTargetDecoration(getTargetDecoration());
 		targetDecoration = initDecoration();
 		setTargetDecoration(targetDecoration);
-		setLineWidth(1);
+		this.oldState = RoundedLine.DEFAULT_DISPLAY_TOPOLOGY;
+		setLineWidth(drawingStyleSize());
 		setForegroundColor(new Color(Display.getCurrent(), 108, 108, 116));
 		setLineStyle(Graphics.LINE_SOLID);
 	}
@@ -98,6 +102,30 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
+	
+	/**
+	 * @see Shape#outlineShape(Graphics)
+	 */
+	@Override
+	protected void outlineShape(Graphics g) {
+		super.outlineShape(g);
+		if(RoundedLine.displayTopology() == oldState){
+			return;
+		}
+		else{
+			oldState = RoundedLine.displayTopology();
+			if(oldState){
+				endAnchor = endAnchorSave;
+				add(endArrow);
+			}
+			else{
+				endAnchor = null;
+				remove(endArrow);
+			}
+			this.repaint();
+		}
+	}
+	
 	
 	/**
 	 * Hooks the source and target anchors.
@@ -285,6 +313,8 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
 		//No longer needed, revalidate does this.
 		//getConnectionRouter().invalidate(this);
 		endAnchor = anchor;
+		if(endAnchor!=null)
+			endAnchorSave = endAnchor;
 		if (getParent() != null)
 			hookTargetAnchor();
 		revalidate();
