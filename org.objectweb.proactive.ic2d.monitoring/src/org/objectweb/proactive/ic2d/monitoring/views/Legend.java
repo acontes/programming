@@ -77,6 +77,7 @@ public class Legend extends ViewPart {
 
 		Group aoDef = new Group(child, 0);
 		GridLayout aoLayout = new GridLayout();
+		aoLayout.verticalSpacing = 2;
 		aoLayout.numColumns = 2;
 		aoDef.setLayout(aoLayout);
 		aoDef.setText("Active objects");
@@ -202,6 +203,7 @@ public class Legend extends ViewPart {
 		Group nodeDef = new Group(child, 0);
 		GridLayout nodeLayout = new GridLayout();
 		nodeLayout.numColumns = 2;
+		nodeLayout.verticalSpacing = 0;
 		nodeDef.setLayout(nodeLayout);
 		nodeDef.setText("Nodes");
 		FormData nodeDefFormData = new FormData();
@@ -247,6 +249,7 @@ public class Legend extends ViewPart {
 		Group jvmDef = new Group(child, 0);
 		GridLayout jvmLayout = new GridLayout();
 		jvmLayout.numColumns = 2;
+		jvmLayout.verticalSpacing = 0;
 		jvmDef.setLayout(jvmLayout);
 		jvmDef.setText("JVMs");
 		FormData jvmDefFormData = new FormData();
@@ -294,12 +297,13 @@ public class Legend extends ViewPart {
 		Label hostText = new Label(hostDef, 0);
 		hostText.setText("Standard Host");
 
-		/*--------- Hosts ---------*/
+		/*--------- Not Responding ---------*/
 
 		Group noRespondingDef = new Group(child, 0);
 		GridLayout noRespondingLayout = new GridLayout();
 		noRespondingLayout.numColumns = 2;
-		noRespondingDef.setLayout(nodeLayout);
+		noRespondingLayout.verticalSpacing = 5;
+		noRespondingDef.setLayout(noRespondingLayout);
 		noRespondingDef.setText("Not Responding");	
 		FormData noRespondingDefFormData = new FormData();
 		noRespondingDefFormData.top = new FormAttachment(hostDef, 0);
