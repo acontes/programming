@@ -40,6 +40,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -99,6 +100,7 @@ public class NodeObject extends AbstractDataObject{
 	//
 	// -- PUBLIC METHOD -----------------------------------------------
 	//
+	
 	/**
 	 * Explores itself, in order to find all active objects known by this one
 	 */
@@ -135,6 +137,7 @@ public class NodeObject extends AbstractDataObject{
 		return ((HostObject)this.parent.parent).getProtocol();
 	}
 
+	@Override
 	public String toString() {
 		return this.getKey();
 	}
@@ -175,6 +178,16 @@ public class NodeObject extends AbstractDataObject{
 	public void stopMonitoring() {
 		destroySpy();
 		super.stopMonitoring();
+	}
+	
+	public void migrateTo(UniqueID activeObjectID, String nodeTargetURL) throws MigrationException {
+		try {
+            spy.migrateTo(activeObjectID, nodeTargetURL);
+        } catch (MigrationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MigrationException("Problem contacting the Spy", e);
+        }
 	}
 	
 	//

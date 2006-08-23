@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 import java.util.Comparator;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
@@ -154,7 +155,7 @@ public class AOObject extends AbstractDataObject{
 		return "ao";
 	}
 
-	
+
 	/**
 	 * 
 	 * @param length
@@ -167,16 +168,30 @@ public class AOObject extends AbstractDataObject{
 			this.notifyObservers(new Integer(length));
 		}
 	}
-	
-	
+
+
 	/**
 	 * Returns the request queue length
 	 * @return the request queue lenght
 	 * @see #setRequestQueueLength(int)
 	 */
 	public int getRequestQueueLength() {
-        return requestQueueLength;
-    }
+		return requestQueueLength;
+	}
+
+	public boolean migrateTo(String nodeTargetURL) {
+		Console console =  Console.getInstance(Activator.CONSOLE_NAME);
+		try {
+			((NodeObject)getParent()).migrateTo(id, nodeTargetURL);
+			console.log("Successfully migrated " +
+					fullName + " to " + nodeTargetURL);
+			return true;
+		} catch (MigrationException e) {
+			console.err("Couldn't migrate " + fullName + " to " + nodeTargetURL);
+			console.logException(e);
+			return false;
+		}
+	}
 
 	//
 	// -- PROTECTED METHODS ---------------------------------------------
