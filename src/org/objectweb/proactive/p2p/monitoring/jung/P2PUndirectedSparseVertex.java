@@ -5,18 +5,19 @@ import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
 public class P2PUndirectedSparseVertex extends UndirectedSparseVertex {
 
 	protected int noa;
-	protected int maxNOA;
+	protected int maxNoa;
+	protected String name;
 	
 	public P2PUndirectedSparseVertex() {
 		super();
 	}
 
-	public int getMaxNOA() {
-		return maxNOA;
+	public int getMaxNoa() {
+		return maxNoa;
 	}
 
-	public void setMaxNOA(int maxNOA) {
-		this.maxNOA = maxNOA;
+	public void setMaxNoa(int maxNOA) {
+		this.maxNoa = maxNOA;
 	}
 
 	public int getNoa() {
@@ -27,6 +28,13 @@ public class P2PUndirectedSparseVertex extends UndirectedSparseVertex {
 		this.noa = noa;
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
 	
 
 

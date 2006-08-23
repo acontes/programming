@@ -318,7 +318,7 @@ public class TestGUI extends JFrame implements ActionListener, ChangeListener{
     application.setVisible(true);
     Dumper d = new Dumper();
     
-    d.createGraphFromFile2(args[0]);
+    d.createGraphFromFile(args[0]);
 		//application.show();
 	}
 
