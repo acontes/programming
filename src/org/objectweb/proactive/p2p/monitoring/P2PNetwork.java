@@ -14,9 +14,7 @@ import org.objectweb.proactive.p2p.monitoring.event.P2PNetworkListener;
  * @author fhuet
  */
 public class P2PNetwork {
-	
-	protected ArrayList<P2PNetworkListener> listeners = new ArrayList<P2PNetworkListener>();
-	
+    protected ArrayList<P2PNetworkListener> listeners = new ArrayList<P2PNetworkListener>();
     protected HashMap<String, P2PNode> senders = new HashMap<String, P2PNode>();
     protected HashMap<String, Link> links = new HashMap<String, Link>();
     protected String name;
@@ -36,20 +34,16 @@ public class P2PNetwork {
     }
 
     protected void addAsSender(P2PNode p) {
-    	this.notifyListenersNewPeer(p);
-    	senders.put(p.getName(),p);
+        this.notifyListenersNewPeer(p);
+        senders.put(p.getName(), p);
     }
-    
+
     protected void addAsSender(AcquaintanceInfo i) {
         String s = i.getSender();
         P2PNode tmp = senders.get(s);
         if ((tmp == null) || (tmp.getIndex() == -1)) {
-//if (tmp != null) {
-//	System.out.println("P2PNetwork.addAsSender() ------------  " + tmp.getIndex());
-//}
-//            senders.put(s,
-//                new P2PNode(s, index++, i.getCurrentNoa(), i.getNoa()));
-            this.addAsSender(new P2PNode(s, index++, i.getCurrentNoa(), i.getNoa()));
+            this.addAsSender(new P2PNode(s, index++, i.getCurrentNoa(),
+                    i.getNoa()));
         } else {
             if (tmp != null) {
                 tmp.setMaxNOA(i.getNoa());
@@ -64,39 +58,38 @@ public class P2PNetwork {
         }
     }
 
-        public void addAsSender(String s, int noa, int maxNoa) {
-            P2PNode p = senders.get(s);
-            if (p == null) {
-                p = new P2PNode(s);
-                p.setNoa(noa);
-                p.setMaxNOA(maxNoa);
-                this.addAsSender(p);
-            } else {
-                p.setNoa(noa);
-                p.setMaxNOA(maxNoa);
-            }
+    public void addAsSender(String s, int noa, int maxNoa) {
+        P2PNode p = senders.get(s);
+        if (p == null) {
+            p = new P2PNode(s);
+            p.setNoa(noa);
+            p.setMaxNOA(maxNoa);
+            this.addAsSender(p);
+        } else {
+            p.setNoa(noa);
+            p.setMaxNOA(maxNoa);
         }
-    
+    }
 
-        /**
-         * our links are considered bi-directional
-         * ie a->b and b->a will be a a<->b link
-         * so we switch source/destination based on lexical order
-         * @param source
-         * @param dest
-         */
+    /**
+     * our links are considered bi-directional
+     * ie a->b and b->a will be a a<->b link
+     * so we switch source/destination based on lexical order
+     * @param source
+     * @param dest
+     */
     public void addLink(String source, String dest) {
         Link l = null;
         Link previousValue = null;
         if (source.compareTo(dest) <= 0) {
-        	l = new Link(source, dest);
+            l = new Link(source, dest);
             previousValue = links.put(source + dest, l);
         } else {
-        	l = new Link(dest, source);
-            previousValue =links.put(dest + source, l);
+            l = new Link(dest, source);
+            previousValue = links.put(dest + source, l);
         }
         if (previousValue == null) {
-        	this.notifyListenersNewLink(l);    
+            this.notifyListenersNewLink(l);
         }
     }
 
@@ -107,27 +100,26 @@ public class P2PNetwork {
     public HashMap<String, P2PNode> getSenders() {
         return this.senders;
     }
-    
-    
-    
+
     public void addListener(P2PNetworkListener l) {
-       listeners.add(l);	
+        listeners.add(l);
     }
-    
-    
+
     protected void notifyListenersNewPeer(P2PNode node) {
-    	Iterator it = listeners.iterator();
-    	while (it.hasNext()) {
-			P2PNetworkListener element = (P2PNetworkListener) it.next();
-			element.newPeer(node);
-		}	
+        Iterator it = listeners.iterator();
+        System.out.println("P2PNetwork.notifyListenersNewPeer() " + node);
+        while (it.hasNext()) {
+        	System.out.println("            P2PNetwork.notifyListenersNewPeer() ");
+            P2PNetworkListener element = (P2PNetworkListener) it.next();
+            element.newPeer(node);
+        }
     }
+
     protected void notifyListenersNewLink(Link l) {
-    	Iterator it = listeners.iterator();
-    	while (it.hasNext()) {
-			P2PNetworkListener element = (P2PNetworkListener) it.next();
-			element.newLink(l);
-		}	
+        Iterator it = listeners.iterator();
+        while (it.hasNext()) {
+            P2PNetworkListener element = (P2PNetworkListener) it.next();
+            element.newLink(l);
+        }
     }
-    
 }
