@@ -135,7 +135,7 @@ public class HostFigure extends AbstractRectangleFigure{
 
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
 			if(legend)
-				return super.calculatePreferredSize(container, wHint, hHint).expand(100, 10);
+				return super.calculatePreferredSize(container, wHint, hHint).expand(/*100*/50, /*10*/0);
 
 			return super.calculatePreferredSize(container, wHint, hHint).expand(10,0);
 		}

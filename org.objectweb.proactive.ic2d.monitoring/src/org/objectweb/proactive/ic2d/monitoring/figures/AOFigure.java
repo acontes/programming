@@ -275,7 +275,8 @@ public class AOFigure extends AbstractFigure {
 
 		@Override
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
-			//return super.calculatePreferredSize(container, wHint, hHint).expand(15, 15);
+			if(legend)
+				return new Dimension(50, super.calculatePreferredSize(container, wHint, hHint).expand(0, 8).height);
 			return new Dimension(100,super.calculatePreferredSize(container, wHint, hHint).expand(0, 15).height);
 		}
 	}
