@@ -65,7 +65,19 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 
 	public void run(IAction action) {
 		IWorkbenchPage page = window.getActivePage();
+		if(page==null)
+			return;
 		IEditorPart editorPart = page.getActiveEditor();
+		
+		boolean wasDirty = editorPart.isDirty();
+		// Ask to the user, if he wants save his file (if it is not already saved).
+		// If the user chooses 'cancel', we don't run the xml file
+		boolean succeeded = page.saveEditor(editorPart, true);
+		if(!succeeded)
+			return;
+		if(wasDirty && !editorPart.isDirty())
+			Console.getInstance(Activator.CONSOLE_NAME).log("File saved");
+		
 		if (!(editorPart instanceof XMLEditor))
 			return;
 		XMLEditor editor = (XMLEditor) editorPart; 
@@ -73,8 +85,7 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 			Console.getInstance(Activator.CONSOLE_NAME).log("Editor is null");
 		else{
 			PathEditorInput input = (PathEditorInput) editor.getEditorInput();
-			String path = input.getPath().toString();
-			Console.getInstance(Activator.CONSOLE_NAME).log(path);
+			final String path = input.getPath().toString();
 
 			Launcher launcher = null;
 
@@ -93,6 +104,7 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 						public void run () {
 							try {
 								l.activate();
+								Console.getInstance(Activator.CONSOLE_NAME).log(path+" - activated");
 							} catch (Exception e) {
 								Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 							}
