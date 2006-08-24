@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -103,6 +104,21 @@ public class HostObject extends AbstractDataObject {
 		if(monitoredChildren.size() == 0) { //we didn't find any child
 			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+getKey());
 		}
+	}
+	
+	@Override
+	public void stopMonitoring() {
+		Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
+		((WorldObject)(this.parent)).removeChild(this);
+		
+		setChanged();
+		notifyObservers(State.NOT_MONITORED);
+		
+		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
+        while (iterator.hasNext()) {
+        	 AbstractDataObject child = iterator.next();
+        	 child.stopMonitoring();
+        }
 	}
 	
 	@Override

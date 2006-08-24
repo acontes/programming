@@ -127,11 +127,11 @@ public class WorldObject extends AbstractDataObject {
 	protected void removeChild(HostObject host) {
 		monitoredChildren.remove(host.getKey());
 		setChanged();
-		/*if(monitoredChildren.size() == 0)
-			notifyObservers("removeChild");*/
+		if(monitoredChildren.size() == 0)
+			notifyObservers("removeChild");
 		notifyObservers();
 	}
-
+	
 	protected VNObject getVirtualNode(String name) {
 		VNObject virtualNode = vnChildren.get(name);
 		if(virtualNode == null){

@@ -134,12 +134,16 @@ public class MonitorThread implements Observer {
 
 	protected void startRefreshing() {
 		refresh = true;
+		if(refresher.getState()==Thread.State.TERMINATED){
+			refresher = new Thread(new Refresher());
+		}
 		refresher.start();
 	}
 
 
 	protected void stopRefreshing() {
 		refresh = false;
+		refresher.interrupt();
 	}
 	
 	//
