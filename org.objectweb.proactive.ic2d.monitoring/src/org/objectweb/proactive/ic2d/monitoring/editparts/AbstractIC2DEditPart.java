@@ -46,7 +46,8 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 		if (isActive()) {
 			((AbstractDataObject)getModel()).deleteObserver(this);
 			((Figure)getFigure()).removeAll();
-			getFigure().getParent().remove(getFigure());
+			if(getFigure().getParent() != null)
+				getFigure().getParent().remove(getFigure());
 		}
 		super.deactivate();
 	}
