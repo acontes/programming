@@ -93,6 +93,12 @@ public abstract class AbstractDataObject extends Observable {
 		this.parent.skippedChildren.put(getKey(), this);
 		setChanged();
 		notifyObservers(State.NOT_MONITORED);
+		
+		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
+        while (iterator.hasNext()) {
+        	 AbstractDataObject child = iterator.next();
+        	 child.stopMonitoring();
+        }
 	}
 
 	/**
