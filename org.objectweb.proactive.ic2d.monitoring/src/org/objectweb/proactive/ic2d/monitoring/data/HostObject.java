@@ -48,47 +48,47 @@ import org.objectweb.proactive.ic2d.monitoring.finder.HostRTFinderFactory;
  */
 public class HostObject extends AbstractDataObject {
 
-    /** Name of this Host */
-    private String hostname;
-    
-    /** Number of the port */
-    private int port;
-    
-    /** Name of Operating System */
-    private String os = "OS undefined";
-	
-    /** Host's protocol */
-    private Protocol protocol;
-    
+	/** Name of this Host */
+	private String hostname;
+
+	/** Number of the port */
+	private int port;
+
+	/** Name of Operating System */
+	private String os = "OS undefined";
+
+	/** Host's protocol */
+	private Protocol protocol;
+
 	//
-    // -- CONSTRUCTORS -----------------------------------------------
-    //
-    
-    /**
-     * Creates a new HostObject
-     * @parent hostname machine's name
-     * @param port
-     * @param protocol to use
-     * @throws HostAlreadyExistsException 
-     */
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
+
+	/**
+	 * Creates a new HostObject
+	 * @parent hostname machine's name
+	 * @param port
+	 * @param protocol to use
+	 * @throws HostAlreadyExistsException 
+	 */
 	public HostObject(String hostname, int port, Protocol protocol) throws HostAlreadyExistsException{
 		super(WorldObject.getInstance());
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
-		
+
 		HostObject hostAlreadyExists = (HostObject) this.parent.monitoredChildren.get(this.getKey());
 		if(hostAlreadyExists != null)
 			throw new HostAlreadyExistsException(hostAlreadyExists);
-		
+
 		this.parent.putChild(this);
 	}
-	
-    //
-    // -- PUBLIC METHODS -----------------------------------------------
-    //
 
-	
+	//
+	// -- PUBLIC METHODS -----------------------------------------------
+	//
+
+
 	/**
 	 * Explores the host, in order to find all VMs known by this one.
 	 */
@@ -105,55 +105,56 @@ public class HostObject extends AbstractDataObject {
 			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+getKey());
 		}
 	}
-	
+
 	@Override
-	public void stopMonitoring() {
-		Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
+	public void stopMonitoring(boolean log) {
+		if(log)
+			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
 		((WorldObject)(this.parent)).removeChild(this);
-		
+
 		setChanged();
 		notifyObservers(State.NOT_MONITORED);
-		
+
 		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
-        while (iterator.hasNext()) {
-        	 AbstractDataObject child = iterator.next();
-        	 child.stopMonitoring();
-        }
+		while (iterator.hasNext()) {
+			AbstractDataObject child = iterator.next();
+			child.stopMonitoring(false);
+		}
 	}
-	
+
 	@Override
 	public String getKey() {
 		return hostname+":"+port;
 	}
-	
+
 	@Override
 	public String getFullName(){
 		return hostname+":"+port+":"+os;
 	}
-	
-	
+
+
 	/**
 	 * @return Name of this Host
 	 */
 	public String getHostName(){
 		return hostname;
 	}
-	
+
 	/**
 	 * @return Number of the port
 	 */
 	public int getPort(){
 		return this.port;
 	}
-	
+
 	/**
 	 * Return the host's operating system
 	 * @return a string representation of the host's operating system
 	 */
 	public String getOperatingSystem() {
-        return os;
-    }
-	
+		return os;
+	}
+
 	/**
 	 * Returns the host's protocol
 	 * @return The host's protocol
@@ -161,44 +162,44 @@ public class HostObject extends AbstractDataObject {
 	public Protocol getProtocol(){
 		return this.protocol;
 	}
-	
+
 	/**
 	 * Returns a string representing this host
 	 */
-    public String toString() {
-        return "Host " + hostname;
-    }
+	public String toString() {
+		return "Host " + hostname;
+	}
 
-    @Override
-    public String getType() {
-    	return "host";
-    }
-    
-    
-    
-    //
-    // -- PROTECTED METHOD -----------------------------------------------
-    //
-    
+	@Override
+	public String getType() {
+		return "host";
+	}
 
-    /**
-     * Returns the parent with the real type
-     */
-    protected WorldObject getTypedParent() {
-        return (WorldObject) parent;
-    }
-    
-    //
-    // -- PRIVATE METHOD -----------------------------------------------
-    //
-    
-    /**
-     * TODO
-     */
+
+
+	//
+	// -- PROTECTED METHOD -----------------------------------------------
+	//
+
+
+	/**
+	 * Returns the parent with the real type
+	 */
+	protected WorldObject getTypedParent() {
+		return (WorldObject) parent;
+	}
+
+	//
+	// -- PRIVATE METHOD -----------------------------------------------
+	//
+
+	/**
+	 * TODO
+	 */
 	private void handleProActiveRuntime(ProActiveRuntime runtime, int depth){
 		VMObject vm = new VMObject(this, runtime);
 		exploreChild(vm);
-		
+
 		if(depth > 0) {
 			List<ProActiveRuntime> knownRuntimes = vm.getKnownRuntimes();
 			for(int i=0, size=knownRuntimes.size() ; i<size ; i++) {
@@ -225,5 +226,5 @@ public class HostObject extends AbstractDataObject {
 
 	@Override
 	protected void foundForTheFirstTime() {/* Do nothing */}
-    
+
 }

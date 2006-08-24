@@ -53,8 +53,8 @@ public class StopMonitoringAction extends Action {
 	
 	@Override
 	public void run() {
-		System.out.println("StopMonitoringAction.run() "+object.getFullName());
-		object.stopMonitoring();
+		//System.out.println("StopMonitoringAction.run() "+object.getFullName());
+		object.stopMonitoring(true);
 	}
 	
 }

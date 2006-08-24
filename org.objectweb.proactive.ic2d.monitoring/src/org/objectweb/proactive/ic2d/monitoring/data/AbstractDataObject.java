@@ -26,7 +26,7 @@ public abstract class AbstractDataObject extends Observable {
 	protected Map<String, AbstractDataObject> skippedChildren;
 
 	protected boolean isAlive;
-	
+
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -86,19 +86,21 @@ public abstract class AbstractDataObject extends Observable {
 
 	/**
 	 * Stop monitor this object
+	 * @param log Indicates if you want to log a message in the console.
 	 */
-	public void stopMonitoring() {
-		Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
+	public void stopMonitoring(boolean log) {
+		if(log)
+			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
 		this.parent.monitoredChildren.remove(getKey());
 		this.parent.skippedChildren.put(getKey(), this);
 		setChanged();
 		notifyObservers(State.NOT_MONITORED);
-		
+
 		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
-        while (iterator.hasNext()) {
-        	 AbstractDataObject child = iterator.next();
-        	 child.stopMonitoring();
-        }
+		while (iterator.hasNext()) {
+			AbstractDataObject child = iterator.next();
+			child.stopMonitoring(false);
+		}
 	}
 
 	/**
@@ -132,28 +134,28 @@ public abstract class AbstractDataObject extends Observable {
 	 * @return the type of the object.
 	 */
 	public abstract String getType();
-	
+
 	/**
 	 * Find an active object.
 	 * @param id The UniqueID of the active object
 	 * @return The active object, or null.
 	 */
-    public synchronized AOObject findActiveObjectById(UniqueID id) {
-    	// We search in the monitored objects.
-        Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
-        while (iterator.hasNext()) {
-            AbstractDataObject object = iterator.next();
-            AOObject activeObject = object.findActiveObjectById(id);
-            if (activeObject != null) {
-                return activeObject;
-            }
-        }
-        return null;
-    }
-    
-    
-    public void notResponding() {
-    	if(isAlive) {
+	public synchronized AOObject findActiveObjectById(UniqueID id) {
+		// We search in the monitored objects.
+		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
+		while (iterator.hasNext()) {
+			AbstractDataObject object = iterator.next();
+			AOObject activeObject = object.findActiveObjectById(id);
+			if (activeObject != null) {
+				return activeObject;
+			}
+		}
+		return null;
+	}
+
+
+	public void notResponding() {
+		if(isAlive) {
 			this.isAlive = false;
 			List<AbstractDataObject> children = getMonitoredChildren();
 			for(AbstractDataObject child : children){
@@ -162,8 +164,8 @@ public abstract class AbstractDataObject extends Observable {
 			setChanged();
 			notifyObservers(State.NOT_RESPONDING);
 		}
-    }
-	
+	}
+
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
@@ -188,10 +190,10 @@ public abstract class AbstractDataObject extends Observable {
 			return;
 		if(skippedChildren.containsKey(child.getKey()))
 			return;
-		
-		
+
+
 		if(monitoredChildren.containsKey(child.getKey())) {
-			
+
 			child = monitoredChildren.get(child.getKey());
 			child.alreadyMonitored();
 			child.explore();
@@ -208,8 +210,8 @@ public abstract class AbstractDataObject extends Observable {
 			}
 		}
 	}
-	
+
 	protected abstract void foundForTheFirstTime();
-	
+
 	protected abstract void alreadyMonitored();
 }

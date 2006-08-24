@@ -33,9 +33,6 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.objectweb.proactive.ic2d.console.Console;
-import org.objectweb.proactive.ic2d.monitoring.Activator;
-
 
 public class MonitorThread implements Observer {
 
@@ -157,9 +154,7 @@ public class MonitorThread implements Observer {
 				WorldObject.getInstance().explore();
 				try {
 					Thread.sleep(ttr * 1000);
-				} catch (InterruptedException e) {
-					Console.getInstance(Activator.CONSOLE_NAME).debug("Manual refresh");
-				}
+				} catch (InterruptedException e) {/* Do nothing */}
 			}
 		}
 	}

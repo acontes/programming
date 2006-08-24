@@ -132,6 +132,7 @@ public class SetTTRDialog extends Dialog {
 				int ttr = Integer.parseInt(text.getText());
 				MonitorThread thread = MonitorThread.getInstance();
 				thread.setTTR(ttr);
+				thread.forceRefresh();
 			}
 			shell.close();
 		}

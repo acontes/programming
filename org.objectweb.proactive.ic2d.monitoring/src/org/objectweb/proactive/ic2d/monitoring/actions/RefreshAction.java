@@ -32,6 +32,8 @@ package org.objectweb.proactive.ic2d.monitoring.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 
 public class RefreshAction extends Action {
@@ -48,5 +50,6 @@ public class RefreshAction extends Action {
 	@Override
 	public void run() {
 		MonitorThread.getInstance().forceRefresh();
+		Console.getInstance(Activator.CONSOLE_NAME).debug("Manual refresh");
 	}
 }

@@ -175,9 +175,9 @@ public class NodeObject extends AbstractDataObject{
 	}
 	
 	@Override
-	public void stopMonitoring() {
+	public void stopMonitoring(boolean log) {
 		destroySpy();
-		super.stopMonitoring();
+		super.stopMonitoring(log);
 	}
 	
 	public void migrateTo(UniqueID activeObjectID, String nodeTargetURL) throws MigrationException {
