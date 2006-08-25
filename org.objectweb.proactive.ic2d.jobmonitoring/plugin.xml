@@ -7,6 +7,7 @@
             id="org.objectweb.proactive.ic2d.jobmonitoring.JobMonitoringCategory"
             name="Job Monitoring"/>
       <view
+            category="org.objectweb.proactive.ic2d.jobmonitoring.JobMonitoringCategory"
             class="org.objectweb.proactive.ic2d.jobmonitoring.views.JobMonitoringView"
             id="org.objectweb.proactive.ic2d.jobmonitoring.views.JobMonitoringView"
             name="Job Monitoring"/>
