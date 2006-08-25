@@ -12,7 +12,7 @@ public class JobMonitoringLabelProvider extends LabelProvider {
 	}
 	
 	public Image getImage(Object element) {
-		String type = ((AbstractDataObject)element).getType();
+		String type = ((AbstractDataObject)element).getType().toLowerCase();
 		return new Image(Display.getCurrent(),
 				this.getClass().getResourceAsStream(type+"_icon.png"));
 	}
