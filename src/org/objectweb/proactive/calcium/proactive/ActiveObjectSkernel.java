@@ -56,7 +56,7 @@ public class ActiveObjectSkernel<T> extends Skernel<T> implements RunActive, Ser
 		Service service = new Service(body);
 		
 		while(true){
-			String allowedMethodNames="getStats|putTask|getReadyQueueLength|hasResults|isFinished|isPaniqued";
+			String allowedMethodNames="getStats|putTask|getReadyQueueLength|hasResults|isFinished|isPaniqued|getStatsGlobal";
 			
 			if(getReadyQueueLength() > 0 || isFinished()) allowedMethodNames +="getReadyTask|";
 			if(hasResults()) allowedMethodNames += "getResult|";

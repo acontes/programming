@@ -40,9 +40,8 @@ public class Board implements java.io.Serializable {
 
 	// the board
 	public int board[];
-
 	
-	public Board(int n, int solvableSize){
+	public Board (int n, int solvableSize){
 		this.n=n;
 		this.solvableSize=solvableSize;
 		
@@ -106,4 +105,15 @@ public class Board implements java.io.Serializable {
 		
 		return v;
 	}
+	/*
+	@Override
+	public int hashCode(){
+		return id;
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		return hashCode() == o.hashCode();
+	}
+	*/
 }

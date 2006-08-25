@@ -35,8 +35,10 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
+import org.objectweb.proactive.calcium.statistics.StatsGlobalImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 
 /**
  * This class represents the skeleton kernel.
@@ -53,25 +55,28 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class Skernel<T> implements Serializable{
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
 	
-	private Statistics stats;
+	//State Queues
 	private PriorityQueue<Task<T>> ready; //Tasks ready for execution
 	private Hashtable<Task<T>,Task<T>> waiting; //Tasks waiting for subtasks completition
 	private Vector<Task<T>> results; //Finished root-tasks
 	private Hashtable<Task<T>,Task<T>> processing; //Tasks being processed at this moment
+	
 	private PanicException panicException;
-	private Hashtable<T, TaskStats> taskStats;
+	
+	//Statistics
+
+	private StatsGlobalImpl stats;
 	
 	public Skernel(){
 		this.ready= new PriorityQueue<Task<T>>();
 		this.waiting=new Hashtable<Task<T>,Task<T>>();
 		this.results=new Vector<Task<T>>();
 		this.processing=new Hashtable<Task<T>,Task<T>>();
-		this.stats=new Statistics();
+		this.stats=new StatsGlobalImpl();
 		this.panicException=null;
-		this.taskStats = new Hashtable<T, TaskStats>();
 	}
 	
-	public synchronized T getResult() throws PanicException{
+	public synchronized Task<T> getResult() throws PanicException{
 		while(results.size()<=0 && !isPaniqued()){
 			try {
 				if(logger.isDebugEnabled()){
@@ -90,15 +95,15 @@ public class Skernel<T> implements Serializable{
 		}
 			
 		Task<T> resultTask=results.remove(0);
-		
-		taskStats.put(resultTask.getObject(),resultTask.getStats());
+		resultTask.getStats().exitResultsState();
+		//keep stats for future use
 		
 		if(resultTask.hasException()){
 			//Only runtime exception can be found here
 			throw (RuntimeException)resultTask.getException(); 
 		}
 		
-		return resultTask.getObject();
+		return resultTask;
 	}
 
 	/**
@@ -132,6 +137,8 @@ public class Skernel<T> implements Serializable{
 		if(ready.isEmpty()) return null;
 		
 		Task<T> task = ready.poll(); //get the highest priority task
+		task.getStats().exitReadyState();
+
 		processing.put(task,task);
 		if(logger.isDebugEnabled()){
 			logger.debug("Serving taskId="+task);
@@ -160,6 +167,8 @@ public class Skernel<T> implements Serializable{
 			}
 			return;
 		}
+		
+		task.getStats().exitProcessingState();
 		
 		if(task.hasException()){
 			updateExceptionedTask(task);
@@ -264,6 +273,7 @@ public class Skernel<T> implements Serializable{
 				if(waiting.remove(parent)==null){
 					logger.error("Error, parent not waiting when it should have been.");
 				}
+				parent.getStats().exitWaitingState();
 				ready.add(parent);
 			}
 		}
@@ -289,7 +299,7 @@ public class Skernel<T> implements Serializable{
 		else{
 			if(logger.isDebugEnabled()){
 				logger.debug("Task taskId="+task.getId() +" is ready");
-			}	
+			}
 			ready.add(task);
 		}
 	}//method
@@ -307,13 +317,10 @@ public class Skernel<T> implements Serializable{
 		return ready.size();
 	}
 	
-	public synchronized Statistics getStats(){
-		stats.setReadyQueueLength(ready.size());
+	public synchronized StatsGlobalImpl getStatsGlobal() {
+		stats.setQueueLengths(ready.size(), processing.size(), 
+								waiting.size(), results.size());
 		return stats;
-	}
-	
-	public synchronized TaskStats getStats(T param){
-		return taskStats.get(param);
 	}
 	
 	private void deleteTaskFamilyFromQueues(Task<T> blackSheepTask){
@@ -333,6 +340,7 @@ public class Skernel<T> implements Serializable{
 		for(Task<T> task:ready){
 			if(task.getFamilyId()==blackSheepTask.getFamilyId()){
 				ready.remove(task);
+				task.getStats().exitReadyState();
 			}
 		}
 		
@@ -342,6 +350,7 @@ public class Skernel<T> implements Serializable{
 			Task<T> task = enumeration.nextElement();
 			if(task.getFamilyId()==blackSheepTask.getFamilyId()){
 				waiting.remove(task);
+				task.getStats().exitWaitingState();
 			}
 		}
 		
@@ -375,17 +384,17 @@ public class Skernel<T> implements Serializable{
 		if(task.isRootTask()) return task;
 		
 		if(this.waiting.contains(task.getFamilyId())){
-			return waiting.remove(task.getFamilyId());
+			Task<T> root = waiting.remove(task.getFamilyId());
+			root.getStats().exitWaitingState();
+			return root;
 		}
 		
 		if(this.processing.contains(task.getFamilyId())){
 			throw new PanicException("Error, root taskId="
 					+task.getFamilyId()+" found in processing queue");
-			//return processing.remove(task.getFamilyId());
 		}
 		
 		for(Task<T> r:ready){
-			
 			if(r.getId()==task.getFamilyId()){
 				throw new PanicException("Error, root taskId="
 						+task.getFamilyId()+" found in ready queue");

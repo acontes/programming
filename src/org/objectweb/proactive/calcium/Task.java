@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
+import org.objectweb.proactive.calcium.statistics.StatsImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -55,9 +56,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	public static int DEFAULT_PRIORITY=0;
 	static private int DEFAULT_ROOT_PARENT_ID=-1;
 
-	/*
-	 * Rebirth preserved parameters
-	 */
+	//Rebirth preserved parameters
 	private int familyId; //Id of the root task
 	private int parentId;
 	private T object;
@@ -65,7 +64,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	private int priority; //higher number, higher priority
 	private boolean isTainted;
 	private boolean isDummy;
-	private TaskStats stats;
+	private StatsImpl stats;
 	
 	//The program stack. Higher indexed elements are served first (LIFO).
 	private Vector<Instruction<T>> stack;
@@ -91,7 +90,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		this.familyId=familyId;
 		
 		isDummy=false;
-		stats = new TaskStats();
+		stats = new StatsImpl();
 		stack=new Vector<Instruction<T>>();
 		
 		childrenReady=new Vector<Task<T>>();
@@ -298,6 +297,8 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		childrenWaiting.remove(task);
 		childrenFinished.add(task);
 		
+		stats.addChildStats(task.getStats());
+		
 		return true;
 	}
 	
@@ -385,7 +386,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		stats.markFinishTime();
 	}
 	
-	public TaskStats getStats(){
+	public StatsImpl getStats(){
 		return stats;
 	}
 }

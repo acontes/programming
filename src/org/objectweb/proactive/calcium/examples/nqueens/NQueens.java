@@ -36,6 +36,8 @@ import org.objectweb.proactive.calcium.interfaces.*;
 import org.objectweb.proactive.calcium.proactive.ProActiveManager;
 import org.objectweb.proactive.calcium.proactive.ProActiveThreadedManager;
 import org.objectweb.proactive.calcium.skeletons.*;
+import org.objectweb.proactive.calcium.statistics.StatsGlobal;
+import org.objectweb.proactive.calcium.statistics.StatsGlobalImpl;
 
 public class NQueens implements Serializable{
 
@@ -44,7 +46,7 @@ public class NQueens implements Serializable{
 	public static void main(String[] args) {
 		
 		NQueens nq = new NQueens();
-		nq.start(new Board(14,13));
+		nq.start(new Board(15,14));
 	}
 	
 	public NQueens(){
@@ -63,7 +65,7 @@ public class NQueens implements Serializable{
 		//descriptor="/home/mleyton/workspace/ProActive/descriptors/examples/SSH_SGE_Example.xml";
 		ResourceManager manager= 
 			//new MonoThreadedManager();
-			//new MultiThreadedManager(8);
+			//new MultiThreadedManager(4);
 		 	//new ProActiveThreadedManager(descriptor, "local");
 			new ProActiveManager(descriptor, "local");
 		
@@ -79,16 +81,16 @@ public class NQueens implements Serializable{
 					total+=res.solutions[i];
 				}
 				System.out.println();
-				System.out.println("Total="+total);
-				
+				System.out.println("Total="+total);				
+				System.out.println(calcium.getStats(res));
 			}
 		} catch (ParameterException e) {
 			e.printStackTrace();
 		} catch (PanicException e) {
 			e.printStackTrace();
 		}
-		
-		Statistics stats = calcium.getStats();
+
+		StatsGlobal stats = calcium.getStatsGlobal();
 		System.out.println(stats);
 	}
 }
