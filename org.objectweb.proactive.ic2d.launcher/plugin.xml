@@ -33,7 +33,6 @@
          <action
                class="org.objectweb.proactive.ic2d.launcher.actions.Launch"
                definitionId="org.objectweb.proactive.ic2d.launcher.actions.Launch"
-               disabledIcon="icons/runDisabled.gif"
                icon="icons/run.gif"
                id="org.objectweb.proactive.ic2d.launcher.actions.Launch"
                label="&amp;Launch the application"
@@ -45,7 +44,6 @@
          <action
                class="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
                definitionId="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
-               disabledIcon="icons/saveDisabled.gif"
                icon="icons/save.gif"
                id="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
                label="&amp;Save"
@@ -67,5 +65,27 @@
             name="XML Editor">
       </editor>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.objectweb.proactive.ic2d.launcher.categories.Launcher"
+            name="Launcher"/>
+      <view
+            allowMultiple="false"
+            category="org.objectweb.proactive.ic2d.launcher.categories.Launcher"
+            class="org.objectweb.proactive.ic2d.launcher.views.InfoView"
+            id="org.objectweb.proactive.ic2d.launcher.views.InfoView"
+            name="Activated Applications"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.objectweb.proactive.ic2d.launcher.perspectiveExtension1">
+         <view
+               id="org.objectweb.proactive.ic2d.launcher.views.InfoView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.TaskList"
+               visible="true"/>
+      </perspectiveExtension>
+   </extension>
 </plugin>

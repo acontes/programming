@@ -32,16 +32,23 @@ package org.objectweb.proactive.ic2d.launcher.perspectives;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.eclipse.ui.IPerspectiveListener4;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.IConsoleConstants;
+import org.objectweb.proactive.ic2d.launcher.views.InfoView;
 
-public class LauncherPerspective implements IPerspectiveFactory {
+public class LauncherPerspective implements IPerspectiveFactory ,IPerspectiveListener4 {
 
 	public static final String ID = "org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective";
 
 	/** Bottom folder's id. */
 	public static final String FI_BOTTOM = ID + ".bottomFolder";
-
+    /** Right folder's id. */
+    public static final String FI_RIGHT = ID + ".rightFolder";
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
@@ -50,8 +57,56 @@ public class LauncherPerspective implements IPerspectiveFactory {
 		String editorAreaId=layout.getEditorArea();
 		layout.setEditorAreaVisible(true);
 		layout.setFixed(false);
+		
+		IFolderLayout rightFolder = layout.createFolder(FI_RIGHT, IPageLayout.RIGHT, 0.80f, editorAreaId);
+		rightFolder.addView(InfoView.ID);
+		
 		IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.75f, editorAreaId);
 		bottomFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
+		
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(this);
+	}
+
+	public void perspectivePreDeactivate(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		//System.out.println("LauncherPerspective.perspectivePreDeactivate()");
+	}
+
+	public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		//System.out.println("LauncherPerspective.perspectiveClosed()");
+	}
+
+	public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		//System.out.println("LauncherPerspective.perspectiveDeactivated()");
+	}
+
+	public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		//System.out.println("LauncherPerspective.perspectiveOpened()");
+	}
+
+	public void perspectiveSavedAs(IWorkbenchPage page, IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
+		// TODO Auto-generated method stub
+		//System.out.println("LauncherPerspective.perspectiveSavedAs()");
+	}
+
+	public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {
+		// We remove the file of the list of the launched applications
+//		if(page!=null && changeId.compareTo("editorClose")==0){
+//				XMLDescriptorSet.getInstance().removeFile(partRef.getTitle());
+//		}
+	}
+
+	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		//System.out.println("LauncherPerspective.perspectiveActivated()");
+	}
+
+	public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {
+		// TODO Auto-generated method stub
+		//System.out.println("LauncherPerspective.perspectiveChanged()");
 	}
 
 }

@@ -50,6 +50,8 @@ import org.eclipse.ui.PartInitException;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.launcher.Activator;
 import org.objectweb.proactive.ic2d.launcher.editors.PathEditorInput;
+import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptor;
+import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptorSet;
 import org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective;
 
 
@@ -121,6 +123,7 @@ public class OpenFile implements IWorkbenchWindowActionDelegate {
 		if (path != null && path.length() > 0){
 			changePerspective();
 			Console.getInstance(Activator.CONSOLE_NAME).log("File selected : " + path);
+			XMLDescriptorSet.getInstance().addFile(new XMLDescriptor(path));
 			return new File(path);
 		}
 		else{

@@ -33,7 +33,9 @@ package org.objectweb.proactive.ic2d.launcher.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -43,7 +45,9 @@ import org.objectweb.proactive.core.descriptor.Launcher;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.launcher.Activator;
 import org.objectweb.proactive.ic2d.launcher.editors.PathEditorInput;
-import org.objectweb.proactive.ic2d.launcher.editors.xml.XMLEditor;
+import org.objectweb.proactive.ic2d.launcher.exceptions.TagMissingException;
+import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptor;
+import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptorSet;
 import org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective;
 
 public class Launch extends Action implements IWorkbenchWindowActionDelegate {
@@ -68,54 +72,85 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
 		if(page==null)
 			return;
 		IEditorPart editorPart = page.getActiveEditor();
-		
-		boolean wasDirty = editorPart.isDirty();
-		// Ask to the user, if he wants save his file (if it is not already saved).
-		// If the user chooses 'cancel', we don't run the xml file
-		boolean succeeded = page.saveEditor(editorPart, true);
-		if(!succeeded)
+		if(editorPart==null)
 			return;
-		if(wasDirty && !editorPart.isDirty())
-			Console.getInstance(Activator.CONSOLE_NAME).log("File saved");
-		
-		if (!(editorPart instanceof XMLEditor))
+		String path = ((PathEditorInput) editorPart.getEditorInput()).getPath().toString();
+
+		launch(window.getActivePage(), path);
+	}
+
+	/**
+	 * Launch an XML file. If the file is not saved, a pop-up will display.
+	 * @param page
+	 * @param path The file's path.
+	 */
+	public static void launch(IWorkbenchPage page, final String path){
+		if(page == null)
 			return;
-		XMLEditor editor = (XMLEditor) editorPart; 
-		if(editor == null)
-			Console.getInstance(Activator.CONSOLE_NAME).log("Editor is null");
-		else{
-			PathEditorInput input = (PathEditorInput) editor.getEditorInput();
-			final String path = input.getPath().toString();
 
-			Launcher launcher = null;
-
-			// creates the launcher
-			try {
-				launcher = new Launcher(path);
-			} catch (Exception e) {
-				Console.getInstance(Activator.CONSOLE_NAME).logException(e);
-			}
-
-			// activate the launcher
-			try {
-				if(!launcher.isActivated()){
-					final Launcher l = launcher;
-					Thread thread = new Thread(new Runnable() {
-						public void run () {
-							try {
-								l.activate();
-								Console.getInstance(Activator.CONSOLE_NAME).log(path+" - activated");
-							} catch (Exception e) {
-								Console.getInstance(Activator.CONSOLE_NAME).logException(e);
-							}
-						}});
-					thread.start();
-				}
-			} catch (Exception e) {
-				Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+		IEditorReference[] editorReference = page.getEditorReferences();
+		IEditorReference editor = null;
+		for(int i=0, size=editorReference.length; i<size; i++){
+			if(editorReference[i].getName().compareTo(path)==0){
+				editor = editorReference[i];
+				break;
 			}
 		}
+
+		//  If the file editor is open.(And maybe not saved)
+		if(editor!=null){
+			IEditorPart editorPart = editor.getEditor(false);
+
+			boolean wasDirty = editorPart.isDirty();
+			// Ask to the user, if he wants save his file (if it is not already saved).
+			// If the user chooses 'cancel', we don't run the xml file
+			boolean succeeded = page.saveEditor(editorPart, true);
+			if(!succeeded)
+				return;
+			if(wasDirty && !editorPart.isDirty())
+				Console.getInstance(Activator.CONSOLE_NAME).log("File saved");
+		}
+
+
+		Launcher launcher = null;
+
+		// creates the launcher
+		try {
+			launcher = new Launcher(path);
+			XMLDescriptorSet.getInstance().getFile(path).setLauncher(launcher);
+		} catch (TagMissingException e){
+			XMLDescriptorSet.getInstance().getFile(path).setState(XMLDescriptor.FileState.ERROR);
+			Console.getInstance(Activator.CONSOLE_NAME).debug(e);
+			return;
+		} catch (Exception e) {
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+		}
+
+		// activate the launcher
+		try {
+			if(!launcher.isActivated()){
+				final Launcher l = launcher;
+				Thread thread = new Thread(new Runnable() {
+					public void run () {
+						try {
+							l.activate();
+							Console.getInstance(Activator.CONSOLE_NAME).log(path+" - activated");
+							Console.getInstance(Activator.CONSOLE_NAME).log("Open the log4j console for more details");
+							Display.getDefault().asyncExec(new Runnable() {
+								public void run () {
+									XMLDescriptorSet.getInstance().getFile(path).setState(XMLDescriptor.FileState.LAUNCHED);
+								}
+							});
+						} catch (Exception e) {
+							Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+							XMLDescriptorSet.getInstance().getFile(path).setState(XMLDescriptor.FileState.ERROR);
+						}
+					}});
+				thread.start();
+			}
+		} catch (Exception e) {Console.getInstance(Activator.CONSOLE_NAME).logException(e);}
 	}
+
 
 	public void selectionChanged(IAction action, ISelection selection) {
 		action.setEnabled(goodContext());
