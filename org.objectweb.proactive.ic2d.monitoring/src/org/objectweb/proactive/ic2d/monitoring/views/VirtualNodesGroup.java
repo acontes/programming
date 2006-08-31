@@ -88,6 +88,8 @@ public class VirtualNodesGroup implements Observer {
 	
 	public Color getColor(VNObject vn) {
 		Button b = virtualNodes.get(vn);
+		if(b == null)
+			return null;
 		if(! b.getSelection())
 			return null;
 		return VNColors.getInstance().getColor(vn.getKey());
