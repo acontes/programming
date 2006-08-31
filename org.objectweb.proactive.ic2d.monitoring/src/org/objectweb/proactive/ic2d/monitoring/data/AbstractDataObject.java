@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
 
@@ -85,22 +115,19 @@ public abstract class AbstractDataObject extends Observable {
 
 
 	/**
-	 * Stop monitor this object
+	 * Stop monitoring this object
+	 * @param log Indicates if you want to log a message in the console.
 	 * @param log Indicates if you want to log a message in the console.
 	 */
 	public void stopMonitoring(boolean log) {
 		if(log)
 			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
-		this.parent.monitoredChildren.remove(getKey());
-		this.parent.skippedChildren.put(getKey(), this);
+		this.parent.removeChild(this);
 		setChanged();
 		notifyObservers(State.NOT_MONITORED);
-
-		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
-		while (iterator.hasNext()) {
-			AbstractDataObject child = iterator.next();
-			child.stopMonitoring(false);
-		}
+		AbstractDataObject[] children = monitoredChildren.values().toArray(new AbstractDataObject[]{});
+		for(int i=0, size=children.length ; i<size ; i++)
+			children[i].stopMonitoring(false);
 	}
 
 	/**
@@ -166,6 +193,17 @@ public abstract class AbstractDataObject extends Observable {
 		}
 	}
 
+
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof AbstractDataObject))
+			return false;
+		else {
+			AbstractDataObject o = (AbstractDataObject)obj;
+			return this.getKey().compareTo(o.getKey()) == 0;
+		}
+	}
+
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
@@ -177,6 +215,17 @@ public abstract class AbstractDataObject extends Observable {
 	 */
 	protected synchronized void putChild(AbstractDataObject child) {
 		monitoredChildren.put(child.getKey(), child);
+		setChanged();
+		notifyObservers();
+	}
+	
+	/**
+	 * Remove a child to this object.
+	 * @param child the object to remove
+	 */
+	protected synchronized void removeChild(AbstractDataObject child) {
+		monitoredChildren.remove(child.getKey());
+		this.parent.skippedChildren.put(getKey(), this);
 		setChanged();
 		notifyObservers();
 	}

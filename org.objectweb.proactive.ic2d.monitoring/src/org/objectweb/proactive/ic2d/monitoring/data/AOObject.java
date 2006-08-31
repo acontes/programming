@@ -58,6 +58,9 @@ public class AOObject extends AbstractDataObject{
 	/** id used to identify the active object globally, even in case of migration */
 	private UniqueID id;
 
+	/** the jobID of the active object */
+	private String jobID;
+	
 	/** request queue length */
 	private int requestQueueLength; // -1 = not known
 
@@ -70,7 +73,7 @@ public class AOObject extends AbstractDataObject{
 	 * @param name the active object's name
 	 * @param id the active object's id
 	 */
-	public AOObject(NodeObject parent, String name, UniqueID id){
+	public AOObject(NodeObject parent, String name, UniqueID id, String jobID){
 		super(parent);
 
 		if ( name == null) 
@@ -78,6 +81,7 @@ public class AOObject extends AbstractDataObject{
 		this.name = name;
 		this.fullName = name + "#" + counter();
 		this.id = id;
+		this.jobID = jobID;
 		this.requestQueueLength = -1;
 	}
 
@@ -92,7 +96,16 @@ public class AOObject extends AbstractDataObject{
 	public UniqueID getID(){
 		return this.id;
 	}
-
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getJobID() {
+		return this.jobID;
+	}
+	
 	/**
 	 * Returns the object's key. It is an unique identifier.
 	 * @return the object's key

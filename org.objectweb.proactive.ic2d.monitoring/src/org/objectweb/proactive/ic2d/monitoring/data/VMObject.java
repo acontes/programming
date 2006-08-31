@@ -45,10 +45,15 @@ import org.objectweb.proactive.ic2d.monitoring.Activator;
 
 public class VMObject extends AbstractDataObject {
 
+	/** The key of this object */
 	private String key;
 
+	/** The ProActive runtime corresponding to this JVM */
 	private ProActiveRuntime runtime;
 
+	/** The JVM job ID */
+	private String jobID;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -58,6 +63,7 @@ public class VMObject extends AbstractDataObject {
 		this.runtime = runtime;
 		this.key = this.runtime.getVMInformation()/*.getVMID().toString()*/.getName();
 		this.runtime = runtime;
+		this.jobID = runtime.getJobID();
 	}
 
 	//
@@ -91,7 +97,7 @@ public class VMObject extends AbstractDataObject {
 
 	@Override
 	public String getFullName() {
-		return "JVM " + key;
+		return /*"JVM " + */key;
 	}
 
 	public String toString() {
@@ -105,6 +111,10 @@ public class VMObject extends AbstractDataObject {
 
 	public ProActiveRuntime getRuntime() {
 		return this.runtime;
+	}
+	
+	public String getJobID() {
+		return jobID;
 	}
 
 	@Override

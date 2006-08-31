@@ -32,8 +32,12 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 
 
 
@@ -45,10 +49,10 @@ public class WorldObject extends AbstractDataObject {
 	
 	private static WorldObject instance;
 	
-	/**
-	 * Contains all virtual nodes.
-	 */
+	/** Contains all virtual nodes. */
 	private Map<String, VNObject> vnChildren;
+	
+	public enum methodName { PUT_CHILD, REMOVE_CHILD }
 	
 	//
     // -- CONSTRUCTORS -----------------------------------------------
@@ -60,6 +64,7 @@ public class WorldObject extends AbstractDataObject {
 	private WorldObject() {
         super(null);
         vnChildren = new HashMap<String, VNObject>();
+        addObserver(MonitorThread.getInstance());
     }
 	
 	
@@ -100,48 +105,79 @@ public class WorldObject extends AbstractDataObject {
 	public List<AbstractDataObject> getVNChildren() {
 		return new ArrayList<AbstractDataObject>(vnChildren.values());
 	}
+
+	
+	/**
+	 * @see AbstractDataObject#stopMonitoring(boolean)
+	 */
+	@Override
+	public void stopMonitoring(boolean log) {
+		if(log)
+			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
+		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
+		while (iterator.hasNext()) {
+			AbstractDataObject child = iterator.next();
+			child.stopMonitoring(false);
+		}
+	}
 	
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
 	
 	/**
-	 * Add a child to this object
-	 * @param key 
-	 * @param child
+	 * Add a host to this object 
+	 * @param child the host added
 	 */
 	@Override
 	protected synchronized void putChild(AbstractDataObject child) {
 		monitoredChildren.put(child.getKey(), child);
 		setChanged();
 		if(monitoredChildren.size() == 1)
-			notifyObservers("putChild");
+			notifyObservers(methodName.PUT_CHILD/*"putChild"*/);
 		notifyObservers();
 	}
     
+	/**
+	 * 
+	 * @param vn
+	 */
+	protected synchronized void putVNChild(VNObject vn) {
+		vnChildren.put(vn.getKey(), vn);
+		setChanged();
+		notifyObservers(vn);
+	}
 	
 	/**
 	 * Stop monitoring the host specified.
-	 * @param host the host to stop monitoring
+	 * @param child the host to stop monitoring
 	 */
-	protected void removeChild(HostObject host) {
-		monitoredChildren.remove(host.getKey());
+	@Override
+	protected void removeChild(AbstractDataObject child) {
+		monitoredChildren.remove(child.getKey());
 		setChanged();
 		if(monitoredChildren.size() == 0)
-			notifyObservers("removeChild");
+			notifyObservers(methodName.REMOVE_CHILD/*"removeChild"*/);
 		notifyObservers();
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
 	protected VNObject getVirtualNode(String name) {
-		VNObject virtualNode = vnChildren.get(name);
-		if(virtualNode == null){
-			virtualNode = new VNObject(name);
-			vnChildren.put(name, virtualNode);
-			setChanged();
-			notifyObservers(virtualNode);
-		}
-		return virtualNode;
+//		VNObject virtualNode = vnChildren.get(name);
+//		if(virtualNode == null){
+//			virtualNode = new VNObject(name);
+//			vnChildren.put(name, virtualNode);
+//			setChanged();
+//			notifyObservers(virtualNode);
+//		}
+//		return virtualNode;
+		return vnChildren.get(name);
 	}
+	
 	
 	@Override
 	protected void alreadyMonitored() {/* Do nothing */}

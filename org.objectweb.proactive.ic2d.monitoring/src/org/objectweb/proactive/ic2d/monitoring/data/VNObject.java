@@ -33,15 +33,20 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 
 public class VNObject extends AbstractDataObject {
 	
+	/** The virtual node name */
 	private String name;
+	/** The virtual node job ID */
+	private String jobID;
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
-	protected VNObject(String name) {
+	protected VNObject(String name, String jobID) {
 		super(WorldObject.getInstance());
 		this.name = name;
+		this.jobID = jobID;
+		WorldObject.getInstance().putVNChild(this);
 	}
 
 	
@@ -72,7 +77,10 @@ public class VNObject extends AbstractDataObject {
 	public String getType() {
 		return "vn";
 	}
-
+	
+	public String getJobID() {
+		return jobID;
+	}
 	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
