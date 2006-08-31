@@ -66,9 +66,8 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
-import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
-import org.objectweb.proactive.ic2d.monitoring.editparts.IC2DEditPartFactory;
+import org.objectweb.proactive.ic2d.monitoring.editparts.MonitoringEditPartFactory;
 import org.objectweb.proactive.ic2d.monitoring.figures.RoundedLine;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyEventListenerImpl;
@@ -264,7 +263,7 @@ public class MonitoringView extends ViewPart {
 	 * @return the <code>EditPartFactory</code>
 	 */
 	protected EditPartFactory getEditPartFactory(){
-		return new IC2DEditPartFactory();
+		return new MonitoringEditPartFactory();
 	}
 
 
@@ -306,16 +305,22 @@ public class MonitoringView extends ViewPart {
 		// initialize the viewer with input
 		graphicalViewer.setEditPartFactory(getEditPartFactory());
 		WorldObject world = WorldObject.getInstance();
-		world.addObserver(MonitorThread.getInstance());
+//		world.addObserver(MonitorThread.getInstance());
 		graphicalViewer.setContents(world);
 
-		initContextMenu(parent.getDisplay());
+		createActions(parent.getDisplay());
 		ContextMenuProvider contextMenu = new MonitoringContextMenuProvider(graphicalViewer);
 		graphicalViewer.setContextMenu(contextMenu);
 		getSite().registerContextMenu(contextMenu, graphicalViewer);
+		
+		// drag and drop
+//		graphicalViewer.addDropTargetListener((TransferDropTargetListener)
+//				new TemplateTransferDropTargetListener(getGraphicalViewer()));
+//		graphicalViewer.addDropTargetListener((TransferDropTargetListener)
+//				new TextTransferDropTargetListener(getGraphicalViewer(), TextTransfer.getInstance()));
 	}
 
-	private void initContextMenu(Display display) {
+	private void createActions(Display display) {
 		ActionRegistry registry = graphicalViewer.getActionRegistry();
 
 		registry.registerAction(new NewHostAction(display));
