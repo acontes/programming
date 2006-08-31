@@ -52,7 +52,7 @@
 <!ENTITY biblio SYSTEM "biblio.xml">
 <!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
 <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
-<!ENTITY newIC2D SYSTEM "ic2d/newIC2D.xml">
+<!ENTITY IC2D_EclipsePlugin SYSTEM "ic2d/IC2D_EclipsePlugin.xml">
 ]>
 <book>
  <!--
@@ -125,7 +125,7 @@
     <title>User Interface and tools</title>
     &IC2D;
     &plugin;
-    &newIC2D;
+    &IC2D_EclipsePlugin;
    </part>
 
 <!--
