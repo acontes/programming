@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+
+<chapter id="IC2D_EclipsePlugin">
+    
+    <title>IC2D: Interactive Control and Debugging of Distribution and Eclipse plugin </title>
+    
+    
+    
+    <para> <!-- paragraphe introductif--> </para>
+    
+    
+    
+    <sect1 id="Principles">
+        
+        <title>Principles</title>
+        
+    </sect1> <!-- Principles -->
+    
+    
+    
+    <sect1 id="MonitoringControl">
+        
+        <title>Monitoring and Control</title>
+        
+    </sect1> <!-- Monitoring and Control -->
+    
+    
+    
+    <sect1 id="LauncherScheduler">
+        
+        <title>Launcher and Scheduler</title>
+        
+    </sect1> <!-- Launcher and Scheduler -->
+    
+    
+    
+    <sect1 id="ProgrammingTools">
+        
+        <title>Programming Tools</title>
+        
+    </sect1> <!-- Programming Tools-->
+    
+</chapter>
