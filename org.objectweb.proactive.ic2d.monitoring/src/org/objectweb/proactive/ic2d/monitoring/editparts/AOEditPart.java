@@ -42,7 +42,7 @@ import org.objectweb.proactive.ic2d.monitoring.figures.AOConnection;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
 
-public class AOEditPart extends AbstractIC2DEditPart{
+public class AOEditPart extends AbstractMonitoringEditPart{
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------

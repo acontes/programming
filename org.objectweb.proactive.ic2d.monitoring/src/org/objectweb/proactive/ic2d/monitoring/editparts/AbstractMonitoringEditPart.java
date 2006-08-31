@@ -5,20 +5,19 @@ import java.util.Observer;
 
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AbstractFigure;
 
-public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart implements Observer {
+public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPart implements Observer {
 
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	
-	public AbstractIC2DEditPart(AbstractDataObject model) {
+	public AbstractMonitoringEditPart(AbstractDataObject model) {
 		setModel(model);
 	}
 	
@@ -46,8 +45,8 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 		if (isActive()) {
 			((AbstractDataObject)getModel()).deleteObserver(this);
 			((Figure)getFigure()).removeAll();
-			if(getFigure().getParent() != null)
-				getFigure().getParent().remove(getFigure());
+//			if(getFigure().getParent() != null)
+//				getFigure().getParent().remove(getFigure());
 		}
 		super.deactivate();
 	}
@@ -72,8 +71,8 @@ public abstract class AbstractIC2DEditPart extends AbstractGraphicalEditPart imp
 		return ((AbstractFigure)getFigure()).getContentPane();
 	}
 
-	public void removeChildVisual(EditPart childEditPart) {
-		super.removeChildVisual(childEditPart);
-	}
+//	public void removeChildVisual(EditPart childEditPart) {
+//		super.removeChildVisual(childEditPart);
+//	}
 	
 }

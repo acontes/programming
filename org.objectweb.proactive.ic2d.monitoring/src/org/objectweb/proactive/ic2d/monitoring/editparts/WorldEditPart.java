@@ -39,7 +39,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
 
-public class WorldEditPart extends AbstractIC2DEditPart {
+public class WorldEditPart extends AbstractMonitoringEditPart {
 
 
 	private FreeformLayer layer;

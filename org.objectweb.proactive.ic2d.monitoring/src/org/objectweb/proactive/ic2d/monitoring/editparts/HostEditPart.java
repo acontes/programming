@@ -41,7 +41,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.HostListener;
 
-public class HostEditPart extends AbstractIC2DEditPart {
+public class HostEditPart extends AbstractMonitoringEditPart {
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------

@@ -41,7 +41,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.JVMListener;
 
-public class VMEditPart extends AbstractIC2DEditPart {
+public class VMEditPart extends AbstractMonitoringEditPart {
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------

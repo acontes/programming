@@ -42,7 +42,7 @@ import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.NodeListener;
 import org.objectweb.proactive.ic2d.monitoring.views.VirtualNodesGroup;
 
-public class NodeEditPart extends AbstractIC2DEditPart{
+public class NodeEditPart extends AbstractMonitoringEditPart{
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------

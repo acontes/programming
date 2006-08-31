@@ -38,8 +38,11 @@ import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
-public class IC2DEditPartFactory implements EditPartFactory{
+public class MonitoringEditPartFactory implements EditPartFactory{
 	
+//	public IC2DEditPartFactory() {
+//		super();
+//	}
 	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
