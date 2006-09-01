@@ -7,13 +7,40 @@
     
     
     
-    <para> <!-- paragraphe introductif--> </para>
+    <para>
+        IC2D is a tool which enables you to <emphasis role="bold">launch</emphasis>,
+        <emphasis role="bold">monitor</emphasis> and <emphasis role="bold">control</emphasis>
+        ProActive distributed and grid application.
+    </para>
+    <para>
+        You can find it in 2 forms :
+    </para>
+    <itemizedlist>
+        <listitem><para>
+            A <emphasis role="bold">Java standalone application</emphasis> available
+            for all the platforms ;
+        </para></listitem>
+        <listitem><para>
+            An <emphasis role="bold">Eclipse plugin</emphasis>. This plugin also proposes
+            functionalities facilitating the development of applications using ProActive
+            (TODO a short list ...).
+        </para></listitem>
+    </itemizedlist>
+        <!--
+            IC2D est un outil qui permet de lancer, de visualiser et de controler des applications ProActive.
+            Vous pouvez le trouver sous 2 formes :
+            - une application standalone en Java disponible pour toutes les plateformes ;
+            - un plugin pour la plateforme Eclipse. Ce plugin propose aussi de fonctionnalites 
+            facilitant le developpement d'applications utilisant ProActive (petite liste) 
+        --> 
     
     
     
     <sect1 id="Principles">
         
         <title>Principles</title>
+        
+        <para></para>
         
     </sect1> <!-- Principles -->
     
@@ -23,6 +50,21 @@
         
         <title>Monitoring and Control</title>
         
+        <para>
+            <!--
+                IC2D permet de visualiser graphiquement l'activite d'objets actifs, 
+                c'est a dire leur "position" ainsi que la topologie et le volume des communications.
+                
+                -> screenshot monitoring + jobmonitoring un peu complique (C3D)
+                
+                1. Pour monitorer une nouvelle machine : Monitoring->Monitor a new host ...
+                -> screenshot dialog
+                
+                2. ...
+                
+            -->
+        </para>
+        
     </sect1> <!-- Monitoring and Control -->
     
     
@@ -31,6 +73,8 @@
         
         <title>Launcher and Scheduler</title>
         
+        <para></para>
+        
     </sect1> <!-- Launcher and Scheduler -->
     
     
@@ -38,6 +82,8 @@
     <sect1 id="ProgrammingTools">
         
         <title>Programming Tools</title>
+        
+        <para></para>
         
     </sect1> <!-- Programming Tools-->
     
