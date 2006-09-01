@@ -2,232 +2,229 @@
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 
 <chapter id="IC2D_EclipsePlugin">
-	
-	<title>
-		IC2D: Interactive Control and Debugging of Distribution and
-		Eclipse plugin
-	</title>
-	
-	
-	
-	<para>
-		IC2D is a tool which enables you to
-		<emphasis role="bold">launch</emphasis>
-		,
-		<emphasis role="bold">monitor</emphasis>
-		and
-		<emphasis role="bold">control</emphasis>
-		ProActive distributed and grid application.
-	</para>
-	<para>You can find it in 2 forms :</para>
-	<itemizedlist>
-		<listitem>
-			<para>
-				A
-				<emphasis role="bold">
-					Java standalone application
-				</emphasis>
-				available for all the platforms ;
-			</para>
-		</listitem>
-		<listitem>
-			<para>
-				An
-				<emphasis role="bold">Eclipse plugin</emphasis>
-				. This plugin also proposes functionalities facilitating
-				the development of applications using ProActive (TODO a
-				short list ...).
-			</para>
-		</listitem>
-	</itemizedlist>
-	<!--
-		IC2D est un outil qui permet de lancer, de visualiser et de controler des applications ProActive.
-		Vous pouvez le trouver sous 2 formes :
-		- une application standalone en Java disponible pour toutes les plateformes ;
-		- un plugin pour la plateforme Eclipse. Ce plugin propose aussi de fonctionnalites 
-		facilitant le developpement d'applications utilisant ProActive (petite liste) 
-	-->
-	
-	
-	
-	<sect1 id="Principles">
-		
-		<title>Principles</title>
-		
-		<para></para>
-		
-	</sect1><!-- Principles -->
-	
-	
-	
-	<sect1 id="MonitoringControl">
-		
-		<title>Monitoring and Control</title>
-		
-		<para>
-			<!--
-				IC2D permet de visualiser graphiquement l'activite d'objets actifs, 
-				c'est a dire leur "position" ainsi que la topologie et le volume des communications.
-				
-				-> screenshot monitoring + jobmonitoring un peu complique (C3D)
-				
-				1. Pour monitorer une nouvelle machine : Monitoring->Monitor a new host ...
-				-> screenshot dialog
-				
-				2. ...
-				
-			-->
-		</para>
-		
-	</sect1><!-- Monitoring and Control -->
-	
-	
-	
-	<sect1 id="LauncherScheduler">
-		
-		<title>Launcher and Scheduler</title>
-				
-		<sect2>
-			<title>Launcher in IC2D</title>
-			
-			<para>
-				In order to open an XML descriptor select : Launcher > <emphasis role="bold">Open an XML file
-				</emphasis>
-				. Next select your XML file. Then the <emphasis role="bold">Launcher pespective</emphasis> will open.
-			</para>
-			
-			<para>
-				<figure>
-					<title>The launcher menu</title>
-					
-					<mediaobject>
-						<imageobject>
-							<imagedata fileref="ic2d/images/launcher_menu.png" format="PNG"  contentwidth="100" width="6in"/>
-						</imageobject>
-					</mediaobject>
-				</figure>
-			</para>
-			
-			<para>
-				Now, the Launcher perspective is open if it was not open before.
-			</para>
-			
-			<para>
-				<figure>
-					<title>The Launcher perspective</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata fileref="ic2d/images/Launcher.png" format="PNG"  contentwidth="100" width="6in"/>
-						</imageobject>
-					</mediaobject>
-				</figure>
-			</para>
-			
-			<para>
-				This perspective contains an <emphasis role="bold">XML editor</emphasis>, a <emphasis role="bold">console</emphasis>,
-				and the <emphasis role="bold">list of opened xml descriptors</emphasis>.
-			</para>
-			
-			<para>
-				To <emphasis role="bold">launch</emphasis> the application, you have severals possibilities :
-				<itemizedlist>
-					<listitem>
-						<para>Click on the button of the main menu bar, the file which is in the active editor will be launched.</para>
-					</listitem>
-					<listitem>
-						<para>Select your file in the xml descriptors list, and click on the launch icon in the popup menu.</para>
-					</listitem>
-					<listitem>
-						<para>Select your file in the xml descriptors list, and click on the launch icon on the menu bar of the application list.</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			
-			<para>
-				You can kill the applications launched from a popup-menu in the "XML descriptors" liste.
-			</para>
-			
-			<para>
-				To see your launched application, open the "Monitoring perspective" and monitor the corresponding host.
-			</para>
-		</sect2>
-		
-		
-	</sect1><!-- Launcher and Scheduler -->
-	
-	<sect1 id="ProgrammingTools">
-		
-		<title>Programming Tools</title>
-		
-		<sect2 >
-			<title>ProActive Wizards</title>
-			<para>These wizards will guide developpers to make complex operations with
-				ProActive, such as installation, integration , configuration or execution. We have created 4
-				wizards:</para>
-			<orderedlist>
-				<listitem>
-					<para> a ProActive installation wizard</para>
-				</listitem>
-				<listitem>
-					<para> a wizard that create applications using ProActive</para>
-				</listitem>
-				<listitem>
-					<para> an active object creation wizard</para>
-				</listitem>
-				<listitem>
-					<para> a configuration and execution wizard</para>
-				</listitem>
-			</orderedlist>
-			<figure>
-				<title>One wizard popup</title>
-				<mediaobject>
-					<imageobject>
-						<imagedata  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  contentwidth="100" width="6in"/>
-					</imageobject>
-				</mediaobject>
-			</figure>
-		</sect2>
-		
-		<sect2 >
-			<title>The ProActive Editor</title>
-			<para>This editor checks coding rules. It informs the developper of error
-				concerning ProActive in his classes and can resolve some of these errors.</para>
-			<figure>
-				<title>The editor error highlighting</title>
-				<mediaobject>
-					<imageobject>
-						<imagedata  fileref="development/plugin_files/editor.jpg" format="JPG" contentwidth="100" width="6in"/>
-					</imageobject>
-				</mediaobject>
-			</figure>
-		</sect2>
-			
-	</sect1><!-- Programming Tools-->
-	
-	<sect1 ><!-- The Guided Tours as Plugin  -->
-		<title>The Guided Tour as Plugin</title>
-		<para>The aim of the guided tour is to provide a step by step explanation to the
-			ProActive beginners.</para>
-		<figure>
-			<title>The plugin's interface</title>
-			<mediaobject>
-				<imageobject>
-					<imagedata  fileref="development/plugin_files/guided_tour.jpg" format="JPG" contentwidth="100" width="6in"/>
-				</imageobject>
-			</mediaobject>
-		</figure>
-		<para>This guided tour (that is actually eclipse cheat sheet) purposes:</para>
-		<itemizedlist>
-			<listitem>
-				<para> To Explain ProActive to beginners</para>
-			</listitem>
-			<listitem>
-				<para> To make interactions with the user with simple situations</para>
-			</listitem>
-			<listitem>
-				<para> To Show the important points</para>
-			</listitem>
-		</itemizedlist>
-	</sect1>
-	
+    
+    <title>IC2D: Interactive Control and Debugging of Distribution and Eclipse plugin</title>
+    
+    
+    <para>
+        IC2D is a tool which enables you to <emphasis role="bold">launch</emphasis>,
+        <emphasis role="bold">monitor</emphasis> and <emphasis role="bold">control</emphasis>
+        ProActive distributed and grid applications.
+    </para>
+    <para>
+        You can find it in 2 forms :
+    </para>
+    <itemizedlist>
+        <listitem><para>
+            A <emphasis role="bold">Java standalone application</emphasis> available
+            for all the platforms ;
+        </para></listitem>
+        <listitem><para>
+            An <emphasis role="bold">Eclipse plugin</emphasis>. This plugin also proposes
+            functionalities facilitating the development of applications using ProActive
+            (TODO a short list ...).
+        </para></listitem>
+    </itemizedlist>
+    
+    <!-- ************************************************************************************ -->
+    
+    <sect1 id="Principles">
+        
+        <title>Principles</title>
+        
+        <para></para>
+        
+    </sect1><!-- Principles -->
+    
+    <!-- ************************************************************************************ -->
+    <sect1 id="MonitoringControl">
+        
+        <title>Monitoring and Control</title>
+        
+        <para>
+            IC2D features <emphasis role="bold">graphical visualisation</emphasis> of hosts,
+            Java Virtual Machines, and active objects, including the topology and volume of
+            communications.
+        </para>
+        
+        <para>
+            In order to monitor a new host, open the <emphasis role="bold">Monitoring Perspective</emphasis>
+            and select <emphasis role="bold">Monitoring->Monitor a new host...</emphasis> :
+        </para>
+        
+        <figure id="monitorNewHost">
+            <title>Dialog in which you have to enter information about the host that you want to monitor</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="ic2d/images/features/monitor_new_host.png" format="PNG"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        
+        <!-- petite phrase de transition -->
+        
+        <figure id="monitoring">
+            <title>Monitoring of 2 applications : C3D and philosophers (see examples) on 2 hosts</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="ic2d/images/features/monitoring.png" format="PNG"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        
+    </sect1> <!-- Monitoring and Control -->
+    
+    <!-- ************************************************************************************ -->
+    
+    <sect1 id="LauncherScheduler">
+        
+        <title>Launcher and Scheduler</title>
+        
+        <sect2>
+            <title>Launcher in IC2D</title>
+            
+            <para>
+                In order to open an XML descriptor select : Launcher > <emphasis role="bold">Open an XML file
+                </emphasis>
+                . Next select your XML file. Then the <emphasis role="bold">Launcher pespective</emphasis> will open.
+            </para>
+            
+            <para>
+                <figure>
+                    <title>The launcher menu</title>
+                    
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="ic2d/images/launcher_menu.png" format="PNG"  contentwidth="100" width="6in"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            
+            <para>
+                Now, the Launcher perspective is open if it was not open before.
+            </para>
+            
+            <para>
+                <figure>
+                    <title>The Launcher perspective</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="ic2d/images/Launcher.png" format="PNG"  contentwidth="100" width="6in"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            
+            <para>
+                This perspective contains an <emphasis role="bold">XML editor</emphasis>, a <emphasis role="bold">console</emphasis>,
+                and the <emphasis role="bold">list of opened xml descriptors</emphasis>.
+            </para>
+            
+            <para>
+                To <emphasis role="bold">launch</emphasis> the application, you have severals possibilities :
+                <itemizedlist>
+                    <listitem>
+                        <para>Click on the button of the main menu bar, the file which is in the active editor will be launched.</para>
+                    </listitem>
+                    <listitem>
+                        <para>Select your file in the xml descriptors list, and click on the launch icon in the popup menu.</para>
+                    </listitem>
+                    <listitem>
+                        <para>Select your file in the xml descriptors list, and click on the launch icon on the menu bar of the application list.</para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+            
+            <para>
+                You can kill the applications launched from a popup-menu in the "XML descriptors" liste.
+            </para>
+            
+            <para>
+                To see your launched application, open the "Monitoring perspective" and monitor the corresponding host.
+            </para>
+        </sect2>
+        
+        
+    </sect1><!-- Launcher and Scheduler -->
+    
+    <!-- ************************************************************************************ -->
+    
+    <sect1 id="ProgrammingTools">
+        
+        <title>Programming Tools</title>
+        
+        <sect2 >
+            <title>ProActive Wizards</title>
+            <para>These wizards will guide developpers to make complex operations with
+                ProActive, such as installation, integration , configuration or execution. We have created 4
+                wizards:</para>
+            <orderedlist>
+                <listitem>
+                    <para> a ProActive installation wizard</para>
+                </listitem>
+                <listitem>
+                    <para> a wizard that create applications using ProActive</para>
+                </listitem>
+                <listitem>
+                    <para> an active object creation wizard</para>
+                </listitem>
+                <listitem>
+                    <para> a configuration and execution wizard</para>
+                </listitem>
+            </orderedlist>
+            <figure>
+                <title>One wizard popup</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  contentwidth="100" width="6in"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </sect2>
+        
+        <sect2 >
+            <title>The ProActive Editor</title>
+            <para>This editor checks coding rules. It informs the developper of error
+                concerning ProActive in his classes and can resolve some of these errors.</para>
+            <figure>
+                <title>The editor error highlighting</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata  fileref="development/plugin_files/editor.jpg" format="JPG" contentwidth="100" width="6in"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </sect2>
+        
+    </sect1><!-- Programming Tools-->
+    
+    <!-- ************************************************************************************ -->
+    
+    <sect1 ><!-- The Guided Tours as Plugin  -->
+        <title>The Guided Tour as Plugin</title>
+        <para>The aim of the guided tour is to provide a step by step explanation to the
+            ProActive beginners.</para>
+        <figure>
+            <title>The plugin's interface</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata  fileref="development/plugin_files/guided_tour.jpg" format="JPG" contentwidth="100" width="6in"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>This guided tour (that is actually eclipse cheat sheet) purposes:</para>
+        <itemizedlist>
+            <listitem>
+                <para> To Explain ProActive to beginners</para>
+            </listitem>
+            <listitem>
+                <para> To make interactions with the user with simple situations</para>
+            </listitem>
+            <listitem>
+                <para> To Show the important points</para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+    
 </chapter>
