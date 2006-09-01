@@ -25,18 +25,9 @@
             (TODO a short list ...).
         </para></listitem>
     </itemizedlist>
-    
+        
     <!-- ************************************************************************************ -->
     
-    <sect1 id="Principles">
-        
-        <title>Principles</title>
-        
-        <para></para>
-        
-    </sect1><!-- Principles -->
-    
-    <!-- ************************************************************************************ -->
     <sect1 id="MonitoringControl">
         
         <title>Monitoring and Control</title>
@@ -95,7 +86,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/launcher_menu.png" format="PNG"  contentwidth="100" width="6in"/>
+                            <imagedata fileref="ic2d/images/features/launcher_menu.png" format="PNG"  contentwidth="100" width="6in"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -110,7 +101,7 @@
                     <title>The Launcher perspective</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/Launcher.png" format="PNG"  contentwidth="100" width="6in"/>
+                            <imagedata fileref="ic2d/images/features/Launcher.png" format="PNG"  contentwidth="100" width="6in"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
