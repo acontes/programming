@@ -53,7 +53,7 @@
                 <title>Graphical representation of the data</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="ic2d/images/architecture/graphicalHierarchy.png" format="PNG"/>
+                        <imagedata align="center" fileref="ic2d/images/architecture/graphicalHierarchy.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -87,7 +87,7 @@
                     <title>Relations of the data</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png" format="PNG"/>
+                            <imagedata align="center" fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -104,10 +104,85 @@
                     <para></para>
                 </sect4> <!-- GEF -->
                 
-                <sect4 id="observer">
+                <sect4 id="observerObservable">
                     <title>Observer/Observable</title>
                     
-                    <para></para>
+                    <para>
+                        The pattern Observer/Observable is used to update the figures when the model has changed.
+                    </para>
+                    <para>
+                        In the <xref linkend="observable"/> you can see all the observable objects with
+                        methods which can call <emphasis role="bold">notifyObservers</emphasis>.
+                    </para>
+                    
+                    <figure id="observable">
+                        <title>Observable objects</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata align="center" fileref="ic2d/images/architecture/ObservableTransparency.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                    <para>
+                        In the <xref linkend="observer"/>, you can see all the observer objects and where 
+                        the method <emphasis role="bold">update</emphasis> is overriden.
+                    </para>
+                    
+                    <figure id="observer">
+                        <title>Observer objects</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata align="center" fileref="ic2d/images/architecture/ObserverTransparency.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                    <para>
+                        In the <xref linkend="observerObservableTable"/>, you can see each observable with their observers.
+                    </para>
+                    
+                    <table id="observerObservableTable">
+                        <title>Observable and Observer objects</title>
+                        <tgroup cols="2">
+                            
+                            <thead>
+                                <row>
+                                    <entry><para>Observable</para></entry>
+                                    <entry><para>Observer</para></entry>
+                                </row>
+                            </thead>
+                            <tbody>
+                                <row>
+                                    <entry morerows='2' valign='middle'><para>WorldObject</para></entry>
+                                    <entry><para>WorldEditPart</para></entry>
+                                </row>
+                                <row>
+                                    <entry><para>MonitorThread</para></entry>
+                                </row>
+                                <row>
+                                    <entry><para>VirtualNodesGroup</para></entry>
+                                </row>
+                                <row>
+                                    <entry><para>HostObject</para></entry>
+                                    <entry><para>HostEditPart</para></entry>
+                                </row>
+                                <row>
+                                    <entry><para>VMObject</para></entry>
+                                    <entry><para>VMEditPart</para></entry>
+                                </row>
+                                <row>
+                                    <entry><para>NodeObject</para></entry>
+                                    <entry><para>NodeEditPart</para></entry>
+                                </row>
+                                <row>
+                                    <entry><para>AOObject</para></entry>
+                                    <entry><para>AOEditPart</para></entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </table>
+                    
                 </sect4> <!-- Observer/Observable -->
                 
             </sect3> <!-- Model View Controller -->
