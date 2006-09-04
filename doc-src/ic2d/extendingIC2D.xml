@@ -2,10 +2,20 @@
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="newIC2D">
     
-    <title>IC2D: Interactive Control and Debugging of Distribution</title>
+    <title>Adding Grahical User Interfaces and Eclipse Plugins</title>
     
+    <sect1>
+        <title>Architecture and documentation</title>
+        
+        <para></para>
+        
+    </sect1>
     
-    <sect1 id="checkout">
+    <sect1>
+        <title>Extending IC2D</title>
+        
+    
+    <sect2 id="checkout">
         <title>How to checkout IC2D</title>
         
         <para>
@@ -69,10 +79,10 @@
             </mediaobject>
         </figure>
         
-    </sect1>
+    </sect2>
     
     
-    <sect1 id="implementAPlugin">
+    <sect2 id="implementAPlugin">
         
         <title>How to implement a plug-in for IC2D</title>
         
@@ -80,7 +90,7 @@
             familiar <emphasis role="bold">Eclipse plug-in architecture</emphasis>. 
         </para>
         
-        <sect2 id="createAProject">
+        <sect3 id="createAProject">
             
             <title>Create a project with the plug-in project wizard</title>
             
@@ -175,10 +185,10 @@
                 </listitem>
             </orderedlist>
             
-        </sect2>
+        </sect3>
         <!-- createAProject -->
         
-        <sect2 id="pluginStructure">
+        <sect3 id="pluginStructure">
             
             <title>The plug-in structure</title>
             
@@ -193,7 +203,7 @@
                 </mediaobject>
             </figure>
             
-            <sect3 id="pluginManifest">
+            <sect4 id="pluginManifest">
                 
                 <title>Plug-in manifest</title>
                 
@@ -216,7 +226,7 @@
                     </mediaobject>
                 </figure>
                 
-                <sect4 id="manifestMF">
+                <sect5 id="manifestMF">
                     
                     <title>MANIFEST.MF</title>
                     
@@ -244,9 +254,9 @@
                             Eclipse-AutoStart: true</screen>
                     </example>
                     
-                </sect4><!-- manifestMF -->
+                </sect5><!-- manifestMF -->
                 
-                <sect4 id="pluginXML">
+                <sect5 id="pluginXML">
                     
                     <title>plugin.xml</title>
                     
@@ -258,11 +268,11 @@
                         yet using extension points so the plug-in wizard didn't generate the plugin.xml file.
                     </para>
                     
-                </sect4><!-- pluginXML -->
+                </sect5><!-- pluginXML -->
                 
-            </sect3><!-- pluginManifest -->
+            </sect4><!-- pluginManifest -->
             
-            <sect3 id="pluginClass">
+            <sect4 id="pluginClass">
                 
                 <title>Plug-in class</title>
                 
@@ -331,9 +341,9 @@ public class ExamplePlugin extends AbstractUIPlugin {
 }]]></programlisting>
                 </example>
                 
-            </sect3><!-- pluginClass -->
+            </sect4><!-- pluginClass -->
             
-            <sect3 id="buildProperties">
+            <sect4 id="buildProperties">
                 
                 <title>Build properties</title>
                 
@@ -355,11 +365,11 @@ public class ExamplePlugin extends AbstractUIPlugin {
                         .</screen>
                 </example>
                 
-            </sect3><!-- buildProperties -->
+            </sect4><!-- buildProperties -->
             
-        </sect2><!-- pluginStructure -->
+        </sect3><!-- pluginStructure -->
         
-        <sect2 id="addPluginToIC2D">
+        <sect3 id="addPluginToIC2D">
             
             <title>How to add your plugin to IC2D</title>
             
@@ -415,9 +425,9 @@ public class ExamplePlugin extends AbstractUIPlugin {
                 </mediaobject>
             </figure>
             
-        </sect2><!-- addPluginToIC2D -->
+        </sect3><!-- addPluginToIC2D -->
         
-        <sect2 id="perspectivesViewsEditors">
+        <sect3 id="perspectivesViewsEditors">
             
             <title>Perspectives, views and editors</title>
             
@@ -430,7 +440,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                 </mediaobject>
             </figure>
             
-            <sect3 id="perspectives">
+            <sect4 id="perspectives">
                 <title>Perspectives</title>
                 
                 <para>
@@ -457,7 +467,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                     </emphasis></para></listitem>
                 </orderedlist>
                 
-                <sect4 id="perspectives_step1">
+                <sect5 id="perspectives_step1">
                     
                     <title>Step 1 : Add a Perspective Extension to the plugin.xml file</title>
                     
@@ -546,9 +556,9 @@ public class ExamplePlugin extends AbstractUIPlugin {
                     </example>
                     
                     
-                </sect4><!-- perspectives_step1 -->
+                </sect5><!-- perspectives_step1 -->
                 
-                <sect4 id="perspectives_step2">
+                <sect5 id="perspectives_step2">
                     
                     <title>Step 2 : Define a Perspective Class for the Extension within the Plug-in</title>
                     
@@ -579,11 +589,11 @@ public class ExamplePerspective implements IPerspectiveFactory {
                         You have created your first perspective !
                     </para>
                     
-                </sect4><!-- perspectives_step2 -->
+                </sect5><!-- perspectives_step2 -->
                 
-            </sect3><!-- perspectives -->
+            </sect4><!-- perspectives -->
             
-            <sect3 id="views">
+            <sect4 id="views">
                 
                 <title>Views</title>
                 
@@ -598,7 +608,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
                     and to <emphasis role="bold">define a view class for the extension within the plug-in</emphasis>.
                 </para>
                 
-                <sect4 id="views_step1">
+                <sect5 id="views_step1">
                     
                     <title>Step 1 : Add a View Extension to the plugin.xml file</title>
                     
@@ -616,11 +626,11 @@ public class ExamplePerspective implements IPerspectiveFactory {
                         </mediaobject>
                     </figure>
                     
-                </sect4><!-- views_step1 -->
+                </sect5><!-- views_step1 -->
                 
-            </sect3><!-- views -->
+            </sect4><!-- views -->
             
-            <sect3 id="editor">
+            <sect4 id="editor">
                 <title>Editors</title>
                 
                 <para>
@@ -628,11 +638,11 @@ public class ExamplePerspective implements IPerspectiveFactory {
                     with the primary focus of attention, which may be a document, data object, or person. 
                     The primary focus of attention is a reflection of the primary task.
                 </para>
-            </sect3><!-- editor -->
+            </sect4><!-- editor -->
             
-        </sect2><!-- perspectivesViewsEditors -->
+        </sect3><!-- perspectivesViewsEditors -->
         
-        <sect2 id="links">
+        <sect3 id="links">
             <title>Useful links</title>
             
             <itemizedlist>
@@ -665,9 +675,11 @@ public class ExamplePerspective implements IPerspectiveFactory {
                 </para></listitem>
             </itemizedlist>
             
-        </sect2><!-- links -->
+        </sect3><!-- links -->
         
-    </sect1><!-- implementAPlugin -->
+    </sect2><!-- implementAPlugin -->
+    
+    </sect1>
     
 </chapter><!-- newIC2D -->
      
