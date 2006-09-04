@@ -94,6 +94,30 @@
                 
             </sect3> <!-- Hierarchy of the data -->
             
+            <sect3 id="mvc">
+                
+                <title>Model View Controller</title>
+                
+                <sect4 id="gef">
+                    <title>GEF</title>
+                    
+                    <para></para>
+                </sect4> <!-- GEF -->
+                
+                <sect4 id="observer">
+                    <title>Observer/Observable</title>
+                    
+                    <para></para>
+                </sect4> <!-- Observer/Observable -->
+                
+            </sect3> <!-- Model View Controller -->
+            
+            <sect3 id="spy">
+                <title>The espionage of the active objects</title>
+                
+                <para></para>
+            </sect3> <!-- The espionage of the active objects -->
+            
         </sect2>
         
     </sect1> <!-- Architecture and documentation -->
