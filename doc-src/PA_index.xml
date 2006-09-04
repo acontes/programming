@@ -53,6 +53,7 @@
 <!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
 <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
 <!ENTITY IC2D_EclipsePlugin SYSTEM "ic2d/IC2D_EclipsePlugin.xml">
+<!ENTITY extendingIC2D SYSTEM "ic2d/extendingIC2D.xml">
 ]>
 <book>
  <!--
@@ -128,16 +129,19 @@
     &IC2D_EclipsePlugin;
    </part>
 
-<!--
+
 
    <part id="ProActiveExtensions">
     <title>Extending ProActive</title>
     &writeDoc;
+    &extendingIC2D;
     &DescriptorProcess;
     &devFileTransfer;
     &devFaultTolerance;
     &MOP;
    </part>
+    
+ <!--
      
    <part id="backMattersPart">
     <title>Back matters</title>
