@@ -4,12 +4,95 @@
     
     <title>Adding Grahical User Interfaces and Eclipse Plugins</title>
     
-    <sect1>
+    <sect1 id="archiDoc">
+        
         <title>Architecture and documentation</title>
         
-        <para></para>
+        <para>
+            IC2D is composed of several plugins :
+        </para>
+        <itemizedlist>
+            <listitem><para>
+                <emphasis role="bold">org.objectweb.proactive.ic2d</emphasis> : TODO describe its role
+            </para></listitem>
+            <listitem><para>
+                <emphasis role="bold">org.objectweb.proactive.ic2d.monitoring</emphasis> : allows graphical visualisation of hosts,
+                Java Virtual Machines, and active objects, including the topology and volume of
+                communications.
+            </para></listitem>
+            <listitem><para>
+                <emphasis role="bold">org.objectweb.proactive.ic2d.jobmonitoring</emphasis> : allows tree representation of hosts,
+                Java Virtual Machines, and active objects.
+            </para></listitem>
+            <listitem><para>
+                <emphasis role="bold">org.objectweb.proactive.ic2d.launcher</emphasis> : launches applications with xml descriptors
+            </para></listitem>
+            <listitem><para>
+                <emphasis role="bold">org.objectweb.proactive.ic2d.lib</emphasis> : contains all jar (which are not provided by Eclipse)
+                necessary to the other plugins (like ProActive.jar, log4j.jar, ...)
+            </para></listitem>
+            <listitem><para>
+                <emphasis role="bold">org.objectweb.proactive.ic2d.console</emphasis> : provides methods used to log in the Eclipse console.
+            </para></listitem>
+        </itemizedlist>
         
-    </sect1>
+        
+        
+        <sect2 id="org.objectweb.proactive.ic2d.monitoring">
+        
+            <title>org.objectweb.proactive.ic2d.monitoring</title>    
+            
+            <para>
+                As you can see in the following figure (<xref linkend="graphicalHierarchy"/>), this plugin allows graphical representation of
+                <emphasis role="bold">hosts</emphasis>, <emphasis role="bold">virtual nodes</emphasis>,
+                <emphasis role="bold">JVM</emphasis>, <emphasis role="bold">nodes</emphasis> and
+                <emphasis role="bold">active objects</emphasis>.
+            </para>
+            
+            <figure id="graphicalHierarchy">
+                <title>Graphical representation of the data</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="ic2d/images/architecture/graphicalHierarchy.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            
+            <para>
+                In the diagram <xref linkend="hierarchy"/> you can see relations of the data :
+            </para>
+            <itemizedlist>
+                <listitem><para>
+                    The world is a "special" object wich contains all instances of hosts and virtual nodes.
+                </para></listitem>
+                <listitem><para>
+                    A host may contain several JVM
+                </para></listitem>
+                <listitem><para>
+                    A JVM may contain several nodes
+                </para></listitem>
+                <listitem><para>
+                    A virtual node may contain several nodes
+                </para></listitem>
+                <listitem><para>
+                    A node may contain several active objects
+                </para></listitem>
+            </itemizedlist>
+            
+            <figure id="hierarchy">
+                <title>Relations of the data</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            
+        </sect2>
+        
+    </sect1> <!-- Architecture and documentation -->
+    
+    <!-- ************************************************************************************************** -->
     
     <sect1>
         <title>Extending IC2D</title>
