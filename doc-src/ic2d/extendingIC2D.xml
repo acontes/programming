@@ -156,7 +156,8 @@
                     </para>
                     
                     <para>
-                        We will explain here only the principles necessary to the comprehension of GEF. For more explanation on GEF go to the <xref linkend="MVCLinks"/>.
+                        We will explain here only the principles necessary to the comprehension of GEF. For more explanation on GEF go to the
+                        <xref linkend="MVCLinks"/>.
                     </para>
                     
                     <para>
@@ -165,7 +166,9 @@
                     
                     <itemizedlist>
                         <listitem><para>The Models</para></listitem>
-                        <listitem><para>The Controllers = In GEF the controllers are subclasses of <emphasis role="bold">EditPart</emphasis></para></listitem>
+                        <listitem><para>
+                            The Controllers = In GEF the controllers are subclasses of <emphasis role="bold">EditPart</emphasis>
+                        </para></listitem>
                         <listitem><para>The Views = The <emphasis role="bold">Figure</emphasis>s</para></listitem>
                     </itemizedlist>
                     
@@ -338,19 +341,52 @@
                 
             </sect3> <!-- The espionage of the active objects -->
             
+            
+            <sect3 id="filters">
+                
+                <title>How to create and use filters</title>
+                
+                <para>
+                    It is possible that you don't want the user to see some objects when he is monitoring, for example
+                    the JVM of IC2D or the spies. That's why there is filters in the plugin monitoring.
+                </para>
+                
+                <para>
+                    In the package <emphasis role="bold">org.objectweb.proactive.monitoring.filters</emphasis>, you can find :
+                </para>
+                <itemizedlist>
+                    <listitem><para>
+                        the abstract class <emphasis role="bold">Filter</emphasis>, which must be extended by all filter classes,
+                        that's to say that all filters must provide a method <emphasis role="bold">filter</emphasis>(AbstractDataObject)
+                        which return true if it matches the filter and false otherwise.
+                    </para></listitem>
+                    <listitem><para>
+                        the class <emphasis role="bold">FilterProcess</emphasis> which provides the method 
+                        <emphasis role="bold">filter</emphasis>(AbstractDataObject object).For example this method is called when 
+                        a new object is discovered. It applies all filters on the object and if at least one filter returns true the object
+                        is not monitored. But you can use this method for another thing.
+                    </para></listitem>
+                </itemizedlist>
+     
+            </sect3>
+            
+            
             <sect3 id="MVCLinks">
                 <title>Links</title>
                 <para>
                     The official site of GEF : <ulink url="http://www.eclipse.org/gef/"></ulink>
                 </para>
                 <para>
-                    A web page referring a lot of very interesting links about GEF: <ulink url="http://eclipsewiki.editme.com/GEF">http://eclipsewiki.editme.com/GEF</ulink>
+                    A web page referring a lot of very interesting links about GEF:
+                    <ulink url="http://eclipsewiki.editme.com/GEF">http://eclipsewiki.editme.com/GEF</ulink>
                 </para>                
                 <para>
-                    A detailed description of GEF : <ulink url="http://eclipse-wiki.info/GEFDescription">http://eclipse-wiki.info/GEFDescription</ulink>
+                    A detailed description of GEF :
+                    <ulink url="http://eclipse-wiki.info/GEFDescription">http://eclipse-wiki.info/GEFDescription</ulink>
                 </para>
                 <para>
-                    A tutorial : 'Building a GEF-based Eclipse editor' : <ulink url="http://home.izforge.com/index.php/2005/08/08/160-building-a-gef-based-eclipse-editor-part-0">Part 0</ulink>,
+                    A tutorial : 'Building a GEF-based Eclipse editor' :
+                    <ulink url="http://home.izforge.com/index.php/2005/08/08/160-building-a-gef-based-eclipse-editor-part-0">Part 0</ulink>,
                     <ulink url="http://home.izforge.com/index.php/2005/08/09/161-building-a-gef-based-eclipse-editor-part-1">Part 1</ulink>, 
                     <ulink url="http://home.izforge.com/index.php/2005/08/18/166-building-a-gef-based-eclipse-editor-part-2">Part 2</ulink>, 
                     <ulink url="http://home.izforge.com/index.php/2005/09/01/170-building-a-gef-based-eclipse-editor-part-3">Part 3</ulink>.
@@ -361,6 +397,64 @@
                 </para>
                 
             </sect3><!-- Links -->
+            
+        </sect2>
+        
+        <sect2 id="org.objectweb.proactive.ic2d.console">
+            
+            <title>org.objectweb.proactive.ic2d.console</title>
+            
+            <para>
+                This plugin provides several methods to log in the console :
+            </para>
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis role="bold">log</emphasis>(String message)
+                </para></listitem>
+                <listitem><para>
+                    <emphasis role="bold">warn</emphasis>(String message)
+                </para></listitem>
+                <listitem><para>
+                    <emphasis role="bold">err</emphasis>(String message)
+                </para></listitem>
+                <listitem><para>
+                    <emphasis role="bold">logException</emphasis>(Throwable e)
+                </para></listitem>
+                <listitem><para>
+                    <emphasis role="bold">debug</emphasis>(String message)
+                </para></listitem>
+                <listitem><para>
+                    <emphasis role="bold">debug</emphasis>(Throwable e)
+                </para></listitem>
+            </itemizedlist>
+            
+            <para>
+                You can have several different consoles. For example, the plugin
+                monitoring logs in a console named "Monitoring", all the log4j
+                messages are logged in the console "Log4j", ...  
+            </para>
+            
+            <para>
+                If you want to add your own console, you must choose a unique name.
+                and call the method Console.<emphasis role="bold">getInstance</emphasis>(String yourUniqueName)
+                to obtain the console (if it didn't exist it is created). Then you can call the methods above on your console.
+            </para>
+            
+        </sect2> <!-- org.objectweb.proactive.ic2d.console -->
+        
+        
+        
+        <sect2 id="org.objectweb.proactive.ic2d.lib">
+            
+            <title>org.objectweb.proactive.ic2d.lib</title>
+            
+            <para>
+                This plugin contains all jar (which are not provided by Eclipse)
+                necessary to the other plugins (like ProActive.jar, log4j.jar, ...). 
+                So if you modify the code and need a new jar, you have to add it to the plugin lib.
+                And if you create a new plugin which needs a jar which is in the plugin lib,
+                it must be dependent of this plugin.   
+            </para>
             
         </sect2>
         
@@ -998,7 +1092,8 @@ public class ExamplePerspective implements IPerspectiveFactory {
                         <ulink url="http://www.eclipse.org/articles/Article-RCP-2/tutorial3.html">Rich Client Tutorial Part 3</ulink>
                     </para></listitem>
                     <listitem><para>
-                        <ulink url="http://www.eclipsecon.org/2005/presentations/EclipseCon2005_Tutorial26.pdf">Developing for the Rich Client Platform</ulink>
+                        <ulink url="http://www.eclipsecon.org/2005/presentations/EclipseCon2005_Tutorial26.pdf">Developing
+                        for the Rich Client Platform</ulink>
                     </para></listitem>
                     <listitem><para>
                         <ulink url="http://wiki.eclipse.org/images/d/d9/EclipseCon_RCP_Tutorial_2006.pdf">Rich Client Application Development</ulink>
@@ -1007,7 +1102,8 @@ public class ExamplePerspective implements IPerspectiveFactory {
                         <ulink url="http://www.eclipse.org/articles/viewArticle/ViewArticle2.html">Creating an Eclipse View</ulink>
                     </para></listitem>
                     <listitem><para>
-                        <ulink url="http://www.eclipse.org/articles/using-perspectives/PerspectiveArticle.html">Using Perspectives in the Eclipse UI</ulink>
+                        <ulink url="http://www.eclipse.org/articles/using-perspectives/PerspectiveArticle.html">Using
+                        Perspectives in the Eclipse UI</ulink>
                     </para></listitem>
                     <listitem><para>
                         <ulink url="http://wiki.eclipse.org/index.php/Eclipse_FAQs">The Official Eclipse FAQs</ulink>
