@@ -99,9 +99,83 @@
                 <title>Model View Controller</title>
                 
                 <sect4 id="gef">
-                    <title>GEF</title>
+                    <title> The Graphical Editing Framework (GEF)</title>
                     
-                    <para></para>
+                    <para>
+                        GEF is a tool developped by the Eclipse foundation.
+                        This tool allows developers to create a rich graph from an existing application model. GEF contains a powerful MVC.
+                    </para>
+                    
+                    <para>
+                        We will explain here only the principles necessary to the comprehension of GEF. For more explanation on GEF go to the <xref linkend="MVCLinks"/>.
+                    </para>
+                    
+                    <para>
+                        We must first of all provide :
+                    </para>
+                    
+                    <itemizedlist>
+                        <listitem><para>The Models</para></listitem>
+                        <listitem><para>The Controllers = In GEF the controllers are subclasses of <emphasis role="bold">EditPart</emphasis></para></listitem>
+                        <listitem><para>The Views = The <emphasis role="bold">Figure</emphasis>s</para></listitem>
+                    </itemizedlist>
+                    
+                    <figure id="models">
+                        <title>The Models</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata align="center" fileref="ic2d/images/architecture/GEFDataTransparency.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                    <figure id="controllers">
+                        <title>The Controllers and the factory</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata align="center" fileref="ic2d/images/architecture/GEFEditPartTransparency.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                    <figure id="figures">
+                        <title>The Views</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata align="center" fileref="ic2d/images/architecture/GEFFigureTransparency.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                    <para><emphasis role="bold">3 things not to be forgotten</emphasis></para>
+                    
+                    
+                    
+                    <itemizedlist>
+                        <listitem><para>The data must be represented in <emphasis role="bold">a tree architecture</emphasis>.
+                            Here the data are structured in the following way : WorldObject can contain severals HostObjects
+                            which can contain severals NodeObjects, etc...</para></listitem>
+                        <listitem><para>In GEF the controllers are subclasses of <emphasis role="bold">EditPart</emphasis></para></listitem>
+                        <listitem><para>A <emphasis role="bold">factory</emphasis>(implementing <emphasis role="bold">EditPartFactory</emphasis>
+                            ) allows GEF to create the controller corresponding to the model.</para></listitem>
+                    </itemizedlist>
+                    
+                    
+                    
+                    <para><emphasis role="bold">Description of the creation of the controllers and the figures step by step :</emphasis></para>
+                    
+                    <orderedlist>
+                        <listitem><para>We indicate to GEF the root element of the tree, and the factory.</para></listitem>
+                        <listitem><para>GEF asks to the factory to create the controller corresponding to the root.</para></listitem>
+                        <listitem><para>GEF asks to the obtained controller to create the figure corresponding to the model.</para></listitem>
+                        <listitem><para>GEF asks to the root to provide him its sons.</para></listitem>
+                        <listitem><para>On each one of these children, GEF will do the same process.</para></listitem>
+                        <listitem><para>GEF asks to the factory to create the controller corresponding to first child.</para></listitem>
+                        <listitem><para>GEF asks to the obtained controller to create the figure corresponding to the model.</para></listitem>
+                        <listitem><para>GEF asks to the model to provide him its sons.</para></listitem>
+                        <listitem><para>etc...</para></listitem>
+                    </orderedlist>
+                    
                 </sect4> <!-- GEF -->
                 
                 <sect4 id="observerObservable">
@@ -192,6 +266,30 @@
                 
                 <para></para>
             </sect3> <!-- The espionage of the active objects -->
+            
+            <sect3 id="MVCLinks">
+                <title>Links</title>
+                <para>
+                    The official site of GEF : <ulink url="http://www.eclipse.org/gef/"></ulink>
+                </para>
+                <para>
+                    A web page referring a lot of very interesting links about GEF: <ulink url="http://eclipsewiki.editme.com/GEF">http://eclipsewiki.editme.com/GEF</ulink>
+                </para>                
+                <para>
+                    A detailed description of GEF : <ulink url="http://eclipse-wiki.info/GEFDescription">http://eclipse-wiki.info/GEFDescription</ulink>
+                </para>
+                <para>
+                    A tutorial : 'Building a GEF-based Eclipse editor' : <ulink url="http://home.izforge.com/index.php/2005/08/08/160-building-a-gef-based-eclipse-editor-part-0">Part 0</ulink>,
+                    <ulink url="http://home.izforge.com/index.php/2005/08/09/161-building-a-gef-based-eclipse-editor-part-1">Part 1</ulink>, 
+                    <ulink url="http://home.izforge.com/index.php/2005/08/18/166-building-a-gef-based-eclipse-editor-part-2">Part 2</ulink>, 
+                    <ulink url="http://home.izforge.com/index.php/2005/09/01/170-building-a-gef-based-eclipse-editor-part-3">Part 3</ulink>.
+                </para>
+                
+                <para>
+                    Somes GEF examples : <ulink url="http://eclipse-wiki.info/GEFExamples">http://eclipse-wiki.info/GEFExamples</ulink>
+                </para>
+                
+            </sect3><!-- Links -->
             
         </sect2>
         
@@ -414,49 +512,41 @@
                         </mediaobject>
                     </figure>
                     
-                    <sect5 id="manifestMF">
-                        
-                        <title>MANIFEST.MF</title>
-                        
-                        <para> The <emphasis role="bold">OSGi bundle manifest</emphasis> is stored in
-                            MANIFEST.MF. OSGi is the name of a standard that Eclipse uses for
-                            dynamically loading plug-ins. <xref linkend="manifestMFListing"/> shows the OSGi bundle
-                            manifest generated by the plug-in wizard. Everything in this file can be
-                            edited by the Manifest editor, so <emphasis role="bold">there should be no
-                                need to edit it by hand</emphasis>. However if you need to, just
-                            double-click it in the Package Explorer to bring up the Manifest editor,
-                            then click on the MANIFEST.MF tab in the editor to see and modify the
-                            source. </para>
-                        
-                        <example id="manifestMFListing">
-                            <title>MANIFEST.MF</title>
-                            <screen>Manifest-Version: 1.0
-                                Bundle-ManifestVersion: 2
-                                Bundle-Name: Example Plug-in
-                                Bundle-SymbolicName: org.objectweb.proactive.ic2d.example
-                                Bundle-Version: 1.0.0
-                                Bundle-Activator: org.objectweb.proactive.ic2d.example.ExamplePlugin
-                                Bundle-Localization: plugin
-                                Require-Bundle: org.eclipse.ui,
-                                org.eclipse.core.runtime
-                                Eclipse-AutoStart: true</screen>
-                        </example>
-                        
-                    </sect5><!-- manifestMF -->
+                    <para><emphasis role="bold">MANIFEST.MF</emphasis></para>
                     
-                    <sect5 id="pluginXML">
-                        
-                        <title>plugin.xml</title>
-                        
-                        <para>
-                            The Eclipse extension manifest is called plugin.xml. It's used for defining and 
-                            using Eclipse <emphasis role="bold">extension points</emphasis>, so if you're not 
-                            using extension points then this file may be omitted. Extension points are the 
-                            fundamental way that Eclipse plug-ins are tied together. This new plug-in is not 
-                            yet using extension points so the plug-in wizard didn't generate the plugin.xml file.
-                        </para>
-                        
-                    </sect5><!-- pluginXML -->
+                    <para> The <emphasis role="bold">OSGi bundle manifest</emphasis> is stored in
+                        MANIFEST.MF. OSGi is the name of a standard that Eclipse uses for
+                        dynamically loading plug-ins. <xref linkend="manifestMFListing"/> shows the OSGi bundle
+                        manifest generated by the plug-in wizard. Everything in this file can be
+                        edited by the Manifest editor, so <emphasis role="bold">there should be no
+                            need to edit it by hand</emphasis>. However if you need to, just
+                        double-click it in the Package Explorer to bring up the Manifest editor,
+                        then click on the MANIFEST.MF tab in the editor to see and modify the
+                        source. </para>
+                    
+                    <example id="manifestMFListing">
+                        <title>MANIFEST.MF</title>
+                        <screen>Manifest-Version: 1.0
+                            Bundle-ManifestVersion: 2
+                            Bundle-Name: Example Plug-in
+                            Bundle-SymbolicName: org.objectweb.proactive.ic2d.example
+                            Bundle-Version: 1.0.0
+                            Bundle-Activator: org.objectweb.proactive.ic2d.example.ExamplePlugin
+                            Bundle-Localization: plugin
+                            Require-Bundle: org.eclipse.ui,
+                            org.eclipse.core.runtime
+                            Eclipse-AutoStart: true</screen>
+                    </example>
+                    
+                    <para><emphasis role="bold">plugin.xml</emphasis></para>
+                    
+                    <para>
+                        The Eclipse extension manifest is called plugin.xml. It's used for defining and 
+                        using Eclipse <emphasis role="bold">extension points</emphasis>, so if you're not 
+                        using extension points then this file may be omitted. Extension points are the 
+                        fundamental way that Eclipse plug-ins are tied together. This new plug-in is not 
+                        yet using extension points so the plug-in wizard didn't generate the plugin.xml file.
+                    </para>
                     
                 </sect4><!-- pluginManifest -->
                 
@@ -655,9 +745,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                         </emphasis></para></listitem>
                     </orderedlist>
                     
-                    <sect5 id="perspectives_step1">
-                        
-                        <title>Step 1 : Add a Perspective Extension to the plugin.xml file</title>
+                    <para><emphasis role="bold">Step 1 : Add a Perspective Extension to the plugin.xml file</emphasis></para>
                         
                         <orderedlist>
                             <listitem><para>
@@ -744,11 +832,9 @@ public class ExamplePlugin extends AbstractUIPlugin {
                         </example>
                         
                         
-                    </sect5><!-- perspectives_step1 -->
+
                     
-                    <sect5 id="perspectives_step2">
-                        
-                        <title>Step 2 : Define a Perspective Class for the Extension within the Plug-in</title>
+                    <para><emphasis role="bold">Step 2 : Define a Perspective Class for the Extension within the Plug-in</emphasis></para>
                         
                         <para>
                             Now we need to define the perspective class which must implements the IPerspectiveFactory interface :
@@ -776,9 +862,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
                         <para>
                             You have created your first perspective !
                         </para>
-                        
-                    </sect5><!-- perspectives_step2 -->
-                    
+                                            
                 </sect4><!-- perspectives -->
                 
                 <sect4 id="views">
@@ -796,9 +880,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
                         and to <emphasis role="bold">define a view class for the extension within the plug-in</emphasis>.
                     </para>
                     
-                    <sect5 id="views_step1">
-                        
-                        <title>Step 1 : Add a View Extension to the plugin.xml file</title>
+                    <para><emphasis role="bold">Step 1 : Add a View Extension to the plugin.xml file</emphasis></para>
                         
                         <para>
                             Add an extension : org.eclipse.ui.views, then add a view and configure it. 
@@ -814,8 +896,6 @@ public class ExamplePerspective implements IPerspectiveFactory {
                             </mediaobject>
                         </figure>
                         
-                    </sect5><!-- views_step1 -->
-                    
                 </sect4><!-- views -->
                 
                 <sect4 id="editor">
