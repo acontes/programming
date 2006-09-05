@@ -204,15 +204,23 @@
                     
                     
                     <itemizedlist>
-                        <listitem><para>The data must be represented in <emphasis role="bold">a tree architecture</emphasis>.
-                            Here the data are structured in the following way : WorldObject can contain severals HostObjects
-                            which can contain severals NodeObjects, etc...</para></listitem>
+                        <listitem><para>The data must be organized in <emphasis role="bold">a tree structure.</emphasis>. See <xref linkend="treeGEF"/></para></listitem>
                         <listitem><para>In GEF the controllers are subclasses of <emphasis role="bold">EditPart</emphasis></para></listitem>
                         <listitem><para>A <emphasis role="bold">factory</emphasis>(implementing <emphasis role="bold">EditPartFactory</emphasis>
                             ) allows GEF to create the controller corresponding to the model.</para></listitem>
                     </itemizedlist>
                     
                     
+                    <para>In blue, the data which we use with GEF. As you can see it, they are organized in a tree structure.</para>
+                    
+                    <figure id="treeGEF">
+                        <title>The data strucure of the monitoring plugin</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata align="center" fileref="ic2d/images/architecture/treeArchitectureGef.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
                     
                     <para><emphasis role="bold">Description of the creation of the controllers and the figures step by step :</emphasis></para>
                     
@@ -317,7 +325,7 @@
                 <title>The espionage of the active objects</title>
                 
                 <para>
-                    In the following diagram, you can see all classes necessary to the espionage of the avctive objects.
+                    In the following diagram, you can see all classes necessary to the espionage of the active objects.
                 </para>
                 
                 <figure id="spyDiagram">
@@ -338,6 +346,58 @@
                         When a node is found for the first time, IC2D put a spy in the node
                     </para></listitem>
                 </orderedlist>
+                
+                <sect4 id="spyEvent">
+                    <title>How an event of a proactive object arrive to the monitoring plugin?</title>
+                    
+                    <para></para>
+                    
+                    <orderedlist>
+                        <listitem><para>The <emphasis role="bold">Spy</emphasis> regularly asks to the <emphasis role="bold">SpyEventManager</emphasis> to provide all the events.</para></listitem>
+                        <listitem><para>Then the Spy transmits all these events to the <emphasis role="bold">SpyListener</emphasis>.</para></listitem>
+                        <listitem><para>For the each event, the SpyListener calls the corresponding method on <emphasis role="bold">SpyEventListener</emphasis></para></listitem>
+                        <listitem><para>The SpyEventListener searches the <emphasis role="bold">AOObject</emphasis> concerned with this event (thanks to the Node attribut of his class). And it modifies the state of this object.</para></listitem>
+                        <listitem><para>The AOObject notify its observers.</para></listitem>
+                        <listitem><para>The <emphasis role="bold">AOEditPart</emphasis>, which is an AOObject observer, update the view of this Active Object.</para></listitem>
+                    </orderedlist>
+                </sect4>
+                
+                <sect4 id="newSpyWhen">
+                    <title>When a new Spy is created?</title>
+                    
+                    <para>A new spy is created each time that a new Node is found.</para>
+                </sect4>
+                
+                <sect4 id="newSpyHow">
+                    <title>How a new Spy is created?</title>
+                    
+                    <para>The NodeObject calls its "addSpy()" method :</para>
+                    
+                    <orderedlist>
+                        <listitem><para>This method creates a <emphasis role="bold">SpyEventListener</emphasis> with the <emphasis role="bold">NodeObject</emphasis> in parameter.</para></listitem>
+                        <listitem><para>It creates also a <emphasis role="bold">SpyListener</emphasis> with the SpyEventListener in parameter.</para></listitem>
+                        <listitem><para>Next,it <emphasis role="bold">turns active</emphasis> the previous SpyListener.</para></listitem>
+                        <listitem><para>And creates a new Active Object (with the <emphasis role="bold">ProActive.newActive</emphasis> method) which is the spy with 2 parameters :
+                            the turned active object (SpyListener) ,
+                            and the <emphasis role="bold">node</emphasis>.
+                            (This node is given in parameter at the constructor of the NodeObject)</para></listitem>
+                    </orderedlist>
+                      
+                </sect4>
+                
+                <sect4 id="gef">
+                    <title>How an active object is added to the objects to monitor?</title>
+                    
+                    <para></para>
+                    
+                    <orderedlist>
+                        <listitem><para>When an active object is founded for the first time, we ask to the <emphasis role="bold">NodeObject</emphasis> to provide us the spy.</para></listitem>
+                        <listitem><para>And, we call the '<emphasis role="bold">addMessageEventListener</emphasis>' method of the <emphasis role="bold">Spy</emphasis>.</para></listitem>
+                        <listitem><para>The Spy calls on its <emphasis role="bold">SpyEventManager</emphasis> the '<emphasis role="bold">addMessageEventListener</emphasis>' method.</para></listitem>
+                        <listitem><para>And to finish this SpyEventManager adds a listener of <emphasis role="bold">MessageEvent</emphasis> to the <emphasis role="bold">body</emphasis> of the active object.</para></listitem>
+                    </orderedlist>
+
+                </sect4>
                 
             </sect3> <!-- The espionage of the active objects -->
             
