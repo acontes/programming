@@ -58,6 +58,8 @@
                 </mediaobject>
             </figure>
             
+            
+            
             <sect3 id="hierarchyPart">
                 
                 <title>Hierarchy of the data</title>
@@ -93,6 +95,53 @@
                 </figure>
                 
             </sect3> <!-- Hierarchy of the data -->
+            
+            
+            
+            <sect3 id="exploration">
+                
+                <title>How works the exploration ?</title>
+                
+                <para>
+                    When the user asks to IC2D to monitor a host, IC2D explores the host in order to find JVM, nodes, virtual nodes,
+                    and active objects. Here is how it works :
+                </para>
+                
+                <itemizedlist>
+                    <listitem><para>
+                        The user wants to monitor a new host
+                    </para></listitem>
+                    <listitem><para>
+                        A new <emphasis role="bold">HostObject</emphasis> is added to the <emphasis role="bold">WorldObject</emphasis>
+                    </para></listitem>
+                    <listitem><para>
+                        The <emphasis role="bold">Refresher</emphasis> thread (in <emphasis role="bold">MonitorThread</emphasis>)
+                        is started and regularly asks to the WorldObject to explore itself
+                    </para></listitem>
+                    <listitem><para>
+                        The WorldObject asks to its HostObjects to explore themselves
+                    </para></listitem>
+                    <listitem><para>
+                        Each HostObject searches its ProActiveRuntimes and creates new <emphasis role="bold">VMObject</emphasis>s
+                        corresponding to the runtimes
+                    </para></listitem>
+                    <listitem><para>
+                        Each VMObject explores itself, that's to say searches Nodes asking it to its ProActiveRuntime,
+                        once it has found Nodes, it creates new <emphasis role="bold">NodeObject</emphasis>s
+                    </para></listitem>
+                    <listitem><para>
+                        Each NodeObject searches all its active objects asking it to the ProActiveRuntime of its parent (VMObject)
+                        and creates the corresponding <emphasis role="bold">AOObject</emphasis>s.
+                    </para></listitem>
+                </itemizedlist>
+                
+                <para>
+                    Now all objects are found. And as it is written above, these operation will be 
+                </para>
+                
+            </sect3> <!-- How to find data? -->
+            
+            
             
             <sect3 id="mvc">
                 
@@ -264,7 +313,29 @@
             <sect3 id="spy">
                 <title>The espionage of the active objects</title>
                 
-                <para></para>
+                <para>
+                    In the following diagram, you can see all classes necessary to the espionage of the avctive objects.
+                </para>
+                
+                <figure id="spyDiagram">
+                    <title>Spies</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata align="center" fileref="ic2d/images/architecture/SpyTransparency.png" format="PNG"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+                
+                <para>
+                    Here is how the espionnage works :
+                </para>
+                
+                <orderedlist>
+                    <listitem><para>
+                        When a node is found for the first time, IC2D put a spy in the node
+                    </para></listitem>
+                </orderedlist>
+                
             </sect3> <!-- The espionage of the active objects -->
             
             <sect3 id="MVCLinks">
