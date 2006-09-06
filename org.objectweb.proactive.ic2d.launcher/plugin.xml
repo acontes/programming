@@ -33,7 +33,7 @@
          <action
                class="org.objectweb.proactive.ic2d.launcher.actions.Launch"
                definitionId="org.objectweb.proactive.ic2d.launcher.actions.Launch"
-               icon="icons/run.gif"
+               icon="src/org/objectweb/proactive/ic2d/launcher/views/launch.gif"
                id="org.objectweb.proactive.ic2d.launcher.actions.Launch"
                label="&amp;Launch the application"
                menubarPath="org.objectweb.proactive.ic2d.launcher.Menu/content"
@@ -41,17 +41,6 @@
                style="push"
                toolbarPath="org.eclipse.ui.workbench.file/launch.ext"
                tooltip="Launch the application"/>
-         <action
-               class="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
-               definitionId="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
-               icon="icons/save.gif"
-               id="org.objectweb.proactive.ic2d.launcher.actions.SaveFile"
-               label="&amp;Save"
-               menubarPath="org.objectweb.proactive.ic2d.launcher.Menu/content"
-               state="true"
-               style="push"
-               toolbarPath="org.eclipse.ui.workbench.file/launch.ext"
-               tooltip="Save the XML file"/>
       </actionSet>
    </extension>
    <extension
@@ -59,7 +48,7 @@
       <editor
             class="org.objectweb.proactive.ic2d.launcher.editors.xml.XMLEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            extensions="xml"
+            extensions="toto"
             icon="icons/text.gif"
             id="org.objectweb.proactive.ic2d.launcher.editors.xml.XMLEditor"
             name="XML Editor">
