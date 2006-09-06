@@ -24,13 +24,17 @@
          <property
                name="aboutImage"
                value="icons/alt_about.gif"/>
+         <property
+               name="startupProgressRect"
+               value="0,300,455,20"/>
       </product>
-   </extension> <extension
+   </extension>
+   <extension
          point="org.eclipse.ui.perspectives">
-                   <perspective
-                         class="org.objectweb.proactive.ic2d.DefaultPerspective"
-                         id="org.objectweb.proactive.ic2d.DefaultPerspective"
-                         name="Default"/>
+      <perspective
+               class="org.objectweb.proactive.ic2d.DefaultPerspective"
+               id="org.objectweb.proactive.ic2d.DefaultPerspective"
+               name="Default"/>
    </extension>
 
 </plugin>

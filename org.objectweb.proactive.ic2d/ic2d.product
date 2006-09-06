@@ -15,13 +15,16 @@
    <windowImages i16="/org.objectweb.proactive.ic2d/icons/alt_window_16.gif" i32="/org.objectweb.proactive.ic2d/icons/alt_window_32.gif"/>
 
    <splash
-      location="org.objectweb.proactive.ic2d" />
+      location="org.objectweb.proactive.ic2d"
+      startupProgressRect="0,300,455,20" />
    <launcher name="IC2D">
+      <linux icon="/org.objectweb.proactive.ic2d/icons/alt_launcher.xpm"/>
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
+
 
    <plugins>
       <plugin id="com.ibm.icu"/>
@@ -29,14 +32,12 @@
       <plugin id="org.eclipse.core.contenttype"/>
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.hpux.PA_RISC" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
+      <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
       <plugin id="org.eclipse.core.variables"/>
       <plugin id="org.eclipse.draw2d"/>
       <plugin id="org.eclipse.equinox.common"/>
@@ -48,23 +49,18 @@
       <plugin id="org.eclipse.jface.text"/>
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.carbon.macosx" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.ppc" fragment="true"/>
       <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.swt.motif.aix.ppc" fragment="true"/>
-      <plugin id="org.eclipse.swt.motif.hpux.PA_RISC" fragment="true"/>
-      <plugin id="org.eclipse.swt.motif.linux.x86" fragment="true"/>
       <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.carbon" fragment="true"/>
       <plugin id="org.eclipse.ui.console"/>
+      <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.objectweb.proactive.ic2d"/>
       <plugin id="org.objectweb.proactive.ic2d.console"/>
+      <plugin id="org.objectweb.proactive.ic2d.jobmonitoring"/>
+      <plugin id="org.objectweb.proactive.ic2d.launcher"/>
       <plugin id="org.objectweb.proactive.ic2d.lib"/>
       <plugin id="org.objectweb.proactive.ic2d.monitoring"/>
    </plugins>
