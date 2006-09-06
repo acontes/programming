@@ -391,10 +391,10 @@
                     <para></para>
                     
                     <orderedlist>
-                        <listitem><para>When an active object is founded for the first time, we ask to the <emphasis role="bold">NodeObject</emphasis> to provide us the spy.</para></listitem>
-                        <listitem><para>And, we call the '<emphasis role="bold">addMessageEventListener</emphasis>' method of the <emphasis role="bold">Spy</emphasis>.</para></listitem>
+                        <listitem><para>When an active object is found for the first time, we ask to the <emphasis role="bold">NodeObject</emphasis> to provide us the spy.</para></listitem>
+                        <listitem><para>We call the '<emphasis role="bold">addMessageEventListener</emphasis>' method on the <emphasis role="bold">Spy</emphasis>.</para></listitem>
                         <listitem><para>The Spy calls on its <emphasis role="bold">SpyEventManager</emphasis> the '<emphasis role="bold">addMessageEventListener</emphasis>' method.</para></listitem>
-                        <listitem><para>And to finish this SpyEventManager adds a listener of <emphasis role="bold">MessageEvent</emphasis> to the <emphasis role="bold">body</emphasis> of the active object.</para></listitem>
+                        <listitem><para>The SpyEventManager adds a <emphasis role="bold">MessageEvent</emphasis> listener to the <emphasis role="bold">body</emphasis> of the active object.</para></listitem>
                     </orderedlist>
 
                 </sect4>
@@ -407,24 +407,25 @@
                 <title>How to create and use filters</title>
                 
                 <para>
-                    It is possible that you don't want the user to see some objects when he is monitoring, for example
-                    the JVM of IC2D or the spies. That's why there is filters in the plugin monitoring.
+                    In some cases, you may want to hide some objects to the users, i.e. don't monitor some internal objects.
+                    For example, spy objects used by IC2D for monitoring JVMs. That's why we introduce the concept of filtering
+                    in the monitoring plugin.
                 </para>
                 
                 <para>
-                    In the package <emphasis role="bold">org.objectweb.proactive.monitoring.filters</emphasis>, you can find :
+                    The package <emphasis role="bold">org.objectweb.proactive.monitoring.filters</emphasis> contains:
                 </para>
                 <itemizedlist>
                     <listitem><para>
-                        the abstract class <emphasis role="bold">Filter</emphasis>, which must be extended by all filter classes,
-                        that's to say that all filters must provide a method <emphasis role="bold">filter</emphasis>(AbstractDataObject)
-                        which return true if it matches the filter and false otherwise.
+                        <emphasis role="bold">Filter</emphasis>: an abstract class, which has to be extended by all filter classes.
+                        This class provides the method <emphasis role="bold">filter</emphasis>(AbstractDataObject)
+                        that returns true if it matches the filter, otherwise false.
                     </para></listitem>
                     <listitem><para>
-                        the class <emphasis role="bold">FilterProcess</emphasis> which provides the method 
-                        <emphasis role="bold">filter</emphasis>(AbstractDataObject object).For example this method is called when 
+                        <emphasis role="bold">FilterProcess</emphasis>: provides the method 
+                        <emphasis role="bold">filter</emphasis>(AbstractDataObject object).This is the first method called when 
                         a new object is discovered. It applies all filters on the object and if at least one filter returns true the object
-                        is not monitored. But you can use this method for another thing.
+                        is not monitored. 
                     </para></listitem>
                 </itemizedlist>
      
@@ -434,7 +435,7 @@
             <sect3 id="MVCLinks">
                 <title>Links</title>
                 <para>
-                    The official site of GEF : <ulink url="http://www.eclipse.org/gef/"></ulink>
+                    The official site of GEF: <ulink url="http://www.eclipse.org/gef/"></ulink>
                 </para>
                 <para>
                     A web page referring a lot of very interesting links about GEF:
