@@ -9,6 +9,7 @@
       <view
             category="org.objectweb.proactive.ic2d.jobmonitoring.JobMonitoringCategory"
             class="org.objectweb.proactive.ic2d.jobmonitoring.views.JobMonitoringView"
+            icon="icons/jobmonitoring.gif"
             id="org.objectweb.proactive.ic2d.jobmonitoring.views.JobMonitoringView"
             name="Job Monitoring"/>
    </extension>
