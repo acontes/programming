@@ -35,6 +35,7 @@ import java.util.List;
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
@@ -81,7 +82,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	 */
 	protected IFigure createFigure() {
 		layer = new FreeformLayer();
-		FlowLayout layout = new FlowLayout()/*new MonitoringLayout(true)*/;
+		FlowLayout layout = /*new FlowLayout()*/new MonitoringLayout();
 		layout.setMajorAlignment(FlowLayout.ALIGN_CENTER);
 		layout.setMajorSpacing(50);
 		layout.setMinorSpacing(50);
@@ -123,5 +124,14 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 		}
 		return super.getAdapter(adapter);
 	}*/
+	
+	private class MonitoringLayout extends FlowLayout {
+		
+		protected void setBoundsOfChild(IFigure parent, IFigure child, Rectangle bounds) {
+			parent.getClientArea(Rectangle.SINGLETON);
+			bounds.translate(Rectangle.SINGLETON.x, Rectangle.SINGLETON.y+100);
+			child.setBounds(bounds);
+		}
+	}
 
 }
