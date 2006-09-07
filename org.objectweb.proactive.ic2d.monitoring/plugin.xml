@@ -7,6 +7,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective"
+            icon="icons/monitoring.gif"
             id="org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective"
             name="Monitoring"/>
    </extension>
@@ -20,12 +21,14 @@
       <view
             category="org.objectweb.proactive.ic2d.monitoring.category"
             class="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
+            icon="icons/monitoring.gif"
             id="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
             name="Monitoring"/>
       <view
             allowMultiple="false"
             category="org.objectweb.proactive.ic2d.monitoring.category"
             class="org.objectweb.proactive.ic2d.monitoring.views.Legend"
+            icon="icons/legend.gif"
             id="org.objectweb.proactive.ic2d.monitoring.views.Legend"
             name="Legend"/>
    </extension>
