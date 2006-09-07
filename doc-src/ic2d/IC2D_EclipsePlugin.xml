@@ -7,21 +7,21 @@
     
     
     <para>
-        IC2D is a tool which enables you to <emphasis role="bold">launch</emphasis>,
+        IC2D is a tool, which enables you to <emphasis role="bold">launch</emphasis>,
         <emphasis role="bold">monitor</emphasis> and <emphasis role="bold">control</emphasis>
         ProActive distributed and grid applications.
     </para>
     <para>
-        You can find it in 2 forms :
+        IC2D is available in two forms :
     </para>
     <itemizedlist>
         <listitem><para>
             A <emphasis role="bold">Java standalone application</emphasis> available
-            for all the platforms ;
+            for all the platforms,
         </para></listitem>
         <listitem><para>
-            An <emphasis role="bold">Eclipse plugin</emphasis>. This plugin also proposes
-            functionalities facilitating the development of applications using ProActive
+            An <emphasis role="bold">Eclipse plugin</emphasis>, this plugin also proposes
+            functionalities for facilitating the development of applications using ProActive
             (TODO a short list ...).
         </para></listitem>
     </itemizedlist>
@@ -33,9 +33,10 @@
         <title>Monitoring and Control</title>
         
         <para>
-            IC2D features <emphasis role="bold">graphical visualisation</emphasis> of hosts,
-            Java Virtual Machines, and active objects, including the topology and volume of
-            communications.
+            The <emphasis role="bold">Monitoring plugin</emphasis> provides a <emphasis role="bold">graphical visualisation</emphasis> for hosts,
+            Java Virtual Machines, and active objects, including the topology and the volume of
+            communications. And the <emphasis role="bold">Job Monitoring plugin</emphasis> provides a 
+            <emphasis role="bold">tree representation</emphasis> of all these objects.
         </para>
         
         <para>
@@ -44,7 +45,7 @@
         </para>
         
         <figure id="monitorNewHost">
-            <title>Dialog in which you have to enter information about the host that you want to monitor</title>
+            <title>Dialog in which you specify the host to be monitored</title>
             <mediaobject>
                 <imageobject>
                     <imagedata fileref="ic2d/images/features/monitor_new_host.png" format="PNG"/>
@@ -52,13 +53,34 @@
             </mediaobject>
         </figure>
         
-        <!-- petite phrase de transition -->
+        <para>
+        	Then you can observe in the <emphasis role="bold">Monitoring view</emphasis> a graphical
+        	representation of the activity of the host.
+        </para>
         
-        <figure id="monitoring">
-            <title>Monitoring of 2 applications : C3D and philosophers (see examples) on 2 hosts</title>
+        <para>
+        	And if you want to observe the <emphasis role="bold">tree representation</emphasis>,
+        	open the <emphasis role="bold">Job Monitoring view</emphasis>:
+        </para>
+        
+        <figure id="openJobMonitoringView">
+            <title>Select the Job Monitoring view in the list</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="ic2d/images/features/monitoring.png" format="PNG"/>
+                    <imagedata fileref="ic2d/images/features/showViewJobMonitoring.png" format="PNG"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        
+   		<para>
+   			The <xref linkend="monitoring"/> is an example of what you can obtain.
+   		</para>
+        
+        <figure id="monitoring">
+            <title>Monitoring of 2 applications</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="ic2d/images/features/RunMonitoring3.png" format="PNG"/>
                 </imageobject>
             </mediaobject>
         </figure>
@@ -75,9 +97,8 @@
             <title>Launcher in IC2D</title>
             
             <para>
-                In order to open an XML descriptor select : Launcher > <emphasis role="bold">Open an XML file
-                </emphasis>
-                . Next select your XML file. Then the <emphasis role="bold">Launcher pespective</emphasis> will open.
+                In order to open a deployment descriptor select : Launcher > <emphasis role="bold">Open an XML file
+                </emphasis>. Next select your deployment file. Then, the <emphasis role="bold">Launcher pespective</emphasis> will open.
             </para>
             
             <para>
@@ -93,7 +114,7 @@
             </para>
             
             <para>
-                Now, the Launcher perspective is open if it was not open before.
+                Now, the Launcher perspective is open.
             </para>
             
             <para>
@@ -109,11 +130,11 @@
             
             <para>
                 This perspective contains an <emphasis role="bold">XML editor</emphasis>, a <emphasis role="bold">console</emphasis>,
-                and the <emphasis role="bold">list of opened xml descriptors</emphasis>.
+                and the <emphasis role="bold">list of opened deployment descriptors</emphasis>.
             </para>
             
             <para>
-                To <emphasis role="bold">launch</emphasis> the application, you have severals possibilities :
+                To <emphasis role="bold">launch</emphasis> an application, you have several possibilities :
                 <itemizedlist>
                     <listitem>
                         <para>Click on the button of the main menu bar, the file which is in the active editor will be launched.</para>
@@ -128,11 +149,11 @@
             </para>
             
             <para>
-                You can kill the applications launched from a popup-menu in the "XML descriptors" liste.
+                You can kill the applications launched from a popup-menu in the "Deployment descriptors" list.
             </para>
             
             <para>
-                To see your launched application, open the "Monitoring perspective" and monitor the corresponding host.
+                To see your application running, open the "Monitoring perspective" and monitor the corresponding host.
             </para>
         </sect2>
         
@@ -148,8 +169,8 @@
         <sect2 >
             <title>ProActive Wizards</title>
             <para>These wizards will guide developpers to make complex operations with
-                ProActive, such as installation, integration , configuration or execution. We have created 4
-                wizards:</para>
+                ProActive, such as installation, integration, configuration, or execution :
+            </para>
             <orderedlist>
                 <listitem>
                     <para> a ProActive installation wizard</para>
@@ -165,7 +186,7 @@
                 </listitem>
             </orderedlist>
             <figure>
-                <title>One wizard popup</title>
+                <title>A wizard popup</title>
                 <mediaobject>
                     <imageobject>
                         <imagedata  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  contentwidth="100" width="6in"/>
