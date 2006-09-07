@@ -6,7 +6,7 @@
       <perspective
             class="org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective"
             fixed="true"
-            icon="icons/perspective.gif"
+            icon="icons/launcher.gif"
             id="org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective"
             name="Launcher"/>
    </extension>
@@ -63,6 +63,7 @@
             allowMultiple="false"
             category="org.objectweb.proactive.ic2d.launcher.categories.Launcher"
             class="org.objectweb.proactive.ic2d.launcher.views.InfoView"
+            icon="icons/xmlDescriptors.gif"
             id="org.objectweb.proactive.ic2d.launcher.views.InfoView"
             name="Activated Applications"/>
    </extension>
