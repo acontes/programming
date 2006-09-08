@@ -25,7 +25,7 @@
             (TODO a short list ...).
         </para></listitem>
     </itemizedlist>
-        
+    
     <!-- ************************************************************************************ -->
     
     <sect1 id="MonitoringControl">
@@ -97,64 +97,83 @@
             <title>Launcher in IC2D</title>
             
             <para>
-                In order to open a deployment descriptor select : Launcher > <emphasis role="bold">Open an XML file
-                </emphasis>. Next select your deployment file. Then, the <emphasis role="bold">Launcher pespective</emphasis> will open.
+                In order to launch a <emphasis role="bold">deployment descriptor</emphasis>, you must open your file with the <emphasis role="bold">IC2D XML Editor</emphasis>.
             </para>
             
             <para>
-                <figure>
-                    <title>The launcher menu</title>
-                    
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="ic2d/images/features/launcher_menu.png" format="PNG"  contentwidth="100" width="6in"/>
-                        </imageobject>
-                    </mediaobject>
-                </figure>
+                To use this editor, you have two possibilities:
             </para>
             
-            <para>
-                Now, the Launcher perspective is open.
-            </para>
+            <sect3>
+                <title>First possibility</title>
+                
+                <para>Open the <emphasis role="bold">Launcher perspective</emphasis>. Select: <emphasis role="bold">Window > Open perspective > Other... > Launcher</emphasis></para>
+                
+                <para>
+                    <figure>
+                        <title>The "Open Perspective" window</title>
+                        
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="ic2d/images/features/perspectiveLauncher.png" format="PNG"  contentwidth="100" width="6in"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                </para>
+                
+                <para>
+                    Then select: <emphasis role="bold">File > Open File...</emphasis> and open your deployment descriptor, it will be opened with the IC2D XML editor. And its name will appear in the <emphasis role="bold">Deployment descriptors</emphasis> list.
+                </para>
+            </sect3>
             
-            <para>
-                <figure>
-                    <title>The Launcher perspective</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="ic2d/images/features/Launcher.png" format="PNG"  contentwidth="100" width="6in"/>
-                        </imageobject>
-                    </mediaobject>
-                </figure>
-            </para>
+            <sect3>
+                <title>Second possibility</title>
+                <para>
+                    In the Navigator view, or another similar, a right click on the XML file allows you to open your file with the <emphasis role="bold">IC2D XML editor</emphasis>.
+                </para>
+                <para>
+                    <figure>
+                        <title>The open with action</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="ic2d/images/features/openWith.png" format="PNG"  contentwidth="100" width="6in"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                </para>     
+            </sect3>
             
-            <para>
-                This perspective contains an <emphasis role="bold">XML editor</emphasis>, a <emphasis role="bold">console</emphasis>,
-                and the <emphasis role="bold">list of opened deployment descriptors</emphasis>.
-            </para>
-            
-            <para>
-                To <emphasis role="bold">launch</emphasis> an application, you have several possibilities :
-                <itemizedlist>
-                    <listitem>
-                        <para>Click on the button of the main menu bar, the file which is in the active editor will be launched.</para>
-                    </listitem>
-                    <listitem>
-                        <para>Select your file in the xml descriptors list, and click on the launch icon in the popup menu.</para>
-                    </listitem>
-                    <listitem>
-                        <para>Select your file in the xml descriptors list, and click on the launch icon on the menu bar of the application list.</para>
-                    </listitem>
-                </itemizedlist>
-            </para>
-            
-            <para>
-                You can kill the applications launched from a popup-menu in the "Deployment descriptors" list.
-            </para>
-            
-            <para>
-                To see your application running, open the "Monitoring perspective" and monitor the corresponding host.
-            </para>
+            <sect3>
+                <title>The Launcher perspective</title>
+                
+                <para>The <xref linkend="launcherPerspective"/> represents the Launcher perspective containing an <emphasis role="bold">XML editor</emphasis>, a <emphasis role="bold">console</emphasis>,
+                    and the <emphasis role="bold">list of deployment descriptors</emphasis>.
+                </para>
+                
+                <para>
+                    To <emphasis role="bold">launch</emphasis> an application, select your file in the deployment descriptors list, and click on the launch icon.
+                </para>
+                
+                <para>
+                    You can <emphasis role="bold">kill</emphasis> the applications launched from a popup-menu in the "Deployment descriptors" list.
+                </para>
+                
+                <para>
+                    To see your application running, open the "Monitoring perspective" and monitor the corresponding host.
+                </para>
+          
+                <para>
+                    <figure id="launcherPerspective">
+                        <title>The Launcher perspective</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata align="center" fileref="ic2d/images/features/LauncherPerspective.png" format="PNG"  contentwidth="100" width="6in"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                </para>
+                
+            </sect3>
         </sect2>
         
         
