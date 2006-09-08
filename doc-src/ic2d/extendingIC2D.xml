@@ -9,30 +9,30 @@
         <title>Architecture and documentation</title>
         
         <para>
-            IC2D is composed of several plugins :
+            IC2D is composed of several plugins:
         </para>
         <itemizedlist>
             <listitem><para>
-                <emphasis role="bold">org.objectweb.proactive.ic2d</emphasis> : TODO describe its role
+                <emphasis role="bold">org.objectweb.proactive.ic2d</emphasis>: TODO describe its role
             </para></listitem>
             <listitem><para>
-                <emphasis role="bold">org.objectweb.proactive.ic2d.monitoring</emphasis> : allows graphical visualisation of hosts,
-                virtual nodes, Java Virtual Machines, and active objects, including the topology and volume of
+                <emphasis role="bold">org.objectweb.proactive.ic2d.monitoring</emphasis>: provides graphical visualisation of hosts,
+                virtual nodes, Java Virtual Machines, and active objects, including the topology and the total of
                 communications.
             </para></listitem>
             <listitem><para>
-                <emphasis role="bold">org.objectweb.proactive.ic2d.jobmonitoring</emphasis> : allows tree representation of hosts,
+                <emphasis role="bold">org.objectweb.proactive.ic2d.jobmonitoring</emphasis>: allows tree representation of hosts,
                 virtual nodes, Java Virtual Machines, and active objects.
             </para></listitem>
             <listitem><para>
-                <emphasis role="bold">org.objectweb.proactive.ic2d.launcher</emphasis> : launches applications with xml descriptors
+                <emphasis role="bold">org.objectweb.proactive.ic2d.launcher</emphasis>: launches applications with deployment descriptors
             </para></listitem>
             <listitem><para>
-                <emphasis role="bold">org.objectweb.proactive.ic2d.lib</emphasis> : contains all jar (which are not provided by Eclipse)
-                necessary to the other plugins (like ProActive.jar, log4j.jar, ...)
+                <emphasis role="bold">org.objectweb.proactive.ic2d.lib</emphasis>: contains all jar (which are not provided by Eclipse)
+                used by the other plugins (like ProActive.jar, log4j.jar, etc)
             </para></listitem>
             <listitem><para>
-                <emphasis role="bold">org.objectweb.proactive.ic2d.console</emphasis> : provides methods used to log in the Eclipse console.
+                <emphasis role="bold">org.objectweb.proactive.ic2d.console</emphasis>: provides methods used to log in the Eclipse console.
             </para></listitem>
         </itemizedlist>
         
@@ -43,9 +43,9 @@
             <title>org.objectweb.proactive.ic2d.monitoring</title>    
             
             <para>
-                As you can see in the following figure (<xref linkend="graphicalHierarchy"/>), this plugin allows graphical representation of
+                <xref linkend="graphicalHierarchy"/>shows the graphical representation of
                 <emphasis role="bold">hosts</emphasis>, <emphasis role="bold">virtual nodes</emphasis>,
-                <emphasis role="bold">JVM</emphasis>, <emphasis role="bold">nodes</emphasis> and
+                <emphasis role="bold">JVM</emphasis>, <emphasis role="bold">nodes</emphasis>, and
                 <emphasis role="bold">active objects</emphasis>.
             </para>
             
@@ -65,28 +65,28 @@
                 <title>Hierarchy of the data</title>
                 
                 <para>
-                    In the diagram <xref linkend="hierarchy"/> you can see relations of the data :
+                    The diagram <xref linkend="hierarchy"/> shows relations between the data:
                 </para>
                 <itemizedlist>
                     <listitem><para>
-                        The world is a "special" object wich contains all instances of hosts and virtual nodes.
+                        The world is a "special" object that contains all hosts and virtual nodes instances.
                     </para></listitem>
                     <listitem><para>
-                        A host may contain several JVM
+                        A host contains one or more JVM
                     </para></listitem>
                     <listitem><para>
-                        A JVM may contain several nodes
+                        A JVM contains one or more nodes
                     </para></listitem>
                     <listitem><para>
-                        A virtual node may contain several nodes
+                        A virtual node contains one or more nodes
                     </para></listitem>
                     <listitem><para>
-                        A node may contain several active objects
+                        A node contains one or more active objects
                     </para></listitem>
                 </itemizedlist>
                 
                 <figure id="hierarchy">
-                    <title>Relations of the data</title>
+                    <title>Relationship</title>
                     <mediaobject>
                         <imageobject>
                             <imagedata align="center" fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png" format="PNG"/>
@@ -100,43 +100,43 @@
             
             <sect3 id="exploration">
                 
-                <title>How works the exploration ?</title>
+                <title>How does the exploration works?</title>
                 
                 <para>
-                    When the user asks to IC2D to monitor a host, IC2D explores the host in order to find JVM, nodes, virtual nodes,
-                    and active objects. Here is how it works :
+                    When the user uses IC2D to monitor a host, IC2D explores the host in order to find any JVMs, nodes, virtual nodes,
+                    and active objects contained within the runtime. The steps are:
                 </para>
                 
                 <itemizedlist>
                     <listitem><para>
-                        The user wants to monitor a new host
+                        The user entersthe URL of the host to monitor
                     </para></listitem>
                     <listitem><para>
                         A new <emphasis role="bold">HostObject</emphasis> is added to the <emphasis role="bold">WorldObject</emphasis>
                     </para></listitem>
                     <listitem><para>
                         The <emphasis role="bold">Refresher</emphasis> thread (in <emphasis role="bold">MonitorThread</emphasis>)
-                        is started and regularly asks to the WorldObject to explore itself
+                        is started and regularly queries the WorldObject to explore itself
                     </para></listitem>
                     <listitem><para>
-                        The WorldObject asks to its HostObjects to explore themselves
+                        The WorldObject queries its HostObjects to explore themselves
                     </para></listitem>
                     <listitem><para>
-                        Each HostObject searches its ProActiveRuntimes and creates new <emphasis role="bold">VMObject</emphasis>s
-                        corresponding to the runtimes
+                        Each HostObject looks for ProActive Runtimes on the current host then creates <emphasis role="bold">VMObject</emphasis>s
+                        corresponding to the newly discovered runtimes
                     </para></listitem>
                     <listitem><para>
-                        Each VMObject explores itself, that's to say searches Nodes asking it to its ProActiveRuntime,
-                        once it has found Nodes, it creates new <emphasis role="bold">NodeObject</emphasis>s
+                        Each VMObject explores itself, looking for Nodes contained within its ProActiveRuntime.
+                        Each Node is mapped into a <emphasis role="bold">NodeObject</emphasis>
                     </para></listitem>
                     <listitem><para>
-                        Each NodeObject searches all its active objects asking it to the ProActiveRuntime of its parent (VMObject)
+                        Each NodeObject looks for contained active objects asking it to the ProActiveRuntime of its parent (VMObject)
                         and creates the corresponding <emphasis role="bold">AOObject</emphasis>s.
                     </para></listitem>
                 </itemizedlist>
                 
                 <para>
-                    Now all objects are found. And as it is written above, these operation will be 
+                    Now all objects are found. And these operation will be regularly repeated until the user stops monitoring.  
                 </para>
                 
             </sect3> <!-- How to find data? -->
@@ -145,31 +145,41 @@
             
             <sect3 id="mvc">
                 
-                <title>Model View Controller</title>
+                <title>Model View Controller (MVC)</title>
                 
                 <sect4 id="gef">
-                    <title> The Graphical Editing Framework (GEF)</title>
+                    <title>The Graphical Editing Framework (GEF)</title>
                     
                     <para>
-                        GEF is a tool developped by the Eclipse foundation.
-                        This tool allows developers to create a rich graph from an existing application model. GEF contains a powerful MVC.
+                    	The <ulink url="http://www.eclipse.org/gef">Graphical Editing Framework (GEF)</ulink>
+                    	allows developers to take an existing 
+                    	application model and quickly create a rich graphical interface.
                     </para>
                     
                     <para>
-                        We will explain here only the principles necessary to the comprehension of GEF. For more explanation on GEF go to the
-                        <xref linkend="MVCLinks"/>.
+                        GEF employs an MVC (Model View Controller) architecture which enables simple changes 
+                        to be applied to the model from the view.
                     </para>
                     
                     <para>
-                        We must first of all provide :
+                        This section introduces the needed to the comprehension of GEF.
+                        For more details about GEF go to the <xref linkend="MVCLinks"/>.
+                    </para>
+                    
+                    <para>
+                    	We describe here the implementation of the MVC pattern used within IC2D: 
                     </para>
                     
                     <itemizedlist>
-                        <listitem><para>The Models</para></listitem>
+                        <listitem><para>The Models (<xref linkend="models"/>)</para></listitem>
                         <listitem><para>
                             The Controllers = In GEF the controllers are subclasses of <emphasis role="bold">EditPart</emphasis>
+                            (<xref linkend="controllers"/>)
                         </para></listitem>
-                        <listitem><para>The Views = The <emphasis role="bold">Figure</emphasis>s</para></listitem>
+                        <listitem><para>
+                        	The Views = The <emphasis role="bold">Figure</emphasis>s
+                        	(<xref linkend="figures"/>)
+                        </para></listitem>
                     </itemizedlist>
                     
                     <figure id="models">
@@ -199,7 +209,7 @@
                         </mediaobject>
                     </figure>
                     
-                    <para><emphasis role="bold">3 things not to be forgotten</emphasis></para>
+                    <para><emphasis role="bold">Three things to not forget</emphasis></para>
                     
                     
                     
@@ -228,11 +238,11 @@
                         <listitem><para>We indicate to GEF the root element of the tree, and the factory.</para></listitem>
                         <listitem><para>GEF asks to the factory to create the controller corresponding to the root.</para></listitem>
                         <listitem><para>GEF asks to the obtained controller to create the figure corresponding to the model.</para></listitem>
-                        <listitem><para>GEF asks to the root to provide him its sons.</para></listitem>
-                        <listitem><para>On each one of these children, GEF will do the same process.</para></listitem>
-                        <listitem><para>GEF asks to the factory to create the controller corresponding to first child.</para></listitem>
+                        <listitem><para>GEF asks to the root to provide it its sons.</para></listitem>
+                        <listitem><para>On each one of these children, GEF do the same process.</para></listitem>
+                        <listitem><para>GEF asks to the factory to create the controller corresponding to the first child.</para></listitem>
                         <listitem><para>GEF asks to the obtained controller to create the figure corresponding to the model.</para></listitem>
-                        <listitem><para>GEF asks to the model to provide him its sons.</para></listitem>
+                        <listitem><para>GEF asks to the model to provide it its sons.</para></listitem>
                         <listitem><para>etc...</para></listitem>
                     </orderedlist>
                     
@@ -242,7 +252,7 @@
                     <title>Observer/Observable</title>
                     
                     <para>
-                        The pattern Observer/Observable is used to update the figures when the model has changed.
+                        The pattern Observer/Observable is used to update the figures when the model changes.
                     </para>
                     <para>
                         In the <xref linkend="observable"/> you can see all the observable objects with
@@ -385,7 +395,7 @@
                       
                 </sect4>
                 
-                <sect4 id="gef">
+                <sect4>
                     <title>How an active object is added to the objects to monitor?</title>
                     
                     <para></para>
@@ -566,7 +576,7 @@
                 <title>SVN Repository</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="ic2d/images/svnRepository.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/extending/svnRepository.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -586,7 +596,7 @@
                 <title>ic2d.product</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="ic2d/images/launch.png" format="PNG"/>
+                        <imagedata fileref="ic2d/images/extending/launch.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -631,7 +641,7 @@
                     <title>Create a new project</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/new_project.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/extending/new_project.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -664,7 +674,7 @@
                     <title>Specify name and plug-in structure</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/new_plugin_project.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/extending/new_plugin_project.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -686,7 +696,7 @@
                     <title>Specify plug-in content</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/new_plugin_project_2.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/extending/new_plugin_project_2.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -710,7 +720,7 @@
                     <title>The plug-in structure</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/package_explorer.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/extending/package_explorer.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -733,7 +743,7 @@
                         <title>Interface for editing the manifest and related files.</title>
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="ic2d/images/overview.png" format="PNG"/>
+                                <imagedata fileref="ic2d/images/extending/overview.png" format="PNG"/>
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -887,7 +897,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                     <title>Configuration</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/ic2d_product.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/extending/ic2d_product.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -900,7 +910,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                     <title>Plug-in selection</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/plugin_selection.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/extending/plugin_selection.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -924,7 +934,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                     <title>About product Plug-ins</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/product_plugins.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/extending/product_plugins.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -939,7 +949,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                     <title>Workbench structure</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/workbench_decomposed.png" format="PNG"/>
+                            <imagedata fileref="ic2d/images/extending/workbench_decomposed.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -986,7 +996,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                             <title>Extensions tab (no extensions)</title>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="ic2d/images/extensions-0.png" format="PNG"/>
+                                    <imagedata fileref="ic2d/images/extending/extensions-0.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -1013,7 +1023,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                             <title>Extensions tab (org.eclipse.ui.perspectives)</title>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="ic2d/images/extensions-1.png" format="PNG"/>
+                                    <imagedata fileref="ic2d/images/extending/extensions-1.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -1032,7 +1042,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
                             <title>Extensions tab (Example)</title>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="ic2d/images/extensions-2.png" format="PNG"/>
+                                    <imagedata fileref="ic2d/images/extending/extensions-2.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -1117,7 +1127,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
                             <title>Extensions tab (org.objectweb.proactive.ic2d.example.view)</title>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="ic2d/images/extensions-3.png" format="PNG"/>
+                                    <imagedata fileref="ic2d/images/extending/extensions-3.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
