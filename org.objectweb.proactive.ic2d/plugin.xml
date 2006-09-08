@@ -17,7 +17,7 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="org.objectweb.proactive.ic2d.application"
-            name="product">
+            name="IC2D">
          <property
                name="windowImages"
                value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
