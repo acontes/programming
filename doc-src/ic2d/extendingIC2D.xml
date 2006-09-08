@@ -236,13 +236,13 @@
                     
                     <orderedlist>
                         <listitem><para>We indicate to GEF the root element of the tree, and the factory.</para></listitem>
-                        <listitem><para>GEF asks to the factory to create the controller corresponding to the root.</para></listitem>
-                        <listitem><para>GEF asks to the obtained controller to create the figure corresponding to the model.</para></listitem>
-                        <listitem><para>GEF asks to the root to provide it its sons.</para></listitem>
+                        <listitem><para>GEF queries the factory to create the controller corresponding to the root.</para></listitem>
+                        <listitem><para>GEF queries the obtained controller to create the figure corresponding to the model.</para></listitem>
+                        <listitem><para>GEF queries the root to provide it its sons.</para></listitem>
                         <listitem><para>On each one of these children, GEF do the same process.</para></listitem>
-                        <listitem><para>GEF asks to the factory to create the controller corresponding to the first child.</para></listitem>
-                        <listitem><para>GEF asks to the obtained controller to create the figure corresponding to the model.</para></listitem>
-                        <listitem><para>GEF asks to the model to provide it its sons.</para></listitem>
+                        <listitem><para>GEF queries the factory to create the controller corresponding to the first child.</para></listitem>
+                        <listitem><para>GEF queries the obtained controller to create the figure corresponding to the model.</para></listitem>
+                        <listitem><para>GEF queries the model to provide it its sons.</para></listitem>
                         <listitem><para>etc...</para></listitem>
                     </orderedlist>
                     
