@@ -34,13 +34,12 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
-import org.objectweb.proactive.ic2d.monitoring.figures.AOConnection;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
-import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
 
 public class AOEditPart extends AbstractMonitoringEditPart{
 
@@ -58,7 +57,7 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 
 	/**
 	 * This method is called whenever the observed object is changed.
-	 * It calls the method <code>refreshVisuals()</code>.
+	 * It calls the method <code>refresh()</code>.
 	 * @param o the observable object (instance of AbstractDataObject).
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
@@ -67,38 +66,37 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 			// State updated
 			if(arg instanceof State){
 				final State state = (State)arg;
+				final IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure().getParent();
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
-						getCastedFigure().setState(state);
-						refreshChildren();
-						refreshVisuals();
+						if(state == State.NOT_MONITORED) {
+							getCastedFigure().removeConnections(panel);
+						}
+						else
+							getCastedFigure().setState(state);
+						refresh();
 					}
 				});
 			}
 			// Add communication
-			else if(arg instanceof SpyMessageEvent){
-				SpyMessageEvent message = (SpyMessageEvent)arg;
-				final String source = message.getSourceBodyID().toString();
-				final String target = message.getDestinationBodyID().toString();
-			
+			else if(arg instanceof AOObject) {
+				final AOFigure source = getCastedFigure();
+				final AOFigure target = (AOFigure)((AbstractGraphicalEditPart)getViewer().getEditPartRegistry().get((AOObject)arg)).getFigure();
+
+				final IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure().getParent();
+
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
-						IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure().getParent();
-						if(((AOObject)getModel()).getID().toString().compareTo(source)==0)
-							AOConnection.addSourceConnection(panel, source, (AOFigure)getFigure(), target);
-						else
-							AOConnection.addTargetConnection(panel, target, (AOFigure)getFigure(), source);
-					}
-				});
+						source.addConnection(target, panel);
+					}});
 			}
 			// Request queue length has changed
 			else if(arg instanceof Integer) {
 				final int length  = ((Integer)arg).intValue();
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
-						((AOFigure)getFigure()).setRequestQueueLength(length);
-						refreshChildren();
-						refreshVisuals();
+						getCastedFigure().setRequestQueueLength(length);
+						refresh();
 					}
 				});
 			}

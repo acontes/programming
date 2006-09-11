@@ -132,11 +132,11 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		//System.out.println("# SpyEventListener : requestMessageReceived ,id="+getName(id));
 		if(!isMonitoring)
 			return;
-		AOObject destination = nodeObject.findActiveObjectById(id);
-		if(destination == null)
+		AOObject target = nodeObject.findActiveObjectById(id);
+		if(target == null)
 			return;
-		destination.setState(State.SERVING_REQUEST);
-		destination.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
+		target.setState(State.SERVING_REQUEST);
+		target.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 
 		UniqueID sourceId = ((SpyMessageEvent) spyEvent).getSourceBodyID();
 		AOObject source = WorldObject.getInstance().findActiveObjectById(sourceId);
@@ -146,14 +146,10 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 			return;
 
 		// We didn't find the destination
-		if(destination == null)
+		if(target == null)
 			return;
 
-		//Communication communication = new Communication(source, destination);
-
-		source.addCommunication(/*communication*/(SpyMessageEvent) spyEvent);
-		destination.addCommunication(/*communication*/(SpyMessageEvent) spyEvent);
-
+		source.addCommunication(target);
 	}
 
 	public void replyMessageReceived(UniqueID id, SpyEvent spyEvent) {

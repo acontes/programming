@@ -116,7 +116,7 @@ public class MonitorThread implements Observer {
 			WorldObject.methodName method = (WorldObject.methodName)arg;
 			if(method == WorldObject.methodName.PUT_CHILD)
 				MonitorThread.getInstance().startRefreshing();
-			else // (method == WorldObject.methodName.REMOVE_CHILD)
+			else if (method == WorldObject.methodName.REMOVE_CHILD)
 				MonitorThread.getInstance().stopRefreshing();
 		}
 	}

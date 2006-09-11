@@ -30,7 +30,12 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Map;
+
 import org.eclipse.draw2d.BorderLayout;
+import org.eclipse.draw2d.Connection;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;
@@ -86,6 +91,11 @@ public class AOFigure extends AbstractFigure {
 	/** Request queue length (used to display small square int the active object) */
 	private int requestQueueLength;
 
+	/** All connections whose target is this and source is the key */
+	private Map<AOFigure, Connection> sourceConnections;
+
+	/** All connections whose source is this and target is the key */
+	private Map<AOFigure, Connection> targetConnections;
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -97,6 +107,8 @@ public class AOFigure extends AbstractFigure {
 		super(text);
 		this.requestQueueLength = 0;
 		addMouseListener(new AOListener());
+		this.sourceConnections = new Hashtable<AOFigure, Connection>();
+		this.targetConnections = new Hashtable<AOFigure, Connection>();
 	}
 
 	/**
@@ -230,6 +242,42 @@ public class AOFigure extends AbstractFigure {
 		this.requestQueueLength = length;
 	}
 
+	/**
+	 * Adds a connection between this and <code>target</code>.
+	 * <code>this</code> is the source and <code>target</code> is the target
+	 * @param target the target of the connection
+	 * @param panel the connection is added to this panel
+	 */
+	public void addConnection(AOFigure target, IFigure panel) {
+		if(targetConnections.get(target) != null)
+			return;
+		Connection connection = AOConnection.createConnection(this, target);
+		this.targetConnections.put(target, connection);
+		target.sourceConnections.put(this, connection);
+		panel.add(connection);
+
+	}
+
+	/**
+	 * Removes all connections linked with <code>this</code>.
+	 * @param panel The panel wich contains all connections
+	 */
+	public void removeConnections(IFigure panel) {
+		for (Enumeration<AOFigure> e = ((Hashtable<AOFigure, Connection>)targetConnections).keys() ; e.hasMoreElements() ;) {
+			AOFigure target = e.nextElement();
+			target.sourceConnections.remove(this);
+			panel.remove(targetConnections.get(target));
+			this.targetConnections.remove(target);
+		}
+
+		for (Enumeration<AOFigure> e = ((Hashtable<AOFigure, Connection>)sourceConnections).keys() ; e.hasMoreElements() ;) {
+			AOFigure source = e.nextElement();
+			source.targetConnections.remove(this);
+			panel.remove(sourceConnections.get(source));
+			this.sourceConnections.remove(source);
+		}
+	}
+	
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
@@ -267,6 +315,7 @@ public class AOFigure extends AbstractFigure {
 		return DEFAULT_BORDER_COLOR;
 	}
 
+	
 	//
 	// -- INNER CLASS -------------------------------------------
 	//
@@ -280,24 +329,24 @@ public class AOFigure extends AbstractFigure {
 			return new Dimension(100,super.calculatePreferredSize(container, wHint, hHint).expand(0, 15).height);
 		}
 	}
-	
-	
+
+
 	public class RequestQueueFigure extends Figure {
 
 		private Color color;
-		
+
 		public RequestQueueFigure(Color color) {
 			this.color = color;
 			setLayoutManager(new RequestQueueLayout());
 		}
-		
+
 		public void paintFigure(Graphics graphics) {
 			super.paintFigure(graphics);
 			graphics.setBackgroundColor(color);
 			graphics.fillRectangle(bounds.x, bounds.y, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
 			graphics.restoreState();
 		}
-		
+
 		class RequestQueueLayout extends BorderLayout {
 			@Override
 			protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {

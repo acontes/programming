@@ -95,7 +95,7 @@ public class NodeObject extends AbstractDataObject{
 	//
 
 	public NodeObject(VMObject parent, Node node){
-		super(parent/*, node.getNodeInformation().getName()*/);
+		super(parent);
 		Comparator<String> comparator = new AOObject.AOComparator();
 		monitoredChildren = new TreeMap<String , AbstractDataObject>(comparator);
 		this.node = node;

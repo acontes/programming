@@ -53,15 +53,14 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 
 	/**
 	 * This method is called whenever the observed object is changed.
-	 * It calls the method <code>refreshVisuals()</code>.
+	 * It calls the method <code>refresh()</code>.
 	 * @param o the observable object (instance of AbstractDataObject).
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
 	public void update(Observable o, Object arg) {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
-				refreshChildren();
-				refreshVisuals();		
+				refresh();		
 			}
 		});
 	}

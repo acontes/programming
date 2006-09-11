@@ -94,6 +94,14 @@ public abstract class AbstractDataObject extends Observable {
 	 */
 	public abstract String getFullName();
 
+	
+	/**
+	 * Returns the type of the object (ex : "ao" for AOObject).
+	 * @return the type of the object.
+	 */
+	public abstract String getType();
+
+	
 	/**
 	 * Returns a string representing the object's name and children's names
 	 */
@@ -105,6 +113,7 @@ public abstract class AbstractDataObject extends Observable {
 		 */
 	}
 
+	
 	/**
 	 * Returns the object's parent
 	 * @return the object's parent
@@ -113,7 +122,21 @@ public abstract class AbstractDataObject extends Observable {
 		return parent;
 	}
 
+	
+	/**
+	 * Returns the list of monitored children
+	 * @return The list of monitored children
+	 */
+	public List<AbstractDataObject> getMonitoredChildren() {
+		return new ArrayList<AbstractDataObject>(monitoredChildren.values());
+	}
+	
 
+	/**
+	 * Explore the current object
+	 */
+	public abstract void explore();
+ 
 	/**
 	 * Stop monitoring this object
 	 * @param log Indicates if you want to log a message in the console.
@@ -122,27 +145,16 @@ public abstract class AbstractDataObject extends Observable {
 	public void stopMonitoring(boolean log) {
 		if(log)
 			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
-		this.parent.removeChild(this);
-		setChanged();
-		notifyObservers(State.NOT_MONITORED);
 		AbstractDataObject[] children = monitoredChildren.values().toArray(new AbstractDataObject[]{});
 		for(int i=0, size=children.length ; i<size ; i++)
 			children[i].stopMonitoring(false);
+		this.parent.removeChild(this);
+		setChanged();
+		notifyObservers(State.NOT_MONITORED);
+
 	}
 
-	/**
-	 * Returns the list of monitored children
-	 * @return The list of monitored children
-	 */
-	public List<AbstractDataObject> getMonitoredChildren() {
-		return new ArrayList<AbstractDataObject>(monitoredChildren.values());
-	}
-
-	/**
-	 * Explore the current object
-	 */
-	public abstract void explore();
-
+	
 	/**
 	 * To know if this object is monitored
 	 * @return true if it is monitored, false otherwise
@@ -156,11 +168,6 @@ public abstract class AbstractDataObject extends Observable {
 			return false;
 	}
 
-	/**
-	 * Returns the type of the object (ex : "ao" for AOObject).
-	 * @return the type of the object.
-	 */
-	public abstract String getType();
 
 	/**
 	 * Find an active object.
@@ -204,6 +211,18 @@ public abstract class AbstractDataObject extends Observable {
 		}
 	}
 
+	
+	/**
+	 * TODO
+	 *
+	 */
+	public void resetCommunications() {
+		List<AbstractDataObject> children = getMonitoredChildren();
+		for(AbstractDataObject child : children){
+			child.resetCommunications();
+		}
+	}
+	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//

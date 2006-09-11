@@ -78,8 +78,7 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 					deactivate();
 //					((AbstractIC2DEditPart)getParent()).removeChildVisual(vmEditPart);
 				}
-				refreshChildren();
-				refreshVisuals();		
+				refresh();	
 			}
 		});
 	}

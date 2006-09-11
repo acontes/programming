@@ -177,6 +177,7 @@ public class MonitoringView extends ViewPart {
 
 		Button resetTopology = new Button(groupD, SWT.NONE);
 		resetTopology.setText("Reset Topology");
+		resetTopology.addSelectionListener(new ResetTopologyListener());
 
 		Button monitoringEnable = new Button(groupD, SWT.CHECK);
 		monitoringEnable.setText("Monitoring enable");
@@ -425,6 +426,13 @@ public class MonitoringView extends ViewPart {
 
 		public void widgetSelected(SelectionEvent e) {
 			SpyEventListenerImpl.SetMonitoring(((Button) e.widget).getSelection());
+		}
+	}
+	
+	private class ResetTopologyListener extends SelectionAdapter {
+		
+		public void widgetSelected(SelectionEvent e) {
+			WorldObject.getInstance().resetCommunications();
 		}
 	}
 }

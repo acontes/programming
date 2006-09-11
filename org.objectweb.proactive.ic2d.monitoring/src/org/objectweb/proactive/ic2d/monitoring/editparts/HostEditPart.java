@@ -77,8 +77,7 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 					deactivate();
 //					((AbstractIC2DEditPart)getParent()).removeChildVisual(hostEditPart);
 				}
-				refreshChildren();
-				refreshVisuals();		
+				refresh();
 			}
 		});
 	}

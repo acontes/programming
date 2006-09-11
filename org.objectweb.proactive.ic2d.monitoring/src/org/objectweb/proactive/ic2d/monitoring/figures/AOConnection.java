@@ -31,77 +31,19 @@
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.draw2d.BendpointConnectionRouter;
 import org.eclipse.draw2d.Connection;
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RelativeBendpoint;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 public class AOConnection {
-	
-	/**
-	 * Symbolizes connections in waitings. The source object awaits the target object.
-	 */
-	private static Hashtable<String, AOFigure> sources = new Hashtable<String, AOFigure>();
 
-	/**
-	 * Symbolizes connections in waitings. The target object awaits the source object.
-	 */
-	private static Hashtable<String, AOFigure> targets = new Hashtable<String, AOFigure>();
-
-	/**
-	 * Established connections.
-	 */
-	private static Hashtable<String, RoundedLineConnection> connections = new Hashtable<String, RoundedLineConnection>();
-	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
-	//
-
-	/**
-	 * If the source is the present then a connection is made. Otherwise the request is stored until the arrival of the target.
-	 * @param panel The panel containing the two figures.
-	 * @param sourceID A String representing the source
-	 * @param sourceFigure The source figure.
-	 * @param targetID A String representing the target.(In order to find the target)
-	 */
-	public synchronized static void addSourceConnection(IFigure panel, String sourceID, AOFigure sourceFigure, String targetID){
-		AOFigure targetFigure = targets.get(targetID);
-		if(targetFigure!=null){
-			targets.remove(targetID);
-			connect(panel, sourceFigure, targetFigure, sourceID, targetID);
-		}
-		else{
-			sources.put(sourceID, sourceFigure);
-		}
-	}
-
-	/**
-	 * If the target is the present then a connection is made. Otherwise the request is stored until the arrival of the source.
-	 * @param panel The panel containing the two figures.
-	 * @param targetID A String representing the target.
-	 * @param targetFigure The target figure.
-	 * @param sourceID A String representing the source.(In order to find the source)
-	 */
-	public synchronized static void addTargetConnection(IFigure panel, String targetID, AOFigure targetFigure, String sourceID){
-		AOFigure sourceFigure = sources.get(sourceID);
-		if(sourceFigure!=null){
-			sources.remove(sourceID);
-			connect(panel, sourceFigure, targetFigure, sourceID, targetID);
-		}
-		else{
-			targets.put(targetID, targetFigure);
-		}
-	}
-
-	//
-	// -- PRIVATE METHODS -------------------------------------------
 	//
 
 	/**
@@ -112,22 +54,8 @@ public class AOConnection {
 	 * @param sourceID The source ID.
 	 * @param targetID The target ID.
 	 */
-	public static void connect(IFigure panel, AOFigure source, AOFigure target, String sourceID, String targetID){
-		RoundedLineConnection connection = null;
-		//PolylineConnection connection = new PolylineConnection();
-		synchronized (connections) {
-			connection = connections.get(sourceID+"#"+targetID);
-			//String targetUsed = .getTargetName();
-			// If a connection already exists
-			if(connection != null){
-				connection.addOneCommunication();
-				return;
-			}
-			// Store a new connection in the Hashtable [sourceID#targetID, targetID]
-			// We used "sourceID#targetID" for the key, because a source can have several targets
-			connection = new RoundedLineConnection();
-			connections.put(sourceID+"#"+targetID, connection);
-		}
+	public static Connection createConnection(AOFigure source, AOFigure target){
+		RoundedLineConnection connection = new RoundedLineConnection();
 
 		Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width/2, source.getBounds().height/2);
 		Point targetCenter = target.getLocation().getTranslated(target.getBounds().width/2, target.getBounds().height/2);
@@ -154,7 +82,7 @@ public class AOConnection {
 
 		connection.setConnectionRouter(router);
 
-		panel.add(connection);
+		return connection;
 	}
 
 

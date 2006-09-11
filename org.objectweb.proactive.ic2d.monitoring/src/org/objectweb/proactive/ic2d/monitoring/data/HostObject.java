@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -106,7 +105,7 @@ public class HostObject extends AbstractDataObject {
 		}
 	}
 
-	@Override
+	/*@Override
 	public void stopMonitoring(boolean log) {
 		if(log)
 			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
@@ -120,7 +119,7 @@ public class HostObject extends AbstractDataObject {
 			AbstractDataObject child = iterator.next();
 			child.stopMonitoring(false);
 		}
-	}
+	}*/
 
 	@Override
 	public String getKey() {

@@ -52,7 +52,7 @@ public class WorldObject extends AbstractDataObject {
 	/** Contains all virtual nodes. */
 	private Map<String, VNObject> vnChildren;
 	
-	public enum methodName { PUT_CHILD, REMOVE_CHILD }
+	public enum methodName { PUT_CHILD, REMOVE_CHILD, RESET_COMMUNICATIONS }
 	
 	//
     // -- CONSTRUCTORS -----------------------------------------------
@@ -134,7 +134,7 @@ public class WorldObject extends AbstractDataObject {
 		monitoredChildren.put(child.getKey(), child);
 		setChanged();
 		if(monitoredChildren.size() == 1)
-			notifyObservers(methodName.PUT_CHILD/*"putChild"*/);
+			notifyObservers(methodName.PUT_CHILD);
 		notifyObservers();
 	}
     
@@ -157,7 +157,7 @@ public class WorldObject extends AbstractDataObject {
 		monitoredChildren.remove(child.getKey());
 		setChanged();
 		if(monitoredChildren.size() == 0)
-			notifyObservers(methodName.REMOVE_CHILD/*"removeChild"*/);
+			notifyObservers(methodName.REMOVE_CHILD);
 		notifyObservers();
 	}
 	
@@ -167,14 +167,6 @@ public class WorldObject extends AbstractDataObject {
 	 * @return
 	 */
 	protected VNObject getVirtualNode(String name) {
-//		VNObject virtualNode = vnChildren.get(name);
-//		if(virtualNode == null){
-//			virtualNode = new VNObject(name);
-//			vnChildren.put(name, virtualNode);
-//			setChanged();
-//			notifyObservers(virtualNode);
-//		}
-//		return virtualNode;
 		return vnChildren.get(name);
 	}
 	

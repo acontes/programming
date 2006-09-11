@@ -106,7 +106,6 @@ public abstract class AbstractFigure extends Figure {
 			this.borderColor = getDefaultBorderColor();
 		this.repaint();
 	}
-
 	
 	//
 	// -- PROTECTED METHODS --------------------------------------------

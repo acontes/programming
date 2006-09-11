@@ -67,23 +67,27 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 
 	/**
 	 * This method is called whenever the observed object is changed.
-	 * It calls the method <code>refreshVisuals()</code>.
+	 * It calls the method <code>refresh()</code>.
 	 * @param o the observable object (instance of AbstractDataObject).
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
 	public void update(Observable o, Object arg) {
 		final Object param = arg;
 //		final NodeEditPart nodeEditPart = this;
-		
+
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
 				if(param instanceof State && (State)param == State.NOT_MONITORED) {
 					deactivate();
 //					((AbstractIC2DEditPart)getParent()).removeChildVisual(nodeEditPart);
 				}
-				((NodeFigure)getFigure()).setHighlight(VirtualNodesGroup.getInstance().getColor(((NodeObject)getModel()).getVNParent()));
-				refreshChildren();
-				refreshVisuals();		
+				else if(param instanceof State) {
+					((NodeFigure)getFigure()).setHighlight(VirtualNodesGroup.getInstance().getColor(((NodeObject)getModel()).getVNParent()));
+					refresh();
+				}
+				else {
+					refresh();
+				}
 			}
 		});
 	}

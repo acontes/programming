@@ -36,7 +36,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
-import org.objectweb.proactive.ic2d.monitoring.spy.SpyMessageEvent;
 
 public class AOObject extends AbstractDataObject{
 
@@ -145,14 +144,15 @@ public class AOObject extends AbstractDataObject{
 	public State getState(){
 		return this.state;
 	}
-
+	
 	/**
-	 * Add a communication between two active objects.
-	 * @param message
+	 * Add a communication between this active object and the
+	 * active object destination.
+	 * @param the destination active object
 	 */
-	public void addCommunication(SpyMessageEvent message){
+	public void addCommunication(AOObject destination) {
 		setChanged();
-		notifyObservers(message);
+		notifyObservers(destination);
 	}
 
 	public String toString() {
@@ -205,38 +205,22 @@ public class AOObject extends AbstractDataObject{
 			return false;
 		}
 	}
-
+	
+	public void explore() {/* Do nothing */}
+	
+	@Override
+	public void resetCommunications() {
+		setChanged();
+//		notifyObservers(methodName.RESET_COMMUNICATIONS);
+		notifyObservers(State.NOT_MONITORED);
+	}
+	
 	//
 	// -- PROTECTED METHODS ---------------------------------------------
 	//
 
 	protected static synchronized void cancelCreation() {
 		counter--;
-	}
-
-	//
-	// -- PRIVATE METHODS ---------------------------------------------
-	//
-
-	private static synchronized int counter() {
-		return ++counter;
-	}
-
-	public void explore() {/* Do nothing */}
-
-
-	public static class AOComparator implements Comparator<String>{
-
-		/**
-		 * Compare two active objects.
-		 * (For Example: ao#3 and ao#5 give -1 because ao#3 has been discovered before ao#5.)
-		 * @return -1, 0, or 1 as the first argument is less than, equal to, or greater than the second.
-		 */
-		public int compare(String ao1, String ao2) {
-			String ao1Name = ao1;
-			String ao2Name = ao2;
-			return -(ao1Name.compareTo(ao2Name));
-		}	
 	}
 
 	@Override
@@ -260,5 +244,28 @@ public class AOObject extends AbstractDataObject{
 		Console.getInstance(Activator.CONSOLE_NAME).
 		log("AOObject "+fullName+" already monitored");
 		AOObject.cancelCreation();
+	}
+	
+	//
+	// -- PRIVATE METHODS ---------------------------------------------
+	//
+
+	private static synchronized int counter() {
+		return ++counter;
+	}
+
+
+	public static class AOComparator implements Comparator<String>{
+
+		/**
+		 * Compare two active objects.
+		 * (For Example: ao#3 and ao#5 give -1 because ao#3 has been discovered before ao#5.)
+		 * @return -1, 0, or 1 as the first argument is less than, equal to, or greater than the second.
+		 */
+		public int compare(String ao1, String ao2) {
+			String ao1Name = ao1;
+			String ao2Name = ao2;
+			return -(ao1Name.compareTo(ao2Name));
+		}	
 	}
 }
