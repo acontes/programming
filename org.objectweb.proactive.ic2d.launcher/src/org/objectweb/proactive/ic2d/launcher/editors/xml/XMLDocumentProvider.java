@@ -31,20 +31,16 @@
 package org.objectweb.proactive.ic2d.launcher.editors.xml;
 
 import org.eclipse.core.runtime.CoreException;
-
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.jface.text.source.IAnnotationModel;
-import org.objectweb.proactive.ic2d.launcher.editors.SimpleDocumentProvider;
+import org.eclipse.ui.editors.text.FileDocumentProvider;
 
-public class XMLDocumentProvider extends SimpleDocumentProvider {
+public class XMLDocumentProvider extends FileDocumentProvider {
 
-	//
-	// -- PROTECTED METHODS ---------------------------------------------
-	//
-	
-	protected void setupDocument(IDocument document) {
+	protected IDocument createDocument(Object element) throws CoreException {
+		System.out.println("XMLDocumentProvider.createDocument() "+element.getClass().getName());
+		IDocument document = super.createDocument(element);
 		if (document != null) {
 			IDocumentPartitioner partitioner =
 				new FastPartitioner(
@@ -55,9 +51,6 @@ public class XMLDocumentProvider extends SimpleDocumentProvider {
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
 		}
-	}
-
-	protected IAnnotationModel createAnnotationModel(Object element) throws CoreException {
-		return null;
+		return document;
 	}
 }

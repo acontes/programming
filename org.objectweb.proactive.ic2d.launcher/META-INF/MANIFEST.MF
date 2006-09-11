@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.ui,
  org.objectweb.proactive.ic2d.lib,
  org.eclipse.ui.console,
  org.eclipse.jface.text,
- org.eclipse.ui.workbench.texteditor
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.editors
 Eclipse-LazyStart: true
 Eclipse-RegisterBuddy: org.objectweb.proactive.ic2d.lib

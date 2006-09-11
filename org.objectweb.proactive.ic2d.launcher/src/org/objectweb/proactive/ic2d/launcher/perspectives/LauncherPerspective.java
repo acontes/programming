@@ -30,15 +30,19 @@
  */
 package org.objectweb.proactive.ic2d.launcher.perspectives;
 
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IPerspectiveListener4;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.IConsoleConstants;
+import org.objectweb.proactive.ic2d.launcher.editors.xml.XMLEditor;
 import org.objectweb.proactive.ic2d.launcher.views.InfoView;
 
 public class LauncherPerspective implements IPerspectiveFactory ,IPerspectiveListener4 {
@@ -47,8 +51,12 @@ public class LauncherPerspective implements IPerspectiveFactory ,IPerspectiveLis
 
 	/** Bottom folder's id. */
 	public static final String FI_BOTTOM = ID + ".bottomFolder";
-    /** Right folder's id. */
-    public static final String FI_RIGHT = ID + ".rightFolder";
+	/** Right folder's id. */
+	public static final String FI_RIGHT = ID + ".rightFolder";
+
+	private IEditorDescriptor oldDefaultEditor;
+
+
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
@@ -57,34 +65,37 @@ public class LauncherPerspective implements IPerspectiveFactory ,IPerspectiveLis
 		String editorAreaId=layout.getEditorArea();
 		layout.setEditorAreaVisible(true);
 		layout.setFixed(false);
-		
+
 		IFolderLayout rightFolder = layout.createFolder(FI_RIGHT, IPageLayout.RIGHT, 0.80f, editorAreaId);
 		rightFolder.addView(InfoView.ID);
-		
+
 		IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.75f, editorAreaId);
 		bottomFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
-		
+
 		PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(this);
 	}
 
 	public void perspectivePreDeactivate(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		// TODO Auto-generated method stub
-		//System.out.println("LauncherPerspective.perspectivePreDeactivate()");
 	}
 
 	public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		//System.out.println("LauncherPerspective.perspectiveClosed()");
+		//If the closed perspective is the Launcher perspective
+		if(perspective.getId().compareTo(LauncherPerspective.ID)==0 && this.oldDefaultEditor!=null){
+			restoreDefaultEditor();
+		}
 	}
 
 	public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		//System.out.println("LauncherPerspective.perspectiveDeactivated()");
+		if(perspective.getId().compareTo(LauncherPerspective.ID)==0)
+			restoreDefaultEditor();		
 	}
 
 	public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		//System.out.println("LauncherPerspective.perspectiveOpened()");
+		//If the opened perspective is the Launcher perspective
+		if(perspective.getId().compareTo(LauncherPerspective.ID)==0){
+			saveDefaultEditor();
+		}
 	}
 
 	public void perspectiveSavedAs(IWorkbenchPage page, IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
@@ -93,20 +104,51 @@ public class LauncherPerspective implements IPerspectiveFactory ,IPerspectiveLis
 	}
 
 	public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {
-		// We remove the file of the list of the launched applications
-//		if(page!=null && changeId.compareTo("editorClose")==0){
-//				XMLDescriptorSet.getInstance().removeFile(partRef.getTitle());
-//		}
+		// TODO Auto-generated method stub
 	}
 
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		//System.out.println("LauncherPerspective.perspectiveActivated()");
+		if(perspective.getId().compareTo(LauncherPerspective.ID)==0)
+			saveDefaultEditor();
 	}
 
 	public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {
 		// TODO Auto-generated method stub
-		//System.out.println("LauncherPerspective.perspectiveChanged()");
 	}
 
+	//
+	// -- PRIVATE METHODS ---------------------------------------------
+	//
+
+	/**
+	 * Save the default XML editor,
+	 * and install the IC2D XML editor as default editor.
+	 */
+	private synchronized void saveDefaultEditor(){
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if(workbench==null)
+			return;
+		IEditorRegistry regEdit = workbench.getEditorRegistry();
+		if(regEdit==null)
+			return;
+		if(this.oldDefaultEditor==null)
+			this.oldDefaultEditor = regEdit.getDefaultEditor("foo.xml");
+		System.out.println("Activator.start() "+workbench+" "+PlatformUI.getWorkbench());
+		regEdit.setDefaultEditor("*.xml", XMLEditor.ID);
+		System.out.println("Activator.start() "+regEdit.getDefaultEditor("toto.xml").getId());
+	}
+
+	/**
+	 * Restore the default XML editor
+	 */
+	private synchronized  void restoreDefaultEditor(){
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if(workbench==null)
+			return;
+		IEditorRegistry regEdit = workbench.getEditorRegistry();
+		if(regEdit==null)
+			return;
+		regEdit.setDefaultEditor("*.xml", this.oldDefaultEditor.getId());
+		this.oldDefaultEditor = null;
+	}
 }

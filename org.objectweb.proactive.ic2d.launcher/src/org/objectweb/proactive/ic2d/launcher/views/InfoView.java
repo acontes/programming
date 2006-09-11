@@ -61,6 +61,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorRegistry;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
@@ -92,10 +93,10 @@ public class InfoView extends ViewPart  implements Observer{
 
 	// Display some informations about the application
 	private Action action2;
-	
+
 	// Kills the application
 	private Action action3;
-	
+
 	// Open the descriptor into an XML editor.
 	private Action doubleClickAction;
 
@@ -103,7 +104,7 @@ public class InfoView extends ViewPart  implements Observer{
 	//
 	// -- CONSTRUCTORS ---------------------------------------------
 	//
-	
+
 	/**
 	 * The constructor.
 	 */
@@ -114,7 +115,7 @@ public class InfoView extends ViewPart  implements Observer{
 	//
 	// -- PUBLIC METHODS ---------------------------------------------
 	//
-	
+
 	/**
 	 * This is a callback that will allow us
 	 * to create the viewer and initialize it.
@@ -128,11 +129,12 @@ public class InfoView extends ViewPart  implements Observer{
 		viewer.setInput(getViewSite());
 		makeActions();
 		hookContextMenu();
-		hookDoubleClickAction();
+		// TODO Fix the bug of the double click action
+		//hookDoubleClickAction();
 		contributeToActionBars();
 	}
 
-	
+
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
@@ -149,23 +151,36 @@ public class InfoView extends ViewPart  implements Observer{
 				XMLDescriptor file = (XMLDescriptor)arg;
 				file.addObserver(this);
 			}
-			this.viewer.refresh();
+			if(this.viewer!=null){
+				IWorkbench workbench = PlatformUI.getWorkbench();
+				IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
+				IPerspectiveDescriptor perspective = perspectiveRegistry.findPerspectiveWithId(LauncherPerspective.ID);
+				if(perspective!=null && !this.viewer.getControl().isDisposed())
+					this.viewer.refresh();
+			}
 		}
 		else if(o instanceof XMLDescriptor){
 			if(arg instanceof String){
 				String message = (String)arg;
 				showError((XMLDescriptor) o, message);
 			}
-			else
-				this.viewer.refresh();
+			else{
+				if(this.viewer!=null){
+					IWorkbench workbench = PlatformUI.getWorkbench();
+					IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
+					IPerspectiveDescriptor perspective = perspectiveRegistry.findPerspectiveWithId(LauncherPerspective.ID);
+					if(perspective!=null & !this.viewer.getControl().isDisposed())
+						this.viewer.refresh();
+				}
+			}
 		}
 	}
-	
-	
+
+
 	//
 	// -- PRIVATE METHODS ---------------------------------------------
 	//
-	
+
 	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
@@ -224,7 +239,7 @@ public class InfoView extends ViewPart  implements Observer{
 		action1.setToolTipText("Launch the application");
 		action1.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "launch.gif"));
 
-		
+
 		// Action 2 : Display some informations about the application
 		action2 = new Action() {
 			public void run() {
@@ -239,7 +254,7 @@ public class InfoView extends ViewPart  implements Observer{
 		action2.setToolTipText("Informations");
 		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		
+
 		// Action 3 : Kills the application
 		action3 = new Action() {
 			public void run() {
@@ -269,7 +284,7 @@ public class InfoView extends ViewPart  implements Observer{
 		action3.setToolTipText("Kill the application");
 		action3.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "kill.gif"));
 
-		
+
 		// doubleClickAction : Open the descriptor into an XML editor.
 		doubleClickAction = new Action() {
 			public void run() {
@@ -280,7 +295,7 @@ public class InfoView extends ViewPart  implements Observer{
 				System.out.println(".run() obj="+obj.toString());
 
 				IWorkbenchWindow workbenchWindow = getSite().getWorkbenchWindow();
-				IWorkbenchPage page = workbenchWindow.getActivePage();
+				IWorkbenchPage page = /*workbenchWindow.getActivePage();*/getSite().getPage();
 				IWorkbench workbench = workbenchWindow.getWorkbench();
 
 				// Opens the corresponding page.
@@ -369,17 +384,18 @@ public class InfoView extends ViewPart  implements Observer{
 		IEditorDescriptor descriptor= editorRegistry.getDefaultEditor(path);
 		String editorId= descriptor.getId();
 		try {
-			page.openEditor(input, editorId);
+			if(page!=null)
+				page.openEditor(input, editorId);
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
 	}
 
-	
+
 	//
 	// -- INNER CLASSES ---------------------------------------------
 	//
-	
+
 	/*
 	 * The content provider class is responsible for
 	 * providing objects to the view. It can wrap
@@ -413,5 +429,5 @@ public class InfoView extends ViewPart  implements Observer{
 
 	class NameSorter extends ViewerSorter {
 	}
-	
+
 }
