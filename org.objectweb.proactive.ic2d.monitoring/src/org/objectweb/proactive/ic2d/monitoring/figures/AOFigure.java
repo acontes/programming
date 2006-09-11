@@ -249,8 +249,10 @@ public class AOFigure extends AbstractFigure {
 	 * @param panel the connection is added to this panel
 	 */
 	public void addConnection(AOFigure target, IFigure panel) {
-		if(targetConnections.get(target) != null)
+		if(targetConnections.get(target) != null) {
+			((RoundedLine)targetConnections.get(target)).addOneCommunication();
 			return;
+		}
 		Connection connection = AOConnection.createConnection(this, target);
 		this.targetConnections.put(target, connection);
 		target.sourceConnections.put(this, connection);
