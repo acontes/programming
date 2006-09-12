@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.AOListener;
 
-public class AOFigure extends AbstractFigure {
+public class AOFigure extends AbstractFigure{
 
 	protected final static int DEFAULT_WIDTH = 40;
 
@@ -96,6 +96,9 @@ public class AOFigure extends AbstractFigure {
 
 	/** All connections whose source is this and target is the key */
 	private Map<AOFigure, Connection> targetConnections;
+
+	/** */
+	private GUIManager manager;
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -109,6 +112,8 @@ public class AOFigure extends AbstractFigure {
 		addMouseListener(new AOListener());
 		this.sourceConnections = new Hashtable<AOFigure, Connection>();
 		this.targetConnections = new Hashtable<AOFigure, Connection>();
+
+		this.manager = new GUIManager(this);
 	}
 
 	/**
@@ -230,7 +235,8 @@ public class AOFigure extends AbstractFigure {
 		default:
 			break;
 		}
-		this.repaint();
+		//this.repaint();
+		if(this.manager!=null) this.manager.repaint();
 	}
 
 
@@ -240,6 +246,7 @@ public class AOFigure extends AbstractFigure {
 	 */
 	public void setRequestQueueLength(int length) {
 		this.requestQueueLength = length;
+		if(this.manager!=null) this.manager.repaint();
 	}
 
 	/**
@@ -279,7 +286,20 @@ public class AOFigure extends AbstractFigure {
 			this.sourceConnections.remove(source);
 		}
 	}
-	
+
+	@Override
+	public void repaint() {
+		super.repaint();
+	}
+
+	@Override
+	public void refresh(){
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run () {
+				repaint();
+			}});
+	}
+
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//

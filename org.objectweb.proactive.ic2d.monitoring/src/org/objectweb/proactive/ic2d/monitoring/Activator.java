@@ -34,6 +34,7 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ic2d.monitoring.filters.IC2DJVMFilter;
 import org.objectweb.proactive.ic2d.monitoring.filters.SpyFilter;
 import org.osgi.framework.BundleContext;
@@ -65,6 +66,8 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		
+		RuntimeFactory.getDefaultRuntime().getURL();
 		
 		// add current classpath for javassist class pool
 		ClassPool pool = ClassPool.getDefault();

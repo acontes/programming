@@ -95,6 +95,10 @@ public abstract class AbstractFigure extends Figure {
 		this.label.setText(title);
 	}
 	
+	public String getTitle(){
+		return this.label.getText();
+	}
+	
 	public abstract IFigure getContentPane();
 	
 	
@@ -106,6 +110,12 @@ public abstract class AbstractFigure extends Figure {
 			this.borderColor = getDefaultBorderColor();
 		this.repaint();
 	}
+	
+	/**
+	 * Refreshes the graphical interface.
+	 * This method is used by GUIManager
+	 */
+	public void refresh(){ /* DO NOTHING */}
 	
 	//
 	// -- PROTECTED METHODS --------------------------------------------

@@ -74,7 +74,7 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 						}
 						else
 							getCastedFigure().setState(state);
-						refresh();
+						//refresh();
 					}
 				});
 			}
@@ -96,7 +96,7 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
 						getCastedFigure().setRequestQueueLength(length);
-						refresh();
+						//refresh();
 					}
 				});
 			}
