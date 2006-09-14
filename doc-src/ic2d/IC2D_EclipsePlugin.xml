@@ -112,7 +112,7 @@
 					<mediaobject>
 						<imageobject>
 							<imagedata
-								fileref="ic2d/images/features/monitoringPerspective3.png" format="PNG" />
+								fileref="ic2d/images/features/monitoringPerspective4.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -159,24 +159,61 @@
 			<sect3>
 				
 				<title>The Virtual Nodes list</title>
-			
-				<para></para>
-			
+				
+				<para>
+					At the top of the Monitoring View, one can find the <emphasis role="bold">Virtual Nodes list</emphasis>.
+					When some nodes are monirored, their virtual nodes are added to this list. And when a virtual node is checked,
+					all its nodes are highlighted.
+				</para>
+				
+				<figure id="virtualNodesList">
+					<title>Virtual nodes List</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/virtualnodes.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
 			</sect3><!-- The Virtual Nodes list -->
 			
 			<sect3>
 				
-				<title>The management of the communications display</title>
+				<title>Management of the communications display</title>
 				
-				<para></para>
+				<para>
+					At the bottom of the Monitoring view, one can find a set of buttons
+					used to manage the communications display:
+				</para>
+				<orderedlist>
+					<listitem><para>
+						<emphasis role="bold">Display topology</emphasis>: show/hide communications
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Proportional</emphasis>: arrows thickness is proportional to the number of requests
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Ratio</emphasis>: ???
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Filaire</emphasis>: arrows always have the same thickness whatever the number of communications
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Reset topology</emphasis>: erase all communications
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Monitoring enable</emphasis>: listen or not communications between active objects
+					</para></listitem>
+				</orderedlist>
 				
 			</sect3><!-- The management of the communications display -->
 			
 			
 			<para>
-				Then one can observe in the
-				<emphasis role="bold">Monitoring view</emphasis>
-				a graphical representation of the host activity.
+				The <xref linkend="monitoring"/> shows an example where 3 hosts are monitored.
+				The applications running are philosophers (<xref linkend="diningPhilosophers"/>)
+				and C3D (<xref linkend="C3D_example"/>). 
 			</para>
 			
 		</sect2> <!-- The Monitoring plugin -->
@@ -187,10 +224,13 @@
 			
 			
 			<para>
-				One can also look at the
-				<emphasis role="bold">tree representation</emphasis>
-				thanks to 
-				<emphasis role="bold">Job Monitoring view</emphasis>
+				To look at the <emphasis role="bold">tree representation</emphasis>
+				of the monitored objects, one have to open the 
+				<emphasis role="bold">Job Monitoring view</emphasis>.
+			</para>
+			<para>
+				For that,
+				select <emphasis role="bold">Window->Show view->Other...->Job Monitoring->Job Monitoring</emphasis>.
 			</para>
 			
 			<figure id="openJobMonitoringView">
@@ -204,13 +244,11 @@
 				</mediaobject>
 			</figure>
 			
+			<para>
+				One can see in the <xref linkend="monitoring"/> an example of a tree representation of some monitored objects.
+			</para>
+			
 		</sect2><!-- The Job Monitoring plugin -->
-		
-		<para>
-			The
-			<xref linkend="monitoring" />
-			is an example of what you can obtain.
-		</para>
 		
 		<figure id="monitoring">
 			<title>Monitoring of 2 applications</title>

@@ -66,17 +66,20 @@
     &Installation;
     &TroubleShooting;
   </part>
- 
+ -->
 	<part id="ProActiveGuidedTour">
    <title>Guided Tour and Tutorial</title>
    &guidedindex;
    &capabilities-intro;
+   <!--
    &hands_on_programming;
    &OOSPMDJacobiexample;
    &nbody;
    &guidedComp;
    &conclusion;
+   -->
   </part>
+  <!--
   
   <part id="ProActiveProgramming">
     <title>Programming</title>
@@ -88,7 +91,7 @@
     &exceptions;
     &bnb;
   </part>
--->
+  
   <part id="ProActiveDeployment">
     <title>Deploying</title>
     &PAConfiguration;
@@ -99,7 +102,7 @@
     &faultTolerance;
     &technicalService;
    </part>
-<!--   
+   
    <part id="ProActiveComponents">
     <title>Composing</title>
     &intro;
@@ -124,8 +127,10 @@
 
    <part id="ProActiveTools">
     <title>Graphical User Interface (GUI) and tools</title>
+<!--
     &IC2D;
     &plugin;
+    -->
     &IC2D_EclipsePlugin;
    </part>
 
@@ -133,12 +138,16 @@
 
    <part id="ProActiveExtensions">
     <title>Extending ProActive</title>
+<!--
     &writeDoc;
+    -->
     &extendingIC2D;
+    <!--
     &DescriptorProcess;
     &devFileTransfer;
     &devFaultTolerance;
     &MOP;
+    -->
    </part>
     
  <!--

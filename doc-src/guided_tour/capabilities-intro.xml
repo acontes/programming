@@ -466,7 +466,7 @@ scripts/windows/components$ c3d.bat</screen>
       </sect3>
     </sect2>
 
-    <sect2 >
+    <sect2 id="diningPhilosophers">
       <title>The dining philosophers</title>
 
       <para>The 'dining philosophers' problem is a classical exercise in the
