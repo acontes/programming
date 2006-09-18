@@ -25,10 +25,8 @@
 					<emphasis role="bold">
 						org.objectweb.proactive.ic2d.monitoring
 					</emphasis>
-					: provides graphical visualisation of hosts, virtual
-					nodes, Java Virtual Machines, and active objects,
-					including the topology and the total of
-					communications.
+					: provides graphical representation of hosts, runtimes, virtual
+					nodes and active objects topology, also displaying communications between active objects.
 				</para>
 			</listitem>
 			<listitem>
@@ -36,8 +34,8 @@
 					<emphasis role="bold">
 						org.objectweb.proactive.ic2d.jobmonitoring
 					</emphasis>
-					: allows tree representation of hosts, virtual
-					nodes, Java Virtual Machines, and active objects.
+					: provides tree-based representation of hosts, runtimes , virtual
+					nodes and active objects.
 				</para>
 			</listitem>
 			<listitem>
@@ -45,7 +43,7 @@
 					<emphasis role="bold">
 						org.objectweb.proactive.ic2d.launcher
 					</emphasis>
-					: launches applications with deployment descriptors
+					: initiates application deployment using deployment descriptors
 				</para>
 			</listitem>
 			<listitem>
@@ -53,9 +51,8 @@
 					<emphasis role="bold">
 						org.objectweb.proactive.ic2d.lib
 					</emphasis>
-					: contains all jar (which are not provided by
-					Eclipse) used by the other plugins (like
-					ProActive.jar, log4j.jar, etc)
+					: provides Java archives (jar) required by the other plugins which are not provided by
+					the Eclipse like ProActive.jar, log4j.jar, etc.
 				</para>
 			</listitem>
 			<listitem>
@@ -63,7 +60,7 @@
 					<emphasis role="bold">
 						org.objectweb.proactive.ic2d.console
 					</emphasis>
-					: provides methods used to log in the Eclipse
+					: provides logging capability through the Eclipse
 					console.
 				</para>
 			</listitem>
@@ -74,27 +71,23 @@
 		<sect2 id="org.objectweb.proactive.ic2d.monitoring">
 
 			<title>org.objectweb.proactive.ic2d.monitoring</title>
-
+<para>The aim of this plugin is to provide the essential features for monitoring of ProActive applications. 
+ Monitorable entities are </para>
 			<para>
 				<xref linkend="graphicalHierarchy" />
 				shows the graphical representation of
-				<emphasis role="bold">hosts</emphasis>
-				,
-				<emphasis role="bold">virtual nodes</emphasis>
-				,
-				<emphasis role="bold">JVM</emphasis>
-				,
-				<emphasis role="bold">nodes</emphasis>
-				, and
-				<emphasis role="bold">active objects</emphasis>
-				.
+				<emphasis role="bold">hosts</emphasis>,
+				<emphasis role="bold">virtual nodes</emphasis>,
+				<emphasis role="bold">runtimes (ProActive JVM)</emphasis>,
+				<emphasis role="bold">nodes</emphasis>, and
+				<emphasis role="bold">active objects</emphasis>.
 			</para>
 
-			<figure id="graphicalHierarchy">
-				<title>Graphical representation of the data</title>
+			<figure id="graphicalHierarchy"  >
+				<title align="center">Graphical representation of the data</title>
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center"
+						<imagedata 
 							fileref="ic2d/images/architecture/graphicalHierarchy.png"
 							format="PNG" />
 					</imageobject>
@@ -105,41 +98,51 @@
 
 			<sect3 id="hierarchyPart">
 
-				<title>Hierarchy of the data</title>
+				<title>Class Diagrams</title>
 
 				<para>
-					The diagram
-					<xref linkend="hierarchy" />
-					shows relations between the data:
+					The diagram	<xref linkend="hierarchy" /> describes relationships between Java classes:
 				</para>
 				<itemizedlist>
-					<listitem>
+				     <listitem>
 						<para>
-							The world is a "special" object that
-							contains all hosts and virtual nodes
-							instances.
-						</para>
-					</listitem>
-					<listitem>
-						<para>A host contains one or more JVM</para>
-					</listitem>
-					<listitem>
-						<para>A JVM contains one or more nodes</para>
-					</listitem>
-					<listitem>
-						<para>
-							A virtual node contains one or more nodes
+							The AOObject class represents an Active Object.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							A node contains one or more active objects
+							The NodeObject class represents a node. Nodes contain Active Objects.
 						</para>
 					</listitem>
+					<listitem>
+						<para>The VMObject represents a runtime. Runtimes contain nodes</para>
+					</listitem>
+					<listitem>
+						<para>
+							The VNObject class represents a virtual node. The virtual node is a logical
+							entity which has no real existence at runtime. When using Deployment Descriptors, 
+							it is the mapping of a virtual node on a runtime that leads to the creation of one
+							or more nodes on this runtime. Virtual nodes can be mapped on more than one runtime, 
+							thus as shown in the figure, a node is bound to both a runtime and a virtual node.
+						</para>
+					</listitem>
+					<listitem>
+						<para>The HostObject class represents the hardware that hosts the runtime, it is possible to coallocate several runtimes on the same host</para>
+					</listitem>
+					<listitem>
+						<para>
+							The WorldObject class is a "special" object that
+							allows to gather hosts and virtual nodes under a common root.
+						</para>
+					</listitem>
+					
+					
+				
+					
 				</itemizedlist>
 
-				<figure id="hierarchy">
-					<title>Relationship</title>
+				<figure id="hierarchy" >
+					<title align="center">Class diagram</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata align="center"
@@ -155,27 +158,26 @@
 
 			<sect3 id="exploration">
 
-				<title>How does the exploration works?</title>
+				<title>Monitoring in detail</title>
 
 				<para>
-					When the user uses IC2D to monitor a host, IC2D
-					explores the host in order to find any JVMs, nodes,
-					virtual nodes, and active objects contained within
-					the runtime. The steps are:
+					When IC2D is used to monitor a host, it 
+					looks for any available runtimes on the host, then enumerates any nodes,
+					virtual nodes and active objects contained within
+					each runtime. The complete process is :
 				</para>
 
 				<itemizedlist>
 					<listitem>
 						<para>
-							The user enters the URL of the host to
-							monitor
+							Grab the URL entered by the user,
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							A new
+							create a new
 							<emphasis role="bold">HostObject</emphasis>
-							is added to the
+							and add it to the
 							<emphasis role="bold">WorldObject</emphasis>
 						</para>
 					</listitem>
