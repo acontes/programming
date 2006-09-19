@@ -4,21 +4,16 @@
 <chapter id="IC2D_EclipsePlugin">
 	
 	<title>
-		IC2D: Interactive Control and Debugging of Distribution and
-		Eclipse plugin
+		IC2D: Interactive Control and Debugging of Distribution and Eclipse plugin
 	</title>
 	
 	
 	<para>
-		<emphasis role="bold">IC2D</emphasis>
-		is a
+		<emphasis role="bold">IC2D</emphasis> is a
 		<emphasis role="bold">graphical environment</emphasis>
 		for remote monitoring and steering of
-		<emphasis role="bold">
-			distributed and grid applications
-		</emphasis>
-		. IC2D is built on top of
-		<emphasis role="bold">ProActive</emphasis>
+		<emphasis role="bold">distributed and grid applications</emphasis>.
+		IC2D is built on top of <emphasis role="bold">ProActive</emphasis>
 		that provides asynchronous calls and migration.
 	</para>
 	<para>IC2D is available in two forms :</para>
@@ -30,9 +25,8 @@
 			(Windows, Linux, Mac OSX,Solaris, ...)
 		</para></listitem>
 		<listitem><para>
-			A set of <emphasis role="bold">Eclipse plugins</emphasis>:
-			with all the functionnalities within the standalone
-			application, enhanced with a tool that makes easier the
+			A set of <emphasis role="bold"><ulink url="http://www.eclipse.org">Eclipse</ulink> plugins</emphasis>:
+			with all the functionnalities within the standalone	application, enhanced with a tool that makes easier the
 			development of Grid Applications, including:
 			<itemizedlist>
 				<listitem><para>
@@ -92,7 +86,7 @@
 				</para>
 				
 				<para>
-					This perspective defines the following set of views:
+					This perspective defines the following set of <ulink url="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">views</ulink>:
 				</para>
 				
 				<itemizedlist>
@@ -269,7 +263,7 @@
 		<title>Launcher and Scheduler</title>
 		
 		<sect2>
-			<title>Launcher in IC2D</title>
+			<title>The Launcher plug-in</title>
 			
 			<para>
 				In order to launch a
@@ -396,8 +390,16 @@
 				</para>
 				
 			</sect3>
-		</sect2>
+		</sect2> <!-- The Launcher plug-in -->
 		
+		
+		
+		<sect2>
+			<title>The Scheduler plug-in</title>
+			
+			<para>Coming soon ...</para>	
+			
+		</sect2> <!-- The Scheduler plug-in -->
 		
 	</sect1><!-- Launcher and Scheduler -->
 	

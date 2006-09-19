@@ -164,35 +164,17 @@
 					When IC2D is used to monitor a host, it 
 					looks for any available runtimes on the host, then enumerates any nodes,
 					virtual nodes and active objects contained within
-					each runtime. The complete process is :
+					each runtime.
 				</para>
-
-				<itemizedlist>
-					<listitem>
-						<para>
-							Grab the URL entered by the user,
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							create a new
-							<emphasis role="bold">HostObject</emphasis>
-							and add it to the
-							<emphasis role="bold">WorldObject</emphasis>
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							The
-							<emphasis role="bold">Refresher</emphasis>
-							thread (in
-							<emphasis role="bold">
-								MonitorThread
-							</emphasis>
-							) is started and regularly queries the
-							WorldObject to explore itself
-						</para>
-					</listitem>
+				<para>
+					In order to do this, it grabs the URL entered by the user,
+					then creates a new HostObject and add it to the WorldObject.
+					Next, a thread starts and regularly queries the WorldObject to 
+					<emphasis role="bold">explore</emphasis> itself.
+					The following sequence diagram explains how a WorldObject explores itself for the first time 
+					(<xref linkend="exploreSequenceDiagram"/>).
+				</para>
+					<!--			
 					<listitem>
 						<para>
 							The WorldObject queries its HostObjects to
@@ -227,6 +209,18 @@
 						</para>
 					</listitem>
 				</itemizedlist>
+				-->
+
+				<figure id="exploreSequenceDiagram" >
+					<title align="center">The world exploring itself for the first time</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center"
+								fileref="ic2d/images/architecture/sequenceDiagram.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
 
 				<para>
 					Now all objects are found. And these operation will
