@@ -77,8 +77,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         menuBar.add(helpMenu);
         
         // File
-        fileMenu.add(exitAction);
+        fileMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+        fileMenu.add(new Separator());
         fileMenu.add(ActionFactory.SAVE.create(window));
+        fileMenu.add(new Separator());
+        fileMenu.add(exitAction);
         
         // Window
         windowMenu.add(newWindowAction);
