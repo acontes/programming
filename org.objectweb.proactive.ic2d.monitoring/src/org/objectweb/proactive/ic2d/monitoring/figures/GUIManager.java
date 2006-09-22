@@ -77,6 +77,8 @@ public class GUIManager{
 		}
 		
 		public void run() {
+			if(figure==null)
+				return;
 			while(isAlive) {
 				if(dirty){
 					figure.refresh();
