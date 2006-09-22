@@ -47,7 +47,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
-import org.objectweb.proactive.ic2d.monitoring.figures.listeners.AOListener;
 
 public class AOFigure extends AbstractFigure{
 
@@ -109,7 +108,6 @@ public class AOFigure extends AbstractFigure{
 	public AOFigure(String text){
 		super(text);
 		this.requestQueueLength = 0;
-		addMouseListener(new AOListener());
 		this.sourceConnections = new Hashtable<AOFigure, Connection>();
 		this.targetConnections = new Hashtable<AOFigure, Connection>();
 

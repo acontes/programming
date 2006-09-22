@@ -40,6 +40,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.listeners.AOListener;
 
 public class AOEditPart extends AbstractMonitoringEditPart{
 
@@ -118,7 +119,9 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	 * @return a new NodeFigure view associated with the NodeObject model.
 	 */
 	protected IFigure createFigure() {
-		return new AOFigure(getCastedModel().getFullName());
+		AOFigure figure = new AOFigure(getCastedModel().getFullName());
+		figure.addMouseListener(new AOListener(getMonitoringView()));
+		return figure;
 	}
 
 	/**
