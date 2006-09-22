@@ -38,7 +38,6 @@ import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 /**
  * Provides utility methods that can be used to build a job monitoring tree.
@@ -66,7 +65,7 @@ public class JobMonitoringTreeUtil {
 	 */
 	public static List<HostObject> getVNChildren(VNObject vn) {
 		List<HostObject> result = new ArrayList<HostObject>();
-		List<AbstractDataObject> worldChildren = WorldObject.getInstance().getMonitoredChildren();
+		List<AbstractDataObject> worldChildren = vn.getWorld().getMonitoredChildren();
 		for(AbstractDataObject obj : worldChildren) {
 			HostObject host = (HostObject) obj;
 			if(! getHostChildren(host, vn).isEmpty())
