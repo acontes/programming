@@ -53,8 +53,12 @@ public class SetTTRDialog extends Dialog {
 	private Button okButton;
 	private Button cancelButton;
 	
-	public SetTTRDialog(Shell parent) {
+	private MonitorThread monitorThread;
+	
+	public SetTTRDialog(Shell parent, MonitorThread monitorThread) {
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		
+		this.monitorThread = monitorThread;
 		
 		/* Init the display */
 		Display display = getParent().getDisplay();
@@ -74,7 +78,7 @@ public class SetTTRDialog extends Dialog {
 		titleLabel.setLayoutData(titleLabelFormData);
 		
 		this.text = new Text(shell, SWT.BORDER);
-		text.setText(MonitorThread.getInstance().getTTR()+"");
+		text.setText(monitorThread.getTTR()+"");
 		FormData textFormData = new FormData();
 		textFormData.top = new FormAttachment(titleLabel, 5);
 		textFormData.left = new FormAttachment(40, 0);
@@ -130,9 +134,8 @@ public class SetTTRDialog extends Dialog {
 		public void widgetSelected(SelectionEvent e) {
 			if(e.widget == okButton) {
 				int ttr = Integer.parseInt(text.getText());
-				MonitorThread thread = MonitorThread.getInstance();
-				thread.setTTR(ttr);
-				thread.forceRefresh();
+				monitorThread.setTTR(ttr);
+				monitorThread.forceRefresh();
 			}
 			shell.close();
 		}

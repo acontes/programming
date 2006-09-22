@@ -117,7 +117,6 @@ public class NodeObject extends AbstractDataObject{
 		try {
 			activeObjects = parent.getProActiveRuntime().getActiveObjects(this.key);
 		} catch (ProActiveException e) {
-			// TODO Auto-generated catch block
 			notResponding();
 			Console.getInstance(Activator.CONSOLE_NAME).debug(e);
 		}
@@ -254,7 +253,7 @@ public class NodeObject extends AbstractDataObject{
 			e.printStackTrace();
 		}
 		if(vnName != null) {
-			this.vnParent = VNObject.getInstance(vnName);
+			this.vnParent = getWorld().getVirtualNode(vnName);
 			if(vnParent == null) {
 				ProActiveRuntime pr = getTypedParent().getRuntime();
 				String jobID = null;
@@ -264,7 +263,7 @@ public class NodeObject extends AbstractDataObject{
 					// TODO
 					Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 				}
-				vnParent = new VNObject(vnName, jobID);
+				vnParent = new VNObject(vnName, jobID, getWorld());
 			}
 			if(FilterProcess.getInstance().filter(this))
 				vnParent.skippedChildren.put(key, this);

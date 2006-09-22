@@ -97,7 +97,7 @@ public class AOFigure extends AbstractFigure{
 	/** All connections whose source is this and target is the key */
 	private Map<AOFigure, Connection> targetConnections;
 
-	/** */
+	/** Optimizes the GUI, the arrows are not drawn during a time. */
 	private GUIManager manager;
 	//
 	// -- CONSTRUCTORS -----------------------------------------------

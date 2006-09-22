@@ -45,9 +45,13 @@ import org.objectweb.proactive.ic2d.monitoring.Activator;
  * Holder class for all monitored hosts and virtual nodes
  */
 public class WorldObject extends AbstractDataObject {
-
 	
 	private static WorldObject instance;
+	
+	/** The name of this world */
+	private String name;
+	
+	private MonitorThread monitorThread;
 	
 	/** Contains all virtual nodes. */
 	private Map<String, VNObject> vnChildren;
@@ -61,10 +65,14 @@ public class WorldObject extends AbstractDataObject {
 	/**
 	 * Create a new WorldObject
 	 */
-	private WorldObject() {
+	public WorldObject() {
         super(null);
         vnChildren = new HashMap<String, VNObject>();
-        addObserver(MonitorThread.getInstance());
+        monitorThread = new MonitorThread(this);
+        addObserver(monitorThread);
+        
+        // Record the model
+        this.name = ModelRecorder.getInstance().addModel(this);
     }
 	
 	
@@ -72,6 +80,7 @@ public class WorldObject extends AbstractDataObject {
     // -- PUBLIC METHODS ---------------------------------------------
     //
 	
+	//TODO It is used by the Job monitoring, so resolve and delete this methode.
 	public static WorldObject getInstance() {
 		if(instance == null)
 			instance = new WorldObject();
@@ -121,6 +130,13 @@ public class WorldObject extends AbstractDataObject {
 		}
 	}
 	
+	/**
+	 * Returns the name of this world.
+	 * @return The name of this world.
+	 */
+	public String getName(){
+		return name;
+	}
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -177,4 +193,14 @@ public class WorldObject extends AbstractDataObject {
 
 	@Override
 	protected void foundForTheFirstTime() {/* Do nothing */}
+
+
+	@Override
+	public WorldObject getWorld() {
+		return this;
+	}
+	
+	public MonitorThread getMonitorThread(){
+		return monitorThread;
+	}
 }

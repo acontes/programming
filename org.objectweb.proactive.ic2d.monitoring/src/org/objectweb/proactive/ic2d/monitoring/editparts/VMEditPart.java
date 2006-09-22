@@ -95,7 +95,7 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	 */
 	protected IFigure createFigure() {
 		VMFigure figure = new VMFigure(getCastedModel().getFullName());
-		figure.addMouseListener(new JVMListener(getCastedModel()));
+		figure.addMouseListener(new JVMListener(getCastedModel(), getMonitoringView()));
 		return figure;
 	}
 

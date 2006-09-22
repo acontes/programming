@@ -223,6 +223,15 @@ public abstract class AbstractDataObject extends Observable {
 		}
 	}
 	
+	
+	/**
+	 * Returns the current World
+	 * @return The World, or null if the parent of this object is null.
+	 */
+	public WorldObject getWorld(){
+		return parent.getWorld();
+	}
+	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//

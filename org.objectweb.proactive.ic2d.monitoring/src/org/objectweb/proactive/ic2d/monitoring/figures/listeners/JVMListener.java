@@ -53,8 +53,8 @@ public class JVMListener implements MouseListener {
 	
 	private VMObject jvm;
 
-	public JVMListener(VMObject jvm) {
-		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
+	public JVMListener(VMObject jvm, MonitoringView monitoringView) {
+		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 		this.jvm = jvm;
 	}
 	

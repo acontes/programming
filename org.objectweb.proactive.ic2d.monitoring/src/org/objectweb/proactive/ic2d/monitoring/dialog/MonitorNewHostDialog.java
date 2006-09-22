@@ -51,8 +51,8 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.exceptions.HostAlreadyExistsException;
 
 
@@ -68,17 +68,20 @@ public class MonitorNewHostDialog extends Dialog {
 	private Button okButton;
 	private Button cancelButton;
 	
-
+	/** The World */
+	private WorldObject world;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
-	public MonitorNewHostDialog(Shell parent) {
+	public MonitorNewHostDialog(Shell parent, WorldObject world) {
 		// Pass the default styles here
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
 		this.parent = parent;
-
+		this.world = world;
+		
 		String initialHostValue = "localhost";
 		String port = "";
 
@@ -178,7 +181,7 @@ public class MonitorNewHostDialog extends Dialog {
 
 		// text depth
 		this.depthText = new Text(shell, SWT.BORDER);
-		depthText.setText(MonitorThread.getInstance().getDepth()+"");
+		depthText.setText(world.getMonitorThread().getDepth()+"");
 		FormData depthFormData2 = new FormData();
 		depthFormData2.top = new FormAttachment(hostGroup, 17);
 		depthFormData2.left = new FormAttachment(depthLabel, 5);
@@ -262,11 +265,11 @@ public class MonitorNewHostDialog extends Dialog {
 				hostname = hostText.getText();
 				port = Integer.parseInt(portText.getText());
 				protocol = Protocol.getProtocolFromString((combo.getText()));
-				MonitorThread.getInstance().setDepth(Integer.parseInt(depthText.getText()));
+				world.getMonitorThread().setDepth(Integer.parseInt(depthText.getText()));
 				new Thread(){
 					public void run(){
 						try {
-							new HostObject(hostname, port, protocol);
+							new HostObject(hostname, port, protocol, world);
 						} catch (HostAlreadyExistsException e) {
 							displayMessage(e.getMessage());
 						}

@@ -5,10 +5,12 @@ import java.util.Observer;
 
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AbstractFigure;
+import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPart implements Observer {
 
@@ -73,5 +75,16 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 //	public void removeChildVisual(EditPart childEditPart) {
 //		super.removeChildVisual(childEditPart);
 //	}
-	
+
+	/**
+	 * Returns the monitoring view. Or null if the parent of this object is null,
+	 * or if its parent isn't an instance of AbstractMonitoringEditPart.
+	 */
+	public MonitoringView getMonitoringView(){
+		EditPart parent = getParent();
+		if(parent == null || !(parent instanceof AbstractMonitoringEditPart))
+			return null;
+		else
+			return ((AbstractMonitoringEditPart) parent).getMonitoringView();
+	}
 }

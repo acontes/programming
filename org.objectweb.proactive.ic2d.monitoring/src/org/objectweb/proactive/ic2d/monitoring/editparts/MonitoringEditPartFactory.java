@@ -37,12 +37,16 @@ import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public class MonitoringEditPartFactory implements EditPartFactory{
 	
-//	public IC2DEditPartFactory() {
-//		super();
-//	}
+	/** The monitoring view, where the figures will be drawn */
+	private MonitoringView monitoringView;
+	
+	public MonitoringEditPartFactory(MonitoringView monitoringView){
+		this.monitoringView = monitoringView;
+	}
 	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
@@ -50,7 +54,7 @@ public class MonitoringEditPartFactory implements EditPartFactory{
 	
 	public EditPart createEditPart(EditPart context, Object model) {
 		if (model instanceof WorldObject)
-			return new WorldEditPart((WorldObject)model);
+			return new WorldEditPart((WorldObject)model, monitoringView);
 		else if (model instanceof HostObject)
 			return new HostEditPart((HostObject)model);
 		else if(model instanceof VMObject)

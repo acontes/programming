@@ -55,8 +55,8 @@ public class HostListener implements MouseListener {
 	private HostObject host;
 	private HostFigure figure;
 	
-	public HostListener(HostObject host, HostFigure figure) {
-		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
+	public HostListener(HostObject host, HostFigure figure, MonitoringView monitoringView) {
+		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 		this.host = host;
 		this.figure = figure;
 	}

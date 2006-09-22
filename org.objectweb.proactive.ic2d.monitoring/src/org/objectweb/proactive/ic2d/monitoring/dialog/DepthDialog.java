@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 
 public class DepthDialog extends Dialog {
 
@@ -52,10 +52,13 @@ public class DepthDialog extends Dialog {
 	private Button okButton;
 	private Button cancelButton;
 	
+	private WorldObject world;
 	
-	public DepthDialog(Shell parent) {
+	public DepthDialog(Shell parent, WorldObject world) {
 		// Pass the default styles here
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		
+		this.world = world;
 		
 		/* Init the display */
 		Display display = getParent().getDisplay();
@@ -75,7 +78,7 @@ public class DepthDialog extends Dialog {
 		titleLabel.setLayoutData(titleLabelFormData);
 		
 		this.text = new Text(shell, SWT.BORDER);
-		text.setText(MonitorThread.getInstance().getDepth()+"");
+		text.setText(world.getMonitorThread().getDepth()+"");
 		FormData textFormData = new FormData();
 		textFormData.top = new FormAttachment(0, -3);
 		textFormData.left = new FormAttachment(titleLabel, 10);
@@ -116,7 +119,7 @@ public class DepthDialog extends Dialog {
 		
 		public void widgetSelected(SelectionEvent e) {
 			if(e.widget == okButton) {
-				MonitorThread.getInstance().setDepth(Integer.parseInt(text.getText()));
+				world.getMonitorThread().setDepth(Integer.parseInt(text.getText()));
 			}
 			shell.close();
 		}

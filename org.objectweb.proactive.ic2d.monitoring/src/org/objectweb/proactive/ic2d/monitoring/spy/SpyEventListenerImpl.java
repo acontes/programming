@@ -34,9 +34,8 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.monitoring.data.State;
 
 public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
@@ -139,7 +138,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		target.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 
 		UniqueID sourceId = ((SpyMessageEvent) spyEvent).getSourceBodyID();
-		AOObject source = WorldObject.getInstance().findActiveObjectById(sourceId);
+		AOObject source = target.getWorld().findActiveObjectById(sourceId);
 
 		// We didn't find the source
 		if(source == null)

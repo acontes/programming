@@ -31,52 +31,31 @@
 package org.objectweb.proactive.ic2d.monitoring.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.objectweb.proactive.ic2d.monitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.monitoring.dialog.SetTTRDialog;
 
-public class SetTTRAction extends Action implements IWorkbenchWindowActionDelegate {
+public class SetTTRAction extends Action {
 
 	public static final String SET_TTR = "Set ttr";
 	
 	private Display display;
 	
-	public SetTTRAction() {
-		super();
-	}
-	
-	public SetTTRAction(Display display) {
-		this.setId(SET_TTR);
+	private MonitorThread monitorThread;
+		
+	public SetTTRAction(Display display, MonitorThread monitorThread) {
 		this.display = display;
+		this.monitorThread = monitorThread;
+		this.setId(SET_TTR);
 		this.setText("Set Time To Refresh...");
+		setToolTipText("Set Time To Refresh");
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "ttr.gif"));
 	}
-	
-	
-	public void dispose() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void init(IWorkbenchWindow window) {
-		this.display = window.getShell().getDisplay();
-	}
-
-	public void run(IAction action) {
-		new SetTTRDialog(display.getActiveShell());
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-		// TODO Auto-generated method stub
-
-	}
-	
-	
+		
 	@Override
 	public void run() {
-		new SetTTRDialog(display.getActiveShell());
+		new SetTTRDialog(display.getActiveShell(), monitorThread);
 	}
 
 }

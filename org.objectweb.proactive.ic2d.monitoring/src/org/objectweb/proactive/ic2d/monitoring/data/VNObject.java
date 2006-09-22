@@ -42,11 +42,11 @@ public class VNObject extends AbstractDataObject {
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
-	protected VNObject(String name, String jobID) {
-		super(WorldObject.getInstance());
+	protected VNObject(String name, String jobID, WorldObject world) {
+		super(world);
 		this.name = name;
 		this.jobID = jobID;
-		WorldObject.getInstance().putVNChild(this);
+		world.putVNChild(this);
 	}
 
 	
@@ -55,9 +55,6 @@ public class VNObject extends AbstractDataObject {
 	//
 	
 	
-	public static VNObject getInstance(String name){
-		return WorldObject.getInstance().getVirtualNode(name);
-	}
 
 	
 	@Override
@@ -91,5 +88,5 @@ public class VNObject extends AbstractDataObject {
 	
 	@Override
 	protected void foundForTheFirstTime() { /* Do nothing*/ }
-	
+
 }

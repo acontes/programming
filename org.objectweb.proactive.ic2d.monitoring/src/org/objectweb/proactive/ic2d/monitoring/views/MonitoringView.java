@@ -32,7 +32,6 @@ package org.objectweb.proactive.ic2d.monitoring.views;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.ContextMenuProvider;
-import org.eclipse.gef.EditPartFactory;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.ActionRegistry;
@@ -40,6 +39,7 @@ import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -57,6 +57,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.MonitoringContextMenuProvider;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.NewViewAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshJVMAction;
@@ -77,7 +78,7 @@ public class MonitoringView extends ViewPart {
 
 	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.views.MonitoringView";
 
-	private static MonitoringView instance = null; 
+	private String title;
 
 	/** the graphical viewer */
 	private MonitoringViewer graphicalViewer;
@@ -89,6 +90,11 @@ public class MonitoringView extends ViewPart {
 	private Button bRatio;
 	private Button bFilaire;
 
+	/** The World */
+	private WorldObject world;
+
+	/** The graphical set of virtual nodes */
+	private VirtualNodesGroup virtualNodesGroup;
 
 	//
 	// -- CONSTRUCTOR ----------------------------------------------
@@ -96,27 +102,28 @@ public class MonitoringView extends ViewPart {
 
 	public MonitoringView () {
 		super();
-		instance = this;
+		world = new WorldObject();
+		title = world.getName();
 	}
 
 	//
 	// -- PUBLIC METHODS ----------------------------------------------
 	//
 
-	public static MonitoringView getInstance() {
-		return instance;
-	}
 
 	@Override
 	public void createPartControl(Composite parent){
-
+		
+		// To identify each Monitoring view.
+		setPartName(title);
+		
 		FormLayout form = new FormLayout ();
 		parent.setLayout (form);
 
 		final int limit = 50;
 
-		VirtualNodesGroup virtualNodesGroup = new VirtualNodesGroup(parent);
-		WorldObject.getInstance().addObserver(virtualNodesGroup);
+		virtualNodesGroup = new VirtualNodesGroup(parent);
+		world.addObserver(virtualNodesGroup);
 		FormData vnData = new FormData();
 		vnData.left = new FormAttachment (0, 0);
 		vnData.right = new FormAttachment (100, 0);
@@ -134,7 +141,7 @@ public class MonitoringView extends ViewPart {
 		graphicalViewer.getControl().setLayoutData(graphicalViewerData);
 
 		//--- To change the arrow style
-		
+
 		FormData drawingStyleData = new FormData();
 		drawingStyleData.left = new FormAttachment (0, 0);
 		drawingStyleData.right = new FormAttachment (100, 0);
@@ -154,8 +161,8 @@ public class MonitoringView extends ViewPart {
 		rowLayout.spacing = 5;
 		groupD.setLayout(rowLayout);
 		groupD.setLayoutData(drawingStyleData);
-		
-		
+
+
 		Button topology = new Button(groupD, SWT.CHECK);
 		topology.setText("Display topology");
 		topology.setSelection(RoundedLine.DEFAULT_DISPLAY_TOPOLOGY);
@@ -189,9 +196,25 @@ public class MonitoringView extends ViewPart {
 
 		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
+		// Adds "Monitor a new Host" action to the view's toolbar
+		NewHostAction toolBarNewHost = new NewHostAction(parent.getDisplay(), world);
+		toolBarManager.add(toolBarNewHost);
+
+		// Adds "Set depth" action to the view's toolbar
+		SetDepthAction toolBarSetDepth = new SetDepthAction(parent.getDisplay(), world);
+		toolBarManager.add(toolBarSetDepth);
+
+		toolBarManager.add(new Separator());
+
+		// Adds "Set Time to refresh" action to the view's toolbar
+		SetTTRAction toolBarTTR = new SetTTRAction(parent.getDisplay(), world.getMonitorThread());
+		toolBarManager.add(toolBarTTR);
+
 		// Adds refresh action to the view's toolbar
-		RefreshAction toolBarRefresh = new RefreshAction();
+		RefreshAction toolBarRefresh = new RefreshAction(world.getMonitorThread());
 		toolBarManager.add(toolBarRefresh);
+
+		toolBarManager.add(new Separator());
 
 		// Adds Zoom-in and Zoom-out actions to the view's toolbar
 		ZoomManager zoomManager = ((ScalableFreeformRootEditPart)graphicalViewer.getRootEditPart()).getZoomManager();
@@ -206,6 +229,12 @@ public class MonitoringView extends ViewPart {
 		zoomOut.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-out-2.gif"));
 		graphicalViewer.getActionRegistry().registerAction(zoomIn);
 		toolBarManager.add(zoomOut);
+
+		toolBarManager.add(new Separator());
+
+		// Adds "New Monitoring view" action to the view's toolbar
+		NewViewAction toolBarNewView = new NewViewAction();
+		toolBarManager.add(toolBarNewView);
 
 
 		//graphicalViewer.setProperty(MouseWheelHandler.KeyGenerator.getKey(SWT.NONE), MouseWheelZoomHandler.SINGLETON);
@@ -225,6 +254,40 @@ public class MonitoringView extends ViewPart {
 //		});
 //		}
 
+//		Create the drag source on the tree
+		/*		DragSource ds = new DragSource(getGraphicalViewer().getControl(), DND.DROP_MOVE);
+		ds.setTransfer(new Transfer[] {TextTransfer.getInstance()});
+		ds.addDragListener(new DragSourceAdapter() {
+
+			public void dragStart(DragSourceEvent event){
+				System.out.println(".dragStart()");
+				//event.doit = false;
+			}
+
+			public void dragFinished(DragSourceEvent event){
+				System.out.println(".dragFinished()");
+			}
+
+			public void dragSetData(DragSourceEvent event) {
+				// Set the data to be the first selected item's text
+				//event.data = tree.getSelection()[0].getText();
+				event.data = "Essai";
+				System.out.println(".dragSetData()");
+			}
+		});
+
+
+		// Create the drop target on the text field
+		DropTarget dt = new DropTarget(getGraphicalViewer().getControl(), DND.DROP_MOVE);
+		dt.setTransfer(new Transfer[] {TextTransfer.getInstance()});
+		dt.addDropListener(new DropTargetAdapter() {
+			public void drop(DropTargetEvent event) {
+				// Set the text field's text to the text being dropped
+				//text.setText((String)event.data);
+				System.out.println(".drop()");
+			}
+		});
+		 */
 	}
 
 
@@ -235,12 +298,14 @@ public class MonitoringView extends ViewPart {
 	public MonitoringViewer getGraphicalViewer() {
 		return graphicalViewer;
 	}
-
-
+	
 	public void setFocus() {
 		// TODO Auto-generated method stub
 	}
 
+	public VirtualNodesGroup getVirtualNodesGroup(){
+		return virtualNodesGroup;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
@@ -258,14 +323,14 @@ public class MonitoringView extends ViewPart {
 	// -- PROTECTED METHODS -------------------------------------------
 	//
 
-	/**
-	 * Returns the <code>EditPartFactory</code> that the
-	 * <code>GraphicalViewer</code> will use.
-	 * @return the <code>EditPartFactory</code>
-	 */
-	protected EditPartFactory getEditPartFactory(){
-		return new MonitoringEditPartFactory();
-	}
+//	/**
+//	* Returns the <code>EditPartFactory</code> that the
+//	* <code>GraphicalViewer</code> will use.
+//	* @return the <code>EditPartFactory</code>
+//	*/
+//	protected EditPartFactory getEditPartFactory(){
+//	return new MonitoringEditPartFactory();
+//	}
 
 
 	/**
@@ -297,15 +362,14 @@ public class MonitoringView extends ViewPart {
 		// configure the viewer
 		graphicalViewer.getControl().setBackground(ColorConstants.white);
 		ScalableFreeformRootEditPart root = new ScalableFreeformRootEditPart();
-		root.getFigure().addMouseListener(new WorldListener());
+		root.getFigure().addMouseListener(new WorldListener(this));
 		graphicalViewer.setRootEditPart(root);
 
 		// activate the viewer as selection provider for Eclipse
 		getSite().setSelectionProvider(graphicalViewer);
 
 		// initialize the viewer with input
-		graphicalViewer.setEditPartFactory(getEditPartFactory());
-		WorldObject world = WorldObject.getInstance();
+		graphicalViewer.setEditPartFactory(new MonitoringEditPartFactory(this));
 //		world.addObserver(MonitorThread.getInstance());
 		graphicalViewer.setContents(world);
 
@@ -313,21 +377,21 @@ public class MonitoringView extends ViewPart {
 		ContextMenuProvider contextMenu = new MonitoringContextMenuProvider(graphicalViewer);
 		graphicalViewer.setContextMenu(contextMenu);
 		getSite().registerContextMenu(contextMenu, graphicalViewer);
-		
+
 		// drag and drop
 //		graphicalViewer.addDropTargetListener((TransferDropTargetListener)
-//				new TemplateTransferDropTargetListener(getGraphicalViewer()));
+//		new TemplateTransferDropTargetListener(getGraphicalViewer()));
 //		graphicalViewer.addDropTargetListener((TransferDropTargetListener)
-//				new TextTransferDropTargetListener(getGraphicalViewer(), TextTransfer.getInstance()));
+//		new TextTransferDropTargetListener(getGraphicalViewer(), TextTransfer.getInstance()));
 	}
 
 	private void createActions(Display display) {
 		ActionRegistry registry = graphicalViewer.getActionRegistry();
 
-		registry.registerAction(new NewHostAction(display));
-		registry.registerAction(new SetDepthAction(display));
-		registry.registerAction(new RefreshAction());
-		registry.registerAction(new SetTTRAction(display));
+		registry.registerAction(new NewHostAction(display, world));
+		registry.registerAction(new SetDepthAction(display, world));
+		registry.registerAction(new RefreshAction(world.getMonitorThread()));
+		registry.registerAction(new SetTTRAction(display, world.getMonitorThread()));
 		registry.registerAction(new RefreshHostAction());
 		registry.registerAction(new RefreshJVMAction());
 		registry.registerAction(new RefreshNodeAction());
@@ -421,18 +485,18 @@ public class MonitoringView extends ViewPart {
 				children[1].redraw();
 		}
 	}
-	
+
 	private class EnableMonitoringListener extends SelectionAdapter {
 
 		public void widgetSelected(SelectionEvent e) {
 			SpyEventListenerImpl.SetMonitoring(((Button) e.widget).getSelection());
 		}
 	}
-	
+
 	private class ResetTopologyListener extends SelectionAdapter {
-		
+
 		public void widgetSelected(SelectionEvent e) {
-			WorldObject.getInstance().resetCommunications();
+			world.resetCommunications();
 		}
 	}
 }

@@ -50,8 +50,8 @@ public class WorldListener implements MouseListener {
 
 	private ActionRegistry registry;
 
-	public WorldListener() {
-		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
+	public WorldListener(MonitoringView monitoringView) {
+		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 	}
 
 	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }

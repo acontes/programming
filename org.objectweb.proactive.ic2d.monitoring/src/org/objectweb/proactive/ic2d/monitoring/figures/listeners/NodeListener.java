@@ -53,8 +53,8 @@ public class NodeListener implements MouseListener {
 	
 	private NodeObject node;
 	
-	public NodeListener(NodeObject node) {
-		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
+	public NodeListener(NodeObject node, MonitoringView monitoringView) {
+		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 		this.node = node;
 	}
 	

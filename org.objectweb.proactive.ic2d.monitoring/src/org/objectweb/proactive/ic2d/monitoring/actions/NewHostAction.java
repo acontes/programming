@@ -31,53 +31,39 @@
 package org.objectweb.proactive.ic2d.monitoring.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.dialog.MonitorNewHostDialog;
 
-public class NewHostAction extends Action implements IWorkbenchWindowActionDelegate {
+public class NewHostAction extends Action {
 
 	private Display display;
 	
+	/** The World */
+	private WorldObject world;
+	
 	public static final String NEW_HOST = "New host";
 	
-	public NewHostAction() {
-		super();
-	}
-	
-	public NewHostAction(Display display) {
+	public NewHostAction(Display display, WorldObject world) {
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "host.gif"));
 		this.display = display;
+		this.world = world;
 		this.setId(NEW_HOST);
 		this.setText("Monitor a new host...");
+		setToolTipText("Monitor a new host");
 	}
 	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 	
-	public void dispose() {
-		// TODO Auto-generated method stub
+	protected void setWorldObject(WorldObject world){
+		this.world = world;
 	}
-
-	public void init(IWorkbenchWindow window) {
-		this.display = window.getShell().getDisplay();
-	}
-
-	public void run(IAction action) {
-		new MonitorNewHostDialog(display.getActiveShell());
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-		// TODO Auto-generated method stub
-	}
-	
-	
 	
 	@Override
 	public void run() {
-		new MonitorNewHostDialog(display.getActiveShell());
+		new MonitorNewHostDialog(display.getActiveShell(), world);
 	}
 }

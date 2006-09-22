@@ -22,21 +22,22 @@ import org.objectweb.proactive.ic2d.monitoring.figures.VNColors;
 
 public class VirtualNodesGroup implements Observer {
 	
-	private static VirtualNodesGroup instance;
-	
 	private Group group;
 
 	private Map<Button, VNObject> buttons = new HashMap<Button, VNObject>();
 	
 	private Map<VNObject, Button> virtualNodes = new HashMap<VNObject, Button>();
 	
-	
+	private VNColors vnColors;
 	
 	//
 	// -- CONSTRUCTOR -----------------------------------------------
 	//
 
 	public VirtualNodesGroup(Composite parent) {
+		
+		vnColors = new VNColors();
+		
 		group = new Group(parent, SWT.NONE);
 		group.setText("Virtual nodes");
 
@@ -50,8 +51,6 @@ public class VirtualNodesGroup implements Observer {
 		rowLayout.marginBottom = 5;
 		rowLayout.spacing = 10;
 		group.setLayout(rowLayout);
-		
-		instance = this;
 	}
 
 
@@ -59,9 +58,6 @@ public class VirtualNodesGroup implements Observer {
 	// -- PUBLIC METHOD -----------------------------------------------
 	//
 	
-	public static VirtualNodesGroup getInstance() {
-		return instance;
-	}
 
 	
 	public void update(Observable o, Object arg) {
@@ -70,7 +66,7 @@ public class VirtualNodesGroup implements Observer {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run () {
 					Button b = new Button(group, SWT.CHECK);
-					b.setForeground(VNColors.getInstance().getColor(vn.getKey())); //DOESN'T WORK !!!
+					b.setForeground(vnColors.getColor(vn.getKey())); //DOESN'T WORK !!!
 					b.setText(vn.getFullName());
 					b.addSelectionListener(new VirtualNodeButtonListener());
 					buttons.put(b, vn);
@@ -92,7 +88,7 @@ public class VirtualNodesGroup implements Observer {
 			return null;
 		if(! b.getSelection())
 			return null;
-		return VNColors.getInstance().getColor(vn.getKey());
+		return vnColors.getColor(vn.getKey());
 	}
 	
 	//

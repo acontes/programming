@@ -40,15 +40,12 @@ public class GUIManager{
 	/** The manager */
 	private Thread thread;
 
-	/** The figure to repaint */
-	private AbstractFigure figure;
 
 	/** Time To Sleep (in seconds) */
 	private float tts = 0.01f;
 
 	public GUIManager(AbstractFigure figure){
-		this.figure = figure;
-		this.thread = new Thread(new Manager());
+		this.thread = new Thread(new Painter(figure));
 	}
 
 	public void setAlive(boolean isAlive) {
@@ -70,8 +67,15 @@ public class GUIManager{
 //	-- INNER CLASS -----------------------------------------------
 
 
-	private class Manager implements Runnable {
-
+	private class Painter implements Runnable {
+		
+		/** The figure to repaint */
+		private AbstractFigure figure;
+		
+		public Painter(AbstractFigure figure){
+			this.figure = figure;
+		}
+		
 		public void run() {
 			while(isAlive) {
 				if(dirty){

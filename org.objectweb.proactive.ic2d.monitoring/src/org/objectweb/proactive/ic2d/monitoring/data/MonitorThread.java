@@ -39,8 +39,6 @@ public class MonitorThread implements Observer {
 	private final static int DEFAULT_DEPTH = 3;
 	private final static int DEFAULT_TTR = 30;
 
-	/** Singleton design pattern */
-	private static MonitorThread instance;
 
 	/** Hosts will be recursively searched up to this depth */
 	private int depth;
@@ -56,26 +54,17 @@ public class MonitorThread implements Observer {
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
-	private MonitorThread(){
+	public MonitorThread(WorldObject world){
 		this.depth = DEFAULT_DEPTH;
 		this.ttr = DEFAULT_TTR;
 
 		this.refresh = false;
-		this.refresher = new Thread(new Refresher());
+		this.refresher = new Thread(new Refresher(world));
 	}
 
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-
-	/**
-	 * TODO
-	 */
-	public static MonitorThread getInstance(){
-		if(instance == null)
-			instance = new MonitorThread();
-		return instance;
-	}
 
 	/**
 	 * Hosts will be recursively searched up to 
@@ -112,12 +101,13 @@ public class MonitorThread implements Observer {
 
 
 	public void update(Observable o, Object arg) {
-		if (arg != null && arg instanceof WorldObject.methodName) {
+		if (arg != null && o instanceof WorldObject && arg instanceof WorldObject.methodName) {
+			WorldObject world = (WorldObject)o;
 			WorldObject.methodName method = (WorldObject.methodName)arg;
 			if(method == WorldObject.methodName.PUT_CHILD)
-				MonitorThread.getInstance().startRefreshing();
+				world.getMonitorThread().startRefreshing((WorldObject)o);
 			else if (method == WorldObject.methodName.REMOVE_CHILD)
-				MonitorThread.getInstance().stopRefreshing();
+				world.getMonitorThread().stopRefreshing();
 		}
 	}
 
@@ -129,10 +119,10 @@ public class MonitorThread implements Observer {
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
 
-	protected void startRefreshing() {
+	protected void startRefreshing(WorldObject world) {
 		refresh = true;
 		if(refresher.getState()==Thread.State.TERMINATED){
-			refresher = new Thread(new Refresher());
+			refresher = new Thread(new Refresher(world));
 		}
 		refresher.start();
 	}
@@ -149,9 +139,16 @@ public class MonitorThread implements Observer {
 
 	private class Refresher implements Runnable {
 
+		/** The World to refresh*/
+		private WorldObject world;
+		
+		public Refresher(WorldObject world){
+			this.world = world;
+		}
+		
 		public void run() {
 			while(refresh) {
-				WorldObject.getInstance().explore();
+				world.explore();
 				try {
 					Thread.sleep(ttr * 1000);
 				} catch (InterruptedException e) {/* Do nothing */}

@@ -31,53 +31,31 @@
 package org.objectweb.proactive.ic2d.monitoring.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.dialog.DepthDialog;
 
-public class SetDepthAction extends Action implements IWorkbenchWindowActionDelegate {
+public class SetDepthAction extends Action {
 
 	public static final String SET_DEPTH = "Set depth";
 	
 	private Display display;
 	
-	public SetDepthAction() {
-		this.setId(SET_DEPTH);
-	}
-	
-	public SetDepthAction(Display display) {
+	/** The world */
+	private WorldObject world;
+		
+	public SetDepthAction(Display display, WorldObject world) {
 		this.display = display;
+		this.world = world;
 		this.setId(SET_DEPTH);
 		this.setText("Set Depth Control...");
+		setToolTipText("Set Depth Control");
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "depth.gif"));
 	}
-	
-	
-	
-	public void dispose() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void init(IWorkbenchWindow window) {
-		this.display = window.getShell().getDisplay();
-
-	}
-
-	public void run(IAction action) {
-		new DepthDialog(display.getActiveShell());
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-		// TODO Auto-generated method stub
-
-	}
-	
-	
+		
 	@Override
 	public void run() {
-		new DepthDialog(display.getActiveShell());
+		new DepthDialog(display.getActiveShell(), world);
 	}
 }

@@ -36,11 +36,10 @@ import java.util.Observable;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.NodeListener;
-import org.objectweb.proactive.ic2d.monitoring.views.VirtualNodesGroup;
 
 public class NodeEditPart extends AbstractMonitoringEditPart{
 
@@ -82,7 +81,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 //					((AbstractIC2DEditPart)getParent()).removeChildVisual(nodeEditPart);
 				}
 				else if(param instanceof State) {
-					((NodeFigure)getFigure()).setHighlight(VirtualNodesGroup.getInstance().getColor(((NodeObject)getModel()).getVNParent()));
+					((NodeFigure)getFigure()).setHighlight(getMonitoringView().getVirtualNodesGroup().getColor(((NodeObject)getModel()).getVNParent()));
 					refresh();
 				}
 				else {
@@ -104,7 +103,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 */
 	protected IFigure createFigure() {
 		NodeFigure figure = new NodeFigure(getCastedModel().getFullName(),getCastedModel().getProtocol());
-		figure.addMouseListener(new NodeListener(getCastedModel()));
+		figure.addMouseListener(new NodeListener(getCastedModel(), getMonitoringView()));
 		return figure;
 	}
 

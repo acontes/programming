@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
@@ -46,19 +47,24 @@ import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
-public class AOListener implements MouseListener{
+public class AOListener  /*extends MouseMotionListener.Stub*/ implements MouseListener{
 
+//	private boolean drag = false;
+//	private boolean exited = false;
 
 	private ActionRegistry registry;
 
-	public AOListener() {
-		this.registry = MonitoringView.getInstance().getGraphicalViewer().getActionRegistry();
+	public AOListener(MonitoringView monitoringView) {
+		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 	}
 
 	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
 
 	public void mousePressed(MouseEvent me) {
-		if(me.button == 3) {
+		/*if(me.button == 1){
+			drag = true;
+		}
+		else*/ if(me.button == 3) {
 			// Monitor a new host
 			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
 			
@@ -94,6 +100,22 @@ public class AOListener implements MouseListener{
 		}
 	}
 
-	public void mouseReleased(MouseEvent me) { /* Do nothing */ }
+	public void mouseReleased(MouseEvent me) {
+		/*System.out.println("AOListener.mouseReleased()");
+		if(me.button == 1){
+			drag = false;
+     	}*/
+	}
 
+/*	@Override
+	public void mouseDragged(MouseEvent me) {
+//		System.out.println("AOListener.mouseDragged()");
+	}*/
+
+/*	@Override
+	public void mouseExited(MouseEvent me) {
+		System.out.println("AOListener.mouseExited()");
+		if(drag)
+			this.exited = true; 
+	}*/
 }

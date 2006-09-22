@@ -39,18 +39,21 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
+import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public class WorldEditPart extends AbstractMonitoringEditPart {
 
-
 	private FreeformLayer layer;
 
+	private MonitoringView monitoringView;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
-	public WorldEditPart(WorldObject model) {
+	public WorldEditPart(WorldObject model, MonitoringView monitoringView) {
 		super(model);
+		this.monitoringView = monitoringView;
 	}
 
 	//
@@ -68,6 +71,11 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 
 	public IFigure getContentPane() {
 		return layer;
+	}
+	
+	@Override
+	public MonitoringView getMonitoringView(){
+		return this.monitoringView;
 	}
 
 	//
@@ -90,7 +98,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 //		layout.setMinorAlignment(MonitoringLayout.ALIGN_CENTER_CENTER);
 		layer.setLayoutManager(layout);
 		
-		layer.addMouseListener(new WorldListener());
+		layer.addMouseListener(new WorldListener(monitoringView));
 		
 		return layer;
 	}

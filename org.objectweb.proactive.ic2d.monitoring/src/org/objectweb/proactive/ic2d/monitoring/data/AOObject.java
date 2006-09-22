@@ -47,7 +47,7 @@ public class AOObject extends AbstractDataObject{
 
 
 	/** State of the object (ex: WAITING_BY_NECESSITY) */
-	private State state;
+	private State state = State.UNKNOWN;
 
 	/** the object's name (ex: ao) */
 	private String name;

@@ -10,21 +10,13 @@ public class VNColors {
 
 	private static final Color[] colors = 
 	{ColorConstants.cyan, ColorConstants.yellow, ColorConstants.lightBlue, ColorConstants.orange, ColorConstants.green};
-	
-	private static VNColors instance;
-	
+		
 	private Map<String, Color> vnColors;
 	
-	private VNColors() {
+	public VNColors() {
 		vnColors = new HashMap<String, Color>();
 	}
-	
-	public static VNColors getInstance() {
-		if(instance == null)
-			instance = new VNColors();
-		return instance;
-	}
-	
+		
 	public Color getColor(String vnID) {
 		Color c = vnColors.get(vnID);
 		if (c == null) {
@@ -32,8 +24,5 @@ public class VNColors {
 			vnColors.put(vnID, c);
 		}
 		return c; 
-	}
-	
-	
-	
+	}	
 }

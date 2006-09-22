@@ -19,6 +19,7 @@
             id="org.objectweb.proactive.ic2d.monitoring.category"
             name="Monitoring"/>
       <view
+            allowMultiple="true"
             category="org.objectweb.proactive.ic2d.monitoring.category"
             class="org.objectweb.proactive.ic2d.monitoring.views.MonitoringView"
             icon="icons/monitoring.gif"
@@ -55,26 +56,11 @@
                >
          </menu>
          <action
-               class="org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction"
-               id="org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction"
-               label="Monitor a new host..."
+               class="org.objectweb.proactive.ic2d.monitoring.actions.NewViewAction"
+               id="org.objectweb.proactive.ic2d.monitoring.actions.NewViewAction"
+               label="New Monitoring view"
                menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.MonitoringMenu/content"
-               tooltip="Monitor a new RMI host"/>
-         <menu
-               id="org.objectweb.proactive.ic2d.monitoring.menu.ControlMenu"
-               label="&amp;Control"/>
-         <action
-               class="org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction"
-               id="org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction"
-               label="Set Time To Refresh..."
-               menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.ControlMenu/content"
-               tooltip="Set time to refresh"/>
-         <action
-               class="org.objectweb.proactive.ic2d.monitoring.actions.SetDepthAction"
-               id="org.objectweb.proactive.ic2d.monitoring.actions.SetDepthAction"
-               label="Set Depth Control..."
-               menubarPath="org.objectweb.proactive.ic2d.monitoring.menu.ControlMenu/content"
-               tooltip="Set Depth Control"/>
+               tooltip="Add a new Monitoring view"/>
       </actionSet>
    </extension>
    <extension

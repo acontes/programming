@@ -68,10 +68,11 @@ public class HostObject extends AbstractDataObject {
 	 * @parent hostname machine's name
 	 * @param port
 	 * @param protocol to use
+	 * @param world The World
 	 * @throws HostAlreadyExistsException 
 	 */
-	public HostObject(String hostname, int port, Protocol protocol) throws HostAlreadyExistsException{
-		super(WorldObject.getInstance());
+	public HostObject(String hostname, int port, Protocol protocol, WorldObject world) throws HostAlreadyExistsException{
+		super(world);
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
@@ -98,7 +99,7 @@ public class HostObject extends AbstractDataObject {
 
 		for (int i = 0; i < foundRuntimes.size(); ++i) {
 			ProActiveRuntime proActiveRuntime = foundRuntimes.get(i);
-			handleProActiveRuntime(proActiveRuntime, MonitorThread.getInstance().getDepth());
+			handleProActiveRuntime(proActiveRuntime, getWorld().getMonitorThread().getDepth());
 		}
 		if(monitoredChildren.size() == 0) { //we didn't find any child
 			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+getKey());
@@ -211,7 +212,7 @@ public class HostObject extends AbstractDataObject {
 				Protocol protocol = Protocol.getProtocolFromString(pro.substring(0, pro.length()-1).toUpperCase());
 				HostObject host;
 				try {
-					host = new HostObject(hostname, port, protocol);
+					host = new HostObject(hostname, port, protocol, getWorld());
 				} catch (HostAlreadyExistsException e) {
 					continue;
 				}
