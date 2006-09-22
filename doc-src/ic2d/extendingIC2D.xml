@@ -654,7 +654,7 @@
 				</para>
 
 				<figure id="spyDiagram">
-					<title>Spies</title>
+					<title>Spy classes</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata align="center"
@@ -664,37 +664,33 @@
 					</mediaobject>
 				</figure>
 
-				<para>Here is how the espionnage works :</para>
-
-				<orderedlist>
-					<listitem>
-						<para>
-							When a node is found for the first time,
-							IC2D put a spy in the node
-						</para>
-					</listitem>
-				</orderedlist>
-
-				<sect4 id="spyEvent">
-					<title>
-						How an event of a proactive object arrive to the
-						monitoring plugin?
-					</title>
-
-					<para></para>
-
-					<orderedlist>
-						<listitem>
-							<para>
-								The
-								<emphasis role="bold">Spy</emphasis>
-								regularly asks to the
-								<emphasis role="bold">
-									SpyEventManager
-								</emphasis>
-								to provide all the events.
-							</para>
-						</listitem>
+				<para>
+					When a node is found for the first time,
+					IC2D put a spy in the node.
+				</para>
+				
+				<sect4>
+					<title>How an event of a proactive object arrive to the monitoring plugin?</title>
+				
+					<para>
+						Once the spy is in the node, it
+						regularly asks to the <emphasis role="bold">SpyEventManager</emphasis>
+						to provide all the events. The next step is explained in the <xref linkend="spySequenceDiagram"/>. 
+					</para>
+					
+					<figure id="spySequenceDiagram">
+						<title>Active Objects' events management</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/architecture/sequenceDiagramSpies.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+					
+				<!--
+				</listitem>
 						<listitem>
 							<para>
 								Then the Spy transmits all these events
@@ -741,7 +737,9 @@
 							</para>
 						</listitem>
 					</orderedlist>
+				-->
 				</sect4>
+				
 
 				<sect4 id="newSpyWhen">
 					<title>When a new Spy is created?</title>
