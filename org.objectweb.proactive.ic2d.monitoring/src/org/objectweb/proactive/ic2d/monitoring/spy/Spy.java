@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.body.migration.MigratableBody;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 
 
 /**
@@ -166,7 +168,7 @@ public class Spy implements RunActive, ProActiveInternalObject {
 		try {
 			body.terminate();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 		}
 	}
 	
