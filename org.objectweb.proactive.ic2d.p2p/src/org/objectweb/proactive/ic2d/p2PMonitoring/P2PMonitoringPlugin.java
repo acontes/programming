@@ -1,7 +1,10 @@
 package org.objectweb.proactive.ic2d.p2PMonitoring;
 
-import org.eclipse.ui.plugin.*;
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -24,6 +27,16 @@ public class P2PMonitoringPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		System.out.println("P2PMonitoringPlugin.start()");
+		ClassPool pool = ClassPool.getDefault();
+       pool.insertClassPath(new ClassClassPath(this.getClass()));
+//       try{
+//			RuntimeFactory.getDefaultRuntime();
+//		}
+//		catch(ProActiveException e) {
+//			//TODO log?
+//			e.printStackTrace();
+//		}
 	}
 
 	/**

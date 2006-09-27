@@ -1,7 +1,5 @@
 package org.objectweb.proactive.ic2d.p2PMonitoring.actions;
 
-import java.io.File;
-
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
@@ -20,7 +18,6 @@ public class DumpFileChooserAction  implements IWorkbenchWindowActionDelegate {
 		//
 		
 		public void dispose() {
-			// TODO Auto-generated method stub
 			
 		}
 
@@ -36,14 +33,13 @@ public class DumpFileChooserAction  implements IWorkbenchWindowActionDelegate {
 			 String filename = fd.open();
 		        if (filename != null){
 		        // loadImage(filename);
-		         String currentDir = fd.getFilterPath();
+		//         String currentDir = fd.getFilterPath();
 		         System.out.println("Opening " + filename);
 		         P2PView.loadDumpFile(filename);
 		        }
 		}
 
 		public void selectionChanged(IAction action, ISelection selection) {
-			// TODO Auto-generated method stub
 			
 		}
 	}
