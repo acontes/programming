@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.monitoring.views;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.ContextMenuProvider;
+import org.eclipse.gef.EditPartFactory;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.ActionRegistry;
@@ -307,6 +308,10 @@ public class MonitoringView extends ViewPart {
 		return virtualNodesGroup;
 	}
 
+	public WorldObject getWorld() {
+		return world;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
@@ -323,14 +328,14 @@ public class MonitoringView extends ViewPart {
 	// -- PROTECTED METHODS -------------------------------------------
 	//
 
-//	/**
-//	* Returns the <code>EditPartFactory</code> that the
-//	* <code>GraphicalViewer</code> will use.
-//	* @return the <code>EditPartFactory</code>
-//	*/
-//	protected EditPartFactory getEditPartFactory(){
-//	return new MonitoringEditPartFactory();
-//	}
+	/**
+	* Returns the <code>EditPartFactory</code> that the
+	* <code>GraphicalViewer</code> will use.
+	* @return the <code>EditPartFactory</code>
+	*/
+	protected EditPartFactory getEditPartFactory(){
+		return new MonitoringEditPartFactory(this);
+	}
 
 
 	/**
@@ -369,7 +374,7 @@ public class MonitoringView extends ViewPart {
 		getSite().setSelectionProvider(graphicalViewer);
 
 		// initialize the viewer with input
-		graphicalViewer.setEditPartFactory(new MonitoringEditPartFactory(this));
+		graphicalViewer.setEditPartFactory(getEditPartFactory());
 //		world.addObserver(MonitorThread.getInstance());
 		graphicalViewer.setContents(world);
 
