@@ -157,6 +157,7 @@ public class SpyEventManager {
 			if (activeObjectBody.isActive()) {
 				addListenersToNewBody(activeObjectBody);
 				spyEvents[i] = new BodyCreationSpyEvent(activeObjectBody.getID(),
+						activeObjectBody.getJobID(),
 						activeObjectBody.getNodeURL(),
 						activeObjectBody.getName(), activeObjectBody.isActive());
 				i++;
@@ -298,8 +299,8 @@ public class SpyEventManager {
 			}
 
 			//System.out.println("bodyCreated name="+body.getNodeURL());
-			addEvent(new BodyCreationSpyEvent(body.getID(), body.getNodeURL(),
-					body.getName(), body.isActive()));
+			addEvent(new BodyCreationSpyEvent(body.getID(), body.getJobID(), body.getNodeURL(),
+					body.getName(),  body.isActive()));
 			addListenersToNewBody(body);
 		}
 

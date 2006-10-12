@@ -182,9 +182,8 @@ public class VMObject extends AbstractDataObject {
 	private void handleNode(String nodeName){
 		HostObject parent = getTypedParent();
 		String nodeUrl = UrlBuilder.buildUrl(parent.getHostName(), nodeName,
-				parent.toString()+":", parent.getPort());
-
-		Node node = null;
+				parent.getProtocol().toString (), parent.getPort());
+				Node node = null;
 		try {
 			node = new NodeImpl(runtime, nodeUrl,UrlBuilder.getProtocol(nodeUrl), runtime.getJobID(nodeUrl));
 		} catch (ProActiveException e) {
@@ -195,5 +194,10 @@ public class VMObject extends AbstractDataObject {
 		}
 		NodeObject nodeObject = new NodeObject(this, node);
 		this.exploreChild(nodeObject);
+		
+//		String os = parent.getOperatingSystem();
+//		if(os==null){
+//			parent.setOperatingSystem(nodeObject.getSystemProperty("os.name"));
+//		}
 	}
 }

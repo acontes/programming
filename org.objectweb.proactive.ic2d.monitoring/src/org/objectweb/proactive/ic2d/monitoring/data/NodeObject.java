@@ -69,6 +69,9 @@ public class NodeObject extends AbstractDataObject{
 	private static Node SPY_LISTENER_NODE;
 	private SpyListenerImpl activeSpyListener;
 
+	/** The url of the node */
+	private String url;
+	
 	/** The node job ID */
 	private String jobID;
 	
@@ -99,6 +102,7 @@ public class NodeObject extends AbstractDataObject{
 		Comparator<String> comparator = new AOObject.AOComparator();
 		monitoredChildren = new TreeMap<String , AbstractDataObject>(comparator);
 		this.node = node;
+		this.url = node.getNodeInformation().getURL();
 		this.key = node.getNodeInformation().getName();
 		this.jobID = node.getNodeInformation().getJobID();
 	}
@@ -127,11 +131,16 @@ public class NodeObject extends AbstractDataObject{
 	public String getKey() {
 		return this.key;
 	}
+	
+	public String getURL(){
+        return this.url;
+	}
 
 	@Override
 	public String getFullName() {
 		return "Node "+this.key;
 	}
+	
 	/**
 	 * Returns the node's protocol
 	 * @return The protocol used
@@ -199,6 +208,15 @@ public class NodeObject extends AbstractDataObject{
 		}
 	}
 
+	/**
+	 * @param key
+	 * @return
+	 */
+	public String getSystemProperty(String key){
+            return spy.getSystemProperty(key);
+	}
+
+	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//

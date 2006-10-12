@@ -54,7 +54,7 @@ public class HostObject extends AbstractDataObject {
 	private int port;
 
 	/** Name of Operating System */
-	private String os = "OS undefined";
+	private String os;// = "OS undefined";
 
 	/** Host's protocol */
 	private Protocol protocol;
@@ -129,7 +129,10 @@ public class HostObject extends AbstractDataObject {
 
 	@Override
 	public String getFullName(){
-		return hostname+":"+port+":"+os;
+		if(os==null)
+			return hostname+":"+port+":OS undefined";
+		else
+			return hostname+":"+port+":"+os;
 	}
 
 
@@ -155,6 +158,13 @@ public class HostObject extends AbstractDataObject {
 		return os;
 	}
 
+//	protected void setOperatingSystem(String os){
+//		this.os = os;
+//		System.out.println("HostObject.setOperatingSystem()====>Os="+os);
+//		setChanged();
+//		notifyObservers(this.os);
+//	}
+	
 	/**
 	 * Returns the host's protocol
 	 * @return The host's protocol
@@ -174,7 +184,6 @@ public class HostObject extends AbstractDataObject {
 	public String getType() {
 		return "host";
 	}
-
 
 
 	//
@@ -198,6 +207,11 @@ public class HostObject extends AbstractDataObject {
 	 */
 	private void handleProActiveRuntime(ProActiveRuntime runtime, int depth){
 		VMObject vm = new VMObject(this, runtime);
+
+		/*if (os == null) {
+			os = vm.getParent().getSystemProperty("os.name");
+			}
+		 */
 		exploreChild(vm);
 
 		if(depth > 0) {

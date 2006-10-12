@@ -68,19 +68,21 @@ public class GUIManager{
 
 
 	private class Painter implements Runnable {
-		
+
 		/** The figure to repaint */
 		private AbstractFigure figure;
-		
+
 		public Painter(AbstractFigure figure){
 			this.figure = figure;
 		}
-		
+
 		public void run() {
 			if(figure==null)
 				return;
 			while(isAlive) {
 				if(dirty){
+					if(figure==null)
+						return;
 					figure.refresh();
 				}
 				try {

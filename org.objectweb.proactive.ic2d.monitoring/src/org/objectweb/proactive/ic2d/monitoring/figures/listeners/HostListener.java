@@ -45,6 +45,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
@@ -54,17 +55,24 @@ public class HostListener implements MouseListener {
 
 	private HostObject host;
 	private HostFigure figure;
+
+	private DragAndDrop dnd;
 	
 	public HostListener(HostObject host, HostFigure figure, MonitoringView monitoringView) {
 		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 		this.host = host;
 		this.figure = figure;
+		this.dnd = monitoringView.getDragAndDrop();
 	}
 
 	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
 
 	public void mousePressed(MouseEvent me) {
-		if(me.button == 3) {
+		if(me.button == 1){
+			dnd.setDrag(false);
+			dnd.setDrop(false);
+		}
+		else if(me.button == 3) {
 			// Monitor a new host
 			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
 			
@@ -113,6 +121,8 @@ public class HostListener implements MouseListener {
 		}
 	}
 
-	public void mouseReleased(MouseEvent me) { /* Do nothing */ }
+	public void mouseReleased(MouseEvent me) {
+		dnd.setDrag(false);
+	}
 
 }

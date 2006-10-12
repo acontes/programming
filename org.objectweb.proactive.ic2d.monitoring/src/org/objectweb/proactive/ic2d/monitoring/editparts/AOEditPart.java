@@ -120,7 +120,7 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	 */
 	protected IFigure createFigure() {
 		AOFigure figure = new AOFigure(getCastedModel().getFullName());
-		figure.addMouseListener(new AOListener(getMonitoringView()));
+		figure.addMouseListener(new AOListener(getCastedModel(), figure,  getMonitoringView()));
 		return figure;
 	}
 

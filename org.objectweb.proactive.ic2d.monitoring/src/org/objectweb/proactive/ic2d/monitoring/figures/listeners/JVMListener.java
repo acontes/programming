@@ -45,16 +45,18 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
+import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public class JVMListener implements MouseListener {
 
 	private ActionRegistry registry;
-	
 	private VMObject jvm;
+	private DragAndDrop dnd;
 
 	public JVMListener(VMObject jvm, MonitoringView monitoringView) {
 		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
+		this.dnd = monitoringView.getDragAndDrop();
 		this.jvm = jvm;
 	}
 	
@@ -62,7 +64,11 @@ public class JVMListener implements MouseListener {
 	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
 
 	public void mousePressed(MouseEvent me) {
-		if(me.button == 3) {
+		if(me.button == 1){
+			dnd.setDrag(false);
+			dnd.setDrop(false);
+		}
+		else if(me.button == 3) {
 			// Monitor a new host
 			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
 			
@@ -102,6 +108,8 @@ public class JVMListener implements MouseListener {
 		}
 	}
 
-	public void mouseReleased(MouseEvent me) { /* Do nothing */ }
+	public void mouseReleased(MouseEvent me) {
+		dnd.setDrag(false);
+	}
 
 }

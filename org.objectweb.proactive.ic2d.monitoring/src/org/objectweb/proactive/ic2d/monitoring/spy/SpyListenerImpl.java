@@ -101,10 +101,10 @@ public class SpyListenerImpl implements SpyListener{
         case SpyEvent.BODY_CREATION_EVENT_TYPE:
             BodyCreationSpyEvent event = (BodyCreationSpyEvent) spyEvent;
             spyEventListener.activeObjectAdded(spyEvent.getBodyID(),
-                event.getNodeURL(), event.getClassName(), event.isActive());
+            		event.getJobID(),event.getNodeURL(),event.getClassName(),event.isActive());
             break;
         case SpyEvent.BODY_EVENT_TYPE:
-            BodySpyEvent bse = (BodySpyEvent) spyEvent;
+            BodySpyEvent bse = (BodySpyEvent) spyEvent;            
             spyEventListener.activeObjectChanged(spyEvent.getBodyID(),
                 bse.isActive(), bse.isAlive());
             break;

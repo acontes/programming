@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.event.ProActiveListener;
 
 public interface SpyEventListener extends ProActiveListener {
 	
-    public void activeObjectAdded(UniqueID id, String nodeURL,
+    public void activeObjectAdded(UniqueID id, String jobID, String nodeURL,
         String classname, boolean isActive);
 
     public void activeObjectChanged(UniqueID id, boolean isActive,

@@ -41,6 +41,7 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LayoutManager;
+import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
@@ -98,12 +99,16 @@ public class AOFigure extends AbstractFigure{
 
 	/** Optimizes the GUI, the arrows are not drawn during a time. */
 	private GUIManager manager;
+
+	private MouseListener mouseListener;
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
 	/**
 	 * @param text Text to display
+	 * @param viewer 
 	 */
 	public AOFigure(String text){
 		super(text);
@@ -229,6 +234,7 @@ public class AOFigure extends AbstractFigure{
 			// migrate
 		case MIGRATING:
 			this.backgroundColor = AOFigure.COLOR_WHEN_MIGRATING;
+			removeMouseListener(mouseListener);
 			break;
 		default:
 			break;
@@ -292,10 +298,18 @@ public class AOFigure extends AbstractFigure{
 
 	@Override
 	public void refresh(){
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				repaint();
-			}});
+		if(Display.getDefault()!=null){
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run () {
+					repaint();
+				}});
+		}
+	}
+
+	@Override
+	public void addMouseListener(MouseListener listener){
+		this.mouseListener = listener;
+		super.addMouseListener(listener);
 	}
 
 	//
@@ -335,7 +349,7 @@ public class AOFigure extends AbstractFigure{
 		return DEFAULT_BORDER_COLOR;
 	}
 
-	
+
 	//
 	// -- INNER CLASS -------------------------------------------
 	//

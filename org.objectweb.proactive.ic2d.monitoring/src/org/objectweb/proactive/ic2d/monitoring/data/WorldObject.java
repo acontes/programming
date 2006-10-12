@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,9 @@ public class WorldObject extends AbstractDataObject {
 	private Map<String, VNObject> vnChildren;
 	
 	public enum methodName { PUT_CHILD, REMOVE_CHILD, RESET_COMMUNICATIONS }
+	
+	/** Set of all the active object names */
+	private Map<String, String> recorededFullNames = new Hashtable<String, String>();
 	
 	//
     // -- CONSTRUCTORS -----------------------------------------------
@@ -169,13 +173,22 @@ public class WorldObject extends AbstractDataObject {
 	 * @param child the host to stop monitoring
 	 */
 	@Override
-	protected void removeChild(AbstractDataObject child) {
+	public void removeChild(AbstractDataObject child) {
 		monitoredChildren.remove(child.getKey());
 		setChanged();
 		if(monitoredChildren.size() == 0)
 			notifyObservers(methodName.REMOVE_CHILD);
 		notifyObservers();
 	}
+	
+	
+    /**
+     * Returns a map of recorded full names
+     * @return A map of recorded full names
+     */
+    protected Map<String, String> getRecordedFullNames(){
+    	return this.recorededFullNames;
+    }
 	
 	/**
 	 * 

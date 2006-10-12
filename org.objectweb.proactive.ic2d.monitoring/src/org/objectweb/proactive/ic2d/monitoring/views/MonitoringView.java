@@ -69,6 +69,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.editparts.MonitoringEditPartFactory;
 import org.objectweb.proactive.ic2d.monitoring.figures.RoundedLine;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
@@ -94,6 +95,8 @@ public class MonitoringView extends ViewPart {
 	/** The World */
 	private WorldObject world;
 
+	private DragAndDrop dnd = new DragAndDrop();
+	
 	/** The graphical set of virtual nodes */
 	private VirtualNodesGroup virtualNodesGroup;
 
@@ -312,6 +315,10 @@ public class MonitoringView extends ViewPart {
 		return world;
 	}
 	
+	public DragAndDrop getDragAndDrop(){
+		return this.dnd;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
@@ -382,12 +389,6 @@ public class MonitoringView extends ViewPart {
 		ContextMenuProvider contextMenu = new MonitoringContextMenuProvider(graphicalViewer);
 		graphicalViewer.setContextMenu(contextMenu);
 		getSite().registerContextMenu(contextMenu, graphicalViewer);
-
-		// drag and drop
-//		graphicalViewer.addDropTargetListener((TransferDropTargetListener)
-//		new TemplateTransferDropTargetListener(getGraphicalViewer()));
-//		graphicalViewer.addDropTargetListener((TransferDropTargetListener)
-//		new TextTransferDropTargetListener(getGraphicalViewer(), TextTransfer.getInstance()));
 	}
 
 	private void createActions(Display display) {

@@ -44,20 +44,27 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
+import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public class WorldListener implements MouseListener {
 
+	private DragAndDrop dnd;
 	private ActionRegistry registry;
 
 	public WorldListener(MonitoringView monitoringView) {
+		this.dnd = monitoringView.getDragAndDrop();
 		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 	}
 
 	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
 
 	public void mousePressed(MouseEvent me) {
-		if(me.button == 3) {
+		if(me.button == 1){
+			dnd.setDrag(false);
+			dnd.setDrop(false);
+		}
+		else if(me.button == 3) {
 			// Monitor a new host
 			registry.getAction(NewHostAction.NEW_HOST).setEnabled(true);
 			
@@ -93,6 +100,7 @@ public class WorldListener implements MouseListener {
 		}
 	}
 
-	public void mouseReleased(MouseEvent me) { /* Do nothing */ }
-
+	public void mouseReleased(MouseEvent me) {
+		dnd.setDrag(false);
+	}
 }

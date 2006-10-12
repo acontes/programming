@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
@@ -45,26 +45,35 @@ import org.objectweb.proactive.ic2d.monitoring.actions.SetTTRAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
+import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
+import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
+import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
-public class AOListener  /*extends MouseMotionListener.Stub*/ implements MouseListener{
+public class AOListener implements MouseListener{
 
-//	private boolean drag = false;
-//	private boolean exited = false;
-
+	private AOObject ao;
+	private AOFigure figure;
 	private ActionRegistry registry;
+	private DragAndDrop dnd;
 
-	public AOListener(MonitoringView monitoringView) {
+	public AOListener(AOObject ao, AOFigure figure, MonitoringView monitoringView) {
+		this.ao = ao;
+		this.figure = figure;
+		this.dnd = monitoringView.getDragAndDrop();
 		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 	}
 
 	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
 
 	public void mousePressed(MouseEvent me) {
-		/*if(me.button == 1){
-			drag = true;
+		if(me.button == 1){
+			dnd.setSource(ao);
+			dnd.setSourceFigure(figure);
+			dnd.setDrag(true);
+			figure.setHighlight(ColorConstants.green);
 		}
-		else*/ if(me.button == 3) {
+		else if(me.button == 3) {
 			// Monitor a new host
 			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
 			
@@ -101,21 +110,6 @@ public class AOListener  /*extends MouseMotionListener.Stub*/ implements MouseLi
 	}
 
 	public void mouseReleased(MouseEvent me) {
-		/*System.out.println("AOListener.mouseReleased()");
-		if(me.button == 1){
-			drag = false;
-     	}*/
+		dnd.setDrag(false);
 	}
-
-/*	@Override
-	public void mouseDragged(MouseEvent me) {
-//		System.out.println("AOListener.mouseDragged()");
-	}*/
-
-/*	@Override
-	public void mouseExited(MouseEvent me) {
-		System.out.println("AOListener.mouseExited()");
-		if(drag)
-			this.exited = true; 
-	}*/
 }

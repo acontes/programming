@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.util.Comparator;
+import java.util.Map;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -78,7 +79,18 @@ public class AOObject extends AbstractDataObject{
 		if ( name == null) 
 			name = this.getClass().getName() ;
 		this.name = name;
-		this.fullName = name + "#" + counter();
+		
+		Map<String, String> fullNames = getWorld().getRecordedFullNames();
+		String recordedName = fullNames.get(id.toString());
+		
+		// If a name is already associated to this object
+		if(recordedName!=null){
+			this.fullName = recordedName;
+		}
+		else{
+			this.fullName = name + "#" + counter();
+			fullNames.put(id.toString(), fullName);
+		}
 		this.id = id;
 		this.jobID = jobID;
 		this.requestQueueLength = -1;
@@ -198,6 +210,7 @@ public class AOObject extends AbstractDataObject{
 			((NodeObject)getParent()).migrateTo(id, nodeTargetURL);
 			console.log("Successfully migrated " +
 					fullName + " to " + nodeTargetURL);
+			setState(State.MIGRATING);
 			return true;
 		} catch (MigrationException e) {
 			console.err("Couldn't migrate " + fullName + " to " + nodeTargetURL);

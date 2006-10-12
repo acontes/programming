@@ -41,17 +41,21 @@ public class BodyCreationSpyEvent extends BodySpyEvent
 
     /** nodename */
     protected String nodeURL;
+    
+    /** The jobID */
+    protected String jobID;
 
     public BodyCreationSpyEvent(UniqueID bodyID, String nodeURL,
         String className) {
-        this(bodyID, nodeURL, className, false);
+        this(bodyID, "Job is not defined", nodeURL, className, false);
     }
 
-    public BodyCreationSpyEvent(UniqueID bodyID, String nodeURL,
+    public BodyCreationSpyEvent(UniqueID bodyID, String jobID,String nodeURL,
         String className, boolean isActive) {
         super(BODY_CREATION_EVENT_TYPE, bodyID, isActive, true);
         this.className = className;
         this.nodeURL = nodeURL;
+        this.jobID = jobID;
     }
 
     public String getClassName() {
@@ -62,6 +66,10 @@ public class BodyCreationSpyEvent extends BodySpyEvent
         return nodeURL;
     }
 
+    public String getJobID(){
+    	return this.jobID;
+    }
+    
     public String toString() {
         return super.toString() + "\n\tnodeName:" + nodeURL +
         " Type: NEW OBJECT class: " + className;

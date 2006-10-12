@@ -101,7 +101,9 @@ public abstract class AbstractFigure extends Figure {
 	
 	public abstract IFigure getContentPane();
 	
-	
+	/**
+	 * @param color The color, or null to use the default color.
+	 */
 	public void setHighlight(Color color) {
 		this.highlight = color;
 		if(highlight != null)

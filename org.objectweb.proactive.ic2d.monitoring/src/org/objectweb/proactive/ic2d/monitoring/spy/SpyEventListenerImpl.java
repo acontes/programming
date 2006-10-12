@@ -59,15 +59,25 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 	public static boolean isMonitoring(){
 		return isMonitoring;
 	}
-	
-	public void activeObjectAdded(UniqueID id, String nodeURL, String classname, boolean isActive) {
-		// TODO Auto-generated method stub
-		//System.out.println("# SpyEventListener : activeObjectAdded ,id="+getName(id));
+
+	public void activeObjectAdded(UniqueID id, String jobID, String nodeURL, String className, boolean isActive) {
+		AOObject ao = getActiveObject(id);
+		if(ao==null){
+			ao = new AOObject(nodeObject, className.substring(className.lastIndexOf(".")+1), id, jobID);
+			nodeObject.exploreChild(ao);
+		}
 	}
 
 	public void activeObjectChanged(UniqueID id, boolean isActive, boolean isAlive) {
-		// TODO Auto-generated method stub
 		//System.out.println("# SpyEventListener : activeObjectChanged ,id="+getName(id));
+		AOObject ao = getActiveObject(id);
+		if(ao == null)
+			return;
+
+		if(!isActive){
+			ao.resetCommunications();
+			nodeObject.removeChild(ao);
+		}
 	}
 
 	public void objectWaitingForRequest(UniqueID id, SpyEvent spyEvent) {
@@ -88,6 +98,11 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;
+
+		//TODO is correct?
+		if(ao.getState()==State.MIGRATING)
+			return;
+
 		ao.setState((ao.getState() == State.SERVING_REQUEST)
 				?State.WAITING_BY_NECESSITY_WHILE_SERVING
 						:State.WAITING_BY_NECESSITY_WHILE_ACTIVE);
@@ -134,6 +149,11 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		AOObject target = nodeObject.findActiveObjectById(id);
 		if(target == null)
 			return;
+
+		//TODO is correct?
+		if(target.getState()==State.MIGRATING)
+			return;
+
 		target.setState(State.SERVING_REQUEST);
 		target.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 
@@ -183,6 +203,11 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		AOObject ao = getActiveObject(id);
 		if(ao == null)
 			return;
+
+		//TODO is correct?
+		if(ao.getState()==State.MIGRATING)
+			return;
+
 		ao.setState(State.SERVING_REQUEST);
 		ao.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 	}

@@ -251,7 +251,7 @@ public abstract class AbstractDataObject extends Observable {
 	 * Remove a child to this object.
 	 * @param child the object to remove
 	 */
-	protected synchronized void removeChild(AbstractDataObject child) {
+	public synchronized void removeChild(AbstractDataObject child) {
 		monitoredChildren.remove(child.getKey());
 		this.parent.skippedChildren.put(getKey(), this);
 		setChanged();
@@ -262,7 +262,7 @@ public abstract class AbstractDataObject extends Observable {
 	 * Explore the child
 	 * @param child The child to explore
 	 */
-	protected void exploreChild(AbstractDataObject child) {
+	public void exploreChild(AbstractDataObject child) {
 		if(!child.isAlive)
 			return;
 		if(skippedChildren.containsKey(child.getKey()))
