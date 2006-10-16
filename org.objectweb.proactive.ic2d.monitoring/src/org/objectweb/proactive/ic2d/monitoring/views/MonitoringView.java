@@ -225,12 +225,12 @@ public class MonitoringView extends ViewPart {
 		zoomManager.setZoomLevels(new double[]{0.25, 0.5, 0.75, 1.0, 1.5});
 
 		ZoomInAction zoomIn = new ZoomInAction(zoomManager);
-		zoomIn.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-in-2.gif"));
+		zoomIn.setImageDescriptor(ImageDescriptor.createFromFile(MonitoringView.class, "zoom-in-2.gif"));
 		graphicalViewer.getActionRegistry().registerAction(zoomIn);
 		toolBarManager.add(zoomIn);
 
 		ZoomOutAction zoomOut = new ZoomOutAction(zoomManager);
-		zoomOut.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "zoom-out-2.gif"));
+		zoomOut.setImageDescriptor(ImageDescriptor.createFromFile(MonitoringView.class, "zoom-out-2.gif"));
 		graphicalViewer.getActionRegistry().registerAction(zoomIn);
 		toolBarManager.add(zoomOut);
 
