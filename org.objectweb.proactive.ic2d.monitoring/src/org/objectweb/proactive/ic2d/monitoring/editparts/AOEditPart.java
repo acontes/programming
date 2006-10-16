@@ -35,6 +35,8 @@ import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
@@ -88,7 +90,7 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
-						source.addConnection(target, panel);
+						source.addConnection(target, panel, getArrowColor());
 					}});
 			}
 			// Request queue length has changed
@@ -124,6 +126,10 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 		return figure;
 	}
 
+	protected Color getArrowColor() {
+		return new Color(Display.getCurrent(), 108, 108, 116);
+	}
+	
 	/**
 	 * Returns a List containing the children model objects.
 	 * @return the List of children

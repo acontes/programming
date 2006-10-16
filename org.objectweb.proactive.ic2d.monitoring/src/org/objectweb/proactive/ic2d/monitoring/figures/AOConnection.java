@@ -39,6 +39,7 @@ import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RelativeBendpoint;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.swt.graphics.Color;
 
 public class AOConnection {
 
@@ -54,8 +55,8 @@ public class AOConnection {
 	 * @param sourceID The source ID.
 	 * @param targetID The target ID.
 	 */
-	public static Connection createConnection(AOFigure source, AOFigure target){
-		RoundedLineConnection connection = new RoundedLineConnection();
+	public static Connection createConnection(AOFigure source, AOFigure target, Color color){
+		RoundedLineConnection connection = new RoundedLineConnection(color);
 
 		Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width/2, source.getBounds().height/2);
 		Point targetCenter = target.getLocation().getTranslated(target.getBounds().width/2, target.getBounds().height/2);

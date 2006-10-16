@@ -89,13 +89,13 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 	
-	public RoundedLineConnection(){
+	public RoundedLineConnection(Color c){
 		super();
 		targetDecoration = initDecoration();
 		setTargetDecoration(targetDecoration);
 		this.oldState = RoundedLine.DEFAULT_DISPLAY_TOPOLOGY;
 		setLineWidth(drawingStyleSize());
-		setForegroundColor(new Color(Display.getCurrent(), 108, 108, 116));
+		setForegroundColor(c);
 		setLineStyle(Graphics.LINE_SOLID);
 	}
 

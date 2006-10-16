@@ -36,8 +36,6 @@ import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * This class is used to display a rounded line. This class works with RoundedLineConnection.
@@ -102,9 +100,6 @@ public class RoundedLine extends Polyline {
 		PointList pointList = getPoints();
 		Point source = pointList.getFirstPoint();
 		Point target = pointList.getLastPoint();
-
-		setForegroundColor(new Color(Display.getCurrent(), 108, 108, 116));
-		setLineStyle(Graphics.LINE_SOLID);
 
 		drawArc(g, source, target);
 	}
