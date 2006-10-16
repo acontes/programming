@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.monitoring.spy;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -42,6 +43,8 @@ import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigratableBody;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.gc.GarbageCollector;
+import org.objectweb.proactive.core.gc.ObjectGraph;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
@@ -90,9 +93,14 @@ public class Spy implements RunActive, ProActiveInternalObject {
 		this.updateFrequence = updateFrequence;
 	}
 	
+    public Collection<UniqueID> getReferenceList(UniqueID bodyID) {
+    	return ObjectGraph.getReferenceList(bodyID);
+    }
 	
-	
-	
+    public String getDgcState(UniqueID bodyID) {
+    	return GarbageCollector.getDgcState(bodyID);
+    }
+
 	public void migrateTo(UniqueID bodyId, String nodeDestination)
 	throws MigrationException {
 		Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
