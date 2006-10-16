@@ -58,6 +58,7 @@
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.objectweb.proactive.ic2d"/>
       <plugin id="org.objectweb.proactive.ic2d.console"/>
+      <plugin id="org.objectweb.proactive.ic2d.dgc"/>
       <plugin id="org.objectweb.proactive.ic2d.jobmonitoring"/>
       <plugin id="org.objectweb.proactive.ic2d.launcher"/>
       <plugin id="org.objectweb.proactive.ic2d.lib"/>
