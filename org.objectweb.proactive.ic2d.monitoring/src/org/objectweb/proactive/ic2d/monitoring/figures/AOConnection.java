@@ -98,7 +98,6 @@ public class AOConnection {
 		double distance = source.getDistance(target);
 		RelativeBendpoint point = new RelativeBendpoint(connection);
 		int value = (int)(0.4*distance);
-		point.setWeight(1);
 		if(source==target){// If the source and the target are the same point
 			position=PositionConstants.NORTH;
 			value = 90;
