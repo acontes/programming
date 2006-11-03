@@ -203,13 +203,14 @@
 				
 			</sect3><!-- The management of the communications display -->
 			
-			
+			<sect3>
+			<title> Example </title>
 			<para>
 				The <xref linkend="monitoring"/> shows an example where 3 hosts are monitored.
-				The applications running are philosophers (<xref linkend="diningPhilosophers"/>)
+				The applications running are philosophers
 				and C3D (<xref linkend="C3D_example"/>). 
 			</para>
-			
+			</sect3>
 		</sect2> <!-- The Monitoring plugin -->
 		
 		<sect2>
@@ -241,9 +242,7 @@
 			<para>
 				One can see in the <xref linkend="monitoring"/> an example of a tree representation of some monitored objects.
 			</para>
-			
-		</sect2><!-- The Job Monitoring plugin -->
-		
+
 		<figure id="monitoring">
 			<title>Monitoring of 2 applications</title>
 			<mediaobject>
@@ -253,6 +252,9 @@
 				</imageobject>
 			</mediaobject>
 		</figure>
+			
+		</sect2><!-- The Job Monitoring plugin -->
+		
 		
 	</sect1><!-- Monitoring and Control -->
 	

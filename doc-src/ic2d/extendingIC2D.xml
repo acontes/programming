@@ -84,7 +84,7 @@
 			</para>
 
 			<figure id="graphicalHierarchy"  >
-				<title align="center">Graphical representation of the data</title>
+				<title>Graphical representation of the data</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata 
@@ -142,7 +142,7 @@
 				</itemizedlist>
 
 				<figure id="hierarchy" >
-					<title align="center">Class diagram</title>
+					<title>Class diagram</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata align="center"
@@ -212,7 +212,7 @@
 				-->
 
 				<figure id="exploreSequenceDiagram" >
-					<title align="center">The world exploring itself for the first time</title>
+					<title>The world exploring itself for the first time</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata align="center"
@@ -457,8 +457,8 @@
 						</listitem>
 					</orderedlist>
 
-
-					<sect3 id="GEFLinks">
+					</sect4>
+					<sect4 id="GEFLinks">
 						<title>Links</title>
 						<para>
 							The official site of GEF:
@@ -512,10 +512,10 @@
 							</ulink>
 						</para>
 
-					</sect3><!-- Links -->
+					</sect4><!-- Links -->
 
 
-				</sect4><!-- GEF -->
+				
 
 				<sect4 id="observerObservable">
 					<title>Observer/Observable</title>
@@ -1522,7 +1522,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
 					.
 				</para>
 
-				<figure id="configuration">
+				<figure id="ic2dConfiguration">
 					<title>Configuration</title>
 					<mediaobject>
 						<imageobject>
@@ -1609,7 +1609,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
 					</mediaobject>
 				</figure>
 
-				<sect4 id="perspectives">
+				<sect4 id="ic2dPerspectives">
 					<title>Perspectives</title>
 
 					<para>
