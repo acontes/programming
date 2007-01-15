@@ -47,12 +47,12 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.loadbalancing.LoadBalancer;
-import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
-import org.objectweb.proactive.loadbalancing.LoadMonitor;
-import org.objectweb.proactive.loadbalancing.metrics.CPURanking.LinuxCPURanking;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+import org.objectweb.proactive_ext.loadbalancing.LoadBalancer;
+import org.objectweb.proactive_ext.loadbalancing.LoadBalancingConstants;
+import org.objectweb.proactive_ext.loadbalancing.LoadMonitor;
+import org.objectweb.proactive_ext.loadbalancing.metrics.CPURanking.LinuxCPURanking;
 
 public class P2PLoadBalancer extends LoadBalancer implements RunActive,ProActiveInternalObject{
 	static int MAX_KNOWN_PEERS = 10;

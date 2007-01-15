@@ -28,20 +28,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.jmx;
+package org.objectweb.proactive_ext.jmx;
 
-import org.objectweb.proactive_ext.jmx.server.ServerConnector;
-
+import java.util.HashMap;
 
 /**
- *  This class launch a JMX ProActive connector. Once the connector is launched, the instrumented jvm is remotely
- *  reachable via ProActive, by using a Connector client.
- * @see org.objectweb.proactive.examples.jmx.TestClient
+ *  Constants for ProActive JMX ServerConnector 
  * @author ProActive Team
  *
  */
-public class TestServer {
-    public static void main(String[] args) {
-        ServerConnector connector = new ServerConnector();
-    }
+public class ProActiveJMXConstants {
+	
+    public static final String PROTOCOL = "proactive";
+    
+    public static final String VERSION = "ProActive 3.2";
+    
+    public static final String SERVER_REGISTERED_NAME = "/PAJMXServer";
+    	
+    public static final HashMap <String, String>PROACTIVE_JMX_ENV= new HashMap<String, String>();
+	
+    static {
+		PROACTIVE_JMX_ENV.put("jmx.remote.protocol.provider.pkgs",
+		"org.objectweb.proactive.jmx.provider");
+	}
 }
