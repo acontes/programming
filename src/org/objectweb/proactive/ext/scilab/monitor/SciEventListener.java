@@ -1,47 +1,42 @@
-/*
+/* 
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, 
  *            Concurrent computing with Security and Mobility
- *
+ * 
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- *
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *
+ *  
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *
+ *  
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
+ *  Contributor(s): 
+ * 
  * ################################################################
- */
-package org.objectweb.proactive.examples.jmx;
-
-import org.objectweb.proactive.jmx.server.ServerConnector;
-
+ */ 
+package org.objectweb.proactive.ext.scilab.monitor;
+import java.util.EventListener;
 
 /**
- *  This class launch a JMX ProActive connector. Once the connector is launched, the instrumented jvm is remotely
- *  reachable via ProActive, by using a Connector client.
- * @see org.objectweb.proactive.examples.jmx.TestClient
- * @author ProActive Team
+ * 
+ * This interface is a listener for Scilab events
  *
  */
-public class TestServer {
-    public static void main(String[] args) {
-        ServerConnector connector = new ServerConnector();
-    }
+public interface SciEventListener extends EventListener {
+	public void actionPerformed(SciEvent evt);
 }
+

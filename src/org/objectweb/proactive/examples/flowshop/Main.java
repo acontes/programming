@@ -39,16 +39,16 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.branchnbound.ProActiveBranchNBound;
+import org.objectweb.proactive.branchnbound.core.Manager;
+import org.objectweb.proactive.branchnbound.core.Result;
+import org.objectweb.proactive.branchnbound.core.Task;
+import org.objectweb.proactive.branchnbound.core.queue.BasicQueueImpl;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive_ext.branchnbound.ProActiveBranchNBound;
-import org.objectweb.proactive_ext.branchnbound.core.Manager;
-import org.objectweb.proactive_ext.branchnbound.core.Result;
-import org.objectweb.proactive_ext.branchnbound.core.Task;
-import org.objectweb.proactive_ext.branchnbound.core.queue.BasicQueueImpl;
 
 
 /**

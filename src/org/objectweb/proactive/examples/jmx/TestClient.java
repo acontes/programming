@@ -53,8 +53,8 @@ import javax.management.remote.JMXConnector;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive_ext.jmx.ProActiveConnection;
-import org.objectweb.proactive_ext.jmx.client.ClientConnector;
+import org.objectweb.proactive.jmx.ProActiveConnection;
+import org.objectweb.proactive.jmx.client.ClientConnector;
 
 
 /**
