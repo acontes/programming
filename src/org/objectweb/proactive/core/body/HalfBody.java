@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
+import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -110,6 +111,7 @@ public class HalfBody extends AbstractBody {
         } else {
             this.ftmanager = null;
         }
+        this.gc = HalfBodies.getInstance();
     }
 
     //
@@ -169,6 +171,10 @@ public class HalfBody extends AbstractBody {
         Class[] parametersTypes) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
+
+	public boolean isInImmediateService() {
+		throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+	}
 
     /**
      *  @see org.objectweb.proactive.Job#getJobID()

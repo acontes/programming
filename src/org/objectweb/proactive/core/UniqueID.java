@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.9
  *
  */
-public class UniqueID implements java.io.Serializable {
+public class UniqueID implements java.io.Serializable, Comparable {
     private java.rmi.server.UID id;
     private java.rmi.dgc.VMID vmID;
 
@@ -55,6 +55,10 @@ public class UniqueID implements java.io.Serializable {
     private static java.rmi.dgc.VMID uniqueVMID = new java.rmi.dgc.VMID();
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
+    // Optim
+    private final String cachedShortString;
+    private final String cachedCanonString;
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -65,6 +69,8 @@ public class UniqueID implements java.io.Serializable {
     public UniqueID() {
         this.id = new java.rmi.server.UID();
         this.vmID = uniqueVMID;
+        this.cachedCanonString = "" + id + " " + vmID;
+        this.cachedShortString = "" + Math.abs(cachedCanonString.hashCode() % 65536);
     }
 
     //
@@ -111,8 +117,21 @@ public class UniqueID implements java.io.Serializable {
             vmID.toString().substring(vmID.toString().length() - 9,
                 vmID.toString().length() - 6) + ">";
         } else {
-            return "" + id + " " + vmID;
+            return getCanonString();
         }
+    }
+
+    public String shortString() {
+    	return this.cachedShortString;
+    }
+    
+    public String getCanonString() {
+    	return this.cachedCanonString;
+    }
+    
+    public int compareTo(Object o) {
+    	UniqueID u = (UniqueID) o;
+    	return getCanonString().compareTo(u.getCanonString());
     }
 
     /**
