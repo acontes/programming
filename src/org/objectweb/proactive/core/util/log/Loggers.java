@@ -88,13 +88,14 @@ public interface Loggers {
     public static final String P2P_NODES = P2P + ".nodes"; // lookup and nodes sharing
     public static final String P2P_ACQUAINTANCES = P2P + ".acquaintances";
     public static final String P2P_FIRST_CONTACT = P2P + ".first_contact";
-    public static final String P2P_SKELETONS = P2P + ".skeletons";
-    public static final String P2P_SKELETONS_WORKER = P2P_SKELETONS +
-        ".worker";
-    public static final String P2P_SKELETONS_MANAGER = P2P_SKELETONS +
-        ".manager";
     public static final String P2P_DAEMON = P2P + ".daemon";
-
+    
+    // Branch and Bound loggers
+    public static final String BNB = "proactive.bnb";
+    public static final String BNB_FACTORY = BNB + ".factory";
+	public static final String BNB_MANAGER = BNB + ".manager";
+    public static final String BNB_WORKER = BNB + ".worker";
+    
     // Security loggers
     public static final String SECURITY = "proactive.security";
     public static final String SECURITY_NODE = SECURITY + ".node";

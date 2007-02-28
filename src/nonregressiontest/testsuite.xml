@@ -37,6 +37,9 @@
 			<unitTest exclude="no" class="nonregressiontest.activeobject.loopmixedlocation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.acontinuation.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.activeobject.wrapper.Test" /> 
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnActivated" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnNotActivated" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestArrayOfArray" />
 			<unitTest exclude="no" class="nonregressiontest.exception.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.validateall.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
@@ -70,9 +73,7 @@
 			<unitTest exclude="no" class="nonregressiontest.group.barrier.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.accessbyname.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.equality.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnActivated" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnNotActivated" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestArrayOfArray" />
+			<unitTest exclude="no" class="nonregressiontest.bnb.Test" />
 			<unitTest exclude="no" class="nonregressiontest.component.generation.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.conform.TestConformWrapper"/>
 			<unitTest exclude="yes" class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
