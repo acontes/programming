@@ -69,8 +69,8 @@ public abstract class BnBInternalTask<Task extends BnBTask> implements InitActiv
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-        this.initLowerBound();
-        this.initUpperBound();
+      // TODO  this.initLowerBound();
+     //TODO  this.initUpperBound();
     }
 
     /**

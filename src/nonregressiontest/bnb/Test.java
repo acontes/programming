@@ -30,9 +30,12 @@
  */
 package nonregressiontest.bnb;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.BranchNBoundFactory;
+import org.objectweb.proactive.branchnbound.core.BnBManagerImpl;
 import org.objectweb.proactive.branchnbound.exception.BnBManagerException;
 import org.objectweb.proactive.branchnbound.user.BnBManager;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
@@ -40,17 +43,27 @@ import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
     private BnBManager manager = null;
+    private ProActiveDescriptor pad = null;
+
+    public Test() {
+        super("BnB", "Test most used branch and bound features");
+    }
 
     @Override
     public void action() throws Exception {
         Assertions.assertNotNull(this.manager);
-        Task task = new Task();
-        Integer result = this.manager.start(task);
+        Assertions.assertNotNull(this.pad);
+        this.manager.deployAndAddResources(this.pad.getVirtualNode("Workers"));
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+        }
     }
 
     @Override
     public void endTest() throws Exception {
         this.manager.terminate();
+        this.pad.killall(false);
     }
 
     @Override
@@ -61,5 +74,7 @@ public class Test extends FunctionalTest {
             logger.fatal("Cannot instatiate the BnBManager", e);
             throw e;
         }
+        this.pad = ProActive.getProactiveDescriptor(Test.class.getResource(
+                    "/nonregressiontest/bnb/Workers.xml").getPath());
     }
 }

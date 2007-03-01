@@ -33,6 +33,7 @@ package org.objectweb.proactive.branchnbound;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.branchnbound.core.BnBManagerImpl;
 import org.objectweb.proactive.branchnbound.exception.BnBManagerException;
 import org.objectweb.proactive.branchnbound.user.BnBManager;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -83,7 +84,7 @@ public final class BranchNBoundFactory {
         }
         BnBManager manager = null;
         try {
-            manager = (BnBManager) ProActive.newActive(BnBManager.class.getName(),
+            manager = (BnBManager) ProActive.newActive(BnBManagerImpl.class.getName(),
                     new Object[] { enableCommunication }, node);
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Cannot activating BnBManager", e);

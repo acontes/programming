@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.branchnbound.exception;
 
-public class BnBManagerException extends Throwable {
+public class BnBManagerException extends Exception {
 
 	public BnBManagerException() {
 	}

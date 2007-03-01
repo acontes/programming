@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
  */
 public class BnBWorker implements InitActive, Serializable {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.BNB_WORKER);
-    private Node localNode;
+   // private Node localNode;
 
     /**
      * Empty no args constructor for activing object.
@@ -64,12 +64,12 @@ public class BnBWorker implements InitActive, Serializable {
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-        try {
-            this.localNode = ProActive.getNode();
-        } catch (NodeException e) {
-            logger.fatal("Cannot get the local node", e);
-            throw new IllegalStateException("No local node");
-        }
+//        try {
+//            this.localNode = ProActive.getNode();
+//        } catch (NodeException e) {
+//            logger.fatal("Cannot get the local node", e);
+//            throw new IllegalStateException("No local node");
+//        }
     }
 
     /**
@@ -84,13 +84,15 @@ public class BnBWorker implements InitActive, Serializable {
      * @return the node URL of the Worker.
      */
     public StringWrapper hostname() {
-        return new StringWrapper(this.localNode.getNodeInformation().getURL());
+       // return new StringWrapper(this.localNode.getNodeInformation().getURL());
+    	return null;
     }
 
     /**
      * @return the deployer tag of the Worker.
      */
     public DeployerTag deployerTag() {
-        return this.localNode.getNodeInformation().getDeployerTag();
+     //   return this.localNode.getNodeInformation().getDeployerTag();
+    	return null;
     }
 }

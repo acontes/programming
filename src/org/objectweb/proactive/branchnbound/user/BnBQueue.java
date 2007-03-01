@@ -30,8 +30,7 @@
  */
 package org.objectweb.proactive.branchnbound.user;
 
-import org.objectweb.proactive.branchnbound.user.BnBTask;
 
-public interface BnBQueue<T extends BnBTask<Value>, Value> {
+public interface BnBQueue<T> {
 
 }

@@ -32,10 +32,7 @@ package org.objectweb.proactive.branchnbound.core;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.branchnbound.user.BnBQueue;
-import org.objectweb.proactive.branchnbound.user.BnBTask;
 
-
-public class BnBInternalQueue<T extends BnBTask<Value>, Value, Q extends BnBQueue<T, Value>>
+public class BnBInternalQueue<T>
     implements Serializable {
 }

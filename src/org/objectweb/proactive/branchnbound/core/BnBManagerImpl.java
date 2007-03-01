@@ -32,6 +32,7 @@ package org.objectweb.proactive.branchnbound.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.benchmarks.timit.util.TimItManager;
 import org.objectweb.proactive.branchnbound.user.BnBManager;
 import org.objectweb.proactive.branchnbound.user.BnBTask;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -56,19 +56,28 @@ public class BnBManagerImpl implements BnBManager, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.BNB_MANAGER);
     private ExecutorService deploymentThreadPool = null;
     private ArrayList<VirtualNode> vnList = new ArrayList<VirtualNode>();
-    private TimItManager timitManager = TimItManager.getInstance();
-    
+    private boolean enableCommunications = true;
+
     public BnBManagerImpl() {
         // empty for activating
     }
 
+    public BnBManagerImpl(boolean enableCommunications) {
+        this.enableCommunications = enableCommunications;
+    }
+
     public void deployAndAddResources(VirtualNode virtualNode) {
-        assert virtualNode != null : virtualNode;
+        if (virtualNode == null) {
+            throw new IllegalArgumentException("virtualNode cannot be null");
+        }
         this.deployAndAddResources(new VirtualNode[] { virtualNode });
     }
 
     public void deployAndAddResources(VirtualNode[] virtualNodes) {
-        assert (virtualNodes != null) && (virtualNodes.length > 0): virtualNodes;
+        if ((virtualNodes == null) || (virtualNodes.length == 0)) {
+            throw new IllegalArgumentException(
+                "virtualNodes cannot be null or empty");
+        }
         if (this.deploymentThreadPool == null) {
             this.deploymentThreadPool = Executors.newCachedThreadPool();
             if (logger.isDebugEnabled()) {
@@ -76,7 +85,10 @@ public class BnBManagerImpl implements BnBManager, Serializable {
             }
         }
         for (VirtualNode vn : virtualNodes) {
-        	assert vn.isActivated() == false : vn;
+            if (vn.isActivated()) {
+                throw new IllegalArgumentException("virtual node " +
+                    vn.getName() + " must be not activated");
+            }
             this.deploymentThreadPool.execute(new VnThread(vn));
             this.vnList.add(vn);
         }
@@ -101,27 +113,40 @@ public class BnBManagerImpl implements BnBManager, Serializable {
         for (VirtualNode vn : this.vnList) {
             vn.killAll(false);
         }
-        // TODO termib=nate on the queue
+        // TODO terminate on the queue
         ProActive.terminateActiveObject(ProActive.getStubOnThis(), true);
     }
 
+    // -------------------------------------------------------------------------
+    // Internal private classes
+    // -------------------------------------------------------------------------
     private class VnThread implements Runnable, NodeCreationEventListener {
         private VirtualNode vn = null;
+        private String threadName = null;
+        private int workerCounter = 0;
 
         public VnThread(VirtualNode vn) {
+            assert vn.isActivated() == false : vn;
             this.vn = vn;
         }
 
-        // FIXME CANNOT WORK....
         public void run() {
             assert this.vn != null : this.vn;
-
+            this.threadName = Thread.currentThread().getName();
+            if (logger.isInfoEnabled()) {
+                logger.info("Deployment for " + this.vn.getName() +
+                    " started by thread " + Thread.currentThread().getName());
+            }
             ((VirtualNodeImpl) this.vn).addNodeCreationEventListener(this);
             this.vn.activate();
             try {
                 ((VirtualNodeImpl) this.vn).waitForAllNodesCreation();
             } catch (NodeException e) {
-                logger.warn("Something wronf while waiting nodes creation", e);
+                logger.warn("Something wrong while waiting nodes creation", e);
+            }
+
+            if (logger.isInfoEnabled()) {
+                logger.info("Thread " + this.threadName + " is going to die");
             }
         }
 
@@ -130,6 +155,15 @@ public class BnBManagerImpl implements BnBManager, Serializable {
             try {
                 // TODO set constructor params: Queue
                 ProActive.newActive(BnBWorker.class.getName(), null, node);
+                this.workerCounter++;
+                if (logger.isDebugEnabled()) {
+                    logger.debug("A new worker just created by " +
+                        this.threadName);
+                }
+                if (logger.isInfoEnabled()) {
+                    logger.info(this.threadName + " has now created " +
+                        this.workerCounter + " workers");
+                }
             } catch (ActiveObjectCreationException e) {
                 logger.warn("Cannot activate a BnBWorker", e);
             } catch (NodeException e) {

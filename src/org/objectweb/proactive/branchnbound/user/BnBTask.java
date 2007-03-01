@@ -35,7 +35,8 @@ import java.util.ArrayList;
 
 public interface BnBTask<Value extends Comparable<Value>> extends Serializable{
 
-    public abstract Value explore(<?> ... params);
+	// TODO find something sexier for passing parameters
+    public abstract Value explore(Object [] params);
 
     public abstract ArrayList<? extends BnBTask> split();
 
