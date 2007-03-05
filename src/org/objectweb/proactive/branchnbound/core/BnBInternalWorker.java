@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.branchnbound.user.BnBWorker;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.DeployerTag;
@@ -49,14 +50,14 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
  *
  * Created on Sep 12, 2006
  */
-public class BnBWorker implements InitActive, Serializable {
+public class BnBInternalWorker implements BnBWorker, InitActive, Serializable {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.BNB_WORKER);
    // private Node localNode;
 
     /**
      * Empty no args constructor for activing object.
      */
-    public BnBWorker() {
+    public BnBInternalWorker() {
         // newActive requires empty no args constructor
     }
 
@@ -94,5 +95,9 @@ public class BnBWorker implements InitActive, Serializable {
     public DeployerTag deployerTag() {
      //   return this.localNode.getNodeInformation().getDeployerTag();
     	return null;
+    }
+    
+    public void setBestCurrentSolution() {
+    	// TODO
     }
 }

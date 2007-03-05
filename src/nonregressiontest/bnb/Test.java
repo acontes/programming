@@ -32,7 +32,6 @@ package nonregressiontest.bnb;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.BranchNBoundFactory;
-import org.objectweb.proactive.branchnbound.core.BnBManagerImpl;
 import org.objectweb.proactive.branchnbound.exception.BnBManagerException;
 import org.objectweb.proactive.branchnbound.user.BnBManager;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -55,6 +54,7 @@ public class Test extends FunctionalTest {
         Assertions.assertNotNull(this.pad);
         this.manager.deployAndAddResources(this.pad.getVirtualNode("Workers"));
         try {
+            // TODO to remove
             Thread.sleep(5000);
         } catch (Exception e) {
         }

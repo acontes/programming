@@ -33,12 +33,19 @@ package org.objectweb.proactive.branchnbound.user;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public interface BnBTask<Value extends Comparable<Value>> extends Serializable{
+import org.objectweb.proactive.branchnbound.core.BnBWorker;
 
-	// TODO find something sexier for passing parameters
-    public abstract Value explore(Object [] params);
 
-    public abstract ArrayList<? extends BnBTask> split();
+public abstract class BnBTask<Value extends Comparable<Value>>
+    implements Serializable {
+    protected Value bestCurrentSolution;
+    protected BnBWorker worker;
+
+    public abstract Value explore(Object[] params);
+
+    public abstract Value gather(Value[] values);
+
+    public abstract ArrayList<?extends BnBTask<Value>> split();
 
     public abstract void initLowerBound();
 

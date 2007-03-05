@@ -118,7 +118,7 @@ public final class BranchNBoundFactory {
      * @throws BnBManagerException problem with the <code>BnBManager</code>
      * creation.
      */
-    public static BnBManager BnBManager(Node nodeManager)
+    public static BnBManager getBnBManager(Node nodeManager)
         throws NodeException, BnBManagerException {
         return BranchNBoundFactory.getBnBManager(true, nodeManager);
     }

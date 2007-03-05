@@ -31,19 +31,18 @@
 package org.objectweb.proactive.branchnbound.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.branchnbound.core.BnBInternalResult;
-import org.objectweb.proactive.branchnbound.core.BnBWorker;
 import org.objectweb.proactive.branchnbound.user.BnBTask;
+import org.objectweb.proactive.branchnbound.user.BnBWorker;
 
 
 // TODO Javadoc
-public abstract class BnBInternalTask<Task extends BnBTask> implements InitActive, RunActive, Serializable {
+public abstract class BnBInternalTask<Value extends Comparable<Value>, Task extends BnBTask<Value>>
+    implements InitActive, RunActive, Serializable {
     protected BnBWorker worker = null;
 
     /**
@@ -57,7 +56,6 @@ public abstract class BnBInternalTask<Task extends BnBTask> implements InitActiv
         this.worker = associatedWorker;
     }
 
-
     //--------------------------------------------------------------------------
     // Internal stuff
     //--------------------------------------------------------------------------
@@ -69,8 +67,8 @@ public abstract class BnBInternalTask<Task extends BnBTask> implements InitActiv
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-      // TODO  this.initLowerBound();
-     //TODO  this.initUpperBound();
+        // TODO  this.initLowerBound();
+        //TODO  this.initUpperBound();
     }
 
     /**

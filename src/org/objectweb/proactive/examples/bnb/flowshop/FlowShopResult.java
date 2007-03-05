@@ -1,34 +1,34 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
-package org.objectweb.proactive.examples.flowshop;
+ */
+package org.objectweb.proactive.examples.bnb.flowshop;
 
 import java.io.Serializable;
 
@@ -42,7 +42,7 @@ import java.io.Serializable;
  * @author Cedric Dalmasso
  *
  */
-public class FlowShopResult implements Comparable, Serializable {
+public class FlowShopResult implements Comparable<FlowShopResult>, Serializable {
 
     /**
      * A job permutation
@@ -116,24 +116,6 @@ public class FlowShopResult implements Comparable, Serializable {
         this.permutation = permutation;
     }
 
-    /**
-     * Compare two FlowShopResult on them makespan value.
-     *
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-    public int compareTo(Object o) {
-        if (o == null) {
-            return -1;
-        }
-        FlowShopResult fsr = (FlowShopResult) o;
-        if (makespan > fsr.makespan) {
-            return 1;
-        } else if (makespan < fsr.makespan) {
-            return -1;
-        }
-        return 0;
-    }
-
     public String toString() {
         return "FSR : permutation " + Permutation.string(permutation) +
         ", makespan " + makespan + " and time " + time;
@@ -159,5 +141,22 @@ public class FlowShopResult implements Comparable, Serializable {
 
     public void setMakespanCut(int[] makespanCut) {
         this.makespanCut = makespanCut;
+    }
+
+    /**
+     * Compare two FlowShopResult on them makespan value.
+     *
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(FlowShopResult o) {
+        if (o == null) {
+            return -1;
+        }
+        if (makespan > o.makespan) {
+            return 1;
+        } else if (makespan < o.makespan) {
+            return -1;
+        }
+        return 0;
     }
 }

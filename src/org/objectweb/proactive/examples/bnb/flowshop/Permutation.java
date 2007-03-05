@@ -28,7 +28,7 @@
  * 
  * ################################################################
  */ 
-package org.objectweb.proactive.examples.flowshop;
+package org.objectweb.proactive.examples.bnb.flowshop;
 
 import java.io.Serializable;
 
@@ -113,7 +113,6 @@ public class Permutation implements Serializable {
     }
 
     private static int[] iemePermBig(int n,int size) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

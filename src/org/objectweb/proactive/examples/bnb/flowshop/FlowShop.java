@@ -28,7 +28,7 @@
  * 
  * ################################################################
  */ 
-package org.objectweb.proactive.examples.flowshop;
+package org.objectweb.proactive.examples.bnb.flowshop;
 
 import java.io.Serializable;
 
