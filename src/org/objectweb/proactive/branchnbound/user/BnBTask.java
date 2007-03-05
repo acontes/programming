@@ -33,8 +33,6 @@ package org.objectweb.proactive.branchnbound.user;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.objectweb.proactive.branchnbound.core.BnBWorker;
-
 
 public abstract class BnBTask<Value extends Comparable<Value>>
     implements Serializable {

@@ -32,7 +32,6 @@ package org.objectweb.proactive.branchnbound.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -154,7 +153,8 @@ public class BnBManagerImpl implements BnBManager, Serializable {
             Node node = event.getNode();
             try {
                 // TODO set constructor params: Queue
-                ProActive.newActive(BnBWorker.class.getName(), null, node);
+                ProActive.newActive(BnBInternalWorker.class.getName(), null,
+                    node);
                 this.workerCounter++;
                 if (logger.isDebugEnabled()) {
                     logger.debug("A new worker just created by " +
