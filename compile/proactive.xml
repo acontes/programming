@@ -137,7 +137,7 @@
 	<!--  =============================================================== -->
 	<target name="compile" depends="addons, ic2d, p2p, timit, examples, trywithcatch, stub_wrapper, mpi" description="build the class files" />
 
-	<target name="addons" depends="bnb, calcium, jmx, loadbalancing, osgi, scilab, webservices"/>
+	<target name="addons" depends="bnb, calcium, jmx, loadbalancing, osgi, scilab, webservices,taskscheduler"/>
 	
 	<!-- ================================================================ -->
 	<!--                   Compile ProActive Core                         -->
@@ -254,6 +254,20 @@
 			<arg line="-srcDir ${classes.dir} -pkg org.objectweb.proactive.calcium -class Task" />
 		</java>
 	</target>
+	
+	
+		<!-- ================================================================ -->
+		<!--                          Compile TaskScheduler                   -->
+		<!--  =============================================================== -->
+
+		<target name="taskscheduler" depends="core">
+			<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${javac.source}" debug="${javac.debug}">
+				<classpath refid="project.classpath" />
+				<include name="${proactive.dir}/taskscheduler/**/*.java" />
+			</javac>
+		</target>	
+
+
 
 
 	<!-- ================================================================ -->
@@ -696,7 +710,7 @@
 			<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
 			<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
 			<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
-			<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
+			<group title="ProActive TaskScheduler API" packages="org.objectweb.proactive.taskscheduler*" />
 			<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
 		</javadoc>
 		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API"  breakiterator="yes">
