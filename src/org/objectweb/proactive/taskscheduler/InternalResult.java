@@ -48,18 +48,22 @@ public class InternalResult implements java.io.Serializable{
 	private GenericTypeWrapper<Exception> proActiveTaskException;
 	private BooleanWrapper exceptionOccured;
 	private LongWrapper executionTimeBeforeException;
-	private  String killedMessage;
+	private  String errorMessage;
 	
 	public InternalResult(){}
 
-	
-	public String getKilledMessage() {
-		return killedMessage;
+	/**
+	 * if an error occured that is related only to the user rights, for eg if a task was killed or deleted from the queue, or a getresutl request was issued with the wrong user name
+	 * note: this doesnt cover internal shceudler failures or exceptions due to problems in the user code.
+	 * @return the error message
+	 */
+	public String getErrorMessage() {
+		return errorMessage;
 	}
 
 
-	public void setKilledMessage(String killedMessage) {
-		this.killedMessage = killedMessage;
+	public void setErrorMessage(String killedMessage) {
+		this.errorMessage = killedMessage;
 	}
 
 

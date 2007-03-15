@@ -74,7 +74,7 @@ public class UserResult implements java.io.Serializable{
 				resultAvailable=true;
 			}
 		
-			if(!result.getKilledMessage().equals("")) throw new UserException(result.getKilledMessage());	
+			if(!result.getErrorMessage().equals("")) throw new UserException(result.getErrorMessage());	
 			//checks for exceptions if occured throws it, otherwise returns the result		
 			if(result.getExceptionOccured().booleanValue()) throw result.getProActiveTaskException().getObject();
 		else return result.getProActiveTaskExecutionResult().getObject();
@@ -109,7 +109,7 @@ public class UserResult implements java.io.Serializable{
 			return 0;
 		
 		
-		if(!result.getKilledMessage().equals("")) throw new UserException(result.getKilledMessage());
+		if(!result.getErrorMessage().equals("")) throw new UserException(result.getErrorMessage());
 				
 				return result.getExecutionTime().longValue();
 		

@@ -51,6 +51,9 @@ public class InternalTask implements java.io.Serializable{
 	
 	 InternalResult result;
 	
+	 /*
+	  * a negative value indicates invalidity
+	  */
 	 long timeCreated;
 	 long timeInsertedInQueue;
 	 long timeScheduled;
@@ -68,6 +71,12 @@ public class InternalTask implements java.io.Serializable{
 		this.taskID = taskID;
 		this.userName = userName;
 		this.timeCreated=System.currentTimeMillis();
+		
+		 
+		 
+		 timeInsertedInQueue=-1;
+		 timeScheduled=-1;
+		 timeFinished=-1;
 	}
 	public String getTaskID() {
 		return taskID;
@@ -79,6 +88,17 @@ public class InternalTask implements java.io.Serializable{
 		return userTask;
 	}
 
+	public Info getTaskINFO()
+	{
+		String nodeURL;
+		if(nodeNExecuter!=null)
+		nodeURL=nodeNExecuter.node.getNodeInformation().getURL();
+		
+		else nodeURL="unknown";
+		
+		return new Info( status,  taskID,  userName, nodeURL, timeCreated, timeInsertedInQueue,timeScheduled, timeFinished);
+		
+	}
 
 
 	

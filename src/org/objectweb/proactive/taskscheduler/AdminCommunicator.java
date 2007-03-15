@@ -38,9 +38,11 @@ package org.objectweb.proactive.taskscheduler;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.taskscheduler.exception.AdminException;
 
 
 public class AdminCommunicator {
@@ -53,7 +55,8 @@ public class AdminCommunicator {
 	 	
    
   
-    private static final String STAT_CMD = "stat ";
+    private static final String STAT_CMD = "stat";
+    private static final String STAT_ADV_CMD = "stat_adv";
     
     private static final String DEL_CMD = "del";
     private static final String START_CMD = "start";
@@ -87,7 +90,7 @@ public class AdminCommunicator {
     	}
 		else
 		{
-			try
+		try
 			{
 				scheduler=AdminScheduler.connectTo(args[0]);
 				stopCommunicator=false;
@@ -97,8 +100,8 @@ public class AdminCommunicator {
 			}
 			catch(Exception e)
 			{
-				error("A fatal error has occured:"+ e.getMessage()+ "\n Will shut down communicator.\n");
-				System.exit(1);
+			error("A fatal error has occured:"+ e.getMessage()+ "\n Will shut down communicator.\n");
+			System.exit(1);
 				
 			}
 			
@@ -164,39 +167,102 @@ public class AdminCommunicator {
 		        	stopCommunicator=true;
 	        }
 	        	
-	        else if (command.equals(STAT_CMD)) {
+	        else if (command.equals(STAT_ADV_CMD)) {
 	        	
 	        	
 	        	String out="";
-	        	Vector<String> temp;
+	        	Vector<Info> info=scheduler.info_all();
+	        	Info tempInfo;
+	        	long tempTime;
+	        
+	        	while(!info.isEmpty())
+	        	{
+	        		tempInfo=info.remove(0);
+	        		
+	        		
+	        		out+=String.format("%1$-6s\t",tempInfo.getTaskID());
+	        		out+=String.format("%1$-8s\t",tempInfo.getStatus().toString());
+	        		out+=String.format("%1$-8s\t",tempInfo.getUserName());
+	        		
+	        		
+	        		
+	        		tempTime=tempInfo.getTimeCreated();
+	        		if (tempTime<0)//indicates an unvalid Time
+	        			out+=String.format("%1$-20s\t","Not Available yet");
+	        		else
+	        		out+=String.format("%1$td/%1$tb/%1$tY %1$tH:%1$tM:%1$tS\t", Long.valueOf(tempTime));
+	        		
+	        		tempTime=tempInfo.getTimeScheduled();
+	        		if (tempTime<0)//indicates an unvalid Time
+	        			out+=String.format("%1$-20s\t","Not Available yet");
+			  		else
+			  		out+=String.format("%1$td/%1$tb/%1$tY %1$tH:%1$tM:%1$tS\t", Long.valueOf(tempTime));
+			  		
+	        		
+	        		tempTime=tempInfo.getTimeFinished();
+	        		if (tempTime<0)//indicates an unvalid Time
+  					  out+=String.format("%1$-20s\t","Not Available yet");
+			  		else
+			  		out+=String.format("%1$td/%1$tb/%1$tY %1$tH:%1$tM:%1$tS\t", Long.valueOf(tempTime));
+			  		
+
+	        		
+	        		
+	        	
+	        		out+=tempInfo.getNodeURL()+"\n";
+	        		
+	        		
+	        	}
 	        	
 	        	
-	        	temp=scheduler.getQueuedID();
-	        	while(!temp.isEmpty())
-	        		out+=(temp.remove(0)+" Queued\n");
 	        	
-	        	temp=scheduler.getRunningID();
-	           	while(!temp.isEmpty())
-	           		out+=(temp.remove(0)+" Running\n");
-	        	
-	        	temp=scheduler.getFinishedID();
-	        	while(!temp.isEmpty())
-	        		out+=(temp.remove(0)+" Finished\n");
-	        	
-	        	temp=scheduler.getFailedID();
-	        	while(!temp.isEmpty())
-	        		out+=(temp.remove(0)+" Failed\n");
-	        	
-	        	temp=scheduler.getKilledID();
-	        	while(!temp.isEmpty())
-	        		out+=(temp.remove(0)+" Killed\n");
 	            
 	        	if(out.isEmpty())
 	        		output("Scheduler is Empty\n");
 	        		
-	        		else
-	        		output("Current Status\n"+out);
+	        		else			
+	        		output(String.format("%1$-6s\t%2$-8s\t%3$-8s\t%4$-20s\t%5$-20s\t%6$-20s\t%7$-5s\n","TaskID","Status","UserName","Submitted","Started","Finished","NodeURL")+out);
 	        }
+	        else if (command.equals(STAT_CMD)) {
+	        	
+	        	
+	        	String out="";
+	        	Vector<Info> info=scheduler.info_all();
+	        	Info tempInfo;
+	        	long tempTime;
+	        
+	        	while(!info.isEmpty())
+	        	{
+	        		tempInfo=info.remove(0);
+	        		
+	        		
+	        		out+=String.format("%1$-6s\t",tempInfo.getTaskID());
+	        		out+=String.format("%1$-8s\t",tempInfo.getStatus().toString());
+	        		out+=String.format("%1$-8s\t",tempInfo.getUserName());
+	        		
+	        		
+	        		
+	        		tempTime=tempInfo.getTimeCreated();
+	        		if (tempTime<0)//indicates an unvalid Time
+	        			out+=String.format("%1$-20s\t","Not Available yet");
+	        		else
+	        		out+=String.format("%1$td/%1$tb/%1$tY %1$tH:%1$tM:%1$tS\t", Long.valueOf(tempTime));
+	        		
+	        		
+	        		out+="\n";
+	        		
+	        	}
+	        	
+	        	
+	        	
+	            
+	        	if(out.isEmpty())
+	        		output("Scheduler is Empty\n");
+	        		
+	        		else			
+	        		output(String.format("%1$-6s\t%2$-8s\t%3$-8s\t%4$-20s\n","TaskID","Status","UserName","Submitted")+out);
+	        }
+
 	        else if(command.startsWith(STAT_CMD))
 	        {
 	        	String taskID = command.substring(command.indexOf(' ') + 1);
@@ -226,7 +292,7 @@ public class AdminCommunicator {
 	        }
 	        
 	    }	
-	 private static void startCommandListener() throws Exception {
+	 private static void startCommandListener() throws Exception{
 	        
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 

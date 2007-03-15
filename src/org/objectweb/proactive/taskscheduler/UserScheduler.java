@@ -40,6 +40,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -177,13 +178,20 @@ public class UserScheduler extends SchedulerUserAPI{
 	}
 	public void shutdown()
 	{
+		
+		
 		try
 		{
+//			FIXME :must make sure that futures have been propagated using automatic continuation
+			logger.info("FIX ME:Will sleep in user scheduler to allow for automatic continuation to propagate");
+			Thread.sleep(1000);
+			
+			
 			ProActive.getBodyOnThis().terminate();
 		}
 		catch(Exception e)
 		{
-			logger.info("error terminating userscheulder"+e.getMessage());
+			logger.info("error terminating userscheulder "+e.getMessage());
 		}
 	}
 	public BooleanWrapper del(String tID) throws UserException

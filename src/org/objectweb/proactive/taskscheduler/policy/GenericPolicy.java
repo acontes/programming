@@ -33,6 +33,7 @@ package org.objectweb.proactive.taskscheduler.policy;
 import java.util.Vector;
 
 import org.objectweb.proactive.taskscheduler.InternalTask;
+import org.objectweb.proactive.taskscheduler.Info;
 
 /**
  * Must be implemented in order to be used as a policy in the scheduler
@@ -112,5 +113,12 @@ public interface GenericPolicy {
 	 * @return
 	 */
 	public Vector<String> getFailedID();
+	
+	
+	/**
+	 * gets the information of all the objects in the queue wether failed or queued
+	 * @return vector of information
+	 */
+	public Vector<Info> getInfo_all();
 
 }

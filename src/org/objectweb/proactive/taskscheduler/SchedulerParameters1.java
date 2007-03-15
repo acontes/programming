@@ -34,7 +34,7 @@ package org.objectweb.proactive.taskscheduler;
  * @author walzouab
  *
  */
-public interface SchedulerParameters
+public interface SchedulerParameters1
 {
 	/**
 	 * The default policy to be used by the scheduler.

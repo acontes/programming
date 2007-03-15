@@ -39,6 +39,7 @@ package org.objectweb.proactive.taskscheduler.policy;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import org.objectweb.proactive.taskscheduler.Info;
 import org.objectweb.proactive.taskscheduler.InternalTask;
 
 /**
@@ -118,7 +119,7 @@ public class FIFOPolicy implements GenericPolicy {
 		for(int i=0;i<failedList.size();i++)
 		{
 			if(failedList.get(i).getTaskID().equals(TaskID))
-				return list.get(i);
+				return failedList.get(i);
 		}
 		
 	
@@ -163,6 +164,23 @@ public class FIFOPolicy implements GenericPolicy {
 			queued.add(list.get(i).getTaskID());
 		}
 		return queued;
+	}
+
+	public Vector<Info> getInfo_all() {
+		Vector<Info> info=new Vector<Info>();
+    	
+    	for (int i=0;i<failedList.size();i++)
+    	{
+    		info.add(failedList.get(i).getTaskINFO());
+    		
+    	}
+    	
+    	for (int i=0;i<list.size();i++)
+    	{
+    		info.add(list.get(i).getTaskINFO());
+    	}
+    	
+    	return info;
 	}
 
 }

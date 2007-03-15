@@ -138,11 +138,17 @@ public class AdminScheduler {
    
     		this.stop();
     		scheduler.shutdown(immediate);
+    		
     		BooleanWrapper schedulerterminated=scheduler.terminateScheduler();
     		ProActive.waitFor(schedulerterminated);
     		userScheduler.shutdown();
     		try
     		{
+    			//FIXME :must make sure that futures have been propagated using automatic continuation
+    			logger.info("FIX ME:Will sleep in adminscheduler to allow for automatic continuation to propagate");
+    			Thread.sleep(1000);
+    			
+    			
     			ProActive.getBodyOnThis().terminate();
     		}
     		catch(Exception e)
@@ -173,7 +179,7 @@ public class AdminScheduler {
      */
     public static AdminScheduler createLocalScheduler(GenericResourceManager RM,String nodeName)throws AdminException
     {
-    	return AdminScheduler.createLocalScheduler(RM,nodeName,SchedulerParameters.DEFAULT_POLICY);
+    	return AdminScheduler.createLocalScheduler(RM,nodeName,System.getProperty("proactive.taskscheduler.default_policy"));
     	
     }
 
@@ -190,7 +196,7 @@ public class AdminScheduler {
      */
     public static AdminScheduler createLocalScheduler(String RMURL,String nodeName) throws AdminException
     {
-    	return AdminScheduler.createLocalScheduler(RMURL,nodeName,SchedulerParameters.DEFAULT_POLICY);
+    	return AdminScheduler.createLocalScheduler(RMURL,nodeName,System.getProperty("proactive.taskscheduler.default_policy"));
     }
 
     
@@ -301,7 +307,7 @@ public class AdminScheduler {
      */
     public static AdminScheduler createScheduler(GenericResourceManager RM,String schedulerURL)throws AdminException
     {
-    	return AdminScheduler.createScheduler(RM,schedulerURL,SchedulerParameters.DEFAULT_POLICY);
+    	return AdminScheduler.createScheduler(RM,schedulerURL,System.getProperty("proactive.taskscheduler.default_policy"));
     	
     }
 
@@ -318,7 +324,7 @@ public class AdminScheduler {
      */
     public static AdminScheduler createScheduler(String RMURL,String schedulerURL) throws AdminException
     {
-    	return AdminScheduler.createScheduler(RMURL,schedulerURL,SchedulerParameters.DEFAULT_POLICY);
+    	return AdminScheduler.createScheduler(RMURL,schedulerURL,System.getProperty("proactive.taskscheduler.default_policy"));
     }
     
     /**
@@ -420,7 +426,7 @@ public class AdminScheduler {
      */
     public Status status(String taskID) 
     {
-    	return scheduler.status(taskID).getObject();
+    	return scheduler.info(taskID).getObject().getStatus();
     }
     
     /**
@@ -450,4 +456,9 @@ public class AdminScheduler {
 			
 		return scheduler.del(tID);
 	}
+    
+    public Vector<Info> info_all()
+    {
+    	return scheduler.info_all();
+    }
 }

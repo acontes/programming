@@ -66,7 +66,7 @@ public class Scheduler implements RunActive, RequestFilter {
     private long previousRunOfPingAll;
     private long TIME_BEFORE_RETURNING_NODES_TO_RM;
     private long SCHEDULER_TIMEOUT;
-    private String DEFAULT_POLICY;
+  
     private long TIME_BEFORE_TEST_ALIVE;
     private double PERCENTAGE_OF_RESOURCES_TO_RETURN;
     private boolean shutdown;
@@ -132,15 +132,35 @@ public class Scheduler implements RunActive, RequestFilter {
         logger.info("Scheduler intialized in Stop Mode.");
     }
 
-    public void configureScheduler()
+    public void configureScheduler() throws Exception
     {
-    	TIME_BEFORE_RETURNING_NODES_TO_RM=SchedulerParameters.TIME_BEFORE_RETURNING_NODES_TO_RM;
+    	try{
+    	SCHEDULER_TIMEOUT=Long.parseLong(System.getProperty("proactive.taskscheduler.scheduler_timeout"));
+    	TIME_BEFORE_RETURNING_NODES_TO_RM=Long.parseLong(System.getProperty("proactive.taskscheduler.time_before_returning_nodes_to_rm"));
     	
-    	SCHEDULER_TIMEOUT=SchedulerParameters.SCHEDULER_TIMEOUT;
-        DEFAULT_POLICY=SchedulerParameters.DEFAULT_POLICY;
-        TIME_BEFORE_TEST_ALIVE=SchedulerParameters.TIME_BEFORE_TEST_ALIVE;
-        PERCENTAGE_OF_RESOURCES_TO_RETURN=SchedulerParameters.PERCENTAGE_OF_RESOURCES_TO_RETURN;
-        
+    	
+      
+        TIME_BEFORE_TEST_ALIVE=Long.parseLong(System.getProperty("proactive.taskscheduler.time_before_test_alive"));
+        PERCENTAGE_OF_RESOURCES_TO_RETURN=Double.parseDouble(System.getProperty("proactive.taskscheduler.percentage_of_resources_to_return"));
+    	
+        if(this.SCHEDULER_TIMEOUT<1)
+    		throw new Exception("SCHEDULER_TIMEOUT must be a positive integer");
+    	if(this.TIME_BEFORE_RETURNING_NODES_TO_RM<1)
+    		throw new Exception("TIME_BEFORE_RETURNING_NODES_TO_RM must be a positive integer");
+    	if(this.TIME_BEFORE_TEST_ALIVE<1)
+    		throw new Exception("TIME_BEFORE_TEST_ALIVE must be a positive integer");
+    	
+    	if(PERCENTAGE_OF_RESOURCES_TO_RETURN>1||PERCENTAGE_OF_RESOURCES_TO_RETURN<0)
+    		throw new Exception("PERCENTAGE_OF_RESOURCES_TO_RETURN Must be a double between zero and one");
+    	
+    		
+    	}
+    	catch(Exception e)
+    	{
+    		logger.error("An error trying to parse scheduler arguments "+e.toString());
+    		throw e;
+    		
+    	}
 
     	
     }
@@ -181,8 +201,26 @@ public class Scheduler implements RunActive, RequestFilter {
         
         
         logger.info("Shutdown Started");
+        
+        
         //now set all get result requests that cann never be served to killed  
-         boolean onlyTerminateLeft;//this field indicates that all requests other than terminate has been served 
+         boolean onlyTerminateLeft;//this field indicates that all requests other than terminate has been served
+         
+         
+     	
+    	if(logger.isDebugEnabled())
+    		{
+    		onlyTerminateLeft=((service.getRequestCount()==1)&&service.hasRequestToServe("terminateScheduler"))||(service.getRequestCount()==0);
+    		logger.debug("running tasks size "+runningTasks.size());
+    		logger.debug("nodepool size "+nodePool.size());
+    		logger.debug("service request count "+service.getRequestCount());
+    		if(service.getOldest()!=null)
+    		logger.debug("oldest method is "+service.getOldest().getMethodName());
+    		else logger.debug("terminate not called yet!!");
+    		logger.debug("only terminate left? "+onlyTerminateLeft);
+    		}
+    			
+    
         int i=0;
          do 
         {
@@ -203,12 +241,13 @@ public class Scheduler implements RunActive, RequestFilter {
         	
         	
         	onlyTerminateLeft=((service.getRequestCount()==1)&&service.hasRequestToServe("terminateScheduler"))||(service.getRequestCount()==0);
-        	if(logger.isDebugEnabled()&&!(runningTasks.isEmpty()&&nodePool.isEmpty()))logger.debug((i++)+" "+runningTasks.size()+" "+nodePool.size()+" "+service.getRequestCount()+" "+service.getOldest().getMethodName()+ " "+onlyTerminateLeft);
+        	if(logger.isDebugEnabled()&&service.getRequestCount()>0)logger.debug((i++)+" "+runningTasks.size()+" "+nodePool.size()+" "+service.getRequestCount()+service.getOldest().getMethodName() +" "+onlyTerminateLeft);
         	
         }while(!(runningTasks.isEmpty()&&nodePool.isEmpty()&&onlyTerminateLeft));
-        
+
         handlePolicyNFinishedTasks();
-     	
+        
+
         service.blockingServeOldest("terminateScheduler");
        
     }
@@ -320,8 +359,17 @@ public class Scheduler implements RunActive, RequestFilter {
 
         if (!troubledNodes.isEmpty()) { //There are troubled nodes to be freed
         	if(logger.isDebugEnabled()){logger.info("will free from schedule");}
-        	resourceManager.freeNodes(troubledNodes);
+        	freeNodes(troubledNodes);
         }
+    }
+    
+    /**
+     * returns a vector of nodes back to the source for recycling
+     * @param nodes
+     */
+    private void freeNodes(Vector<Node>nodes)
+    {
+    	resourceManager.freeNodes(nodes);
     }
 
     /**
@@ -338,7 +386,7 @@ public class Scheduler implements RunActive, RequestFilter {
                 task.timeFinished = System.currentTimeMillis();
 
                 task.status = Status.FINISHED;
-                task.result.setKilledMessage("");
+                task.result.setErrorMessage("");
                 policy.finished(task);
 
                 nodePool.add(task.nodeNExecuter);
@@ -389,13 +437,13 @@ public class Scheduler implements RunActive, RequestFilter {
                     }
                     if(logger.isDebugEnabled()){
                     logger.info("willfree from return nodes");}
-                    resourceManager.freeNodes(nodesToFree);
+                    freeNodes(nodesToFree);
 
                     //resets the timer
                     previousCleanupWithTasksInPolicy = System.currentTimeMillis();
                     if (logger.isDebugEnabled()) {
                         logger.debug(nodesToFree.size() +
-                            " nodes returned to resource manager");
+                            " nodes returned to resource manager, there are still in the node pool :"+this.nodePool.size());
                     }
                 }
             }
@@ -434,42 +482,45 @@ public class Scheduler implements RunActive, RequestFilter {
         return new BooleanWrapper(false);
     }
 
-    public GenericTypeWrapper<Status> status(String taskID) 
+    public Vector<Info> info_all()
     {
-    	Vector<String> temp;
-    	temp=getQueuedID();
-    	if(temp.contains(taskID))
+    	Vector<Info> info=new Vector<Info>();
+    	
+    	//get failed and queued from policy
+    	info.addAll(policy.getInfo_all());
+    	
+    	
+    	
+    	for (int i=0;i<runningTasks.size();i++)
+    	{
+    		info.add(runningTasks.get(i).getTaskINFO());
+    	}
+    	
+    	for (int i=0;i<finishedTasks.size();i++)
     	{
     		
-    		return new GenericTypeWrapper<Status>(Status.QUEUED);
-    	}
-    	temp=getRunningID();
-    	if(temp.contains(taskID))
-    	{
-    		return new GenericTypeWrapper<Status>(Status.RUNNNING);
+    				info.add(finishedTasks.get(i).getTaskINFO());
+    		
+    			
     	}
     	
-    	temp=getFinishedID();
-    	if(temp.contains(taskID))
-    	{
-    		return new GenericTypeWrapper<Status>(Status.FINISHED);
-    	}
-    	
-    	temp=getFailedID();
-    	if(temp.contains(taskID))
-    	{
-    		return new GenericTypeWrapper<Status>(Status.FAILED);
-    	}
-
-    	
-    	temp=getKilledID();
-    	if(temp.contains(taskID))
-    	{
-    		return new GenericTypeWrapper<Status>(Status.KILLED);
-    	}
+    	return info;
+    }
+    public GenericTypeWrapper<Info> info(String taskID) 
+    {
+    	InternalTask task=getTask(taskID);
+    	if (task!=null)
+    	return new GenericTypeWrapper<Info>(task.getTaskINFO());
     	
     	//if it couldnt be found
-    	return new GenericTypeWrapper<Status>(Status.NEW);
+    	else
+    	
+    		
+    		return new GenericTypeWrapper<Info>(new Info( Status.NEW,  taskID,  "unknown", "unknown", -1, -1,-1, -1));
+    		
+    	
+    	
+    	
     	
     }
     /**
@@ -477,7 +528,7 @@ public class Scheduler implements RunActive, RequestFilter {
      * @param taskID
      * @return
      */
-    public BooleanWrapper isQueued(String taskID)
+    public BooleanWrapper isInTheQueue(String taskID)
     {
     	
     	if(policy.getTask(taskID)!=null)
@@ -486,28 +537,26 @@ public class Scheduler implements RunActive, RequestFilter {
     	return new BooleanWrapper(false);
     }
     /**
-     * gets a task if it is running finished or queued
+     * gets a task as long as it exxists in the scheduler 
      * @param taskID
-     * @return the task , null if not in the three main queues
+     * @return the task , null if not in the three main queues ie it was either already collected or its is new and wasnt inserted in the scheduler yet
      */
     private InternalTask getTask(String taskID)
     {
-    	if(isQueued(taskID).booleanValue())
+    	if(isInTheQueue(taskID).booleanValue())
     	return policy.getTask(taskID);
-    	if(isRunning(taskID).booleanValue())
-    	{
+    
 		 for (int i = 0; i < runningTasks.size(); i++)
 	            if (runningTasks.get(i).getTaskID().equals(taskID)) {
 	                return runningTasks.get(i);
 	            }
 		
-    	}
-    	if(isFinished(taskID).booleanValue())
-    	{
+    	
+    	
     		for (int i = 0; i < finishedTasks.size(); i++)
                 if (finishedTasks.get(i).getTaskID().equals(taskID)) {
                     return finishedTasks.get(i);
-                }
+               
     	}
     	
     	
@@ -560,13 +609,13 @@ public class Scheduler implements RunActive, RequestFilter {
         	//task doesnt exist while shutting down
         	if(task==null&&shutdown)
         	{
-        		createKilled(taskID,userName,"The Task doesnt exist in the scheduler or hasn't been added to the queue yet or already collected by the user");
+        		createError(taskID,userName,"The Task doesnt exist in the scheduler or hasn't been added to the queue yet or already collected by the user");
         		return true;
         	}
         	//if the username isnt correct 
         	else if(task!=null&&!task.getUserName().equals(userName))
         	{
-        		createKilled(taskID,userName,"The User Name isnt correct.");
+        		createError(taskID,userName,"The User Name isnt correct.");
         		return true;
         		
         	}
@@ -578,10 +627,17 @@ public class Scheduler implements RunActive, RequestFilter {
             
         	
             
-        	//check if the task is queued and shutdown has started
+        	//check if the task is queued or failed and shutdown has started
         	else if(task!=null&&task.status==Status.QUEUED&&shutdown)
         	{
-        		createKilled(taskID,userName,"Shcheduler is shutting down, task wont be scheduled");
+        		createError(taskID,userName,"Shcheduler is shutting down, task wont be scheduled");
+        		return true;
+        	
+        	}
+            
+        	else if(task!=null&&task.status==Status.FAILED&&shutdown)
+        	{
+        		createError(taskID,userName,"Due to an internal error, task execution failed. However, sheduler is shutting down.task wont be scheduled");
         		return true;
         	
         	}
@@ -617,7 +673,18 @@ public class Scheduler implements RunActive, RequestFilter {
     			toBeKilled.status=Status.KILLED;
     			policy.finished(toBeKilled);
     			
-    			createKilled(toBeKilled.getTaskID(),toBeKilled.getUserName(),"Task Was killed before execution finished.");
+    			
+    			
+    			
+    			
+    		
+    			
+    		
+    			
+        		toBeKilled.result=new InternalResult();
+        		toBeKilled.result.setErrorMessage("Task Was killed before execution finished.");
+        		finishedTasks.add(toBeKilled);
+    			
     			
     			try
     			{
@@ -656,7 +723,7 @@ public class Scheduler implements RunActive, RequestFilter {
     		if(logger.isDebugEnabled())
 		logger.debug("will frree from kill");
 	
-		resourceManager.freeNodes(nodesKilled);
+		freeNodes(nodesKilled);
 		}
     	
     }
@@ -746,7 +813,8 @@ public class Scheduler implements RunActive, RequestFilter {
                     i++;
                 } catch (Exception e) {
                     logger.info("Task "+runningTasks.get(i).getTaskID()+" has failed and will be returned to policy for rescheduling");
-                	troubledNodes.add(runningTasks.get(i).nodeNExecuter.node);
+                    runningTasks.get(i).status=Status.FAILED;
+                    troubledNodes.add(runningTasks.get(i).nodeNExecuter.node);
                     policy.failed(runningTasks.remove(i));
                 }
             }
@@ -756,7 +824,7 @@ public class Scheduler implements RunActive, RequestFilter {
             	{
             	if(logger.isDebugEnabled()){
             		logger.info("will freee from ping");}
-            		resourceManager.freeNodes(troubledNodes);
+            		freeNodes(troubledNodes);
             		if(logger.isDebugEnabled())
                 		logger.warn(troubledNodes.size()+" nodes are trobled and were returned to resource manager.");
             	}
@@ -765,13 +833,13 @@ public class Scheduler implements RunActive, RequestFilter {
         }
     }
 
-    private void createKilled(String taskID,String userName,String Message)
+    private void createError(String taskID,String userName,String Message)
     {
-    	InternalTask killed=new InternalTask(null,taskID,userName);
-    	killed.result=new InternalResult();
-    	killed.status=Status.KILLED;
-		killed.result.setKilledMessage(Message);
-		finishedTasks.add(killed);
+    	InternalTask error=new InternalTask(null,taskID,userName);
+    	error.result=new InternalResult();
+    	error.status=Status.ERROR;
+		error.result.setErrorMessage(Message);
+		finishedTasks.add(error);
     	
     }
 	
@@ -844,18 +912,26 @@ public class Scheduler implements RunActive, RequestFilter {
      */
     public BooleanWrapper del(String taskID)
     {
-    	if (isQueued(taskID).booleanValue())
+    	
+    	//notice that it wont be scheduled when running this fct becasue run activity runs schedule perdiodically after serving requests
+    	if (isInTheQueue(taskID).booleanValue())
     	{
+    		InternalTask toBeKilled=policy.removeTask(taskID);
     		
-    		createKilled(taskID,policy.removeTask(taskID).getUserName(),"Task Has been deleted from scheduler");
+    		toBeKilled.status=Status.KILLED;
+    		toBeKilled.result=new InternalResult();
+    		toBeKilled.result.setErrorMessage("Task has been deleted from the scheduler queue");
+    		finishedTasks.add(toBeKilled);
+    		
     		return new BooleanWrapper(true);
     	}
-    	//this is a hack of kill al runing
+    
     	if(isRunning(taskID).booleanValue())
     	{
     		
-    		Vector<Node> nodesKilled=new Vector<Node>();
-        	for(int i=0;i<runningTasks.size();i++)
+    		
+        	//run trying to locate the task
+    		for(int i=0;i<runningTasks.size();i++)
         	{
         		if(runningTasks.get(i).getTaskID().equals(taskID))
         		{
@@ -863,10 +939,16 @@ public class Scheduler implements RunActive, RequestFilter {
 	        		if(ProActive.isAwaited(runningTasks.get(i).result))
 	        		{
 	        			InternalTask toBeKilled=runningTasks.remove(i);
-	        			nodesKilled.add(toBeKilled.nodeNExecuter.node);
+	        			
 	        			toBeKilled.status=Status.KILLED;
 	        			policy.finished(toBeKilled);
-	        			createKilled(toBeKilled.getTaskID(),toBeKilled.getUserName(),"Task Was killed before execution finished.");
+	        			
+	        			
+	            		toBeKilled.result=new InternalResult();
+	            		toBeKilled.result.setErrorMessage("Task Was killed before execution finished.");
+	            		finishedTasks.add(toBeKilled);
+	            		
+	  
 	        			try
 	        			{
 	         				toBeKilled.nodeNExecuter.executer.kill();
@@ -882,30 +964,33 @@ public class Scheduler implements RunActive, RequestFilter {
 	        				e.printStackTrace();
 	        				logger.info("Something went wrong killing Task "+toBeKilled.getTaskID());
 	        			}
-	        			
+	        		
+	                		if(logger.isDebugEnabled())
+	            		logger.debug("will frree from kill");
+	                	
+	                		//a vector must be created because RM only takes vectors
+	                	Vector<Node> nodesKilled=new Vector<Node>();
+	                	nodesKilled.add(toBeKilled.nodeNExecuter.node);
+	            		freeNodes(nodesKilled);
+	            		return new BooleanWrapper(true);
+	            		
+	                
 	        			
 	        		}
 	        		else//if result is available already just clean up
 	        		{
 	        			manageRunningTasks();
 	        			
+//	        			it wasnt killed because it became finished
+	                	return new BooleanWrapper(false);
+	        			
 	        		}
         		}
         		
         	}
         	
-        	if(!nodesKilled.isEmpty())
-    			
-    		{
-        		if(logger.isDebugEnabled())
-    		logger.debug("will frree from kill");
-    	
-    		resourceManager.freeNodes(nodesKilled);
-    		return new BooleanWrapper(true);
-    		}
-        
-        	//it wasnt killed because it became finished
-        	return new BooleanWrapper(false);
+      
+        	
     	}
     	
     	
