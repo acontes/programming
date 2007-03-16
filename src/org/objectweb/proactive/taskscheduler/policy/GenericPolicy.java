@@ -32,22 +32,27 @@ package org.objectweb.proactive.taskscheduler.policy;
 
 import java.util.Vector;
 
+import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.taskscheduler.InternalTask;
 import org.objectweb.proactive.taskscheduler.Info;
+
 
 /**
  * Must be implemented in order to be used as a policy in the scheduler
  *  
- *
+ * <b> must create public static GenericPolicy getNewPolicy(GenericResourceManager rm)/b>
  * @author walzouab
  *
  */
+
+//the function underneath must be implemented because it is the only way the scheduler gets an instance!!!
+//public static GenericPolicy getNewPolicy(GenericResourceManager rm)
 
 public interface GenericPolicy {
 	
 	
 	/**
-	 * //used for loggging, only implement if absouletely needed
+	 * //used for loggging, only implement if  needed
 	 * @param jobID
 	 */
 	
@@ -56,17 +61,12 @@ public interface GenericPolicy {
 	
 
 	/**
-	 * gets the next available task and removes it from policy 
-	 * @param maxumum tasks reqiured
-	 * @return next task and null if not available
+	 * gets the ready tasks and removes them from policy.
+	 * <b>a ready task means that we have both the node and the active executer</b> 
+	 * @return Vector of ready tasks, and an empty vector if none is ready
 	 */
-	public InternalTask getNextTask();
+	public Vector<InternalTask> getReadyTasks();
 
-	/**
-	 * 
-	 * @return number of queued tasks
-	 */
-	public int getQueuedTasksNb();
 	/**
 	 * Inserts a set of  new tasks into the policy
 	 * @param task to be inserted
@@ -81,8 +81,8 @@ public interface GenericPolicy {
 	public void failed(InternalTask t);
 	
 	/**
-	 * Deletes all tasks in the policy
-	 * <b>Warning, make sure that failed tasks are flushed too</b>
+	 * Deletes all tasks in the policy, ie a call to get nextready tasks will be zero
+	 * <b>Warning, make sure that failed and ready tasks are flushed too</b>
 	 *
 	 */
 	public void flush();
@@ -91,17 +91,17 @@ public interface GenericPolicy {
 	 * returns the task with the specified ID
 	 * <b>Warning, this function doesnt remo
 	 * @param TaskID
-	 * @return returns the task and null if it doesnt exist in queue 
+	 * @return A wrapper contiaining (the ttask required and null if not available) 
 	 */
-	public InternalTask getTask(String TaskID);
+	public GenericTypeWrapper<InternalTask> getTask(String TaskID);
 	
 	
 	/**
 	 * gets the task at the specified index and removes it 
 	 * @param TaskID
-	 * @return the ttask required and null if not available
+	 * @return A wrapper contiaining (the ttask required and null if not available)
 	 */
-	public InternalTask removeTask(String TaskID);
+	public GenericTypeWrapper<InternalTask> removeTask(String TaskID);
 	
 	/**
 	 * returns a vector containing all queued taskID

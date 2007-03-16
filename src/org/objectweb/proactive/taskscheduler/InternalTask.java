@@ -47,7 +47,7 @@ public class InternalTask implements java.io.Serializable{
 		private String taskID;
 		private String userName; 
 	
-	 NodeNExecuter nodeNExecuter;
+	 public NodeNExecuter nodeNExecuter;
 	
 	 InternalResult result;
 	

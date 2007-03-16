@@ -31,14 +31,14 @@ package org.objectweb.proactive.taskscheduler;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.*;
-import org.objectweb.proactive.core.*;
-import org.objectweb.proactive.core.node.*;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
-import org.objectweb.proactive.taskscheduler.exception.*;
+import org.objectweb.proactive.taskscheduler.exception.AdminException;
 import org.objectweb.proactive.taskscheduler.resourcemanager.GenericResourceManager;
 
 
@@ -145,7 +145,7 @@ public class AdminScheduler {
     		try
     		{
     			//FIXME :must make sure that futures have been propagated using automatic continuation
-    			logger.info("FIX ME:Will sleep in adminscheduler to allow for automatic continuation to propagate");
+    			logger.warn("FIX ME:Bugs #945 in proacive forge Will sleep in adminscheduler to allow for automatic continuation to propagate");
     			Thread.sleep(1000);
     			
     			
@@ -179,7 +179,22 @@ public class AdminScheduler {
      */
     public static AdminScheduler createLocalScheduler(GenericResourceManager RM,String nodeName)throws AdminException
     {
-    	return AdminScheduler.createLocalScheduler(RM,nodeName,System.getProperty("proactive.taskscheduler.default_policy"));
+    	String defaultPolicy;
+    	String defaultFactory;
+    	try
+    	{
+	    	defaultPolicy=System.getProperty("proactive.taskscheduler.default_policy");
+	    	defaultFactory=System.getProperty("proactive.taskscheduler.default_policy_factory");
+	    
+    	}
+    	catch(Exception e)
+    	{
+    		logger.error("Must define the property defaultpolicy and default factory in proactive configuration");
+    		throw new AdminException(e.getLocalizedMessage());
+    	}
+    	
+    	
+    	return AdminScheduler.createLocalScheduler(RM,nodeName,defaultPolicy,defaultFactory);
     	
     }
 
@@ -196,7 +211,27 @@ public class AdminScheduler {
      */
     public static AdminScheduler createLocalScheduler(String RMURL,String nodeName) throws AdminException
     {
-    	return AdminScheduler.createLocalScheduler(RMURL,nodeName,System.getProperty("proactive.taskscheduler.default_policy"));
+    	//get properties from the proactive confuguration file
+      	String defaultPolicy;
+    	String defaultFactory;
+    	try
+    	{
+	    	defaultPolicy=System.getProperty("proactive.taskscheduler.default_policy");
+	    	defaultFactory=System.getProperty("proactive.taskscheduler.default_policy_factory");
+	    
+    	}
+    	catch(Exception e)
+    	{
+    		logger.error("Must define the property defaultpolicy and default factory in proactive configuration");
+    		throw new AdminException(e.getLocalizedMessage());
+    	}
+    	 	
+    	
+    	
+    	return AdminScheduler.createLocalScheduler(RMURL,nodeName,defaultPolicy,defaultFactory);
+    	
+    	
+    	
     }
 
     
@@ -212,7 +247,7 @@ public class AdminScheduler {
      * @return Reference to the AdminInterface
      * @throws AdminException
      */
-    public static AdminScheduler createLocalScheduler(String RMURL,String nodeName,String Policy) throws AdminException
+    public static AdminScheduler createLocalScheduler(String RMURL,String nodeName,String Policy,String policyFactory) throws AdminException
     {
      	GenericResourceManager rm;
     	try
@@ -224,7 +259,7 @@ public class AdminScheduler {
     		throw new AdminException("Resource Manager doesn't exist in the specified URL");
     	}
     	
-    	return AdminScheduler.createLocalScheduler(rm,nodeName,Policy);
+    	return AdminScheduler.createLocalScheduler(rm,nodeName,Policy, policyFactory);
     }
 
     
@@ -239,7 +274,7 @@ public class AdminScheduler {
      * @return Reference to the AdminInterface
      * @throws AdminException
      */
-    public static AdminScheduler createLocalScheduler(GenericResourceManager RM,String nodeName,String Policy)throws AdminException
+    public static AdminScheduler createLocalScheduler(GenericResourceManager RM,String nodeName,String Policy, String policyFactory )throws AdminException
     {
     	String localNode;
     	
@@ -264,7 +299,7 @@ public class AdminScheduler {
     	{
     		throw new AdminException("Cannot create Scheduler locally "+e.getMessage());
     	}
-    	return AdminScheduler.createScheduler(RM,localNode,Policy);
+    	return AdminScheduler.createScheduler(RM,localNode,Policy,policyFactory);
     	
     }
 
@@ -307,7 +342,21 @@ public class AdminScheduler {
      */
     public static AdminScheduler createScheduler(GenericResourceManager RM,String schedulerURL)throws AdminException
     {
-    	return AdminScheduler.createScheduler(RM,schedulerURL,System.getProperty("proactive.taskscheduler.default_policy"));
+      	String defaultPolicy;
+    	String defaultFactory;
+    	try
+    	{
+	    	defaultPolicy=System.getProperty("proactive.taskscheduler.default_policy");
+	    	defaultFactory=System.getProperty("proactive.taskscheduler.default_policy_factory");
+	    
+    	}
+    	catch(Exception e)
+    	{
+    		logger.error("Must define the property defaultpolicy and default factory in proactive configuration");
+    		throw new AdminException(e.getLocalizedMessage());
+    	}
+    	
+    	return AdminScheduler.createScheduler(RM,schedulerURL,defaultPolicy,defaultFactory);
     	
     }
 
@@ -324,7 +373,20 @@ public class AdminScheduler {
      */
     public static AdminScheduler createScheduler(String RMURL,String schedulerURL) throws AdminException
     {
-    	return AdminScheduler.createScheduler(RMURL,schedulerURL,System.getProperty("proactive.taskscheduler.default_policy"));
+    	String defaultPolicy;
+    	String defaultFactory;
+    	try
+    	{
+	    	defaultPolicy=System.getProperty("proactive.taskscheduler.default_policy");
+	    	defaultFactory=System.getProperty("proactive.taskscheduler.default_policy_factory");
+	    
+    	}
+    	catch(Exception e)
+    	{
+    		logger.error("Must define the property defaultpolicy and default factory in proactive configuration");
+    		throw new AdminException(e.getLocalizedMessage());
+    	}
+    	return AdminScheduler.createScheduler(RMURL,schedulerURL,defaultPolicy,defaultFactory);
     }
     
     /**
@@ -337,7 +399,7 @@ public class AdminScheduler {
      * @return Reference to the AdminInterface
      * @throws AdminException
      */
-    public static AdminScheduler createScheduler( String RMURL,String schedulerURL,String Policy) throws AdminException{
+    public static AdminScheduler createScheduler( String RMURL,String schedulerURL,String Policy,String policyFactory) throws AdminException{
     	GenericResourceManager rm;
     	try
     	{
@@ -348,7 +410,7 @@ public class AdminScheduler {
     		throw new AdminException("Resource Manager doesn't exist in the specified URL");
     	}
     	
-    	return AdminScheduler.createScheduler(rm,schedulerURL,Policy) ;
+    	return AdminScheduler.createScheduler(rm,schedulerURL,Policy,policyFactory) ;
     }
 
     /**
@@ -360,7 +422,7 @@ public class AdminScheduler {
      * @return Reference to the AdminInterface
      * @throws AdminException
      */
-    public static AdminScheduler createScheduler(GenericResourceManager RM,String schedulerURL,String Policy)throws AdminException {
+    public static AdminScheduler createScheduler(GenericResourceManager RM,String schedulerURL,String Policy,String policyFactory)throws AdminException {
     	if(RM==null)
     		throw new AdminException("The Resource manager is set to null");
     	try
@@ -381,7 +443,7 @@ public class AdminScheduler {
     	try
     	{
     		//first thing to do is create the scheduler. if this fails then it will not continute, this clean up is not needed
-    		scheduler=(Scheduler) ProActive.newActive(Scheduler.class.getName(), new Object[]{Policy,RM},schedulerURL);
+    		scheduler=(Scheduler) ProActive.newActive(Scheduler.class.getName(), new Object[]{Policy,RM,policyFactory},schedulerURL);
     		userScheduler=(UserScheduler)ProActive.newActive(UserScheduler.class.getName(), new Object[]{scheduler},schedulerURL);
     		adminScheduler=(AdminScheduler)ProActive.newActive(AdminScheduler.class.getName(), new Object[]{scheduler,userScheduler},schedulerURL);
     		logger.info("Scheduler Created on "+schedulerURL);
