@@ -244,6 +244,7 @@ public class AdminScheduler {
      * @param RM- The URL of the resource manager
      * @param nodeName- the required name to be used. Use null to create using a random name
      * @param  Policy- A string that referes to the class's formal name and package
+     * @param policyFactory- A string that refers to a static Policy Factory that  takes a resource manager and returns a generic policy
      * @return Reference to the AdminInterface
      * @throws AdminException
      */
@@ -269,7 +270,7 @@ public class AdminScheduler {
      * @param nodeName- the required name to be used. Use null to the default node(random name)
      * @param RM- a refernce to the resoruce manager
      * @param Policy- A string that referes to the class's formal name and package
-     * 
+     * @param policyFactory- A string that refers to a static Policy Factory that  takes a resource manager and returns a generic policy
      * 
      * @return Reference to the AdminInterface
      * @throws AdminException
@@ -395,6 +396,7 @@ public class AdminScheduler {
      * @param RM- The URL of the resource manager
      * @param schedulerURL- the node where the scheduler is to be created
      * @param Policy- A string that referes to the class's formal name and package
+     * @param policyFactory- A string that refers to a static Policy Factory that  takes a resource manager and returns a generic policy
      * 
      * @return Reference to the AdminInterface
      * @throws AdminException
@@ -418,6 +420,7 @@ public class AdminScheduler {
      * @param RM- a refernce to the resoruce manager
      * @param schedulerURL- the node where the scheduler is to be created
      * @param Policy- A string that referes to the class's formal name and package
+     * @param policyFactory- A string that refers to a static Policy Factory that  takes a resource manager and returns a generic policy
      * 
      * @return Reference to the AdminInterface
      * @throws AdminException
