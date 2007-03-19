@@ -16,5 +16,6 @@ CLASSPATH=.
 
 $JAVACMD org.objectweb.proactive.taskscheduler.AdminCommunicator $SCHEDULER_URL
 
+
 echo
 
