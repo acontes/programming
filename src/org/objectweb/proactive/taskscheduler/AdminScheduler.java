@@ -132,7 +132,10 @@ public class AdminScheduler {
          throw new AdminException("Scheduler object doesnt Exist please make sure its running");
     }
     
-    
+    /** 
+     *  shuts down the scheduler 
+     * @param true means killing running processes flushing queues and terminating, false means waiting for current processes to finish
+     */
     public void shutdown(BooleanWrapper immediate)
     {
    
