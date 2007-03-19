@@ -38,11 +38,9 @@ package org.objectweb.proactive.taskscheduler;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Date;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.taskscheduler.exception.AdminException;
 
 
 public class AdminCommunicator {
@@ -84,7 +82,7 @@ public class AdminCommunicator {
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		
 		if (args.length != 1) {		
 			output("Usage <java_command> Scheduler_URL\n");
     	}
@@ -217,7 +215,7 @@ public class AdminCommunicator {
 	        	
 	        	
 	            
-	        	if(out.isEmpty())
+	        	if(out.length()==0)
 	        		output("Scheduler is Empty\n");
 	        		
 	        		else			
@@ -256,7 +254,7 @@ public class AdminCommunicator {
 	        	
 	        	
 	            
-	        	if(out.isEmpty())
+	        	if(out.length()==0)
 	        		output("Scheduler is Empty\n");
 	        		
 	        		else			
