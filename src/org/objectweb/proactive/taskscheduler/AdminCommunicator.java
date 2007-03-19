@@ -306,18 +306,23 @@ public class AdminCommunicator {
 	 
 	 private static void helpScreen()
 	 {
-		 output("Communicator Commands are:\n\n");
-		 output(STAT_CMD+ ": gets the status of all tasks\n\n");
-		 output(STAT_CMD+" <taskID> : gets the status of a specific tasks\n\n");   
-		 output(DEL_CMD+" <taskID> : deletes a specific tasks, must be either queued or running\n\n");
-		 output(START_CMD+ ": starts scheduling\n\n");		    
-		 output(STOP_CMD+ ": stops scheduling\n\n");
-		 output(KILLALL_CMD+ ": kills all running tasks\n\n");
-		 output(FLUSH_CMD+ ": deletes all queued tasks\n\n"); 
-		 output(SHUTDOWN_IMMEDIATE_CMD+ ": kills all running tasks and shutsdown immediately\n\n");
-		 output(SHUTDOWN_SOFT_CMD+ ": waits for running tasks to finish and shutsdown immediately\n\n");
-		 output(EXIT_CMD+ ": exits communicator\n\n");
-		    
+		 String out="";
+		 out+="Communicator Commands are:\n\n";
+		 out+=String.format(" %1$-18s\t Gets the status of all tasks\n",STAT_CMD);
+		 out+=String.format(" %1$-18s\t Gets the advanced status of all tasks\n",STAT_ADV_CMD);
+		 out+=String.format(" %1$-18s\t <taskID> : gets the status of a specific tasks\n",STAT_CMD);
+		 out+=String.format(" %1$-18s\t <taskID> : deletes a specific tasks, must be either queued or running\n",DEL_CMD);
+		 out+=String.format(" %1$-18s\t Starts UserAPI\n",START_CMD);
+		 out+=String.format(" %1$-18s\t Stops UserAPI\n",STOP_CMD);
+		 out+=String.format(" %1$-18s\t Kills all running tasks\n",KILLALL_CMD);
+		 out+=String.format(" %1$-18s\t Deletes all queued tasks\n",FLUSH_CMD);
+		 out+=String.format(" %1$-18s\t Kills all running tasks and shutsdown immediately\n",SHUTDOWN_IMMEDIATE_CMD);
+		 out+=String.format(" %1$-18s\t Waits for running tasks to finish and shutsdown\n",SHUTDOWN_SOFT_CMD);
+		 out+=String.format(" %1$-18s\t Exits Communicator\n",EXIT_CMD);
+		 
+
+		
+		 output(out);   
 		    
 		    
 		 
