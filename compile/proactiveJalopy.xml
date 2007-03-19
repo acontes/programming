@@ -2,7 +2,7 @@
 <jalopy>
     <general>
         <compliance>
-            <version>14</version>
+            <version>15</version>
         </compliance>
         <style>
             <description>ProActive Java Coding Convention</description>
@@ -10,7 +10,7 @@
         </style>
     </general>
     <inspector>
-        <enable>true</enable>
+        <enable>false</enable>
         <naming>
             <classes>
                 <abstract>[A-Z][a-zA-Z0-9]+</abstract>

@@ -27,15 +27,16 @@ CLUSTERS=(
 	tartopom.rennes
 	azur.sophia
 	helios.sophia
+	sol.sophia
 	toulouse
 )
 
 CMD_HOSTNAME=''
 UNAME=$(uname)
-if [ "$UNAME" == "Linux" ] ;
+if [ "$UNAME" = "Linux" ] ;
 then
 	CMD_HOSTNAME='hostname -f'
-elif [ "$UNAME" == "Darwin" ] ;
+elif [ "$UNAME" = "Darwin" ] ;
 then
 	CMD_HOSTNAME='hostname'
 else
@@ -61,10 +62,10 @@ function get_cluster_from_hostname {
 	
 	function bordeaux_get_cluster {
 		FQDN=$1
-		if [ "$FQDN" == "frontale.bordeaux.grid5000.fr" ] ;
+		if [ "$FQDN" = "frontale.bordeaux.grid5000.fr" ] ;
 		then
 			echo ""
-		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}.bordeaux.grid5000.fr\)')" == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}.bordeaux.grid5000.fr\)')" = "$FQDN" ] ;
 		then
 			echo ""
 		else
@@ -75,13 +76,13 @@ function get_cluster_from_hostname {
 
 	function grenoble_get_cluster {
 		FQDN=$1
-		if [ "$FQDN" == "oar.grenoble.grid5000.fr" ] ;
+		if [ "$FQDN" = "oar.grenoble.grid5000.fr" ] ;
 		then
 			echo "idpot"
-		elif [ "$(expr $FQDN : '\(idpot[0-9]\{1,3\}.imag.fr\)')" == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(idpot[0-9]\{1,3\}.imag.fr\)')" = "$FQDN" ] ;
 		then
 			echo "idpot"
-		elif [ "$(expr $FQDN : '\(ita[0-9]\{0,3\}.imag.fr\)')" == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(ita[0-9]\{0,3\}.imag.fr\)')" = "$FQDN" ] ;
 		then
 			echo "icluster2"
 		else
@@ -93,10 +94,10 @@ function get_cluster_from_hostname {
 
 	function lille_get_cluster {
 		FQDN=$1
-		if [ "$FQDN" == "frontale.lille.grid5000.fr" ] ;
+		if [ "$FQDN" = "frontale.lille.grid5000.fr" ] ;
 		then
 			echo ""
-		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}.lille.grid5000.fr\)')" == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}.lille.grid5000.fr\)')" = "$FQDN" ] ;
 		then
 			echo ""
 		else
@@ -107,12 +108,12 @@ function get_cluster_from_hostname {
 
 	function lyon_get_cluster {
 		FQDN=$1
-		if   [ "$FQDN" == "capricorne.lyon.grid5000.fr" ] ; then echo "capricorne" ; 
-		elif [ "$FQDN" == "sagittaire.lyon.grid5000.fr" ] ; then echo "sagittaire" ; 
+		if   [ "$FQDN" = "capricorne.lyon.grid5000.fr" ] ; then echo "capricorne" ; 
+		elif [ "$FQDN" = "sagittaire.lyon.grid5000.fr" ] ; then echo "sagittaire" ; 
 
-		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}\(-[a-z]\)\?.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
+		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}\(-[a-z]\)\?.lyon.grid5000.fr\)')" = "$FQDN" ] ; then
 			echo "capricorne"
-		elif [ "$(expr $FQDN : '\(sagittaire-[0-9]\{1,2\}\(-[a-z]\)\?.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
+		elif [ "$(expr $FQDN : '\(sagittaire-[0-9]\{1,2\}\(-[a-z]\)\?.lyon.grid5000.fr\)')" = "$FQDN" ] ; then
 			echo "sagittaire"
 		else
 			echo ERR_PREFIX "lyon_get_cluster, Strange FQDN=$FQDN for lyon site. Aborting" 1>&2
@@ -122,10 +123,10 @@ function get_cluster_from_hostname {
 
 	function nancy_get_cluster {
 		FQDN=$1
-		if [ "$FQDN" == "fgrillon1.nancy.grid5000.fr" ] ;
+		if [ "$FQDN" = "fgrillon1.nancy.grid5000.fr" ] ;
 		then
 			echo ""
-		elif [ "$(expr $FQDN : '\(grillon-[0-9]\{1,2\}.nancy.grid5000.fr\)')" == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(grillon-[0-9]\{1,2\}.nancy.grid5000.fr\)')" = "$FQDN" ] ;
 		then
 			echo ""
 		else
@@ -136,7 +137,7 @@ function get_cluster_from_hostname {
 
 	function orsay_get_cluster {
 		FQDN=$1
-		if [ "$(expr $FQDN : '\(\(dev\)\?gdx[0-9]\{3,4\}.orsay.grid5000.fr\)')"  == "$FQDN" ] ;
+		if [ "$(expr $FQDN : '\(\(dev\)\?gdx[0-9]\{3,4\}.orsay.grid5000.fr\)')"  = "$FQDN" ] ;
 		then
 			echo ""
 		else
@@ -154,16 +155,16 @@ function get_cluster_from_hostname {
 		elif [ "$FQDN" = "tartopom-dev.irisa.fr" ] ; then echo tartopom ; 
 
 		# Nodes have a standard domain name eg. grid5000.fr
-		elif [ "$(expr $FQDN : '\(parasol[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(parasol[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  = "$FQDN" ] ;
 		then
 			echo "parasol"
-		elif [ "$(expr $FQDN : '\(paravent[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(paravent[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  = "$FQDN" ] ;
 		then
 			echo "paravent"
-		elif [ "$(expr $FQDN : '\(paravent[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(paravent[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  = "$FQDN" ] ;
 		then
 			echo "paravent"
-		elif [ "$(expr $FQDN : '\(tartopom[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(tartopom[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  = "$FQDN" ] ;
 		then
 			echo "tartopom"
 		else
@@ -175,18 +176,21 @@ function get_cluster_from_hostname {
 
 	function sophia_get_cluster {
 		FQDN=$1
-		if [ "$FQDN" == "frontale.sophia.grid5000.fr" ] ;
+		if [ "$FQDN" = "frontale.sophia.grid5000.fr" ] ;
 		then
 			echo "azur"
-		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,3\}.sophia.grid5000.fr\)')" == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,3\}.sophia.grid5000.fr\)')" = "$FQDN" ] ;
 		then
 			echo "azur"
-		elif [ "$FQDN" == "stock.sophia.grid5000.fr" ] ;
+		elif [ "$FQDN" = "stock.sophia.grid5000.fr" ] ;
 		then
 			echo "helios"
-		elif [ "$(expr $FQDN : '\(helios[0-9]\{1,3\}.sophia.grid5000.fr\)')" == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(helios[0-9]\{1,3\}.sophia.grid5000.fr\)')" = "$FQDN" ] ;
 		then
 			echo "helios"	
+		elif [ "$(expr $FQDN : '\(sol[0-9]\{0,3\}.sophia.grid5000.fr\)')" = "$FQDN" ] ;
+		then
+			echo "sol"	
 		else
 			echo ERR_PREFIX "sophia_get_cluster, Strange FQDN=$FQDN for sophia site. Aborting" 1>&2
 			exit 1
@@ -195,7 +199,7 @@ function get_cluster_from_hostname {
 
 	function toulouse_get_cluster {
 		FQDN=$1
-		if [ "$(expr $FQDN : '\(cict-[0-9]\{1,3\}.toulouse.grid5000.fr\)')" == "$FQDN" ] ;
+		if [ "$(expr $FQDN : '\(cict-[0-9]\{1,3\}.toulouse.grid5000.fr\)')" = "$FQDN" ] ;
 		then
 			echo ""
 		else
@@ -205,7 +209,7 @@ function get_cluster_from_hostname {
 	}
 
 	# Check that we are on grid5000
-	if [ "`expr "$FQDN" : '.*\(grid5000.fr\)'`" == "grid5000.fr" ] ;
+	if [ "`expr "$FQDN" : '.*\(grid5000.fr\)'`" = "grid5000.fr" ] ;
 	then
 		# We are on a grid5000's machine
 
@@ -220,10 +224,10 @@ function get_cluster_from_hostname {
 		else
 			echo $cluster.$SITE
 		fi
-	elif [ "`expr "$FQDN" : '.*\(irisa.fr\)'`"  == "irisa.fr" ] ;
+	elif [ "`expr "$FQDN" : '.*\(irisa.fr\)'`"  = "irisa.fr" ] ;
 	then
                echo `rennes_get_cluster $FQDN`.rennes
-	elif [ "`expr "$FQDN" : '.*\(imag.fr\)'`"  == "imag.fr" ] ;
+	elif [ "`expr "$FQDN" : '.*\(imag.fr\)'`"  = "imag.fr" ] ;
 	then
 		echo `grenoble_get_cluster $FQDN`.grenoble
 	else
@@ -241,6 +245,7 @@ function cluster2site {
     tartopom.rennes) echo rennes ;;
     azur.sophia)     echo sophia ;;
     helios.sophia)   echo sophia ;;
+    sol.sophia)      echo sophia ;;
     capricorne.lyon) echo lyon   ;;
     sagittaire.lyon) echo lyon   ;;
     # Note: each of idpot & icluster2 has its own NFS
@@ -254,6 +259,7 @@ function resolv_cluster_alias {
   case $1 in
 	helios)    echo helios.sophia     ;;
 	azur)      echo azur.sophia       ;;
+	sol)       echo sol.sophia        ;;
 	parasol)   echo parasol.rennes    ;;
 	paravent)  echo paravent.rennes   ;;
 	tartopom)  echo tartopom.rennes   ;;
@@ -288,8 +294,9 @@ function get_sync_hostname {
 
 function allow_direct_ssh {
 	CLUSTER=$1
-  	if [ "$CLUSTER" == "azur.sophia" ]   ; then return 0 ;fi
-  	if [ "$CLUSTER" == "helios.sophia" ] ; then return 0 ;fi
+  	if [ "$CLUSTER" = "azur.sophia" ]   ; then return 0 ;fi
+  	if [ "$CLUSTER" = "helios.sophia" ] ; then return 0 ;fi
+  	if [ "$CLUSTER" = "sol.sophia" ] ; then return 0 ;fi
 
 	return 1
 }
@@ -308,6 +315,7 @@ function get_kadeploy_part {
 	paravent.rennes)   echo "sda3" ;;
 	azur.sophia)       echo "hda3" ;;
 	helios.sophia)     echo "sda3" ;;
+	sol.sophia)        echo "sda3" ;;
 	toulouse)          echo "sda3" ;;
 	*) echo "[E] $cluster is not KADEPLOYABLE" 1>&2
 	   return 1
