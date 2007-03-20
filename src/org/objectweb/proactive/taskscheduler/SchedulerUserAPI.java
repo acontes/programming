@@ -90,7 +90,7 @@ public abstract class SchedulerUserAPI {
 	 * @return true if sucessfulll, false if itsnt queued or running anymore
 	 * @throws UserException
 	 */
-	public abstract BooleanWrapper del(String tID) throws UserException;
+	public abstract BooleanWrapper del(String tID,String userName) throws UserException;
 	
 	/**
 	 * gets the status of a certain task

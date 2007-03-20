@@ -522,7 +522,7 @@ public class AdminScheduler {
 	{
 		
 			
-		return scheduler.del(tID);
+		return scheduler.del(tID,"admin");
 	}
     
     public Vector<Info> info_all()

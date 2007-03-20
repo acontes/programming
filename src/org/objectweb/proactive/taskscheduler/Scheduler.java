@@ -870,15 +870,21 @@ public class Scheduler implements RunActive, RequestFilter {
     /**
      * Deletes a specfic task, only if it is either queued or running
      * @param taskID
+     * @param username
      * @return true if it is deleted else false
      */
-    public BooleanWrapper del(String taskID)
+    public BooleanWrapper del(String taskID,String userName)
     {
-    	
+    	InternalTask  toBeKilled=this.getTask(taskID);
+    	//if its not (the admin or the correct user decline it
+    	if (!(toBeKilled.getUserName().equals(userName)||toBeKilled.getUserName().equals("admin")))
+    		return new BooleanWrapper(false);
+    		
+    		
     	//notice that it wont be scheduled when running this fct becasue run activity runs schedule perdiodically after serving requests
     	if (isInTheQueue(taskID).booleanValue())
     	{
-    		InternalTask toBeKilled=policy.removeTask(taskID).getObject();
+    		 toBeKilled=policy.removeTask(taskID).getObject();
     		
     		toBeKilled.status=Status.KILLED;
     		toBeKilled.result=new InternalResult();
@@ -900,7 +906,7 @@ public class Scheduler implements RunActive, RequestFilter {
         	
 	        		if(ProActive.isAwaited(runningTasks.get(i).result))
 	        		{
-	        			InternalTask toBeKilled=runningTasks.remove(i);
+	        			toBeKilled=runningTasks.remove(i);
 	        			
 	        			toBeKilled.status=Status.KILLED;
 	        			policy.finished(toBeKilled);

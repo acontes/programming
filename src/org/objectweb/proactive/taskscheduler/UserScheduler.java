@@ -193,12 +193,12 @@ public class UserScheduler extends SchedulerUserAPI{
 			logger.info("error terminating userscheulder "+e.getMessage());
 		}
 	}
-	public BooleanWrapper del(String tID) throws UserException
+	public BooleanWrapper del(String tID,String userName) throws UserException
 	{
 		if(stopped)
 			throw new UserException("Scheduler is stopped. Please contact the administator");
 			
-		return scheduler.del(tID);
+		return scheduler.del(tID,userName);
 	}
 	public Status stat(String tID)throws UserException
 	{
