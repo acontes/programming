@@ -52,7 +52,7 @@ public class Test extends FunctionalTest {
 
 	private AdminScheduler adminAPI;
 	private SchedulerUserAPI userAPI;
-	private final String xmlURL = SimpleResourceManager.class.getResource("nonregressiontest/taskscheduler/testDeployment.xml").getPath();
+	private final String xmlURL = Test.class.getResource("/nonregressiontest/taskscheduler/testDeployment.xml").getPath();
 	private final String SNode="//localhost/SCHEDULER_NODE";
 	private SimpleResourceManager rm;
 	public Test() {
