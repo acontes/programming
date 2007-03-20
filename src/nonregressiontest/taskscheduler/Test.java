@@ -40,9 +40,9 @@ package nonregressiontest.taskscheduler;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.taskscheduler.AdminScheduler;
-import org.objectweb.proactive.taskscheduler.SchedulerUserAPI;
-import org.objectweb.proactive.taskscheduler.resourcemanager.SimpleResourceManager;
+import org.objectweb.proactive.extra.taskscheduler.AdminScheduler;
+import org.objectweb.proactive.extra.taskscheduler.SchedulerUserAPI;
+import org.objectweb.proactive.extra.taskscheduler.resourcemanager.SimpleResourceManager;
 
 import testsuite.test.FunctionalTest;
 
