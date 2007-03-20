@@ -35,21 +35,24 @@
  *
  */
 
-/*
-package nonregressiontest.taskscheduler;
 
-import testsuite.test.FunctionalTest;
+package nonregressiontest.taskscheduler;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.taskscheduler.*;
-import org.objectweb.proactive.taskscheduler.resourcemanager.*;
+import org.objectweb.proactive.taskscheduler.AdminScheduler;
+import org.objectweb.proactive.taskscheduler.SchedulerUserAPI;
+import org.objectweb.proactive.taskscheduler.resourcemanager.SimpleResourceManager;
+
+import testsuite.test.FunctionalTest;
+
+
 
 public class Test extends FunctionalTest {
 
 	private AdminScheduler adminAPI;
 	private SchedulerUserAPI userAPI;
-	private final String xmlURL = SimpleResourceManager.class.getResource("nonregressiontest/taskscheduler/test.xml").getPath();
+	private final String xmlURL = SimpleResourceManager.class.getResource("nonregressiontest/taskscheduler/testDeployment.xml").getPath();
 	private final String SNode="//localhost/SCHEDULER_NODE";
 	private SimpleResourceManager rm;
 	public Test() {
@@ -83,7 +86,19 @@ public class Test extends FunctionalTest {
 	}
 	public boolean preConditions() throws Exception {return adminAPI.start().booleanValue();	}
 	public boolean postConditions() throws Exception {return true;	}	
+	public static void main(String[] args) {
+        Test test = new Test();
+        
+        try
+        {
+        	test.initTest();
+        	test.action();
+        	test.endTest();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+	}
 
 
 }
-*/
