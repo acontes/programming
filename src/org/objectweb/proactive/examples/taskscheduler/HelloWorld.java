@@ -21,7 +21,8 @@ public class HelloWorld implements ProActiveTask,java.io.Serializable{
 		
 			
 			
-			Vector<UserResult> resultVector=scheduler.submit(tasks ,"walzouab");
+			Vector<UserResult> resultVector=scheduler.submit(tasks ,System.getProperty("user.name"));
+			
 			System.out.println(resultVector.get(0).getResult());
 			
 		}

@@ -15,7 +15,7 @@ public class HelloWorld2 implements ProActiveTask, java.io.Serializable {
         try {
             SchedulerUserAPI scheduler = SchedulerUserAPI.connectTo(args[0]);
 
-            UserResult result1 = scheduler.submit(new HelloWorld2(), "walzouab");
+            UserResult result1 = scheduler.submit(new HelloWorld2(), System.getProperty("user.name"));
 
             System.out.println("Is the execution 1finished??" +
                 result1.isFinished());
