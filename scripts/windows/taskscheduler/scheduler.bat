@@ -24,11 +24,10 @@ goto end
 
 
 :doit
-IF  "%1" == "" (
-  SET SCHEDULER_URL=//localhost/SCHEDULER_NODE 
- ) ELSE (
+
   SET SCHEDULER_URL=%1
-)
+  SET RM=%2
+
 
 SETLOCAL
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
@@ -36,7 +35,7 @@ call "%PROACTIVE%\scripts\windows\init.bat"
 
 rem This program will enable you to launch the scheduler daemon
 
-%JAVA_CMD% org.objectweb.proactive.examples.taskscheduler.LocalSchedulerExample %SCHEDULER_URL%
+%JAVA_CMD% org.objectweb.proactive.examples.taskscheduler.LocalSchedulerExample %SCHEDULER_URL% %RM%
 ENDLOCAL
 
 :end

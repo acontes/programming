@@ -121,7 +121,7 @@ public class AdminCommunicator {
 	            output("Communicator will exit.\n");
 	        	stopCommunicator=true;
 	        }
-	        else if (command.equals("?")) {
+	        else if (command.equals("?")||command.equals("help")) {
 	        	
 	        	helpScreen();
 	            
@@ -204,7 +204,7 @@ public class AdminCommunicator {
 			  		out+=String.format("%1$td/%1$tb/%1$tY %1$tH:%1$tM:%1$tS\t", Long.valueOf(tempTime));
 			  		
 
-	        		
+	        		out+=String.format("%1$-5d\t",tempInfo.getFailures());
 	        		
 	        	
 	        		out+=tempInfo.getNodeURL()+"\n";
@@ -219,7 +219,7 @@ public class AdminCommunicator {
 	        		output("Scheduler is Empty\n");
 	        		
 	        		else			
-	        		output(String.format("%1$-6s\t%2$-8s\t%3$-8s\t%4$-20s\t%5$-20s\t%6$-20s\t%7$-5s\n","TaskID","Status","UserName","Submitted","Started","Finished","NodeURL")+out);
+	        		output(String.format("%1$-6s\t%2$-8s\t%3$-8s\t%4$-20s\t%5$-20s\t%6$-20s\t%7$-5s\t%8$-5s\n","TaskID","Status","UserName","Submitted","Started","Finished","Fails","NodeURL")+out);
 	        }
 	        else if (command.equals(STAT_CMD)) {
 	        	
@@ -269,7 +269,9 @@ public class AdminCommunicator {
 	        	Status status=scheduler.status(taskID);
 	        	        	
 	        	
-	        	
+	        	if(status==Status.NEW)
+	        		output("Task "+taskID+" is unknown\n");
+	        	else
 	        	output("Task "+taskID+" is "+status.toString()+"\n");
 	        	
 	        }
@@ -286,7 +288,7 @@ public class AdminCommunicator {
 	        }
 	        else
 	        {
-	        	 output("UNKNOWN COMMAND!!... Please type \'?\' to see a list of commands\n");
+	        	 output("UNKNOWN COMMAND!!... Please type \'?\' or \'help\' to see a list of commands\n");
 	        }
 	        
 	    }	

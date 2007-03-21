@@ -1,20 +1,19 @@
 #!/bin/sh
 
 echo
-echo --- HelloWorld2 ----------------------------------------------
+echo --- HelloWorld 2----------------------------------------------
 
-if [ $# -lt 1 ]; then
-    SCHEDULER_URL=//localhost/SchedulerNode
-else
-  SCHEDULER_URL=$1
-fi
+  SCHEDULER_URL=$3
+  TASK=$1
+  SLEEP=$2
+
 
 workingDir=..
 PROACTIVE=$workingDir/../..
 CLASSPATH=.
 . $workingDir/env.sh
 
-$JAVACMD org.objectweb.proactive.examples.taskscheduler.HelloWorld2 $SCHEDULER_URL
+$JAVACMD org.objectweb.proactive.examples.taskscheduler.HelloWorld2 $TASK $SLEEP $SCHEDULER_URL
 
 echo
 

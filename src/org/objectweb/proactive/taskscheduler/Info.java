@@ -39,7 +39,7 @@ package org.objectweb.proactive.taskscheduler;
  */
 public class Info implements java.io.Serializable{
 	
-	public Info(Status status, String taskID, String userName, String nodeURL, long timeCreated, long timeInsertedInQueue, long timeScheduled, long timeFinished) {
+	public Info(Status status, String taskID, String userName, String nodeURL, long timeCreated, long timeInsertedInQueue, long timeScheduled, long timeFinished,int failures) {
 		this.status = status;
 		this.taskID = taskID;
 		this.userName = userName;
@@ -48,6 +48,7 @@ public class Info implements java.io.Serializable{
 		this.timeInsertedInQueue = timeInsertedInQueue;
 		this.timeScheduled = timeScheduled;
 		this.timeFinished = timeFinished;
+		this.failures=failures;
 	}
 	/**
 	 * priactive no arg constuctor
@@ -67,6 +68,7 @@ private	Status status;
  private long timeInsertedInQueue;
  private long timeScheduled;
  private long timeFinished;
+ private int failures;
 public String getNodeURL() {
 	return nodeURL;
 }
@@ -90,6 +92,9 @@ public long getTimeScheduled() {
 }
 public String getUserName() {
 	return userName;
+}
+public int getFailures() {
+	return failures;
 }
 
 }

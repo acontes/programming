@@ -346,6 +346,7 @@ public class Scheduler implements RunActive, RequestFilter {
                 
                 troubledNodes.add(taskRetrivedFromPolicy.nodeNExecuter.node);
                 taskRetrivedFromPolicy.status=Status.FAILED;
+                taskRetrivedFromPolicy.failures++;
                 policy.failed(taskRetrivedFromPolicy);
                 logger.error("Node " +taskRetrivedFromPolicy.nodeNExecuter.node.getNodeInformation().getURL().toString() +" has problems, will be returned to resource manager, and task will be put at the end of the queue" + e.toString());
             }
@@ -486,7 +487,7 @@ public class Scheduler implements RunActive, RequestFilter {
     	else
     	
     		
-    		return new GenericTypeWrapper<Info>(new Info( Status.NEW,  taskID,  "unknown", "unknown", -1, -1,-1, -1));
+    		return new GenericTypeWrapper<Info>(new Info( Status.NEW,  taskID,  "unknown", "unknown", -1, -1,-1, -1,-1));
     		
     	
     	
@@ -775,6 +776,7 @@ public class Scheduler implements RunActive, RequestFilter {
                     
                     troubledNodes.add(failed.nodeNExecuter.node);
                 	failed.status=Status.FAILED;
+                	failed.failures++;
                     policy.failed(failed);
                     logger.error("Task "+failed.getTaskID()+" has failed and will be returned to policy for rescheduling");
                     
@@ -876,6 +878,11 @@ public class Scheduler implements RunActive, RequestFilter {
     public BooleanWrapper del(String taskID,String userName)
     {
     	InternalTask  toBeKilled=this.getTask(taskID);
+    	
+    	//this means it doesnt exist in the scheduler
+    	if (toBeKilled==null)
+    		return new BooleanWrapper(false);
+    	
     	//if its not (the admin or the correct user decline it
     	if (!(toBeKilled.getUserName().equals(userName)||toBeKilled.getUserName().equals("admin")))
     		return new BooleanWrapper(false);

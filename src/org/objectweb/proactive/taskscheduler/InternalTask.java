@@ -58,7 +58,9 @@ public class InternalTask implements java.io.Serializable{
 	 long timeInsertedInQueue;
 	 long timeScheduled;
 	 long timeFinished;
+	 
 	
+	 int failures;
 	/**
 	 * The parameters passed are private with only getters and no setters available , so once they are created they cannot be changed.
 	 * @param userTask 
@@ -71,6 +73,7 @@ public class InternalTask implements java.io.Serializable{
 		this.taskID = taskID;
 		this.userName = userName;
 		this.timeCreated=System.currentTimeMillis();
+		this.failures=0;
 		
 		 
 		 
@@ -96,7 +99,7 @@ public class InternalTask implements java.io.Serializable{
 		
 		else nodeURL="unknown";
 		
-		return new Info( status,  taskID,  userName, nodeURL, timeCreated, timeInsertedInQueue,timeScheduled, timeFinished);
+		return new Info( status,  taskID,  userName, nodeURL, timeCreated, timeInsertedInQueue,timeScheduled, timeFinished,failures);
 		
 	}
 

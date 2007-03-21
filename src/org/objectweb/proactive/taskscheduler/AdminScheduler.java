@@ -138,7 +138,9 @@ public class AdminScheduler {
      */
     public void shutdown(BooleanWrapper immediate)
     {
+    	
    
+    		
     		this.stop();
     		scheduler.shutdown(immediate);
     		
@@ -153,6 +155,8 @@ public class AdminScheduler {
     			
     			
     			ProActive.getBodyOnThis().terminate();
+    			
+    			
     		}
     		catch(Exception e)
     		{
