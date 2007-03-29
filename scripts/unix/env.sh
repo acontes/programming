@@ -31,7 +31,11 @@ fi
 
 if [ -d $PROACTIVE/classes ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/classes
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Core
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extensions
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extra
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Examples
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/IC2D-old
 fi
 if [ -f $PROACTIVE/ProActive.jar ]
 then
@@ -68,9 +72,9 @@ fi
 
 #--------------------------------------------------
 # jar to set when using RMI/SSH
-if [ -f $PROACTIVE/lib/jsch.jar ]
+if [ -f $PROACTIVE/lib/ganymed-ssh2-build210.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jsch.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ganymed-ssh2-build210.jar
 fi
 
 #--------------------------------------------------

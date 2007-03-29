@@ -22,14 +22,14 @@ SET CLASSPATH=%CLASSPATHEXT%
 SET CLASSPATH=.
 )
 
-IF EXIST "%PROACTIVE%\classes" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes
+IF EXIST "%PROACTIVE%\classes" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes\Core;%PROACTIVE%\classes\Extensions;%PROACTIVE%\classes\Extra;%PROACTIVE%\classes\Examples;%PROACTIVE%\classes\IC2D-old
 IF EXIST "%PROACTIVE%\ProActive.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive.jar
 IF EXIST "%PROACTIVE%\ProActive_examples.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
 IF EXIST "%PROACTIVE%\lib\log4j.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j.jar
 IF EXIST "%PROACTIVE%\lib\bouncycastle.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bouncycastle.jar
 IF EXIST "%PROACTIVE%\lib\xercesImpl.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xercesImpl.jar
 IF EXIST "%PROACTIVE%\lib\components\fractal.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\fractal.jar
-IF EXIST "%PROACTIVE%\lib\jsch.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jsch.jar
+IF EXIST "%PROACTIVE%\lib\ganymed-ssh2-build210.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ganymed-ssh2-build210.jar
 IF EXIST "%PROACTIVE%\ic2d.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ic2d.jar
 IF EXIST "%PROACTIVE%\lib\javassist.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\javassist.jar
 
