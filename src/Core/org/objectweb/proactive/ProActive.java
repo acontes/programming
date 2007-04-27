@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
@@ -103,6 +104,11 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
+
+import groovy.lang.Binding;
+import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
+import groovy.util.ScriptException;
 
 import ibis.rmi.RemoteException;
 
@@ -1575,17 +1581,22 @@ public class ProActive {
     }
 
     private static ProActiveDescriptor getProActiveDescriptor(
-        String xmlDescriptorUrl, VariableContract variableContract,
+        String descriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         //Get lock on XMLProperties global static variable
         org.objectweb.proactive.core.xml.VariableContract.lock.aquire();
         org.objectweb.proactive.core.xml.VariableContract.xmlproperties = variableContract;
 
         //Get the pad
-        ProActiveDescriptor pad;
+        ProActiveDescriptor pad = null;
         try {
-            pad = internalGetProActiveDescriptor(xmlDescriptorUrl,
-                    variableContract, hierarchicalSearch);
+            if (descriptorUrl.endsWith(".xml")) {
+                pad = internalGetProActiveDescriptor(descriptorUrl,
+                        variableContract, hierarchicalSearch);
+            } else if (descriptorUrl.endsWith(".groovy")) {
+                pad = internalGetProActiveDescriptorGroovy(descriptorUrl,
+                        variableContract, hierarchicalSearch);
+            }
         } catch (ProActiveException e) {
             org.objectweb.proactive.core.xml.VariableContract.lock.release();
             throw e;
@@ -1668,6 +1679,79 @@ public class ProActive {
             logger.fatal(
                 "A problem occured when getting the proActiveDescriptor at location \"" +
                 xmlDescriptorUrl + "\".");
+            throw new ProActiveException(e);
+        }
+    }
+
+    /**
+     * return the pad matching with the given url or parse it from the file system
+     * @param groovyDescriptorUrl url of the pad
+     * @param hierarchicalSearch must search in hierarchy ?
+     * @return the pad found or a new pad parsed from xmlDescriptorUrl
+     * @throws ProActiveException
+     * @throws RemoteException
+     */
+    private static ProActiveDescriptor internalGetProActiveDescriptorGroovy(
+        String groovyDescriptorUrl, VariableContract variableContract,
+        boolean hierarchicalSearch) throws ProActiveException {
+        RuntimeFactory.getDefaultRuntime();
+        if (groovyDescriptorUrl.indexOf(':') == -1) {
+            groovyDescriptorUrl = "file:" + groovyDescriptorUrl;
+        }
+        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveDescriptor pad;
+        try {
+            if (!hierarchicalSearch) {
+                //if not hierarchical search, we assume that the descriptor might has been
+                //register with the default jobID
+                pad = part.getDescriptor(groovyDescriptorUrl +
+                        ProActive.getJobId(), hierarchicalSearch);
+            } else {
+                pad = part.getDescriptor(groovyDescriptorUrl, hierarchicalSearch);
+            }
+        } catch (Exception e) {
+            throw new ProActiveException(e);
+        }
+
+        // if pad found, returns it
+        if (pad != null) {
+            return pad;
+        }
+
+        // else parses it
+        try {
+            if (logger.isInfoEnabled()) {
+                logger.info(
+                    "************* Reading groovy deployment descriptor: " +
+                    groovyDescriptorUrl + " ********************");
+            }
+
+            int s1 = groovyDescriptorUrl.indexOf(':');
+            int s2 = groovyDescriptorUrl.lastIndexOf(File.separatorChar);
+            String dirPath = groovyDescriptorUrl.substring(s1 + 1, s2 + 1);
+            String scriptName = groovyDescriptorUrl.substring(s2 + 1,
+                    groovyDescriptorUrl.length());
+
+            String[] roots = new String[] { dirPath };
+            GroovyScriptEngine gse = new GroovyScriptEngine(roots);
+            Binding binding = new Binding();
+            // some initial setup
+            //            binding.setVariable("varname", value);
+            gse.run(scriptName, binding);
+            pad = (ProActiveDescriptor) binding.getVariable("returned_pad");
+
+            return pad;
+        } catch (java.io.IOException e) {
+            //e.printStackTrace(); hides errors when testing parameters in xml descriptors
+            logger.fatal(
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                groovyDescriptorUrl + "\".");
+            throw new ProActiveException(e);
+        } catch (ResourceException e) {
+            logger.fatal("");
+            throw new ProActiveException(e);
+        } catch (ScriptException e) {
+            // TODO Auto-generated catch block
             throw new ProActiveException(e);
         }
     }
