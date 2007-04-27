@@ -85,5 +85,9 @@
 	<classpathentry kind="lib" path="lib/scilab/javasci.jar"/>
 	<classpathentry kind="lib" path="dev/lib/junit-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/home/glaurent/eclipse/plugins/org.codehaus.groovy.eclipse_1.0.0.20070118/lib/commons-io-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="/home/glaurent/eclipse/plugins/org.codehaus.groovy.eclipse_1.0.0.20070118/lib/commons-lang-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="bin-groovy"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
