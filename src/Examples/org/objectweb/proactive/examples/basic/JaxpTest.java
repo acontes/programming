@@ -27,7 +27,6 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
-import org.objectweb.proactive.core.descriptor.xml.ProcessReferenceHandler;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
@@ -42,8 +41,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import sun.security.provider.PolicyParser.GrantEntry;
 
 public class JaxpTest implements ProActiveDescriptorConstants {
 
@@ -62,9 +59,9 @@ public class JaxpTest implements ProActiveDescriptorConstants {
 
     public static final String LOOKUP = "//pa:lookup";
 
-    public static final String JVM_CREATION = "//pa:creation/pa:processReference/@refid";
+    public static final String JVM_CREATION = "//pa:creation/pa:processReference";
 
-    public static final String JVM_ACQUISITION = "//pa:acquisition/pa:serviceReference/@refid";
+    public static final String JVM_ACQUISITION = "//pa:acquisition/pa:serviceReference";
 
     // infrastructure
     public static final String INFRASTRUCTURE = "//pa:infrastructure";
@@ -99,7 +96,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
     public void parserTest(String filename) {
         DocumentBuilderFactory domFactory = DocumentBuilderFactory
                 .newInstance();
-        domFactory.setNamespaceAware(true); // never forget this!
+        domFactory.setNamespaceAware(true);
         DocumentBuilder builder;
         try {
 
@@ -117,6 +114,8 @@ public class JaxpTest implements ProActiveDescriptorConstants {
 
             handleDeployment();
 
+            handleInfrastructure();
+            
         } catch (ParserConfigurationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -129,12 +128,17 @@ public class JaxpTest implements ProActiveDescriptorConstants {
         } catch (XPathExpressionException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
     private void handleInfrastructure() throws XPathExpressionException,
             ProActiveException, SAXException {
-        XPathExpression infrastructureContext = xpath.compile(INFRASTRUCTURE);
+        XPathExpression infrastructureExpr = xpath.compile(INFRASTRUCTURE);
+        NodeList t = (NodeList) infrastructureExpr.evaluate(document, XPathConstants.NODESET);
+        Node infrastructureContext = t.item(0);
         expr = xpath.compile(PROCESS_DEFINITIONS);
         result = expr.evaluate(infrastructureContext, XPathConstants.NODESET);
         nodes = (NodeList) result;
@@ -223,7 +227,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
     protected class ProcessExtractor {
         
         public ProcessExtractor(ExternalProcess targetProcess, Node node,
-                XPathExpression context) throws XPathExpressionException,
+                Node context) throws XPathExpressionException,
                 SAXException {
 
             Node namedItem = node.getAttributes().getNamedItem("closeStream");
@@ -357,7 +361,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
 
     protected class RshProcessExtractor extends ProcessExtractor {
 
-        public RshProcessExtractor(ExternalProcess targetProcess, Node node, XPathExpression context) throws XPathExpressionException, SAXException {
+        public RshProcessExtractor(ExternalProcess targetProcess, Node node, Node context) throws XPathExpressionException, SAXException {
             super(targetProcess, node, context);
         }
         
@@ -365,7 +369,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
 
     protected class MapRshProcessExtractor extends RshProcessExtractor {
 
-        public MapRshProcessExtractor(ExternalProcess targetProcess, Node node, XPathExpression context) throws XPathExpressionException, SAXException {
+        public MapRshProcessExtractor(ExternalProcess targetProcess, Node node, Node context) throws XPathExpressionException, SAXException {
             super(targetProcess, node, context);
             
             Node namedItem = node.getAttributes().getNamedItem("parallelize");
@@ -388,7 +392,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
     
     protected class SshProcessExtractor extends ProcessExtractor {
         
-        public SshProcessExtractor(ExternalProcess targetProcess, Node node, XPathExpression context) throws XPathExpressionException, SAXException {
+        public SshProcessExtractor(ExternalProcess targetProcess, Node node, Node context) throws XPathExpressionException, SAXException {
             super(targetProcess, node, context);
         }
         
@@ -396,7 +400,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
 
     protected class RloginProcessExtractor extends ProcessExtractor {
 
-        public RloginProcessExtractor(ExternalProcess targetProcess, Node node, XPathExpression context) throws XPathExpressionException, SAXException {
+        public RloginProcessExtractor(ExternalProcess targetProcess, Node node, Node context) throws XPathExpressionException, SAXException {
             super(targetProcess, node, context);
         }
         
@@ -404,7 +408,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
     
     protected class BSubProcessExtractor extends ProcessExtractor {
 
-        public BSubProcessExtractor(ExternalProcess targetProcess, Node node, XPathExpression context) throws XPathExpressionException, SAXException {
+        public BSubProcessExtractor(ExternalProcess targetProcess, Node node, Node context) throws XPathExpressionException, SAXException {
             super(targetProcess, node, context);
             
             Node namedItem = node.getAttributes().getNamedItem("interactive");
@@ -458,7 +462,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
     
     protected class GlobusProcessExtractor extends ProcessExtractor {
 
-        public GlobusProcessExtractor(ExternalProcess targetProcess, Node node, XPathExpression context) throws XPathExpressionException, SAXException {
+        public GlobusProcessExtractor(ExternalProcess targetProcess, Node node, Node context) throws XPathExpressionException, SAXException {
             super(targetProcess, node, context);
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
@@ -494,7 +498,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
     
     protected class GliteProcessExtractor extends ProcessExtractor {
 
-        public GliteProcessExtractor(ExternalProcess targetProcess, Node node, XPathExpression context) throws XPathExpressionException, SAXException {
+        public GliteProcessExtractor(ExternalProcess targetProcess, Node node, Node context) throws XPathExpressionException, SAXException {
             super(targetProcess, node, context);
             
             GLiteProcess gliteProcess = ((GLiteProcess) targetProcess);
@@ -629,7 +633,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
 
     protected class UnicoreProcessExtractor extends ProcessExtractor {
 
-        public UnicoreProcessExtractor(ExternalProcess targetProcess, Node node, XPathExpression context) throws XPathExpressionException, SAXException {
+        public UnicoreProcessExtractor(ExternalProcess targetProcess, Node node, Node context) throws XPathExpressionException, SAXException {
             super(targetProcess, node, context);
             UnicoreProcess unicoreProcess = ((UnicoreProcess) targetProcess);
             
@@ -871,9 +875,12 @@ public class JaxpTest implements ProActiveDescriptorConstants {
         //
         // register
         //
-        XPathExpression deploymentContext = xpath.compile(DEPLOYMENT);
+        XPathExpression deploymentExpr = xpath.compile(DEPLOYMENT);
+        NodeList deploymentNodes = (NodeList) deploymentExpr.evaluate(document, XPathConstants.NODESET);
+        
         expr = xpath.compile(REGISTER);
-        result = expr.evaluate(deploymentContext, XPathConstants.NODESET);
+        Node deploymentContextItem = deploymentNodes.item(0);
+        result = expr.evaluate(deploymentContextItem, XPathConstants.NODESET);
         nodes = (NodeList) result;
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
@@ -898,7 +905,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
         // collect the mappings in a hashmap
         //
         expr = xpath.compile(VM_MAPPING);
-        result = expr.evaluate(deploymentContext, XPathConstants.NODESET);
+        result = expr.evaluate(deploymentContextItem, XPathConstants.NODESET);
         nodes = (NodeList) result;
 
         HashMap<String, ArrayList<String>> vmMapping = new HashMap<String, ArrayList<String>>();
@@ -931,7 +938,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
         // current vm mappings
         //
         expr = xpath.compile(CURRENT_VM_MAPPING);
-        result = expr.evaluate(deploymentContext, XPathConstants.NODESET);
+        result = expr.evaluate(deploymentContextItem, XPathConstants.NODESET);
         nodes = (NodeList) result;
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
@@ -947,7 +954,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
         // vm lookup
         //
         expr = xpath.compile(LOOKUP);
-        result = expr.evaluate(deploymentContext, XPathConstants.NODESET);
+        result = expr.evaluate(deploymentContextItem, XPathConstants.NODESET);
         nodes = (NodeList) result;
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
@@ -979,12 +986,11 @@ public class JaxpTest implements ProActiveDescriptorConstants {
         // vm creation and acquisition
         //
         expr = xpath.compile(JVM_CREATION);
-        result = expr.evaluate(deploymentContext, XPathConstants.NODESET);
+        result = expr.evaluate(deploymentContextItem, XPathConstants.NODESET);
         nodes = (NodeList) result;
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
-            Node jvmParent = node.getParentNode().getParentNode()
-                    .getParentNode();
+            Node jvmParent = node.getParentNode().getParentNode();
             String jvmName = jvmParent.getAttributes().getNamedItem("name")
                     .getNodeValue();
             Node t = jvmParent.getAttributes().getNamedItem("askedNodes");
@@ -992,16 +998,15 @@ public class JaxpTest implements ProActiveDescriptorConstants {
                     .createVirtualMachine(jvmName);
             if (checkNonEmpty(t))
                 currentVM.setNbNodes(t.getNodeValue());
-            proActiveDescriptor.registerProcess(currentVM, node.getNodeValue());
+            proActiveDescriptor.registerProcess(currentVM, node.getAttributes().getNamedItem("refid").getNodeValue());
         }
 
         expr = xpath.compile(JVM_ACQUISITION);
-        result = expr.evaluate(deploymentContext, XPathConstants.NODESET);
+        result = expr.evaluate(deploymentContextItem, XPathConstants.NODESET);
         nodes = (NodeList) result;
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
-            Node jvmParent = node.getParentNode().getParentNode()
-                    .getParentNode();
+            Node jvmParent = node.getParentNode().getParentNode();
             String jvmName = jvmParent.getAttributes().getNamedItem("name")
                     .getNodeValue();
             Node t = jvmParent.getAttributes().getNamedItem("askedNodes");
@@ -1009,7 +1014,7 @@ public class JaxpTest implements ProActiveDescriptorConstants {
                     .createVirtualMachine(jvmName);
             if (checkNonEmpty(t))
                 currentVM.setNbNodes(t.getNodeValue());
-            proActiveDescriptor.registerService(currentVM, node.getNodeValue());
+            proActiveDescriptor.registerService(currentVM, node.getAttributes().getNamedItem("refid").getNodeValue());
         }
     }
 
