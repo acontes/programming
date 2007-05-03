@@ -30,6 +30,12 @@
  */
 package org.objectweb.proactive;
 
+import groovy.lang.Binding;
+import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
+import groovy.util.ScriptException;
+import ibis.rmi.RemoteException;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -104,13 +110,6 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
-
-import groovy.lang.Binding;
-import groovy.util.GroovyScriptEngine;
-import groovy.util.ResourceException;
-import groovy.util.ScriptException;
-
-import ibis.rmi.RemoteException;
 
 
 /**
@@ -1629,6 +1628,63 @@ public class ProActive {
      * @throws RemoteException
      */
     private static ProActiveDescriptor internalGetProActiveDescriptor(
+            String xmlDescriptorUrl, VariableContract variableContract,
+            boolean hierarchicalSearch) throws ProActiveException {
+
+        RuntimeFactory.getDefaultRuntime();
+        if (xmlDescriptorUrl.indexOf(':') == -1) {
+            xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
+        }
+        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveDescriptor pad;
+        try {
+            if (!hierarchicalSearch) {
+                //if not hierarchical search, we assume that the descriptor might has been
+                //register with the default jobID
+                pad = part.getDescriptor(xmlDescriptorUrl +
+                        ProActive.getJobId(), hierarchicalSearch);
+            } else {
+                pad = part.getDescriptor(xmlDescriptorUrl, hierarchicalSearch);
+            }
+        } catch (Exception e) {
+            throw new ProActiveException(e);
+        }
+
+        // if pad found, returns it
+        if (pad != null) {
+            return pad;
+        }
+
+        // else parses it
+        try {
+            if (logger.isInfoEnabled()) {
+                logger.info("************* Reading deployment descriptor: " +
+                    xmlDescriptorUrl + " ********************");
+            }
+            JaxpDescriptorParser parser = new JaxpDescriptorParser(xmlDescriptorUrl);
+            parser.parse();
+            pad = parser.getProActiveDescriptor();
+            part.registerDescriptor(pad.getUrl(), pad);
+            return pad;
+        } catch (org.xml.sax.SAXException e) {
+            //e.printStackTrace(); hides errors when testing parameters in xml descriptors
+            logger.fatal(
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\".");
+            throw new ProActiveException(
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\"." + e);
+        } catch (java.io.IOException e) {
+            //e.printStackTrace(); hides errors when testing parameters in xml descriptors
+            logger.fatal(
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\".");
+            throw new ProActiveException(e);
+        }
+        
+    }
+
+    private static ProActiveDescriptor internalGetProActiveDescriptor_orig(
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
