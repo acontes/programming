@@ -115,9 +115,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node nodeName = attributes.getNamedItem("name"), nodeProperty = attributes
                     .getNamedItem("property");
 
-            System.out.println("Virtual node definition : "
-                    + nodeName.getNodeValue() + " - "
-                    + nodeProperty.getNodeValue());
+//            System.out.println("Virtual node definition : "
+//                    + nodeName.getNodeValue() + " - "
+//                    + nodeProperty.getNodeValue());
 
             VirtualNodeImpl vn = (VirtualNodeImpl) proActiveDescriptor
                     .createVirtualNode(nodeName.getNodeValue(), false);
@@ -260,8 +260,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     "virtualNode").getNodeValue();
             VirtualNode vn = proActiveDescriptor.createVirtualNode(
                     virtualNodeName, false);
-            vn.createNodeOnCurrentJvm(node.getAttributes().getNamedItem(
-                    "protocol").getNodeValue());
+            Node protocolAttr = node.getAttributes().getNamedItem("protocol");
+            if (checkNonEmpty(protocolAttr))
+                vn.createNodeOnCurrentJvm(protocolAttr.getNodeValue());
         }
 
         // vm lookup
@@ -471,7 +472,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     envVars.add(name + "=" + value);
             }
 
-            String[] env = (String[]) envVars.toArray();
+            String[] env = new String[envVars.size()]; 
+            envVars.toArray(env);
             targetProcess.setEnvironment(env);
 
             NodeList childNodes = node.getChildNodes();
@@ -1017,12 +1019,16 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
         for (int i = 0; i < childNodes.getLength(); ++i) {
             Node subNode = childNodes.item(i);
-            String parameter = subNode.getAttributes().getNamedItem("value")
-                    .getNodeValue();
+            if (subNode.getAttributes() == null)
+                continue;
+            Node namedItem = subNode.getAttributes().getNamedItem("value");
+            if (checkNonEmpty(namedItem)) {
+                String parameter = namedItem.getNodeValue();
 
-            if (i != 0)
-                sb.append(' ');
-            sb.append(parameter);
+                if (i != 0)
+                    sb.append(' ');
+                sb.append(parameter);
+            }
         }
 
         return sb.toString().trim();
