@@ -261,8 +261,13 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             VirtualNode vn = proActiveDescriptor.createVirtualNode(
                     virtualNodeName, false);
             Node protocolAttr = node.getAttributes().getNamedItem("protocol");
+            String protocol;
             if (checkNonEmpty(protocolAttr))
-                vn.createNodeOnCurrentJvm(protocolAttr.getNodeValue());
+                protocol = protocolAttr.getNodeValue();
+            else
+                protocol = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+            
+            vn.createNodeOnCurrentJvm(protocol);
         }
 
         // vm lookup
@@ -385,7 +390,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                                 + path);
                     } else if (child.getNodeName().equals(JVMPARAMETERS_TAG)) {
                         String params = getParameters(child);
-                        jvmProcess.setParameters(params);
+                        jvmProcess.setJvmOptions(params);
                     } else if (child.getNodeName().equals(EXTENDED_JVM_TAG)) {
                         Node overwriteParamsArg = child.getAttributes()
                                 .getNamedItem("overwriteParameters");

@@ -1619,6 +1619,13 @@ public class ProActive {
         //return getProactiveDescriptor(xmlDescriptorUrl, false);
     }
 
+    private static ProActiveDescriptor internalGetProActiveDescriptor(
+            String xmlDescriptorUrl, VariableContract variableContract,
+            boolean hierarchicalSearch) throws ProActiveException {
+//        return internalGetProActiveDescriptor_old(xmlDescriptorUrl, variableContract, hierarchicalSearch);
+        return internalGetProActiveDescriptor_new(xmlDescriptorUrl, variableContract, hierarchicalSearch);
+    }
+    
     /**
      * return the pad matching with the given url or parse it from the file system
      * @param xmlDescriptorUrl url of the pad
@@ -1627,7 +1634,7 @@ public class ProActive {
      * @throws ProActiveException
      * @throws RemoteException
      */
-    private static ProActiveDescriptor internalGetProActiveDescriptor(
+    private static ProActiveDescriptor internalGetProActiveDescriptor_new(
             String xmlDescriptorUrl, VariableContract variableContract,
             boolean hierarchicalSearch) throws ProActiveException {
 
@@ -1684,7 +1691,7 @@ public class ProActive {
         
     }
 
-    private static ProActiveDescriptor internalGetProActiveDescriptor_orig(
+    private static ProActiveDescriptor internalGetProActiveDescriptor_old(
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
