@@ -1668,7 +1668,7 @@ public class ProActive {
                 logger.info("************* Reading deployment descriptor: " +
                     xmlDescriptorUrl + " ********************");
             }
-            JaxpDescriptorParser parser = new JaxpDescriptorParser(xmlDescriptorUrl);
+            JaxpDescriptorParser parser = new JaxpDescriptorParser(xmlDescriptorUrl, variableContract);
             parser.parse();
             pad = parser.getProActiveDescriptor();
             part.registerDescriptor(pad.getUrl(), pad);
