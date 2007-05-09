@@ -179,13 +179,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             String varName  = varNameItem.getNodeValue();
             
             Node varValueItem = node.getAttributes().getNamedItem("value");
-            if (!checkNonEmptyNode(varValueItem)) {
-                throw new org.xml.sax.SAXException("Variable has no value");
-            }
-
-            String varValue = varValueItem.getNodeValue();
+            String varValue = checkNonEmptyNode(varValueItem) ? varValueItem.getNodeValue() : "";
             
-            variableContract.setDescriptorVariable(varName, varValue, varContractType);            
+            variableContract.setDescriptorVariable(varName, varValue, varContractType);
         }    
         
     }
