@@ -30,65 +30,71 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.finder;
 
-import ibis.rmi.registry.LocateRegistry;
-import ibis.rmi.registry.Registry;
-
 import java.net.URI;
+import java.rmi.ConnectException;
+import java.rmi.ConnectIOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 
-public class IbisHostRTFinder implements HostRTFinder {
+public class RemoteObjectHostRTFinder implements HostRTFinder{
+
+	//
+	// -- PUBLIC METHODS -----------------------------------------------
+	//
 
 	public List<ProActiveRuntime> findPARuntime(HostObject host) {
-		
+
 		Console console = Console.getInstance(Activator.CONSOLE_NAME);
-		
-		console.log("Exploring "+host+" with Ibis on port "+host.getPort());
+
+		console.log("Exploring "+host+"  on port "+host.getPort());
 		/* List of ProActive runtime */
 		List<ProActiveRuntime> runtimes = new ArrayList<ProActiveRuntime>();
-		try {
-			/* Hook the registry */
-			Registry registry = LocateRegistry.getRegistry(host.getHostName(),host.getPort());
-			/* Gets a snapshot of the names bounds in the 'registry' */
-			String[] names = registry.list();
 
-			/* Searchs all ProActve Runtimes */
-			for (int i = 0; i < names.length; ++i) {
-				String name = names[i];
-				if (name.indexOf("PA_JVM") != -1) {
-//					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
-//					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
-//					runtimes.add(proActiveRuntime);
-					
-					URI url = new URI(host.getProtocol(),null,host.getHostName(),host.getPort(),"/"+name,null,null);
-					System.out.println("RMIHostRTFinder.findPARuntime()  "  + url);
+		
+		URI [] uris = null;
+		try {
+			
+			 URI target = URIBuilder.buildURI(host.getHostName(), null, host.getProtocol(), host.getPort());
+			 uris = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).list(target);
+
+			if (uris != null ) {
+			 /* Searchs all ProActive Runtimes */
+				for (int i = 0; i < uris.length; ++i) {
+			
+					URI url = uris[i];
+			
 					RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);  
-					
-					System.out.println("RMIHostRTFinder.findPARuntime()  "  + ro);
-					
+							
 					Object stub = ro.getObjectProxy();
-					
-					System.out.println("RMIHostRTFinder.findPARuntime()  "  + stub);
+							
 					if (stub instanceof ProActiveRuntime) {
 						runtimes.add((ProActiveRuntime ) stub);
 					}
+							
+				}	
 					
-					
-				}
 			}
+		} catch (Exception e) {
+			if(e instanceof ConnectException || e instanceof ConnectIOException) {
+				console.debug(e);
+			}
+			else
+				console.logException(e);
+			return runtimes;
 		}
-		catch (Exception e) {
-			console.logException(e);
-			e.printStackTrace();
-		}
+
+		
 		return runtimes;
 	}
-
 }
