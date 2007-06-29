@@ -26,4 +26,16 @@ public class ResourceProviderParams {
     protected Set<FileTransferBlock> getFtBlocks() {
         return ftBlocks;
     }
+
+    protected void setFtBlocks(Set<FileTransferBlock> ftBlocks) {
+        this.ftBlocks = ftBlocks;
+    }
+
+    protected void setGCMDescriptor(File descriptor) {
+        GCMDescriptor = descriptor;
+    }
+
+    protected void setId(String id) {
+        this.id = id;
+    }
 }
