@@ -22,7 +22,7 @@ public interface GCMApplicationParser {
      *
      * @return all the declared Resources Providers as ResourceProviderParams
      */
-    public Set<ResourceProviderParams> getResourceProviders();
+    public Set<GCMDeploymentDescriptorParams> getResourceProviders();
 
     /**
      * Returns all the Virtual Node

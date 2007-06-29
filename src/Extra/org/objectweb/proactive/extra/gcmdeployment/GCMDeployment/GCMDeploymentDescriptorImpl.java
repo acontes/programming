@@ -11,7 +11,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         Set<FileTransferBlock> ftBlocks) {
     }
 
-    public void start() {
+    public void start(CommandBuilder commandBuilder) {
         // TODO Auto-generated method stub
     }
 }

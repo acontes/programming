@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Set;
 
 
-public class ResourceProviderParams {
+public class GCMDeploymentDescriptorParams {
 
     /** The GCM Descriptor describing the resources to be used */
     private File GCMDescriptor;

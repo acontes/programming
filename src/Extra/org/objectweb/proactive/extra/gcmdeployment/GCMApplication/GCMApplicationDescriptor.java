@@ -38,4 +38,14 @@ public interface GCMApplicationDescriptor {
      * @return All the Virtual Nodes declared inside the GCM Application Descriptor.
      */
     public Map<String, VirtualNode> getVirtualNodes();
+
+    /**
+     * Kills all Nodes and JVMs(local or remote) created when activating the GCM Application Descriptor
+     * @param softly if false, all JVMs created when activating the descriptor are killed abruptely
+     * if true a JVM that originates the creation of  a rmi registry waits until registry is empty before
+     * dying. To be more precise a thread is created to ask periodically the registry if objects are still
+     * registered.
+     * @throws ProActiveException if a problem occurs when terminating all jvms
+     */
+    public void kill();
 }
