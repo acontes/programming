@@ -38,20 +38,13 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
             throw new IllegalArgumentException(e);
         }
 
-        // 1. Build ResourceProviderParams
-        Set<GCMDeploymentDescriptorParams> gddps;
-        gddps = gadParser.getResourceProviders();
+        // 1. Load all GCM Deployment Descriptor
+        Set<GCMDeploymentDescriptor> gdds;
+        gdds = gadParser.getResourceProviders();
 
         // 2. Get Virtual Node and Command Builder
         virtualNodes = gadParser.getVirtualNodes();
         CommandBuilder commandBuilder = gadParser.getCommandBuilder();
-
-        // 3. Load all GCM Deployment Descriptors
-        Set<GCMDeploymentDescriptor> gdds = new HashSet<GCMDeploymentDescriptor>();
-        for (GCMDeploymentDescriptorParams gddp : gddps) {
-            gdds.add(new GCMDeploymentDescriptorImpl(gddp.getGCMDescriptor(),
-                    gddp.getFtBlocks()));
-        }
 
         // 4. Select the GCM Deployment Descriptors to be used
         gdds = selectGCMD(virtualNodes, gdds);
