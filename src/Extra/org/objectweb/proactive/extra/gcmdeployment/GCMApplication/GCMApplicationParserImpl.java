@@ -20,7 +20,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -147,7 +147,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         return null;
     }
 
-    public Map<String, VirtualNode> getVirtualNodes() {
+    public Map<String, VirtualNodeInternal> getVirtualNodes() {
         // TODO Auto-generated method stub
         return null;
     }

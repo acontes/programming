@@ -1,4 +1,4 @@
 package org.objectweb.proactive.extra.gcmdeployment;
 
-public interface VirtualNodeInternal {
+public interface VirtualNodeInternal extends VirtualNode {
 }

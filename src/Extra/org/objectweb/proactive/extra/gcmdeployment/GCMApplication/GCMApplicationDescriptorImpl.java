@@ -10,6 +10,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
@@ -21,7 +22,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
     private GCMApplicationParser gadParser = null;
 
     /** All the Virtual Nodes defined in this application */
-    private Map<String, VirtualNode> virtualNodes = null;
+    private Map<String, VirtualNodeInternal> virtualNodes = null;
 
     public GCMApplicationDescriptorImpl(String filename)
         throws IllegalArgumentException {
@@ -41,19 +42,21 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         Set<GCMDeploymentDescriptorParams> gddps;
         gddps = gadParser.getResourceProviders();
 
-        // 2. Parse "application" tag by using a custom Parser
+        // 2. Get Virtual Node and Command Builder
         virtualNodes = gadParser.getVirtualNodes();
         CommandBuilder commandBuilder = gadParser.getCommandBuilder();
 
-        // 3. Call GCMDParser for each GCM Deployment Descriptor
+        // 3. Load all GCM Deployment Descriptors
         Set<GCMDeploymentDescriptor> gdds = new HashSet<GCMDeploymentDescriptor>();
         for (GCMDeploymentDescriptorParams gddp : gddps) {
             gdds.add(new GCMDeploymentDescriptorImpl(gddp.getGCMDescriptor(),
                     gddp.getFtBlocks()));
         }
 
-        // 4. Start Resource Providers
+        // 4. Select the GCM Deployment Descriptors to be used
         gdds = selectGCMD(virtualNodes, gdds);
+
+        // 5. Start the deployment
         for (GCMDeploymentDescriptor gdd : gdds) {
             gdd.start(commandBuilder);
         }
@@ -104,9 +107,17 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
      * @return A
      */
     static private Set<GCMDeploymentDescriptor> selectGCMD(
-        Map<String, VirtualNode> vns, Set<GCMDeploymentDescriptor> gdds) {
+        Map<String, VirtualNodeInternal> vns, Set<GCMDeploymentDescriptor> gdds) {
         // TODO: Implement this method
         return gdds;
+    }
+
+    private long getRequiredCapacity() {
+        int cap = 0;
+        for (VirtualNodeInternal vn : virtualNodes.values()) {
+        }
+
+        return cap;
     }
 
     public VirtualNode getVirtualNode(String vnName)
@@ -119,7 +130,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         return ret;
     }
 
-    public Map<String, VirtualNode> getVirtualNodes() {
+    public Map<String, ?extends VirtualNode> getVirtualNodes() {
         return virtualNodes;
     }
 

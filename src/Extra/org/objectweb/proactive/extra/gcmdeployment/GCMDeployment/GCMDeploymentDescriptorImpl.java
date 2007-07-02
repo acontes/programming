@@ -14,4 +14,9 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     public void start(CommandBuilder commandBuilder) {
         // TODO Auto-generated method stub
     }
+
+    public long getMaxCapacity() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 }

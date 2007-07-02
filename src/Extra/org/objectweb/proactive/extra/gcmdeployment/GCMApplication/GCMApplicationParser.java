@@ -1,11 +1,10 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 
 
 /**
@@ -29,7 +28,7 @@ public interface GCMApplicationParser {
      *
      * @return all the declared Virtual Nodes
      */
-    public Map<String, VirtualNode> getVirtualNodes();
+    public Map<String, VirtualNodeInternal> getVirtualNodes();
 
     /**
      * Returns the Command Builder

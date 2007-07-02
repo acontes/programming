@@ -37,7 +37,7 @@ public interface GCMApplicationDescriptor {
      *
      * @return All the Virtual Nodes declared inside the GCM Application Descriptor.
      */
-    public Map<String, VirtualNode> getVirtualNodes();
+    public Map<String, ?extends VirtualNode> getVirtualNodes();
 
     /**
      * Kills all Nodes and JVMs(local or remote) created when activating the GCM Application Descriptor
