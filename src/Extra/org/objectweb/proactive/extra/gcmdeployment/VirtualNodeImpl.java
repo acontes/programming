@@ -10,27 +10,27 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     private String id;
     private List<GCMDeploymentDescriptor> providers;
 
-    protected long getRequiredCapacity() {
+    public long getRequiredCapacity() {
         return requiredCapacity;
     }
 
-    protected void setRequiredCapacity(long requiredCapacity) {
+    public void setRequiredCapacity(long requiredCapacity) {
         this.requiredCapacity = requiredCapacity;
     }
 
-    protected String getId() {
+    public String getId() {
         return id;
     }
 
-    protected void setId(String id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    protected List<GCMDeploymentDescriptor> getProviders() {
+    public List<GCMDeploymentDescriptor> getProviders() {
         return providers;
     }
 
-    protected void setProviders(List<GCMDeploymentDescriptor> providers) {
+    public void setProviders(List<GCMDeploymentDescriptor> providers) {
         this.providers = providers;
     }
 }

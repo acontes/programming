@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 
 
@@ -21,7 +22,7 @@ public interface GCMApplicationParser {
      *
      * @return all the declared Resources Providers as ResourceProviderParams
      */
-    public Set<GCMDeploymentDescriptorParams> getResourceProviders();
+    public Set<GCMDeploymentDescriptor> getResourceProviders();
 
     /**
      * Returns all the Virtual Node

@@ -15,15 +15,15 @@ public class GCMDeploymentDescriptorParams {
     /** Set of file transfer to be performed by the Resource provider */
     private Set<FileTransferBlock> ftBlocks;
 
-    protected File getGCMDescriptor() {
+    public File getGCMDescriptor() {
         return GCMDescriptor;
     }
 
-    protected String getId() {
+    public String getId() {
         return id;
     }
 
-    protected Set<FileTransferBlock> getFtBlocks() {
+    public Set<FileTransferBlock> getFtBlocks() {
         return ftBlocks;
     }
 
