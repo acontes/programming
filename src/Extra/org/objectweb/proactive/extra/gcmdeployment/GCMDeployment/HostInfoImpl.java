@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-
-
 public class HostInfoImpl implements HostInfo {
     private String username;
     private String homeDirectory;
