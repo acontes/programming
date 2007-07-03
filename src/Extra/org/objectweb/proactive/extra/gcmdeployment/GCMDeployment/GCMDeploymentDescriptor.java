@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
+import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
+
+
 public interface GCMDeploymentDescriptor {
 
     /** A magic number to indicate that the maximum capacity of

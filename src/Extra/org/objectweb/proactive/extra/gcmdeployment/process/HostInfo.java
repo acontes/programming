@@ -1,8 +1,9 @@
-package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
+package org.objectweb.proactive.extra.gcmdeployment.process;
 
 import java.util.Set;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
 
 
 /**

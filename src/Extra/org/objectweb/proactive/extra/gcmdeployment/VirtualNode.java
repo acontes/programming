@@ -12,4 +12,18 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public interface VirtualNode {
+
+    /**
+     * A magic number to indicate that a Virtual Node is asking
+     * for every available nodes
+     */
+    static final public long MAX_CAPACITY = -2;
+
+    /**
+     * Returns the capacity asked by this Virtual Node
+     *
+     * @return the capacity asked by this Virtual Node. If max is specified
+     * in the GCM Application Descriptor then MAX_CAPACITY is returned.
+     */
+    public long getRequiredCapacity();
 }

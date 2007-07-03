@@ -2,15 +2,13 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
@@ -108,6 +106,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
     private long getRequiredCapacity() {
         int cap = 0;
         for (VirtualNodeInternal vn : virtualNodes.values()) {
+            cap += vn.getRequiredCapacity();
         }
 
         return cap;

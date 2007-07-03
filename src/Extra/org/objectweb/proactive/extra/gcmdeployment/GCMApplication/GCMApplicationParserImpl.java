@@ -1,6 +1,5 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
-import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,11 +21,11 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

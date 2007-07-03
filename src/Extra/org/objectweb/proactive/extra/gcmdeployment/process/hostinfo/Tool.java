@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
+package org.objectweb.proactive.extra.gcmdeployment.process.hostinfo;
 
 public class Tool {
     private String id;

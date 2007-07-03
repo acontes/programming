@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Set;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
