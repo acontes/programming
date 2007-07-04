@@ -24,6 +24,7 @@ import javax.xml.xpath.XPathFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -109,8 +110,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 // get Id
                 //
                 GCMDeploymentDescriptorParams resourceProviderParams = new GCMDeploymentDescriptorParams();
-                String id = node.getAttributes().getNamedItem("id")
-                                .getNodeValue();
+                String id = getAttributeValue(node, "id");
                 resourceProviderParams.setId(id);
 
                 // get GCMDescriptor file
@@ -118,9 +118,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 Node fileNode = (Node) xpath.evaluate("pa:file", node,
                         XPathConstants.NODE);
                 if (fileNode != null) {
-                    String nodeValue = fileNode.getAttributes()
-                                               .getNamedItem("path")
-                                               .getNodeValue();
+                    String nodeValue = getAttributeValue(fileNode, "path");
                     resourceProviderParams.setGCMDescriptor(new File(nodeValue));
                 }
 
@@ -150,12 +148,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     protected FileTransferBlock parseFileTransferNode(Node fileTransferNode) {
         FileTransferBlock fileTransferBlock = new FileTransferBlock();
-        String source = fileTransferNode.getAttributes().getNamedItem("source")
-                                        .getNodeValue();
+        String source = getAttributeValue(fileTransferNode, "source");
         fileTransferBlock.setSource(source);
-        String destination = fileTransferNode.getAttributes()
-                                             .getNamedItem("destination")
-                                             .getNodeValue();
+        String destination = getAttributeValue(fileTransferNode, "destination");
         fileTransferBlock.setDestination(destination);
 
         return fileTransferBlock;
@@ -164,6 +159,126 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     public CommandBuilder getCommandBuilder() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    protected void parseApplicationNode(Node appNode)
+        throws XPathExpressionException {
+        NodeList resourceProviderNodes = (NodeList) xpath.evaluate("pa:resourceProvider",
+                appNode, XPathConstants.NODESET);
+
+        for (int i = 0; i < resourceProviderNodes.getLength(); ++i) {
+            Node rpNode = resourceProviderNodes.item(i);
+            getAttributeValue(rpNode, "refid");
+            // TODO - do something with refid
+        }
+
+        Node commandNode = (Node) xpath.evaluate("pa:command", appNode,
+                XPathConstants.NODE);
+
+        String relPath = getAttributeValue(commandNode, "relpath");
+
+        // TODO
+        NodeList argNodes = (NodeList) xpath.evaluate("pa:arg", commandNode,
+                XPathConstants.NODESET);
+        for (int i = 0; i < argNodes.getLength(); ++i) {
+            Node argNode = argNodes.item(i);
+            String argVal = argNode.getNodeValue();
+
+            // TODO
+        }
+
+        NodeList fileTransferNodes = (NodeList) xpath.evaluate("pa:filetransfer",
+                appNode, XPathConstants.NODESET);
+
+        for (int i = 0; i < fileTransferNodes.getLength(); ++i) {
+            Node fileTransferNode = fileTransferNodes.item(i);
+            FileTransferBlock fileTransferBlock = parseFileTransferNode(fileTransferNode);
+
+            // TODO
+        }
+    }
+
+    protected void parseProactiveNode(Node paNode)
+        throws XPathExpressionException {
+        String relPath = getAttributeValue(paNode, "relpath");
+
+        Node javaNode = (Node) xpath.evaluate("pa:java", paNode,
+                XPathConstants.NODE);
+
+        if (javaNode != null) {
+            String javaRelPath = getAttributeValue(javaNode, "relpath");
+
+            // TODO
+        }
+
+        Node configNode = (Node) xpath.evaluate("pa:configuration", paNode,
+                XPathConstants.NODE);
+
+        parseProActiveConfiguration(configNode);
+    }
+
+    protected String getAttributeValue(Node node, String attributeName) {
+        return node.getAttributes().getNamedItem(attributeName).getNodeValue();
+    }
+
+    protected void parseProActiveConfiguration(Node configNode)
+        throws XPathExpressionException {
+        Node classPathNode = (Node) xpath.evaluate("pa:proactiveClasspath",
+                configNode, XPathConstants.NODE);
+
+        List<PathElement> proactiveClassPath = parseClasspath(classPathNode);
+
+        classPathNode = (Node) xpath.evaluate("pa:applicationClasspath",
+                configNode, XPathConstants.NODE);
+
+        List<PathElement> applicationClassPath = parseClasspath(classPathNode);
+
+        // security policy
+        //
+        Node securityPolicyNode = (Node) xpath.evaluate("pa:securityPolicy",
+                configNode, XPathConstants.NODE);
+
+        if (securityPolicyNode != null) {
+            PathElement pathElementNode = parsePathElementNode(securityPolicyNode);
+
+            // TODO
+        }
+
+        // log4j properties
+        Node log4jPropertiesNode = (Node) xpath.evaluate("pa:log4jProperties",
+                configNode, XPathConstants.NODE);
+
+        if (log4jPropertiesNode != null) {
+            PathElement pathElementNode = parsePathElementNode(log4jPropertiesNode);
+        }
+    }
+
+    protected List<PathElement> parseClasspath(Node classPathNode)
+        throws XPathExpressionException {
+        NodeList pathElementNodes = (NodeList) xpath.evaluate("pa:pathElement",
+                classPathNode, XPathConstants.NODESET);
+
+        ArrayList<PathElement> res = new ArrayList<PathElement>();
+
+        for (int i = 0; i < pathElementNodes.getLength(); ++i) {
+            Node pathElementNode = pathElementNodes.item(i);
+            PathElement pathElement = parsePathElementNode(pathElementNode);
+            res.add(pathElement);
+        }
+
+        return res;
+    }
+
+    protected PathElement parsePathElementNode(Node pathElementNode) {
+        PathElement pathElement = new PathElement();
+        String attr = getAttributeValue(pathElementNode, "relpath");
+        pathElement.setRelPath(attr);
+        attr = getAttributeValue(pathElementNode, "base");
+        if (attr != null) {
+            pathElement.setBase(attr);
+        }
+
+        return pathElement;
     }
 
     public Map<String, VirtualNodeInternal> getVirtualNodes() {
@@ -187,14 +302,13 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 //
                 VirtualNodeImpl virtualNode = new VirtualNodeImpl();
 
-                String id = node.getAttributes().getNamedItem("id")
-                                .getNodeValue();
+                String id = getAttributeValue(node, "id");
                 virtualNode.setId(id);
 
                 // get capacity
                 //
-                String capacity = node.getAttributes().getNamedItem("capacity")
-                                      .getNodeValue().toLowerCase();
+                String capacity = getAttributeValue(node, "capacity").trim()
+                                      .toLowerCase();
 
                 int capacityI = 0;
                 if (capacity.equals("max")) {
@@ -212,8 +326,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 for (int j = 0; j < resourceProviderNodes.getLength(); ++j) {
                     Node resProv = resourceProviderNodes.item(j);
-                    String refId = resProv.getAttributes().getNamedItem("refid")
-                                          .getNodeValue();
+                    String refId = getAttributeValue(resProv, "refid");
 
                     GCMDeploymentDescriptor resourceProvider = resourceProvidersMap.get(refId);
                     providers.add(resourceProvider);
