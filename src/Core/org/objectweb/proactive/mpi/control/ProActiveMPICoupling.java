@@ -102,10 +102,12 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         this.manager.register(this.jobID);
     }
 
-    public void register(int rank) {
-        this.manager.register(this.jobID, rank);
-    }
-
+    /*
+        public void register(int rank) {
+                //Vv used somewhere ?
+            this.manager.register(this.jobID, rank);
+        }
+    */
     public void unregisterProcess(int rank) {
         this.manager.unregister(this.jobID, rank);
     }
@@ -114,8 +116,8 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         this.target.receiveFromMpi(m_r);
     }
 
-    public void receiveFromProActive(ProActiveMPIData m_r) {
-        this.target.receiveFromProActive(m_r);
+    public int receiveFromProActive(ProActiveMPIData m_r) {
+        return this.target.receiveFromProActive(m_r);
     }
 
     public void sendToMpi(int jobID, ProActiveMPIData m_r)
@@ -136,12 +138,22 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         }
     }
 
+    //Vv boolean is never used, suspect it is a disambiguation flag for method resolution
     public Ack sendToMpi(int jobID, ProActiveMPIData m_r, boolean b)
         throws IOException {
         this.sendToMpi(jobID, m_r);
         return new Ack();
     }
 
+    /***
+     * @deprecated
+     * @param buf
+     * @param count
+     * @param datatype
+     * @param dest
+     * @param tag
+     * @param jobID
+     */
     public static void MPISend(byte[] buf, int count, int datatype, int dest,
         int tag, int jobID) {
         //create Message to send and use the native method
@@ -182,11 +194,26 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     }
 
     public void notifyProxy(Hashtable jobList, Hashtable groupList,
-        Hashtable userProxyMap) {
+        Hashtable userProxyMap) throws Exception {
         proxyMap = jobList;
         spmdProxyMap = groupList;
         this.userProxyMap = userProxyMap;
         this.target.sendJobNumberAndRegister();
+    }
+
+    public static boolean debugWaitInit() throws Exception {
+        // TODO remove, hack to be sure objects are initialized
+        while (proxyMap == null) {
+            System.out.println("Going to sleep");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        return proxyMap == null;
     }
 
     public void wakeUpThread() {

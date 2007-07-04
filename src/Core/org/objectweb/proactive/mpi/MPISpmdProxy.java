@@ -85,6 +85,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         // UNSTARTED/DEFAULT status
         if (status.equals(MPIConstants.MPI_UNSTARTED)) {
             setStatus(MPIConstants.MPI_RUNNING);
+            MPI_PROXY_LOGGER.debug("[MPI Proxy] status : " + status);
             return target.startMPI();
         } else {
             ProActive.terminateActiveObject(target, true);

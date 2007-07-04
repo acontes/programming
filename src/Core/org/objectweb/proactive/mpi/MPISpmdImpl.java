@@ -31,8 +31,15 @@
 package org.objectweb.proactive.mpi;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -123,12 +130,28 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
      * @return MPIResult
      */
     public MPIResult startMPI() {
-        MPI_IMPL_LOGGER.debug("[MPISpmd Object] Start MPI Process ");
+        String hostname = "undef";
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        MPI_IMPL_LOGGER.debug("[MPISpmd Object] Start MPI -q attached to vn " +
+            this.name + " on host " + hostname);
         MPIResult result = new MPIResult();
         try {
             mpiProcess.startProcess();
+            MPI_IMPL_LOGGER.debug(
+                "[MPISpmd Object] wait for -q attached to vn " + this.name +
+                " on host " + hostname);
             mpiProcess.waitFor();
+            MPI_IMPL_LOGGER.debug(
+                "[MPISpmd Object] MPI ended for -q attached to vn " +
+                this.name + " on host " + hostname);
             result.setReturnValue(mpiProcess.exitValue());
+            MPI_IMPL_LOGGER.debug("[MPISpmd Object] " +
+                result.getReturnValue());
             return result;
         } catch (IOException e) {
             e.printStackTrace();
@@ -163,7 +186,6 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         // stop method is called before start method on process thus interrupted exceptionis launched. 
         try {
             mpiProcess.stopProcess();
-
             //the sleep might be needed for processes killed
             Thread.sleep(200);
             return true;
@@ -287,7 +309,8 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
 
     public void newActiveSpmd(String cl, Object[][] params) {
         try {
-            if (params.length != vn.getNodes().length) {
+            //Vv can't handle null params array
+            if ((params != null) && (params.length != vn.getNodes().length)) {
                 throw new RuntimeException(
                     "!!! ERROR: mismatch between number of parameters and number of Nodes");
             }

@@ -88,7 +88,7 @@ public class MPIDependentProcess extends MPIProcess implements DependentProcess 
     }
 
     protected void buildHostsFile(Node[] nodes) {
-        logger.info("Generating machinefile...");
+        logger.info("Generating machinefile... to " + hostsFileName);
         try {
             PrintWriter mf_writer;
             mf_writer = new PrintWriter(new BufferedWriter(

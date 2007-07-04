@@ -125,7 +125,7 @@ public interface Loggers {
     // MPI loggers
     static final public String MPI = CORE + ".mpi";
     static final public String MPI_CONTROL = MPI + ".control";
-    static final public String MPI_CONTROL_MANAGER = MPI_CONTROL + ".control";
+    static final public String MPI_CONTROL_MANAGER = MPI_CONTROL + ".manager";
     static final public String MPI_CONTROL_COUPLING = MPI_CONTROL +
         ".coupling";
 

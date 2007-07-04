@@ -74,6 +74,7 @@ public class ProActiveMPIManager implements Serializable {
 
     /*  ackToRecvlist[jobID] = number of proxy ready to begin activities */
     private int[] ackToRecv;
+    private boolean debugWaitForInit = false;
 
     public ProActiveMPIManager() {
     }
@@ -99,14 +100,19 @@ public class ProActiveMPIManager implements Serializable {
                         "org/objectweb/proactive/mpi/control/" +
                         DEFAULT_LIBRARY_NAME);
 
-                File remoteDest = new File(remoteLibraryPath +
-                        "/libProActiveMPIComm.so");
-                File localSource = new File(u.getFile());
+                if (remoteLibraryPath != null) {
+                    File remoteDest = new File(remoteLibraryPath + "/" +
+                            DEFAULT_LIBRARY_NAME);
+                    File localSource = new File(u.getFile());
 
-                FileVector filePushed = FileTransfer.pushFile(allNodes[0],
-                        localSource, remoteDest);
-                filePushed.waitForAll();
+                    FileVector filePushed = FileTransfer.pushFile(allNodes[0],
+                            localSource, remoteDest);
+                    filePushed.waitForAll();
+                }
+                //else 
+                // we assume local and remote path to reach the shared library were the same
 
+                //Vv Where do we update the LD_LIBRARY_PATH ?
                 ackToStart[i] = allNodes.length - 1;
                 ackToRecv[i] = allNodes.length - 1;
                 Object[][] params = new Object[allNodes.length][];
@@ -143,6 +149,7 @@ public class ProActiveMPIManager implements Serializable {
                     new Hashtable());
 
                 currentJobNumber++;
+                //Vv Why don't we return a reference on the ProActiveMpiCoupling in order to avoid manipulate hazardous jobId ?
             }
         } catch (NodeException e) {
             e.printStackTrace();
@@ -162,6 +169,9 @@ public class ProActiveMPIManager implements Serializable {
     public void register(int jobID, int rank) {
         // ack of corresponding job is null means that the 
         // job is ready to recv message from another job
+        MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
+            " register mpi process #" + rank);
+
         if (ackToRecv[jobID] == 0) {
             for (int i = 0; i < currentJobNumber; i++) {
                 if (ackToRecv[i] != 0) {
@@ -182,17 +192,17 @@ public class ProActiveMPIManager implements Serializable {
         ProActiveMPICoupling activeProxyComm) {
         if (jobID < currentJobNumber) {
             MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
-                " register mpi process #" + rank);
+                " register mpi coupling proxy for mpi process #" + rank);
 
-            ((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(jobID)))[rank] = activeProxyComm;
+            ProActiveMPICoupling[] mpiCouplingArray = ((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(
+                        jobID)));
+
+            mpiCouplingArray[rank] = activeProxyComm;
 
             // test if this job is totally registered
             boolean deployUserSpmdObject = true;
-            for (int i = 0;
-                    i < ((ProActiveMPICoupling[]) this.proxyMap.get(
-                        new Integer(jobID))).length; i++) {
-                if (((ProActiveMPICoupling[]) this.proxyMap.get(
-                            new Integer(jobID)))[i] == null) {
+            for (int i = 0; i < mpiCouplingArray.length; i++) {
+                if (mpiCouplingArray[i] == null) {
                     // not totally registered
                     deployUserSpmdObject = false;
                 }
@@ -201,12 +211,10 @@ public class ProActiveMPIManager implements Serializable {
             //  all proxy are registered
             if (deployUserSpmdObject) {
                 // create a new array of nodes well ordered
-                Node[] orderedNodes = new Node[((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(
-                            jobID))).length];
+                Node[] orderedNodes = new Node[mpiCouplingArray.length];
                 for (int i = 0; i < orderedNodes.length; i++) {
                     try {
-                        orderedNodes[i] = ((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(
-                                    jobID)))[i].getNode();
+                        orderedNodes[i] = mpiCouplingArray[i].getNode();
                     } catch (NodeException e) {
                         e.printStackTrace();
                     }
@@ -215,6 +223,7 @@ public class ProActiveMPIManager implements Serializable {
                 deployUserClasses(jobID, orderedNodes);
             }
 
+            /* If all jobs have finished */
             for (int i = 0; i < currentJobNumber; i++) {
                 int jobListLength = ((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(
                             i))).length;
@@ -228,14 +237,23 @@ public class ProActiveMPIManager implements Serializable {
 
             for (int i = 0; i < currentJobNumber; i++) {
                 // send the table of User ProSpmd object to all the Proxy 
-                //     ((ProActiveMPICoupling) proxySpmdTabByJob.get(new Integer(i))).setUserProSPMDList(this.userSpmdTabByJob);
-                ((ProActiveMPICoupling) spmdProxyMap.get(new Integer(i))).notifyProxy(this.proxyMap,
-                    this.spmdProxyMap, this.userProxyMap);
+                try {
+                    ((ProActiveMPICoupling) spmdProxyMap.get(new Integer(i))).notifyProxy(this.proxyMap,
+                        this.spmdProxyMap, this.userProxyMap);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
+            this.debugWaitForInit = true;
         } else {
             throw new IndexOutOfBoundsException(" No MPI job exists with num " +
                 jobID);
         }
+    }
+
+    public boolean waitForInit() {
+        return !this.debugWaitForInit;
     }
 
     public void deployUserClasses(int jobID, Node[] orderedNodes) {
@@ -324,10 +342,14 @@ public class ProActiveMPIManager implements Serializable {
 
     public void register(int jobID) {
         // ack of job is null means we can start MPI application
+        MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
+            " register mpi process before starting #");
         if (ackToStart[jobID] == 0) {
             MPISpmd mpiSpmd = (MPISpmd) mpiSpmdList.get(jobID);
             MPIResult res = mpiSpmd.startMPI();
-
+            MPI_IMPL_LOGGER.info(
+                "[MANAGER] Start MPI has been send for JobID #" + jobID);
+            //System.out.println("[MANAGER] Start return value :" +res.getReturnValue());
             // the prinln generate a deadlock
             //System.out.println(mpiSpmd);
         } else {
@@ -361,6 +383,40 @@ public class ProActiveMPIManager implements Serializable {
         }
     }
 
+    /***
+     * @param buf
+     * @param count
+     * @param datatype
+     * @param dest
+     * @param tag
+     * @param jobID
+     */
+    public int debugMPISend(byte[] buf, int count, int datatype, int dest,
+        int tag, int jobID) {
+        //TODO to remove
+        //create Message to send and use the native method
+        ProActiveMPIData m_r = new ProActiveMPIData();
+
+        m_r.setData(buf);
+        m_r.setCount(count);
+        m_r.setDatatype(datatype);
+        m_r.setDest(dest);
+        m_r.setTag(tag);
+        m_r.setJobID(jobID);
+        if (jobID < proxyMap.size()) {
+            ProActiveMPICoupling[] arrayComm = (ProActiveMPICoupling[]) proxyMap.get(new Integer(
+                        jobID));
+            if ((dest < arrayComm.length) && (arrayComm[dest] != null)) {
+                return arrayComm[dest].receiveFromProActive(m_r);
+            } else {
+                throw new IndexOutOfBoundsException(
+                    " ActiveProxyComm destinator " + dest + " is unreachable!");
+            }
+        } else {
+            throw new IndexOutOfBoundsException(" No MPI job exists with num " +
+                jobID);
+        }
+    }
     ////////////////////////////////////////////////////////////
     ////////// IF MANAGER IS USED AS A PROXY ///////////////////
     ////////////////////////////////////////////////////////////

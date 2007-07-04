@@ -49,6 +49,7 @@ public class ProActiveMPI {
                         new Object[] {  });
                 //  VectorResult vres = 
                 manager.deploy(spmdList);
+                //Vv remove return null vector
                 return null;
                 // get a future and wait on future
                 // System.out.println("[PROACTIVEMPI] RETURNS VECTOR OF FUTURES ");
@@ -64,5 +65,9 @@ public class ProActiveMPI {
         }
 
         return null;
+    }
+
+    public static ProActiveMPIManager getManager() {
+        return manager;
     }
 }

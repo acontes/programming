@@ -32,7 +32,7 @@ package org.objectweb.proactive.mpi.control;
 
 public class ProActiveMPIData implements java.io.Serializable {
     private int jobID = 0;
-    private int TAG1 = 0;
+    private int msg_type = 0;
 
     // number of element in the message
     private int count = 0;
@@ -105,8 +105,8 @@ public class ProActiveMPIData implements java.io.Serializable {
     /////////////////////
     ///// GETTERS  //////
     /////////////////////
-    public int getTag1() {
-        return this.TAG1;
+    public int getMsgType() {
+        return this.msg_type;
     }
 
     public int getSrc() {
@@ -148,11 +148,12 @@ public class ProActiveMPIData implements java.io.Serializable {
         sb.append("\n Class: ");
         sb.append(this.getClass().getName());
         sb.append("\n idJob: " + this.jobID);
-        sb.append("\n TAG1: " + this.TAG1);
+        sb.append("\n msg_type: " + this.msg_type);
         sb.append("\n Count: " + this.count);
         sb.append("\n src: " + this.src);
         sb.append("\n dest: " + this.dest);
         sb.append("\n datatype: " + this.datatype);
+        sb.append("\n tag: " + this.tag);
         return sb.toString();
     }
 

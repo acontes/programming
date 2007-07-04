@@ -25,62 +25,111 @@
  * 
  * ################################################################
  */
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/sem.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <signal.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <sys/wait.h>
-#include <pthread.h>
-#include <sched.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <mpi.h>
-#include "ProActiveMPI.h"
-#include <errno.h>
-#include <stdarg.h>
 
-#define DEBUG 0	// most verbose debug info
+#include "ProActiveMPI.h"
+
+
+
 // if debug is on please define the path variable below
 // in the MPI_Init function
 #define BIGINT 100000
 #define MAX_NOM 32
+
+
+
 int INTERVAL = 5 ;
 
 char * path; 
 
 char *daemon_address, *jobmanager, *myhostname;
 
+#define RECV_QUEUE_SIZE 20
+msg_t * recv_queue [RECV_QUEUE_SIZE];
+int recv_queue_order [RECV_QUEUE_SIZE];
+int msg_recv_nb = 1;
+
 int C2S_Q_ID, S2C_Q_ID;
 int sem_set_id_mpi;            // semaphore set ID.
 int myJob=-1;
-int myRank=-1;
+
 int TAG_S_KEY;
 int TAG_R_KEY;
-FILE* mslog;
 
 void msg_stat(int msgid, struct msqid_ds * msg_info);
 int openlog(char *path, int rank);
-// semaphore functions
-void sem_unlock(int sem_set_id);
-void sem_lock(int sem_set_id);
 
-
-
-
+/*
+int send_to_ipc_queue(int msg_type, void * buf, int count, MPI_Datatype datatype, 
+					  int length, int dest, int tag, int idjob);
+int send_splitted_buffer(int qid, void * buf, int count, MPI_Datatype datatype, int dest, int tag, int idjob);
+*/
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
 /*---+----+-----+- MPI <-> MPI FUNCTIONS -+----+-----+- */
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
+
+
+int get_available_recv_queue_index() {
+	int i = 0, free = -1;
+	while((i < RECV_QUEUE_SIZE) && (free == -1)) {
+		if (recv_queue_order[i] == -1) {
+			recv_queue_order[i] = msg_recv_nb;
+			free = i;
+		}
+		i++;
+	}
+	return free;
+}
+
+msg_t * check_already_received_msg(int count, ProActive_Datatype pa_datatype, int src, int tag, int idjob) {
+	int i = 0;
+ 	msg_t * candidate = NULL;
+ 	int candidate_index = -1;
+ 	
+	DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] check already received message invoked\n"));
+	
+	while (i < RECV_QUEUE_SIZE) {
+	
+		if(recv_queue[i] != NULL) {
+			if ((recv_queue[i]->count == count) &&
+				(recv_queue[i]->src == src) &&
+				(recv_queue[i]->tag == tag) &&
+				(recv_queue[i]->idjob == idjob) &&
+				(recv_queue[i]->pa_datatype == pa_datatype)) {
+					if (candidate != NULL) {
+						// check which message was received first
+						if (recv_queue_order[i] < candidate_index) {
+							candidate = recv_queue[i];
+							candidate_index = i;		
+						}
+					} else {
+						candidate = recv_queue[i];
+						candidate_index = i;
+					}
+				// We probably got the right message, but we must ensure fifo order.
+			}
+		}
+		i++;
+	}
+	
+	if (candidate != NULL) {
+		// we found a message that match the requirements in the message queue.
+		// we need to remove it
+		recv_queue[candidate_index] = NULL;
+		recv_queue_order[candidate_index] = -1;
+		i = 0;
+		while(i < RECV_QUEUE_SIZE) {
+			if ((recv_queue_order[i] != -1) && (recv_queue_order[i] > recv_queue_order[candidate_index])) {
+				recv_queue_order[i]--;
+			}
+			i++;
+		}
+		msg_recv_nb--;
+
+		DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] QUEUE : got message at idx: %d lg: %d \n", candidate_index, msg_recv_nb));
+	}
+	
+	return candidate;
+}
 
 /*
  * ProActiveMPI_Init
@@ -88,35 +137,52 @@ void sem_lock(int sem_set_id);
 int ProActiveMPI_Init(int rank){
 	int error;
 	msg_t send_msg_buf, recv_msg_buf ;
-	int pms;
+//	int pms;
 	struct msqid_ds bufstat;
+	
+	init_msg_t(&send_msg_buf);
+	init_msg_t(&recv_msg_buf);
+	
     // keep rank of this process
 	myRank=rank;
-	if (DEBUG){  
-		path = (char*) malloc(56);
-		strcpy(path, "/tmp");
-		if (openlog(path, rank) < 0){
+	
+	// init message queue
+	int i = 0;
+	while (i < RECV_QUEUE_SIZE) {
+		recv_queue_order[i] = -1;
+		i++;
+	}
+	
+	if (DEBUG){
+		path = (char*) malloc(256);
+		strcpy(path, "/tmp/vcave");
+		if (openlog(path, myRank) < 0){
 			printf("ERROR WHILE OPENING FILE PATH= %s \n", path); 
 			perror("[ProActiveMPI_Init] openlog");  exit(1);}
 		fprintf(mslog, "Initializing queues \n");
 	}
+
 	// get the mpi semaphore
-	sem_set_id_mpi = semget(SEM_ID_MPI, 1, 0600);
+	sem_set_id_mpi = semget(SEM_ID_MPI, 1, IPC_CREAT | S_IRUSR |
+                 S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if  (sem_set_id_mpi == -1){
 		perror("[ProActiveMPI_Init] semget");
 		exit(1);
 	}
-	if (DEBUG){
-		fprintf(mslog, "Block Semaphore  \n");
-	}
+	
+	struct semid_ds test;
+	
+	semctl(sem_set_id_mpi, 0, IPC_STAT, &test);
+	
+	DEBUG_PRINT(mslog, fprintf(mslog, "Block Semaphore  \n"));
+	
 	// first process lock the semaphore
 	sem_lock(sem_set_id_mpi);
     // accessing exclusively the ClientToServer queue
 	if ((C2S_Q_ID = msgget(C2S_KEY, ACCESS_PERM)) == -1) {
 		perror("[ProActiveMPI_Init] msgget 1 ");
-		if (DEBUG){
-			fprintf(mslog, "Cannot open sending queue: %d   \n",C2S_Q_ID);
-		}
+		DEBUG_PRINT(mslog, fprintf(mslog, "Cannot open sending queue: %d   \n",C2S_Q_ID))
+
 		return -1;
 	}
 	// the queue successfully opened
@@ -131,27 +197,21 @@ int ProActiveMPI_Init(int rank){
 			// acess the second message queue
 			if ((C2S_Q_ID = msgget(C2S02_KEY,  ACCESS_PERM)) == -1) {
 				perror("[ProActiveMPI_Init] msgget C2S_02");
-				if (DEBUG){
-					fprintf(mslog, "Cannot open the second sending queue: %d   \n",C2S_Q_ID);
-				}
+				DEBUG_PRINT(mslog, fprintf(mslog, "Cannot open the second sending queue: %d   \n",C2S_Q_ID))
 				return -1;
 			}
 			else{
 				// update TAG_KEY
 				TAG_S_KEY=C2S02_KEY;
-				if (DEBUG){ 
-					fprintf(mslog, "Second Sending Queue %d successfully opened \n ",C2S_Q_ID); }
+				DEBUG_PRINT(mslog, fprintf(mslog, "Second Sending Queue %d successfully opened \n ",C2S_Q_ID))
 			}
 		}
-		if (DEBUG){ 
-			fprintf(mslog, "Sending Queue %d successfully opened \n ",C2S_Q_ID); }
+DEBUG_PRINT(mslog, fprintf(mslog, "Sending Queue %d successfully opened \n ",C2S_Q_ID))
 	}
 	// accessing exclusively the ServerToClient queue
 	if ((S2C_Q_ID = msgget(S2C_KEY,  ACCESS_PERM)) == -1) {
 		perror("[ProActiveMPI_Init] mssget S2C_01  ");
-		if (DEBUG){
-			fprintf(mslog, "Cannot open receiving queue: %d   \n",S2C_Q_ID);
-		}
+DEBUG_PRINT(mslog, fprintf(mslog, "Cannot open receiving queue: %d   \n",S2C_Q_ID))
 		return -1;
 	}
 	else {
@@ -161,49 +221,58 @@ int ProActiveMPI_Init(int rank){
 		if (bufstat.msg_lspid != 0){
 			if ((S2C_Q_ID = msgget(S2C02_KEY,  ACCESS_PERM)) == -1) {
 				perror("[ProActiveMPI_Init] msgget S2C_02 ");
-				if (DEBUG){
-					fprintf(mslog, "Cannot open the second recving queue: %d   \n",S2C_Q_ID);
-				}
+DEBUG_PRINT(mslog, fprintf(mslog, "Cannot open the second recving queue: %d   \n",S2C_Q_ID))
 				return -1;
 			}
 			else{
 				TAG_R_KEY=S2C02_KEY;
-				if (DEBUG){ 
-					fprintf(mslog, "Second Recving Queue %d successfully opened \n ",S2C_Q_ID); }
+DEBUG_PRINT(mslog, fprintf(mslog, "Second Recving Queue %d successfully opened \n ",S2C_Q_ID))
 			}
 		}
-		if (DEBUG){
-			fprintf(mslog, "Receivind Queue %d successfully opened \n ",S2C_Q_ID); }
+DEBUG_PRINT(mslog, fprintf(mslog, "Receivind Queue %d successfully opened \n ",S2C_Q_ID))
 	}
 	// unlock the semaphore
 	sem_unlock(sem_set_id_mpi);
-	if (DEBUG){
-		fprintf(mslog, "UnBlock Semaphore  \n");
-	}
-	send_msg_buf.TAG1 = MSG_INIT;
+DEBUG_PRINT(mslog, fprintf(mslog, "UnBlock Semaphore  \n"))
+	send_msg_buf.msg_type = MSG_INIT;
 	send_msg_buf.TAG = TAG_S_KEY;
 	send_msg_buf.src = rank;
-// strcpy(send_msg_buf.data, "");
-	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
-	// send the rank of this mpi process
-	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+1, 0);
+	/*
+#	msg->TAG = 0; 
+# 	msg->msg_type = 0;
+?? 	msg->idjob = 0;
+ 	msg->count = 0;
+# 	msg->src = 0;
+?? 	msg->dest = 0;
+ 	msg->pa_datatype = 0;
+ 	msg->data = NULL; 	
+ 	msg->tag = 0;
+ 	*/
+	DEBUG_PRINT(mslog, fprintf(mslog, "Sending to  %d \n ",C2S_Q_ID))
+	error = msgsnd(C2S_Q_ID, &send_msg_buf,  get_payload_size(&send_msg_buf)/*pms+1*/, 0);
+	DEBUG_PRINT(mslog, fprintf(mslog, "Sent %d bytes to queue %d successfully EINVAL %d error %d\n ", get_payload_size(&send_msg_buf), C2S_Q_ID, EINVAL, error))
+	/*************************************************/
+	/*************************************************/
+	/*************************************************/
+	
 	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
+DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveMPI_Init] !!! ERROR: msgsnd error\n"))
 		perror("ERROR");
 		return -1; }
 	if (DEBUG){
 		fprintf(mslog, "Waiting for job number in recv queue \n "); }
 	// wait for the job number
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
+	error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, 0);
+//	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
 	// if an error occured during receive call check if its an interrupted
 	// System call and so retry to receive
 	while (error < 0){
-		strerror(errno);
+//		strerror(errno);
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+			fprintf(mslog, "[ProActiveMPI_Init] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
+			if (DEBUG) { fprintf(mslog, "[ProActiveMPI_Init] !!! ERRNO = EINTR, \n");}
+			error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, 0);
 		}
 		else{
 			perror("ERROR");
@@ -212,7 +281,13 @@ int ProActiveMPI_Init(int rank){
 	}
 	// update the job field of this mpi process
 	myJob = recv_msg_buf.idjob;
-	if (DEBUG) {fflush(mslog);}
+
+	if (DEBUG) {
+ 		fprintf(mslog, "[ProActiveMPI_Init] [END] Process\n");
+  		fprintf(mslog, "[ProActiveMPI_Init] [END] myRank == %d \n", myRank);
+  		fflush(mslog);
+	}
+
 	return 0;
 }
 
@@ -225,210 +300,146 @@ int ProActiveMPI_Job(int * job){
 }
 
 
+
+
 /*
  * ProActiveMPI_Send
  */
 int ProActiveMPI_Send(void * buf, int count, MPI_Datatype datatype, int dest, int tag, int idjob)
 { 
-	msg_t send_msg_buf;
-	int error;
-	int pms;
-	int length;
-	send_msg_buf.TAG1 = MSG_SEND;
-	send_msg_buf.count = count;
-	send_msg_buf.src = myRank ;
-	send_msg_buf.dest = dest;
-	send_msg_buf.datatype = datatype;
-	send_msg_buf.tag = tag;
-	send_msg_buf.TAG = TAG_S_KEY;
-	send_msg_buf.idjob = idjob;
-	
-	switch (datatype){
-	case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-		length = sizeof(char) * count; 
-		break;
-	case  MPI_INT:  case MPI_UNSIGNED:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_INT Datatype found  \n");}
-		length = sizeof(int) * count;
-		break;
-	case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-		length = sizeof(short) * count;
-		break; 
-	case MPI_LONG: case MPI_UNSIGNED_LONG:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG Datatype found  \n");}
-		length = sizeof(long) * count;
-		break; 
-	case MPI_FLOAT:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-		length = sizeof(float) * count;
-		break; 
-	case MPI_DOUBLE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-		length = sizeof(double) * count;
-		break; 	
-	case MPI_LONG_DOUBLE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-		length = sizeof(long double) * count;
-		break; 
-	case MPI_LONG_LONG:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-		length = sizeof(long long) * count;
-		break; 
-	default:
-		if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-	return -1;
-	}
-	memcpy(send_msg_buf.data, buf, length);
-	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
-	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+length, 0);
-	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
-		perror("ERROR"); 
-		return -1;  }
-	if (DEBUG) {fflush(mslog);}
-	return 0;
+	return send_to_ipc(C2S_Q_ID, MSG_SEND, TAG_S_KEY, buf, count, datatype, myRank, dest, tag, idjob);
 }
+
 
 /*
  * ProActiveMPI_Recv
  */
 int ProActiveMPI_Recv(void* buf, int count, MPI_Datatype datatype, int src, int tag, int idjob){
-	msg_t recv_msg_buf;
-	int error = -1;
-	int pms;
-	int length;
 
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
-	// if an error occured during receive call check if its an interrupted
-	// System call and so retry to receive
-	while (error < 0){
-		strerror(errno);
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+	msg_t * recv_msg_buf;
+	ProActive_Datatype pa_datatype = type_conversion_MPI_to_proactive(datatype);
+	int not_received = 1;
+	int warning = 0;
+	int error;
+	while (not_received == 1) {
 		
-		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
-		}
-		else{
-			perror("ERROR");
-			return -1; 
-		}
-	}
-	if (DEBUG) {fflush(mslog);}
-	if (recv_msg_buf.idjob != idjob){
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
-		return -1;
-	}
-	else if ((src != MPI_ANY_SOURCE) && (recv_msg_buf.src != src)){
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
-		return -1;
-	}
-	else if ((tag != MPI_ANY_TAG) && (recv_msg_buf.tag != tag)) {
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
-		return -1;
-	} 
-	else if (recv_msg_buf.datatype != datatype){
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
-		return -1;
-	} 
-	else{
-		switch (datatype){
-		case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INT:  case MPI_UNSIGNED:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found  \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-			length = sizeof(short) * count;
-			break; 
-		case MPI_LONG: case MPI_UNSIGNED_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG Datatype found  \n");}
-			length = sizeof(long) * count;
-			break; 
-		case MPI_FLOAT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-			length = sizeof(float) * count;
-			break; 
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-			
-		case MPI_LONG_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-			length = sizeof(long double) * count;
-			break; 
-		case MPI_LONG_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-			length = sizeof(long long) * count;
-			break; 
-			
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		return -1;
-		}
-		memcpy(buf, recv_msg_buf.data, length);
-	}
+		recv_msg_buf = check_already_received_msg(count, pa_datatype, src, tag, idjob);
 	
+		// the message queue is empty we're waiting for a message coming from the queue.
+		if (recv_msg_buf == NULL) {
+			if ((recv_msg_buf = malloc(sizeof(msg_t))) == NULL) {
+				if (DEBUG) {
+				fprintf(mslog, "[ProActiveMPI_Recv] !!! ERROR : MALLOC FAILED\n");
+				}
+				perror("[ProActiveMPI_Recv] !!! ERROR : MALLOC FAILED");
+				return -1;
+			}
+			if ((error = recv_ipc_message(S2C_Q_ID, TAG_R_KEY, recv_msg_buf)) < 0) {
+			if (DEBUG) {
+				fprintf(mslog, "[ProActiveMPI_Recv] !!! ERROR : IPC message queue reception error code: %d \n", error);
+			}
+
+				return -2;
+			}
+		}
+
+		// A message has been received
+		// We check if it's the one we're waiting for.
+		if (recv_msg_buf->idjob != idjob){
+			if (DEBUG) {
+				fprintf(mslog, "[ProActiveMPI_Recv] !!! WARNING: BAD PARAMETER idjob. Storing to the message queue\n");
+			}
+			warning = 1;
+		}
+		else if ((src != MPI_ANY_SOURCE) && (recv_msg_buf->src != src)){
+			if (DEBUG) {
+				fprintf(mslog, "[ProActiveMPI_Recv] !!! WARNING: BAD PARAMETER src. Storing to the message queue\n");
+			}
+			warning = 1;
+		}
+		else if ((tag != MPI_ANY_TAG) && (recv_msg_buf->tag != tag)) {
+			if (DEBUG) {
+				fprintf(mslog, "[ProActiveMPI_Recv] !!! WARNING: BAD PARAMETER tab. Storing to the message queue\n");
+			}
+			warning = 1;
+		} 
+		else if (recv_msg_buf->pa_datatype != type_conversion_MPI_to_proactive(datatype)){
+			if (DEBUG) {
+				fprintf(mslog, "[ProActiveMPI_Recv] !!! WARNING: BAD PARAMETER datatype. Storing to the message queue\n");
+			}
+			warning = 1;
+		} 
+		
+		if (warning == 0) {
+			// We got the right message
+			not_received = 0;
+		} else {
+			// Recevied mesage is not the awaited one, we store it in the message queue
+			int index = get_available_recv_queue_index();
+		
+			if (index == -1) {
+				DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveMPI_Recv] !!! ERROR: RECV MSG QUEUE IS FULL \n"))	
+			} else {	
+			// we store the message in the message queue
+				recv_queue[index] = recv_msg_buf;
+		
+				DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveMPI_Recv] WAIT FOR MSG from jobid:%d, rank:%d tagged as %d\n", idjob, src, tag));
+				DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveMPI_Recv] QUEUE store message at idx: %d lg: %d \n", index, msg_recv_nb));
+				msg_recv_nb++;
+			}
+		}
+
+		warning = 0;
+	}
+		//Received message is the one we're waiting for.	
+		int length = debug_get_mpi_buffer_length(count, datatype, sizeof(char));
+
+		if (length < 0) {
+			if (DEBUG) {fprintf(mslog, "[ProActiveMPI_Recv] !!! WRONG DATATYPE \n");}
+			return -3;
+		}
+	// TODO see how we could integrate this copy into recv_message
+		memcpy(buf, recv_msg_buf->data, length);
+	
+		free_msg_t(recv_msg_buf);	
 	return 0;
 	
 }
+
+
 
 /*
  * ProActiveMPI_IRecv
  */
 int ProActiveMPI_IRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag, int idjob, ProActiveMPI_Request *r){
-	msg_t recv_msg_buf;
+
 	int error = -1;
-	int pms;
 	int length;
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, IPC_NOWAIT);
+	msg_t recv_msg_buf;
+	
+	if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&recv_msg_buf);
+	} 
+	
+	error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, IPC_NOWAIT);
 	while (error < 0){
 		strerror(errno);
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, IPC_NOWAIT);
+			if (DEBUG) { fprintf(mslog, "[ProActiveMPI.c] !!! ERRNO = EINTR, \n");}
+			error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, IPC_NOWAIT);
 		}
 		// no message in the queue
 		else if (errno == ENOMSG){
 			if (DEBUG) {
-				fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+				fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 			r->buf = buf; // keep buf address in structure to update it later
 			(*r).flag = 0; // nothing recv yet
 			// keep parameters for further recv
 			(*r).count = count;
-			(*r).datatype = datatype;
+			(*r).pa_datatype =  type_conversion_MPI_to_proactive(datatype);
 			(*r).src = src;
 			(*r).tag = tag;
 			(*r).idjob = idjob;
@@ -444,72 +455,31 @@ int ProActiveMPI_IRecv(void* buf, int count, MPI_Datatype datatype, int src, int
 	// filter
 	if (recv_msg_buf.idjob != idjob){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER idjob \n");}
 		return -1;
 	}
 	else if ((src != MPI_ANY_SOURCE) && (recv_msg_buf.src != src)){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER src %d\n", src);}
 		return -1;
 	}
 	else if (recv_msg_buf.tag != tag) {
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER tag \n");}
 		return -1;
 	} 
-	else if (recv_msg_buf.datatype != datatype){
+	else if (recv_msg_buf.pa_datatype !=  type_conversion_MPI_to_proactive(datatype)){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER datatype \n");}
 		return -1;
-	} 
-	else{
-		switch (datatype){
-		case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INT:  case MPI_UNSIGNED:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found  \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-			length = sizeof(short) * count;
-			break; 
-		case MPI_LONG: case MPI_UNSIGNED_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG Datatype found  \n");}
-			length = sizeof(long) * count;
-			break; 
-		case MPI_FLOAT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-			length = sizeof(float) * count;
-			break; 
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-			
-		case MPI_LONG_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-			length = sizeof(long double) * count;
-			break; 
-		case MPI_LONG_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-			length = sizeof(long long) * count;
-			break; 
-						
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		return -1;
+	} else {
+		length = debug_get_mpi_buffer_length(count, datatype, sizeof(char));
+
+		if (length < 0) {
+			if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! BAD DATATYPE \n");}
+			return -1;
 		}
+		
 		memcpy(buf, recv_msg_buf.data, length);	
 	}
 	return 0;
@@ -521,104 +491,73 @@ int ProActiveMPI_IRecv(void* buf, int count, MPI_Datatype datatype, int src, int
 int ProActiveMPI_Wait(ProActiveMPI_Request *r){
 	msg_t recv_msg_buf;
 	int error = -1;
-	int pms;
+//	int pms;
 	int length;
+	
+	if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&recv_msg_buf);
+	} 
+	
 	
 	int idjob = (*r).idjob;
 	int tag = (*r).tag;
 	int count = (*r).count;
-	int datatype = (*r).datatype;
+	int pa_datatype = (*r).pa_datatype;
 	int src = (*r).src;
 	
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
+//	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
 	
+	if((error = recv_ipc_message(S2C_Q_ID, TAG_R_KEY, &recv_msg_buf)) < 0) {
+	 return error;	
+	}
+	/*
 	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
 	while (error < 0){
 		strerror(errno);
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 		
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
+			if (DEBUG) { fprintf(mslog, "[ProActiveMPI.c] !!! ERRNO = EINTR, \n");}
 			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
 		}
 		// no message in the queue
 		else{
-			perror("ERROR");
+			perror("[ProActiveMPI.c] ERROR");
 			return -1; 
 		}
 	}
-	
+	*/
 	if (DEBUG) {fflush(mslog);}
 	// filter
 	if (recv_msg_buf.idjob != idjob){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER idjob \n");}
 		return -1;
 	}
 	else if ((src != MPI_ANY_SOURCE) && (recv_msg_buf.src != src)){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER src %d\n", src);}
 		return -1;
 	}
 	else if ((tag != MPI_ANY_TAG) && (recv_msg_buf.tag != tag)) {
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER tag \n");}
 		return -1;
 	} 
-	else if (recv_msg_buf.datatype != datatype){
+	else if (recv_msg_buf.pa_datatype != pa_datatype){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER datatype \n");}
 		return -1;
-	} 
-	else{
-		switch (datatype){
-		case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INT:  case MPI_UNSIGNED:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found  \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-			length = sizeof(short) * count;
-			break; 
-		case MPI_LONG: case MPI_UNSIGNED_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG Datatype found  \n");}
-			length = sizeof(long) * count;
-			break; 
-		case MPI_FLOAT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-			length = sizeof(float) * count;
-			break; 
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-			
-		case MPI_LONG_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-			length = sizeof(long double) * count;
-			break; 
-		case MPI_LONG_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-			length = sizeof(long long) * count;
-			break; 
-						
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		return -1;
+	} else {
+		length = get_proactive_buffer_length(count, pa_datatype);
+
+		if (length < 0) {
+			if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! BAD DATATYPE \n");}
+			return -1;
 		}
+		
 		memcpy(r->buf, recv_msg_buf.data, length);
 	}
 	return 0;
@@ -630,37 +569,42 @@ int ProActiveMPI_Wait(ProActiveMPI_Request *r){
 int ProActiveMPI_Test(ProActiveMPI_Request *r, int* flag){
 	msg_t recv_msg_buf;
 	int error = -1;
-	int pms;
+//	int pms;
 	int length;
+	
+	if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&recv_msg_buf);
+	} 
 	
 	int idjob = (*r).idjob;
 	int tag = (*r).tag;
 	int count = (*r).count;
-	int datatype = (*r).datatype;
+	int pa_datatype = (*r).pa_datatype;
 	int src=(*r).src;
 	
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
+//	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
 	
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, IPC_NOWAIT);
+	error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, IPC_NOWAIT);
 	while (error < 0){
 		strerror(errno);
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 		
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, IPC_NOWAIT);
+			if (DEBUG) { fprintf(mslog, "[ProActiveMPI.c] !!! ERRNO = EINTR, \n");}
+			error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, IPC_NOWAIT);
 		}
 		// no message in the queue
 		else if (errno == ENOMSG){
 			if (DEBUG) {
-				fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+				fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 			// mv buffer pointer
 			*flag = 0; // not recv yet
 			return 0;
 		}
 		else{
-			perror("ERROR");
+			perror("[ProActiveMPI.c] ERROR");
 			return -1; 
 		}
 	}
@@ -671,72 +615,31 @@ int ProActiveMPI_Test(ProActiveMPI_Request *r, int* flag){
 	// filter
 	if (recv_msg_buf.idjob != idjob){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER idjob \n");}
 		return -1;
 	}
 	else if ((src != MPI_ANY_SOURCE) && (recv_msg_buf.src != src)){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER src %d\n", src);}
 		return -1;
 	}
 	else if ((tag != MPI_ANY_TAG) && (recv_msg_buf.tag != tag)) {
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER tag \n");}
 		return -1;
 	} 
-	else if (recv_msg_buf.datatype != datatype){
+	else if (recv_msg_buf.pa_datatype != pa_datatype){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER datatype \n");}
 		return -1;
-	} 
-	else{
-		switch (datatype){
-		case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INT:  case MPI_UNSIGNED:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found  \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-			length = sizeof(short) * count;
-			break; 
-		case MPI_LONG: case MPI_UNSIGNED_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG Datatype found  \n");}
-			length = sizeof(long) * count;
-			break; 
-		case MPI_FLOAT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-			length = sizeof(float) * count;
-			break; 
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-			
-		case MPI_LONG_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-			length = sizeof(long double) * count;
-			break; 
-		case MPI_LONG_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-			length = sizeof(long long) * count;
-			break; 
-						
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		return -1;
+	} else {
+		length = get_proactive_buffer_length(count, pa_datatype);
+
+		if (length < 0) {
+			if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! BAD DATATYPE \n");}
+			return -1;
 		}
+		
 		memcpy(r->buf, recv_msg_buf.data, length);	
 	}
 	return 0;
@@ -746,78 +649,48 @@ int ProActiveMPI_Test(ProActiveMPI_Request *r, int* flag){
  * ProActiveMPI_AllSend
  */
 int ProActiveMPI_AllSend( void * buf, int count, MPI_Datatype datatype, int tag, int idjob)
-{ 
+{ /*
 	msg_t send_msg_buf;
 	int error;
 	int pms;
 	int length;
-	
+	*/
+	int error;
 	if (DEBUG) {
-		fprintf(mslog, "!!! ProActiveMPI_AllSend \n");}
-	send_msg_buf.TAG1 = MSG_ALLSEND;
+		fprintf(mslog, "[ProActiveMPI.c] !!! ProActiveMPI_AllSend \n");}
+		
+
+	/*		
+	send_msg_buf.msg_type = MSG_ALLSEND;
 	send_msg_buf.count = count;
 	send_msg_buf.src = myRank ;
 	send_msg_buf.dest = -1;
-	send_msg_buf.datatype = datatype;
+	send_msg_buf.pa_datatype =  ;
 	send_msg_buf.tag = tag;
 	send_msg_buf.TAG = TAG_S_KEY;
 	send_msg_buf.idjob = idjob;
 	
-	switch (datatype){
-	case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-		length = sizeof(char) * count; 
-		break;
-	case  MPI_INT:  case MPI_UNSIGNED:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_INT Datatype found  \n");}
-		length = sizeof(int) * count;
-		break;
-	case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-		length = sizeof(short) * count;
-		break; 
-	case MPI_LONG: case MPI_UNSIGNED_LONG:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG Datatype found - Length = %d \n", sizeof(long) * count);}
-		length = sizeof(long) * count;
-		break; 
-	case MPI_FLOAT:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-		length = sizeof(float) * count;
-		break; 
-	case MPI_DOUBLE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-		length = sizeof(double) * count;
-		break; 
-		
-	case MPI_LONG_DOUBLE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-		length = sizeof(long double) * count;
-		break; 
-	case MPI_LONG_LONG:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-		length = sizeof(long long) * count;
-		break; 
-	default:
-		if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-	return -1;
+	length = get_mpi_buffer_length(count, datatype, sizeof(char));
+
+	if (length < 0) {
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! BAD DATATYPE \n");}
+		return -1;
 	}
+
 	memcpy(send_msg_buf.data, buf, length);
 	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
 	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+length, 0);
 	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
-		perror("ERROR"); 
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgsnd error\n");}
+		perror("[ProActiveMPI.c] ERROR"); 
 		return -1;  }
+		*/
+	error = send_to_ipc(C2S_Q_ID, MSG_ALLSEND, TAG_S_KEY, 
+							 buf, count, datatype, myRank, 
+							 /*dest*/ -1, tag, idjob);
+		
 	if (DEBUG) {fflush(mslog);}
-	return 0;
+	return error;
 }
 
 
@@ -837,19 +710,22 @@ int ProActiveMPI_Barrier(int job){
  * ProActiveMPI_Finalize
  */
 int ProActiveMPI_Finalize(){
-	msg_t send_msg_buf;
+	msg_t send_msg_buf;	
 	int error;
-	int pms;
-	send_msg_buf.TAG1 = MSG_FINALIZE;
+	
+	if (DEBUG_STMT) {
+		init_msg_t(&send_msg_buf);
+	}
+	
+	send_msg_buf.msg_type = MSG_FINALIZE;
 	send_msg_buf.TAG = TAG_S_KEY;
-	strcpy(send_msg_buf.data, "");
-	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
-	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+1, 0);
+	strcpy(send_msg_buf.data_backend, "");
+	//TODO why payload + 1 ???
+	error = msgsnd(C2S_Q_ID, &send_msg_buf, get_payload_size(&send_msg_buf)/*pms+1*/, 0);
 	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
-		perror("ERROR");
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgsnd error\n");}
+		perror("[ProActiveMPI.c] ERROR");
 		return -1; }
-	if (DEBUG) {fflush(mslog);}
 	return 0;
 }
 
@@ -864,7 +740,7 @@ int ProActiveMPI_Finalize(){
 int ProActiveSend(void* buf, int count, MPI_Datatype datatype, int dest, char* clazz, char* method, int idjob, ...){
 	msg_t send_msg_buf;
 	int error;
-	int pms;
+//	int pms;
 	int length;
 	char* next;
 	int nb_args = 0;
@@ -872,8 +748,17 @@ int ProActiveSend(void* buf, int count, MPI_Datatype datatype, int dest, char* c
 	char * parameters = (char *) malloc(50);
 	va_list ptr;
 	
+	if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&send_msg_buf);
+	} 
+	
+	if (DEBUG) {
+	fprintf(mslog, "Test 0 %s %s\n", clazz, method); fflush(mslog);}
+			
 	strcpy(parameters, "");
 	strcpy(send_msg_buf.method, "");
+
 	// ptr initialization
 	va_start(ptr, idjob);  
 	next = va_arg(ptr, char*);
@@ -884,11 +769,11 @@ int ProActiveSend(void* buf, int count, MPI_Datatype datatype, int dest, char* c
 		next = va_arg(ptr, char*);	
 	}
 	sprintf(nb, "%d", nb_args);
-	send_msg_buf.TAG1 = MSG_SEND_PROACTIVE;
+	send_msg_buf.msg_type = MSG_SEND_PROACTIVE;
 	send_msg_buf.count = count;
 	send_msg_buf.src = myRank ;
 	send_msg_buf.dest = dest;
-	send_msg_buf.datatype = datatype;
+	send_msg_buf.pa_datatype =  type_conversion_MPI_to_proactive(datatype);
 	send_msg_buf.TAG = TAG_S_KEY;
 	send_msg_buf.idjob = idjob;
 	strcpy(send_msg_buf.method,clazz);
@@ -898,64 +783,28 @@ int ProActiveSend(void* buf, int count, MPI_Datatype datatype, int dest, char* c
 	strcat(send_msg_buf.method,nb);
 	strcat(send_msg_buf.method,"\t");
 	strcat(send_msg_buf.method,parameters);
-	
-	switch (datatype){
-	case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-		length = sizeof(char) * count; 
-		break;
-	case  MPI_INT:  case MPI_UNSIGNED:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_INT Datatype found  \n");}
-		length = sizeof(int) * count;
-		break;
-	case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-		length = sizeof(short) * count;
-		break; 
-	case MPI_LONG: case MPI_UNSIGNED_LONG:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG Datatype found  \n");}
-		length = sizeof(long) * count;
-		break; 
-	case MPI_FLOAT:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-		length = sizeof(float) * count;
-		break; 
-	case MPI_DOUBLE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-		length = sizeof(double) * count;
-		break; 	
-	case MPI_LONG_DOUBLE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-		length = sizeof(long double) * count;
-		break; 
-	case MPI_LONG_LONG:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-		length = sizeof(long long) * count;
-		break; 
-		
-	default:
-		if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-	return -1;
+				if (DEBUG) {
+	fprintf(mslog, "Test 4 %s \n", send_msg_buf.method);fflush(mslog);}
+				
+	length = debug_get_mpi_buffer_length(count, datatype, sizeof(char));
+
+	if (length < 0) {
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! BAD DATATYPE \n");}
+		return -1;
 	}
+	
 	memcpy(send_msg_buf.data, buf, length);
-	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
-	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+length, 0);
+//	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
+	error = msgsnd(C2S_Q_ID, &send_msg_buf, get_payload_size(&send_msg_buf), 0);
 	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
-		perror("ERROR"); 
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgsnd error\n");}
+		perror("[ProActiveMPI.c] ERROR"); 
 		return -1;  }
 	if (DEBUG) {fflush(mslog);}
 	
 	return 0;
 }
+
 
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
 /*---+----+----- PROACTIVE -> MPI  FUNCTIONS  -+-----+- */
@@ -965,105 +814,91 @@ int ProActiveSend(void* buf, int count, MPI_Datatype datatype, int dest, char* c
  * ProActiveRecv
  */
 int ProActiveRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag, int idjob){
-	msg_t recv_msg_buf;
-	int error = -1;
-	int pms;
+	msg_t  * recv_msg_buf = malloc(sizeof(msg_t));
+	int error = 0;
+//	int pms;
 	int length;
+	// getting datatype
+	if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(recv_msg_buf);
+	} 
+	//TODO refactor not finished see ProActiveMPI_Recv
+	ProActive_Datatype pa_datatype = type_conversion_MPI_to_proactive(datatype);
+		
+	DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveMPI.c][ProActiveRecv] Entering %d", errno))	
+
+	// first we check if we already receive the message
+	recv_msg_buf = check_already_received_msg(count, pa_datatype, src, tag, idjob);
+	if (recv_msg_buf == NULL) { 
+		error = recv_ipc_message(S2C_Q_ID, PROACTIVE_KEY, recv_msg_buf);
+	}
 	
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
+	if (error < 0){
+		//TODO free
+		return error;
+	}
 	
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, PROACTIVE_KEY, 0);
 	// if an error occured during receive call check if its an interrupted
 	// System call and so retry to receive
+	/*
 	while (error < 0){
-		strerror(errno);
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+//		strerror(errno);
+		DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] !!! ERROR: msgrcv error ERRNO = %d, \n", errno))
 		
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, PROACTIVE_KEY, 0);
-			if (DEBUG) {
-				fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
-		}
-		else{
-			perror("ERROR");
+			DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] !!! ERRNO = EINTR, \n"))
+			error = msgrcv(S2C_Q_ID, recv_msg_buf, get_payload_size(recv_msg_buf), PROACTIVE_KEY, 0);
+			DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] !!! ERROR: msgrcv error ERRNO = %d, \n", errno))
+		} else {
+			DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] !!! ERROR %d\n", errno))
 			return -1; 
 		}
-	}
-	if (DEBUG) {fflush(mslog);}
-	if (recv_msg_buf.idjob != idjob){
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
+	}*/
+	
+	DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] !!! msgrcv succeeds \n"))
+
+	if (recv_msg_buf->idjob != idjob){
+		DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] !!! BAD PARAMETER idjob, Queuing the message \n"))
 		return -1;
 	}
-// else if (recv_msg_buf.src != src){
-// if (DEBUG) {
-// fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
-// return -1;
-// }
-	else if ((tag != MPI_ANY_TAG) && (recv_msg_buf.tag != tag)) {
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
-		return -1;
-	} 
-	else if (recv_msg_buf.datatype != datatype){
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
-		return -1;
-	} 
-	else{
-		switch (datatype){
-		case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INT:  case MPI_UNSIGNED:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found  \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-			length = sizeof(short) * count;
-			break; 
-		case MPI_LONG: case MPI_UNSIGNED_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG Datatype found  \n");}
-			length = sizeof(long) * count;
-			break; 
-		case MPI_FLOAT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-			length = sizeof(float) * count;
-			break; 
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-			
-		case MPI_LONG_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-			length = sizeof(long double) * count;
-			break; 
-		case MPI_LONG_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-			length = sizeof(long long) * count;
-			break; 
-			// case MPI_LOGICAL: break;
-			// case MPI_PACKED: break;
-			
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		return -1;
+ 	else if (recv_msg_buf->src != src){
+ 		if (DEBUG) {
+ 			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER src \n");}
+ 			return -1;
+ 	}
+	else if ((tag != MPI_ANY_TAG) && (recv_msg_buf->tag != tag)) {
+			DEBUG_PRINT(mslog, 
+				fprintf(mslog, "[ProActiveRecv] !!! ERROR: BAD PARAMETER tag \n"))
+						
+		int index = get_available_recv_queue_index();
+		
+		if (index == -1) {
+			DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv] !!! ERROR: RECV MSG QUEUE IS FULL \n"))	
+		} else {
+		// we store the message in the message queue
+			recv_queue[index] = recv_msg_buf;
+			msg_recv_nb++;
 		}
-		memcpy(buf, recv_msg_buf.data, length);
+//		return -1;
+	} 
+	else if (recv_msg_buf->pa_datatype != pa_datatype){
+			DEBUG_PRINT(mslog, 
+				fprintf(mslog, "[ProActiveRecv] !!! ERROR: BAD PARAMETER datatype \n"))
+		return -1;
+	} else {
+		length = debug_get_mpi_buffer_length(count, datatype, sizeof(char));
+
+		if (length < 0) {
+			if (DEBUG) {fprintf(mslog, "[ProActiveRecv] !!! BAD DATATYPE \n");}
+			return -1;
+		}
+
+		memcpy(buf, recv_msg_buf->data, length);
+		// we don't need the message buffer anymore
+		free_msg_t(recv_msg_buf);
 	}
+	DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveRecv]Exiting %d", errno))
 	return 0;
 }
 
@@ -1073,29 +908,33 @@ int ProActiveRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag,
 int ProActiveWait(ProActiveMPI_Request *r){
 	msg_t recv_msg_buf;
 	int error = -1;
-	int pms;
+//	int pms;
 	int length;
+	if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&recv_msg_buf);
+	} 
 	
 	int idjob = (*r).idjob;
 	int tag = (*r).tag;
 	int count = (*r).count;
-	int datatype = (*r).datatype;
+	int pa_datatype = (*r).pa_datatype;
 	
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
+//	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
 	
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, PROACTIVE_KEY, 0);
+	error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), PROACTIVE_KEY, 0);
 	while (error < 0){
 		strerror(errno);
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 		
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, PROACTIVE_KEY, 0);
+			if (DEBUG) { fprintf(mslog, "[ProActiveMPI.c] !!! ERRNO = EINTR, \n");}
+			error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), PROACTIVE_KEY, 0);
 		}
 		// no message in the queue
 		else{
-			perror("ERROR");
+			perror("[ProActiveMPI.c] ERROR");
 			return -1; 
 		}
 	}
@@ -1104,72 +943,31 @@ int ProActiveWait(ProActiveMPI_Request *r){
 	// filter
 	if (recv_msg_buf.idjob != idjob){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER idjob \n");}
 		return -1;
 	}
 // else if (recv_msg_buf.src != src){
 // if (DEBUG) {
-// fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
+// fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER src \n");}
 // return -1;
 // }
 	else if ((tag != MPI_ANY_TAG) && (recv_msg_buf.tag != tag)) {
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER tag \n");}
 		return -1;
 	} 
-	else if (recv_msg_buf.datatype != datatype){
+	else if (recv_msg_buf.pa_datatype != pa_datatype){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER datatype \n");}
 		return -1;
-	} 
-	else{
-		switch (datatype){
-		case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INT:  case MPI_UNSIGNED:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found  \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-			length = sizeof(short) * count;
-			break; 
-		case MPI_LONG: case MPI_UNSIGNED_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG Datatype found  \n");}
-			length = sizeof(long) * count;
-			break; 
-		case MPI_FLOAT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-			length = sizeof(float) * count;
-			break; 
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-			
-		case MPI_LONG_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-			length = sizeof(long double) * count;
-			break; 
-		case MPI_LONG_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-			length = sizeof(long long) * count;
-			break; 
-						
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		return -1;
+	} else {		
+		length = get_proactive_buffer_length(count, pa_datatype);
+
+		if (length < 0) {
+			if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! BAD DATATYPE \n");}
+			return -1;
 		}
+
 		memcpy(r->buf, recv_msg_buf.data, length);	
 	}
 	return 0;	
@@ -1181,36 +979,40 @@ int ProActiveWait(ProActiveMPI_Request *r){
 int ProActiveTest(ProActiveMPI_Request *r, int* flag){
 	msg_t recv_msg_buf;
 	int error = -1;
-	int pms;
+//	int pms;
 	int length;
+	if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&recv_msg_buf);
+	} 
 	
 	int idjob = (*r).idjob;
 	int tag = (*r).tag;
 	int count = (*r).count;
-	int datatype = (*r).datatype;
+	int pa_datatype = (*r).pa_datatype;
 	
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
+//	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
 	
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, PROACTIVE_KEY, IPC_NOWAIT);
+	error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), PROACTIVE_KEY, IPC_NOWAIT);
 	while (error < 0){
 		strerror(errno);
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 		
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, PROACTIVE_KEY, IPC_NOWAIT);
+			if (DEBUG) { fprintf(mslog, "[ProActiveMPI.c] !!! ERRNO = EINTR, \n");}
+			error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), PROACTIVE_KEY, IPC_NOWAIT);
 		}
 		// no message in the queue
 		else if (errno == ENOMSG){
 			if (DEBUG) {
-				fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+				fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 			// mv buffer pointer
 			*flag = 0; // not recv yet
 			return 0;
 		}
 		else{
-			perror("ERROR");
+			perror("[ProActiveMPI.c] ERROR");
 			return -1; 
 		}
 	}
@@ -1221,72 +1023,31 @@ int ProActiveTest(ProActiveMPI_Request *r, int* flag){
 	// filter
 	if (recv_msg_buf.idjob != idjob){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER idjob \n");}
 		return -1;
 	}
 // else if (recv_msg_buf.src != src){
 // if (DEBUG) {
-// fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
+// fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER src \n");}
 // return -1;
 // }
 	else if ((tag != MPI_ANY_TAG) && (recv_msg_buf.tag != tag)) {
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER tag \n");}
 		return -1;
 	} 
-	else if (recv_msg_buf.datatype != datatype){
+	else if (recv_msg_buf.pa_datatype != pa_datatype){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER datatype \n");}
 		return -1;
-	} 
-	else{
-		switch (datatype){
-		case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INT:  case MPI_UNSIGNED:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found  \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-			length = sizeof(short) * count;
-			break; 
-		case MPI_LONG: case MPI_UNSIGNED_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG Datatype found  \n");}
-			length = sizeof(long) * count;
-			break; 
-		case MPI_FLOAT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-			length = sizeof(float) * count;
-			break; 
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-			
-		case MPI_LONG_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-			length = sizeof(long double) * count;
-			break; 
-		case MPI_LONG_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-			length = sizeof(long long) * count;
-			break; 
-						
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		return -1;
+	} else {
+		length = get_proactive_buffer_length(count, pa_datatype);
+
+		if (length < 0) {
+			if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! BAD DATATYPE \n");}
+			return -1;
 		}
+
 		memcpy(r->buf, recv_msg_buf.data, length);	
 	}
 	return 0;
@@ -1298,31 +1059,35 @@ int ProActiveTest(ProActiveMPI_Request *r, int* flag){
 int ProActiveIRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag, int idjob, ProActiveMPI_Request *r){
 	msg_t recv_msg_buf;
 	int error = -1;
-	int pms;
+//	int pms;
 	int length;
+		if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&recv_msg_buf);
+	} 
 	
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
+//	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
 	
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, PROACTIVE_KEY, IPC_NOWAIT);
+	error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), PROACTIVE_KEY, IPC_NOWAIT);
 	
 	while (error < 0){
 		strerror(errno);
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 		
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, PROACTIVE_KEY, IPC_NOWAIT);
+			if (DEBUG) { fprintf(mslog, "[ProActiveMPI.c] !!! ERRNO = EINTR, \n");}
+			error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), PROACTIVE_KEY, IPC_NOWAIT);
 		}
 		// no message in the queue
 		else if (errno == ENOMSG){
 			if (DEBUG) {
-				fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+				fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 			r->buf = buf; // keep buf address in structure to update it later
 			(*r).flag = 0; // nothing recv yet
 			// keep parameters for further recv
 			(*r).count = count;
-			(*r).datatype = datatype;
+			(*r).pa_datatype = type_conversion_MPI_to_proactive(datatype);
 			(*r).src = src;
 			(*r).tag = tag;
 			(*r).idjob = idjob;
@@ -1338,83 +1103,37 @@ int ProActiveIRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag
 	// filter
 	if (recv_msg_buf.idjob != idjob){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER idjob \n");}
 		return -1;
 	}
 // else if (recv_msg_buf.src != src){
 // if (DEBUG) {
-// fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
+// fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER src \n");}
 // return -1;
 // }
 	else if (recv_msg_buf.tag != tag) {
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER tag \n");}
 		return -1;
 	} 
-	else if (recv_msg_buf.datatype != datatype){
+	else if (recv_msg_buf.pa_datatype != type_conversion_MPI_to_proactive(datatype)){
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: BAD PARAMETER datatype \n");}
 		return -1;
-	} 
-	else{
-		switch (datatype){
-		case  MPI_CHAR:  case MPI_UNSIGNED_CHAR: case MPI_BYTE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INT:  case MPI_UNSIGNED:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found  \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_SHORT: case MPI_UNSIGNED_SHORT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_SHORT Datatype found  \n");}
-			length = sizeof(short) * count;
-			break; 
-		case MPI_LONG: case MPI_UNSIGNED_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG Datatype found  \n");}
-			length = sizeof(long) * count;
-			break; 
-		case MPI_FLOAT:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_FLOAT Datatype found  \n");}
-			length = sizeof(float) * count;
-			break; 
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-			
-		case MPI_LONG_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_DOUBLE Datatype found  \n");}
-			length = sizeof(long double) * count;
-			break; 
-		case MPI_LONG_LONG:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_LONG_LONG Datatype found  \n");}
-			length = sizeof(long long) * count;
-			break; 
-						
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		return -1;
+	} else {
+		length = debug_get_mpi_buffer_length(count, datatype, sizeof(char));
+
+		if (length < 0) {
+			if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! BAD DATATYPE \n");}
+			return -1;
 		}
+
 		memcpy(buf, recv_msg_buf.data, length);
-		
-		
 	}
 	
 	return 0;
 	
 }
-
-
-
 
 // /////////////////////////////////////////////////////////
 // ///////////////// F77 IMPLEMENTATION /////////////////////
@@ -1424,68 +1143,74 @@ int ProActiveIRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag
 void proactivempi_init_(int * rank, int* ierr){
 	msg_t send_msg_buf, recv_msg_buf ;
 	int error;
-	int pms;
+//	int pms;
 	char path[256];
+		if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&recv_msg_buf);
+		init_msg_t(&send_msg_buf);
+	} 
+	
 	strcpy(path,"");
 	strcpy(path,"/tmp");
 	myRank = *rank;
 	if (DEBUG){  
-		if (openlog(path, *rank) < 0){ printf("ERROR WHILE OPENING FILE PATH= %s \n", path); perror("ERROR");  exit(1);}
-		fprintf(mslog, "Initializing queues \n");
+		if (openlog(path, *rank) < 0){ printf("[ProActiveMPI.c] ERROR WHILE OPENING FILE PATH= %s \n", path); perror("ERROR");  exit(1);}
+		fprintf(mslog, "[ProActiveMPI.c] Initializing queues \n");
 	}
 	
 	if ((C2S_Q_ID = msgget(C2S_KEY,  ACCESS_PERM)) == -1) {
-		perror("ERROR ");
+		perror("[ProActiveMPI.c] ERROR ");
 		if (DEBUG){
-			fprintf(mslog, "Cannot open sending queue: %d   \n",C2S_Q_ID);
+			fprintf(mslog, "[ProActiveMPI.c] Cannot open sending queue: %d   \n",C2S_Q_ID);
 		}
 		*ierr=-1;
 		return;
 	}
 	else {
 		if (DEBUG){ 
-			fprintf(mslog, "Sending Queue %d successfully opened \n ",C2S_Q_ID); }
+			fprintf(mslog, "[ProActiveMPI.c] Sending Queue %d successfully opened \n ",C2S_Q_ID); }
 	}
 	if ((S2C_Q_ID = msgget(S2C_KEY,  ACCESS_PERM)) == -1) {
-		perror("ERROR ");
+		perror("[ProActiveMPI.c] ERROR ");
 		if (DEBUG){
-			fprintf(mslog, "Cannot open receiving queue: %d   \n",S2C_Q_ID);
+			fprintf(mslog, "[ProActiveMPI.c] Cannot open receiving queue: %d   \n",S2C_Q_ID);
 		}
 		*ierr=-1;
 		return;
 	}
 	else {
 		if (DEBUG){
-			fprintf(mslog, "Receivind Queue %d successfully opened \n ",S2C_Q_ID); }
+			fprintf(mslog, "[ProActiveMPI.c] Receivind Queue %d successfully opened \n ",S2C_Q_ID); }
 	}
-	send_msg_buf.TAG1 = MSG_INIT;
+	send_msg_buf.msg_type = MSG_INIT;
 	send_msg_buf.TAG = TAG_S_KEY;
 	send_msg_buf.src = *rank;
 // strcpy(send_msg_buf.data, "");
-	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
-	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+1, 0);
+//	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
+	error = msgsnd(C2S_Q_ID, &send_msg_buf,  get_payload_size(&send_msg_buf)+1, 0);
 	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
-		perror("ERROR");
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgsnd error\n");}
+		perror("[ProActiveMPI.c] ERROR");
 		*ierr=-1;
 		return; }
 	
 	if (DEBUG){
-		fprintf(mslog, "Waiting for job number in recv queue \n "); }
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
+		fprintf(mslog, "[ProActiveMPI.c] Waiting for job number in recv queue \n "); }
+	error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, 0);
 	// if an error occured during receive call check if its an interrupted
 	// System call and so retry to receive
 	while (error < 0){
 		strerror(errno);
 		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+			fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
 		
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
+			if (DEBUG) { fprintf(mslog, "[ProActiveMPI.c] !!! ERRNO = EINTR, \n");}
+			error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, 0);
 		}
 		else{
-			perror("ERROR");
+			perror("[ProActiveMPI.c] ERROR");
 			*ierr=-1;
 			return; 
 		}
@@ -1501,45 +1226,34 @@ void proactivempi_send_(void * buf, int* cnt, MPI_Datatype* datatype, int* dest,
 { 
 	msg_t send_msg_buf;
 	int error;
-	int pms;
-	int length;
+//	int pms;
+	int length = 0;
+		if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&send_msg_buf);
+	} 
+	
 	int count = *cnt;
-	send_msg_buf.TAG1 = MSG_SEND;
+	send_msg_buf.msg_type = MSG_SEND;
 	send_msg_buf.count = *cnt;
 	send_msg_buf.src = myRank ;
 	send_msg_buf.dest = *dest;
-	send_msg_buf.datatype = *datatype;
+	send_msg_buf.pa_datatype = type_conversion_MPI_to_proactive(*datatype);
 	send_msg_buf.tag = *tag;
 	send_msg_buf.TAG = TAG_S_KEY;
 	send_msg_buf.idjob = *idjob;
 	
-	switch (*datatype){
-	case  MPI_CHARACTER:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_CHAR Datatype found \n");}
-		length = sizeof(char) * count; 
-		break;
-	case  MPI_INTEGER:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_INT Datatype found \n");}
-		length = sizeof(int) * count;
-		break;
-	case MPI_DOUBLE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-		length = sizeof(double) * count;
-		break; 
-		
-	default:
-		if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
+	length = debug_get_mpi_buffer_length(count, *datatype, sizeof(char));
+	if (length < 0) {
 	 	*ierr=-1;
 	}
+	
 	memcpy(send_msg_buf.data, buf, length);
-	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
-	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+length, 0);
+//	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
+	error = msgsnd(C2S_Q_ID, &send_msg_buf,  get_payload_size(&send_msg_buf), 0);
 	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
-		perror("ERROR"); 
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgsnd error\n");}
+		perror("[ProActiveMPI.c] ERROR"); 
 		*ierr= -1;
 		return;}
 	if (DEBUG) {fflush(mslog);}
@@ -1551,83 +1265,73 @@ void proactivempi_send_(void * buf, int* cnt, MPI_Datatype* datatype, int* dest,
 void proactivempi_recv_(void* buf, int* cnt, MPI_Datatype* datatype, int* src, int* tag, int* idjob, int* ierr){
 	msg_t recv_msg_buf;
 	int error = -1;
-	int pms;
+//	int pms;
 	int length;
+		if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&recv_msg_buf);
+	} 
+	
 	int count = *cnt;
+
+	DEBUG_PRINT(mslog, fprintf(mslog, "[ProActiveMPI.c][proactivempi_recv_] Entering %d", errno))
+
+//	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
 	
-	pms= sizeof(msg_t) - sizeof(recv_msg_buf.TAG) - sizeof(recv_msg_buf.data);
-	
-	error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
+	error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, 0);
 	// if an error occured during receive call check if its an interrupted
 	// System call and so retry to receive
 	while (error < 0){
 		strerror(errno);
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: msgrcv error ERRNO = %d, \n", errno);}
+		DEBUG_PRINT(mslog,fprintf(mslog, "[ProActiveMPI.c][proactivempi_recv_] !!! ERROR: msgrcv error ERRNO = %d, \n", errno))
 		
 		if (errno == EINTR){
-			if (DEBUG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
-			error = msgrcv(S2C_Q_ID, &recv_msg_buf, pms+MSG_SIZE, TAG_R_KEY, 0);
+			DEBUG_PRINT(mslog,fprintf(mslog, "[ProActiveMPI.c][proactivempi_recv_] !!! ERRNO = EINTR, \n"))
+			error = msgrcv(S2C_Q_ID, &recv_msg_buf, get_payload_size(&recv_msg_buf), TAG_R_KEY, 0);
 		}
 		else{
-			perror("ERROR");
+			perror("[ProActiveMPI.c][proactivempi_recv_] ERROR");
 			*ierr=-1; 
 			return; 
 		}
 	}
 	
-	if (DEBUG) {fflush(mslog);}
+//	if (DEBUG) {fflush(mslog);}
 	// filter
 	if (recv_msg_buf.idjob != *idjob){
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER idjob \n");}
+
+			DEBUG_PRINT(mslog,fprintf(mslog, "[ProActiveMPI.c][proactivempi_recv_] !!! ERROR: BAD PARAMETER idjob \n"))
 		*ierr=-1; 
 		return; 
 	}
 	else if (recv_msg_buf.src != *src){
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER src \n");}
+			DEBUG_PRINT(mslog,fprintf(mslog, "[ProActiveMPI.c][proactivempi_recv_] !!! ERROR: BAD PARAMETER src \n"))
 		*ierr=-1; 
 		return; 
 	}
 	else if (recv_msg_buf.tag != *tag) {
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER tag \n");}
+			DEBUG_PRINT(mslog,fprintf(mslog, "[ProActiveMPI.c][proactivempi_recv_] !!! ERROR: BAD PARAMETER tag \n"))
 		*ierr=-1; 
 		return; 
 	} 
-	else if (recv_msg_buf.datatype != *datatype){
-		if (DEBUG) {
-			fprintf(mslog, "!!! ERROR: BAD PARAMETER datatype \n");}
+	else if (recv_msg_buf.pa_datatype != type_conversion_MPI_to_proactive(*datatype)){
+			DEBUG_PRINT(mslog,fprintf(mslog, "[ProActiveMPI.c][proactivempi_recv_] !!! ERROR: BAD PARAMETER datatype \n"))
 		*ierr=-1; 
 		return; 
 	} 
 	else{
-		switch (*datatype){
-		case  MPI_CHARACTER:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-			length = sizeof(char) * count; 
-			break;
-		case  MPI_INTEGER:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_INT Datatype found \n");}
-			length = sizeof(int) * count;
-			break;
-		case MPI_DOUBLE:
-			if (DEBUG) {
-				fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-			length = sizeof(double) * count;
-			break; 
-		default:
-			if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-		*ierr=-1; 
-		return; 
+		length = debug_get_mpi_buffer_length(count, *datatype, sizeof(char));
+		
+		if (length < 0) {
+			*ierr=-1;
+			return; 
 		}
+		
 		memcpy(buf, recv_msg_buf.data, length);
 	}
 	
-	*ierr=0; 
+	*ierr=0;
+	DEBUG_PRINT(mslog,fprintf(mslog, "[ProActiveMPI.c][proactivempi_recv_] Exiting %d", errno)) 
 }
 
 /* NON BLOCKING COMMUNICATION - HOW TO HANDLE REQUEST WITH PROACTIVEMPI_FORTRAN ? 
@@ -1663,15 +1367,19 @@ void proactivempi_finalize_(int* ierr){
 	msg_t send_msg_buf;
 	int error;
 	int pms;
+		if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&send_msg_buf);
+	} 
 	
-	send_msg_buf.TAG1 = MSG_FINALIZE;
+	send_msg_buf.msg_type = MSG_FINALIZE;
 	send_msg_buf.TAG = TAG_S_KEY;
 	strcpy(send_msg_buf.data, "");
 	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
-	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+1, 0);
+	error = msgsnd(C2S_Q_ID, &send_msg_buf,  get_payload_size(&send_msg_buf)/*pms+1*/, 0);
 	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
-		perror("ERROR");
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgsnd error\n");}
+		perror("[ProActiveMPI.c] ERROR");
 		*ierr= -1; return; }
 	if (DEBUG) {fflush(mslog);}
 	*ierr=0;
@@ -1688,47 +1396,38 @@ void proactivempi_allsend_(void * buf, int* cnt, MPI_Datatype* datatype, int* ta
 { 
 	msg_t send_msg_buf;
 	int error;
-	int pms;
+//	int pms;
 	int length;
+		if (DEBUG_STMT) {
+		// clear buffers in debug mode to avoid valgrind warnings
+		init_msg_t(&send_msg_buf);
+	} 
+	
 	int count = *cnt;
 	if (DEBUG) {
-		fprintf(mslog, "!!! ProActiveMPI_AllSend \n");}
-	send_msg_buf.TAG1 = MSG_ALLSEND;
+		fprintf(mslog, "[ProActiveMPI.c] !!! ProActiveMPI_AllSend \n");}
+	send_msg_buf.msg_type = MSG_ALLSEND;
 	send_msg_buf.count = *cnt;
 	send_msg_buf.src = myRank ;
 	send_msg_buf.dest = -1;
-	send_msg_buf.datatype = *datatype;
+	send_msg_buf.pa_datatype = type_conversion_MPI_to_proactive(*datatype);
 	send_msg_buf.tag = *tag;
 	send_msg_buf.TAG = TAG_S_KEY;
 	send_msg_buf.idjob = *idjob;
 	
-	switch (*datatype){
-	case  MPI_CHARACTER: case MPI_BYTE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_CHAR Datatype found  \n");}
-		length = sizeof(char) * count; 
-		break;
-	case  MPI_INTEGER:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_INT Datatype found  \n");}
-		length = sizeof(int) * count;
-		break;
-	case MPI_DOUBLE:
-		if (DEBUG) {
-			fprintf(mslog, "MPI_DOUBLE Datatype found  \n");}
-		length = sizeof(double) * count;
-		break; 
-	default:
-		if (DEBUG) {fprintf(mslog, "!!! BAD DATATYPE \n");}
-	*ierr = -1;
-	return;
+	length = debug_get_mpi_buffer_length(count, *datatype, sizeof(char));
+		
+	if (length < 0) {
+		*ierr=-1;
+		return; 
 	}
+		
 	memcpy(send_msg_buf.data, buf, length);
-	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
-	error = msgsnd(C2S_Q_ID, &send_msg_buf, pms+length, 0);
+//	pms= sizeof(msg_t) - sizeof(send_msg_buf.TAG) - sizeof(send_msg_buf.data);
+	error = msgsnd(C2S_Q_ID, &send_msg_buf,  get_payload_size(&send_msg_buf), 0);
 	if (error < 0) {
-		if (DEBUG) {fprintf(mslog, "!!! ERROR: msgsnd error\n");}
-		perror("ERROR"); 
+		if (DEBUG) {fprintf(mslog, "[ProActiveMPI.c] !!! ERROR: msgsnd error\n");}
+		perror("[ProActiveMPI.c] ERROR"); 
 		*ierr = -1;
 		return;  }
 	if (DEBUG) {fflush(mslog);}
@@ -1742,71 +1441,37 @@ void msg_stat(int msgid, struct msqid_ds * msg_info)
 	reval=msgctl(msgid,IPC_STAT,msg_info);
 	if(reval==-1)
 	{
-		printf( "get msg info error\n");
+		printf( "[ProActiveMPI.c] get msg info error\n");
 		return;
 	}
-
-	if(reval==-1)
-	{
-		printf( "set msg info error\n");
-		return;
-	}
-
 }
 
 int openlog(char *path, int rank){
-	char *filename = (char *)malloc(sizeof(char)*256);
 	char hostname[MAX_NOM];
-	char * nombre = (char *)malloc(sizeof(char)*2);
+	char nombre[2];
+	int err = 0;
 	sprintf(nombre, "%d", rank);
 	gethostname(hostname, MAX_NOM);
-	strcpy(filename, path);
-	strcat(filename, "/log/mpi_log");
-	strcat(filename, "_");
-	strcat(filename, hostname);
-	strcat(filename, "_");
-	strcat(filename, nombre);
-	mslog = fopen(filename, "w");
-	if(mslog==NULL) return -1;
-	else return 0; 
-}
+	strcat(path, "/log");
+	umask(000);
+	err = mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO);
 
+	if ((err >  0) || (errno == EEXIST)) {
+		//TODO possible bug as EEXIST indicate that it could be a file
+		strcat(path, "/mpi_log");
+		strcat(path, "_");
+		strcat(path, hostname);
+		strcat(path, "_");
+		strcat(path, nombre);
+		mslog = fopen(path, "w");
 
-// ///////////////////////////////////////////
-// ////////// SEMAPHORE FUNCTIONS ////////////
-// ///////////////////////////////////////////
-
-/*
- * function: sem_lock. locks the semaphore, for exclusive access to a resource.
- * input: semaphore set ID. output: none.
- */
-
-void sem_lock(int sem_set_id)
-{
-    /* structure for semaphore operations. */
-    struct sembuf sem_op;
-
-    /* wait on the semaphore, unless it's value is non-negative. */
-    sem_op.sem_num = 0;
-    sem_op.sem_op = -1;
-    sem_op.sem_flg = 0;
-    semop(sem_set_id, &sem_op, 1);
-}
-
-/*
- * function: sem_unlock. un-locks the semaphore. input: semaphore set ID.
- * output: none.
- */
-void
-sem_unlock(int sem_set_id)
-{
-    /* structure for semaphore operations. */
-    struct sembuf sem_op;
-
-    /* signal the semaphore - increase its value by one. */
-    sem_op.sem_num = 0;
-    sem_op.sem_op = 1;   /* <-- Comment 3 */
-    sem_op.sem_flg = 0;
-    semop(sem_set_id, &sem_op, 1);
+		if(mslog==NULL) { 
+			err= -1;
+		} else {
+		 err = 0;
+		}
+	}
+	
+	return err;
 }
 

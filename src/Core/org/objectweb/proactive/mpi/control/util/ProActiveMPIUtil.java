@@ -76,6 +76,22 @@ public class ProActiveMPIUtil {
         (((int) bytes[startIndex + 3] & 0xff) << 24));
     }
 
+    /** Given a byte array, restore it as an int
+     * @param bytes the byte array
+     * @param startIndex the starting index of the place the int is stored
+     */
+    public static int[] byteArrayToIntArray(byte[] bytes) {
+        int lg = bytes.length / 4;
+        int[] res = new int[lg];
+        int i = 0;
+        while (i < lg) {
+            res[i] = bytesToInt(bytes, i * 4);
+            i++;
+        }
+
+        return res;
+    }
+
     /** translate float into bytes, stored in byte array
      *starting from startIndex
      *@param num the float to be translated
