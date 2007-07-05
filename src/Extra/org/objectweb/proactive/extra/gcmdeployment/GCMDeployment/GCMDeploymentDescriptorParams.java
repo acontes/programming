@@ -6,6 +6,8 @@ import java.util.Set;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+
+
 public class GCMDeploymentDescriptorParams {
 
     /** The GCM Descriptor describing the resources to be used */

@@ -20,6 +20,12 @@ public interface VirtualNode {
     static final public long MAX_CAPACITY = -2;
 
     /**
+     * Returns the name of this Virtual Node
+     * @return name of the Virtual Node as declared inside the GCM Application Descriptor
+     */
+    public String getName();
+
+    /**
      * Returns the capacity asked by this Virtual Node
      *
      * @return the capacity asked by this Virtual Node. If max is specified
