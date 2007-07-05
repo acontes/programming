@@ -42,7 +42,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
     static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
     static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
-    public static final String DESCRIPTOR_NAMESPACE = "urn:proactive:deployment:3.3";
+    public static final String DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema";
     protected Document document;
     private DocumentBuilderFactory domFactory;
     private XPath xpath;
@@ -74,11 +74,15 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-        // domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-        // new String[] {
-        // "http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
-        // });
-        // this.variableContract = variableContract;
+        
+        
+        String deploymentSchema = getClass()
+        .getResource("/org/objectweb/proactive/extra/ressourceallocator/schema/ApplicationDescriptorSchema.xsd")
+        .toString();
+
+        domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
+                new Object[] { deploymentSchema });
+        
         try {
             builder = domFactory.newDocumentBuilder();
             builder.setErrorHandler(new MyDefaultHandler());
@@ -102,7 +106,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         try {
             NodeList nodes;
 
-            nodes = (NodeList) xpath.evaluate("//pa:resourceProvider",
+            nodes = (NodeList) xpath.evaluate("/pa:GCMApplication/pa:resourceProvider",
                     document, XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); ++i) {
@@ -158,7 +162,33 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     }
 
     public CommandBuilder getCommandBuilder() {
-        // TODO Dispatch to parseApplicationNode or parseProActiveNode
+        
+        Node commandNode;
+
+        try {
+
+            commandNode = (Node) xpath.evaluate("//pa:proactive", document,
+                    XPathConstants.NODE);
+
+            if (commandNode != null) {
+                parseProactiveNode(commandNode);
+            } else {
+
+                commandNode = (Node) xpath.evaluate("//pa:application", document,
+                        XPathConstants.NODE);
+                
+                if (commandNode != null) {
+                    parseApplicationNode(commandNode);
+                }
+                
+            }
+            
+        } catch (XPathExpressionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        
         return null;
     }
 
@@ -215,11 +245,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         Node configNode = (Node) xpath.evaluate("pa:configuration", paNode,
                 XPathConstants.NODE);
 
-        parseProActiveConfiguration(configNode);
+        if (configNode != null) {
+            parseProActiveConfiguration(configNode);
+        }
     }
 
     protected String getAttributeValue(Node node, String attributeName) {
-        return node.getAttributes().getNamedItem(attributeName).getNodeValue();
+        Node namedItem = node.getAttributes().getNamedItem(attributeName);
+        return namedItem != null ? namedItem.getNodeValue() : null;
     }
 
     protected void parseProActiveConfiguration(Node configNode)
@@ -293,7 +326,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             // make sure these are parsed
             getResourceProviders();
 
-            NodeList nodes = (NodeList) xpath.evaluate("//pa:virtualNode",
+            NodeList nodes = (NodeList) xpath.evaluate("/pa:GCMApplication/pa:proactive/pa:virtualNode",
                     document, XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); ++i) {
