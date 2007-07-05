@@ -25,6 +25,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDe
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -91,7 +92,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         }
     }
 
-    public Set<GCMDeploymentDescriptor> getResourceProviders() {
+    synchronized public Set<GCMDeploymentDescriptor> getResourceProviders() {
         if (resourceProviders != null) {
             return resourceProviders;
         }
@@ -157,7 +158,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     }
 
     public CommandBuilder getCommandBuilder() {
-        // TODO Auto-generated method stub
+        // TODO Dispatch to parseApplicationNode or parseProActiveNode
         return null;
     }
 
@@ -281,7 +282,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         return pathElement;
     }
 
-    public Map<String, VirtualNodeInternal> getVirtualNodes() {
+    synchronized public Map<String, VirtualNodeInternal> getVirtualNodes() {
         if (virtualNodes != null) {
             return virtualNodes;
         }
@@ -310,11 +311,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 String capacity = getAttributeValue(node, "capacity").trim()
                                       .toLowerCase();
 
-                int capacityI = 0;
+                long capacityI = 0;
                 if (capacity.equals("max")) {
-                    capacityI = Integer.MAX_VALUE;
+                    capacityI = VirtualNode.MAX_CAPACITY;
                 } else {
-                    capacityI = Integer.parseInt(capacity);
+                    capacityI = Long.parseLong(capacity);
                 }
                 virtualNode.setRequiredCapacity(capacityI);
 
