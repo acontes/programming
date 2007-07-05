@@ -34,6 +34,7 @@
 						<parameter
 							value="-Dproactive.useIPaddress=true" />
 						<parameter value="-Dproactive.rmi.port=6099" />
+						<parameter value="-Dsun.rmi.server.exceptionTrace=true" />
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -48,7 +49,7 @@
 						<processNumber>4</processNumber>
 						<localRelativePath>
 							<relativePath origin="user.dir"
-								value="../../src/org/objectweb/proactive/examples/mpi" />
+								value="../../src/Examples/org/objectweb/proactive/examples/mpi" />
 						</localRelativePath>
 					</mpiOptions>
 				</mpiProcess>
