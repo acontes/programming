@@ -1,12 +1,48 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public class CommandBuilderScript implements CommandBuilder {
+
+    /** List of providers to be used */
+    private List<GCMDeploymentDescriptor> providers;
+
+    /** The command */
+    private PathElement commandPath;
+
+    /** The arguments*/
+    private List<String> args;
+
+    /** File transfers to perform before starting the command */
+    private List<FileTransferBlock> fts;
+
+    public CommandBuilderScript() {
+        providers = new ArrayList<GCMDeploymentDescriptor>();
+        args = new ArrayList<String>();
+    }
+
+    public void setCommandPath(PathElement pe) {
+        commandPath = pe;
+    }
+
+    public void addArg(String arg) {
+        args.add(arg);
+    }
+
+    public void addFileTransferBlock(FileTransferBlock ftb) {
+        fts.add(ftb);
+    }
+
     public String buildCommand(HostInfo hostInfo) {
-        // TODO Auto-generated method stub
+        // TODO Build the command here
         return null;
     }
 }
