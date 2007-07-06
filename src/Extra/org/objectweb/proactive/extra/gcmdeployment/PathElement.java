@@ -3,7 +3,8 @@ package org.objectweb.proactive.extra.gcmdeployment;
 public class PathElement {
     protected String relPath;
     public enum PathBase {PROACTIVE,
-        HOME;
+        HOME,
+        ROOT;
     }
     ;
     protected PathBase base;
