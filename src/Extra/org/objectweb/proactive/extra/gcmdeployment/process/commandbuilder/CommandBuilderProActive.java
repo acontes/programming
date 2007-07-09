@@ -68,7 +68,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     synchronized public void setProActiveClasspath(List<PathElement> pe) {
         proactiveClasspath = pe;
     }
-    
+
     synchronized public void addApplicationPath(PathElement pe) {
         if (applicationClasspath == null) {
             applicationClasspath = new ArrayList<PathElement>();
@@ -79,8 +79,8 @@ public class CommandBuilderProActive implements CommandBuilder {
 
     synchronized public void setApplicationClasspath(List<PathElement> pe) {
         applicationClasspath = pe;
-    }    
-    
+    }
+
     public void setVirtualNodes(Map<String, VirtualNodeInternal> vns) {
         this.vns = vns;
     }
