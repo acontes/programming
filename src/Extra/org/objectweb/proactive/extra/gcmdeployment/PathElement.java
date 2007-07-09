@@ -9,6 +9,21 @@ public class PathElement {
     ;
     protected PathBase base;
 
+    public PathElement() {
+        this.relPath = null;
+        this.base = PathBase.HOME;
+    }
+
+    public PathElement(String relPath) {
+        this.relPath = relPath;
+        this.base = PathBase.HOME;
+    }
+
+    public PathElement(String relPath, String base) {
+        this.relPath = relPath;
+        setBase(base);
+    }
+
     public String getRelPath() {
         return relPath;
     }
@@ -26,10 +41,17 @@ public class PathElement {
     }
 
     public void setBase(String baseString) {
-        if (baseString.trim().toLowerCase().equals("proactive")) {
-            this.base = PathBase.PROACTIVE;
+        if (baseString == null) {
+            this.base = PathBase.PROACTIVE; // TODO - what should be the default ?
         } else {
-            this.base = PathBase.HOME;
+            String baseStringCanonical = baseString.trim();
+            if (baseStringCanonical.equalsIgnoreCase("proactive")) {
+                this.base = PathBase.PROACTIVE;
+            } else if (baseStringCanonical.equalsIgnoreCase("home")) {
+                this.base = PathBase.HOME;
+            } else if (baseStringCanonical.equalsIgnoreCase("root")) {
+                this.base = PathBase.ROOT;
+            }
         }
     }
 
