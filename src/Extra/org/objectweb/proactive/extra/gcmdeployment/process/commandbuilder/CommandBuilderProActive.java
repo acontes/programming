@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         vns.put(id, vn);
     }
 
-    synchronized public void addProActiveClass(PathElement pe) {
+    synchronized public void addProActivePath(PathElement pe) {
         if (proactiveClasspath == null) {
             proactiveClasspath = new ArrayList<PathElement>();
         }
@@ -64,12 +65,24 @@ public class CommandBuilderProActive implements CommandBuilder {
         proactiveClasspath.add(pe);
     }
 
-    synchronized public void addApplicationClasspath(PathElement pe) {
+    synchronized public void setProActiveClasspath(List<PathElement> pe) {
+        proactiveClasspath = pe;
+    }
+    
+    synchronized public void addApplicationPath(PathElement pe) {
         if (applicationClasspath == null) {
             applicationClasspath = new ArrayList<PathElement>();
         }
 
         applicationClasspath.add(pe);
+    }
+
+    synchronized public void setApplicationClasspath(List<PathElement> pe) {
+        applicationClasspath = pe;
+    }    
+    
+    public void setVirtualNodes(Map<String, VirtualNodeInternal> vns) {
+        this.vns = vns;
     }
 
     public void addFileTransferBlock(FileTransferBlock ftb) {

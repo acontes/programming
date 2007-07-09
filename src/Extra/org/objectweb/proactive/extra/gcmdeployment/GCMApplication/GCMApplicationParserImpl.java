@@ -29,6 +29,7 @@ import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -74,15 +75,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-        
-        
+
         String deploymentSchema = getClass()
-        .getResource("/org/objectweb/proactive/extra/ressourceallocator/schema/ApplicationDescriptorSchema.xsd")
-        .toString();
+                                      .getResource("/org/objectweb/proactive/extra/ressourceallocator/schema/ApplicationDescriptorSchema.xsd")
+                                      .toString();
 
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-                new Object[] { deploymentSchema });
-        
+            new Object[] { deploymentSchema });
+
         try {
             builder = domFactory.newDocumentBuilder();
             builder.setErrorHandler(new MyDefaultHandler());
@@ -162,33 +162,27 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     }
 
     public CommandBuilder getCommandBuilder() {
-        
         Node commandNode;
 
         try {
-
             commandNode = (Node) xpath.evaluate("//pa:proactive", document,
                     XPathConstants.NODE);
 
             if (commandNode != null) {
                 parseProactiveNode(commandNode);
             } else {
+                commandNode = (Node) xpath.evaluate("//pa:application",
+                        document, XPathConstants.NODE);
 
-                commandNode = (Node) xpath.evaluate("//pa:application", document,
-                        XPathConstants.NODE);
-                
                 if (commandNode != null) {
                     parseApplicationNode(commandNode);
                 }
-                
             }
-            
         } catch (XPathExpressionException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        
+
         return null;
     }
 
@@ -231,41 +225,54 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     protected void parseProactiveNode(Node paNode)
         throws XPathExpressionException {
+        CommandBuilderProActive commandBuilderProActive = new CommandBuilderProActive();
+
         String relPath = getAttributeValue(paNode, "relpath");
 
+        // TODO - what do we do with this ?
         Node javaNode = (Node) xpath.evaluate("pa:java", paNode,
                 XPathConstants.NODE);
 
         if (javaNode != null) {
             String javaRelPath = getAttributeValue(javaNode, "relpath");
-
-            // TODO
+            PathElement pathElement = new PathElement();
+            pathElement.setRelPath(javaRelPath);
+            commandBuilderProActive.setJavaPath(pathElement);
         }
 
         Node configNode = (Node) xpath.evaluate("pa:configuration", paNode,
                 XPathConstants.NODE);
 
         if (configNode != null) {
-            parseProActiveConfiguration(configNode);
+            parseProActiveConfiguration(commandBuilderProActive, configNode);
         }
+
+        Map<String, VirtualNodeInternal> virtualNodesMap = getVirtualNodes();
+
+        commandBuilderProActive.setVirtualNodes(virtualNodesMap);
     }
 
     protected String getAttributeValue(Node node, String attributeName) {
         Node namedItem = node.getAttributes().getNamedItem(attributeName);
-        return namedItem != null ? namedItem.getNodeValue() : null;
+        return (namedItem != null) ? namedItem.getNodeValue() : null;
     }
 
-    protected void parseProActiveConfiguration(Node configNode)
+    protected void parseProActiveConfiguration(
+        CommandBuilderProActive commandBuilderProActive, Node configNode)
         throws XPathExpressionException {
         Node classPathNode = (Node) xpath.evaluate("pa:proactiveClasspath",
                 configNode, XPathConstants.NODE);
 
         List<PathElement> proactiveClassPath = parseClasspath(classPathNode);
 
+        commandBuilderProActive.setProActiveClasspath(proactiveClassPath);
+
         classPathNode = (Node) xpath.evaluate("pa:applicationClasspath",
                 configNode, XPathConstants.NODE);
 
         List<PathElement> applicationClassPath = parseClasspath(classPathNode);
+
+        commandBuilderProActive.setApplicationClasspath(applicationClassPath);
 
         // security policy
         //
@@ -273,17 +280,18 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 configNode, XPathConstants.NODE);
 
         if (securityPolicyNode != null) {
-            PathElement pathElementNode = parsePathElementNode(securityPolicyNode);
-
-            // TODO
+            PathElement pathElement = parsePathElementNode(securityPolicyNode);
+            commandBuilderProActive.setSecurityPolicy(pathElement);
         }
 
         // log4j properties
+        //
         Node log4jPropertiesNode = (Node) xpath.evaluate("pa:log4jProperties",
                 configNode, XPathConstants.NODE);
 
         if (log4jPropertiesNode != null) {
-            PathElement pathElementNode = parsePathElementNode(log4jPropertiesNode);
+            PathElement pathElement = parsePathElementNode(log4jPropertiesNode);
+            commandBuilderProActive.setLog4jProperties(pathElement);
         }
     }
 
