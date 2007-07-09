@@ -30,6 +30,7 @@ import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
+import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderScript;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,11 +48,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Document document;
     private DocumentBuilderFactory domFactory;
     private XPath xpath;
-    private String xmlDescriptorUrl;
     protected Map<String, GCMDeploymentDescriptor> resourceProvidersMap;
     protected Set<GCMDeploymentDescriptor> resourceProviders;
     protected Map<String, VirtualNodeInternal> virtualNodes;
-    protected DocumentBuilder builder;
+    protected DocumentBuilder documentBuilder;
+    protected CommandBuilder commandBuilder;
 
     public GCMApplicationParserImpl(File descriptor) throws IOException {
         resourceProviders = null;
@@ -63,7 +64,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         InputSource inputSource = new InputSource(new FileInputStream(
                     descriptor));
         try {
-            document = builder.parse(inputSource);
+            document = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -84,8 +85,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             new Object[] { deploymentSchema });
 
         try {
-            builder = domFactory.newDocumentBuilder();
-            builder.setErrorHandler(new MyDefaultHandler());
+            documentBuilder = domFactory.newDocumentBuilder();
+            documentBuilder.setErrorHandler(new MyDefaultHandler());
 
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
@@ -162,20 +163,24 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     }
 
     public CommandBuilder getCommandBuilder() {
-        Node commandNode;
+        if (commandBuilder != null) {
+            return commandBuilder;
+        }
 
         try {
+            Node commandNode;
+
             commandNode = (Node) xpath.evaluate("//pa:proactive", document,
                     XPathConstants.NODE);
 
             if (commandNode != null) {
-                parseProactiveNode(commandNode);
+                commandBuilder = parseProactiveNode(commandNode);
             } else {
                 commandNode = (Node) xpath.evaluate("//pa:application",
                         document, XPathConstants.NODE);
 
                 if (commandNode != null) {
-                    parseApplicationNode(commandNode);
+                    commandBuilder = parseApplicationNode(commandNode);
                 }
             }
         } catch (XPathExpressionException e) {
@@ -183,47 +188,64 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             e.printStackTrace();
         }
 
-        return null;
+        return commandBuilder;
     }
 
-    protected void parseApplicationNode(Node appNode)
+    protected CommandBuilder parseApplicationNode(Node appNode)
         throws XPathExpressionException {
         NodeList resourceProviderNodes = (NodeList) xpath.evaluate("pa:resourceProvider",
                 appNode, XPathConstants.NODESET);
 
+        CommandBuilderScript commandBuilderScript = new CommandBuilderScript();
+
+        getResourceProviders();
+
+        // resource providers
+        //
         for (int i = 0; i < resourceProviderNodes.getLength(); ++i) {
             Node rpNode = resourceProviderNodes.item(i);
-            getAttributeValue(rpNode, "refid");
-            // TODO - do something with refid
+            String refid = getAttributeValue(rpNode, "refid");
+            GCMDeploymentDescriptor deploymentDescriptor = resourceProvidersMap.get(refid);
+            if (deploymentDescriptor != null) {
+                commandBuilderScript.addDescriptor(deploymentDescriptor);
+            } else {
+                // TODO - log warning
+            }
         }
 
         Node commandNode = (Node) xpath.evaluate("pa:command", appNode,
                 XPathConstants.NODE);
 
         String relPath = getAttributeValue(commandNode, "relpath");
+        String base = getAttributeValue(commandNode, "base");
 
-        // TODO
+        commandBuilderScript.setCommandPath(new PathElement(relPath, base));
+
+        // command args
+        //
         NodeList argNodes = (NodeList) xpath.evaluate("pa:arg", commandNode,
                 XPathConstants.NODESET);
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);
             String argVal = argNode.getNodeValue();
-
-            // TODO
+            commandBuilderScript.addArg(argVal);
         }
 
+        // filetransfer
+        //
         NodeList fileTransferNodes = (NodeList) xpath.evaluate("pa:filetransfer",
                 appNode, XPathConstants.NODESET);
 
         for (int i = 0; i < fileTransferNodes.getLength(); ++i) {
             Node fileTransferNode = fileTransferNodes.item(i);
             FileTransferBlock fileTransferBlock = parseFileTransferNode(fileTransferNode);
-
-            // TODO
+            commandBuilderScript.addFileTransferBlock(fileTransferBlock);
         }
+
+        return commandBuilderScript;
     }
 
-    protected void parseProactiveNode(Node paNode)
+    protected CommandBuilder parseProactiveNode(Node paNode)
         throws XPathExpressionException {
         CommandBuilderProActive commandBuilderProActive = new CommandBuilderProActive();
 
@@ -247,9 +269,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             parseProActiveConfiguration(commandBuilderProActive, configNode);
         }
 
-        Map<String, VirtualNodeInternal> virtualNodesMap = getVirtualNodes();
+        getVirtualNodes();
 
-        commandBuilderProActive.setVirtualNodes(virtualNodesMap);
+        commandBuilderProActive.setVirtualNodes(virtualNodes);
+
+        return commandBuilderProActive;
     }
 
     protected String getAttributeValue(Node node, String attributeName) {
