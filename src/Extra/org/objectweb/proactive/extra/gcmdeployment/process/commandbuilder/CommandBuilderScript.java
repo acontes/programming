@@ -41,6 +41,10 @@ public class CommandBuilderScript implements CommandBuilder {
         fts.add(ftb);
     }
 
+    public void addDescriptor(GCMDeploymentDescriptor desc) {
+        providers.add(desc);
+    }
+
     public String buildCommand(HostInfo hostInfo) {
         // TODO Build the command here
         return null;
