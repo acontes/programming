@@ -15,6 +15,8 @@ public class HostInfoImpl implements HostInfo {
     private String username;
     private String homeDirectory;
     private String id;
+    private int hostCapacity;
+    private int vmCapacity;
     private OperatingSystem os;
     private Set<Tool> tools;
 
@@ -22,6 +24,8 @@ public class HostInfoImpl implements HostInfo {
         username = null;
         homeDirectory = null;
         id = null;
+        hostCapacity = 0;
+        vmCapacity = 0;
         os = null;
         tools = new HashSet<Tool>();
     }
@@ -108,23 +112,31 @@ public class HostInfoImpl implements HostInfo {
         return true;
     }
 
-    protected void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
-    protected void setHomeDirectory(String homeDirectory) {
+    public void setHomeDirectory(String homeDirectory) {
         this.homeDirectory = homeDirectory;
     }
 
-    protected void setId(String id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    protected void setOs(OperatingSystem os) {
+    public void setOs(OperatingSystem os) {
         this.os = os;
     }
+    
+    public void setHostCapacity(int hostCapacity) {
+        this.hostCapacity = hostCapacity;
+    }
 
-    protected void addTool(Tool tool) {
+    public void setVmCapacity(int vmCapacity) {
+        this.vmCapacity = vmCapacity;
+    }
+
+    public void addTool(Tool tool) {
         this.tools.add(tool);
     }
 
@@ -164,6 +176,14 @@ public class HostInfoImpl implements HostInfo {
         return username;
     }
 
+    public int getHostCapacity() {
+        return hostCapacity;
+    }
+
+    public int getVmCapacity() {
+        return vmCapacity;
+    }
+        
     @SuppressWarnings("unused")
     static public class TestHostInfoImpl {
         HostInfoImpl notInitialized;
@@ -246,4 +266,7 @@ public class HostInfoImpl implements HostInfo {
             notInitialized.getUsername();
         }
     }
+
+
+
 }

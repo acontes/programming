@@ -54,4 +54,21 @@ public interface HostInfo {
      * @return If declared the Tool is returned. Otherwise null is returned
      */
     public Tool getTool(final String id);
+    
+    /**
+     * Returns the capacity of this host
+     * 
+     * @return the capacity of this host
+     */
+    public int getHostCapacity();
+
+    /**
+     * Returns the VM capacity of this host
+     * 
+     * @return the VM capacity of this host
+     */
+    public int getVmCapacity();
+    
+
+
 }

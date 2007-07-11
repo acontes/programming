@@ -24,6 +24,8 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.process.bridge.AbstractBridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
+import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
+import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -223,7 +225,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             parseGroupResource(resourceNode, groupResource);
             resources.addGroup(refid, groupResource);
         } else if (nodeName.equals("host")) {
-            addHostResource(refid);
+            resources.addHost(refid);
         }
     }
 
@@ -237,12 +239,68 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    protected void addHostResource(String refid) {
-        resources.addHost(refid);
-    }
+    
+    protected void parseInfrastructure() throws XPathExpressionException {
+        Node infrastructureNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:infrastructure",
+                document, XPathConstants.NODE);
+        
+        
+        NodeList hosts = (NodeList) xpath.evaluate("pa:hosts/pa:host",
+                infrastructureNode, XPathConstants.NODESET);
+        
+        for(int i = 0; i < hosts.getLength(); ++i) {
+            HostInfo hostInfo = parseHostNode(hosts.item(i));
+            hostsMap.put(hostInfo.getId(), hostInfo);            
+        }
 
-    protected void addGroupResource(String refid, GroupResource group) {
-        resources.addGroup(refid, group);
+        NodeList groups = (NodeList) xpath.evaluate("pa:groups/",
+                infrastructureNode, XPathConstants.NODESET);
+    
+        for(int i = 0; i < groups.getLength(); ++i) {
+            // TODO
+        }
+        
+    }
+    
+    protected HostInfo parseHostNode(Node hostNode) throws XPathExpressionException {
+        HostInfoImpl hostInfo = new HostInfoImpl();
+        
+        String id = GCMParserHelper.getAttributeValue(hostNode, "id");
+        hostInfo.setId(id);
+
+        String hostCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "hostCapacity");
+        if (hostCapacityStr != null) {
+            hostInfo.setHostCapacity(Integer.parseInt(hostCapacityStr));
+        }
+        
+        String vmCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "vmCapacity");
+        if (vmCapacityStr != null) {
+            hostInfo.setVmCapacity(Integer.parseInt(vmCapacityStr));
+        }
+
+        String username = GCMParserHelper.getAttributeValue(hostNode, "username");
+        if (username != null) {
+            hostInfo.setUsername(username);            
+        }
+
+        Node homeDirectoryNode = (Node) xpath.evaluate("pa:homeDirectory",
+                hostNode, XPathConstants.NODE);
+        
+        if (homeDirectoryNode != null) {
+            hostInfo.setHomeDirectory(homeDirectoryNode.getFirstChild().getNodeValue());
+        }
+        
+        NodeList tools = (NodeList) xpath.evaluate("pa:tool",
+                hostNode, XPathConstants.NODESET);
+        
+        for(int i = 0; i < tools.getLength(); ++i) {
+            Node toolNode = tools.item(i);
+            Tool tool = new Tool(GCMParserHelper.getAttributeValue(toolNode, "id"),
+                    GCMParserHelper.getAttributeValue(toolNode, "path"));
+            hostInfo.addTool(tool);            
+        }
+        
+        return hostInfo;
     }
 
     public Environment getEnvironment() {
