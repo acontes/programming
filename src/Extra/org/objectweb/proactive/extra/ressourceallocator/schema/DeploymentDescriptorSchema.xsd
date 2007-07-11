@@ -226,7 +226,8 @@
 			<element name="homeDirectory" type="pa:pathElementType"></element>
 			<element name="tool" type="pa:toolType" maxOccurs="unbounded"></element>
 		</sequence>
-		<attribute name="id" type="string"></attribute>
+		<attribute name="id" type="string" use="required"></attribute>
+		<attribute name="username" type="string"></attribute>
 		<attribute name="hostCapacity" type="int"></attribute>
 		<attribute name="vmCapacity" type="int"></attribute>
 	</complexType>
