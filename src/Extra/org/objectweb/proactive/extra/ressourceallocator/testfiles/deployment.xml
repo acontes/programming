@@ -8,11 +8,11 @@
 		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
-	<resource>
+	<resources>
 		<group refid="LAN_INRIA">
 			<host refid="INRIA_x86_64" />
 		</group>
-	</resource>
+	</resources>
 
 	<infrastructure>
 		<hosts>

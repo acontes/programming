@@ -162,7 +162,7 @@
 
 	<complexType name="abstractResourceType"></complexType>
 
-	<complexType name="groupType">
+	<complexType name="groupRefType">
 		<complexContent>
 			<extension base="pa:abstractResourceType">
 				<sequence>
@@ -173,14 +173,14 @@
 		</complexContent>
 	</complexType>
 
-	<complexType name="bridgeType">
+	<complexType name="bridgeRefType">
 		<complexContent>
 			<extension base="pa:abstractResourceType">
 				<sequence>
-					<element name="group" type="pa:groupType"
+					<element name="group" type="pa:groupRefType"
 						minOccurs="0" maxOccurs="unbounded">
 					</element>
-					<element name="bridge" type="pa:bridgeType"
+					<element name="bridge" type="pa:bridgeRefType"
 						minOccurs="0" maxOccurs="unbounded">
 					</element>
 				</sequence>
@@ -196,11 +196,11 @@
 
 	<element name="group"
 		substitutionGroup="pa:abstractResourceElement"
-		type="pa:groupType">
+		type="pa:groupRefType">
 	</element>
 
 	<element name="bridge" substitutionGroup="pa:abstractResourceElement"
-		type="pa:bridgeType">
+		type="pa:bridgeRefType">
 	</element>
 
 	<complexType name="resourceType">
@@ -293,7 +293,7 @@
 	<element name="acquisition" type="pa:acquisitionType"
 		substitutionGroup="pa:abstractGCMElement">
 	</element>
-	<element name="resource" type="pa:resourceType"
+	<element name="resources" type="pa:resourceType"
 		substitutionGroup="pa:abstractGCMElement">
 	</element>
 	<element name="infrastructure" type="pa:infrastructureType"
