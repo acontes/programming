@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
@@ -14,7 +15,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
  * @author cmathieu
  *
  */
-public interface GCMApplicationParser {
+public interface GCMApplicationParser extends GCMParserConstants {
 
     /**
      * Returns all the Resources Providers

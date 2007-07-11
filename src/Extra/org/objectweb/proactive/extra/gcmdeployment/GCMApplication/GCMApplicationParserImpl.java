@@ -6,13 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,6 +21,7 @@ import javax.xml.xpath.XPathFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
@@ -36,23 +34,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 
 
 public class GCMApplicationParserImpl implements GCMApplicationParser {
-    static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-    static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
-    static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
     public static final String DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema";
     protected Document document;
-    private DocumentBuilderFactory domFactory;
-    private XPath xpath;
+    protected DocumentBuilderFactory domFactory;
+    protected XPath xpath;
+    protected DocumentBuilder documentBuilder;
+    protected CommandBuilder commandBuilder;
+
     protected Map<String, GCMDeploymentDescriptor> resourceProvidersMap;
     protected Set<GCMDeploymentDescriptor> resourceProviders;
     protected Map<String, VirtualNodeInternal> virtualNodes;
-    protected DocumentBuilder documentBuilder;
-    protected CommandBuilder commandBuilder;
 
     public GCMApplicationParserImpl(File descriptor) throws IOException {
         resourceProviders = null;
@@ -86,11 +80,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
         try {
             documentBuilder = domFactory.newDocumentBuilder();
-            documentBuilder.setErrorHandler(new MyDefaultHandler());
+            documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
 
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
-            xpath.setNamespaceContext(new ProActiveNamespaceContext());
+            xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -116,7 +110,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 // get Id
                 //
                 GCMDeploymentDescriptorParams resourceProviderParams = new GCMDeploymentDescriptorParams();
-                String id = getAttributeValue(node, "id");
+                String id = GCMParserHelper.getAttributeValue(node, "id");
                 resourceProviderParams.setId(id);
 
                 // get GCMDescriptor file
@@ -124,7 +118,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 Node fileNode = (Node) xpath.evaluate("pa:file", node,
                         XPathConstants.NODE);
                 if (fileNode != null) {
-                    String nodeValue = getAttributeValue(fileNode, "path");
+                    String nodeValue = GCMParserHelper.getAttributeValue(fileNode, "path");
                     resourceProviderParams.setGCMDescriptor(new File(nodeValue));
                 }
 
@@ -154,9 +148,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     protected FileTransferBlock parseFileTransferNode(Node fileTransferNode) {
         FileTransferBlock fileTransferBlock = new FileTransferBlock();
-        String source = getAttributeValue(fileTransferNode, "source");
+        String source = GCMParserHelper.getAttributeValue(fileTransferNode, "source");
         fileTransferBlock.setSource(source);
-        String destination = getAttributeValue(fileTransferNode, "destination");
+        String destination = GCMParserHelper.getAttributeValue(fileTransferNode, "destination");
         fileTransferBlock.setDestination(destination);
 
         return fileTransferBlock;
@@ -204,7 +198,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         //
         for (int i = 0; i < resourceProviderNodes.getLength(); ++i) {
             Node rpNode = resourceProviderNodes.item(i);
-            String refid = getAttributeValue(rpNode, "refid");
+            String refid = GCMParserHelper.getAttributeValue(rpNode, "refid");
             GCMDeploymentDescriptor deploymentDescriptor = resourceProvidersMap.get(refid);
             if (deploymentDescriptor != null) {
                 commandBuilderScript.addDescriptor(deploymentDescriptor);
@@ -216,8 +210,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         Node commandNode = (Node) xpath.evaluate("pa:command", appNode,
                 XPathConstants.NODE);
 
-        String relPath = getAttributeValue(commandNode, "relpath");
-        String base = getAttributeValue(commandNode, "base");
+        String relPath = GCMParserHelper.getAttributeValue(commandNode, "relpath");
+        String base = GCMParserHelper.getAttributeValue(commandNode, "base");
 
         commandBuilderScript.setCommandPath(new PathElement(relPath, base));
 
@@ -227,7 +221,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 XPathConstants.NODESET);
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);
-            String argVal = argNode.getNodeValue();
+            String argVal = argNode.getFirstChild().getNodeValue();
             commandBuilderScript.addArg(argVal);
         }
 
@@ -249,14 +243,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         throws XPathExpressionException {
         CommandBuilderProActive commandBuilderProActive = new CommandBuilderProActive();
 
-        String relPath = getAttributeValue(paNode, "relpath");
+        String relPath = GCMParserHelper.getAttributeValue(paNode, "relpath");
 
         // TODO - what do we do with this ?
         Node javaNode = (Node) xpath.evaluate("pa:java", paNode,
                 XPathConstants.NODE);
 
         if (javaNode != null) {
-            String javaRelPath = getAttributeValue(javaNode, "relpath");
+            String javaRelPath = GCMParserHelper.getAttributeValue(javaNode, "relpath");
             PathElement pathElement = new PathElement();
             pathElement.setRelPath(javaRelPath);
             commandBuilderProActive.setJavaPath(pathElement);
@@ -274,11 +268,6 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         commandBuilderProActive.setVirtualNodes(virtualNodes);
 
         return commandBuilderProActive;
-    }
-
-    protected String getAttributeValue(Node node, String attributeName) {
-        Node namedItem = node.getAttributes().getNamedItem(attributeName);
-        return (namedItem != null) ? namedItem.getNodeValue() : null;
     }
 
     protected void parseProActiveConfiguration(
@@ -337,9 +326,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     protected PathElement parsePathElementNode(Node pathElementNode) {
         PathElement pathElement = new PathElement();
-        String attr = getAttributeValue(pathElementNode, "relpath");
+        String attr = GCMParserHelper.getAttributeValue(pathElementNode, "relpath");
         pathElement.setRelPath(attr);
-        attr = getAttributeValue(pathElementNode, "base");
+        attr = GCMParserHelper.getAttributeValue(pathElementNode, "base");
         if (attr != null) {
             pathElement.setBase(attr);
         }
@@ -368,12 +357,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 //
                 VirtualNodeImpl virtualNode = new VirtualNodeImpl();
 
-                String id = getAttributeValue(node, "id");
+                String id = GCMParserHelper.getAttributeValue(node, "id");
                 virtualNode.setId(id);
 
                 // get capacity
                 //
-                String capacity = getAttributeValue(node, "capacity").trim()
+                String capacity = GCMParserHelper.getAttributeValue(node, "capacity").trim()
                                       .toLowerCase();
 
                 long capacityI = 0;
@@ -392,7 +381,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 for (int j = 0; j < resourceProviderNodes.getLength(); ++j) {
                     Node resProv = resourceProviderNodes.item(j);
-                    String refId = getAttributeValue(resProv, "refid");
+                    String refId = GCMParserHelper.getAttributeValue(resProv, "refid");
 
                     GCMDeploymentDescriptor resourceProvider = resourceProvidersMap.get(refId);
                     providers.add(resourceProvider);
@@ -408,54 +397,5 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         }
 
         return virtualNodes;
-    }
-
-    protected class MyDefaultHandler extends DefaultHandler {
-        private String errMessage = "";
-
-        /*
-         * With a handler class, just override the methods you need to use
-         */
-
-        // Start Error Handler code here
-        public void warning(SAXParseException e) {
-            System.err.println("Warning Line " + e.getLineNumber() + ": " +
-                e.getMessage() + "\n");
-        }
-
-        public void error(SAXParseException e) {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
-                    e.getMessage() + "\n");
-            System.err.println(errMessage);
-        }
-
-        public void fatalError(SAXParseException e) {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
-                    e.getMessage() + "\n");
-            System.err.println(errMessage);
-        }
-    }
-
-    class ProActiveNamespaceContext implements NamespaceContext {
-        public String getNamespaceURI(String prefix) {
-            if (prefix == null) {
-                throw new NullPointerException("Null prefix");
-            } else if ("pa".equals(prefix)) {
-                return DESCRIPTOR_NAMESPACE;
-            } else if ("xml".equals(prefix)) {
-                return XMLConstants.XML_NS_URI;
-            }
-            return XMLConstants.NULL_NS_URI;
-        }
-
-        // This method isn't necessary for XPath processing.
-        public String getPrefix(String uri) {
-            throw new UnsupportedOperationException();
-        }
-
-        // This method isn't necessary for XPath processing either.
-        public Iterator getPrefixes(String uri) {
-            throw new UnsupportedOperationException();
-        }
     }
 }
