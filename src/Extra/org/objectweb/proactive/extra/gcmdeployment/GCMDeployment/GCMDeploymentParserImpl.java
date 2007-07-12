@@ -18,6 +18,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.globus.ogce.beans.console.gui.commands.grid.GRUNCommand;
 import org.objectweb.proactive.extra.gcmdeployment.Environment;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.AbstractGroupParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
@@ -43,6 +45,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected Map<String, HostInfo> hostsMap;
     protected Map<String, AbstractBridge> bridgesMap;
     protected Map<String, AbstractGroup> groupsMap;
+    protected Map<String, AbstractGroupParser> groupParserMap;
 
     static protected class Resource {
         protected String refid;
@@ -122,8 +125,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         bridgesMap = new HashMap<String, AbstractBridge>();
         groupsMap = new HashMap<String, AbstractGroup>();
         resources = new Resources();
+        groupParserMap = new HashMap<String, AbstractGroupParser>();
 
         setup();
+        registerDefaultGroupParsers();
+        registerUserGroupParsers();
 
         InputSource inputSource = new InputSource(new FileInputStream(
                     descriptor));
@@ -133,6 +139,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    protected void registerDefaultGroupParsers() {
+        registerGroupParser("sshGroup", new SSHGroupParser());
+        // TODO add other group parsers here 
+    }
+
+    /**
+     * Override this
+     */
+    protected void registerUserGroupParsers() {
     }
 
     public void setup() throws IOException {
@@ -239,67 +256,77 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    
     protected void parseInfrastructure() throws XPathExpressionException {
         Node infrastructureNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:infrastructure",
                 document, XPathConstants.NODE);
-        
-        
+
         NodeList hosts = (NodeList) xpath.evaluate("pa:hosts/pa:host",
                 infrastructureNode, XPathConstants.NODESET);
-        
-        for(int i = 0; i < hosts.getLength(); ++i) {
+
+        for (int i = 0; i < hosts.getLength(); ++i) {
             HostInfo hostInfo = parseHostNode(hosts.item(i));
-            hostsMap.put(hostInfo.getId(), hostInfo);            
+            hostsMap.put(hostInfo.getId(), hostInfo);
         }
 
         NodeList groups = (NodeList) xpath.evaluate("pa:groups/",
                 infrastructureNode, XPathConstants.NODESET);
-    
-        for(int i = 0; i < groups.getLength(); ++i) {
-            // TODO
+
+        for (int i = 0; i < groups.getLength(); ++i) {
+            Node groupNode = groups.item(i);
+            String id = GCMParserHelper.getAttributeValue(groupNode, "id");
+            AbstractGroupParser groupParser = groupParserMap.get(groupNode.getNodeName());
+            groupParser.parseGroupNode(groupNode, xpath);
         }
-        
     }
-    
-    protected HostInfo parseHostNode(Node hostNode) throws XPathExpressionException {
+
+    public void registerGroupParser(String groupNodeName,
+        AbstractGroupParser groupParser) {
+        groupParserMap.put(groupNodeName, groupParser);
+    }
+
+    protected HostInfo parseHostNode(Node hostNode)
+        throws XPathExpressionException {
         HostInfoImpl hostInfo = new HostInfoImpl();
-        
+
         String id = GCMParserHelper.getAttributeValue(hostNode, "id");
         hostInfo.setId(id);
 
-        String hostCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "hostCapacity");
+        String hostCapacityStr = GCMParserHelper.getAttributeValue(hostNode,
+                "hostCapacity");
         if (hostCapacityStr != null) {
             hostInfo.setHostCapacity(Integer.parseInt(hostCapacityStr));
         }
-        
-        String vmCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "vmCapacity");
+
+        String vmCapacityStr = GCMParserHelper.getAttributeValue(hostNode,
+                "vmCapacity");
         if (vmCapacityStr != null) {
             hostInfo.setVmCapacity(Integer.parseInt(vmCapacityStr));
         }
 
         String username = GCMParserHelper.getAttributeValue(hostNode, "username");
         if (username != null) {
-            hostInfo.setUsername(username);            
+            hostInfo.setUsername(username);
         }
 
         Node homeDirectoryNode = (Node) xpath.evaluate("pa:homeDirectory",
                 hostNode, XPathConstants.NODE);
-        
+
         if (homeDirectoryNode != null) {
-            hostInfo.setHomeDirectory(homeDirectoryNode.getFirstChild().getNodeValue());
+            hostInfo.setHomeDirectory(homeDirectoryNode.getFirstChild()
+                                                       .getNodeValue());
         }
-        
-        NodeList tools = (NodeList) xpath.evaluate("pa:tool",
-                hostNode, XPathConstants.NODESET);
-        
-        for(int i = 0; i < tools.getLength(); ++i) {
+
+        NodeList tools = (NodeList) xpath.evaluate("pa:tool", hostNode,
+                XPathConstants.NODESET);
+
+        for (int i = 0; i < tools.getLength(); ++i) {
             Node toolNode = tools.item(i);
-            Tool tool = new Tool(GCMParserHelper.getAttributeValue(toolNode, "id"),
+            Tool tool = new Tool(GCMParserHelper.getAttributeValue(toolNode,
+                        "id"),
                     GCMParserHelper.getAttributeValue(toolNode, "path"));
-            hostInfo.addTool(tool);            
+            hostInfo.addTool(tool);
         }
-        
+
         return hostInfo;
     }
 
