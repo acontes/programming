@@ -41,9 +41,9 @@
 		</complexContent>
 	</complexType>
 
-	<simpleType name="nameType">
+	<simpleType name="idType">
 		<restriction base="string">
-			<pattern value="[a-zA-Z_.{}$]+" />
+			<pattern value="[a-zA-Z0-9_.{}$]+" />
 		</restriction>
 	</simpleType>
 
@@ -64,10 +64,10 @@
 				maxOccurs="1" minOccurs="0">
 			</element>
 		</sequence>
-		<attribute name="name" type="pa:nameType"></attribute>
-		<attribute name="hostname" type="pa:nameType"></attribute>
-		<attribute name="domain" type="pa:nameType"></attribute>
-		<attribute name="username" type="pa:nameType"></attribute>
+		<attribute name="id" type="pa:idType"></attribute>
+		<attribute name="hostname" type="pa:idType"></attribute>
+		<attribute name="domain" type="pa:idType"></attribute>
+		<attribute name="username" type="pa:idType"></attribute>
 		<attribute name="commandPath" type="pa:pathElementType"></attribute>
 		<attribute name="jvmPerHost" type="integer"></attribute>
 	</complexType>
@@ -226,7 +226,7 @@
 			<element name="homeDirectory" type="pa:pathElementType"></element>
 			<element name="tool" type="pa:toolType" maxOccurs="unbounded"></element>
 		</sequence>
-		<attribute name="id" type="string" use="required"></attribute>
+		<attribute name="id" type="pa:idType" use="required"></attribute>
 		<attribute name="username" type="string"></attribute>
 		<attribute name="hostCapacity" type="int"></attribute>
 		<attribute name="vmCapacity" type="int"></attribute>
