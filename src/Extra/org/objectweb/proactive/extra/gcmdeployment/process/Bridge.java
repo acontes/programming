@@ -28,4 +28,6 @@ public interface Bridge {
      * @param commandPath path to the command
      */
     public void setCommandPath(PathElement commandPath);
+
+    public String getId();
 }

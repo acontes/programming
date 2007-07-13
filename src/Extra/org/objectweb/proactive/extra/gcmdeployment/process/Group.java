@@ -4,6 +4,7 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
 public interface Group {
+    public String getId();
 
     /**
      * Set environment variables for this cluster

@@ -16,12 +16,12 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.globus.ogce.beans.console.gui.commands.grid.GRUNCommand;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.Environment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.AbstractGroupParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
@@ -43,10 +43,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected XPath xpath;
     protected DocumentBuilder documentBuilder;
     protected CommandBuilder commandBuilder;
-    protected Map<String, HostInfo> hostsMap;
-    protected Map<String, AbstractBridge> bridgesMap;
-    protected Map<String, AbstractGroup> groupsMap;
-    protected Map<String, AbstractGroupParser> groupParserMap;
+    protected Map<String, GroupParser> groupParserMap;
+    protected GCMDeploymentInfrastructure infrastructure;
 
     static protected class Resource {
         protected String refid;
@@ -122,11 +120,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected Resources resources;
 
     public GCMDeploymentParserImpl(File descriptor) throws IOException {
-        hostsMap = new HashMap<String, HostInfo>();
-        bridgesMap = new HashMap<String, AbstractBridge>();
-        groupsMap = new HashMap<String, AbstractGroup>();
+        infrastructure = new GCMDeploymentInfrastructure();
         resources = new Resources();
-        groupParserMap = new HashMap<String, AbstractGroupParser>();
+        groupParserMap = new HashMap<String, GroupParser>();
 
         setup();
         registerDefaultGroupParsers();
@@ -273,7 +269,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         for (int i = 0; i < hosts.getLength(); ++i) {
             HostInfo hostInfo = parseHostNode(hosts.item(i));
-            hostsMap.put(hostInfo.getId(), hostInfo);
+            infrastructure.addHost(hostInfo);
         }
 
         NodeList groups = (NodeList) xpath.evaluate("pa:groups/*",
@@ -282,8 +278,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         for (int i = 0; i < groups.getLength(); ++i) {
             Node groupNode = groups.item(i);
             String id = GCMParserHelper.getAttributeValue(groupNode, "id");
-            AbstractGroupParser groupParser = groupParserMap.get(groupNode.getNodeName());
+            GroupParser groupParser = groupParserMap.get(groupNode.getNodeName());
             groupParser.parseGroupNode(groupNode, xpath);
+            infrastructure.addGroup(groupParser.getGroup());
         }
 
         NodeList bridges = (NodeList) xpath.evaluate("pa:bridges/*",
@@ -291,11 +288,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         for (int i = 0; i < bridges.getLength(); ++i) {
             Node bridgeNode = bridges.item(i);
+
+            // TODO
         }
     }
 
     public void registerGroupParser(String groupNodeName,
-        AbstractGroupParser groupParser) {
+        GroupParser groupParser) {
         groupParserMap.put(groupNodeName, groupParser);
     }
 
@@ -357,13 +356,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return null;
     }
 
-    public Map<String, Group> getGroups() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Map<String, HostInfo> getHosts() {
-        // TODO Auto-generated method stub
-        return null;
+    public GCMDeploymentInfrastructure getInfrastructure() {
+        return infrastructure;
     }
 }

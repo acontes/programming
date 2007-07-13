@@ -9,6 +9,7 @@ public abstract class AbstractBridge implements Bridge {
     private String env;
     private String hostname;
     private String username;
+    private String id;
 
     public void setCommandPath(PathElement commandPath) {
         this.commandPath = commandPath;
@@ -40,5 +41,9 @@ public abstract class AbstractBridge implements Bridge {
 
     protected String getEnv() {
         return env;
+    }
+
+    public String getId() {
+        return id;
     }
 }

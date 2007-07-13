@@ -7,6 +7,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 public abstract class AbstractGroup implements Group {
     private PathElement commandPath;
     private String env;
+    private String id;
 
     public void setCommandPath(PathElement commandPath) {
         this.commandPath = commandPath;
@@ -22,5 +23,13 @@ public abstract class AbstractGroup implements Group {
 
     protected String getEnv() {
         return env;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    protected void setId(String id) {
+        this.id = id;
     }
 }

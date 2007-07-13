@@ -2,12 +2,12 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers;
 
 import javax.xml.xpath.XPath;
 
-import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
+import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.w3c.dom.Node;
 
 
-public interface AbstractGroupParser {
+public interface GroupParser {
     public void parseGroupNode(Node groupNode, XPath xpath);
 
-    public AbstractGroup getGroup();
+    public Group getGroup();
 }

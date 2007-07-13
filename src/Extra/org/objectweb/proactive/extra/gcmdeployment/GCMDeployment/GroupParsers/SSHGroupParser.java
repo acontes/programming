@@ -4,12 +4,12 @@ import javax.xml.xpath.XPath;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
+import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.w3c.dom.Node;
 
 
-public class SSHGroupParser implements AbstractGroupParser {
-    public AbstractGroup getGroup() {
+public class SSHGroupParser implements GroupParser {
+    public Group getGroup() {
         // TODO Auto-generated method stub
         return null;
     }
