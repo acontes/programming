@@ -43,7 +43,6 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected XPath xpath;
     protected DocumentBuilder documentBuilder;
     protected CommandBuilder commandBuilder;
-
     protected Map<String, GCMDeploymentDescriptor> resourceProvidersMap;
     protected Set<GCMDeploymentDescriptor> resourceProviders;
     protected Map<String, VirtualNodeInternal> virtualNodes;
@@ -84,7 +83,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
-            xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(DESCRIPTOR_NAMESPACE));
+            xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
+                    DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -118,7 +118,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 Node fileNode = (Node) xpath.evaluate("pa:file", node,
                         XPathConstants.NODE);
                 if (fileNode != null) {
-                    String nodeValue = GCMParserHelper.getAttributeValue(fileNode, "path");
+                    String nodeValue = GCMParserHelper.getAttributeValue(fileNode,
+                            "path");
                     resourceProviderParams.setGCMDescriptor(new File(nodeValue));
                 }
 
@@ -148,9 +149,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     protected FileTransferBlock parseFileTransferNode(Node fileTransferNode) {
         FileTransferBlock fileTransferBlock = new FileTransferBlock();
-        String source = GCMParserHelper.getAttributeValue(fileTransferNode, "source");
+        String source = GCMParserHelper.getAttributeValue(fileTransferNode,
+                "source");
         fileTransferBlock.setSource(source);
-        String destination = GCMParserHelper.getAttributeValue(fileTransferNode, "destination");
+        String destination = GCMParserHelper.getAttributeValue(fileTransferNode,
+                "destination");
         fileTransferBlock.setDestination(destination);
 
         return fileTransferBlock;
@@ -210,7 +213,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         Node commandNode = (Node) xpath.evaluate("pa:command", appNode,
                 XPathConstants.NODE);
 
-        String relPath = GCMParserHelper.getAttributeValue(commandNode, "relpath");
+        String relPath = GCMParserHelper.getAttributeValue(commandNode,
+                "relpath");
         String base = GCMParserHelper.getAttributeValue(commandNode, "base");
 
         commandBuilderScript.setCommandPath(new PathElement(relPath, base));
@@ -250,7 +254,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 XPathConstants.NODE);
 
         if (javaNode != null) {
-            String javaRelPath = GCMParserHelper.getAttributeValue(javaNode, "relpath");
+            String javaRelPath = GCMParserHelper.getAttributeValue(javaNode,
+                    "relpath");
             PathElement pathElement = new PathElement();
             pathElement.setRelPath(javaRelPath);
             commandBuilderProActive.setJavaPath(pathElement);
@@ -326,7 +331,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     protected PathElement parsePathElementNode(Node pathElementNode) {
         PathElement pathElement = new PathElement();
-        String attr = GCMParserHelper.getAttributeValue(pathElementNode, "relpath");
+        String attr = GCMParserHelper.getAttributeValue(pathElementNode,
+                "relpath");
         pathElement.setRelPath(attr);
         attr = GCMParserHelper.getAttributeValue(pathElementNode, "base");
         if (attr != null) {
@@ -362,8 +368,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 // get capacity
                 //
-                String capacity = GCMParserHelper.getAttributeValue(node, "capacity").trim()
-                                      .toLowerCase();
+                String capacity = GCMParserHelper.getAttributeValue(node,
+                        "capacity").trim().toLowerCase();
 
                 long capacityI = 0;
                 if (capacity.equals("max")) {
@@ -381,7 +387,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 for (int j = 0; j < resourceProviderNodes.getLength(); ++j) {
                     Node resProv = resourceProviderNodes.item(j);
-                    String refId = GCMParserHelper.getAttributeValue(resProv, "refid");
+                    String refId = GCMParserHelper.getAttributeValue(resProv,
+                            "refid");
 
                     GCMDeploymentDescriptor resourceProvider = resourceProvidersMap.get(refId);
                     providers.add(resourceProvider);

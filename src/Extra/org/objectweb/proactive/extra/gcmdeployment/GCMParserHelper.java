@@ -9,13 +9,12 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class GCMParserHelper {
 
+public class GCMParserHelper {
     static public String getAttributeValue(Node node, String attributeName) {
         Node namedItem = node.getAttributes().getNamedItem(attributeName);
         return (namedItem != null) ? namedItem.getNodeValue() : null;
     }
-
 
     static public class MyDefaultHandler extends DefaultHandler {
         private String errMessage = "";
@@ -26,27 +25,26 @@ public class GCMParserHelper {
 
         // Start Error Handler code here
         public void warning(SAXParseException e) {
-            System.err.println("Warning Line " + e.getLineNumber() + ": "
-                    + e.getMessage() + "\n");
+            System.err.println("Warning Line " + e.getLineNumber() + ": " +
+                e.getMessage() + "\n");
         }
 
         public void error(SAXParseException e) {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": "
-                    + e.getMessage() + "\n");
+            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
+                    e.getMessage() + "\n");
             System.err.println(errMessage);
         }
 
         public void fatalError(SAXParseException e) {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": "
-                    + e.getMessage() + "\n");
+            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
+                    e.getMessage() + "\n");
             System.err.println(errMessage);
         }
     }
 
     static public class ProActiveNamespaceContext implements NamespaceContext {
-        
         protected String namespace;
-        
+
         public ProActiveNamespaceContext(String namespace) {
             this.namespace = namespace;
         }

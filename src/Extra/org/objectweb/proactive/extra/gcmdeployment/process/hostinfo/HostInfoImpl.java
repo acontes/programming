@@ -127,7 +127,7 @@ public class HostInfoImpl implements HostInfo {
     public void setOs(OperatingSystem os) {
         this.os = os;
     }
-    
+
     public void setHostCapacity(int hostCapacity) {
         this.hostCapacity = hostCapacity;
     }
@@ -183,7 +183,7 @@ public class HostInfoImpl implements HostInfo {
     public int getVmCapacity() {
         return vmCapacity;
     }
-        
+
     @SuppressWarnings("unused")
     static public class TestHostInfoImpl {
         HostInfoImpl notInitialized;
@@ -266,7 +266,4 @@ public class HostInfoImpl implements HostInfo {
             notInitialized.getUsername();
         }
     }
-
-
-
 }

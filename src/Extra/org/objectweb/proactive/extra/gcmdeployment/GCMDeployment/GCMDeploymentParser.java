@@ -7,11 +7,11 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
-public interface GCMDeploymentParser extends GCMParserConstants {
 
+public interface GCMDeploymentParser extends GCMParserConstants {
     public Environment getEnvironment();
-    
+
     public Map<String, HostInfo> getHosts();
-    
+
     public Map<String, Group> getGroups();
 }
