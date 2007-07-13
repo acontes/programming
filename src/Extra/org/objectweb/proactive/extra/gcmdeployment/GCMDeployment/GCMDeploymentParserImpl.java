@@ -17,6 +17,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.globus.ogce.beans.console.gui.commands.grid.GRUNCommand;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.Environment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.AbstractGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
@@ -179,7 +180,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    protected void parseEnvironment() throws XPathExpressionException {
+    public void parseEnvironment() throws XPathExpressionException {
         Node environmentNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:environment",
                 document, XPathConstants.NODE);
 
@@ -197,7 +198,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    protected void parseResources() throws XPathExpressionException {
+    public void parseResources() throws XPathExpressionException {
         Node resourcesNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:resources",
                 document, XPathConstants.NODE);
 
@@ -221,6 +222,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             NodeList childNodes = resourceNode.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); ++i) {
                 Node childNode = childNodes.item(i);
+                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
                 String childNodeName = childNode.getNodeName();
                 String childRefId = GCMParserHelper.getAttributeValue(childNode,
                         "refid");
@@ -250,13 +254,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         GroupResource groupResource) {
         NodeList childNodes = resourceNode.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); ++i) {
-            String hostRefid = GCMParserHelper.getAttributeValue(childNodes.item(
-                        i), "refid");
+            Node childNode = childNodes.item(i);
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            String hostRefid = GCMParserHelper.getAttributeValue(childNode,
+                    "refid");
             groupResource.addHost(hostRefid);
         }
     }
 
-    protected void parseInfrastructure() throws XPathExpressionException {
+    public void parseInfrastructure() throws XPathExpressionException {
         Node infrastructureNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:infrastructure",
                 document, XPathConstants.NODE);
 
@@ -268,7 +276,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             hostsMap.put(hostInfo.getId(), hostInfo);
         }
 
-        NodeList groups = (NodeList) xpath.evaluate("pa:groups/",
+        NodeList groups = (NodeList) xpath.evaluate("pa:groups/*",
                 infrastructureNode, XPathConstants.NODESET);
 
         for (int i = 0; i < groups.getLength(); ++i) {
@@ -276,6 +284,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             String id = GCMParserHelper.getAttributeValue(groupNode, "id");
             AbstractGroupParser groupParser = groupParserMap.get(groupNode.getNodeName());
             groupParser.parseGroupNode(groupNode, xpath);
+        }
+
+        NodeList bridges = (NodeList) xpath.evaluate("pa:bridges/*",
+                infrastructureNode, XPathConstants.NODESET);
+
+        for (int i = 0; i < bridges.getLength(); ++i) {
+            Node bridgeNode = bridges.item(i);
         }
     }
 
@@ -290,6 +305,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         String id = GCMParserHelper.getAttributeValue(hostNode, "id");
         hostInfo.setId(id);
+
+        String os = GCMParserHelper.getAttributeValue(hostNode, "os");
+        if (os.equals("unix")) {
+            hostInfo.setOs(OperatingSystem.unix);
+        } else if (os.equals("windows")) {
+            hostInfo.setOs(OperatingSystem.windows);
+        }
 
         String hostCapacityStr = GCMParserHelper.getAttributeValue(hostNode,
                 "hostCapacity");
