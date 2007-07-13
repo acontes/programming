@@ -41,6 +41,13 @@
 		</complexContent>
 	</complexType>
 
+	<simpleType name="osType">
+		<restriction base="string">
+			<enumeration value="unix"></enumeration>
+			<enumeration value="windows"></enumeration>
+		</restriction>
+	</simpleType>
+
 	<simpleType name="idType">
 		<restriction base="string">
 			<pattern value="[a-zA-Z0-9_.{}$]+" />
@@ -194,12 +201,12 @@
 		type="pa:abstractResourceType">
 	</element>
 
-	<element name="group"
-		substitutionGroup="pa:abstractResourceElement"
+	<element name="group" substitutionGroup="pa:abstractResourceElement"
 		type="pa:groupRefType">
 	</element>
 
-	<element name="bridge" substitutionGroup="pa:abstractResourceElement"
+	<element name="bridge"
+		substitutionGroup="pa:abstractResourceElement"
 		type="pa:bridgeRefType">
 	</element>
 
@@ -224,9 +231,12 @@
 	<complexType name="hostType">
 		<sequence>
 			<element name="homeDirectory" type="pa:pathElementType"></element>
-			<element name="tool" type="pa:toolType" maxOccurs="unbounded"></element>
+			<element name="tool" type="pa:toolType"
+				maxOccurs="unbounded">
+			</element>
 		</sequence>
 		<attribute name="id" type="pa:idType" use="required"></attribute>
+		<attribute name="os" type="pa:osType" use="required"></attribute>
 		<attribute name="username" type="string"></attribute>
 		<attribute name="hostCapacity" type="int"></attribute>
 		<attribute name="vmCapacity" type="int"></attribute>

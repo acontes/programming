@@ -16,7 +16,7 @@
 
 	<infrastructure>
 		<hosts>
-			<host id="INRIA_x86_64" hostCapacity="4" vmCapacity="2">
+			<host id="INRIA_x86_64" os="unix" hostCapacity="4" vmCapacity="2">
 				<homeDirectory>/user/${USERNAME}/home</homeDirectory>
 				<tool id="java" path="/usr/java/j2sdk/bin/java" />
 				<tool id="proactive"
