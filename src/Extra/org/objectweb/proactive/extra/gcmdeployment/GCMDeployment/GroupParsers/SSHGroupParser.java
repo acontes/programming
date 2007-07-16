@@ -8,13 +8,15 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.w3c.dom.Node;
 
 
-public class SSHGroupParser implements GroupParser {
+public class SSHGroupParser extends AbstractGroupParser {
     public Group getGroup() {
         // TODO Auto-generated method stub
         return null;
     }
 
     public void parseGroupNode(Node groupNode, XPath xpath) {
+        super.parseGroupNode(groupNode, xpath);
+
         String hostlist = GCMParserHelper.getAttributeValue(groupNode,
                 "hostList");
         String domain = GCMParserHelper.getAttributeValue(groupNode, "domain");

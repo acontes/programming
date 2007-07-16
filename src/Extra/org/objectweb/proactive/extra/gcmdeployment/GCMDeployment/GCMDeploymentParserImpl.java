@@ -17,16 +17,11 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.extra.gcmdeployment.Environment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
-import org.objectweb.proactive.extra.gcmdeployment.process.bridge.AbstractBridge;
-import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
 import org.w3c.dom.Document;
@@ -45,6 +40,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected CommandBuilder commandBuilder;
     protected Map<String, GroupParser> groupParserMap;
     protected GCMDeploymentInfrastructure infrastructure;
+    protected GCMDeploymentEnvironment environment;
 
     static protected class Resource {
         protected String refid;
@@ -123,6 +119,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         infrastructure = new GCMDeploymentInfrastructure();
         resources = new Resources();
         groupParserMap = new HashMap<String, GroupParser>();
+        environment = new GCMDeploymentEnvironment();
 
         setup();
         registerDefaultGroupParsers();
@@ -190,7 +187,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             String varValue = GCMParserHelper.getAttributeValue(descVarNode,
                     "value");
 
-            // TODO
+            environment.addValue(varName, varValue);
         }
     }
 
@@ -277,7 +274,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         for (int i = 0; i < groups.getLength(); ++i) {
             Node groupNode = groups.item(i);
-            String id = GCMParserHelper.getAttributeValue(groupNode, "id");
             GroupParser groupParser = groupParserMap.get(groupNode.getNodeName());
             groupParser.parseGroupNode(groupNode, xpath);
             infrastructure.addGroup(groupParser.getGroup());
@@ -351,9 +347,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return hostInfo;
     }
 
-    public Environment getEnvironment() {
+    public GCMDeploymentEnvironment getEnvironment() {
         // TODO Auto-generated method stub
-        return null;
+        return environment;
     }
 
     public GCMDeploymentInfrastructure getInfrastructure() {
