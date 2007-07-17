@@ -13,9 +13,6 @@ node0 node1 node2 node3 node4 node5
 node[0-5].fr
 node0.fr node1.fr node2.fr node3.fr node4.fr node5.fr
 
-node[0-2]-[0-1].fr
-node0-0.fr node1-0.fr node2-0.fr node0-1.fr node1-1.fr node2-1.fr
-
 node[00-05]
 node00 node01 node02 node03 node04 node05
 
