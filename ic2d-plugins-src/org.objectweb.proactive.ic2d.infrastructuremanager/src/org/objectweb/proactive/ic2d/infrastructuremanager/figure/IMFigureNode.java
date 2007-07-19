@@ -31,6 +31,9 @@ public class IMFigureNode extends AbstractRectangleFigure{
 			if(imNode.isFree()) {
 				setStatus(IMConstants.STATUS_AVAILABLE);
 				view.incrFree();
+			} else if (imNode.isDown()) {
+			    setStatus(IMConstants.STATUS_DOWN);
+	            view.incrDown();
 			}
 			else {
 				setStatus(IMConstants.STATUS_BUSY);

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
@@ -23,12 +25,12 @@ public class IMData implements Runnable {
 	private IMAdmin admin;
 	private IMMonitoring monitoring;
 
-	private int freeNode, busyNode, downNode;
+	private IntWrapper freeNode, busyNode, downNode;
 	private ArrayList<IMNode> infrastructure;
 	
 	private Console console;
 	
-	private long ttr = 30;
+	private long ttr = 5;
 
 	public IMData() {
 	}
@@ -59,26 +61,46 @@ public class IMData implements Runnable {
 		return admin;
 	}
 
-	public int getFree() {
+	public IntWrapper getFree() {
 		return freeNode;
 	}
 
-	public int getBusy() {
+	public IntWrapper getBusy() {
 		return busyNode;
 	}
 	
+	public IntWrapper getDown() {
+	    return downNode;
+	}
 
+	@SuppressWarnings("unchecked")
 	public void updateInfrastructure() {
 		infrastructure = monitoring.getListAllIMNodes();
-		freeNode = monitoring.getNumberOfFreeResource();
-		busyNode = monitoring.getNumberOfBusyResource();
-		
+		System.out.println("infrastrcuture = " + infrastructure);
+		// New counting of nodes
+		int freeN = 0;
+		int busyN = 0;
+		int downN = 0;
+		for(IMNode imn : infrastructure) {
+			if(imn.isDown()) downN++;
+			else try{
+				if(imn.isFree()) freeN++;
+				else busyN++;
+			} catch (NodeException e) {
+				// Node is down (this case should not appears)
+				downN++;
+			}
+		}
+		freeNode = new IntWrapper(freeN);
+		busyNode = new IntWrapper(busyN);
+		downNode = new IntWrapper(downN);
 		Collections.sort(infrastructure, new ComparatorIMNode());
 	}
 
 	public void run() {
 		while(view != null) {
-			console.log("Refresh");
+			// Not very nice
+			//console.log("Refresh");
 			updateInfrastructure();
 			view.getParent().getDisplay().asyncExec( new Runnable(){
 				public void run(){

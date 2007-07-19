@@ -140,14 +140,13 @@ public class IMViewInfrastructure extends ViewPart {
 	}
 	
 	public void drawInfrastructure() {
-		
+	    
 		free = 0;
 		busy = 0;
 		down = 0;
 			
 		HashMap<String, Boolean> oldExpandItemState = new HashMap<String, Boolean>();
 		HashMap<String, ArrayList<String>> oldState = new HashMap<String, ArrayList<String>>();
-		
 		
 		// Remove old item
 		if(expandBar.getItemCount() != 0) {
@@ -258,9 +257,10 @@ public class IMViewInfrastructure extends ViewPart {
 			freeNodeLabel.setText(freeNodeText + free);
 			downNodeLabel.setText(downNodeText + down);
 			allNodeLabel.setText(allNodeText + (free+busy+down));
-
+			
 			
 			expandBar.redraw();
+			
 		}
 	}
 			
@@ -292,7 +292,7 @@ public class IMViewInfrastructure extends ViewPart {
 	public void shutdown() {
 		try {
 			imData.getAdmin().shutdown();
-			// TODO : 
+			// TODO :  
 			dispose();
 		} 
 		catch (ProActiveException e) {
