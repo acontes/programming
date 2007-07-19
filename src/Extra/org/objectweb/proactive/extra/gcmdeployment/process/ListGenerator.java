@@ -14,48 +14,62 @@ public class ListGenerator {
             "(\\d+)-(\\d+);?(\\d+)?");
     final static protected String SUB_INTERVAL_SPLIT_REGEXP = " *, *";
 
-    static public List<String> generateNames(String names) {
+    static public List<String> generateNames(String nameSetDefinition) {
         List<String> res = null;
-        Matcher matcher = simpleInterval.matcher(names);
+        Matcher matcher = simpleInterval.matcher(nameSetDefinition);
 
         if (matcher.find()) {
-            String root = names.substring(0, matcher.start());
+            String prefix = nameSetDefinition.substring(0, matcher.start());
             String intervalDef = matcher.group(1);
             String exclusionInterval = null;
-
-            if (matcher.find() && (names.charAt(matcher.start() - 1) == '^')) {
+            int lastMatchedEnd = matcher.end();
+            
+            if (matcher.find() && (nameSetDefinition.charAt(matcher.start() - 1) == '^')) {
                 // check for an exclusion pattern
                 exclusionInterval = matcher.group(1);
+                lastMatchedEnd = matcher.end();
             }
 
+            String suffix = "";
+            if (lastMatchedEnd < (nameSetDefinition.length() - 1)) {
+                suffix = nameSetDefinition.substring(lastMatchedEnd);
+            }
+            
             String[] subIntervals = intervalDef.split(SUB_INTERVAL_SPLIT_REGEXP);
             String[] subExclusionIntervals = (exclusionInterval != null)
                 ? exclusionInterval.split(SUB_INTERVAL_SPLIT_REGEXP) : null;
-            res = getSubNames(root, subIntervals, subExclusionIntervals);
+                
+            res = getSubNames(prefix, suffix, subIntervals, subExclusionIntervals);
+            
         } else {
             res = new ArrayList<String>();
-            res.add(names);
+            res.add(nameSetDefinition);
         }
 
         return res;
     }
 
-    static private List<String> getSubNames(String root, String[] subIntervals,
-        String[] exclusionIntervals) {
+    static private List<String> getSubNames(String prefix, String suffix, String[] subIntervalsDefs,
+        String[] exclusionIntervalsDefs) {
+        
+        if (suffix == null) {
+            suffix = "";
+        }
+        
         List<String> res = new ArrayList<String>();
 
         NumberChecker numberChecker = null;
 
-        if (exclusionIntervals != null) {
-            numberChecker = getNumberChecker(exclusionIntervals);
+        if (exclusionIntervalsDefs != null) {
+            numberChecker = getNumberChecker(exclusionIntervalsDefs);
         }
 
-        for (int i = 0; i < subIntervals.length; ++i) {
-            String subIntervalDef = subIntervals[i];
+        for (int i = 0; i < subIntervalsDefs.length; ++i) {
+            String subIntervalDef = subIntervalsDefs[i];
             if (subIntervalDef.indexOf('-') > 0) {
-                generateNames(root, subIntervalDef, numberChecker, res);
+                generateNames(prefix, suffix, subIntervalDef, numberChecker, res);
             } else {
-                res.add(root + subIntervalDef);
+                res.add(prefix + subIntervalDef + suffix);
             }
         }
 
@@ -66,20 +80,20 @@ public class ListGenerator {
      * Returns the list of names given a single interval pattern
      * e.g. :
      * node10
-     * node[0-10] => node0, node1... node10
-     * node[1,2,3] => node1, node2, node3 
-     * node[0-10;2] => node0, node2, node4, node6, node8, node10
+     * node[0-10]      => node0, node1... node10
+     * node[1,2,3]     => node1, node2, node3 
+     * node[0-10;2]    => node0, node2, node4, node6, node8, node10
      * node[1,2,10-20] => node1, node2, node10, node11... node20
      * 
      * or with an exclusion interval :
      * 
-     * node[0-10]^[2-4] => node0, node1, node5, node6... node10
+     * node[0-10]^[2-4]   => node0, node1, node5, node6... node10
      * node[0-10]^[2-4,8] => node0, node1, node5, node6, node7, node9, node10
      * 
      * @param nameSetDefinition a set definition in the form described above
      * @return
      */
-    static private void generateNames(String root, String subIntervalDef,
+    static private void generateNames(String prefix, String suffix, String subIntervalDef,
         NumberChecker numberChecker, List<String> names) {
         Interval interval = new Interval(subIntervalDef);
 
@@ -90,9 +104,9 @@ public class ListGenerator {
                 continue;
             }
 
-            String format = MessageFormat.format("{0,number," + paddingFormat +
-                    "}", n);
-            names.add(root + format);
+            String formattedName = MessageFormat.format("{0}{1,number," + paddingFormat +
+                    "}{2}", prefix, n, suffix);
+            names.add(formattedName);
         }
     }
 
