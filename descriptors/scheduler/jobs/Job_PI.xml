@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job name="job_PI" priority="normal" >
+	<description>Calcul de Pi, methode de MonteCarlo</description>
+	<tasks>
+		<task name="main_task" finalTask="true">
+			<!-- Task human description -->
+			<description>Calculate Pi and store it.</description>
+			<process>
+				<javaProcess class="org.objectweb.proactive.examples.scheduler.MonteCarlo">
+					<initParameters>
+						<parameter name="steps" value="20" />
+						<parameter name="iterations" value="100000000" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+	</tasks>
+</job>
