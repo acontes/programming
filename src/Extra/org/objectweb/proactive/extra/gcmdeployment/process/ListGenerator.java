@@ -26,7 +26,6 @@ public class ListGenerator {
             if (matcher.find() && (names.charAt(matcher.start() - 1) == '^')) {
                 // check for an exclusion pattern
                 exclusionInterval = matcher.group(1);
-                System.out.println(exclusionInterval);
             }
 
             String[] subIntervals = intervalDef.split(SUB_INTERVAL_SPLIT_REGEXP);
@@ -63,6 +62,23 @@ public class ListGenerator {
         return res;
     }
 
+    /**
+     * Returns the list of names given a single interval pattern
+     * e.g. :
+     * node10
+     * node[0-10] => node0, node1... node10
+     * node[1,2,3] => node1, node2, node3 
+     * node[0-10;2] => node0, node2, node4, node6, node8, node10
+     * node[1,2,10-20] => node1, node2, node10, node11... node20
+     * 
+     * or with an exclusion interval :
+     * 
+     * node[0-10]^[2-4] => node0, node1, node5, node6... node10
+     * node[0-10]^[2-4,8] => node0, node1, node5, node6, node7, node9, node10
+     * 
+     * @param nameSetDefinition a set definition in the form described above
+     * @return
+     */
     static private void generateNames(String root, String subIntervalDef,
         NumberChecker numberChecker, List<String> names) {
         Interval interval = new Interval(subIntervalDef);
@@ -76,7 +92,6 @@ public class ListGenerator {
 
             String format = MessageFormat.format("{0,number," + paddingFormat +
                     "}", n);
-            //            System.out.println(format);
             names.add(root + format);
         }
     }
@@ -108,6 +123,13 @@ public class ListGenerator {
         return res;
     }
 
+    /**
+     * Check if a given host number is part of the 'excluded' list of an interval
+     * (e.g. [1-10]^[5-7] )
+     * 
+     * @author glaurent
+     *
+     */
     static protected class NumberChecker {
         List<int[]> intervals;
         List<Integer> values;
@@ -140,6 +162,12 @@ public class ListGenerator {
         }
     }
 
+    /**
+     * Parses an interval from its definition string "[n-m;s]"
+     *   
+     * @author glaurent
+     *
+     */
     static protected class Interval {
         public int start;
         public int end;
