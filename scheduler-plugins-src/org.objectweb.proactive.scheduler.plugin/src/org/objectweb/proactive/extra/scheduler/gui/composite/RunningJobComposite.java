@@ -103,7 +103,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 //			}
 //		});
 		tc.setText(COLUMN_TASK_TITLE);
-		tc.setWidth(40);
+		tc.setWidth(70);
 		tc.setMoveable(true);
 		tc.setToolTipText("You can't sort by this column");
 		return table;
