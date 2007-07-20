@@ -365,6 +365,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (result != null) {
 			Job job = jobs.get(jobId);
 			job.setRemovedTime(System.currentTimeMillis());
+			finishedJobs.remove(job);
 			frontend.removeFinishedJobEvent(job.getJobInfo());
 		}
 		return result;
