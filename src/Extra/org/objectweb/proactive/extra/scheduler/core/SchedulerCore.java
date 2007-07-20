@@ -124,13 +124,13 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		// TODO essayer de retirer le submit des immediate service
 		Service service = new Service(body);
 		//set the filter for serveAll method
-		RequestFilter filter = new MainLoopRequestFilter("terminate","submit");
+		RequestFilter filter = new MainLoopRequestFilter("submit","terminate");
 		do {
 			service.blockingServeOldest();
 			while(schedulerRunning){
 				service.serveAll(filter);
 				schedule();
-	            //blocking loop until a method is invoked and serve it
+	            //block the loop until a method is invoked and serve it
 				service.blockingServeOldest(SCHEDULER_TIME_OUT);
 			}
 		} while (!schedulerShuttingDown);
@@ -235,6 +235,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			finishedJobs.add(job);
 			logger.info("<<<<<<<<<<<<<<<<<<< Terminated job "+jobId);
 			frontend.runningToFinishedJobEvent(job.getJobInfo());
+			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+job.getNumberOfPendingTask());
+			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+job.getNumberOfRunningTask());
+			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+job.getNumberOfFinishedTask());
 		}
 		//free execution node
 		resourceManager.freeNode(node);
