@@ -217,7 +217,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//The task is terminated but it's possible to have to
 		//wait for the futur of the task result (TaskResult).
 		Job job = jobs.get(jobId);
-		job.terminateTask(taskId);
 		TaskDescriptor descriptor = job.terminateTask(taskId);
 		frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
 		//TODO si y'a pas de tache finale, terminer quand toutes les taches sont finies
@@ -235,9 +234,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			finishedJobs.add(job);
 			logger.info("<<<<<<<<<<<<<<<<<<< Terminated job "+jobId);
 			frontend.runningToFinishedJobEvent(job.getJobInfo());
-			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+job.getNumberOfPendingTask());
-			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+job.getNumberOfRunningTask());
-			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+job.getNumberOfFinishedTask());
 		}
 		//free execution node
 		resourceManager.freeNode(node);
