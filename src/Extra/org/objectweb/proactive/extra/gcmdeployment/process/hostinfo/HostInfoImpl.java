@@ -141,22 +141,18 @@ public class HostInfoImpl implements HostInfo {
     }
 
     public String getHomeDirectory() {
-        check();
         return homeDirectory;
     }
 
     public String getId() {
-        check();
         return id;
     }
 
     public OperatingSystem getOS() {
-        check();
         return getOS();
     }
 
     public Tool getTool(String id) {
-        check();
         for (Tool tool : tools) {
             if (tool.getId().equals(id)) {
                 return tool;
@@ -167,12 +163,10 @@ public class HostInfoImpl implements HostInfo {
     }
 
     public Set<Tool> getTools() {
-        check();
         return tools;
     }
 
     public String getUsername() {
-        check();
         return username;
     }
 
@@ -185,7 +179,7 @@ public class HostInfoImpl implements HostInfo {
     }
 
     @SuppressWarnings("unused")
-    static public class TestHostInfoImpl {
+    static public class UnitTestHostInfoImpl {
         HostInfoImpl notInitialized;
         HostInfoImpl halfInitialized;
         HostInfoImpl fullyInitialized;
@@ -223,47 +217,14 @@ public class HostInfoImpl implements HostInfo {
             Assert.assertFalse(tmp.equals(fullyInitialized));
         }
 
-        // Checks that checkReady is correctly implemented
         @Test(expected = IllegalStateException.class)
         public void checkReadygetHalfInitialized() {
-            halfInitialized.getHomeDirectory();
+            halfInitialized.check();
         }
 
-        // Checks that checkReady is correctly implemented
-        @Test(expected = IllegalStateException.class)
-        public void checkReadygetFullyInitialized() {
-            halfInitialized.getHomeDirectory();
-        }
-
-        // Remaining Tests check that checkReady is called before each getter
         @Test(expected = IllegalStateException.class)
         public void checkReadygetHomeDirectory() {
-            notInitialized.getHomeDirectory();
-        }
-
-        @Test(expected = IllegalStateException.class)
-        public void checkReadygetId() {
-            notInitialized.getId();
-        }
-
-        @Test(expected = IllegalStateException.class)
-        public void checkReadygetOS() {
-            notInitialized.getOS();
-        }
-
-        @Test(expected = IllegalStateException.class)
-        public void checkReadygetTool() {
-            notInitialized.getTool("toto");
-        }
-
-        @Test(expected = IllegalStateException.class)
-        public void checkReadygetTools() {
-            notInitialized.getTools();
-        }
-
-        @Test(expected = IllegalStateException.class)
-        public void checkReadygetUsername() {
-            notInitialized.getUsername();
+            notInitialized.check();
         }
     }
 }
