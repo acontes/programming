@@ -10,13 +10,31 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console,
  org.objectweb.proactive.ic2d.lib
 Eclipse-LazyStart: true
-Export-Package: org.objectweb.proactive.extra.scheduler.gui;uses:="org.eclipse.swt.graphics,org.osgi.framework,org.eclipse.ui.plugin",
+Export-Package: org.objectweb.proactive.extra.scheduler.gui;uses:="org.eclipse.ui.plugin,org.eclipse.swt.graphics,org.osgi.framework",
  org.objectweb.proactive.extra.scheduler.gui.composite;
-  uses:="org.objectweb.proactive.core.util.wrapper,
+  uses:="org.objectweb.proactive.extra.scheduler.gui.data,
    org.objectweb.proactive.extra.scheduler.job,
-   org.objectweb.proactive.extra.scheduler.gui.data,
+   org.objectweb.proactive.extra.scheduler.task,
    org.eclipse.swt.widgets",
- org.objectweb.proactive.extra.scheduler.gui.data;uses:="org.objectweb.proactive.core.util.wrapper,org.objectweb.proactive.extra.scheduler.core,org.objectweb.proactive.extra.scheduler.job",
+ org.objectweb.proactive.extra.scheduler.gui.data;
+  uses:="org.objectweb.proactive.extra.scheduler.gui.views,
+   org.objectweb.proactive.extra.scheduler.core,
+   org.apache.log4j,
+   org.objectweb.proactive.extra.scheduler.job,
+   org.apache.log4j.spi,
+   org.objectweb.proactive.extra.scheduler.task,
+   org.eclipse.swt.widgets",
  org.objectweb.proactive.extra.scheduler.gui.dialog;uses:="org.objectweb.proactive.extra.scheduler.core,org.eclipse.swt.widgets",
- org.objectweb.proactive.extra.scheduler.gui.views;uses:="org.eclipse.ui.part,org.eclipse.ui.console,org.eclipse.swt.widgets"
+ org.objectweb.proactive.extra.scheduler.gui.perspective;uses:="org.eclipse.ui",
+ org.objectweb.proactive.extra.scheduler.gui.views;
+  uses:="org.objectweb.proactive.extra.scheduler.core,
+   org.objectweb.proactive.extra.scheduler.gui.data,
+   org.eclipse.ui.console,
+   org.objectweb.proactive.extra.scheduler.job,
+   org.eclipse.swt.graphics,
+   org.eclipse.ui.part,
+   org.objectweb.proactive.extra.scheduler.task,
+   org.eclipse.swt.widgets,
+   org.objectweb.proactive.extra.scheduler.gui.composite",
+ org.objectweb.proactive.extra.scheduler.gui.views.icons
 Eclipse-RegisterBuddy: org.objectweb.proactive.ic2d.lib

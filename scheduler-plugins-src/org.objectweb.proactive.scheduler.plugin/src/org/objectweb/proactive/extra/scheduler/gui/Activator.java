@@ -62,7 +62,7 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-
+		
 		// start the log server
 		simpleLoggerServer = new SimpleLoggerServer(LISTEN_PORT);
 		simpleLoggerServerThread = new Thread(simpleLoggerServer);
