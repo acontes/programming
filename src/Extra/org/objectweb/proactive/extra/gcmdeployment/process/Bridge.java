@@ -1,8 +1,15 @@
 package org.objectweb.proactive.extra.gcmdeployment.process;
 
+import java.util.List;
+
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
+/**
+ *
+ * A Bridge can have Bridges, Groups and HostInfo as children
+ *
+ */
 public interface Bridge {
 
     /**
@@ -30,4 +37,54 @@ public interface Bridge {
     public void setCommandPath(PathElement commandPath);
 
     public String getId();
+
+    /**
+     * Add a bridge to children elements
+     *
+     * @param bridge The child bridge
+     */
+    public void addBridge(Bridge bridge);
+
+    /**
+     * Returns all children of type Bridge
+     *
+     * @return
+     */
+    public List<Bridge> getBridges();
+
+    /**
+     * Add a group to children elements
+     *
+     * @param group The child group
+     */
+    public void addGroup(Group group);
+
+    /**
+     * Returns all children of type Group
+     *
+     * @return
+     */
+    public List<Group> getGroups();
+
+    /**
+     * Set the HostInfo
+     *
+     * @param hostInfo
+     */
+    public void setHostInfo(HostInfo hostInfo);
+
+    /**
+     * Get the HostInfo
+     *
+     * @return if set the HostInfo is returned. null is returned otherwise
+     */
+    public HostInfo getHostInfo();
+
+    /**
+     * Check that this bridge is in a consistent state and is ready to be
+     * used.
+     *
+     * @throws IllegalStateException thrown if anything is wrong
+     */
+    public void check() throws IllegalStateException;
 }

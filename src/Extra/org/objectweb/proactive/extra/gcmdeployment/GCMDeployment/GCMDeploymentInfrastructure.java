@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
@@ -7,32 +10,52 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
+/**
+ *
+ * TODO Transform this class into a real tree.
+ *         This implementation duplicates Bridge and Tree like in the previous
+ *  ProActive deployment framework.
+ *
+ * TODO Allow to start a command on intermediate Bridges
+ *
+ */
 public class GCMDeploymentInfrastructure {
-    private Map<String, Group> groups;
-    private Map<String, Bridge> bridges;
-    private Map<String, HostInfo> hosts;
+    private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
+    private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
+    private HostInfo hostInfo;
 
-    public Map<String, Group> getGroups() {
+    public List<Group> getGroups() {
         return groups;
     }
 
-    public Map<String, Bridge> getBridges() {
+    public List<Bridge> getBridges() {
         return bridges;
     }
 
-    public Map<String, HostInfo> getHosts() {
-        return hosts;
-    }
-
     public void addGroup(Group group) {
-        groups.put(group.getId(), group);
+        groups.add(group);
     }
 
     public void addBrige(Bridge bridge) {
-        bridges.put(bridge.getId(), bridge);
+        bridges.add(bridge);
     }
 
-    public void addHost(HostInfo host) {
-        hosts.put(host.getId(), host);
+    protected HostInfo getHostInfo() {
+        return hostInfo;
+    }
+
+    protected void setHostInfo(HostInfo hostInfo) {
+        assert (hostInfo == null);
+        this.hostInfo = hostInfo;
+    }
+
+    public void check() throws IllegalStateException {
+        for (Group group : groups)
+            group.check();
+
+        for (Bridge bridge : bridges)
+            bridge.check();
+
+        hostInfo.check();
     }
 }

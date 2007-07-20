@@ -264,6 +264,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         NodeList hosts = (NodeList) xpath.evaluate("pa:hosts/pa:host",
                 infrastructureNode, XPathConstants.NODESET);
 
+        // FIXME glaurent Only one HostInfo is allowed in the resource part
+        // The schema is probably to update too
+        // Add host has been replaced by setHost
         for (int i = 0; i < hosts.getLength(); ++i) {
             HostInfo hostInfo = parseHostNode(hosts.item(i));
             infrastructure.addHost(hostInfo);

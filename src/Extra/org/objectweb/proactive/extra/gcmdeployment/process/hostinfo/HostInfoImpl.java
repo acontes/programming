@@ -40,7 +40,7 @@ public class HostInfoImpl implements HostInfo {
      *
      * @throws IllegalStateException If a required field has not been set
      */
-    private void checkReady() throws IllegalStateException {
+    public void check() throws IllegalStateException {
         boolean ready = true;
 
         if (homeDirectory == null) {
@@ -141,22 +141,22 @@ public class HostInfoImpl implements HostInfo {
     }
 
     public String getHomeDirectory() {
-        checkReady();
+        check();
         return homeDirectory;
     }
 
     public String getId() {
-        checkReady();
+        check();
         return id;
     }
 
     public OperatingSystem getOS() {
-        checkReady();
+        check();
         return getOS();
     }
 
     public Tool getTool(String id) {
-        checkReady();
+        check();
         for (Tool tool : tools) {
             if (tool.getId().equals(id)) {
                 return tool;
@@ -167,12 +167,12 @@ public class HostInfoImpl implements HostInfo {
     }
 
     public Set<Tool> getTools() {
-        checkReady();
+        check();
         return tools;
     }
 
     public String getUsername() {
-        checkReady();
+        check();
         return username;
     }
 

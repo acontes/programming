@@ -23,8 +23,9 @@ public class ListGenerator {
             String intervalDef = matcher.group(1);
             String exclusionInterval = null;
             int lastMatchedEnd = matcher.end();
-            
-            if (matcher.find() && (nameSetDefinition.charAt(matcher.start() - 1) == '^')) {
+
+            if (matcher.find() &&
+                    (nameSetDefinition.charAt(matcher.start() - 1) == '^')) {
                 // check for an exclusion pattern
                 exclusionInterval = matcher.group(1);
                 lastMatchedEnd = matcher.end();
@@ -34,13 +35,13 @@ public class ListGenerator {
             if (lastMatchedEnd < (nameSetDefinition.length() - 1)) {
                 suffix = nameSetDefinition.substring(lastMatchedEnd);
             }
-            
+
             String[] subIntervals = intervalDef.split(SUB_INTERVAL_SPLIT_REGEXP);
             String[] subExclusionIntervals = (exclusionInterval != null)
                 ? exclusionInterval.split(SUB_INTERVAL_SPLIT_REGEXP) : null;
-                
-            res = getSubNames(prefix, suffix, subIntervals, subExclusionIntervals);
-            
+
+            res = getSubNames(prefix, suffix, subIntervals,
+                    subExclusionIntervals);
         } else {
             res = new ArrayList<String>();
             res.add(nameSetDefinition);
@@ -49,13 +50,12 @@ public class ListGenerator {
         return res;
     }
 
-    static private List<String> getSubNames(String prefix, String suffix, String[] subIntervalsDefs,
-        String[] exclusionIntervalsDefs) {
-        
+    static private List<String> getSubNames(String prefix, String suffix,
+        String[] subIntervalsDefs, String[] exclusionIntervalsDefs) {
         if (suffix == null) {
             suffix = "";
         }
-        
+
         List<String> res = new ArrayList<String>();
 
         NumberChecker numberChecker = null;
@@ -81,20 +81,20 @@ public class ListGenerator {
      * e.g. :
      * node10
      * node[0-10]      => node0, node1... node10
-     * node[1,2,3]     => node1, node2, node3 
+     * node[1,2,3]     => node1, node2, node3
      * node[0-10;2]    => node0, node2, node4, node6, node8, node10
      * node[1,2,10-20] => node1, node2, node10, node11... node20
-     * 
+     *
      * or with an exclusion interval :
-     * 
+     *
      * node[0-10]^[2-4]   => node0, node1, node5, node6... node10
      * node[0-10]^[2-4,8] => node0, node1, node5, node6, node7, node9, node10
-     * 
+     *
      * @param nameSetDefinition a set definition in the form described above
      * @return
      */
-    static private void generateNames(String prefix, String suffix, String subIntervalDef,
-        NumberChecker numberChecker, List<String> names) {
+    static private void generateNames(String prefix, String suffix,
+        String subIntervalDef, NumberChecker numberChecker, List<String> names) {
         Interval interval = new Interval(subIntervalDef);
 
         String paddingFormat = getPadding(interval.startStr);
@@ -104,8 +104,8 @@ public class ListGenerator {
                 continue;
             }
 
-            String formattedName = MessageFormat.format("{0}{1,number," + paddingFormat +
-                    "}{2}", prefix, n, suffix);
+            String formattedName = MessageFormat.format("{0}{1,number," +
+                    paddingFormat + "}{2}", prefix, n, suffix);
             names.add(formattedName);
         }
     }
@@ -140,7 +140,7 @@ public class ListGenerator {
     /**
      * Check if a given host number is part of the 'excluded' list of an interval
      * (e.g. [1-10]^[5-7] )
-     * 
+     *
      * @author glaurent
      *
      */
@@ -178,7 +178,7 @@ public class ListGenerator {
 
     /**
      * Parses an interval from its definition string "[n-m;s]"
-     *   
+     *
      * @author glaurent
      *
      */

@@ -68,4 +68,12 @@ public interface HostInfo {
      * @return the VM capacity of this host
      */
     public int getVmCapacity();
+
+    /**
+     * Check that this bridge is in a consistent state and is ready to be
+     * used.
+     *
+     * @throws IllegalStateException thrown if anything is wrong
+     */
+    public void check() throws IllegalStateException;
 }
