@@ -13,45 +13,52 @@ public class JobLauncher {
 
 	public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
-    public static void main(String[] args) {
+    public static void main(String[] arg) {
 
-		try {
-			//GET SCHEDULER
-			UserScheduler scheduler = null;
-			String jobUrl = null;
-			int nbJob = 1;			
-			if (args.length>2){
-				jobUrl = args[0];
-				nbJob = Integer.parseInt(args[1]);
-				scheduler = UserScheduler.connectTo("//"+args[2]+"/"+SchedulerFrontend.SCHEDULER_DEFAULT_NAME);
-			} else if (args.length>1){
-				jobUrl = args[0];
-				nbJob = Integer.parseInt(args[1]);
-				scheduler = UserScheduler.connectTo(null);
-			} else if (args.length>0){
-				jobUrl = args[0];
-				scheduler = UserScheduler.connectTo(null);
-			} else {
-				System.err.println("You must enter a job descriptor");
-				System.exit(0);
-			}
-			
-			//CREATE JOB
-			Job j = JobFactory.getFactory().createJob(jobUrl);
-			for (int i=0;i<nbJob;i++){
-				// SUBMIT JOB
-				j.setId(scheduler.submit(j,new UserIdentification("jl","mdp")));
-			}
+    	final String[] args = arg; 
 
-			//Thread.sleep(6000);
-			//System.out.println(scheduler.getResult(j.getId()).getTaskResult());
-			
+    	Thread thread = new Thread(){
+    		@Override
+    		public void run(){
+    			try {
+    				//GET SCHEDULER
+    				UserScheduler scheduler = null;
+    				String jobUrl = null;
+    				int nbJob = 1;			
+    				if (args.length>2){
+    					jobUrl = args[0];
+    					nbJob = Integer.parseInt(args[1]);
+    					scheduler = UserScheduler.connectTo("//"+args[2]+"/"+SchedulerFrontend.SCHEDULER_DEFAULT_NAME);
+    				} else if (args.length>1){
+    					jobUrl = args[0];
+    					nbJob = Integer.parseInt(args[1]);
+    					scheduler = UserScheduler.connectTo(null);
+    				} else if (args.length>0){
+    					jobUrl = args[0];
+    					scheduler = UserScheduler.connectTo(null);
+    				} else {
+    					System.err.println("You must enter a job descriptor");
+    					System.exit(0);
+    				}
+    				
+    				//CREATE JOB
+    				Job j = JobFactory.getFactory().createJob(jobUrl);
+    				for (int i=0;i<nbJob;i++){
+    					// SUBMIT JOB
+    					j.setId(scheduler.submit(j,new UserIdentification("jl","mdp")));
+    				}
+    				
 
-		} catch (Exception e) {
-			System.out.println("Error:" + e.getMessage() + " will exit");
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
+    			} catch (Exception e) {
+    				System.out.println("Error:" + e.getMessage() + " will exit");
+    				e.printStackTrace();
+    				System.exit(1);
+    			}
+    		}
+    		
+    	};
+    	
+    	thread.start();
+
     }
 }
