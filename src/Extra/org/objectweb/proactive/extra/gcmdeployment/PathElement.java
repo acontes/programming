@@ -56,7 +56,7 @@ public class PathElement {
     }
 
     public String getFullPath() {
-        // TODO
+        // TODO return the full path based on the relative root. A pointer to some external structure is needed here (argument or encapsulation ?)
         return null;
     }
 }

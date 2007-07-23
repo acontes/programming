@@ -12,7 +12,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 /**
  *
- * TODO Transform this class into a real tree.
+ * TODO (long term) Transform this class into a real tree.
  *         This implementation duplicates Bridge and Tree like in the previous
  *  ProActive deployment framework.
  *

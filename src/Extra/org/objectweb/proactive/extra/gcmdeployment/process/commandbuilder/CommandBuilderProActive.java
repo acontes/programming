@@ -34,7 +34,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     private List<PathElement> applicationClasspath;
 
     /** File transfers to perform before starting the command */
-    // XXX Not really sure fts are needed here
+    // FIXME cmathieu Not really sure fts are needed here
     private List<FileTransferBlock> fts;
 
     /** Security Policy file*/
