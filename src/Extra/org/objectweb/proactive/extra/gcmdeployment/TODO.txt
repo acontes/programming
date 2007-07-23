@@ -1,0 +1,10 @@
+Design
+======
+
+-> Scheduler integration
+	- ResourceProvider tags must be optional
+		- root level
+		- inside proactive/virtualNode
+	- Implement check method for scheduler and direct mode
+	
+	
