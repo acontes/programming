@@ -86,5 +86,10 @@
 	<classpathentry kind="lib" path="lib/ibis/ibis-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/ibis/ibis-connect-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ibis/ibis-util-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jung/colt.jar"/>
+	<classpathentry kind="lib" path="lib/jung/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/jung/concurrent.jar"/>
+	<classpathentry kind="lib" path="lib/jung/jung-1.7.4.jar"/>
+	<classpathentry kind="con" path="SWT_CONTAINER/PLATFORM"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

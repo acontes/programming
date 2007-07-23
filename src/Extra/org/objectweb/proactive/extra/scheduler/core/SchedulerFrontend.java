@@ -147,6 +147,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job, org.objectweb.proactive.extra.scheduler.job.UserIdentification)
 	 */
 	public JobId submit(Job job, UserIdentification userId) throws SchedulerException {
+		//TODO user/admin identification
+		//ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		job = setInformations(job);
 		jobs.put(job.getId(), new IdentifyJob(job.getId(),userId));
 		scheduler.submit(job);
