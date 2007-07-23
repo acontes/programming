@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.BodyAdapter;
+import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
@@ -78,7 +79,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
-import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.descriptor.parser.JaxpDescriptorParser;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
@@ -1870,7 +1872,18 @@ public class ProActive {
      *     this method.
      */
     public static Body getBodyOnThis() {
-        return LocalBodyStore.getInstance().getCurrentThreadBody();
+        return LocalBodyStore.getInstance().getContext().getBody();
+    }
+
+    /**
+     * Return the current execution context for the calling thread. The execution context
+     * contains a reference to the body associated to this thread, and some informations about
+     * the currently served request if any.
+     * @return the current execution context associated to the calling thread.
+     * @see org.objectweb.proactive.core.body.Context
+     */
+    public static Context getContext() {
+        return LocalBodyStore.getInstance().getContext();
     }
 
     /**

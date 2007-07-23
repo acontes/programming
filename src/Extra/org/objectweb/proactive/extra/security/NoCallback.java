@@ -28,35 +28,34 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.descriptor.xml;
+package org.objectweb.proactive.extra.security;
 
-import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
-import org.objectweb.proactive.core.xml.io.Attributes;
+import java.io.Serializable;
+import java.util.Map;
+
+import javax.security.auth.callback.Callback;
 
 
 /**
- * This class receives deployment events
+ * Actually does no callback. It is given its information by a
+ * <code>NoCallbackHandler</code>.
  *
- * @author  ProActive Team
- * @version 1.0,  2003/04/20
- * @since   ProActive 1.0.2
+ * @author nhouillo
+ *
  */
-public class ProcessReferenceHandler extends BasicUnmarshaller {
-    public ProcessReferenceHandler() {
+public class NoCallback implements Callback, Serializable {
+    private static final long serialVersionUID = -6514625872087330694L;
+    private Map<String, Object> values;
+
+    protected void set(Map<String, Object> values) {
+        this.values = values;
     }
 
-    @Override
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
-        String refid = attributes.getValue("refid");
-        if (logger.isDebugEnabled()) {
-            logger.debug("refid " + refid);
-        }
-        if (checkNonEmpty(refid)) {
-            setResultObject(refid);
-        } else {
-            throw new org.xml.sax.SAXException(
-                "The Id of the referenced definition cannot be set to an empty string");
-        }
+    protected Map<String, Object> get() {
+        return values;
+    }
+
+    protected void clear() {
+        values = null;
     }
 }
