@@ -214,6 +214,7 @@
 		<complexContent>
 			<extension base="pa:abstractGCMType">
 				<sequence>
+					<element name="host" type="pa:hostType" minOccurs="0" maxOccurs="1"></element>
 					<element ref="pa:abstractResourceElement"
 						maxOccurs="unbounded">
 					</element>
