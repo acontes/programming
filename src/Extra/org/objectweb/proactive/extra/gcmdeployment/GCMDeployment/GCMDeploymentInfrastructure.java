@@ -45,7 +45,7 @@ public class GCMDeploymentInfrastructure {
     }
 
     protected void setHostInfo(HostInfo hostInfo) {
-        assert (hostInfo == null);
+        assert (hostInfo != null);
         this.hostInfo = hostInfo;
     }
 
