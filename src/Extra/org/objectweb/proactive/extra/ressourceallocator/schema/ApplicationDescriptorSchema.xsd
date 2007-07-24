@@ -193,7 +193,7 @@
 			<element name="fileTranfer" type="pa:fileTransferType"
 				minOccurs="0" maxOccurs="unbounded">
 			</element>
-			<element name="resourceProvider" maxOccurs="unbounded">
+			<element name="resourceProvider" minOccurs="0" maxOccurs="unbounded">
 				<complexType>
 					<attribute name="refid" type="pa:idType">
 					</attribute>
@@ -230,7 +230,7 @@
 				minOccurs="0">
 			</element>
 			<element name="resourceProvider"
-				type="pa:resourceProviderType" maxOccurs="unbounded">
+				type="pa:resourceProviderType" minOccurs="0" maxOccurs="unbounded">
 			</element>
 			<element name="executable" type="pa:executableType"
 				minOccurs="0">
