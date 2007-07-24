@@ -21,12 +21,12 @@ public abstract class JavaTask implements Task {
 	 */
 	public void init(Map<String, Object> args){
 		try{
-			for (String key : args.keySet()){
+			//for (String key : args.keySet()){
 				//TODO make the mapping automatically (seems not to be possible)
 				//Field f = this.getClass().getDeclaredField(key);
 				//f.set(this, f.getClass().cast(args.get(key)));
 				//f.set(this, args.get(key));
-			}
+			//}
 		} catch(Exception e){
 			e.printStackTrace();
 		}

@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.scheduler.core;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 /**
@@ -9,8 +10,12 @@ import java.util.Calendar;
  * @version 1.0, Jun 26, 2007
  * @since ProActive 3.2
  */
-public class Tools {
+public class Tools implements Serializable {
 
+	/** Serial version UID */
+	private static final long serialVersionUID = 2410081686855631412L;
+
+	
 	/**
 	 * Format the given integer 'toFormat' to a String containing 'nbChar'
 	 * characters
@@ -29,6 +34,7 @@ public class Tools {
 		return formatted;
 	}
 
+	
 	/**
 	 * Format 2 long times into a single duration as a String. The string will
 	 * contains the duration in Days, hours, minutes, seconds, and millis.
@@ -72,6 +78,13 @@ public class Tools {
 		return formatted;
 	}
 
+	
+	/**
+	 * Return the given date as a formatted string.
+	 * 
+	 * @param time the date as a long.
+	 * @return the given date as a formatted string.
+	 */
 	public static String getFormattedDate(long time) {
 		if (time == -1)
 			return "Not yet";
@@ -79,4 +92,5 @@ public class Tools {
 		calendar.setTimeInMillis(time);
 		return String.format("%1$tT  %1$tD", calendar);
 	}
+	
 }

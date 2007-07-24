@@ -39,6 +39,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
 public class AdminCommunicator {
@@ -64,14 +66,16 @@ public class AdminCommunicator {
 
     public static void main(String[] args) {
         try {
+        	SchedulerAuthentificationInterface auth;
         	if (args.length > 0)
-        		scheduler = AdminScheduler.connectTo(args[0]);
+        		auth = SchedulerConnection.join(args[0]);
         	else
-        		scheduler = AdminScheduler.connectTo(null);
+        		auth = SchedulerConnection.join(null);
+        	scheduler = auth.logAsAdmin("jl", "jl");
         	stopCommunicator = false;
             startCommandListener();
         } catch (Exception e) {
-            error("A fatal error has occured:" + e.getMessage() +
+            error("A fatal error has occured : " + e.getMessage() +
                 "\n Will shut down communicator.\n");
             System.exit(1);
         }

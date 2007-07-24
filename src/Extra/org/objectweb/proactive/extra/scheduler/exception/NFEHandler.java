@@ -7,7 +7,10 @@ import static org.objectweb.proactive.extra.scheduler.core.SchedulerCore.logger;
 
 
 public class NFEHandler implements NFEListener, java.io.Serializable {
-    private String source;
+	
+    /** Serial version UID */
+	private static final long serialVersionUID = 6341082431127272393L;
+	private String source;
 
     public NFEHandler() {
     }

@@ -65,7 +65,7 @@ public class FileLoginBackendExample {
         params.put("path", FileLogin.class.getResource("login.cfg").getFile());
 
         try {
-            Login.login(params, "FileLoginMethod");
+            FileLogin.login(params);
             System.out.println("Login successful");
         } catch (LoginException e) {
             e.printStackTrace();

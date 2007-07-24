@@ -1,9 +1,6 @@
 package org.objectweb.proactive.extra.scheduler.core;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -15,6 +12,7 @@ import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
 /**
@@ -25,7 +23,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
  * @version 1.0, Jun 28, 2007
  * @since ProActive 3.2
  */
-public class AdminScheduler extends UserScheduler implements SchedulerInterface {
+public class AdminScheduler extends UserScheduler implements AdminSchedulerInterface{
 	
 	/** serial version UID */
 	private static final long serialVersionUID = -8799427055681878266L;
@@ -33,14 +31,17 @@ public class AdminScheduler extends UserScheduler implements SchedulerInterface 
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 	
     
-    
+    //TODO faire un createScheduler qui prend en param les user//mdp
 	/**
 	 * Create a new scheduler at the specified URL plugged on the given resource manager.
+	 * This will provide a connection interface to allow the access to a restricted number of user.
 	 * 
+	 * @param loginFile the path where are stored the allowed login//password. 
 	 * @param imp the resource manager to plug on the scheduler.
+	 * @param policyFullClassName the full policy class name for the scheduler. 
 	 * @return an admin scheduler interface to manage the scheduler.
 	 */
-	public static AdminScheduler createScheduler(InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException {
+	public static AdminScheduler createScheduler(String loginFile, InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException {
 		logger.info("********************* STARTING NEW SCHEDULER *******************");
 		//verifying arguments...
 		if (imp == null)
@@ -57,6 +58,7 @@ public class AdminScheduler extends UserScheduler implements SchedulerInterface 
 		//creating admin API and scheduler
 		AdminScheduler adminScheduler = new AdminScheduler();
 		SchedulerFrontend schedulerFrontend;
+		SchedulerAuthentification schedulerAuth;
 		try {
 			// creating the scheduler proxy.
 			// if this fails then it will not continue.
@@ -64,13 +66,20 @@ public class AdminScheduler extends UserScheduler implements SchedulerInterface 
 			schedulerFrontend = (SchedulerFrontend) ProActive.newActive(
 					SchedulerFrontend.class.getName(),
 					new Object[] {imp, policyFullClassName});
-			// adding NFE listener to managed non fonctionnal exception
+			// creating the scheduler authentification interface.
+			// if this fails then it will not continue.
+			logger.info("Creating scheduler authentification interface...");
+			schedulerAuth = (SchedulerAuthentification) ProActive.newActive(
+					SchedulerAuthentification.class.getName(),
+					new Object[] {loginFile,schedulerFrontend});
+			// adding NFE listener to managed non fonctionnal exceptions
 			// that occurs in Proactive Core
 			ProActive.addNFEListenerOnAO(schedulerFrontend, new NFEHandler("Scheduler Frontend"));
+			ProActive.addNFEListenerOnAO(schedulerAuth, new NFEHandler("Scheduler authentification"));
 			// registering the scheduler proxy at the given URL
-			logger.info("Registering scheduler frontend...");
-			String schedulerUrl = "//localhost/"+SchedulerFrontend.SCHEDULER_DEFAULT_NAME;
-			ProActive.register(schedulerFrontend, schedulerUrl);
+			logger.info("Registering scheduler...");
+			String schedulerUrl = "//localhost/"+SchedulerConnection.SCHEDULER_DEFAULT_NAME;
+			ProActive.register(schedulerAuth, schedulerUrl);
 			// setting the proxy to the admin scheduler API
 			adminScheduler.schedulerFrontend = schedulerFrontend;
 			// run forest run !!
@@ -85,40 +94,7 @@ public class AdminScheduler extends UserScheduler implements SchedulerInterface 
 	
 	
 	/**
-	 * Connect the admin interface to a scheduler with the given SNode.
-	 * This method will return a new scheduler admin API to managed job.
-	 * 
-	 * @param schedulerURL the url of an already started scheduler.
-	 * @return an adminScheduler interface to managed the scheduler as user right
-	 * @throws SchedulerException
-	 */
-	public static AdminScheduler connectTo(String schedulerURL) throws SchedulerException {
-		AdminScheduler as = new AdminScheduler();
-		
-		logger.info("******************* JOINING EXISTING SCHEDULER *****************");
-		
-		if (schedulerURL == null){
-			logger.info("Scheduler URL was null, looking for scheduler on localhost...");
-			schedulerURL = "//localhost/"+SchedulerFrontend.SCHEDULER_DEFAULT_NAME;
-		}
-		SchedulerFrontend sp = null;
-    	try {
-			sp = (SchedulerFrontend)(ProActive.lookupActive(SchedulerFrontend.class.getName(), schedulerURL));
-		} catch (ActiveObjectCreationException e) {
-			e.printStackTrace();
-			throw new SchedulerException("Error while looking up this active object : "+SchedulerFrontend.class.getName());
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new SchedulerException("IO Error while looking up this active object : "+SchedulerFrontend.class.getName());
-		}
-		
-		as.schedulerFrontend = sp;
-		return as;
-	}
-	
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public JobResult getResult(JobId jobId) throws SchedulerException {
 		return schedulerFrontend.getResult(jobId);
@@ -126,15 +102,15 @@ public class AdminScheduler extends UserScheduler implements SchedulerInterface 
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
 	 */
-	public void listenLog(JobId jobId, String hostname, int port) {
+	public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
 		schedulerFrontend.listenLog(jobId, hostname, port);
 	}
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#submit(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	public JobId submit(Job job) throws SchedulerException {
 		return schedulerFrontend.submit(job);
@@ -142,52 +118,42 @@ public class AdminScheduler extends UserScheduler implements SchedulerInterface 
 	
 	
 	/**
-	 * Start the scheduler.
-	 * 
-	 * @return true if success, false otherwise.
+	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#start()
 	 */
 	public boolean start(){
-		return schedulerFrontend.start().booleanValue();
+		return schedulerFrontend.coreStart().booleanValue();
 	}
 	
 	
 	/**
-	 * Stop the scheduler.
-	 * 
-	 * @return true if success, false otherwise.
+	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#stop()
 	 */
 	public boolean stop(){
-		return schedulerFrontend.stop().booleanValue();
+		return schedulerFrontend.coreStop().booleanValue();
 	}
 	
 	
 	/**
-	 * Pause the scheduler.
-	 * 
-	 * @return true if success, false otherwise.
+	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pause()
 	 */
 	public boolean pause(){
-		return schedulerFrontend.pause().booleanValue();
+		return schedulerFrontend.corePause().booleanValue();
 	}
 	
 	
 	/**
-	 * Resume the scheduler.
-	 * 
-	 * @return true if success, false otherwise.
+	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
 	 */
 	public boolean resume(){
-		return schedulerFrontend.resume().booleanValue();
+		return schedulerFrontend.coreResume().booleanValue();
 	}
 	
 	
 	/**
-	 * Shutdown the scheduler.
-	 * 
-	 * @return true if success, false otherwise.
+	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#shutdown()
 	 */
 	public boolean shutdown(){
-		return schedulerFrontend.shutdown().booleanValue();
+		return schedulerFrontend.coreShutdown().booleanValue();
 	}
 	
 }

@@ -16,7 +16,7 @@ public class IdentifyJob implements Serializable {
 	private static final long serialVersionUID = 9100796464303741891L;
 	/** Job Identification */
 	private JobId jobId;
-	/** User identification (null if the job is admin) */
+	/** User identification */
 	private UserIdentification userIdentification;
 	
 	
@@ -29,17 +29,6 @@ public class IdentifyJob implements Serializable {
 	public IdentifyJob(JobId jobId, UserIdentification userIdentification) {
 		this.jobId = jobId;
 		this.userIdentification = userIdentification;
-	}
-	
-
-	/**
-	 * Identify job constructor with a given job.
-	 * It represents an admin job.
-	 * 
-	 * @param jobId a job description.
-	 */
-	public IdentifyJob(JobId jobId) {
-		this(jobId,null);
 	}
 	
 
@@ -72,7 +61,7 @@ public class IdentifyJob implements Serializable {
 	public boolean hasRight(UserIdentification userId){
 		if (userIdentification == null)
 			return false;
-		return userIdentification.equals(userId);
+		return userId.isAdmin() || userIdentification.equals(userId);
 	}
 	
 	

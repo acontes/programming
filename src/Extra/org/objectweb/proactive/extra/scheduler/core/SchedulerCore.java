@@ -284,7 +284,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#start()
 	 */
-	public BooleanWrapper start() {
+	public BooleanWrapper coreStart() {
 		if (schedulerRunning)
 			return new BooleanWrapper(false);
 		schedulerRunning = true;
@@ -296,7 +296,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#stop()
 	 */
-	public BooleanWrapper stop() {
+	public BooleanWrapper coreStop() {
 		if (!schedulerRunning)
 			return new BooleanWrapper(false);
 		schedulerRunning = false;
@@ -308,7 +308,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#pause()
 	 */
-	public BooleanWrapper pause() {
+	public BooleanWrapper corePause() {
 		// TODO Auto-generated method stub
 		return new BooleanWrapper(false);
 	}
@@ -317,7 +317,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#resume()
 	 */
-	public BooleanWrapper resume() {
+	public BooleanWrapper coreResume() {
 		// TODO Auto-generated method stub
 		return new BooleanWrapper(false);
 	}
@@ -326,7 +326,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#shutdown()
 	 */
-	public BooleanWrapper shutdown() {
+	public BooleanWrapper coreShutdown() {
 		if (schedulerRunning)
 			return new BooleanWrapper(false);
 		schedulerShuttingDown = true;

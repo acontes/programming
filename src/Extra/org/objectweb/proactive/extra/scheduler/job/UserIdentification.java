@@ -3,10 +3,8 @@ package org.objectweb.proactive.extra.scheduler.job;
 import java.io.Serializable;
 
 /**
- * <font color="red">THIS CLASS HAS TO BE IMPLEMENTED</font>
- * This class will be able to authenticate a user.
- * For the moment it is a user/password authentification.
- * Two userIdentification are equals if there username and password are the same.
+ * This class will be able to authenticate a user/admin.
+ * Two userIdentification are equals if there username are the same.
  * 
  * @author ProActive Team
  * @version 1.0, Jul 4, 2007
@@ -14,33 +12,33 @@ import java.io.Serializable;
  */
 public class UserIdentification implements Serializable {
 
-	/**  */
+	/** Serial version UID */
 	private static final long serialVersionUID = -1382908192253223167L;
 	/** user name */
 	private String username;
-	/** user password */
-	private String password;
+	/** is this user an admin */
+	private boolean admin = false;
 	
 	
 	/**
-	 * Constructor of user identification using user name and password.
+	 * Constructor of user identification using user name.
 	 * 
 	 * @param username the user name.
-	 * @param password the user password.
 	 */
-	public UserIdentification(String username, String password) {
+	public UserIdentification(String username) {
 		this.username = username;
-		this.password = password;
 	}
-
-
+	
+	
 	/**
-	 * To get the password
+	 * Constructor of user identification using user name and admin property.
 	 * 
-	 * @return the password
+	 * @param username the user name.
+	 * @param admin true if the user is an administrator, false if not.
 	 */
-	public String getPassword() {
-		return password;
+	public UserIdentification(String username, boolean admin) {
+		this.username = username;
+		this.admin = admin;
 	}
 
 
@@ -53,17 +51,26 @@ public class UserIdentification implements Serializable {
 		return username;
 	}
 
-
+	
+	/**
+	 * To know if this user is an administrator or a user.
+	 * 
+	 * @return true if this user is admin, false if not.
+	 */
+	public boolean isAdmin(){
+		return admin;
+	}
+	
+	
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 * 
-	 * @return true if the username and password of this and obj are equals.
+	 * @return true if the username of this and obj are equals.
 	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof UserIdentification)
-			return username.equals(((UserIdentification) obj).username)
-					&& password.equals(((UserIdentification) obj).password);
+			return username.equals(((UserIdentification) obj).username);
 		return false;
 	}
 	

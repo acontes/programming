@@ -23,12 +23,14 @@ public class Job implements Serializable, Comparable<Job> {
 	public static final int SORT_BY_PRIORITY = 3;
 	public static final int SORT_BY_TYPE = 4;
 	public static final int SORT_BY_DESCRIPTION = 5;
+	public static final int SORT_BY_OWNER = 6;
 	public static final int ASC_ORDER = 1;
 	public static final int DESC_ORDER = 2;
 	private static int currentSort = SORT_BY_ID;
 	private static int currentOrder = ASC_ORDER;
 	/** Serial version UID */
 	private static final long serialVersionUID = 1565033147327965656L;
+	private String owner = "";
 	private String name = "";
 	private JobPriority priority = JobPriority.NORMAL;
 	private JobType type = JobType.SPMD;
@@ -156,6 +158,9 @@ public class Job implements Serializable, Comparable<Job> {
 		case SORT_BY_TYPE:
 			return (currentOrder == ASC_ORDER) ? (type.compareTo(job.type))
 					: (job.type.compareTo(type));
+		case SORT_BY_OWNER:
+			return (currentOrder == ASC_ORDER) ? (owner.compareTo(job.owner))
+					: (job.owner.compareTo(owner));
 		default:
 			return (currentOrder == ASC_ORDER) ? (getId().value() - job.getId().value())
 					: (job.getId().value() - getId().value());
@@ -541,6 +546,21 @@ public class Job implements Serializable, Comparable<Job> {
 	 */
 	public void setLightJob(LightJob lightJob) {
 		this.lightJob = lightJob;
+	}
+	
+
+	/**
+	 * @return the owner
+	 */
+	public String getOwner() {
+		return owner;
+	}
+
+	/**
+	 * @param owner the owner to set
+	 */
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 	
 	

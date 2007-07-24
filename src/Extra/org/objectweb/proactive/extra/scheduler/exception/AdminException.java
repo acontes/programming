@@ -37,7 +37,10 @@ package org.objectweb.proactive.extra.scheduler.exception;
  */
 public class AdminException extends Exception {
 
-    /**
+    /** Serial version UID*/
+	private static final long serialVersionUID = 6717785194586535366L;
+
+	/**
      * Attaches a message to the Exception
      * @param arg0-message ataached
      */

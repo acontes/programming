@@ -37,7 +37,6 @@ package org.objectweb.proactive.examples.scheduler;
 
 import java.io.File;
 import java.net.URI;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -47,6 +46,8 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.SimpleResourceManager;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
 public class LocalSchedulerExample {
@@ -82,7 +83,14 @@ public class LocalSchedulerExample {
                 logger.info("ResourceManager created on " + ProActive.getActiveObjectNodeUrl(imp));
             }
 
-            AdminScheduler adminAPI = AdminScheduler.createScheduler(imp,"org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
+            AdminScheduler.createScheduler(
+            		LocalSchedulerExample.class.getResource("login.cfg").getFile(),
+            		imp,
+            		"org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
+            
+            SchedulerAuthentificationInterface auth = SchedulerConnection.join(null);
+            
+            AdminScheduler adminAPI = auth.logAsAdmin("admin", "admin");
             adminAPI.start();
             
         } catch (Exception e) {

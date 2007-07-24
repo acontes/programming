@@ -2,13 +2,12 @@ package org.objectweb.proactive.examples.scheduler;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
-import org.objectweb.proactive.extra.scheduler.core.SchedulerFrontend;
 import org.objectweb.proactive.extra.scheduler.core.UserScheduler;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
-import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
 public class ResultRecup {
@@ -16,11 +15,14 @@ public class ResultRecup {
         try {
         	//GET SCHEDULER
 			UserScheduler scheduler;
+			SchedulerAuthentificationInterface auth;
 			if (args.length>0){
-				scheduler = UserScheduler.connectTo("//"+args[0]+"/"+SchedulerFrontend.SCHEDULER_DEFAULT_NAME);
+				auth = SchedulerConnection.join("//"+args[0]+"/"+SchedulerConnection.SCHEDULER_DEFAULT_NAME);
 			} else {
-				scheduler = UserScheduler.connectTo(null);
+				auth = SchedulerConnection.join(null);
 			}
+			
+			scheduler = auth.logAsUser("john", "john");
 
             InputStreamReader reader = new InputStreamReader(System.in);
 
@@ -42,7 +44,7 @@ public class ResultRecup {
             	}
             	for (int i=begin;i<=end;i++){
             		try {
-            			JobResult result = scheduler.getResult(new JobId(i),new UserIdentification("jl","mdp"));
+            			JobResult result = scheduler.getResult(new JobId(i));
             			if (result != null) {
             				if (!result.exceptionOccured()) {
             					System.out.println("Job "+i+" Result => "+result.getResult());
