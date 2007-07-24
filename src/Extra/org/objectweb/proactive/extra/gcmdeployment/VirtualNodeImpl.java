@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extra.gcmdeployment;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
@@ -17,6 +18,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
 
     public VirtualNodeImpl() {
         fts = new ArrayList<FileTransferBlock>();
+        providers = new ArrayList<GCMDeploymentDescriptor>();
     }
 
     public long getRequiredCapacity() {
@@ -39,8 +41,12 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return providers;
     }
 
-    public void setProviders(List<GCMDeploymentDescriptor> providers) {
-        this.providers = providers;
+    public void addProvider(GCMDeploymentDescriptor provider) {
+        providers.add(provider);
+    }
+
+    public void addProviders(Collection<GCMDeploymentDescriptor> providers) {
+        providers.addAll(providers);
     }
 
     public void addFileTransfertBlock(FileTransferBlock ftb) {
@@ -49,5 +55,11 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
 
     public String getName() {
         return id;
+    }
+
+    public void check() throws IllegalStateException {
+        if (providers.size() == 0) {
+            throw new IllegalStateException("providers is empty in " + this);
+        }
     }
 }
