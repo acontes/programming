@@ -93,7 +93,15 @@ public interface IMNode {
      */
     public String toString();
 
+    /**
+     * Cleaning method : remove all active objects on this node.
+     */
 	public void clean();
 	
+	/**
+	 * Get a map of all Verifying script allready tested on this node,
+	 * and the responses given.
+	 * @return the map of Script and status
+	 */
 	public HashMap<VerifyingScript, Integer> getScriptStatus();
 }
