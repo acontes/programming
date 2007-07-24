@@ -16,11 +16,14 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
@@ -191,7 +194,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    public void parseResources() throws XPathExpressionException {
+    public void parseResources() throws XPathExpressionException, IOException {
         Node resourcesNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:resources",
                 document, XPathConstants.NODE);
 
@@ -204,13 +207,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    protected void parseResourceNode(Node resourceNode) {
+    protected void parseResourceNode(Node resourceNode)
+        throws XPathExpressionException, IOException {
         String refid = GCMParserHelper.getAttributeValue(resourceNode, "refid");
 
         String nodeName = resourceNode.getNodeName();
 
         if (nodeName.equals("bridge")) {
-            BridgeResource bridgeResource = new BridgeResource(refid);
+            Bridge bridge = getBridge(refid);
 
             NodeList childNodes = resourceNode.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); ++i) {
@@ -223,38 +227,55 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                         "refid");
 
                 if (childNodeName.equals("group")) {
-                    GroupResource groupResource = new GroupResource(childRefId);
+                    Group group = getGroup(childRefId);
 
-                    parseGroupResource(childNode, groupResource);
-                    bridgeResource.addGroup(refid, groupResource);
+                    parseGroupResource(childNode, group);
+                    bridge.addGroup(group);
                 } else if (childNodeName.equals("host")) {
-                    bridgeResource.addHost(childRefId);
+                    HostInfo hostInfo = getHostInfo(refid);
+                    bridge.setHostInfo(hostInfo);
                 }
             }
 
-            resources.addBridge(bridgeResource);
+            resources.addBridge(bridge);
         } else if (nodeName.equals("group")) {
-            GroupResource groupResource = new GroupResource(refid);
+            Group group = getGroup(refid);
 
-            parseGroupResource(resourceNode, groupResource);
-            resources.addGroup(groupResource);
+            parseGroupResource(resourceNode, group);
+            resources.addGroup(group);
         } else if (nodeName.equals("host")) {
-            resources.addHost(refid);
+            HostInfo hostInfo = getHostInfo(refid);
+            resources.setHostInfo(hostInfo);
         }
     }
 
-    protected void parseGroupResource(Node resourceNode,
-        GroupResource groupResource) {
-        NodeList childNodes = resourceNode.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); ++i) {
-            Node childNode = childNodes.item(i);
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            String hostRefid = GCMParserHelper.getAttributeValue(childNode,
-                    "refid");
-            groupResource.addHost(hostRefid);
-        }
+    protected HostInfo getHostInfo(String refid) throws IOException {
+        HostInfo hostInfo = infrastructure.getHosts().get(refid);
+
+        return (HostInfo) ((hostInfo != null) ? Utils.makeDeepCopy(hostInfo)
+                                              : null);
+    }
+
+    protected Group getGroup(String refid) throws IOException {
+        Group group = infrastructure.getGroups().get(refid);
+
+        return (Group) ((group != null) ? Utils.makeDeepCopy(group) : null);
+    }
+
+    protected Bridge getBridge(String refid) throws IOException {
+        Bridge bridge = infrastructure.getBridges().get(refid);
+
+        return (Bridge) ((bridge != null) ? Utils.makeDeepCopy(bridge) : null);
+    }
+
+    protected void parseGroupResource(Node resourceNode, Group group)
+        throws XPathExpressionException, IOException {
+        Node hostNode = (Node) xpath.evaluate("pa:host", resourceNode,
+                XPathConstants.NODE);
+
+        String refid = GCMParserHelper.getAttributeValue(hostNode, "refid");
+        HostInfo hostInfo = getHostInfo(refid);
+        group.setHostInfo(hostInfo);
     }
 
     public void parseInfrastructure() throws XPathExpressionException {

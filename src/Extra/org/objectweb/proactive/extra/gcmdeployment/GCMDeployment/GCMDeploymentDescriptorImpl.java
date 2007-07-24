@@ -15,9 +15,14 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
     public GCMDeploymentDescriptorImpl(File descriptor,
         Set<FileTransferBlock> ftBlocks) {
-        parser = new GCMDeploymentParserImpl(descriptor);
-        environment = parser.getEnvironment();
-        infrastructure = parser.getInfrastructure();
+        try {
+            parser = new GCMDeploymentParserImpl(descriptor);
+            environment = parser.getEnvironment();
+            infrastructure = parser.getInfrastructure();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void start(CommandBuilder commandBuilder) {

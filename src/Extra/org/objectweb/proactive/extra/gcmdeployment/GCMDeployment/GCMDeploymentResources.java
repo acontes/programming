@@ -8,6 +8,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
+
 public class GCMDeploymentResources {
     private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
     private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
@@ -25,7 +26,7 @@ public class GCMDeploymentResources {
         groups.add(group);
     }
 
-    public void addBrige(Bridge bridge) {
+    public void addBridge(Bridge bridge) {
         bridges.add(bridge);
     }
 
@@ -47,5 +48,4 @@ public class GCMDeploymentResources {
 
         hostInfo.check();
     }
-
 }
