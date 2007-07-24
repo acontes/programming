@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map.Entry;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
@@ -148,10 +149,42 @@ public class IMNodeManagerImpl implements IMNodeManager{
 	 */
 	public ArrayList<IMNode> getNodesByScript(VerifyingScript script) {
 		ArrayList<IMNode> result = getListFreeIMNode();
+		verifyWaitingNodes();
 		if(script != null) {
 			Collections.sort(result, new IMNodeComparator(script));
 		} 
 		return result;
+	}
+
+	/**
+	 * Search for responding nodes in the waiting list.
+	 * Depending on the result, updates the node verifyig status
+	 * about the corresponding script.
+	 *
+	 */
+	private void verifyWaitingNodes() {
+		ListIterator<WaitingHandler> iter = waitingNodes.listIterator();
+		while(iter.hasNext()) {
+			WaitingHandler wh = iter.next();
+			if(!ProActive.isAwaited(wh.futureResult)) {// Arrived
+				iter.remove();
+				if(ProActive.isException(wh.futureResult)) {
+					// An error occured, independant of the script
+					// so the node is down
+					setDown(wh.imnode);
+				} else if(wh.futureResult.errorOccured()) {
+					// error on script : can't do anything
+					// for now...
+					wh.futureResult.getException().printStackTrace();
+				} else if(wh.futureResult.getResult()) {
+					// the node verify the script
+					setVerifyingScript(wh.imnode, wh.script);
+				} else {
+					// the node not verify the script
+					setNotVerifyingScript(wh.imnode, wh.script);
+				}
+			}
+		}
 	}
 
 	/**
