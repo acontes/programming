@@ -1,8 +1,5 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
@@ -20,42 +17,31 @@ import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
  *
  */
 public class GCMDeploymentInfrastructure {
-    private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
-    private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
-    private HostInfo hostInfo;
+    private Map<String, Group> groups;
+    private Map<String, Bridge> bridges;
+    private Map<String, HostInfo> hosts;
 
-    public List<Group> getGroups() {
+    public Map<String, Group> getGroups() {
         return groups;
     }
 
-    public List<Bridge> getBridges() {
+    public Map<String, Bridge> getBridges() {
         return bridges;
     }
 
+    public Map<String, HostInfo> getHosts() {
+        return hosts;
+    }
+
     public void addGroup(Group group) {
-        groups.add(group);
+        groups.put(group.getId(), group);
     }
 
     public void addBrige(Bridge bridge) {
-        bridges.add(bridge);
+        bridges.put(bridge.getId(), bridge);
     }
 
-    protected HostInfo getHostInfo() {
-        return hostInfo;
-    }
-
-    protected void setHostInfo(HostInfo hostInfo) {
-        assert (this.hostInfo == null);
-        this.hostInfo = hostInfo;
-    }
-
-    public void check() throws IllegalStateException {
-        for (Group group : groups)
-            group.check();
-
-        for (Bridge bridge : bridges)
-            bridge.check();
-
-        hostInfo.check();
+    public void addHost(HostInfo host) {
+        hosts.put(host.getId(), host);
     }
 }

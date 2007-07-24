@@ -113,11 +113,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    protected Resources resources;
+    protected GCMDeploymentResources resources;
 
     public GCMDeploymentParserImpl(File descriptor) throws IOException {
         infrastructure = new GCMDeploymentInfrastructure();
-        resources = new Resources();
+        resources = new GCMDeploymentResources();
         groupParserMap = new HashMap<String, GroupParser>();
         environment = new GCMDeploymentEnvironment();
 
@@ -232,12 +232,12 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 }
             }
 
-            resources.addBridge(refid, bridgeResource);
+            resources.addBridge(bridgeResource);
         } else if (nodeName.equals("group")) {
             GroupResource groupResource = new GroupResource(refid);
 
             parseGroupResource(resourceNode, groupResource);
-            resources.addGroup(refid, groupResource);
+            resources.addGroup(groupResource);
         } else if (nodeName.equals("host")) {
             resources.addHost(refid);
         }
@@ -264,9 +264,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         NodeList hosts = (NodeList) xpath.evaluate("pa:hosts/pa:host",
                 infrastructureNode, XPathConstants.NODESET);
 
-        // FIXME glaurent Only one HostInfo is allowed in the resource part
-        // The schema is probably to update too
-        // Add host has been replaced by setHost
         for (int i = 0; i < hosts.getLength(); ++i) {
             HostInfo hostInfo = parseHostNode(hosts.item(i));
             infrastructure.addHost(hostInfo);
