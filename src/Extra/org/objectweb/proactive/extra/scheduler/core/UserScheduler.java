@@ -10,6 +10,8 @@ import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 /**
@@ -55,7 +57,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
 	 */
 	public SchedulerState addSchedulerEventListener (SchedulerEventListener sel) throws SchedulerException {
 		return schedulerFrontend.addSchedulerEventListener(sel);

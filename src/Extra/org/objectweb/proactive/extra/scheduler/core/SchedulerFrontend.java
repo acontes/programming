@@ -27,6 +27,8 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 /**
@@ -199,7 +201,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
 	 */
 	public SchedulerState addSchedulerEventListener(SchedulerEventListener sel) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
@@ -340,7 +342,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	public void newPendingJobEvent(Job job) {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
@@ -357,7 +359,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void pendingToRunningJobEvent(JobEvent event) {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
@@ -374,7 +376,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void runningToFinishedJobEvent(JobEvent event) {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
@@ -393,7 +395,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void removeFinishedJobEvent(JobEvent event) {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
@@ -410,7 +412,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
 	 */
 	public void pendingToRunningTaskEvent(TaskEvent event) {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
@@ -427,7 +429,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
 	 */
 	public void runningToFinishedTaskEvent(TaskEvent event) {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();

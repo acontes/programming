@@ -30,6 +30,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>

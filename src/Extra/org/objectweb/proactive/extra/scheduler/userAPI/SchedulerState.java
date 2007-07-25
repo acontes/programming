@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.scheduler.core;
+package org.objectweb.proactive.extra.scheduler.userAPI;
 
 import java.io.Serializable;
 import java.util.Vector;
