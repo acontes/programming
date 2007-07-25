@@ -253,8 +253,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         HostInfo hostInfo = infrastructure.getHosts().get(refid);
 
         try {
-            return (HostInfo) ((hostInfo != null) ? hostInfo.clone()
-                                                  : null);
+            return (HostInfo) ((hostInfo != null) ? hostInfo.clone() : null);
         } catch (CloneNotSupportedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

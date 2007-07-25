@@ -107,7 +107,6 @@ public abstract class AbstractBridge implements Bridge {
         }
         hostInfo.check();
     }
-    
+
     public abstract Object clone() throws CloneNotSupportedException;
-    
 }

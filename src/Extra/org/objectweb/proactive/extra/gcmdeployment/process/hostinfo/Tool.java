@@ -69,5 +69,4 @@ public class Tool implements Cloneable {
         Tool res = new Tool(new String(this.id), new String(this.path));
         return res;
     }
-
 }

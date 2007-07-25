@@ -76,6 +76,6 @@ public interface HostInfo extends Cloneable {
      * @throws IllegalStateException thrown if anything is wrong
      */
     public void check() throws IllegalStateException;
-    
+
     public Object clone() throws CloneNotSupportedException;
 }

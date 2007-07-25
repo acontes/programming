@@ -187,12 +187,12 @@ public class HostInfoImpl implements HostInfo {
         res.vmCapacity = this.vmCapacity;
         res.id = this.id;
         res.os = this.os;
-        for(Tool t : tools) {
-            res.tools.add((Tool) t.clone());            
+        for (Tool t : tools) {
+            res.tools.add((Tool) t.clone());
         }
         return res;
     }
-    
+
     @SuppressWarnings("unused")
     static public class UnitTestHostInfoImpl {
         HostInfoImpl notInitialized;

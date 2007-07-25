@@ -60,8 +60,7 @@ public abstract class AbstractGroup implements Group {
             this.hostInfo = hostInfo;
         }
     }
-    
+
     @Override
     public abstract Object clone() throws CloneNotSupportedException;
-    
 }
