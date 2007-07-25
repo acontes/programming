@@ -12,12 +12,12 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.security.FileLogin;
 import org.objectweb.proactive.extra.security.Login;
 
 /**
- * This is the authentification class of the scheduler.
+ * This is the authentication class of the scheduler.
  * To get an instance of the scheduler you must ident yourselfwith this class.
  * Once authenticate, the <code>login</code> method returns a user/admin interface
  * in order to managed the scheduler.
@@ -27,7 +27,7 @@ import org.objectweb.proactive.extra.security.Login;
  * @since ProActive 3.2
  *
  */
-public class SchedulerAuthentification implements SchedulerAuthentificationInterface {
+public class SchedulerAuthentication implements SchedulerAuthenticationInterface {
 
 	
 	/** Serial version UID */
@@ -38,25 +38,25 @@ public class SchedulerAuthentification implements SchedulerAuthentificationInter
 	private String loginFile;
 	/** The file where to store group management */
 	private String groupFile;
-	/** The scheduler frontend connected to this authentification interface */
+	/** The scheduler frontend connected to this authentication interface */
 	private SchedulerFrontend scheduler;
 	
 	
 	/**
 	 * ProActive empty constructor.
 	 */
-	public SchedulerAuthentification(){}
+	public SchedulerAuthentication(){}
 	
 	
 	/**
-	 * Get a new instance of SchedulerAuthentification according to the given logins file.
+	 * Get a new instance of SchedulerAuthentication according to the given logins file.
 	 * This will also set java.security.auth.login.config property.
 	 * 
 	 * @param loginFile the file path where to check if a username//password is correct.
 	 * @param groupFile the file path where to check the membership of a user.
-	 * @param scheduler the scheduler front-end on which to connect the user after authentification success.
+	 * @param scheduler the scheduler front-end on which to connect the user after authentication success.
 	 */
-	public SchedulerAuthentification(String loginFile, String groupFile, SchedulerFrontend scheduler){
+	public SchedulerAuthentication(String loginFile, String groupFile, SchedulerFrontend scheduler){
 		System.setProperty("java.security.auth.login.config",Login.class.getResource("jaas.config").getFile());
 		this.loginFile = loginFile;
 		this.groupFile = groupFile;
@@ -65,7 +65,7 @@ public class SchedulerAuthentification implements SchedulerAuthentificationInter
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface#logAsUser(java.lang.String, java.lang.String)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
 	 */
 	public UserScheduler logAsUser(String user, String password) throws LoginException, SchedulerException {
 		// Verify that this user//password can connect to this existing scheduler
@@ -93,7 +93,7 @@ public class SchedulerAuthentification implements SchedulerAuthentificationInter
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface#logAsAdmin(java.lang.String, java.lang.String)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
 	 */
 	public AdminScheduler logAsAdmin(String user, String password) throws LoginException, SchedulerException {
 		// Verify that this user//password can connect (as admin) to this existing scheduler.
