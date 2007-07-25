@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 

@@ -52,7 +52,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.composite.FinishedJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;

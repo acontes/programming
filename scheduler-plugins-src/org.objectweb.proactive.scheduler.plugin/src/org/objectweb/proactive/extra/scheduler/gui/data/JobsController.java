@@ -32,9 +32,9 @@ import java.util.Vector;
 
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener;
-import org.objectweb.proactive.extra.scheduler.core.SchedulerState;
-import org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
