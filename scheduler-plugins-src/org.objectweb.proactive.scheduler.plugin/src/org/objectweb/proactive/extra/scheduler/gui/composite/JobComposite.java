@@ -75,6 +75,8 @@ public abstract class JobComposite extends Composite {
 	public static final String COLUMN_NAME_TITLE = "Name";
 	/** the unique id and the title for the column "Description" */
 	public static final String COLUMN_DESCRIPTION_TITLE = "Description";
+	/** the unique id and the title for the column "Owner" */
+	public static final String COLUMN_OWNER_TITLE = "Owner";
 
 	private Label label = null;
 	private Table table = null;
@@ -196,6 +198,7 @@ public abstract class JobComposite extends Composite {
 
 		// creating TableColumn
 		TableColumn tc1 = new TableColumn(table, SWT.RIGHT);
+		TableColumn tc5 = new TableColumn(table, SWT.LEFT);
 		TableColumn tc2 = new TableColumn(table, SWT.CENTER);
 		TableColumn tc3 = new TableColumn(table, SWT.CENTER);
 		TableColumn tc4 = new TableColumn(table, SWT.LEFT);
@@ -224,21 +227,30 @@ public abstract class JobComposite extends Composite {
 				sort(event, Job.SORT_BY_DESCRIPTION);
 			}
 		});
+		tc5.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				sort(event, Job.SORT_BY_OWNER);
+			}
+		});
 		// setText
 		tc1.setText(COLUMN_ID_TITLE);
 		tc2.setText(COLUMN_PRIORITY_TITLE);
 		tc3.setText(COLUMN_NAME_TITLE);
 		tc4.setText(COLUMN_DESCRIPTION_TITLE);
+		tc5.setText(COLUMN_OWNER_TITLE);
 		// setWidth
 		tc1.setWidth(30);
 		tc2.setWidth(70);
 		tc3.setWidth(100);
 		tc4.setWidth(300);
+		tc5.setWidth(100);
 		// setMoveable
 		tc1.setMoveable(true);
 		tc2.setMoveable(true);
 		tc3.setMoveable(true);
 		tc4.setMoveable(true);
+		tc5.setMoveable(true);
 
 		table.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
@@ -288,6 +300,8 @@ public abstract class JobComposite extends Composite {
 				item.setText(i, job.getPriority().toString());
 			else if (title.equals(COLUMN_NAME_TITLE))
 				item.setText(i, job.getName());
+			else if (title.equals(COLUMN_OWNER_TITLE))
+				item.setText(i, job.getOwner());
 		}
 		return item;
 	}

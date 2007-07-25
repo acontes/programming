@@ -34,7 +34,8 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerState;
-import org.objectweb.proactive.extra.scheduler.core.UserScheduler;
+import org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
@@ -46,8 +47,8 @@ import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 
 /**
- *
- *
+ * 
+ * 
  * @author ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
@@ -163,7 +164,7 @@ public class JobsController implements SchedulerEventListener {
 		// call method on listeners
 		removePendingJobEventInternal(jobId);
 
-		// remove job from the pending jobs list 
+		// remove job from the pending jobs list
 		if (!pendingJobsIds.remove(jobId))
 			throw new IllegalStateException("can't remove the job (id = " + jobId
 					+ ") from the pendingJobsIds list !");
@@ -406,32 +407,39 @@ public class JobsController implements SchedulerEventListener {
 		return taskDescriptor;
 	}
 
-	public boolean setScheduler(UserScheduler userScheduler) {
-		SchedulerState state = userScheduler.addSchedulerEventListener(((SchedulerEventListener) ProActive
-				.getStubOnThis()));
-		jobs = new Vector<Job>();
-		pendingJobsIds = new Vector<JobId>();
-		runningJobsIds = new Vector<JobId>();
-		finishedJobsIds = new Vector<JobId>();
+	public boolean setScheduler(UserSchedulerInterface userScheduler) {
+		SchedulerState state;
+		try {
+			state = userScheduler.addSchedulerEventListener(((SchedulerEventListener) ProActive
+					.getStubOnThis()));
+			jobs = new Vector<Job>();
+			pendingJobsIds = new Vector<JobId>();
+			runningJobsIds = new Vector<JobId>();
+			finishedJobsIds = new Vector<JobId>();
 
-		Vector<Job> tmp = state.getPendingJobs();
-		for (Job job : tmp) {
-			jobs.add(job);
-			pendingJobsIds.add(job.getId());
-		}
+			Vector<Job> tmp = state.getPendingJobs();
+			for (Job job : tmp) {
+				jobs.add(job);
+				pendingJobsIds.add(job.getId());
+			}
 
-		tmp = state.getRunningJobs();
-		for (Job job : tmp) {
-			jobs.add(job);
-			runningJobsIds.add(job.getId());
-		}
+			tmp = state.getRunningJobs();
+			for (Job job : tmp) {
+				jobs.add(job);
+				runningJobsIds.add(job.getId());
+			}
 
-		tmp = state.getFinishedJobs();
-		for (Job job : tmp) {
-			jobs.add(job);
-			finishedJobsIds.add(job.getId());
+			tmp = state.getFinishedJobs();
+			for (Job job : tmp) {
+				jobs.add(job);
+				finishedJobsIds.add(job.getId());
+			}
+			return true;
+		} catch (SchedulerException e) {
+			//TODO enlever
+			e.printStackTrace();
+			return false;
 		}
-		return true;
 	}
 
 	public static JobsController getInstance() {

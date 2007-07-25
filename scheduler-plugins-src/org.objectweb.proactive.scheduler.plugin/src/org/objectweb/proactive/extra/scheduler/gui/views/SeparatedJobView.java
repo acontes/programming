@@ -52,7 +52,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.core.UserScheduler;
+import org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.composite.FinishedJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
@@ -65,7 +65,6 @@ import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialog;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobFactory;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
 import org.xml.sax.SAXException;
 
@@ -91,7 +90,7 @@ public class SeparatedJobView extends ViewPart {
 	private Shell shell = null;
 	private Composite parent = null;
 	private boolean firstTime = true;
-	private static UserScheduler userScheduler = null;
+	private static UserSchedulerInterface userScheduler = null;
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -226,7 +225,7 @@ public class SeparatedJobView extends ViewPart {
 						// CREATE JOB
 						Job job = JobFactory.getFactory().createJob(fileName);
 						// SUBMIT JOB
-						job.setId(userScheduler.submit(job, new UserIdentification("jl", "mdp")));
+						job.setId(userScheduler.submit(job));
 					} catch (XPathExpressionException e) {
 						e.printStackTrace();
 					} catch (ParserConfigurationException e) {
@@ -240,6 +239,7 @@ public class SeparatedJobView extends ViewPart {
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					} catch (SchedulerException e) {
+						//TODO 
 						e.printStackTrace();
 					}
 				}
@@ -276,7 +276,7 @@ public class SeparatedJobView extends ViewPart {
 	 * 
 	 * @return the user scheduler
 	 */
-	public static UserScheduler getUserScheduler() {
+	public static UserSchedulerInterface getUserScheduler() {
 		return userScheduler;
 	}
 

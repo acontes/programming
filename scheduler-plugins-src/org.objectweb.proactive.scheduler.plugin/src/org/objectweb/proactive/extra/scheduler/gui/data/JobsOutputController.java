@@ -40,7 +40,6 @@ import org.objectweb.proactive.extra.scheduler.gui.Activator;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobOutput;
 import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 
 /**
  * Create, show and remove jobs output
@@ -113,7 +112,7 @@ public class JobsOutputController {
 			appenders.put(jobId, joa);
 			try {
 				SeparatedJobView.getUserScheduler().listenLog(jobId, Activator.getHostname(),
-						Activator.LISTEN_PORT, new UserIdentification("jl", "mdp"));
+						Activator.LISTEN_PORT);
 			} catch (SchedulerException e) {
 				e.printStackTrace();
 			}
