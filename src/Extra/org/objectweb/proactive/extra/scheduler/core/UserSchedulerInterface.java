@@ -62,8 +62,18 @@ public interface UserSchedulerInterface extends Serializable{
 	 * 
 	 * @param sel a SchedulerEventListener on which the scheduler will talk.
 	 * @return the scheduler current state containing the different lists of jobs.
+	 * @throws SchedulerException
 	 */
 	public SchedulerState addSchedulerEventListener (SchedulerEventListener sel) throws SchedulerException;
+	
+	
+	/**
+	 * Return the scheduler statistics as an hashMap.
+	 * 
+	 * @return the scheduler statistics as an hashMap.
+	 * @throws SchedulerException
+	 */
+	public Stats getStats() throws SchedulerException;
 	
 	
 	/**
@@ -72,4 +82,36 @@ public interface UserSchedulerInterface extends Serializable{
 	 * @throws SchedulerException.
 	 */
 	public void disconnect() throws SchedulerException;
+	
+	
+	/**
+	 * Stop the job represented by jobId.
+	 * This method will stop every running tasks of this job, and remove it from the scheduler.
+	 * The job won't be terminated.
+	 * 
+	 * @param jobId the job to stop.
+	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 */
+	public boolean stop (JobId jobId);
+	
+	
+	/**
+	 * Pause the job represented by jobId.
+	 * This method will finish every running tasks of this job, and then pause the job.
+	 * The job will have to be resumed in order to finish.
+	 * 
+	 * @param jobId the job to pause.
+	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 */
+	public boolean pause (JobId jobId);
+	
+	
+	/**
+	 * Resume the job represented by jobId.
+	 * This method will restart every tasks of this job.
+	 * 
+	 * @param jobId the job to resume.
+	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 */
+	public boolean resume (JobId jobId);
 }

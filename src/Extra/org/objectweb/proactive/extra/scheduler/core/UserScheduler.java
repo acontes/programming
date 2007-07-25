@@ -67,5 +67,37 @@ public class UserScheduler implements UserSchedulerInterface {
 	public void disconnect() throws SchedulerException {
 		schedulerFrontend.disconnect();
 	}
+
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 */
+	public boolean pause(JobId jobId) {
+		return schedulerFrontend.pause(jobId);
+	}
+
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 */
+	public boolean resume(JobId jobId) {
+		return schedulerFrontend.resume(jobId);
+	}
+
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#stop(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 */
+	public boolean stop(JobId jobId) {
+		return schedulerFrontend.stop(jobId);
+	}
+	
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#getStats()
+	 */
+	public Stats getStats() throws SchedulerException {
+		return schedulerFrontend.getStats();
+	}
 	
 }

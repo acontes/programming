@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.scheduler.core;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -63,8 +62,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/** Job identification management */
 	private HashMap<JobId,IdentifyJob> jobs;
 	/** scheduler listeners */
-	private HashSet<SchedulerEventListener> schedulerListeners = new HashSet<SchedulerEventListener>();
-	
+	private HashMap<UniqueID,SchedulerEventListener> schedulerListeners = new HashMap<UniqueID,SchedulerEventListener>();
+	/** Scheduler's statistics */
+	private Stats stats = new Stats();
 	
 	/**
 	 * ProActive empty constructor
@@ -175,6 +175,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		}
 		jobs.put(job.getId(), new IdentifyJob(job.getId(),identifications.get(id)));
 		scheduler.submit(job);
+		//stats
+		stats.increaseSubmittedJobCount(job.getType());
 		return job.getId();
 	}
 	
@@ -202,7 +204,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id))
 			throw new SchedulerException(ACCESS_DENIED);
-		schedulerListeners.add(sel);
+		schedulerListeners.put(id,sel);
 		return scheduler.getSchedulerState();
 	}
 	
@@ -220,6 +222,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 			logger.warn("You do not have permission to start the scheduler !");
 			return new BooleanWrapper(false);
 		}
+		//stats
+		stats.startTime();
 		return scheduler.coreStart();
 	}
 
@@ -237,6 +241,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 			logger.warn("You do not have permission to start the scheduler !");
 			return new BooleanWrapper(false);
 		}
+		//stats
+		stats.stopTime();
 		return scheduler.coreStop();
 	}
 	
@@ -294,15 +300,55 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#disconnect()
+	 */
+	public void disconnect() throws SchedulerException {
+		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
+		if (!identifications.containsKey(id))
+			throw new SchedulerException(ACCESS_DENIED);
+		schedulerListeners.remove(id);
+		identifications.remove(id);
+	}
+
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 */
+	public boolean pause(JobId jobId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 */
+	public boolean resume(JobId jobId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#stop(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 */
+	public boolean stop(JobId jobId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	
+	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	public void newPendingJobEvent(Job job) {
-		Iterator<SchedulerEventListener> iter = schedulerListeners.iterator();
+		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
 			try{
-				iter.next().newPendingJobEvent(job);
+				schedulerListeners.get(iter.next()).newPendingJobEvent(job);
 			} catch(Exception e){
-				iter.remove();
+				schedulerListeners.remove(iter);
+				identifications.remove(iter);
 				logger.error(LISTENER_WARNING);
 			}
 		}
@@ -313,12 +359,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void pendingToRunningJobEvent(JobEvent event) {
-		Iterator<SchedulerEventListener> iter = schedulerListeners.iterator();
+		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
-			try {
-				iter.next().pendingToRunningJobEvent(event);
-			} catch (Exception e) {
-				iter.remove();
+			try{
+				schedulerListeners.get(iter.next()).pendingToRunningJobEvent(event);
+			} catch(Exception e){
+				schedulerListeners.remove(iter);
+				identifications.remove(iter);
 				logger.error(LISTENER_WARNING);
 			}
 		}
@@ -329,15 +376,18 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void runningToFinishedJobEvent(JobEvent event) {
-		Iterator<SchedulerEventListener> iter = schedulerListeners.iterator();
+		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
-			try {
-				iter.next().runningToFinishedJobEvent(event);
-			} catch (Exception e) {
-				iter.remove();
+			try{
+				schedulerListeners.get(iter.next()).runningToFinishedJobEvent(event);
+			} catch(Exception e){
+				schedulerListeners.remove(iter);
+				identifications.remove(iter);
 				logger.error(LISTENER_WARNING);
 			}
 		}
+		//stats
+		stats.increaseFinishedJobCount(event.getNumberOfFinishedTasks());
 	}
 
 
@@ -345,12 +395,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void removeFinishedJobEvent(JobEvent event) {
-		Iterator<SchedulerEventListener> iter = schedulerListeners.iterator();
+		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
-			try {
-				iter.next().removeFinishedJobEvent(event);
-			} catch (Exception e) {
-				iter.remove();
+			try{
+				schedulerListeners.get(iter.next()).removeFinishedJobEvent(event);
+			} catch(Exception e){
+				schedulerListeners.remove(iter);
+				identifications.remove(iter);
 				logger.error(LISTENER_WARNING);
 			}
 		}
@@ -361,12 +412,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
 	 */
 	public void pendingToRunningTaskEvent(TaskEvent event) {
-		Iterator<SchedulerEventListener> iter = schedulerListeners.iterator();
+		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
-			try {
-				iter.next().pendingToRunningTaskEvent(event);
-			} catch (Exception e) {
-				iter.remove();
+			try{
+				schedulerListeners.get(iter.next()).pendingToRunningTaskEvent(event);
+			} catch(Exception e){
+				schedulerListeners.remove(iter);
+				identifications.remove(iter);
 				logger.error(LISTENER_WARNING);
 			}
 		}
@@ -377,12 +429,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
 	 */
 	public void runningToFinishedTaskEvent(TaskEvent event) {
-		Iterator<SchedulerEventListener> iter = schedulerListeners.iterator();
+		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
-			try {
-				iter.next().runningToFinishedTaskEvent(event);
-			} catch (Exception e) {
-				iter.remove();
+			try{
+				schedulerListeners.get(iter.next()).runningToFinishedTaskEvent(event);
+			} catch(Exception e){
+				schedulerListeners.remove(iter);
+				identifications.remove(iter);
 				logger.error(LISTENER_WARNING);
 			}
 		}
@@ -390,14 +443,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#disconnect()
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#getStats()
 	 */
-	public void disconnect() throws SchedulerException {
+	public Stats getStats() throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id))
 			throw new SchedulerException(ACCESS_DENIED);
-		//TODO supprimer les écouteurs de ce user
-		identifications.remove(id);
+		return stats;
 	}
 
 }
