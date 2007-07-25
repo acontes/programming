@@ -44,22 +44,20 @@ public class SchedulerAuthentification implements SchedulerAuthentificationInter
 	
 	/**
 	 * ProActive empty constructor.
-	 * This will also set java.security.auth.login.config property.
 	 */
-	public SchedulerAuthentification(){
-		System.setProperty("java.security.auth.login.config",Login.class.getResource("jaas.config").getFile());
-	}
+	public SchedulerAuthentification(){}
 	
 	
 	/**
 	 * Get a new instance of SchedulerAuthentification according to the given logins file.
+	 * This will also set java.security.auth.login.config property.
 	 * 
 	 * @param loginFile the file path where to check if a username//password is correct.
 	 * @param groupFile the file path where to check the membership of a user.
 	 * @param scheduler the scheduler front-end on which to connect the user after authentification success.
 	 */
 	public SchedulerAuthentification(String loginFile, String groupFile, SchedulerFrontend scheduler){
-		this();
+		System.setProperty("java.security.auth.login.config",Login.class.getResource("jaas.config").getFile());
 		this.loginFile = loginFile;
 		this.groupFile = groupFile;
 		this.scheduler = scheduler;
