@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
@@ -15,7 +15,7 @@ public class ResultRecup {
         try {
         	//GET SCHEDULER
 			UserSchedulerInterface scheduler;
-			SchedulerAuthentificationInterface auth;
+			SchedulerAuthenticationInterface auth;
 			if (args.length>0){
 				auth = SchedulerConnection.join("//"+args[0]+"/"+SchedulerConnection.SCHEDULER_DEFAULT_NAME);
 			} else {

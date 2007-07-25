@@ -39,7 +39,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
@@ -66,7 +66,7 @@ public class AdminCommunicator {
 
     public static void main(String[] args) {
         try {
-        	SchedulerAuthentificationInterface auth;
+        	SchedulerAuthenticationInterface auth;
         	if (args.length > 0)
         		auth = SchedulerConnection.join(args[0]);
         	else

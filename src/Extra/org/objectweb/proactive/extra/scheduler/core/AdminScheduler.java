@@ -59,7 +59,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 		//creating admin API and scheduler
 		AdminScheduler adminScheduler = new AdminScheduler();
 		SchedulerFrontend schedulerFrontend;
-		SchedulerAuthentification schedulerAuth;
+		SchedulerAuthentication schedulerAuth;
 		try {
 			// creating the scheduler proxy.
 			// if this fails then it will not continue.
@@ -67,16 +67,16 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 			schedulerFrontend = (SchedulerFrontend) ProActive.newActive(
 					SchedulerFrontend.class.getName(),
 					new Object[] {imp, policyFullClassName});
-			// creating the scheduler authentification interface.
+			// creating the scheduler authentication interface.
 			// if this fails then it will not continue.
-			logger.info("Creating scheduler authentification interface...");
-			schedulerAuth = (SchedulerAuthentification) ProActive.newActive(
-					SchedulerAuthentification.class.getName(),
+			logger.info("Creating scheduler authentication interface...");
+			schedulerAuth = (SchedulerAuthentication) ProActive.newActive(
+					SchedulerAuthentication.class.getName(),
 					new Object[] {loginFile,groupFile,schedulerFrontend});
 			// adding NFE listener to managed non fonctionnal exceptions
 			// that occurs in Proactive Core
 			ProActive.addNFEListenerOnAO(schedulerFrontend, new NFEHandler("Scheduler Frontend"));
-			ProActive.addNFEListenerOnAO(schedulerAuth, new NFEHandler("Scheduler authentification"));
+			ProActive.addNFEListenerOnAO(schedulerAuth, new NFEHandler("Scheduler authentication"));
 			// registering the scheduler proxy at the given URL
 			logger.info("Registering scheduler...");
 			String schedulerUrl = "//localhost/"+SchedulerConnection.SCHEDULER_DEFAULT_NAME;

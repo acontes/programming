@@ -10,7 +10,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.scheduler.core.SchedulerAuthentification;
+import org.objectweb.proactive.extra.scheduler.core.SchedulerAuthentication;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 
 /**
@@ -39,23 +39,23 @@ public class SchedulerConnection implements Serializable{
 	 * @return the scheduler authentification at the specified URL.
 	 * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
 	 */
-	public static SchedulerAuthentificationInterface join(String schedulerURL) throws SchedulerException{
+	public static SchedulerAuthenticationInterface join(String schedulerURL) throws SchedulerException{
 		// Get the scheduler authentification at the specified URL
-		SchedulerAuthentificationInterface schedulerAuth = null;
+		SchedulerAuthenticationInterface schedulerAuth = null;
 		logger.info("******************* TRYING TO JOIN EXISTING SCHEDULER *****************");
 		if (schedulerURL == null){
 			logger.info("Scheduler URL was null, looking for scheduler on localhost...");
 			schedulerURL = "//localhost/"+SCHEDULER_DEFAULT_NAME;
 		}
     	try {
-    		schedulerAuth = (SchedulerAuthentificationInterface)(ProActive.lookupActive(SchedulerAuthentification.class.getName(), schedulerURL));
+    		schedulerAuth = (SchedulerAuthenticationInterface)(ProActive.lookupActive(SchedulerAuthentication.class.getName(), schedulerURL));
     		return schedulerAuth;
     	} catch (ActiveObjectCreationException e) {
 			e.printStackTrace();
-			throw new SchedulerException("Error while looking up this active object : "+SchedulerAuthentification.class.getName());
+			throw new SchedulerException("Error while looking up this active object : "+SchedulerAuthentication.class.getName());
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new SchedulerException("IO Error while looking up this active object : "+SchedulerAuthentification.class.getName());
+			throw new SchedulerException("IO Error while looking up this active object : "+SchedulerAuthentication.class.getName());
 		}
 	}
 

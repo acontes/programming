@@ -46,7 +46,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.SimpleResourceManager;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
@@ -89,7 +89,7 @@ public class LocalSchedulerExample {
             		imp,
             		"org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
             
-            SchedulerAuthentificationInterface auth = SchedulerConnection.join(null);
+            SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
             
             AdminScheduler adminAPI = auth.logAsAdmin("admin", "admin");
             adminAPI.start();

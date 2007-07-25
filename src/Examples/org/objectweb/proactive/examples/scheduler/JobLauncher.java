@@ -5,7 +5,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobFactory;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
@@ -18,7 +18,7 @@ public class JobLauncher {
 			//GET SCHEDULER
 			String jobUrl = null;
 			int nbJob = 1;
-			SchedulerAuthentificationInterface auth = null;
+			SchedulerAuthenticationInterface auth = null;
 			if (args.length > 2) {
 				jobUrl = args[0];
 				nbJob = Integer.parseInt(args[1]);
