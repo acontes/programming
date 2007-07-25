@@ -16,7 +16,7 @@ import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
  * @version 1.0, Jul 24, 2007
  * @since ProActive 3.2
  */
-public interface SchedulerAuthentificationInterface extends Serializable {
+public interface SchedulerAuthenticationInterface extends Serializable {
 	
 	/**
 	 * Connect the user interface to a scheduler with the given scheduler URL.
