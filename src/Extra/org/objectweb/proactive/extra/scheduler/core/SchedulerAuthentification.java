@@ -34,9 +34,11 @@ public class SchedulerAuthentification implements SchedulerAuthentificationInter
 	private static final long serialVersionUID = -3143047028779653795L;
 	/** Scheduler logger */
 	private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
-	/** the file where to store the allowed user//password */
+	/** The file where to store the allowed user//password */
 	private String loginFile;
-	/** the scheduler frontend connected to this authentification interface */
+	/** The file where to store group management */
+	private String groupFile;
+	/** The scheduler frontend connected to this authentification interface */
 	private SchedulerFrontend scheduler;
 	
 	
@@ -53,11 +55,13 @@ public class SchedulerAuthentification implements SchedulerAuthentificationInter
 	 * Get a new instance of SchedulerAuthentification according to the given logins file.
 	 * 
 	 * @param loginFile the file path where to check if a username//password is correct.
+	 * @param groupFile the file path where to check the membership of a user.
 	 * @param scheduler the scheduler front-end on which to connect the user after authentification success.
 	 */
-	public SchedulerAuthentification(String loginFile, SchedulerFrontend scheduler){
+	public SchedulerAuthentification(String loginFile, String groupFile, SchedulerFrontend scheduler){
 		this();
 		this.loginFile = loginFile;
+		this.groupFile = groupFile;
 		this.scheduler = scheduler;
 	}
 	
@@ -72,6 +76,9 @@ public class SchedulerAuthentification implements SchedulerAuthentificationInter
 		params.put("username", user);
 		params.put("pw", password);
 		params.put("path", loginFile);
+		params.put("group", "user");
+		params.put("groupsFilePath", groupFile);
+        params.put("groupsHierarchy", new String[] {"user","admin"});
 		FileLogin.login(params);
 		logger.info("Logging successfull for user : "+user);
 		// create user scheduler interface
@@ -97,6 +104,9 @@ public class SchedulerAuthentification implements SchedulerAuthentificationInter
 		params.put("username", user);
 		params.put("pw", password);
 		params.put("path", loginFile);
+		params.put("group", "admin");
+		params.put("groupsFilePath", groupFile);
+        params.put("groupsHierarchy", new String[] {"admin"});
 		FileLogin.login(params);
 		logger.info("Logging successfull for user : "+user);
 		// create admin scheduler interface

@@ -36,12 +36,13 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	 * Create a new scheduler at the specified URL plugged on the given resource manager.
 	 * This will provide a connection interface to allow the access to a restricted number of user.
 	 * 
-	 * @param loginFile the path where are stored the allowed login//password. 
+	 * @param loginFile the path where are stored the allowed login//password.
+	 * @param groupFile the path where to check the membership of a user.
 	 * @param imp the resource manager to plug on the scheduler.
 	 * @param policyFullClassName the full policy class name for the scheduler. 
 	 * @return an admin scheduler interface to manage the scheduler.
 	 */
-	public static AdminScheduler createScheduler(String loginFile, InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException {
+	public static AdminScheduler createScheduler(String loginFile, String groupFile, InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException {
 		logger.info("********************* STARTING NEW SCHEDULER *******************");
 		//verifying arguments...
 		if (imp == null)
@@ -71,7 +72,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 			logger.info("Creating scheduler authentification interface...");
 			schedulerAuth = (SchedulerAuthentification) ProActive.newActive(
 					SchedulerAuthentification.class.getName(),
-					new Object[] {loginFile,schedulerFrontend});
+					new Object[] {loginFile,groupFile,schedulerFrontend});
 			// adding NFE listener to managed non fonctionnal exceptions
 			// that occurs in Proactive Core
 			ProActive.addNFEListenerOnAO(schedulerFrontend, new NFEHandler("Scheduler Frontend"));
