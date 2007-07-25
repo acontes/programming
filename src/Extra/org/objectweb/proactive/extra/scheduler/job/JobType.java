@@ -13,7 +13,7 @@ public enum JobType implements java.io.Serializable {
 	 * Every tasks can communicate with each others.
 	 * So they all have to be executed in same time.
 	 */
-	SPMD,
+	APPLI,
 	/**
 	 * Tasks can be executed one by one or all in same time but
 	 * every task represents the same native or java task.

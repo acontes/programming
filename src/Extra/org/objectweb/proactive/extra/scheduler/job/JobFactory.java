@@ -189,7 +189,7 @@ public class JobFactory {
 
         // Job creation
         Job job = new Job(name, getPriority(priority), -1,
-                JobType.SPMD, true, description );
+                JobType.APPLI, true, description );
         // Dependencies
         HashMap<String, TaskDescriptor> depends = 
         	new HashMap<String, TaskDescriptor>();

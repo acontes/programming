@@ -33,7 +33,7 @@ public class Job implements Serializable, Comparable<Job> {
 	private String owner = "";
 	private String name = "";
 	private JobPriority priority = JobPriority.NORMAL;
-	private JobType type = JobType.SPMD;
+	private JobType type = JobType.APPLI;
 	private long runtimeLimit = -1;
 	private boolean RunUntilCancel = false;
 	private String description = "";
