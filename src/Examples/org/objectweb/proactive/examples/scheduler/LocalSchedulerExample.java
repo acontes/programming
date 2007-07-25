@@ -85,6 +85,7 @@ public class LocalSchedulerExample {
 
             AdminScheduler.createScheduler(
             		LocalSchedulerExample.class.getResource("login.cfg").getFile(),
+            		LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
             		imp,
             		"org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
             
