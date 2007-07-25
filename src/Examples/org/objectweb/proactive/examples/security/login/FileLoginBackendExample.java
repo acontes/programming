@@ -32,9 +32,7 @@ package org.objectweb.proactive.examples.security.login;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.extra.security.FileLogin;
 import org.objectweb.proactive.extra.security.Login;
 
@@ -60,12 +58,17 @@ public class FileLoginBackendExample {
 
         Map<String, Object> params = new HashMap<String, Object>(3);
 
-        params.put("username", args[0]);
-        params.put("pw", args[1]);
+        params.put("username", "alexandre");
+        params.put("pw", "legrand");
         params.put("path", FileLogin.class.getResource("login.cfg").getFile());
+        params.put("group", "user");
+        params.put("groupsFilePath",
+            FileLogin.class.getResource("groups.cfg").getFile());
+        params.put("groupsHierarchy",
+            new String[] { "intern", "goon", "user", "admin" });
 
         try {
-            FileLogin.login(params);
+            Login.login(params, "FileLoginMethod");
             System.out.println("Login successful");
         } catch (LoginException e) {
             e.printStackTrace();
