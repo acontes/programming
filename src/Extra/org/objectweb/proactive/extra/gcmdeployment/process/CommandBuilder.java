@@ -8,4 +8,10 @@ public interface CommandBuilder {
      * @return The command to be used to start the application
      */
     public String buildCommand(HostInfo hostInfo);
+
+    /**
+     * Returns the base path associated to this command builder
+     * @return the base path if the base path is specified otherwise null is returned
+     */
+    public String getPath();
 }
