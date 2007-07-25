@@ -10,7 +10,7 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
  * A Bridge can have Bridges, Groups and HostInfo as children
  *
  */
-public interface Bridge {
+public interface Bridge extends Cloneable {
 
     /**
      * Set environment variables for this cluster
@@ -87,4 +87,6 @@ public interface Bridge {
      * @throws IllegalStateException thrown if anything is wrong
      */
     public void check() throws IllegalStateException;
+    
+    public Object clone() throws CloneNotSupportedException;
 }

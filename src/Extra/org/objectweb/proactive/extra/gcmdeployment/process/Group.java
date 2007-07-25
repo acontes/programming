@@ -3,7 +3,7 @@ package org.objectweb.proactive.extra.gcmdeployment.process;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
-public interface Group {
+public interface Group extends Cloneable {
     public String getId();
 
     /**
@@ -39,4 +39,6 @@ public interface Group {
      * @throws IllegalStateException thrown if anything is wrong
      */
     public void check() throws IllegalStateException;
+
+    public Object clone() throws CloneNotSupportedException;
 }

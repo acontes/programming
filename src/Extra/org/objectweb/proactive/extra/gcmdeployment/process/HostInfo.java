@@ -11,7 +11,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
  * @author cmathieu
  *
  */
-public interface HostInfo {
+public interface HostInfo extends Cloneable {
 
     /**
      * Returns the Id of this of set
@@ -76,4 +76,6 @@ public interface HostInfo {
      * @throws IllegalStateException thrown if anything is wrong
      */
     public void check() throws IllegalStateException;
+    
+    public Object clone() throws CloneNotSupportedException;
 }

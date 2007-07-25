@@ -1,6 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.hostinfo;
 
-public class Tool {
+public class Tool implements Cloneable {
     private String id;
     private String path;
 
@@ -63,4 +63,11 @@ public class Tool {
         sb.append(" path=" + path);
         return super.toString();
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Tool res = new Tool(new String(this.id), new String(this.path));
+        return res;
+    }
+
 }

@@ -394,7 +394,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                     providers.add(resourceProvider);
                 }
 
-                virtualNode.setProviders(providers);
+                virtualNode.addProviders(providers);
 
                 virtualNodes.put(virtualNode.getId(), virtualNode);
             }

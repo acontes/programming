@@ -252,14 +252,26 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected HostInfo getHostInfo(String refid) throws IOException {
         HostInfo hostInfo = infrastructure.getHosts().get(refid);
 
-        return (HostInfo) ((hostInfo != null) ? Utils.makeDeepCopy(hostInfo)
-                                              : null);
+        try {
+            return (HostInfo) ((hostInfo != null) ? hostInfo.clone()
+                                                  : null);
+        } catch (CloneNotSupportedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
     }
 
     protected Group getGroup(String refid) throws IOException {
         Group group = infrastructure.getGroups().get(refid);
 
-        return (Group) ((group != null) ? Utils.makeDeepCopy(group) : null);
+        try {
+            return (Group) ((group != null) ? group.clone() : null);
+        } catch (CloneNotSupportedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
     }
 
     protected Bridge getBridge(String refid) throws IOException {
