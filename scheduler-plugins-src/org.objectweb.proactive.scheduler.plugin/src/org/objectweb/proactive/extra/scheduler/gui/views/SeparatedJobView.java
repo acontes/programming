@@ -144,8 +144,10 @@ public class SeparatedJobView extends ViewPart {
 		connectSchedulerAction = new Action() {
 			@Override
 			public void run() {
-				userScheduler = SelectSchedulerDialog.showDialog(shell);
-				if (userScheduler != null) {
+				String[] tmp = SelectSchedulerDialog.showDialog(shell);
+//				userScheduler = SelectSchedulerDialog.showDialog(shell);
+//				if (userScheduler != null) {
+				if (tmp != null) {
 					if (firstTime) {
 						firstTime = false;
 						try {
@@ -156,7 +158,8 @@ public class SeparatedJobView extends ViewPart {
 							e.printStackTrace();
 						}
 					}
-					jobsController.setScheduler(userScheduler);
+//					jobsController.setScheduler(userScheduler);
+					jobsController.setScheduler(userScheduler, tmp);
 					pendingJobComposite.initTable();
 					runningJobComposite.initTable();
 					finishedJobComposite.initTable();

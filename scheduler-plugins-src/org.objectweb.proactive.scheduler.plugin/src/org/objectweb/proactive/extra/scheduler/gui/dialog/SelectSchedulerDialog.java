@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 /**
@@ -297,24 +297,27 @@ public class SelectSchedulerDialog extends Dialog {
 	 * @param parent the parent
 	 * @return a UserScheduler if the connection is established, null otherwise.
 	 */
-	public static UserSchedulerInterface showDialog(Shell parent) {
+//	public static UserSchedulerInterface showDialog(Shell parent) {
+	public static String[] showDialog(Shell parent) {
 		new SelectSchedulerDialog(parent);
 		UserSchedulerInterface userScheduler = null;
 		if (validate) {
-			try {
-				SchedulerAuthentificationInterface sai = SchedulerConnection.join(url);
-				userScheduler = (UserSchedulerInterface) sai.logAsUser(login, pwd);
-				recordUrl(url);
-			} catch (LoginException e) {
-				MessageDialog.openError(parent, "Couldn't connect",
-						"The login and/or the password are wrong !");
-			} catch (Exception e) {
-				e.printStackTrace();
-				// Couldn't Connect to the scheduler => do nothing
-				MessageDialog.openError(parent, "Couldn't connect",
-						"Couldn't Connect to the scheduler based on : \n" + url);
-			}
+			return new String[] {url, login, pwd};
+//			try {
+//				SchedulerAuthenticationInterface sai = SchedulerConnection.join(url);
+//				userScheduler = (UserSchedulerInterface) sai.logAsUser(login, pwd);
+//				recordUrl(url);
+//			} catch (LoginException e) {
+//				MessageDialog.openError(parent, "Couldn't connect",
+//						"The login and/or the password are wrong !");
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				// Couldn't Connect to the scheduler => do nothing
+//				MessageDialog.openError(parent, "Couldn't connect",
+//						"Couldn't Connect to the scheduler based on : \n" + url);
+//			}
 		}
-		return userScheduler;
+		return null;
+//		return userScheduler;
 	}
 }

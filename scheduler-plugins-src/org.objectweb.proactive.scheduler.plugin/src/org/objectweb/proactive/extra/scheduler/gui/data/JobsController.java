@@ -30,11 +30,10 @@ package org.objectweb.proactive.extra.scheduler.gui.data;
 import java.util.Collections;
 import java.util.Vector;
 
+import javax.security.auth.login.LoginException;
+
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
-import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
@@ -45,6 +44,11 @@ import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 /**
  * 
@@ -407,9 +411,19 @@ public class JobsController implements SchedulerEventListener {
 		return taskDescriptor;
 	}
 
-	public boolean setScheduler(UserSchedulerInterface userScheduler) {
+//	public boolean setScheduler(UserSchedulerInterface userScheduler) {
+	public boolean setScheduler(UserSchedulerInterface userScheduler, String[] tmpi) {
 		SchedulerState state;
 		try {
+			try {
+			SchedulerAuthenticationInterface sai = SchedulerConnection.join(tmpi[0]);
+			userScheduler = (UserSchedulerInterface) sai.logAsUser(tmpi[1], tmpi[2]);
+		} catch (LoginException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+			
 			state = userScheduler.addSchedulerEventListener(((SchedulerEventListener) ProActive
 					.getStubOnThis()));
 			jobs = new Vector<Job>();
