@@ -1,6 +1,10 @@
-package org.objectweb.proactive.extra.scheduler.core;
+package org.objectweb.proactive.extra.scheduler.userAPI;
 
 import java.io.Serializable;
+
+import org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener;
+import org.objectweb.proactive.extra.scheduler.core.SchedulerState;
+import org.objectweb.proactive.extra.scheduler.core.Stats;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;

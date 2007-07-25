@@ -10,6 +10,7 @@ import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 /**
  * Scheduler user interface.
@@ -30,7 +31,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public JobResult getResult(JobId jobId) throws SchedulerException {
 		return schedulerFrontend.getResult(jobId);
@@ -38,7 +39,7 @@ public class UserScheduler implements UserSchedulerInterface {
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	public JobId submit(Job job) throws SchedulerException {
 		return schedulerFrontend.submit(job);
@@ -46,7 +47,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
 	 */
 	public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
 		schedulerFrontend.listenLog(jobId,hostname,port);
@@ -54,7 +55,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener)
 	 */
 	public SchedulerState addSchedulerEventListener (SchedulerEventListener sel) throws SchedulerException {
 		return schedulerFrontend.addSchedulerEventListener(sel);
@@ -62,7 +63,7 @@ public class UserScheduler implements UserSchedulerInterface {
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#disconnect()
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#disconnect()
 	 */
 	public void disconnect() throws SchedulerException {
 		schedulerFrontend.disconnect();
@@ -70,7 +71,7 @@ public class UserScheduler implements UserSchedulerInterface {
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean pause(JobId jobId) {
 		return schedulerFrontend.pause(jobId);
@@ -78,7 +79,7 @@ public class UserScheduler implements UserSchedulerInterface {
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean resume(JobId jobId) {
 		return schedulerFrontend.resume(jobId);
@@ -86,7 +87,7 @@ public class UserScheduler implements UserSchedulerInterface {
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#stop(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#stop(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean stop(JobId jobId) {
 		return schedulerFrontend.stop(jobId);
@@ -94,7 +95,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#getStats()
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#getStats()
 	 */
 	public Stats getStats() throws SchedulerException {
 		return schedulerFrontend.getStats();

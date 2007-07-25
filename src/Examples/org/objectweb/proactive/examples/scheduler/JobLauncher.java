@@ -3,11 +3,11 @@ package org.objectweb.proactive.examples.scheduler;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.scheduler.core.UserScheduler;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobFactory;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 public class JobLauncher {
 
@@ -34,7 +34,7 @@ public class JobLauncher {
 				System.err.println("You must enter a job descriptor");
 				System.exit(0);
 			}
-			UserScheduler scheduler = auth.logAsUser("chri", "chri");
+			UserSchedulerInterface scheduler = auth.logAsUser("chri", "chri");
 
 			//CREATE JOB
 			Job j = JobFactory.getFactory().createJob(jobUrl);

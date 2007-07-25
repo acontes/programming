@@ -2,19 +2,19 @@ package org.objectweb.proactive.examples.scheduler;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import org.objectweb.proactive.extra.scheduler.core.UserScheduler;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthentificationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 
 public class ResultRecup {
     public static void main(String[] args) {
         try {
         	//GET SCHEDULER
-			UserScheduler scheduler;
+			UserSchedulerInterface scheduler;
 			SchedulerAuthentificationInterface auth;
 			if (args.length>0){
 				auth = SchedulerConnection.join("//"+args[0]+"/"+SchedulerConnection.SCHEDULER_DEFAULT_NAME);

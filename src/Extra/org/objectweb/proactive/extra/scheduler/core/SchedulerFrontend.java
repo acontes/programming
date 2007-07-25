@@ -27,6 +27,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 /**
  * Scheduler Frontend. This is the API to talk to when you want to managed a scheduler core.
@@ -198,7 +199,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener)
 	 */
 	public SchedulerState addSchedulerEventListener(SchedulerEventListener sel) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
@@ -300,7 +301,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#disconnect()
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#disconnect()
 	 */
 	public void disconnect() throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
@@ -312,7 +313,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean pause(JobId jobId) {
 		// TODO Auto-generated method stub
@@ -321,7 +322,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean resume(JobId jobId) {
 		// TODO Auto-generated method stub
@@ -330,7 +331,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#stop(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#stop(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean stop(JobId jobId) {
 		// TODO Auto-generated method stub
@@ -443,7 +444,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserSchedulerInterface#getStats()
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#getStats()
 	 */
 	public Stats getStats() throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
