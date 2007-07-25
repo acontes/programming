@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
@@ -20,6 +21,12 @@ public class GCMDeploymentInfrastructure {
     private Map<String, Group> groups;
     private Map<String, Bridge> bridges;
     private Map<String, HostInfo> hosts;
+
+    public GCMDeploymentInfrastructure() {
+        groups = new HashMap<String, Group>();
+        bridges = new HashMap<String, Bridge>();
+        hosts = new HashMap<String, HostInfo>();
+    }
 
     public Map<String, Group> getGroups() {
         return groups;

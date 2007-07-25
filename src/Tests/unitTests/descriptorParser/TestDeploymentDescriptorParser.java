@@ -19,7 +19,7 @@ public class TestDeploymentDescriptorParser {
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
 
         parser.parseEnvironment();
-        parser.parseResources();
         parser.parseInfrastructure();
+        parser.parseResources();
     }
 }

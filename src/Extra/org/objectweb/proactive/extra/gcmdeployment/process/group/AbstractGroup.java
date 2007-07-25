@@ -11,6 +11,22 @@ public abstract class AbstractGroup implements Group {
     private String env;
     private String id;
 
+    public AbstractGroup() {
+    }
+
+    public AbstractGroup(AbstractGroup group) {
+        try {
+            this.hostInfo = (HostInfo) ((group.hostInfo != null)
+                ? group.hostInfo.clone() : null);
+            this.commandPath = (PathElement) ((commandPath != null)
+                ? commandPath.clone() : null);
+            this.env = (group.env != null) ? new String(group.env) : null;
+            this.id = (group.id != null) ? new String(group.id) : null;
+        } catch (CloneNotSupportedException e) {
+            // can't happen
+        }
+    }
+
     public void setCommandPath(PathElement commandPath) {
         this.commandPath = commandPath;
     }
@@ -31,7 +47,7 @@ public abstract class AbstractGroup implements Group {
         return id;
     }
 
-    protected void setId(String id) {
+    public void setId(String id) {
         this.id = id;
     }
 

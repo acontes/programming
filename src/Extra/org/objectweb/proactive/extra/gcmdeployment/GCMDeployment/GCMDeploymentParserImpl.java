@@ -276,7 +276,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected Bridge getBridge(String refid) throws IOException {
         Bridge bridge = infrastructure.getBridges().get(refid);
 
-        return (Bridge) ((bridge != null) ? Utils.makeDeepCopy(bridge) : null);
+        try {
+            return (Bridge) ((bridge != null) ? bridge.clone() : null);
+        } catch (CloneNotSupportedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
     }
 
     protected void parseGroupResource(Node resourceNode, Group group)

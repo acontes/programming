@@ -5,7 +5,8 @@ import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tools;
-public class PathElement {
+
+public class PathElement implements Cloneable {
     protected String relPath;
     public enum PathBase {PROACTIVE,
         HOME,
@@ -61,7 +62,7 @@ public class PathElement {
     }
 
     public String getFullPath(HostInfo hostInfo, CommandBuilder commandBuilder) {
-        char fp = hostInfo.getOS().fileSeparator();
+        char fp = hostInfo.getOS().pathSeparator();
 
         switch (base) {
         case ROOT:
@@ -87,5 +88,12 @@ public class PathElement {
         GCMD_LOGGER.warn("Reached unreachable code",
             new Exception("Unreachable"));
         return null;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        PathElement res = new PathElement(this.relPath);
+        res.setBase(this.base);
+        return res;
     }
 }
