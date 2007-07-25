@@ -27,6 +27,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
@@ -34,8 +35,8 @@ import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 /**
  * Scheduler Frontend. This is the API to talk to when you want to managed a scheduler core.
  * Creating this class can only be done by using <code>AdminScheduler</code>.
- * You can join this front-end by using the <code>connectTo</code> method
- * in <code>UserScheduler</code> or <code>AdminScheduler</code>.
+ * You can join this front-end by using the <code>join()</code> method
+ * in {@link SchedulerConnection} .
  * 
  * @author ProActive Team
  * @version 1.0, Jun 28, 2007
@@ -238,6 +239,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#stop()
 	 */
 	public BooleanWrapper coreStop() {
+		//TODO définir ce que fait le stop, le pause ...
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id)){
 			logger.warn(ACCESS_DENIED);
