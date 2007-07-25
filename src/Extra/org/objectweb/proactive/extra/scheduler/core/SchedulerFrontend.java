@@ -120,12 +120,15 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		for (Entry<UniqueID,UserIdentification> entry : identifications.entrySet()){
 			if (entry.getKey().equals(sourceBodyID)){
 				//TODO essayer de pinger et si ping on envoie l'exception
+				logger.warn("Active object already connected");
 				throw new SchedulerException("This active object is already connected to the scheduler !");
 			} else if (entry.getValue().equals(identification)) {
 				//TODO essayer de pinger et si ping on envoie l'exception
+				logger.warn("User already connected : "+identification.getUsername());
 				throw new SchedulerException("This user is already connected to the scheduler : "+identification.getUsername());
 			}
 		}
+		logger.info(identification.getUsername()+" successfully connected !");
 		identifications.put(sourceBodyID, identification);
 	}
 	
