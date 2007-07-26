@@ -46,8 +46,6 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.SimpleResourceManager;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
 public class LocalSchedulerExample {
@@ -83,15 +81,14 @@ public class LocalSchedulerExample {
                 logger.info("ResourceManager created on " + ProActive.getActiveObjectNodeUrl(imp));
             }
 
-            AdminScheduler.createScheduler(
+            AdminScheduler adminAPI = AdminScheduler.createScheduler(
             		LocalSchedulerExample.class.getResource("login.cfg").getFile(),
             		LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
+            		"admin",
+            		"admin",
             		imp,
             		"org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
             
-            SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
-            
-            AdminScheduler adminAPI = auth.logAsAdmin("admin", "admin");
             adminAPI.start();
             
         } catch (Exception e) {

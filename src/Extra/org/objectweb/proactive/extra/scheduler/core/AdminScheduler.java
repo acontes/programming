@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.scheduler.core;
 
+import javax.security.auth.login.LoginException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -12,12 +13,18 @@ import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
 /**
  * Scheduler Admin interface.
- * This class provides method to managed jobs for an administrator.
+ * With this interface, you will be able to create a new scheduler without connecting yourself,
+ * or create it with your admin properties, groupfile and loginFile in order to give the scheduler
+ * the right to only accept predefined user.
+ * A resources manager may have been launched before creating a new scheduler.
+ * This class provides methods to managed jobs as an administrator.
+ * 
  * 
  * @author ProActive Team
  * @version 1.0, Jun 28, 2007
@@ -31,18 +38,17 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 	
     
-    //TODO faire un createScheduler qui prend en param les user//mdp
 	/**
 	 * Create a new scheduler at the specified URL plugged on the given resource manager.
 	 * This will provide a connection interface to allow the access to a restricted number of user.
+	 * It will return an admin scheduler able to managed the scheduler.
 	 * 
 	 * @param loginFile the path where are stored the allowed login//password.
 	 * @param groupFile the path where to check the membership of a user.
 	 * @param imp the resource manager to plug on the scheduler.
-	 * @param policyFullClassName the full policy class name for the scheduler. 
-	 * @return an admin scheduler interface to manage the scheduler.
+	 * @param policyFullClassName the full policy class name for the scheduler.
 	 */
-	public static AdminScheduler createScheduler(String loginFile, String groupFile, InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException {
+	public static void createScheduler(String loginFile, String groupFile, InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException {
 		logger.info("********************* STARTING NEW SCHEDULER *******************");
 		//verifying arguments...
 		if (imp == null)
@@ -90,7 +96,30 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 			e.printStackTrace();
 			throw new AdminSchedulerException(e.getMessage());
 		}
-		return adminScheduler;
+	}
+	
+	
+	/**
+	 * Create a new scheduler at the specified URL plugged on the given resource manager.
+	 * This constructor also requires the username//password of the admin to connect.
+	 * This will provide a connection interface to allow the access to a restricted number of user.
+	 * It will return an admin scheduler able to managed the scheduler.
+	 * 
+	 * @param loginFile the path where are stored the allowed login//password.
+	 * @param groupFile the path where to check the membership of a user.
+	 * @param login the admin login.
+	 * @param password the admin password.
+	 * @param imp the resource manager to plug on the scheduler.
+	 * @param policyFullClassName the full policy class name for the scheduler. 
+	 * @return an admin scheduler interface to manage the scheduler.
+	 * @throws SchedulerException if the scheduler cannot be created.
+	 * @throws AdminSchedulerException if an admin connection exception occurs.
+	 * @throws LoginException if a user login/password exception occurs.
+	 */
+	public static AdminScheduler createScheduler(String loginFile, String groupFile, String login, String password, InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException, SchedulerException, LoginException {
+		createScheduler(loginFile, groupFile, imp, policyFullClassName);
+		SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
+		return auth.logAsAdmin(login, password);
 	}
 	
 	

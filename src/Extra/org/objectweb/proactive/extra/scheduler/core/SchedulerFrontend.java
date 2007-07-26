@@ -2,8 +2,6 @@ package org.objectweb.proactive.extra.scheduler.core;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -118,16 +116,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @param identification the identification of the connected user
 	 */
 	public void connect(UniqueID sourceBodyID, UserIdentification identification) throws SchedulerException {
-		for (Entry<UniqueID,UserIdentification> entry : identifications.entrySet()){
-			if (entry.getKey().equals(sourceBodyID)){
-				//TODO essayer de pinger et si ping on envoie l'exception
-				logger.warn("Active object already connected");
-				throw new SchedulerException("This active object is already connected to the scheduler !");
-			} else if (entry.getValue().equals(identification)) {
-				//TODO essayer de pinger et si ping on envoie l'exception
-				logger.warn("User already connected : "+identification.getUsername());
-				throw new SchedulerException("This user is already connected to the scheduler : "+identification.getUsername());
-			}
+		if (identifications.containsKey(sourceBodyID)){
+			//TODO essayer de pinger et si ping on envoie l'exception sinon on le reconnect
+			logger.warn("Active object already connected !");
+			throw new SchedulerException("This active object is already connected to the scheduler !");
 		}
 		logger.info(identification.getUsername()+" successfully connected !");
 		identifications.put(sourceBodyID, identification);
