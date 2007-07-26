@@ -315,8 +315,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean pause(JobId jobId) {
-		// TODO Auto-generated method stub
-		return false;
+		return scheduler.pause(jobId).booleanValue();
 	}
 
 
@@ -324,8 +323,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean resume(JobId jobId) {
-		// TODO Auto-generated method stub
-		return false;
+		return scheduler.resume(jobId).booleanValue();
 	}
 
 
@@ -333,8 +331,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#stop(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public boolean stop(JobId jobId) {
-		// TODO Auto-generated method stub
-		return false;
+		return scheduler.stop(jobId).booleanValue();
 	}
 	
 	

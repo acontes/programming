@@ -18,6 +18,12 @@ public final class JobId implements Comparable<JobId>, Serializable, Cloneable {
 
 	
 	/**
+	 * ProActive empty constructor
+	 */
+	public JobId(){}
+	
+	
+	/**
 	 * Default Job id constructor
 	 * 
 	 * @param id the id to put in the jobId

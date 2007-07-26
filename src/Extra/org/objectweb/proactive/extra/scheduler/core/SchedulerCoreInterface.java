@@ -51,5 +51,5 @@ public interface SchedulerCoreInterface extends Serializable {
 	 * @return true if success, false otherwise.
 	 */
 	public BooleanWrapper coreShutdown();
-	
+
 }

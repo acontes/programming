@@ -122,7 +122,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	public void runActivity(Body body) {
 		// TODO en cours
 		ProActive.setImmediateService("listenLog");
-		// TODO essayer de retirer le submit des immediate service
 		Service service = new Service(body);
 		//set the filter for serveAll method
 		RequestFilter filter = new MainLoopRequestFilter("submit","terminate");
@@ -335,6 +334,47 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		return new BooleanWrapper(true);
 	}
 
+
+	/**
+	 * Pause the job represented by jobId.
+	 * This method will finish every running tasks of this job, and then pause the job.
+	 * The job will have to be resumed in order to finish.
+	 * 
+	 * @param jobId the job to pause.
+	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 */
+	public BooleanWrapper pause(JobId jobId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	/**
+	 * Resume the job represented by jobId.
+	 * This method will restart every tasks of this job.
+	 * 
+	 * @param jobId the job to resume.
+	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 */
+	public BooleanWrapper resume(JobId jobId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	/**
+	 * Stop the job represented by jobId.
+	 * This method will stop every running tasks of this job, and remove it from the scheduler.
+	 * The job won't be terminated.
+	 * 
+	 * @param jobId the job to stop.
+	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 */
+	public BooleanWrapper stop(JobId jobId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 
 	/**
 	 * To get the schedulerRunning

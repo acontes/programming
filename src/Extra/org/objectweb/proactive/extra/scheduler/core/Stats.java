@@ -24,6 +24,12 @@ public class Stats implements Serializable {
 	
 	
 	/**
+	 * ProActive Empty constructor
+	 */
+	public Stats(){}
+	
+	
+	/**
 	 * Set the start time of the scheduler.
 	 */
 	public void startTime(){

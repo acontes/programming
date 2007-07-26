@@ -25,6 +25,12 @@ public final class SchedulerState implements Serializable {
 	
 	
 	/**
+	 * ProActive Empty constructor.
+	 */
+	public SchedulerState(){}
+	
+	
+	/**
 	 * To get the finishedJobs
 	 * 
 	 * @return the finishedJobs
