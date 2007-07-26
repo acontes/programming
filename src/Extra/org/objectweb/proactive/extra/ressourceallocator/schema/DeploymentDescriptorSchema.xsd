@@ -50,7 +50,23 @@
 
 	<simpleType name="idType">
 		<restriction base="string">
-			<pattern value="[a-zA-Z0-9_.{}$]+" />
+			<pattern value="[a-zA-Z0-9_]+" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="hostnameType">
+		<restriction base="string">
+		        <!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
+<!-- 			<pattern value="([a-z0-9.]*($\{[a-zA-Z0-9]+\})?)+" /> -->
+			<pattern value="[a-z0-9.${}A-Z]+" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="usernameType">
+		<restriction base="string">
+		        <!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
+<!--  			<pattern value="([a-z0-9]*($\{[a-zA-Z0-9]+\})?)+" /> --> 
+ 			<pattern value="[a-z0-9${}A-Z]+" /> 
 		</restriction>
 	</simpleType>
 
@@ -72,9 +88,9 @@
 			</element>
 		</sequence>
 		<attribute name="id" type="pa:idType"></attribute>
-		<attribute name="hostname" type="pa:idType"></attribute>
-		<attribute name="domain" type="pa:idType"></attribute>
-		<attribute name="username" type="pa:idType"></attribute>
+		<attribute name="hostname" type="pa:hostnameType"></attribute>
+		<attribute name="domain" type="pa:hostnameType"></attribute>
+		<attribute name="username" type="pa:usernameType"></attribute>
 		<attribute name="commandPath" type="pa:pathElementType"></attribute>
 		<attribute name="jvmPerHost" type="integer"></attribute>
 	</complexType>
@@ -214,7 +230,9 @@
 		<complexContent>
 			<extension base="pa:abstractGCMType">
 				<sequence>
-					<element name="host" type="pa:hostType" minOccurs="0" maxOccurs="1"></element>
+					<element name="host" type="pa:hostType"
+						minOccurs="0" maxOccurs="1">
+					</element>
 					<element ref="pa:abstractResourceElement"
 						maxOccurs="unbounded">
 					</element>
@@ -271,6 +289,38 @@
 		</complexContent>
 	</complexType>
 
+	<complexType name="abstractBridgeElementType"></complexType>
+	<element name="abstractBridgeElement"
+		type="pa:abstractBridgeElementType">
+	</element>
+
+	<complexType name="sshBridgeType">
+		<complexContent>
+			<extension base="pa:abstractBridgeElementType">
+				<attribute name="id" type="pa:idType"></attribute>
+				<attribute name="hostname" type="pa:hostnameType"></attribute>
+				<attribute name="username" type="pa:usernameType"></attribute>
+				<attribute name="commandPath" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="sshBridge" type="pa:sshBridgeType"
+		substitutionGroup="pa:abstractBridgeElement">
+	</element>
+
+	<complexType name="bridgesType">
+		<complexContent>
+			<extension base="pa:abstractInfrastructureType">
+				<sequence>
+					<element ref="pa:abstractBridgeElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
 	<element name="abstractInfrastructureElement"
 		type="pa:abstractInfrastructureType">
 	</element>
@@ -282,7 +332,7 @@
 	<element name="groups" type="pa:deployersType"
 		substitutionGroup="pa:abstractInfrastructureElement">
 	</element>
-	<element name="bridges" type="pa:deployersType"
+	<element name="bridges" type="pa:bridgesType"
 		substitutionGroup="pa:abstractInfrastructureElement">
 	</element>
 
@@ -299,26 +349,21 @@
 	</complexType>
 
 	<element name="abstractGCMElement" type="pa:abstractGCMType"></element>
-	<element name="environment" type="pa:environmentType"
-		substitutionGroup="pa:abstractGCMElement">
-	</element>
-	<element name="acquisition" type="pa:acquisitionType"
-		substitutionGroup="pa:abstractGCMElement">
-	</element>
-	<element name="resources" type="pa:resourceType"
-		substitutionGroup="pa:abstractGCMElement">
-	</element>
-	<element name="infrastructure" type="pa:infrastructureType"
-		substitutionGroup="pa:abstractGCMElement">
-	</element>
 
 	<element name="GCMDeployment">
 		<complexType>
-			<sequence>
-				<element ref="pa:abstractGCMElement"
-					maxOccurs="unbounded">
+			<all>
+				<element name="environment" type="pa:environmentType">
 				</element>
-			</sequence>
+				<element name="acquisition" type="pa:acquisitionType"
+					minOccurs="0">
+				</element>
+				<element name="resources" type="pa:resourceType">
+				</element>
+				<element name="infrastructure"
+					type="pa:infrastructureType">
+				</element>
+			</all>
 		</complexType>
 	</element>
 
