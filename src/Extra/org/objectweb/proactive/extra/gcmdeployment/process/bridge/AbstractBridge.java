@@ -53,6 +53,10 @@ public abstract class AbstractBridge implements Bridge {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     /* ------
      * Infrastructure tree operations & data
      */

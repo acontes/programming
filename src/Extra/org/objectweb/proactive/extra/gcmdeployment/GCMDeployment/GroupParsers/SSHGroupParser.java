@@ -4,6 +4,7 @@ import javax.xml.xpath.XPath;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupSSH;
 import org.w3c.dom.Node;
 
@@ -24,7 +25,7 @@ public class SSHGroupParser extends AbstractGroupParser {
     }
 
     @Override
-    public void createGroup() {
-        group = new GroupSSH();
+    public AbstractGroup createGroup() {
+        return new GroupSSH();
     }
 }

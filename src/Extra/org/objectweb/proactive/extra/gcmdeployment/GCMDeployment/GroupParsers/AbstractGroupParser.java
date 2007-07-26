@@ -12,7 +12,7 @@ public abstract class AbstractGroupParser implements GroupParser {
     protected AbstractGroup group;
 
     public AbstractGroupParser() {
-        createGroup();
+        group = createGroup();
     }
 
     public void parseGroupNode(Node groupNode, XPath xpath) {
@@ -26,5 +26,5 @@ public abstract class AbstractGroupParser implements GroupParser {
         return group;
     }
 
-    public abstract void createGroup();
+    public abstract AbstractGroup createGroup();
 }

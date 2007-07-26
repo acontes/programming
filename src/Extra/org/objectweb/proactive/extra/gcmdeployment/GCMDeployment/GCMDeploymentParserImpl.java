@@ -18,6 +18,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
@@ -42,80 +43,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected DocumentBuilder documentBuilder;
     protected CommandBuilder commandBuilder;
     protected Map<String, GroupParser> groupParserMap;
+    protected Map<String, BridgeParser> bridgeParserMap;
     protected GCMDeploymentInfrastructure infrastructure;
     protected GCMDeploymentEnvironment environment;
-
-    static protected class Resource {
-        protected String refid;
-
-        public Resource(String refid) {
-            super();
-            this.refid = refid;
-        }
-    }
-
-    static protected class HostResource extends Resource {
-        public HostResource(String refid) {
-            super(refid);
-        }
-    }
-
-    static protected class GroupResource extends Resource {
-        protected List<String> hostRefids;
-
-        public GroupResource(String refid) {
-            super(refid);
-            hostRefids = new ArrayList<String>();
-        }
-
-        public void addHost(String refid) {
-            hostRefids.add(refid);
-        }
-    }
-
-    static protected class BridgeResource extends Resource {
-        protected Map<String, GroupResource> groupRefids;
-        protected List<String> hostRefids;
-
-        public BridgeResource(String refid) {
-            super(refid);
-            groupRefids = new HashMap<String, GroupResource>();
-            hostRefids = new ArrayList<String>();
-        }
-
-        public void addHost(String refid) {
-            hostRefids.add(refid);
-        }
-
-        public void addGroup(String refid, GroupResource group) {
-            groupRefids.put(refid, group);
-        }
-    }
-
-    static protected class Resources {
-        List<HostResource> hosts;
-        Map<String, GroupResource> groups;
-        Map<String, BridgeResource> bridges;
-
-        Resources() {
-            hosts = new ArrayList<HostResource>();
-            groups = new HashMap<String, GroupResource>();
-            bridges = new HashMap<String, BridgeResource>();
-        }
-
-        public void addHost(String refid) {
-            hosts.add(new HostResource(refid));
-        }
-
-        public void addGroup(String refid, GroupResource group) {
-            groups.put(refid, group);
-        }
-
-        public void addBridge(String refid, BridgeResource bridge) {
-            bridges.put(refid, bridge);
-        }
-    }
-
     protected GCMDeploymentResources resources;
 
     public GCMDeploymentParserImpl(File descriptor) throws IOException {
@@ -299,6 +229,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         Node infrastructureNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:infrastructure",
                 document, XPathConstants.NODE);
 
+        //
+        // Hosts
+        //
         NodeList hosts = (NodeList) xpath.evaluate("pa:hosts/pa:host",
                 infrastructureNode, XPathConstants.NODESET);
 
@@ -307,6 +240,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             infrastructure.addHost(hostInfo);
         }
 
+        //
+        // Groups
+        //
         NodeList groups = (NodeList) xpath.evaluate("pa:groups/*",
                 infrastructureNode, XPathConstants.NODESET);
 
@@ -317,13 +253,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             infrastructure.addGroup(groupParser.getGroup());
         }
 
+        //
+        // Bridges
+        //
         NodeList bridges = (NodeList) xpath.evaluate("pa:bridges/*",
                 infrastructureNode, XPathConstants.NODESET);
 
         for (int i = 0; i < bridges.getLength(); ++i) {
             Node bridgeNode = bridges.item(i);
-
-            // TODO
+            BridgeParser bridgeParser = bridgeParserMap.get(bridgeNode.getNodeName());
+            bridgeParser.parseBridgeNode(bridgeNode, xpath);
+            infrastructure.addBrige(bridgeParser.getBridge());
         }
     }
 
