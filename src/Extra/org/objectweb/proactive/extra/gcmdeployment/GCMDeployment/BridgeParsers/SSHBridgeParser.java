@@ -12,11 +12,13 @@ public class SSHBridgeParser extends AbstractBridgeParser {
     @Override
     public void parseBridgeNode(Node bridgeNode, XPath xpath) {
         super.parseBridgeNode(bridgeNode, xpath);
-        
-        String hostname = GCMParserHelper.getAttributeValue(bridgeNode, "hostname");
-        String username = GCMParserHelper.getAttributeValue(bridgeNode, "username");
-        
-        BridgeSSH bridgeSSH = ((BridgeSSH)bridge);
+
+        String hostname = GCMParserHelper.getAttributeValue(bridgeNode,
+                "hostname");
+        String username = GCMParserHelper.getAttributeValue(bridgeNode,
+                "username");
+
+        BridgeSSH bridgeSSH = ((BridgeSSH) bridge);
         bridgeSSH.setHostname(hostname);
         bridgeSSH.setUsername(username);
     }
