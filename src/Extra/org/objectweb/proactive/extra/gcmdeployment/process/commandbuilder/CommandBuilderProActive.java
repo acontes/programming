@@ -8,12 +8,16 @@ import java.util.Map;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement.PathBase;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public class CommandBuilderProActive implements CommandBuilder {
+
+    /** Path to the ProActive installation */
+    private PathElement proActivePath;
 
     /** Declared Virtual nodes*/
     private Map<String, VirtualNodeInternal> vns;
@@ -135,5 +139,13 @@ public class CommandBuilderProActive implements CommandBuilder {
     private PathElement getDefaultLog4jProperties() {
         // TODO Return the default PathElemen for log4jProperties
         return null;
+    }
+
+    public void setProActivePath(String proActivePath) {
+        this.proActivePath = new PathElement(proActivePath, PathBase.HOME);
+    }
+
+    public String getPath(HostInfo hostInfo) {
+        return proActivePath.getFullPath(hostInfo, this);
     }
 }

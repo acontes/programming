@@ -149,7 +149,7 @@ public class HostInfoImpl implements HostInfo {
     }
 
     public OperatingSystem getOS() {
-        return getOS();
+        return os;
     }
 
     public Tool getTool(String id) {

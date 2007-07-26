@@ -11,7 +11,11 @@ public interface CommandBuilder {
 
     /**
      * Returns the base path associated to this command builder
+     *
+     * Since the base path is always relative to the home directory a HostInfo
+     * must be passed as parameter.
+     *
      * @return the base path if the base path is specified otherwise null is returned
      */
-    public String getPath();
+    public String getPath(HostInfo hostInfo);
 }

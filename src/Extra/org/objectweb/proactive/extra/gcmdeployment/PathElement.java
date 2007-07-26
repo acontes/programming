@@ -18,17 +18,22 @@ public class PathElement implements Cloneable {
 
     public PathElement() {
         this.relPath = null;
-        this.base = PathBase.HOME;
+        this.base = PathBase.ROOT;
     }
 
     public PathElement(String relPath) {
         this.relPath = relPath;
-        this.base = PathBase.HOME;
+        this.base = PathBase.ROOT;
     }
 
     public PathElement(String relPath, String base) {
         this.relPath = relPath;
         setBase(base);
+    }
+
+    public PathElement(String relPath, PathBase base) {
+        this.relPath = relPath;
+        this.base = base;
     }
 
     public String getRelPath() {
@@ -49,7 +54,7 @@ public class PathElement implements Cloneable {
 
     public void setBase(String baseString) {
         if (baseString == null) {
-            this.base = PathBase.PROACTIVE; // TODO - what should be the default ?
+            this.base = PathBase.ROOT; // TODO - what should be the default ?
         } else {
             String baseStringCanonical = baseString.trim();
             if (baseStringCanonical.equalsIgnoreCase("proactive")) {
@@ -63,21 +68,19 @@ public class PathElement implements Cloneable {
     }
 
     public String getFullPath(HostInfo hostInfo, CommandBuilder commandBuilder) {
-        char fp = hostInfo.getOS().pathSeparator();
-
         switch (base) {
         case ROOT:
             return relPath;
         case HOME:
-            return hostInfo.getHomeDirectory() + fp + relPath;
+            return appendPath(hostInfo.getHomeDirectory(), relPath, hostInfo);
         case PROACTIVE:
             Tool tool = hostInfo.getTool(Tools.PROACTIVE.id);
             if (tool != null) {
-                return tool.getPath() + fp + relPath;
+                return appendPath(tool.getPath(), relPath, hostInfo);
             } else {
-                String bp = commandBuilder.getPath();
+                String bp = commandBuilder.getPath(hostInfo);
                 if (bp != null) {
-                    return bp + fp + relPath;
+                    return appendPath(bp, relPath, hostInfo);
                 } else {
                     GCMD_LOGGER.warn("Full Path cannot be returned since nor the ProActive tool nor the CommandBuilder base path have been specified",
                         new IllegalStateException());
@@ -96,5 +99,38 @@ public class PathElement implements Cloneable {
         PathElement res = new PathElement(this.relPath);
         res.setBase(this.base);
         return res;
+    }
+
+    /**
+     * Concatenates two path using the file separator given by the hostInfo parameter
+     *
+     * @param s1 the first path
+     * @param s2 the second path
+     * @param hostInfo Indicates which file separator to use
+     * @return The concatenation of s1 and s2
+     */
+    static public String appendPath(final String s1, final String s2,
+        final HostInfo hostInfo) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(s1);
+
+        // If s1 ends with fp remove it
+        if (sb.length() > 0) {
+            if (sb.charAt(sb.length() - 1) == hostInfo.getOS().fileSeparator()) {
+                sb.deleteCharAt(sb.length() - 1);
+            }
+        }
+
+        // Adds fp
+        sb.append(hostInfo.getOS().fileSeparator());
+
+        // If s2 begins with fp remove it
+        if (s2.charAt(0) == hostInfo.getOS().fileSeparator()) {
+            sb.append(s2.substring(1));
+        } else {
+            sb.append(s2);
+        }
+
+        return sb.toString();
     }
 }
