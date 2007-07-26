@@ -1,6 +1,6 @@
 package org.objectweb.proactive.extra.infrastructuremanager.dataresource;
 
-import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 
 
 /**
@@ -12,18 +12,30 @@ import org.objectweb.proactive.core.node.NodeException;
  * @author proactive
  */
 public interface IMNodeSource {
-
-    /**
-     * Get a node from the source.
-     * If there is no node available, a {@link NodeException} is thrown.
-     * @return the node given by the source
-     * @throws NodeException meaning there's no node available.
-     */
-    public IMNode getIMNode() throws NodeException;
+	
+	/**
+	 * String identifying the NodeSource. This must be unique.
+	 * @return
+	 */
+	public String getSourceId();
+	
+	/**
+	 * Get a set of nbNodes nodes from the NodeSource.
+	 * It may return less than that, if the source can't give nbNodes nodes.
+	 * @param nbNodes
+	 * @return
+	 */
+    public NodeSet getIMNodes(int nbNodes);
 
     /**
      * Release a node, meaning don't use it anymore.
      * @param imnode
      */
     public void releaseNode(IMNode imnode);
+
+    /**
+     * Release nodes, meaning don't use them anymore.
+     * @param imnodes the nodes to release
+     */
+    public void releaseNodes(NodeSet imnodes);
 }
