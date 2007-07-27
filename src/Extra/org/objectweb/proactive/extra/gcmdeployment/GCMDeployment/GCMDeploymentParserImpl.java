@@ -333,4 +333,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     public GCMDeploymentInfrastructure getInfrastructure() {
         return infrastructure;
     }
+
+    public GCMDeploymentResources getResources() {
+        return resources;
+    }
 }

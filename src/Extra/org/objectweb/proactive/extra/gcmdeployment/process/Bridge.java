@@ -89,4 +89,6 @@ public interface Bridge extends Cloneable {
     public void check() throws IllegalStateException;
 
     public Object clone() throws CloneNotSupportedException;
+
+    public List<String> buildCommands(CommandBuilder commandBuilder);
 }

@@ -1,6 +1,16 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.bridge;
 
-public class BridgeOARSH extends AbstractBridge {
+
+/**
+ * A dummy bridge to be used in unit tests
+ */
+public class BridgeDummy extends AbstractBridge {
+    String command;
+
+    public BridgeDummy(String command) {
+        this.command = command;
+    }
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         // TODO Auto-generated method stub
@@ -9,7 +19,6 @@ public class BridgeOARSH extends AbstractBridge {
 
     @Override
     public String internalBuildCommand() {
-        // TODO Implements internalBuildCommand for OARSH
-        return null;
+        return command;
     }
 }

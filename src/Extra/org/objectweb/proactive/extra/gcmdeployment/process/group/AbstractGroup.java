@@ -1,6 +1,10 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.group;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
@@ -79,4 +83,16 @@ public abstract class AbstractGroup implements Group {
 
     @Override
     public abstract Object clone() throws CloneNotSupportedException;
+
+    public List<String> buildCommands(CommandBuilder commandBuilder) {
+        List<String> commands = internalBuildCommands();
+        List<String> ret = new ArrayList<String>();
+        for (String comnand : commands) {
+            ret.add(comnand + " " + commandBuilder.buildCommand(hostInfo));
+        }
+
+        return ret;
+    }
+
+    abstract public List<String> internalBuildCommands();
 }

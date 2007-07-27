@@ -6,4 +6,10 @@ public class BridgeSSH extends AbstractBridge {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public String internalBuildCommand() {
+        // TODO Implements internalBuildCommand for BridgeSSH
+        return null;
+    }
 }

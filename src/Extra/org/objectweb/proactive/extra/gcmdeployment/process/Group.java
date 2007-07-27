@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.process;
 
+import java.util.List;
+
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
@@ -41,4 +43,12 @@ public interface Group extends Cloneable {
     public void check() throws IllegalStateException;
 
     public Object clone() throws CloneNotSupportedException;
+
+    /**
+     * Build the command to start the group
+     *
+     * @param commandBuilder The final command builder
+     * @return The command to be used to start this group
+     */
+    public List<String> buildCommands(CommandBuilder commandBuilder);
 }

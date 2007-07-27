@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
+import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
@@ -113,4 +114,39 @@ public abstract class AbstractBridge implements Bridge {
     }
 
     public abstract Object clone() throws CloneNotSupportedException;
+
+    public List<String> buildCommands(CommandBuilder commandBuilder) {
+        List<String> commands = new ArrayList<String>();
+
+        if (hostInfo != null) {
+            commandBuilder.buildCommand(hostInfo);
+        }
+
+        for (Group group : groups) {
+            commands.addAll(group.buildCommands(commandBuilder));
+        }
+
+        for (Bridge bridge : bridges) {
+            commands.addAll(bridge.buildCommands(commandBuilder));
+        }
+
+        // Prefix each command with this bridge
+        List<String> ret = new ArrayList<String>();
+        for (String command : commands) {
+            ret.add(internalBuildCommand() + " " + command);
+        }
+
+        return commands;
+    }
+
+    /**
+     * Returns the command corresponding to this bridge
+     *
+     * This method is called by the generic AbstractBridge.buildCommand
+     * method to prepend this bridge to retrieved command for children nodes
+     * of the tree
+     *
+     * @return
+     */
+    abstract public String internalBuildCommand();
 }
