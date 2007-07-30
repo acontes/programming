@@ -1,3 +1,26 @@
+
+-> Implements the Helpers.escapeCommand method
+	- Commands must be protected at each step by "
+	- Special characters must be escaped
+	- Unit test !
+	
+-> Implements CommandBuilderScript
+	- CommandBuilderDummy is a good start
+	- Write some descriptors to check Parsing and CommandBuilder
+		
+-> Implements CommandBuilderProActive
+	- All options in the descriptor must be handled
+	- Try to understand the old JVMProcess and "magic options"
+	- Write some descriptors
+	
+-> Implements BridgeRSH and BridgeSSH
+	- Test them using the test inside GCMDeploymentDescriptorImpl
+	
+-> Implement GroupSSH and GroupRSH
+	- Test them using the test inside GCMDeploymentDescriptorImpl
+	
+
+
 Design
 ======
 
