@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.gcmdeployment.process.group;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
@@ -88,7 +89,7 @@ public abstract class AbstractGroup implements Group {
         List<String> commands = internalBuildCommands();
         List<String> ret = new ArrayList<String>();
         for (String comnand : commands) {
-            ret.add(comnand + " " + commandBuilder.buildCommand(hostInfo));
+            ret.add(comnand + " " + Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo)));
         }
 
         return ret;

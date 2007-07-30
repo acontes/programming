@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -119,7 +120,7 @@ public abstract class AbstractBridge implements Bridge {
         List<String> commands = new ArrayList<String>();
 
         if (hostInfo != null) {
-            commandBuilder.buildCommand(hostInfo);
+            commands.add(commandBuilder.buildCommand(hostInfo));
         }
 
         for (Group group : groups) {
@@ -133,10 +134,10 @@ public abstract class AbstractBridge implements Bridge {
         // Prefix each command with this bridge
         List<String> ret = new ArrayList<String>();
         for (String command : commands) {
-            ret.add(internalBuildCommand() + " " + command);
+            ret.add(internalBuildCommand() + " " + Helpers.escapeCommand(command));
         }
 
-        return commands;
+        return ret;
     }
 
     /**
