@@ -71,7 +71,7 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
 		// Verify that this user//password can connect to this existing scheduler
 		logger.info(user+" is trying to connect...");
 		logger.info("Verifying user name and password...");
-		Map<String, Object> params = new HashMap<String, Object>(3);
+		Map<String, Object> params = new HashMap<String, Object>(6);
 		params.put("username", user);
 		params.put("pw", password);
 		params.put("path", loginFile);
@@ -99,7 +99,7 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
 	public AdminScheduler logAsAdmin(String user, String password) throws LoginException, SchedulerException {
 		// Verify that this user//password can connect (as admin) to this existing scheduler.
 		logger.info("Verifying admin name and password...");
-		Map<String, Object> params = new HashMap<String, Object>(3);
+		Map<String, Object> params = new HashMap<String, Object>(6);
 		params.put("username", user);
 		params.put("pw", password);
 		params.put("path", loginFile);
