@@ -98,49 +98,66 @@ public class Chepa {
 
 		shell.setText("Connect to scheduler");
 		FormLayout layout = new FormLayout();
-		layout.marginHeight = 5;
-		layout.marginWidth = 5;
+		layout.marginHeight = 20;
+		layout.marginWidth = 20;
 		shell.setLayout(layout);
 
 		// label "URL"
 		Label urlLabel = new Label(shell, SWT.NONE);
+		final Combo urlCombo = new Combo(shell, SWT.BORDER);
+		Label loginLabel = new Label(shell, SWT.NONE);
+		final Combo login = new Combo(shell, SWT.BORDER);
+		Label pwdLabel = new Label(shell, SWT.NONE);
+		Text pwd = new Text(shell, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+
 		urlLabel.setText("Url :");
 
+		
+		
 		// text url
-		final Combo urlCombo = new Combo(shell, SWT.BORDER);
 		FormData urlFormData = new FormData();
 		urlFormData.top = new FormAttachment(0, -1);
-		urlFormData.left = new FormAttachment(urlLabel, 5);
+		urlFormData.left = new FormAttachment(loginLabel, 5);
 		urlFormData.right = new FormAttachment(100, -5);
 		urlCombo.setLayoutData(urlFormData);
 		
-		//**********************************************************************
-		Label loginLabel = new Label(shell, SWT.NONE);
 		loginLabel.setText("login :");
 		FormData loginLabelFormData = new FormData();
-		loginLabelFormData.top = new FormAttachment(urlCombo, 5);
+		loginLabelFormData.top = new FormAttachment(login, 0, SWT.CENTER);
 		loginLabel.setLayoutData(loginLabelFormData);
 		
-		Text login = new Text(shell, SWT.SINGLE | SWT.BORDER);
 		FormData loginFormData = new FormData();
 		loginFormData.top = new FormAttachment(urlCombo, 5);
 		loginFormData.left = new FormAttachment(loginLabel, 5);
-		loginFormData.right = new FormAttachment(40, 5);
+		loginFormData.right = new FormAttachment(45, 5);
 		login.setLayoutData(loginFormData);
-		
-		Label pwdLabel = new Label(shell, SWT.NONE);
+
 		pwdLabel.setText("password :");
 		FormData pwdLabelFormData = new FormData();
-		pwdLabelFormData.top = new FormAttachment(urlCombo, 5);
+		pwdLabelFormData.top = new FormAttachment(pwd, 0, SWT.CENTER);
 		pwdLabelFormData.left = new FormAttachment(login, 5);
 		pwdLabel.setLayoutData(pwdLabelFormData);
 		
-		Text pwd = new Text(shell, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
 		FormData pwdFormData = new FormData();
 		pwdFormData.top = new FormAttachment(urlCombo, 5);
 		pwdFormData.left = new FormAttachment(pwdLabel, 5);
 		pwdFormData.right = new FormAttachment(100, -5);
 		pwd.setLayoutData(pwdFormData);
+		//**********************************************************************
+		
+		Label label = new Label(shell, SWT.NONE);
+		label.setText("log as admin");
+		Button check = new Button(shell, SWT.CHECK);
+		
+		FormData checkFormData = new FormData();
+		checkFormData.top = new FormAttachment(label, 0, SWT.CENTER);
+		checkFormData.left = new FormAttachment(50,-45);
+		check.setLayoutData(checkFormData);
+		
+		FormData textFormData = new FormData();
+		textFormData.top = new FormAttachment(login, 5);
+		textFormData.left = new FormAttachment(check, 5);
+		label.setLayoutData(textFormData);
 		
 		//**********************************************************************
 
@@ -154,7 +171,7 @@ public class Chepa {
 			}
 		});
 		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(login, 5);
+		okFormData.top = new FormAttachment(label, 5);
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
@@ -170,7 +187,7 @@ public class Chepa {
 			}
 		});
 		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(login, 5);
+		cancelFormData.top = new FormAttachment(label, 5);
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);

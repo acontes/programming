@@ -532,6 +532,7 @@ public class JobsController implements SchedulerEventListener {
 	}
 
 	public int setScheduler(SelectSchedulerDialogResult dialogResult) {
+		System.out.println("JobsController.setScheduler()");
 		try {
 			SchedulerAuthenticationInterface sai = SchedulerConnection.join(dialogResult.getUrl());
 			UserSchedulerInterface userScheduler = (UserSchedulerInterface) sai.logAsUser(dialogResult

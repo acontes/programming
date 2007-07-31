@@ -148,7 +148,13 @@ public class SeparatedJobView extends ViewPart {
 				SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(shell);
 				if (dialogResult != null) {
 					shell = parent.getShell();
-					int result = jobsController.setScheduler(dialogResult);
+					int result = 0;
+					try {
+						result = jobsController.setScheduler(dialogResult);
+					} catch (RuntimeException e) {
+						System.out.println("ERORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+						e.printStackTrace();
+					}
 					if (result == JobsController.LOGIN_OR_PASSWORD_WRONG)
 						MessageDialog.openError(shell, "Couldn't connect", "The login and/or the password are wrong !");
 					else if (result == JobsController.COULD_NOT_CONNECT_SCHEDULER)
