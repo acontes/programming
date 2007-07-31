@@ -154,9 +154,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (state == State.SHUTTING_DOWN){
 			try {
 				logger.info("Serializing results...");
-				serialyseResults(SERIALIZE_PATH);
+				serializeResults(SERIALIZE_PATH);
 			} catch (Exception e) {
 				e.printStackTrace();
+				//if an error occurs during serialization, we wait until the result to be got back
 				while (results.size() > 0 && state == State.SHUTTING_DOWN){
 					service.blockingServeOldest();
 				}
@@ -584,19 +585,19 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
 	
 	/**
-	 * Serialyse every jobs results on hard drive before shutting down.
+	 * Serialize every jobs results on hard drive before shutting down.
 	 * file will be named like that pattern : SCHED_{date}_{numJob}.result
 	 * 
 	 * @param path the path on which to saves the results.
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	private void serialyseResults(String path) throws FileNotFoundException, IOException {
+	private void serializeResults(String path) throws FileNotFoundException, IOException {
 		for (Entry<JobId,JobResult> e : results.entrySet()){
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(System.currentTimeMillis());
 			String f = path+"SCHED_"+String.format("%1$tm-%1$te-%1$tY", calendar)+"_"+e.getKey().value()+".result";
-			serialyse(f, e.getValue());
+			serialize(f, e.getValue());
 		}
 	}
 	
@@ -608,7 +609,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private void serialyse(String path, Object toSerialize) throws FileNotFoundException, IOException {
+	private void serialize(String path, Object toSerialize) throws FileNotFoundException, IOException {
 		ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(path));
 		objOut.writeObject(toSerialize);
 		objOut.close();
