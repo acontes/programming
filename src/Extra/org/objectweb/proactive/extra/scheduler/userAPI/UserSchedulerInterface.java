@@ -87,14 +87,14 @@ public interface UserSchedulerInterface extends Serializable{
 	
 	
 	/**
-	 * Stop the job represented by jobId.
-	 * This method will stop every running tasks of this job, and remove it from the scheduler.
-	 * The job won't be terminated.
+	 * kill the job represented by jobId.
+	 * This method will kill every running tasks of this job, and remove it from the scheduler.
+	 * The job won't be terminated, it won't have result.
 	 * 
-	 * @param jobId the job to stop.
+	 * @param jobId the job to kill.
 	 * @return true if success, false otherwise. (false can be due to insufficient permission)
 	 */
-	public boolean stop (JobId jobId);
+	public boolean kill (JobId jobId);
 	
 	
 	/**

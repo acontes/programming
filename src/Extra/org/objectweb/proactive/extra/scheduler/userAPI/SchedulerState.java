@@ -22,6 +22,8 @@ public final class SchedulerState implements Serializable {
 	private Vector<Job> runningJobs = new Vector<Job>();
 	/** finished jobs */
 	private Vector<Job> finishedJobs = new Vector<Job>();
+	/** scheduler state */
+	private State state = State.STOPPED;
 	
 	
 	/**
@@ -87,6 +89,22 @@ public final class SchedulerState implements Serializable {
 	 */
 	public void setRunningJobs(Vector<Job> runningJobs) {
 		this.runningJobs = runningJobs;
+	}
+
+
+	/**
+	 * @return the state
+	 */
+	public State getState() {
+		return state;
+	}
+
+
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(State state) {
+		this.state = state;
 	}
 	
 }

@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extra.scheduler.job;
 
 /**
- * 
+ * Type of the job.
  * 
  * @author ProActive Team
  * @version 1.0, Jun 11, 2007

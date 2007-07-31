@@ -30,11 +30,19 @@ public interface AdminSchedulerInterface {
 	
 	
 	/**
-	 * Pause the scheduler.
+	 * Pause the scheduler by terminating running jobs.
 	 * 
 	 * @return true if success, false otherwise.
 	 */
 	public boolean pause();
+	
+	
+	/**
+	 * Pause the scheduler by terminating running tasks.
+	 * 
+	 * @return true if success, false otherwise.
+	 */
+	public boolean pauseImmediate();
 	
 	
 	/**
@@ -51,4 +59,12 @@ public interface AdminSchedulerInterface {
 	 * @return true if success, false otherwise.
 	 */
 	public boolean shutdown();
+	
+	
+	/**
+	 * kill the scheduler.
+	 * 
+	 * @return true if success, false otherwise.
+	 */
+	public boolean kill();
 }

@@ -86,9 +86,9 @@ public class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @param event a taskEvent containing a job event.
 	 */
-	public synchronized void setTaskInfo(TaskEvent event){
+	public synchronized void update(TaskEvent event){
 		jobInfo = event.getJobEvent();
-		tasks.get(event.getTaskID()).setTaskInfo(event);
+		tasks.get(event.getTaskID()).update(event);
 	}
 
 	/**
@@ -96,11 +96,11 @@ public class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @param jobInfo the jobInfo to set
 	 */
-	public synchronized void setJobInfo(JobEvent jobInfo) {
+	public synchronized void update(JobEvent jobInfo) {
 		this.jobInfo = jobInfo;
 		if (jobInfo.getTaskStatusModify() != null){
-			for (TaskDescriptor td : tasks.values()){
-				td.setStatus(jobInfo.getTaskStatusModify());
+			for (TaskId id : tasks.keySet()){
+				tasks.get(id).setStatus(jobInfo.getTaskStatusModify().get(id));
 			}
 		}
 	}
@@ -227,10 +227,12 @@ public class Job implements Serializable, Comparable<Job> {
 		setStartTime(System.currentTimeMillis());
 		setNumberOfPendingTasks(getTotalNumberOfTasks());
 		setNumberOfRunningTasks(0);
+		HashMap<TaskId,Status> status = new HashMap<TaskId,Status>();
 		for (TaskDescriptor td : getTasks()){
 			td.setStatus(Status.PENDING);
+			status.put(td.getId(), Status.PENDING);
 		}
-		setTaskStatusModify(Status.PENDING);
+		setTaskStatusModify(status);
 	}
 	
 	
@@ -322,7 +324,7 @@ public class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @param taskStatusModify the taskStatusModify to set
 	 */
-	public void setTaskStatusModify(Status taskStatusModify) {
+	public void setTaskStatusModify(HashMap<TaskId,Status> taskStatusModify) {
 		jobInfo.setTaskStatusModify(taskStatusModify);
 	}
 	/**
@@ -561,6 +563,47 @@ public class Job implements Serializable, Comparable<Job> {
 	 */
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+	
+
+	/**
+	 * Paused every running and submitted tasks in this pending job.
+	 */
+	public boolean setPaused() {
+		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
+		boolean change = false;
+		for (TaskDescriptor td : tasks.values()){
+			if (td.getStatus() == Status.SUBMITTED){
+				td.setStatus(Status.PAUSED_S);
+				change = true;
+			} else if (td.getStatus() == Status.PENDING){
+				td.setStatus(Status.PAUSED_P);
+				change = true;
+			}
+			hts.put(td.getId(), td.getStatus());
+		}
+		setTaskStatusModify(hts);
+		return change;
+	}
+
+	/**
+	 * State of every paused tasks becomes pending or submitted in this pending job.
+	 */
+	public boolean setUnPause() {
+		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
+		boolean change = false;
+		for (TaskDescriptor td : tasks.values()){
+			if (td.getStatus() == Status.PAUSED_S){
+				td.setStatus(Status.SUBMITTED);
+				change = true;
+			} else if (td.getStatus() == Status.PAUSED_P){
+				td.setStatus(Status.PENDING);
+				change = true;
+			}
+			hts.put(td.getId(), td.getStatus());
+		}
+		setTaskStatusModify(hts);
+		return change;
 	}
 	
 	

@@ -30,11 +30,19 @@ public interface SchedulerCoreInterface extends Serializable {
 	
 	
 	/**
-	 * Pause the scheduler.
+	 * Pause the scheduler by terminating running jobs.
 	 * 
 	 * @return true if success, false otherwise.
 	 */
 	public BooleanWrapper corePause();
+	
+	
+	/**
+	 * Pause the scheduler by terminating running tasks.
+	 * 
+	 * @return true if success, false otherwise.
+	 */
+	public BooleanWrapper coreImmediatePause();
 	
 	
 	/**
@@ -51,5 +59,13 @@ public interface SchedulerCoreInterface extends Serializable {
 	 * @return true if success, false otherwise.
 	 */
 	public BooleanWrapper coreShutdown();
+	
+	
+	/**
+	 * Kill the scheduler.
+	 * 
+	 * @return true if success, false otherwise.
+	 */
+	public BooleanWrapper coreKill();
 
 }

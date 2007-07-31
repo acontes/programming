@@ -51,11 +51,9 @@ public class SchedulerConnection implements Serializable{
     		schedulerAuth = (SchedulerAuthenticationInterface)(ProActive.lookupActive(SchedulerAuthentication.class.getName(), schedulerURL));
     		return schedulerAuth;
     	} catch (ActiveObjectCreationException e) {
-			e.printStackTrace();
-			throw new SchedulerException("Error while looking up this active object : "+SchedulerAuthentication.class.getName());
+			throw new SchedulerException("Error while looking up this active object : "+SchedulerAuthentication.class.getName(),e);
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new SchedulerException("IO Error while looking up this active object : "+SchedulerAuthentication.class.getName());
+			throw new SchedulerException("IO Error while looking up this active object : "+SchedulerAuthentication.class.getName(),e);
 		}
 	}
 

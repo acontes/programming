@@ -2,12 +2,16 @@ package org.objectweb.proactive.extra.scheduler.task;
 
 import java.io.PrintStream;
 import java.io.Serializable;
+
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
@@ -26,7 +30,7 @@ import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
  * @version 1.0, Jul 10, 2007
  * @since ProActive 3.2
  */
-public class TaskLauncher implements Serializable {
+public class TaskLauncher implements InitActive, Serializable {
 
 	private static final long serialVersionUID = -9159607482957244049L;
 	private TaskId taskId;
@@ -66,8 +70,17 @@ public class TaskLauncher implements Serializable {
 		this(taskId,jobId,host,port);
 		this.pre = pre;
 	}
+	
 
-
+	/**
+     * Initializes the activity of the active object.
+     * @param body the body of the active object being initialized
+     */
+	public void initActivity(Body body) {
+		ProActive.setImmediateService("getNode");
+	}
+	
+	
 	/**
 	 * Execute the user task as an active object.
 	 * 
@@ -112,12 +125,19 @@ public class TaskLauncher implements Serializable {
             LogManager.shutdown();
             System.setOut(stdout);
             System.setErr(stderr);
-			try {
-				core.terminate(ProActive.getNode(),taskId, jobId);
-			} catch (NodeException e) {
-				//TODO certainly something to do here...
-				e.printStackTrace();
-			}		
+			core.terminate(taskId, jobId);	
 		}
 	}
+	
+	
+	/**
+	 * To get the node on which this active object has been launched.
+	 * 
+	 * @return the node of this active object.
+	 * @throws NodeException
+	 */
+	public Node getNode() throws NodeException{
+		return ProActive.getNode();
+	}
+	
 }

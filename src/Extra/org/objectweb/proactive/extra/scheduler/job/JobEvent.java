@@ -1,8 +1,10 @@
 package org.objectweb.proactive.extra.scheduler.job;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 import org.objectweb.proactive.extra.scheduler.task.Status;
+import org.objectweb.proactive.extra.scheduler.task.TaskId;
 
 /**
  * JobEvent provides some informations about a job.
@@ -38,7 +40,7 @@ public class JobEvent implements Serializable{
 	/** number of finished tasks */
 	private int numberOfFinishedTasks = 0;
 	/** If this status is not null, it means the task have to change their status */
-	private Status taskStatusModify = null;
+	private HashMap<TaskId,Status> taskStatusModify = null;
 	
 	
 	/**
@@ -134,7 +136,7 @@ public class JobEvent implements Serializable{
 	 * 
 	 * @param taskStatusModify the taskStatusModify to set
 	 */
-	public void setTaskStatusModify(Status taskStatusModify) {
+	public void setTaskStatusModify(HashMap<TaskId,Status> taskStatusModify) {
 		this.taskStatusModify = taskStatusModify;
 	}
 	/**
@@ -142,7 +144,7 @@ public class JobEvent implements Serializable{
 	 * 
 	 * @return the taskStatusModify
 	 */
-	public Status getTaskStatusModify() {
+	public HashMap<TaskId,Status> getTaskStatusModify() {
 		return taskStatusModify;
 	}
 	/**

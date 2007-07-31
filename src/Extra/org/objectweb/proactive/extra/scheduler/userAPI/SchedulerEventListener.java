@@ -1,8 +1,11 @@
 package org.objectweb.proactive.extra.scheduler.userAPI;
 
 import java.io.Serializable;
+
+import org.objectweb.proactive.extra.scheduler.core.SchedulerEvent;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
+import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 
 /**
@@ -13,6 +16,90 @@ import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
  * @since ProActive 3.2
  */
 public interface SchedulerEventListener extends Serializable {
+	
+	/**
+	 * Invoked when the scheduler has just been started.
+	 */
+	public void SchedulerStartedEvent();
+	
+	
+	/**
+	 * Invoked when the scheduler has just been stopped.
+	 */
+	public void SchedulerStoppedEvent();
+	
+	
+	/**
+	 * Invoked when the scheduler has just been paused.
+	 * 
+	 * @param event the scheduler informations about the status of every tasks.
+	 * 		use <code>SchedulerEvent.update(Vector<<Job>>)</code> to update your job.
+	 */
+	public void SchedulerPausedEvent(SchedulerEvent event);
+	
+	
+	/**
+	 * Invoked when the scheduler has received a paused immediate signal.
+	 * 
+	* @param event the scheduler informations about the status of every tasks.
+	 * 		use <code>event.update(Vector<<Job>>)</code> to update your job.
+	 */
+	public void SchedulerImmediatePausedEvent(SchedulerEvent event);
+	
+	
+	/**
+	 * Invoked when the scheduler has just been resumed.
+	 * 
+	 * @param event the scheduler informations about the status of every tasks.
+	 * 		use <code>event.update(Vector<<Job>>)</code> to update your job.
+	 */
+	public void SchedulerResumedEvent(SchedulerEvent event);
+	
+	
+	/**
+	 * Invoked when the scheduler shutdown sequence is initialised.
+	 */
+	public void SchedulerShuttingDownEvent();
+	
+	
+	/**
+	 * Invoked when the scheduler has just been shutdown.
+	 * 
+	 * @param job the new scheduled job.
+	 */
+	public void SchedulerShutDownEvent();
+	
+	
+	/**
+	 * Invoked when the scheduler has just been killed.
+	 * Scheduler is not reachable anymore.
+	 */
+	public void SchedulerkilledEvent();
+	
+	
+	/**
+	 * Invoked when a job has been killed on the scheduler.
+	 * 
+	 * @param jobId the job to killed.
+	 */
+	public void jobKilledEvent (JobId jobId);
+
+	
+	/**
+	 * Invoked when a job has been paused on the scheduler.
+	 * 
+	 * @param event the informations on the paused job.
+	 */
+	public void jobPausedEvent (JobEvent event);
+	
+	
+	/**
+	 * Invoked when a job has been resumed on the scheduler.
+	 * 
+	 * @param event the informations on the resumed job.
+	 */
+	public void jobResumedEvent (JobEvent event);
+	
 	
 	/**
 	 * Invoked when the scheduler has received a new job to schedule.

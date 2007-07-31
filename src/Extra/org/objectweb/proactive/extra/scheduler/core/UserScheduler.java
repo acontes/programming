@@ -89,10 +89,10 @@ public class UserScheduler implements UserSchedulerInterface {
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#stop(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean stop(JobId jobId) {
-		return schedulerFrontend.stop(jobId);
+	public boolean kill(JobId jobId) {
+		return schedulerFrontend.kill(jobId);
 	}
 	
 

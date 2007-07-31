@@ -69,6 +69,7 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
 	 */
 	public UserScheduler logAsUser(String user, String password) throws LoginException, SchedulerException {
 		// Verify that this user//password can connect to this existing scheduler
+		logger.info(user+" is trying to connect...");
 		logger.info("Verifying user name and password...");
 		Map<String, Object> params = new HashMap<String, Object>(3);
 		params.put("username", user);

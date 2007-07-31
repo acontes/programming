@@ -37,20 +37,30 @@ package org.objectweb.proactive.examples.scheduler;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
+import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
 public class AdminCommunicator {
     private static AdminScheduler scheduler;
+    private static final String STAT_CMD = "stat";
     private static final String START_CMD = "start";
     private static final String STOP_CMD = "stop";
     private static final String PAUSE_CMD = "pause";
+    private static final String PAUSE_IM_CMD = "pausei";
     private static final String RESUME_CMD = "resume";
-    private static final String SHUTDOWN_SOFT_CMD = "shutdown";
+    private static final String SHUTDOWN_CMD = "shutdown";
+    private static final String KILL_CMD = "kill";
     private static final String EXIT_CMD = "exit";
+    private static final String PAUSEJOB_CMD = "pausejob";
+    private static final String RESUMEJOB_CMD = "resumejob";
+    private static final String KILLJOB_CMD = "killjob";
     private static boolean stopCommunicator;
 
     /**
@@ -91,33 +101,85 @@ public class AdminCommunicator {
             stopCommunicator = true;
         } else if (command.equals("?") || command.equals("help")) {
             helpScreen();
+        } else if (command.equals(STAT_CMD)) {
+            statScreen();
         } else if (command.equals(START_CMD)) {
             boolean success = scheduler.start();
             if (success) {
                 output("Scheduler started.\n");
             } else {
-                output("Scheduler already started!!\n");
+                output("Start is impossible!!\n");
             }
         } else if (command.equals(STOP_CMD)) {
             boolean success = scheduler.stop();
             if (success) {
                 output("Scheduler stopped.\n");
             } else {
-                output("Scheduler already stopped!!\n");
+                output("Stop is impossible !!\n");
             }
-        } else if (command.equals(SHUTDOWN_SOFT_CMD)) {
+        }else if (command.equals(PAUSE_CMD)) {
+            boolean success = scheduler.pause();
+            if (success) {
+                output("Scheduler paused.\n");
+            } else {
+                output("Pause is impossible !!\n");
+            }
+        }else if (command.equals(PAUSE_IM_CMD)) {
+            boolean success = scheduler.pauseImmediate();
+            if (success) {
+                output("Scheduler paused.\n");
+            } else {
+                output("Pause is impossible !!\n");
+            }
+        }else if (command.equals(RESUME_CMD)) {
+            boolean success = scheduler.resume();
+            if (success) {
+                output("Scheduler resumed.\n");
+            } else {
+                output("Resume is impossible !!\n");
+            }
+        } else if (command.equals(SHUTDOWN_CMD)) {
             if (scheduler.shutdown()){
             	output("Shutdown sequence initialized, it might take a while to finish all executions, communicator will exit.\n");
             	stopCommunicator = true;
             } else {
-            	output("Scheduler is running, plz stop it before shutting it down.\n");
+            	output("Shutdown the scheduler is impossible for the moment.\n");
+            }
+        } else if (command.equals(KILL_CMD)) {
+            if (scheduler.kill()){
+            	output("Sheduler has just been killed, communicator will exit.\n");
+            	stopCommunicator = true;
+            } else {
+            	output("killed the scheduler is impossible for the moment.\n");
+            }
+        }else if (command.startsWith(PAUSEJOB_CMD)) {
+            boolean success = scheduler.pause(new JobId(Integer.parseInt(command.split(" ")[1])));
+            if (success) {
+                output("Job paused.\n");
+            } else {
+                output("Paused job is impossible !!\n");
+            }
+        }else if (command.startsWith(RESUMEJOB_CMD)) {
+            boolean success = scheduler.resume(new JobId(Integer.parseInt(command.split(" ")[1])));
+            if (success) {
+                output("Job resumed.\n");
+            } else {
+                output("Resume job is impossible !!\n");
+            }
+        }else if (command.startsWith(KILLJOB_CMD)) {
+            boolean success = scheduler.kill(new JobId(Integer.parseInt(command.split(" ")[1])));
+            if (success) {
+                output("Job killed.\n");
+            } else {
+                output("Kill job is impossible !!\n");
             }
         } else {
             output("UNKNOWN COMMAND!!... Please type '?' or 'help' to see the list of commands\n");
         }
     }
 
-    private static void startCommandListener() throws Exception {
+
+	private static void startCommandListener() throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         while (!stopCommunicator) {
             output(" > ");
@@ -129,15 +191,36 @@ public class AdminCommunicator {
             }
         }
     }
-
+	
+	
+	private static void statScreen() {
+		try {
+			HashMap<String,Object> stat = scheduler.getStats().getProperties();
+			String out = "";
+			 for (Entry<String, Object> e : stat.entrySet()){
+				 out += e.getKey()+" : "+e.getValue()+"\n";
+			 }
+			 output(out+"\n");
+		} catch (SchedulerException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
     private static void helpScreen() {
         String out = "";
         out += "Communicator Commands are:\n\n";
+        out += String.format(" %1$-18s\t Display statistics\n", STAT_CMD);
         out += String.format(" %1$-18s\t Starts scheduler\n", START_CMD);
         out += String.format(" %1$-18s\t Stops scheduler\n", STOP_CMD);
         out += String.format(" %1$-18s\t pauses all running tasks\n", PAUSE_CMD);
+        out += String.format(" %1$-18s\t pauses immediately all running jobs\n", PAUSE_IM_CMD);
         out += String.format(" %1$-18s\t resumes all queued tasks\n", RESUME_CMD);
-        out += String.format(" %1$-18s\t Waits for running tasks to finish and shutsdown\n",SHUTDOWN_SOFT_CMD);
+        out += String.format(" %1$-18s\t Waits for running tasks to finish and shutdown\n",SHUTDOWN_CMD);
+        out += String.format(" %1$-18s\t Kill every tasks and jobs and shutdown\n",KILL_CMD);
+        out += String.format(" %1$-18s\t Pause the given job (pausejob num_job)\n",PAUSEJOB_CMD);
+        out += String.format(" %1$-18s\t Resume the given job (resumejob num_job)\n",RESUMEJOB_CMD);
+        out += String.format(" %1$-18s\t Kill the given job (killjob num_job)\n",KILLJOB_CMD);
         out += String.format(" %1$-18s\t Exits Communicator\n", EXIT_CMD);
         output(out);
     }

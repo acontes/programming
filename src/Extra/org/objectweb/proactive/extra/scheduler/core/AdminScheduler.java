@@ -172,6 +172,14 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	
 	
 	/**
+	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pauseImmediate()
+	 */
+	public boolean pauseImmediate(){
+		return schedulerFrontend.coreImmediatePause().booleanValue();
+	}
+	
+	
+	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
 	 */
 	public boolean resume(){
@@ -184,6 +192,11 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	 */
 	public boolean shutdown(){
 		return schedulerFrontend.coreShutdown().booleanValue();
+	}
+	
+	
+	public boolean kill(){
+		return schedulerFrontend.coreKill().booleanValue();
 	}
 	
 }

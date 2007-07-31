@@ -35,17 +35,28 @@ public class Stats implements Serializable {
 	public void startTime(){
 		String key = "Start Time";
 		if (!properties.containsKey(key))
-			properties.put(key, System.currentTimeMillis());
+			properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
 	}
 	
 	/**
-	 * Set the finished time of the scheduler.
+	 * Set the last stopped time of the scheduler.
 	 */
 	public void stopTime(){
-		String key = "Stop Time";
+		String key = "Last Stop Time";
 		if (!properties.containsKey(key))
-			properties.put(key, System.currentTimeMillis());
+			properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
 	}
+	
+	
+	/**
+	 * Set the last paused time of the scheduler.
+	 */
+	public void pauseTime(){
+		String key = "Last Pause Time";
+		if (!properties.containsKey(key))
+			properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
+	}
+	
 	
 	/**
 	 * Increase the number of submitted jobs.
@@ -55,9 +66,9 @@ public class Stats implements Serializable {
 	public void increaseSubmittedJobCount(JobType type){
 		increaseProperty("Jobs Submitted",1);
 		switch(type){
-			case PARAMETER_SWIPPING : increasePSJobCount();
-			case APPLI : increasePAJobCount();
-			case TASKSFLOW : increaseTFJobCount();
+			case PARAMETER_SWIPPING : increasePSJobCount(); break;
+			case APPLI : increasePAJobCount(); break;
+			case TASKSFLOW : increaseTFJobCount(); break;
 		}
 	}
 	
