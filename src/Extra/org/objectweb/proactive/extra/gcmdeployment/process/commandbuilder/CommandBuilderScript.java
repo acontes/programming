@@ -49,4 +49,9 @@ public class CommandBuilderScript implements CommandBuilder {
         // TODO Build the command here
         return null;
     }
+
+    public String getPath(HostInfo hostInfo) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
