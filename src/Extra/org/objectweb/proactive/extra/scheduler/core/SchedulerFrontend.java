@@ -712,6 +712,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 */
 	public void terminate() {
 		//TODO supprimer l'objet actif de connection
+		ProActive.terminateActiveObject(false);
 	}
 
 }

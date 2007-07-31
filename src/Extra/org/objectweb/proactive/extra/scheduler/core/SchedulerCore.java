@@ -169,7 +169,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		frontend.SchedulerShutDownEvent();
 		//destroying scheduler active objects
 		frontend.terminate();
-		ProActive.terminateActiveObject(frontend,true);
 		ProActive.terminateActiveObject(true);
 		//exit
 		System.exit(0);
@@ -597,10 +596,22 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(System.currentTimeMillis());
 			String f = path+"SCHED_"+String.format("%1$tm-%1$te-%1$tY", calendar)+"_"+e.getKey().value()+".result";
-			ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(f));
-			objOut.writeObject(e.getValue());
-			objOut.close();
+			serialyse(f, e.getValue());
 		}
+	}
+	
+	/**
+	 * Serialize the given object in the given file path.
+	 * 
+	 * @param path the path on which to saves the object.
+	 * @param toSerialize the object to serialize.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private void serialyse(String path, Object toSerialize) throws FileNotFoundException, IOException {
+		ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(path));
+		objOut.writeObject(toSerialize);
+		objOut.close();
 	}
 
 }
