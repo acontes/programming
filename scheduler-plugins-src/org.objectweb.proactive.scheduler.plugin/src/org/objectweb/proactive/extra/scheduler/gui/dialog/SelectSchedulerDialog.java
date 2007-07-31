@@ -39,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.security.auth.login.LoginException;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -57,8 +55,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 /**
@@ -79,6 +75,7 @@ public class SelectSchedulerDialog extends Dialog {
 	private static String login = null;
 	private static String pwd = null;
 	private static Combo urlCombo = null;
+	private static Combo loginCombo = null;
 	private Shell shell = null;
 	private Button okButton = null;
 	private Button cancelButton = null;
@@ -105,19 +102,22 @@ public class SelectSchedulerDialog extends Dialog {
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;
 		shell.setLayout(layout);
-		
+
 		// creation
 		Label urlLabel = new Label(shell, SWT.NONE);
 		urlCombo = new Combo(shell, SWT.BORDER);
 		Label loginLabel = new Label(shell, SWT.NONE);
-		final Text loginText = new Text(shell, SWT.SINGLE | SWT.BORDER);
+		loginCombo = new Combo(shell, SWT.BORDER);
 		Label pwdLabel = new Label(shell, SWT.NONE);
 		final Text pwdText = new Text(shell, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
 		okButton = new Button(shell, SWT.NONE);
 		cancelButton = new Button(shell, SWT.NONE);
-		
+
 		// label url
 		urlLabel.setText("Url :");
+		FormData urlLabelFormData = new FormData();
+		urlLabelFormData.top = new FormAttachment(urlCombo, 0, SWT.CENTER);
+		urlLabel.setLayoutData(urlLabelFormData);
 		
 		// combo url
 		FormData urlFormData = new FormData();
@@ -127,27 +127,27 @@ public class SelectSchedulerDialog extends Dialog {
 		urlFormData.width = 320;
 		urlCombo.setLayoutData(urlFormData);
 		loadUrls();
-		
+
 		// label login
 		loginLabel.setText("login :");
 		FormData loginLabelFormData = new FormData();
-		loginLabelFormData.top = new FormAttachment(urlCombo, 5);
+		loginLabelFormData.top = new FormAttachment(loginCombo, 0, SWT.CENTER);
 		loginLabel.setLayoutData(loginLabelFormData);
-		
+
 		// text login
 		FormData loginFormData = new FormData();
 		loginFormData.top = new FormAttachment(urlCombo, 5);
 		loginFormData.left = new FormAttachment(loginLabel, 5);
 		loginFormData.right = new FormAttachment(40, 5);
-		loginText.setLayoutData(loginFormData);
-		
-		//label password
+		loginCombo.setLayoutData(loginFormData);
+
+		// label password
 		pwdLabel.setText("password :");
 		FormData pwdLabelFormData = new FormData();
-		pwdLabelFormData.top = new FormAttachment(urlCombo, 5);
-		pwdLabelFormData.left = new FormAttachment(loginText, 5);
+		pwdLabelFormData.top = new FormAttachment(pwdText, 0, SWT.CENTER);
+		pwdLabelFormData.left = new FormAttachment(loginCombo, 5);
 		pwdLabel.setLayoutData(pwdLabelFormData);
-		
+
 		// text password
 		FormData pwdFormData = new FormData();
 		pwdFormData.top = new FormAttachment(urlCombo, 5);
@@ -162,13 +162,13 @@ public class SelectSchedulerDialog extends Dialog {
 			public void handleEvent(Event event) {
 				validate = true;
 				url = urlCombo.getText();
-				login = loginText.getText();
+				login = loginCombo.getText();
 				pwd = pwdText.getText();
 				shell.close();
 			}
 		});
 		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(loginText, 5);
+		okFormData.top = new FormAttachment(loginCombo, 5);
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
@@ -184,7 +184,7 @@ public class SelectSchedulerDialog extends Dialog {
 			}
 		});
 		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(loginText, 5);
+		cancelFormData.top = new FormAttachment(loginCombo, 5);
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);
@@ -297,27 +297,25 @@ public class SelectSchedulerDialog extends Dialog {
 	 * @param parent the parent
 	 * @return a UserScheduler if the connection is established, null otherwise.
 	 */
-//	public static UserSchedulerInterface showDialog(Shell parent) {
-	public static String[] showDialog(Shell parent) {
+	//TODO mettre a jour les commentaires ci dessus...
+	public static SelectSchedulerDialogResult showDialog(Shell parent) {
 		new SelectSchedulerDialog(parent);
-		UserSchedulerInterface userScheduler = null;
 		if (validate) {
-			return new String[] {url, login, pwd};
-//			try {
-//				SchedulerAuthenticationInterface sai = SchedulerConnection.join(url);
-//				userScheduler = (UserSchedulerInterface) sai.logAsUser(login, pwd);
-//				recordUrl(url);
-//			} catch (LoginException e) {
-//				MessageDialog.openError(parent, "Couldn't connect",
-//						"The login and/or the password are wrong !");
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				// Couldn't Connect to the scheduler => do nothing
-//				MessageDialog.openError(parent, "Couldn't connect",
-//						"Couldn't Connect to the scheduler based on : \n" + url);
-//			}
+			if(url == null || url.trim().equals("")) {
+				MessageDialog.openError(parent, "Error", "The url is empty !");
+				return null;
+			}
+			if(login == null || login.trim().equals("")) {
+				MessageDialog.openError(parent, "Error", "The login is empty !");
+				return null;
+			}
+			if(pwd == null || pwd.trim().equals("")) {
+				MessageDialog.openError(parent, "Error", "The password is empty !");
+				return null;
+			}
+			recordUrl(url);
+			return new SelectSchedulerDialogResult(url, login, pwd);
 		}
 		return null;
-//		return userScheduler;
 	}
 }

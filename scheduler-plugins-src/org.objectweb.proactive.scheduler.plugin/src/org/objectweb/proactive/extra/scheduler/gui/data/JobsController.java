@@ -34,9 +34,12 @@ import javax.security.auth.login.LoginException;
 
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.extra.scheduler.core.SchedulerEvent;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
@@ -58,6 +61,10 @@ import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
  * @since ProActive 3.2
  */
 public class JobsController implements SchedulerEventListener {
+
+	public static final int CONNECTED = 0;
+	public static final int LOGIN_OR_PASSWORD_WRONG = 1;
+	public static final int COULD_NOT_CONNECT_SCHEDULER = 2;
 
 	private static final long serialVersionUID = -160416757449171779L;
 
@@ -159,7 +166,7 @@ public class JobsController implements SchedulerEventListener {
 	@Override
 	public void pendingToRunningJobEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		getJobById(jobId).setJobInfo(event);
+		getJobById(jobId).update(event);
 
 		// remember if the job, which changing list, was selected
 		boolean remember = TableManager.getInstance().isJobSelectedInThisTable(jobId,
@@ -192,7 +199,7 @@ public class JobsController implements SchedulerEventListener {
 	@Override
 	public void runningToFinishedJobEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		getJobById(jobId).setJobInfo(event);
+		getJobById(jobId).update(event);
 
 		// remember if the job, which changing list, was selected
 		boolean remember = TableManager.getInstance().isJobSelectedInThisTable(jobId,
@@ -225,7 +232,7 @@ public class JobsController implements SchedulerEventListener {
 	@Override
 	public void removeFinishedJobEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		getJobById(jobId).setJobInfo(event);
+		getJobById(jobId).update(event);
 
 		// call method on listeners
 		removeFinishedJobEventInternal(jobId);
@@ -250,7 +257,7 @@ public class JobsController implements SchedulerEventListener {
 	@Override
 	public void pendingToRunningTaskEvent(TaskEvent event) {
 		JobId jobId = event.getJobId();
-		getJobById(jobId).setTaskInfo(event);
+		getJobById(jobId).update(event);
 		final TaskEvent taskEvent = event;
 
 		// if this job is selected in the Running table
@@ -277,7 +284,7 @@ public class JobsController implements SchedulerEventListener {
 	@Override
 	public void runningToFinishedTaskEvent(TaskEvent event) {
 		JobId jobId = event.getJobId();
-		getJobById(jobId).setTaskInfo(event);
+		getJobById(jobId).update(event);
 		final TaskEvent taskEvent = event;
 
 		// call method on listeners
@@ -299,6 +306,119 @@ public class JobsController implements SchedulerEventListener {
 				}
 			});
 		}
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+	 */
+	@Override
+	public void SchedulerImmediatePausedEvent(SchedulerEvent event) {
+		event.update(jobs);
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+	 */
+	@Override
+	public void SchedulerPausedEvent(SchedulerEvent event) {
+		event.update(jobs);
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+	 */
+	@Override
+	public void SchedulerResumedEvent(SchedulerEvent event) {
+		event.update(jobs);
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerShutDownEvent()
+	 */
+	@Override
+	public void SchedulerShutDownEvent() {
+		System.out.println("JobsController.SchedulerShutDownEvent()");
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerShuttingDownEvent()
+	 */
+	@Override
+	public void SchedulerShuttingDownEvent() {
+		System.out.println("JobsController.SchedulerShuttingDownEvent()");
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent()
+	 */
+	@Override
+	public void SchedulerStartedEvent() {
+		System.out.println("JobsController.SchedulerStartedEvent()");
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent()
+	 */
+	@Override
+	public void SchedulerStoppedEvent() {
+		System.out.println("JobsController.SchedulerStoppedEvent()");
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent()
+	 */
+	@Override
+	public void SchedulerkilledEvent() {
+		System.out.println("JobsController.SchedulerkilledEvent()");
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobKilledEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 */
+	@Override
+	public void jobKilledEvent(JobId jobId) {
+		System.out.println("JobsController.jobKilledEvent() => " + jobId);
+
+		Vector<JobId> list = null;
+
+		if (pendingJobsIds.contains(jobId)) {
+			list = pendingJobsIds;
+			removePendingJobEventInternal(jobId);
+		} else if (runningJobsIds.contains(jobId)) {
+			list = runningJobsIds;
+			removeRunningJobEventInternal(jobId);
+		} else if (finishedJobsIds.contains(jobId)) {
+			list = finishedJobsIds;
+			removeFinishedJobEventInternal(jobId);
+		}
+
+		Job job = new Job();
+		job.setId(jobId);
+		if (!jobs.remove(job))
+			throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");
+
+		// remove job from the finished jobs list
+		if (!list.remove(jobId))
+			throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the list !");
+
+		// remove job's output
+		JobsOutputController.getInstance().removeJobOutput(jobId);
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobPausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 */
+	@Override
+	public void jobPausedEvent(JobEvent event) {
+		System.out.println("JobsController.jobPausedEvent() => " + event.getJobId());
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobResumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 */
+	@Override
+	public void jobResumedEvent(JobEvent event) {
+		System.out.println("JobsController.jobResumedEvent() => " + event.getJobId());
 	}
 
 	// -------------------------------------------------------------------- //
@@ -411,21 +531,16 @@ public class JobsController implements SchedulerEventListener {
 		return taskDescriptor;
 	}
 
-//	public boolean setScheduler(UserSchedulerInterface userScheduler) {
-	public boolean setScheduler(UserSchedulerInterface userScheduler, String[] tmpi) {
-		SchedulerState state;
+	public int setScheduler(SelectSchedulerDialogResult dialogResult) {
 		try {
-			try {
-			SchedulerAuthenticationInterface sai = SchedulerConnection.join(tmpi[0]);
-			userScheduler = (UserSchedulerInterface) sai.logAsUser(tmpi[1], tmpi[2]);
-		} catch (LoginException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-			
-			state = userScheduler.addSchedulerEventListener(((SchedulerEventListener) ProActive
-					.getStubOnThis()));
+			SchedulerAuthenticationInterface sai = SchedulerConnection.join(dialogResult.getUrl());
+			UserSchedulerInterface userScheduler = (UserSchedulerInterface) sai.logAsUser(dialogResult
+					.getLogin(), dialogResult.getPassword());
+			SchedulerState state = userScheduler
+					.addSchedulerEventListener(((SchedulerEventListener) ProActive.getStubOnThis()));
+
+			SeparatedJobView.setUserScheduler(userScheduler);
+
 			jobs = new Vector<Job>();
 			pendingJobsIds = new Vector<JobId>();
 			runningJobsIds = new Vector<JobId>();
@@ -448,11 +563,11 @@ public class JobsController implements SchedulerEventListener {
 				jobs.add(job);
 				finishedJobsIds.add(job.getId());
 			}
-			return true;
+			return CONNECTED;
 		} catch (SchedulerException e) {
-			//TODO enlever
-			e.printStackTrace();
-			return false;
+			return COULD_NOT_CONNECT_SCHEDULER;
+		} catch (LoginException e) {
+			return LOGIN_OR_PASSWORD_WRONG;
 		}
 	}
 

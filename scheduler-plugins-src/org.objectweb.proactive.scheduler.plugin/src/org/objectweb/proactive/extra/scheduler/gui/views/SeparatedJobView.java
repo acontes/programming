@@ -38,6 +38,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -52,7 +53,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.composite.FinishedJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
@@ -62,10 +62,12 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialog;
+import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobFactory;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 import org.xml.sax.SAXException;
 
 /**
@@ -87,9 +89,8 @@ public class SeparatedJobView extends ViewPart {
 	private Action changeViewModeAction = null;
 	private Action getJobOutputAction = null;
 	private Action submitJob = null;
-	private Shell shell = null;
+	public static Shell shell = null;
 	private Composite parent = null;
-	private boolean firstTime = true;
 	private static UserSchedulerInterface userScheduler = null;
 
 	// -------------------------------------------------------------------- //
@@ -121,7 +122,7 @@ public class SeparatedJobView extends ViewPart {
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(connectSchedulerAction);
 		manager.add(changeViewModeAction);
-		//manager.add(new Separator());
+		// manager.add(new Separator());
 		manager.add(getJobOutputAction);
 		manager.add(submitJob);
 		// Other plug-ins can contribute there actions here
@@ -144,22 +145,14 @@ public class SeparatedJobView extends ViewPart {
 		connectSchedulerAction = new Action() {
 			@Override
 			public void run() {
-				String[] tmp = SelectSchedulerDialog.showDialog(shell);
-//				userScheduler = SelectSchedulerDialog.showDialog(shell);
-//				if (userScheduler != null) {
-				if (tmp != null) {
-					if (firstTime) {
-						firstTime = false;
-						try {
-							jobsController = (JobsController) (ProActive.turnActive(jobsController));
-						} catch (ActiveObjectCreationException e) {
-							e.printStackTrace();
-						} catch (NodeException e) {
-							e.printStackTrace();
-						}
-					}
-//					jobsController.setScheduler(userScheduler);
-					jobsController.setScheduler(userScheduler, tmp);
+				SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(shell);
+				if (dialogResult != null) {
+					shell = parent.getShell();
+					int result = jobsController.setScheduler(dialogResult);
+					if (result == JobsController.LOGIN_OR_PASSWORD_WRONG)
+						MessageDialog.openError(shell, "Couldn't connect", "The login and/or the password are wrong !");
+					else if (result == JobsController.COULD_NOT_CONNECT_SCHEDULER)
+						MessageDialog.openError(shell, "Couldn't connect", "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl());
 					pendingJobComposite.initTable();
 					runningJobComposite.initTable();
 					finishedJobComposite.initTable();
@@ -242,7 +235,7 @@ public class SeparatedJobView extends ViewPart {
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					} catch (SchedulerException e) {
-						//TODO 
+						// TODO
 						e.printStackTrace();
 					}
 				}
@@ -281,6 +274,13 @@ public class SeparatedJobView extends ViewPart {
 	 */
 	public static UserSchedulerInterface getUserScheduler() {
 		return userScheduler;
+	}
+	
+	/**
+	 * set the user scheduler
+	 */
+	public static void setUserScheduler(UserSchedulerInterface userSchedulerInterface) {
+		 userScheduler = userSchedulerInterface;
 	}
 
 	/**
@@ -327,9 +327,8 @@ public class SeparatedJobView extends ViewPart {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-		this.shell = parent.getShell();
+		shell = parent.getShell();
 		this.parent = parent;
-		this.firstTime = true;
 
 		FillLayout layout = new FillLayout(SWT.HORIZONTAL);
 		layout.spacing = 5;
@@ -340,6 +339,15 @@ public class SeparatedJobView extends ViewPart {
 		pendingJobComposite = new PendingJobComposite(parent, "Pending", jobsController);
 		runningJobComposite = new RunningJobComposite(parent, "Running", jobsController);
 		finishedJobComposite = new FinishedJobComposite(parent, "Finished", jobsController);
+		
+		try {
+			jobsController = (JobsController) (ProActive.turnActive(jobsController));
+		} catch (ActiveObjectCreationException e) {
+			e.printStackTrace();
+		} catch (NodeException e) {
+			e.printStackTrace();
+		}
+		
 		makeActions();
 		hookContextMenu(parent);
 		contributeToActionBars();

@@ -244,7 +244,7 @@ public abstract class JobComposite extends Composite {
 		tc2.setWidth(70);
 		tc3.setWidth(100);
 		tc4.setWidth(300);
-		tc5.setWidth(100);
+		tc5.setWidth(45);
 		// setMoveable
 		tc1.setMoveable(true);
 		tc2.setMoveable(true);

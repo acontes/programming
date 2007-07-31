@@ -95,7 +95,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	@Override
 	protected Table createTable(Composite parent, int tableId) {
 		Table table = super.createTable(parent, tableId);
-		TableColumn tc = new TableColumn(table, SWT.RIGHT, 1);
+		TableColumn tc = new TableColumn(table, SWT.RIGHT, 2);
 //		tc.addSelectionListener(new SelectionAdapter() {
 //			@Override
 //			public void widgetSelected(SelectionEvent event) {
