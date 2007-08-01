@@ -34,7 +34,7 @@ public interface Bridge extends Cloneable {
      * Set the command path to override the default one
      * @param commandPath path to the command
      */
-    public void setCommandPath(PathElement commandPath);
+    public void setCommandPath(String commandPath);
 
     public String getId();
 

@@ -13,13 +13,13 @@ import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public abstract class AbstractBridge implements Bridge {
-    private PathElement commandPath;
+    private String commandPath;
     private String env;
     private String hostname;
     private String username;
     private String id;
 
-    public void setCommandPath(PathElement commandPath) {
+    public void setCommandPath(String commandPath) {
         this.commandPath = commandPath;
     }
 
@@ -35,7 +35,7 @@ public abstract class AbstractBridge implements Bridge {
         this.env = env;
     }
 
-    protected PathElement getCommandPath() {
+    protected String getCommandPath() {
         return commandPath;
     }
 

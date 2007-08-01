@@ -2,7 +2,6 @@ package org.objectweb.proactive.extra.gcmdeployment.process;
 
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
 public interface Group extends Cloneable {
@@ -18,7 +17,7 @@ public interface Group extends Cloneable {
      * Set the command path to override the default one
      * @param commandPath path to the command
      */
-    public void setCommandPath(PathElement commandPath);
+    public void setCommandPath(String commandPath);
 
     /**
      * Set the HostInfo

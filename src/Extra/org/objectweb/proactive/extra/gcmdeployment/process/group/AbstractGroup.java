@@ -12,7 +12,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 public abstract class AbstractGroup implements Group {
     private HostInfo hostInfo;
-    private PathElement commandPath;
+    private String commandPath;
     private String env;
     private String id;
 
@@ -23,8 +23,8 @@ public abstract class AbstractGroup implements Group {
         try {
             this.hostInfo = (HostInfo) ((group.hostInfo != null)
                 ? group.hostInfo.clone() : null);
-            this.commandPath = (PathElement) ((commandPath != null)
-                ? commandPath.clone() : null);
+            this.commandPath = (commandPath != null) ? new String(commandPath)
+                                                     : null;
             this.env = (group.env != null) ? new String(group.env) : null;
             this.id = (group.id != null) ? new String(group.id) : null;
         } catch (CloneNotSupportedException e) {
@@ -32,7 +32,7 @@ public abstract class AbstractGroup implements Group {
         }
     }
 
-    public void setCommandPath(PathElement commandPath) {
+    public void setCommandPath(String commandPath) {
         this.commandPath = commandPath;
     }
 
@@ -40,7 +40,7 @@ public abstract class AbstractGroup implements Group {
         this.env = env;
     }
 
-    protected PathElement getCommandPath() {
+    protected String getCommandPath() {
         return commandPath;
     }
 
@@ -89,7 +89,8 @@ public abstract class AbstractGroup implements Group {
         List<String> commands = internalBuildCommands();
         List<String> ret = new ArrayList<String>();
         for (String comnand : commands) {
-            ret.add(comnand + " " + Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo)));
+            ret.add(comnand + " " +
+                Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo)));
         }
 
         return ret;
