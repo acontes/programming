@@ -7,7 +7,6 @@ import java.util.StringTokenizer;
 import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
 
 
-
 public class GroupSSH extends AbstractGroup {
     public final static String DEFAULT_SSHPATH = "ssh";
     private String hostList;
@@ -15,7 +14,7 @@ public class GroupSSH extends AbstractGroup {
     private String username;
 
     public GroupSSH() {
-    	setCommandPath(DEFAULT_SSHPATH);
+        setCommandPath(DEFAULT_SSHPATH);
         hostList = "";
     }
 
@@ -37,18 +36,11 @@ public class GroupSSH extends AbstractGroup {
 
     @Override
     public List<String> internalBuildCommands() {
-        StringTokenizer tokenizer = new StringTokenizer(hostList);
-
         List<String> commands = new ArrayList<String>();
 
-        while (tokenizer.hasMoreTokens()) {
-            String nextToken = tokenizer.nextToken();
-
-            List<String> names = ListGenerator.generateNames(nextToken);
-            for (String hostname : names) {
-                String command = makeSingleCommand(hostname);
-                commands.add(command);
-            }
+        for (String hostname : ListGenerator.generateNames(hostList)) {
+            String command = makeSingleCommand(hostname);
+            commands.add(command);
         }
 
         return commands;

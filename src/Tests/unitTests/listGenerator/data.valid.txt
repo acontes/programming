@@ -31,12 +31,11 @@ node0 node2 node4
 node[0-5;10]
 node0
 
-node[00-05]^[00, 03-04]
+node[00-05]^[00,03-04]
 node01 node02 node05
 
 host1 node[0-5] host2
 host1 node0 node1 node2 node3 node4 node5 host2
-
 
 node0 node[0-5] node5
 node0 node0 node1 node2 node3 node4 node5 node5

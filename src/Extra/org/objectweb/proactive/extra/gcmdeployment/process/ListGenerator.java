@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.gcmdeployment.process;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,22 @@ public class ListGenerator {
     final static protected String SUB_INTERVAL_SPLIT_REGEXP = " *, *";
 
     static public List<String> generateNames(String nameSetDefinition) {
+        StringTokenizer tokenizer = new StringTokenizer(nameSetDefinition);
+
+        List<String> names = new ArrayList<String>();
+        System.out.println();
+        System.out.println("tokens:" + nameSetDefinition);
+
+        while (tokenizer.hasMoreTokens()) {
+            String nextToken = tokenizer.nextToken();
+            System.out.println("token:" + nextToken);
+
+            names.addAll(generateNamesOneToken(nextToken));
+        }
+        return names;
+    }
+
+    static private List<String> generateNamesOneToken(String nameSetDefinition) {
         List<String> res = null;
         Matcher matcher = simpleInterval.matcher(nameSetDefinition);
 
