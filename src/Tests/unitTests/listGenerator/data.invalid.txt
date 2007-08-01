@@ -8,8 +8,6 @@ node[0-2
 
 node[]
 
-node[00-112]
-
 node[2-1]
 
 node[1,2,3]^

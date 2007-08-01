@@ -13,7 +13,13 @@ public class TestListGenerator {
     final static private String validResource = "/unitTests/listGenerator/data.valid.txt";
     final static private String invalidResource = "/unitTests/listGenerator/data.invalid.txt";
 
-    @Test
+//    @Test
+    public void singleTest() {
+//        ListGenerator.generateNames("node[1,2,5]^[2-4]");
+        ListGenerator.generateNames("node[1,2,3]^");
+    }
+    
+//    @Test
     public void testValid() throws Exception {
         BufferedReader br = new BufferedReader(new FileReader(
                     getClass().getResource(validResource).getFile()));

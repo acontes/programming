@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 
 public class ListGenerator {
+    final static protected Pattern plainHostname = Pattern.compile("[a-z0-9]+");
     final static protected Pattern simpleInterval = Pattern.compile(
             "\\[([\\d\\-,; ]+)\\]");
     final static protected Pattern subInterval = Pattern.compile(
@@ -32,17 +33,35 @@ public class ListGenerator {
         List<String> res = null;
         Matcher matcher = simpleInterval.matcher(nameSetDefinition);
 
+        // check for simple interval first
+        //
         if (matcher.find()) {
             String prefix = nameSetDefinition.substring(0, matcher.start());
             String intervalDef = matcher.group(1);
             String exclusionInterval = null;
             int lastMatchedEnd = matcher.end();
 
-            if (matcher.find() &&
-                    (nameSetDefinition.charAt(matcher.start() - 1) == '^')) {
-                // check for an exclusion pattern
-                exclusionInterval = matcher.group(1);
-                lastMatchedEnd = matcher.end();
+            // a simple interval was found, do another match for the same regexp
+            // and check if there's a '^' preceding this other match - if so,
+            // we have a range exclusion interval (e.g. 'foo[0-9]^[5-8]')
+            //
+            if (lastMatchedEnd < (nameSetDefinition.length())) {
+                if (nameSetDefinition.charAt(lastMatchedEnd) == '^') {
+                    // there should be an exclusion interval right after this
+                    //
+                    boolean newIntervalFound = matcher.find();
+
+                    // if there wasn't, or the interval doesn't start right after the '^',
+                    // throw an exception
+                    //
+                    if (!newIntervalFound ||
+                            (matcher.start() != (lastMatchedEnd + 1))) {
+                        throw new IllegalArgumentException(
+                            "misformed interval def : " + nameSetDefinition);
+                    }
+                    exclusionInterval = matcher.group(1);
+                    lastMatchedEnd = matcher.end();
+                }
             }
 
             String suffix = "";
@@ -57,8 +76,16 @@ public class ListGenerator {
             res = getSubNames(prefix, suffix, subIntervals,
                     subExclusionIntervals);
         } else {
-            res = new ArrayList<String>();
-            res.add(nameSetDefinition);
+            // it doesn't look like an interval ('hostname[0-9]'), but we still need to make sure
+            // it looks like a normal hostname
+            //
+            if (plainHostname.matcher(nameSetDefinition).matches()) {
+                res = new ArrayList<String>();
+                res.add(nameSetDefinition);
+            } else {
+                throw new IllegalArgumentException("misformed interval def : " +
+                    nameSetDefinition);
+            }
         }
 
         return res;
@@ -82,8 +109,12 @@ public class ListGenerator {
             String subIntervalDef = subIntervalsDefs[i];
             if (subIntervalDef.indexOf('-') > 0) {
                 generateNames(prefix, suffix, subIntervalDef, numberChecker, res);
-            } else {
-                res.add(prefix + subIntervalDef + suffix);
+            } else { // subIntervalDef is actually a single integer
+                     // check if that integer is within allowed interval                
+                if ((numberChecker == null) ||
+                        numberChecker.check(Integer.parseInt(subIntervalDef))) {
+                    res.add(prefix + subIntervalDef + suffix);
+                }
             }
         }
 
