@@ -43,6 +43,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
         // 2. Get Virtual Node and Command Builder
         virtualNodes = gadParser.getVirtualNodes();
+
         CommandBuilder commandBuilder = gadParser.getCommandBuilder();
 
         // 4. Select the GCM Deployment Descriptors to be used

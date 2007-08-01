@@ -190,11 +190,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             if (commandNode != null) {
                 commandBuilder = parseProactiveNode(commandNode);
             } else {
-                commandNode = (Node) xpath.evaluate("//pa:application",
+                commandNode = (Node) xpath.evaluate("//pa:executable",
                         document, XPathConstants.NODE);
 
                 if (commandNode != null) {
-                    commandBuilder = parseApplicationNode(commandNode);
+                    commandBuilder = parseExecutableNode(commandNode);
                 }
             }
         } catch (XPathExpressionException e) {
@@ -205,7 +205,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         return commandBuilder;
     }
 
-    protected CommandBuilder parseApplicationNode(Node appNode)
+    protected CommandBuilder parseExecutableNode(Node appNode)
         throws XPathExpressionException {
         NodeList resourceProviderNodes = (NodeList) xpath.evaluate("pa:resourceProvider",
                 appNode, XPathConstants.NODESET);

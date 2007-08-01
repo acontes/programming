@@ -15,10 +15,10 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
@@ -30,6 +30,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import sun.security.krb5.internal.PAEncTSEnc;
 
 
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
@@ -45,6 +47,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected GCMDeploymentInfrastructure infrastructure;
     protected GCMDeploymentEnvironment environment;
     protected GCMDeploymentResources resources;
+    private boolean parsedResource = false;
+    private boolean parsedInfrastructure = false;
 
     public GCMDeploymentParserImpl(File descriptor) throws IOException {
         infrastructure = new GCMDeploymentInfrastructure();
@@ -122,6 +126,15 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     public void parseResources() throws XPathExpressionException, IOException {
+        if (parsedResource) {
+            throw new IllegalStateException(
+                "parseResources can only be called once");
+        }
+
+        if (!parsedInfrastructure) {
+            parseInfrastructure();
+        }
+
         Node resourcesNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:resources",
                 document, XPathConstants.NODE);
 
@@ -132,6 +145,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 parseResourceNode(childNode);
             }
         }
+
+        parsedResource = true;
     }
 
     protected void parseResourceNode(Node resourceNode)
@@ -223,6 +238,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     public void parseInfrastructure() throws XPathExpressionException {
+        if (parsedInfrastructure) {
+            throw new IllegalStateException(
+                "parseInfrastructure can only be called once");
+        }
+
         Node infrastructureNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:infrastructure",
                 document, XPathConstants.NODE);
 
@@ -262,6 +282,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             bridgeParser.parseBridgeNode(bridgeNode, xpath);
             infrastructure.addBrige(bridgeParser.getBridge());
         }
+
+        parsedInfrastructure = true;
     }
 
     public void registerGroupParser(String groupNodeName,
@@ -328,10 +350,30 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     public GCMDeploymentInfrastructure getInfrastructure() {
+        if (!parsedInfrastructure) {
+            try {
+                parseInfrastructure();
+            } catch (XPathExpressionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
         return infrastructure;
     }
 
     public GCMDeploymentResources getResources() {
+        if (!parsedResource) {
+            try {
+                parseResources();
+            } catch (XPathExpressionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
         return resources;
     }
 }

@@ -102,12 +102,20 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
     static private boolean execute(String command) {
         try {
+            System.out.println("command=" + command);
             Process p = Runtime.getRuntime().exec(new String[] { command });
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                        p.getErrorStream()));
             String line;
+
+            BufferedReader br;
+
+            br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             while ((line = br.readLine()) != null) {
-                GCMD_LOGGER.warn(line);
+                System.err.println(line);
+            }
+
+            br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
             }
         } catch (IOException e) {
             GCMD_LOGGER.warn("Cannot execute: " + command, e);
