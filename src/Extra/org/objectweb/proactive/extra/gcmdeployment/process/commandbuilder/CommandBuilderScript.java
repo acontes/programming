@@ -14,9 +14,10 @@ public class CommandBuilderScript implements CommandBuilder {
 
     /** List of providers to be used */
     private List<GCMDeploymentDescriptor> providers;
+    private String command;
 
-    /** The command */
-    private PathElement commandPath;
+    /** The path to the command */
+    private PathElement path;
 
     /** The arguments*/
     private List<String> args;
@@ -29,8 +30,12 @@ public class CommandBuilderScript implements CommandBuilder {
         args = new ArrayList<String>();
     }
 
-    public void setCommandPath(PathElement pe) {
-        commandPath = pe;
+    public void setCommand(String command) {
+        this.command = command;
+    }
+
+    public void setPath(PathElement pe) {
+        path = pe;
     }
 
     public void addArg(String arg) {
@@ -46,12 +51,22 @@ public class CommandBuilderScript implements CommandBuilder {
     }
 
     public String buildCommand(HostInfo hostInfo) {
-        // TODO Build the command here
-        return null;
+        StringBuilder sb = new StringBuilder();
+        if (path != null) {
+            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this),
+                    command, hostInfo));
+        } else {
+            sb.append(command);
+        }
+
+        for (String arg : args) {
+            sb.append(arg + " ");
+        }
+
+        return sb.toString();
     }
 
     public String getPath(HostInfo hostInfo) {
-        // TODO Auto-generated method stub
-        return null;
+        return path.getFullPath(hostInfo, this);
     }
 }
