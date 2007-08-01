@@ -33,7 +33,6 @@ public class Helpers {
         // passed as parameter must be escaped. This can be quite difficult since
         // Runtime.getRuntime().exec() only take an array of String as parameter...    	
         String res = command.replaceAll("'", "'\\\\''");
-
         return "'" + res + "'";
     }
 }

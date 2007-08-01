@@ -1,22 +1,54 @@
 package unitTests.commandEscape;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 
 
 public class TestCommandEscape {
+    final static String sshLocalhost = "ssh localhost";
+    final static String cTrue = "true *";
+    final static int vTrue = 0;
+    final static String cFalse = "\"false\"";
+    final static int vFalse = 1;
+
     @Test
-    public void testEscape() {
-        String cmd = "ssh ls 'foo bar'";
+    public void testCommandEscape() throws IOException, InterruptedException {
+        String cmdT = cTrue;
+        String cmdF = cFalse;
 
-        String escapedCommand = Helpers.escapeCommand(cmd);
+        Assert.assertTrue(exec(cTrue) == vTrue);
+        Assert.assertTrue(exec(cTrue) == vTrue);
 
-        System.out.println(escapedCommand);
+        cmdT = concat(sshLocalhost, cmdT);
+        cmdF = concat(sshLocalhost, cmdF);
 
-        // since we're also escaping backslashes in strings, note that the actual
-        // expected string is
-        // 'ssh ls '\''foo bar'\'''
-        Assert.assertEquals("'ssh ls '\\''foo bar'\\'''", escapedCommand);
+        Assert.assertTrue(exec(cTrue) == vTrue);
+        Assert.assertTrue(exec(cTrue) == vTrue);
+
+        cmdT = concat(sshLocalhost, cmdT);
+        cmdF = concat(sshLocalhost, cmdF);
+
+        Assert.assertTrue(exec(cTrue) == vTrue);
+        Assert.assertTrue(exec(cTrue) == vTrue);
+
+        cmdT = concat(sshLocalhost, cmdT);
+        cmdF = concat(sshLocalhost, cmdF);
+
+        Assert.assertTrue(exec(cTrue) == vTrue);
+        Assert.assertTrue(exec(cTrue) == vTrue);
+    }
+
+    static private String concat(String prefixCmd, String cmd) {
+        return prefixCmd + " " + Helpers.escapeCommand(cmd);
+    }
+
+    static private int exec(String cmd)
+        throws IOException, InterruptedException {
+        Process p = Runtime.getRuntime().exec(cmd);
+        p.waitFor();
+        return p.exitValue();
     }
 }
