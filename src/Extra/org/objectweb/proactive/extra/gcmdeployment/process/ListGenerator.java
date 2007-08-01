@@ -19,12 +19,9 @@ public class ListGenerator {
         StringTokenizer tokenizer = new StringTokenizer(nameSetDefinition);
 
         List<String> names = new ArrayList<String>();
-        System.out.println();
-        System.out.println("tokens:" + nameSetDefinition);
 
         while (tokenizer.hasMoreTokens()) {
             String nextToken = tokenizer.nextToken();
-            System.out.println("token:" + nextToken);
 
             names.addAll(generateNamesOneToken(nextToken));
         }
