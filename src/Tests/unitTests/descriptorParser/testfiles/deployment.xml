@@ -9,6 +9,12 @@
 	</environment>
 
 	<resources>
+		<bridge refid="b1">
+			<bridge refid="b2">
+			
+			</bridge>
+		</bridge>
+		
 		<group refid="LAN_INRIA">
 			<host refid="INRIA_x86_64" />
 		</group>
@@ -30,5 +36,13 @@
 				username="${USERNAME}" commandPath="/usr/local/bin/ssh">
 			</sshGroup>
 		</groups>
+		
+		<bridges>
+			<sshBridge id="SEA"
+				hostname="sea.inria.fr"
+				username="${USERNAME}"
+				commandPath="">
+			</sshBridge>
+		</bridges>
 	</infrastructure>
 </GCMDeployment>

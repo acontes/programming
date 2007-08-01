@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
+    public static final String DEPLOYMENT_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd";
     public static final String DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema";
     protected Document document;
     protected DocumentBuilderFactory domFactory;
@@ -54,7 +55,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         setup();
         registerDefaultGroupParsers();
         registerUserGroupParsers();
-
         InputSource inputSource = new InputSource(new FileInputStream(
                     descriptor));
         try {
@@ -83,7 +83,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
         String deploymentSchema = getClass()
-                                      .getResource("/org/objectweb/proactive/extra/ressourceallocator/schema/DeploymentDescriptorSchema.xsd")
+                                      .getResource(DEPLOYMENT_DESC_LOCATION)
                                       .toString();
 
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE,

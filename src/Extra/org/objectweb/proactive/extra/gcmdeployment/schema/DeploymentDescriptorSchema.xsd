@@ -230,11 +230,11 @@
 		<complexContent>
 			<extension base="pa:abstractGCMType">
 				<sequence>
-					<element name="host" type="pa:hostType"
+					<element name="host" type="pa:hostRefType"
 						minOccurs="0" maxOccurs="1">
 					</element>
 					<element ref="pa:abstractResourceElement"
-						maxOccurs="unbounded">
+						minOccurs="0" maxOccurs="unbounded">
 					</element>
 				</sequence>
 			</extension>
@@ -251,7 +251,7 @@
 		<sequence>
 			<element name="homeDirectory" type="pa:pathElementType"></element>
 			<element name="tool" type="pa:toolType"
-				maxOccurs="unbounded">
+				minOccurs="0" maxOccurs="unbounded">
 			</element>
 		</sequence>
 		<attribute name="id" type="pa:idType" use="required"></attribute>
@@ -353,7 +353,7 @@
 	<element name="GCMDeployment">
 		<complexType>
 			<all>
-				<element name="environment" type="pa:environmentType">
+				<element name="environment" type="pa:environmentType" minOccurs="0">
 				</element>
 				<element name="acquisition" type="pa:acquisitionType"
 					minOccurs="0">

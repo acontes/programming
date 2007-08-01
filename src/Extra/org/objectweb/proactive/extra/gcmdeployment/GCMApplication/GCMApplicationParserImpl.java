@@ -36,8 +36,16 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
+/*
+ * FIXME: Improvements needed
+ *  - Refactoring & Cleanup
+ *         - Put all "magic strings" in a warehouse
+ *  - Write some comment to explain how it works
+ */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
+    public static final String APPLICATION_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd";
     public static final String DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema";
+    protected File descriptor;
     protected Document document;
     protected DocumentBuilderFactory domFactory;
     protected XPath xpath;
@@ -48,6 +56,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, VirtualNodeInternal> virtualNodes;
 
     public GCMApplicationParserImpl(File descriptor) throws IOException {
+        this.descriptor = descriptor;
         resourceProviders = null;
         resourceProvidersMap = null;
         virtualNodes = null;
@@ -71,7 +80,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
         String deploymentSchema = getClass()
-                                      .getResource("/org/objectweb/proactive/extra/ressourceallocator/schema/ApplicationDescriptorSchema.xsd")
+                                      .getResource(APPLICATION_DESC_LOCATION)
                                       .toString();
 
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
@@ -120,7 +129,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 if (fileNode != null) {
                     String nodeValue = GCMParserHelper.getAttributeValue(fileNode,
                             "path");
-                    resourceProviderParams.setGCMDescriptor(new File(nodeValue));
+                    if (nodeValue.startsWith(".")) {
+                        // Path is relative to this descriptor
+                        resourceProviderParams.setGCMDescriptor(new File(
+                                descriptor.getParent(), nodeValue));
+                    } else {
+                        resourceProviderParams.setGCMDescriptor(new File(
+                                nodeValue));
+                    }
                 }
 
                 // get fileTransfers
@@ -164,6 +180,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             return commandBuilder;
         }
 
+        // FIXME: Do not switch to parseApplicationNode by default. Check it !
         try {
             Node commandNode;
 
@@ -213,11 +230,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         Node commandNode = (Node) xpath.evaluate("pa:command", appNode,
                 XPathConstants.NODE);
 
-        String relPath = GCMParserHelper.getAttributeValue(commandNode,
-                "relpath");
-        String base = GCMParserHelper.getAttributeValue(commandNode, "base");
+        String name = GCMParserHelper.getAttributeValue(commandNode, "name");
+        commandBuilderScript.setCommand(name);
 
-        commandBuilderScript.setCommandPath(new PathElement(relPath, base));
+        Node pathNode = (Node) xpath.evaluate("pa:path", commandNode,
+                XPathConstants.NODE);
+        commandBuilderScript.setPath(parsePathElementNode(pathNode));
 
         // command args
         //
