@@ -1,15 +1,21 @@
 package org.objectweb.proactive.core.util;
 
-public enum OperatingSystem {windows(';'),
-    unix(':');
+public enum OperatingSystem {windows(';', '\\'),
+    unix(':', '/');
     protected char pathSeparator;
+    protected char fileSeperator;
 
-    OperatingSystem(char pathSeparator) {
+    OperatingSystem(char pathSeparator, char fileSeparator) {
         this.pathSeparator = pathSeparator;
+        this.fileSeperator = fileSeparator;
     }
 
     public char pathSeparator() {
         return pathSeparator;
+    }
+
+    public char fileSeparator() {
+        return fileSeperator;
     }
 
     static public OperatingSystem getOperatingSystem() {
