@@ -7,12 +7,15 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement.PathBase;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
+import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
+import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tools;
 
 
 public class TestPathElement {
     final String path = "/zzzz/plop";
     final String homeDir = "/user/barbie";
     final String proactiveDir = "/bin/proactive";
+    final String toolDir = "/tools/proactive";
 
     @Test
     public void testRoot() {
@@ -58,6 +61,43 @@ public class TestPathElement {
         String expected = PathElement.appendPath(homeDir, proactiveDir, hostInfo);
         expected = PathElement.appendPath(expected, path, hostInfo);
         Assert.assertEquals(expected, pe.getFullPath(hostInfo, cb));
+    }
+
+    @Test
+    public void testTool() {
+        HostInfoImpl hostInfo = new HostInfoImpl();
+        hostInfo.setHomeDirectory(homeDir);
+        hostInfo.setOs(OperatingSystem.unix);
+        hostInfo.addTool(new Tool(Tools.PROACTIVE.id, toolDir));
+
+        CommandBuilderProActive cb = new CommandBuilderProActive();
+        cb.setProActivePath(proactiveDir);
+
+        PathElement pe = new PathElement(path, PathBase.PROACTIVE);
+
+        String expected = PathElement.appendPath(homeDir, toolDir, hostInfo);
+        expected = PathElement.appendPath(expected, path, hostInfo);
+        Assert.assertEquals(expected, pe.getFullPath(hostInfo, cb));
+    }
+
+    @Test
+    public void testToolException() {
+        HostInfoImpl hostInfo = new HostInfoImpl();
+        hostInfo.setHomeDirectory(homeDir);
+        hostInfo.setOs(OperatingSystem.unix);
+
+        CommandBuilderProActive cb = new CommandBuilderProActive();
+        PathElement pe = new PathElement(path, PathBase.PROACTIVE);
+
+        String expected = PathElement.appendPath(homeDir, toolDir, hostInfo);
+        expected = PathElement.appendPath(expected, path, hostInfo);
+        Assert.assertEquals(null, pe.getFullPath(hostInfo, cb));
+    }
+
+    @Test
+    public void testClone() throws CloneNotSupportedException {
+        PathElement pe = new PathElement(path, PathBase.PROACTIVE);
+        Assert.assertEquals(pe, pe.clone());
     }
 
     @Test

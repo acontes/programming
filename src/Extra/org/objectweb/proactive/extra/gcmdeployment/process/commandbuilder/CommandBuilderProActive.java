@@ -146,6 +146,10 @@ public class CommandBuilderProActive implements CommandBuilder {
     }
 
     public String getPath(HostInfo hostInfo) {
-        return proActivePath.getFullPath(hostInfo, this);
+        if (proActivePath != null) {
+            return proActivePath.getFullPath(hostInfo, this);
+        }
+
+        return null;
     }
 }

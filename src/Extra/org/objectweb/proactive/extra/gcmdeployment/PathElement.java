@@ -76,7 +76,9 @@ public class PathElement implements Cloneable {
         case PROACTIVE:
             Tool tool = hostInfo.getTool(Tools.PROACTIVE.id);
             if (tool != null) {
-                return appendPath(tool.getPath(), relPath, hostInfo);
+                String ret = appendPath(hostInfo.getHomeDirectory(),
+                        tool.getPath(), hostInfo);
+                return appendPath(ret, relPath, hostInfo);
             } else {
                 String bp = commandBuilder.getPath(hostInfo);
                 if (bp != null) {
@@ -132,5 +134,44 @@ public class PathElement implements Cloneable {
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((base == null) ? 0 : base.hashCode());
+        result = (prime * result) +
+            ((relPath == null) ? 0 : relPath.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PathElement other = (PathElement) obj;
+        if (base == null) {
+            if (other.base != null) {
+                return false;
+            }
+        } else if (!base.equals(other.base)) {
+            return false;
+        }
+        if (relPath == null) {
+            if (other.relPath != null) {
+                return false;
+            }
+        } else if (!relPath.equals(other.relPath)) {
+            return false;
+        }
+        return true;
     }
 }
