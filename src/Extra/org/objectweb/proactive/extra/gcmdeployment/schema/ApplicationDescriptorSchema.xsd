@@ -4,6 +4,14 @@
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
 	elementFormDefault="qualified">
 
+	<simpleType name="pathElementBaseType">
+		<restriction base="string">
+			<enumeration value="proactive"/>
+			<enumeration value="home"/>
+			<enumeration value="root"/>
+		</restriction>
+	</simpleType>
+
 	<simpleType name="idType">
 		<annotation>
 			<documentation>
@@ -35,7 +43,7 @@
 	</simpleType>
 
 	<complexType name="pathElementType">
-		<attribute name="base" type="pa:idType"></attribute>
+		<attribute name="base" type="pa:pathElementBaseType"></attribute>
 		<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
 	</complexType>
 
@@ -207,10 +215,11 @@
 
 	<complexType name="commandType">
 		<sequence>
-			<element name="arg" type="string" maxOccurs="unbounded"></element>
-			<element name="filetransfer" type="pa:fileTransferType"></element>
+			<element name="path" type="pa:pathElementType" minOccurs="0"/>
+			<element name="arg" type="string" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="filetransfer" type="pa:fileTransferType" minOccurs="0"/>
 		</sequence>
-		<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
+		<attribute name="name" type="pa:parameterType"></attribute>
 	</complexType>
 
 	<complexType name="executableType">
