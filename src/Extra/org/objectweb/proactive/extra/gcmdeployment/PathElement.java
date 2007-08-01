@@ -116,16 +116,16 @@ public class PathElement implements Cloneable {
 
         // If s1 ends with fp remove it
         if (sb.length() > 0) {
-            if (sb.charAt(sb.length() - 1) == hostInfo.getOS().pathSeparator()) {
+            if (sb.charAt(sb.length() - 1) == hostInfo.getOS().fileSeparator()) {
                 sb.deleteCharAt(sb.length() - 1);
             }
         }
 
         // Adds fp
-        sb.append(hostInfo.getOS().pathSeparator());
+        sb.append(hostInfo.getOS().fileSeparator());
 
         // If s2 begins with fp remove it
-        if (s2.charAt(0) == hostInfo.getOS().pathSeparator()) {
+        if (s2.charAt(0) == hostInfo.getOS().fileSeparator()) {
             sb.append(s2.substring(1));
         } else {
             sb.append(s2);
