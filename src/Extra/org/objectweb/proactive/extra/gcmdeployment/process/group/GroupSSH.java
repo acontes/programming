@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
 
 
+
 public class GroupSSH extends AbstractGroup {
     public final static String DEFAULT_SSHPATH = "ssh";
     private String hostList;
@@ -14,6 +15,7 @@ public class GroupSSH extends AbstractGroup {
     private String username;
 
     public GroupSSH() {
+    	setCommandPath(DEFAULT_SSHPATH);
         hostList = "";
     }
 
