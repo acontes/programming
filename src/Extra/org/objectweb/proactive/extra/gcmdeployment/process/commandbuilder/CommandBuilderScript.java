@@ -60,7 +60,7 @@ public class CommandBuilderScript implements CommandBuilder {
         }
 
         for (String arg : args) {
-            sb.append(arg + " ");
+            sb.append(" " + arg);
         }
 
         return sb.toString();
