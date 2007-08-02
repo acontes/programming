@@ -16,6 +16,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.SSHBridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
@@ -54,11 +55,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         infrastructure = new GCMDeploymentInfrastructure();
         resources = new GCMDeploymentResources();
         groupParserMap = new HashMap<String, GroupParser>();
+        bridgeParserMap = new HashMap<String, BridgeParser>();
         environment = new GCMDeploymentEnvironment();
 
         setup();
         registerDefaultGroupParsers();
         registerUserGroupParsers();
+        registerDefaultBridgeParsers();
+        registerUserBridgeParsers();
         InputSource inputSource = new InputSource(new FileInputStream(
                     descriptor));
         try {
@@ -74,10 +78,21 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         // TODO add other group parsers here 
     }
 
+    protected void registerDefaultBridgeParsers() {
+        registerBridgeParser("sshBridge", new SSHBridgeParser());
+        // TODO add other bridge parsers here 
+    }
+
     /**
      * Override this
      */
     protected void registerUserGroupParsers() {
+    }
+
+    /**
+     * Override this
+     */
+    protected void registerUserBridgeParsers() {
     }
 
     public void setup() throws IOException {
@@ -289,6 +304,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     public void registerGroupParser(String groupNodeName,
         GroupParser groupParser) {
         groupParserMap.put(groupNodeName, groupParser);
+    }
+
+    public void registerBridgeParser(String bridgeNodeName,
+        BridgeParser bridgeParser) {
+        bridgeParserMap.put(bridgeNodeName, bridgeParser);
     }
 
     protected HostInfo parseHostNode(Node hostNode)
