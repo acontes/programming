@@ -14,6 +14,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.objectweb.proactive.core.mop.Utils;
+import static org.objectweb.proactive.core.mop.Utils.makeDeepCopy;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.SSHBridgeParser;
@@ -33,8 +35,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import sun.security.krb5.internal.PAEncTSEnc;
-
-
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     public static final String DEPLOYMENT_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd";
     public static final String DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema";
@@ -74,12 +74,12 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     protected void registerDefaultGroupParsers() {
-        registerGroupParser("sshGroup", new SSHGroupParser());
+        registerGroupParser(new SSHGroupParser());
         // TODO add other group parsers here 
     }
 
     protected void registerDefaultBridgeParsers() {
-        registerBridgeParser("sshBridge", new SSHBridgeParser());
+        registerBridgeParser(new SSHBridgeParser());
         // TODO add other bridge parsers here 
     }
 
@@ -189,7 +189,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                     parseGroupResource(childNode, group);
                     bridge.addGroup(group);
                 } else if (childNodeName.equals("host")) {
-                    HostInfo hostInfo = getHostInfo(refid);
+                    HostInfo hostInfo = getHostInfo(childRefId);
                     bridge.setHostInfo(hostInfo);
                 }
             }
@@ -208,38 +208,19 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
     protected HostInfo getHostInfo(String refid) throws IOException {
         HostInfo hostInfo = infrastructure.getHosts().get(refid);
-
-        try {
-            return (HostInfo) ((hostInfo != null) ? hostInfo.clone() : null);
-        } catch (CloneNotSupportedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
+        return (HostInfo) makeDeepCopy(hostInfo);
     }
 
     protected Group getGroup(String refid) throws IOException {
         Group group = infrastructure.getGroups().get(refid);
 
-        try {
-            return (Group) ((group != null) ? group.clone() : null);
-        } catch (CloneNotSupportedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
+        return (Group) makeDeepCopy(group);
     }
 
     protected Bridge getBridge(String refid) throws IOException {
         Bridge bridge = infrastructure.getBridges().get(refid);
 
-        try {
-            return (Bridge) ((bridge != null) ? bridge.clone() : null);
-        } catch (CloneNotSupportedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
+        return (Bridge) makeDeepCopy(bridge);
     }
 
     protected void parseGroupResource(Node resourceNode, Group group)
@@ -301,14 +282,12 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         parsedInfrastructure = true;
     }
 
-    public void registerGroupParser(String groupNodeName,
-        GroupParser groupParser) {
-        groupParserMap.put(groupNodeName, groupParser);
+    public void registerGroupParser(GroupParser groupParser) {
+        groupParserMap.put(groupParser.getNodeName(), groupParser);
     }
 
-    public void registerBridgeParser(String bridgeNodeName,
-        BridgeParser bridgeParser) {
-        bridgeParserMap.put(bridgeNodeName, bridgeParser);
+    public void registerBridgeParser(BridgeParser bridgeParser) {
+        bridgeParserMap.put(bridgeParser.getNodeName(), bridgeParser);
     }
 
     protected HostInfo parseHostNode(Node hostNode)

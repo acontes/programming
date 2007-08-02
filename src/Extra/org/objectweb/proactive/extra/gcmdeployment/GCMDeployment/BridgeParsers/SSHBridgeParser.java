@@ -9,6 +9,8 @@ import org.w3c.dom.Node;
 
 
 public class SSHBridgeParser extends AbstractBridgeParser {
+    static final String NODE_NAME = "sshBridge";
+
     @Override
     public void parseBridgeNode(Node bridgeNode, XPath xpath) {
         super.parseBridgeNode(bridgeNode, xpath);
@@ -26,5 +28,9 @@ public class SSHBridgeParser extends AbstractBridgeParser {
     @Override
     public AbstractBridge createBridge() {
         return new BridgeSSH();
+    }
+
+    public String getNodeName() {
+        return NODE_NAME;
     }
 }

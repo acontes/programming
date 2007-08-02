@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.process;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
@@ -10,7 +11,7 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
  * A Bridge can have Bridges, Groups and HostInfo as children
  *
  */
-public interface Bridge extends Cloneable {
+public interface Bridge extends Serializable {
 
     /**
      * Set environment variables for this cluster
@@ -87,8 +88,6 @@ public interface Bridge extends Cloneable {
      * @throws IllegalStateException thrown if anything is wrong
      */
     public void check() throws IllegalStateException;
-
-    public Object clone() throws CloneNotSupportedException;
 
     public List<String> buildCommands(CommandBuilder commandBuilder);
 }

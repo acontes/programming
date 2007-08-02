@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.process;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
@@ -11,7 +12,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
  * @author cmathieu
  *
  */
-public interface HostInfo extends Cloneable {
+public interface HostInfo extends Serializable {
 
     /**
      * Returns the Id of this of set

@@ -9,6 +9,8 @@ import org.w3c.dom.Node;
 
 
 public class SSHGroupParser extends AbstractGroupParser {
+    static final String NODE_NAME = "sshGroup";
+
     public void parseGroupNode(Node groupNode, XPath xpath) {
         super.parseGroupNode(groupNode, xpath);
 
@@ -37,5 +39,9 @@ public class SSHGroupParser extends AbstractGroupParser {
     @Override
     public AbstractGroup createGroup() {
         return new GroupSSH();
+    }
+
+    public String getNodeName() {
+        return NODE_NAME;
     }
 }

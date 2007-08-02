@@ -12,12 +12,6 @@ public class BridgeDummy extends AbstractBridge {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public String internalBuildCommand() {
         return command;
     }

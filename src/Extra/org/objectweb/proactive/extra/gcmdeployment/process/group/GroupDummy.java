@@ -15,12 +15,6 @@ public class GroupDummy extends AbstractGroup {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public List<String> internalBuildCommands() {
         return commands;
     }

@@ -9,6 +9,10 @@ import org.w3c.dom.Node;
 
 
 public abstract class AbstractBridgeParser implements BridgeParser {
+    static final String ATT_ID = "id";
+    static final String ATT_HOSTNAME = "hostname";
+    static final String ATT_USERNAME = "username";
+    static final String ATT_COMMANDPATH = "commandPath";
     protected AbstractBridge bridge;
 
     public AbstractBridgeParser() {
@@ -16,8 +20,23 @@ public abstract class AbstractBridgeParser implements BridgeParser {
     }
 
     public void parseBridgeNode(Node bridgeNode, XPath xpath) {
-        String id = GCMParserHelper.getAttributeValue(bridgeNode, "id");
-        bridge.setId(id);
+        String value;
+
+        // Mandatory fields
+        value = GCMParserHelper.getAttributeValue(bridgeNode, ATT_ID);
+        bridge.setId(value);
+        value = GCMParserHelper.getAttributeValue(bridgeNode, ATT_HOSTNAME);
+        bridge.setHostname(value);
+
+        // Optional fields
+        value = GCMParserHelper.getAttributeValue(bridgeNode, ATT_USERNAME);
+        if (value != null) {
+            bridge.setUsername(value);
+        }
+        value = GCMParserHelper.getAttributeValue(bridgeNode, ATT_COMMANDPATH);
+        if (value != null) {
+            bridge.setCommandPath(value);
+        }
     }
 
     public Bridge getBridge() {

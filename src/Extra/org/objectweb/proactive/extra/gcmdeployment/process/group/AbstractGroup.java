@@ -82,9 +82,6 @@ public abstract class AbstractGroup implements Group {
         }
     }
 
-    @Override
-    public abstract Object clone() throws CloneNotSupportedException;
-
     public List<String> buildCommands(CommandBuilder commandBuilder) {
         List<String> commands = internalBuildCommands();
         List<String> ret = new ArrayList<String>();

@@ -4,13 +4,7 @@ public class BridgeSSH extends AbstractBridge {
     public final static String DEFAULT_SSHPATH = "ssh";
 
     public BridgeSSH() {
-    	setCommandPath(DEFAULT_SSHPATH);
-    }
-    
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        // TODO Auto-generated method stub
-        return null;
+        setCommandPath(DEFAULT_SSHPATH);
     }
 
     @Override

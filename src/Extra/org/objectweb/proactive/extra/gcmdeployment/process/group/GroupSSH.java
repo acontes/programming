@@ -25,11 +25,6 @@ public class GroupSSH extends AbstractGroup {
         this.username = groupSSH.username;
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return new GroupSSH(this);
-    }
-
     public void setHostList(String hostList) {
         this.hostList = hostList;
     }

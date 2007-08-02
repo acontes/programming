@@ -10,4 +10,10 @@ public interface GroupParser {
     public void parseGroupNode(Node groupNode, XPath xpath);
 
     public Group getGroup();
+
+    /**
+     * Returns the nodeName associated to a particular parser
+     * @return the nodeName as a String
+     */
+    public String getNodeName();
 }

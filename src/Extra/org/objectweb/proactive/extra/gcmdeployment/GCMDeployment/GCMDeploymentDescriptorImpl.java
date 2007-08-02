@@ -103,7 +103,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     static private boolean execute(String command) {
         try {
             System.out.println("command=" + command);
-            Process p = Runtime.getRuntime().exec(new String[] { command });
+            Process p = Runtime.getRuntime().exec(command);
             String line;
 
             BufferedReader br;

@@ -87,10 +87,8 @@ public abstract class AbstractBridge implements Bridge {
     }
 
     public void setHostInfo(HostInfo hostInfo) {
-        synchronized (hostInfo) {
-            assert (hostInfo == null);
-            this.hostInfo = hostInfo;
-        }
+        assert (hostInfo == null);
+        this.hostInfo = hostInfo;
     }
 
     public void check() throws IllegalStateException {
@@ -113,8 +111,6 @@ public abstract class AbstractBridge implements Bridge {
         }
         hostInfo.check();
     }
-
-    public abstract Object clone() throws CloneNotSupportedException;
 
     public List<String> buildCommands(CommandBuilder commandBuilder) {
         List<String> commands = new ArrayList<String>();

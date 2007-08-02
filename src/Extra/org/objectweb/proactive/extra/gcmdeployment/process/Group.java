@@ -1,10 +1,10 @@
 package org.objectweb.proactive.extra.gcmdeployment.process;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-
-public interface Group extends Cloneable {
+public interface Group extends Serializable {
     public String getId();
 
     /**
@@ -40,8 +40,6 @@ public interface Group extends Cloneable {
      * @throws IllegalStateException thrown if anything is wrong
      */
     public void check() throws IllegalStateException;
-
-    public Object clone() throws CloneNotSupportedException;
 
     /**
      * Build the command to start the group
