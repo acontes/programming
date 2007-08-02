@@ -51,7 +51,7 @@ public class GroupSSH extends AbstractGroup {
      */
     private String makeSingleCommand(String hostname) {
         StringBuilder res = new StringBuilder(getCommandPath());
-
+        res.append(" ");
         if (username != null) {
             res.append("-l ").append(username);
         }
