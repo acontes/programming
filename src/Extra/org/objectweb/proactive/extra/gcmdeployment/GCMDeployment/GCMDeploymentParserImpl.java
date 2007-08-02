@@ -35,6 +35,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import sun.security.krb5.internal.PAEncTSEnc;
+
+
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     public static final String DEPLOYMENT_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd";
     public static final String DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema";
@@ -172,32 +174,10 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         if (nodeName.equals("bridge")) {
             Bridge bridge = getBridge(refid);
-
-            NodeList childNodes = resourceNode.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); ++i) {
-                Node childNode = childNodes.item(i);
-                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-                String childNodeName = childNode.getNodeName();
-                String childRefId = GCMParserHelper.getAttributeValue(childNode,
-                        "refid");
-
-                if (childNodeName.equals("group")) {
-                    Group group = getGroup(childRefId);
-
-                    parseGroupResource(childNode, group);
-                    bridge.addGroup(group);
-                } else if (childNodeName.equals("host")) {
-                    HostInfo hostInfo = getHostInfo(childRefId);
-                    bridge.setHostInfo(hostInfo);
-                }
-            }
-
+            parseBridgeResource(resourceNode, bridge);
             resources.addBridge(bridge);
         } else if (nodeName.equals("group")) {
             Group group = getGroup(refid);
-
             parseGroupResource(resourceNode, group);
             resources.addGroup(group);
         } else if (nodeName.equals("host")) {
@@ -213,13 +193,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
     protected Group getGroup(String refid) throws IOException {
         Group group = infrastructure.getGroups().get(refid);
-
         return (Group) makeDeepCopy(group);
     }
 
     protected Bridge getBridge(String refid) throws IOException {
         Bridge bridge = infrastructure.getBridges().get(refid);
-
         return (Bridge) makeDeepCopy(bridge);
     }
 
@@ -231,6 +209,33 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         String refid = GCMParserHelper.getAttributeValue(hostNode, "refid");
         HostInfo hostInfo = getHostInfo(refid);
         group.setHostInfo(hostInfo);
+    }
+
+    protected void parseBridgeResource(Node resourceNode, Bridge bridge)
+        throws IOException, XPathExpressionException {
+        NodeList childNodes = resourceNode.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); ++i) {
+            Node childNode = childNodes.item(i);
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            String childNodeName = childNode.getNodeName();
+            String childRefId = GCMParserHelper.getAttributeValue(childNode,
+                    "refid");
+
+            if (childNodeName.equals("group")) {
+                Group group = getGroup(childRefId);
+                parseGroupResource(childNode, group);
+                bridge.addGroup(group);
+            } else if (childNodeName.equals("host")) {
+                HostInfo hostInfo = getHostInfo(childRefId);
+                bridge.setHostInfo(hostInfo);
+            } else if (childNodeName.equals("bridge")) {
+                Bridge childBridge = getBridge(childRefId);
+                parseBridgeResource(childNode, childBridge);
+                bridge.addBridge(childBridge);
+            }
+        }
     }
 
     public void parseInfrastructure() throws XPathExpressionException {
