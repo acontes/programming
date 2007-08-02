@@ -6,13 +6,15 @@
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 
 	<resourceProvider id="INRIA_LAN">
-		<file path="../deployment/bridgeSSHbridgeSSH.xml" />
+		<file path="../deployment/deployment0.xml" />
 	</resourceProvider>
 	
 	<executable>
 		<resourceProvider refid="INRIA_LAN" />
-		<command name="libc.so.6">
-			<path base="root" relpath="/lib"/>
+		<command name="ls">
+			<arg>-lh</arg>
+			<arg>--sort=time</arg>
+			<arg>*</arg>
 		</command>
 	</executable>
 
