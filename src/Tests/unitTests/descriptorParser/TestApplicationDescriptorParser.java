@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParserImpl;
 
 
@@ -22,6 +25,18 @@ public class TestApplicationDescriptorParser {
             parser.getCommandBuilder();
             parser.getVirtualNodes();
             parser.getResourceProviders();
+        }
+    }
+
+    @Test
+    public void doit() throws IOException {
+        for (File file : getApplicationDescriptors()) {
+            if (!file.toString().contains("scriptHostname")) {
+                continue;
+            }
+            System.out.println(file);
+            GCMApplicationDescriptor gcma = new GCMApplicationDescriptorImpl(file);
+            gcma.waitAllProcessExited();
         }
     }
 
