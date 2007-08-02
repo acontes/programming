@@ -102,7 +102,7 @@
 					</element>
 				</sequence>
 				<attribute name="commandOptions" type="string"></attribute>
-				<attribute name="hostList" type="string"></attribute>
+				<attribute name="hostList" type="string" use="required"></attribute>
 			</extension>
 		</complexContent>
 	</complexType>
