@@ -6,9 +6,9 @@
 
 	<simpleType name="pathElementBaseType">
 		<restriction base="string">
-			<enumeration value="proactive"/>
-			<enumeration value="home"/>
-			<enumeration value="root"/>
+			<enumeration value="proactive" />
+			<enumeration value="home" />
+			<enumeration value="root" />
 		</restriction>
 	</simpleType>
 
@@ -201,7 +201,8 @@
 			<element name="fileTranfer" type="pa:fileTransferType"
 				minOccurs="0" maxOccurs="unbounded">
 			</element>
-			<element name="resourceProvider" minOccurs="0" maxOccurs="unbounded">
+			<element name="resourceProvider" minOccurs="0"
+				maxOccurs="unbounded">
 				<complexType>
 					<attribute name="refid" type="pa:idType">
 					</attribute>
@@ -215,9 +216,12 @@
 
 	<complexType name="commandType">
 		<sequence>
-			<element name="path" type="pa:pathElementType" minOccurs="0"/>
-			<element name="arg" type="string" minOccurs="0" maxOccurs="unbounded"/>
-			<element name="filetransfer" type="pa:fileTransferType" minOccurs="0"/>
+			<element name="path" type="pa:pathElementType"
+				minOccurs="0" />
+			<element name="arg" type="string" minOccurs="0"
+				maxOccurs="unbounded" />
+			<element name="filetransfer" type="pa:fileTransferType"
+				minOccurs="0" />
 		</sequence>
 		<attribute name="name" type="pa:parameterType"></attribute>
 	</complexType>
@@ -231,6 +235,15 @@
 			</element>
 			<element name="command" type="pa:commandType"></element>
 		</sequence>
+		<attribute name="instances">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="onePerHost"></enumeration>
+					<enumeration value="onePerVM"></enumeration>
+					<enumeration value="onePerCapacity"></enumeration>
+				</restriction>
+			</simpleType>
+		</attribute>
 	</complexType>
 
 	<complexType name="GCMApplicationType">
@@ -239,7 +252,8 @@
 				minOccurs="0">
 			</element>
 			<element name="resourceProvider"
-				type="pa:resourceProviderType" minOccurs="0" maxOccurs="unbounded">
+				type="pa:resourceProviderType" minOccurs="0"
+				maxOccurs="unbounded">
 			</element>
 			<element name="executable" type="pa:executableType"
 				minOccurs="0">

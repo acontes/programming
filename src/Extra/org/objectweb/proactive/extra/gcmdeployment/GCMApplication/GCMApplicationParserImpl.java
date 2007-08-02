@@ -207,10 +207,17 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     protected CommandBuilder parseExecutableNode(Node appNode)
         throws XPathExpressionException {
+        CommandBuilderScript commandBuilderScript = new CommandBuilderScript();
+
+        String instancesValue = GCMParserHelper.getAttributeValue(appNode,
+                "instances");
+
+        if (instancesValue != null) {
+            commandBuilderScript.setInstances(instancesValue);
+        }
+
         NodeList resourceProviderNodes = (NodeList) xpath.evaluate("pa:resourceProvider",
                 appNode, XPathConstants.NODESET);
-
-        CommandBuilderScript commandBuilderScript = new CommandBuilderScript();
 
         getResourceProviders();
 

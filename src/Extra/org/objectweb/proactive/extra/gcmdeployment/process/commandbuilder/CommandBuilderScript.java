@@ -24,10 +24,16 @@ public class CommandBuilderScript implements CommandBuilder {
 
     /** File transfers to perform before starting the command */
     private List<FileTransferBlock> fts;
+    public enum Instances {onePerHost,
+        onePerVM,
+        onePerCapacity;
+    }
+    private Instances instances;
 
     public CommandBuilderScript() {
         providers = new ArrayList<GCMDeploymentDescriptor>();
         args = new ArrayList<String>();
+        instances = Instances.onePerHost;
     }
 
     public void setCommand(String command) {
@@ -68,5 +74,15 @@ public class CommandBuilderScript implements CommandBuilder {
 
     public String getPath(HostInfo hostInfo) {
         return path.getFullPath(hostInfo, this);
+    }
+
+    public void setInstances(String instancesValue) {
+        if (instancesValue.equals("onePerHost")) {
+            instances = Instances.onePerHost;
+        } else if (instancesValue.equals("onePerVM")) {
+            instances = Instances.onePerVM;
+        } else if (instancesValue.equals("onePerCapacity")) {
+            instances = Instances.onePerCapacity;
+        }
     }
 }
