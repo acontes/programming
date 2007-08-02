@@ -16,24 +16,28 @@ public class SSHGroupParser extends AbstractGroupParser {
 
         GroupSSH groupSSH = (GroupSSH) getGroup();
 
+        // Mandatory attributes
         String hostList = GCMParserHelper.getAttributeValue(groupNode,
                 "hostList");
-
         groupSSH.setHostList(hostList);
 
+        // Optional attributes
         String domain = GCMParserHelper.getAttributeValue(groupNode, "domain");
-
-        groupSSH.setDomain(domain);
+        if (domain != null) {
+            groupSSH.setDomain(domain);
+        }
 
         String username = GCMParserHelper.getAttributeValue(groupNode,
                 "username");
-
-        groupSSH.setUsername(username);
+        if (username != null) {
+            groupSSH.setUsername(username);
+        }
 
         String commandPath = GCMParserHelper.getAttributeValue(groupNode,
                 "commandPath");
-
-        groupSSH.setCommandPath(commandPath);
+        if (commandPath != null) {
+            groupSSH.setCommandPath(commandPath);
+        }
     }
 
     @Override
