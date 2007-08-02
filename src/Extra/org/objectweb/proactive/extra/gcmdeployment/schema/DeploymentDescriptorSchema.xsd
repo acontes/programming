@@ -87,12 +87,11 @@
 				maxOccurs="1" minOccurs="0">
 			</element>
 		</sequence>
-		<attribute name="id" type="pa:idType"></attribute>
-		<attribute name="hostname" type="pa:hostnameType"></attribute>
-		<attribute name="domain" type="pa:hostnameType"></attribute>
-		<attribute name="username" type="pa:usernameType"></attribute>
-		<attribute name="commandPath" type="pa:pathElementType"></attribute>
-		<attribute name="jvmPerHost" type="integer"></attribute>
+		<attribute name="id" type="pa:idType" use="required"/>
+		<attribute name="hostname" type="pa:hostnameType"/>
+		<attribute name="domain" type="pa:hostnameType"/>
+		<attribute name="username" type="pa:usernameType"/>
+		<attribute name="commandPath" type="pa:pathElementType"/>
 	</complexType>
 
 	<complexType name="groupTypeSSH">
