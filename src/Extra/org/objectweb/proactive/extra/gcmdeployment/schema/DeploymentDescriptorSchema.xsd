@@ -95,7 +95,7 @@
 		<attribute name="jvmPerHost" type="integer"></attribute>
 	</complexType>
 
-	<complexType name="sshGroupType">
+	<complexType name="groupTypeSSH">
 		<complexContent>
 			<extension base="pa:shType">
 				<sequence>
@@ -117,7 +117,7 @@
 
 	<element name="abstractShElement" type="pa:shType"></element>
 	<element name="sshGroup" substitutionGroup="pa:abstractShElement"
-		type="pa:sshGroupType">
+		type="pa:groupTypeSSH">
 	</element>
 	<element name="rsh" substitutionGroup="pa:abstractShElement"
 		type="pa:rshType">
@@ -199,7 +199,10 @@
 	<complexType name="bridgeRefType">
 		<complexContent>
 			<extension base="pa:abstractResourceType">
-				<!-- FIXME: At least one of these elements mustbe present -->
+				<!-- FIXME: At least one of these elements mustbe present - but this can't be done
+				because there must be at most one host, so either we turn this into a sequence of elements
+				of an abstract common type, and then we have to check in the parser that there is at most one host,
+				or we keep it as it is and check in the parser that at least one element is present -->
 				<sequence>
 					<element name="group" type="pa:groupRefType"
 						minOccurs="0" maxOccurs="unbounded">
@@ -297,7 +300,7 @@
 		type="pa:abstractBridgeElementType">
 	</element>
 
-	<complexType name="sshBridgeType">
+	<complexType name="bridgeTypeSSH">
 		<complexContent>
 			<extension base="pa:abstractBridgeElementType">
 				<attribute name="id" type="pa:idType" use="required"/>
@@ -308,7 +311,7 @@
 		</complexContent>
 	</complexType>
 
-	<element name="sshBridge" type="pa:sshBridgeType"
+	<element name="sshBridge" type="pa:bridgeTypeSSH"
 		substitutionGroup="pa:abstractBridgeElement">
 	</element>
 
