@@ -42,7 +42,7 @@ public class GroupSSH extends AbstractGroup {
     }
 
     /**
-     * return something like
+     * return ssh command given the hostname, e.g. :
      *
      * ssh -l username hostname.domain
      *
