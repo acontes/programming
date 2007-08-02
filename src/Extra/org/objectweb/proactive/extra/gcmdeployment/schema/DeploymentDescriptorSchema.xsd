@@ -191,7 +191,7 @@
 				<sequence>
 					<element name="host" type="pa:hostRefType"></element>
 				</sequence>
-				<attribute name="refid" type="pa:refType"></attribute>
+				<attribute name="refid" type="pa:refType" use="required"/>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -207,7 +207,7 @@
 						minOccurs="0" maxOccurs="unbounded">
 					</element>
 				</sequence>
-				<attribute name="refid" type="pa:refType"></attribute>
+				<attribute name="refid" type="pa:refType" use="required"/>
 				<attribute name="relay" type="string"></attribute>
 			</extension>
 		</complexContent>
@@ -262,7 +262,7 @@
 	</complexType>
 
 	<complexType name="hostRefType">
-		<attribute name="refid" type="pa:refType"></attribute>
+		<attribute name="refid" type="pa:refType" use="required"/>
 	</complexType>
 
 	<complexType name="abstractInfrastructureType"></complexType>
@@ -297,8 +297,8 @@
 	<complexType name="sshBridgeType">
 		<complexContent>
 			<extension base="pa:abstractBridgeElementType">
-				<attribute name="id" type="pa:idType"></attribute>
-				<attribute name="hostname" type="pa:hostnameType"></attribute>
+				<attribute name="id" type="pa:idType" use="required"/>
+				<attribute name="hostname" type="pa:hostnameType" use="required"/>
 				<attribute name="username" type="pa:usernameType"></attribute>
 				<attribute name="commandPath" type="string"></attribute>
 			</extension>
