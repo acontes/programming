@@ -56,17 +56,17 @@
 
 	<simpleType name="hostnameType">
 		<restriction base="string">
-		        <!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
-<!-- 			<pattern value="([a-z0-9.]*($\{[a-zA-Z0-9]+\})?)+" /> -->
+			<!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
+			<!-- 			<pattern value="([a-z0-9.]*($\{[a-zA-Z0-9]+\})?)+" /> -->
 			<pattern value="[a-z0-9.${}A-Z]+" />
 		</restriction>
 	</simpleType>
 
 	<simpleType name="usernameType">
 		<restriction base="string">
-		        <!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
-<!--  			<pattern value="([a-z0-9]*($\{[a-zA-Z0-9]+\})?)+" /> --> 
- 			<pattern value="[a-z0-9${}A-Z]+" /> 
+			<!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
+			<!--  			<pattern value="([a-z0-9]*($\{[a-zA-Z0-9]+\})?)+" /> -->
+			<pattern value="[a-z0-9${}A-Z]+" />
 		</restriction>
 	</simpleType>
 
@@ -87,11 +87,10 @@
 				maxOccurs="1" minOccurs="0">
 			</element>
 		</sequence>
-		<attribute name="id" type="pa:idType" use="required"/>
-		<attribute name="hostname" type="pa:hostnameType"/>
-		<attribute name="domain" type="pa:hostnameType"/>
-		<attribute name="username" type="pa:usernameType"/>
-		<attribute name="commandPath" type="pa:pathElementType"/>
+		<attribute name="id" type="pa:idType" use="required" />
+		<attribute name="domain" type="pa:hostnameType" />
+		<attribute name="username" type="pa:usernameType" />
+		<attribute name="commandPath" type="pa:pathElementType" />
 	</complexType>
 
 	<complexType name="groupTypeSSH">
@@ -110,7 +109,9 @@
 
 	<complexType name="rshType">
 		<complexContent>
-			<extension base="pa:shType"></extension>
+			<extension base="pa:shType">
+				<attribute name="hostname" type="pa:hostnameType" />
+			</extension>
 		</complexContent>
 	</complexType>
 
@@ -190,7 +191,8 @@
 				<sequence>
 					<element name="host" type="pa:hostRefType"></element>
 				</sequence>
-				<attribute name="refid" type="pa:refType" use="required"/>
+				<attribute name="refid" type="pa:refType"
+					use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -199,9 +201,9 @@
 		<complexContent>
 			<extension base="pa:abstractResourceType">
 				<!-- FIXME: At least one of these elements mustbe present - but this can't be done
-				because there must be at most one host, so either we turn this into a sequence of elements
-				of an abstract common type, and then we have to check in the parser that there is at most one host,
-				or we keep it as it is and check in the parser that at least one element is present -->
+					because there must be at most one host, so either we turn this into a sequence of elements
+					of an abstract common type, and then we have to check in the parser that there is at most one host,
+					or we keep it as it is and check in the parser that at least one element is present -->
 				<sequence>
 					<element name="group" type="pa:groupRefType"
 						minOccurs="0" maxOccurs="unbounded">
@@ -210,9 +212,10 @@
 						minOccurs="0" maxOccurs="unbounded">
 					</element>
 					<element name="host" type="pa:hostRefType"
-						minOccurs="0" maxOccurs="1"	/>
+						minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<attribute name="refid" type="pa:refType" use="required"/>
+				<attribute name="refid" type="pa:refType"
+					use="required" />
 				<attribute name="relay" type="string"></attribute>
 			</extension>
 		</complexContent>
@@ -255,8 +258,8 @@
 	<complexType name="hostType">
 		<sequence>
 			<element name="homeDirectory" type="pa:pathElementType"></element>
-			<element name="tool" type="pa:toolType"
-				minOccurs="0" maxOccurs="unbounded">
+			<element name="tool" type="pa:toolType" minOccurs="0"
+				maxOccurs="unbounded">
 			</element>
 		</sequence>
 		<attribute name="id" type="pa:idType" use="required"></attribute>
@@ -267,7 +270,7 @@
 	</complexType>
 
 	<complexType name="hostRefType">
-		<attribute name="refid" type="pa:refType" use="required"/>
+		<attribute name="refid" type="pa:refType" use="required" />
 	</complexType>
 
 	<complexType name="abstractInfrastructureType"></complexType>
@@ -302,8 +305,9 @@
 	<complexType name="bridgeTypeSSH">
 		<complexContent>
 			<extension base="pa:abstractBridgeElementType">
-				<attribute name="id" type="pa:idType" use="required"/>
-				<attribute name="hostname" type="pa:hostnameType" use="required"/>
+				<attribute name="id" type="pa:idType" use="required" />
+				<attribute name="hostname" type="pa:hostnameType"
+					use="required" />
 				<attribute name="username" type="pa:usernameType"></attribute>
 				<attribute name="commandPath" type="string"></attribute>
 			</extension>
@@ -358,7 +362,8 @@
 	<element name="GCMDeployment">
 		<complexType>
 			<all>
-				<element name="environment" type="pa:environmentType" minOccurs="0">
+				<element name="environment" type="pa:environmentType"
+					minOccurs="0">
 				</element>
 				<element name="acquisition" type="pa:acquisitionType"
 					minOccurs="0">
