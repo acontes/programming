@@ -4,12 +4,13 @@ import javax.xml.xpath.XPath;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
+import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupRSH;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupSSH;
 import org.w3c.dom.Node;
 
+public class GroupRSHParser extends AbstractGroupParser {
 
-public class SSHGroupParser extends AbstractGroupParser {
-    static final String NODE_NAME = "sshGroup";
+    static final String NODE_NAME = "rshGroup";
 
     public void parseGroupNode(Node groupNode, XPath xpath) {
         super.parseGroupNode(groupNode, xpath);
@@ -42,10 +43,11 @@ public class SSHGroupParser extends AbstractGroupParser {
 
     @Override
     public AbstractGroup createGroup() {
-        return new GroupSSH();
+        return new GroupRSH();
     }
 
     public String getNodeName() {
         return NODE_NAME;
     }
+
 }

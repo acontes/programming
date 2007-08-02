@@ -8,7 +8,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.bridge.BridgeSSH;
 import org.w3c.dom.Node;
 
 
-public class SSHBridgeParser extends AbstractBridgeParser {
+public class BridgeSSHParser extends AbstractBridgeParser {
     static final String NODE_NAME = "sshBridge";
 
     @Override

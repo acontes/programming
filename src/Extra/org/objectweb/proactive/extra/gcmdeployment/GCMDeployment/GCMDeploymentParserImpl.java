@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
+import static org.objectweb.proactive.core.mop.Utils.makeDeepCopy;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,14 +16,14 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.objectweb.proactive.core.mop.Utils;
-import static org.objectweb.proactive.core.mop.Utils.makeDeepCopy;
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.SSHBridgeParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.SSHGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeRSHParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeSSHParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupRSHParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupSSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
@@ -33,8 +35,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import sun.security.krb5.internal.PAEncTSEnc;
 
 
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
@@ -76,12 +76,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     protected void registerDefaultGroupParsers() {
-        registerGroupParser(new SSHGroupParser());
+        registerGroupParser(new GroupSSHParser());
+        registerGroupParser(new GroupRSHParser());
         // TODO add other group parsers here 
     }
 
     protected void registerDefaultBridgeParsers() {
-        registerBridgeParser(new SSHBridgeParser());
+        registerBridgeParser(new BridgeSSHParser());
+        registerBridgeParser(new BridgeRSHParser());
         // TODO add other bridge parsers here 
     }
 
