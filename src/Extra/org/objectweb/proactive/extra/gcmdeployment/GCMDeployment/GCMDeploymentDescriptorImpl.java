@@ -1,16 +1,15 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
-import java.io.BufferedReader;
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
@@ -60,7 +59,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
             GCMD_LOGGER.info("Starting a process on localhost");
             GCMD_LOGGER.debug("command= " + command);
-            execute(command);
+            Executor.getExecutor().submit(command);
         }
     }
 
@@ -74,8 +73,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
             for (String command : commands) {
                 GCMD_LOGGER.debug("group id=" + group.getId() + " command= " +
                     command);
-
-                execute(command);
+                Executor.getExecutor().submit(command);
             }
         }
     }
@@ -91,7 +89,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
             for (String command : commands) {
                 GCMD_LOGGER.debug("bridge id=" + bridge.getId() + " command= " +
                     command);
-                execute(command);
+                Executor.getExecutor().submit(command);
             }
         }
     }
@@ -99,32 +97,6 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     public long getMaxCapacity() {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    static private boolean execute(String command) {
-        try {
-            System.out.println("executing command=" + command);
-            Process p = Runtime.getRuntime()
-                               .exec(new String[] { "sh", "-c", command });
-            String line;
-
-            BufferedReader br;
-
-            br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-            while ((line = br.readLine()) != null) {
-                System.err.println(line);
-            }
-
-            br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            GCMD_LOGGER.warn("Cannot execute: " + command, e);
-            return false;
-        }
-
-        return true;
     }
 
     @SuppressWarnings("unused")
