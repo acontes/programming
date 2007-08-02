@@ -235,7 +235,10 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
         Node pathNode = (Node) xpath.evaluate("pa:path", commandNode,
                 XPathConstants.NODE);
-        commandBuilderScript.setPath(parsePathElementNode(pathNode));
+        if (pathNode != null) {
+            // path tag is optional
+            commandBuilderScript.setPath(parsePathElementNode(pathNode));
+        }
 
         // command args
         //
