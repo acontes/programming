@@ -67,8 +67,9 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private void startGroups(CommandBuilder commandBuilder) {
         List<Group> groups = resources.getGroups();
         for (Group group : groups) {
-            GCMD_LOGGER.info("Starting group id=" + group.getId());
             List<String> commands = group.buildCommands(commandBuilder);
+            GCMD_LOGGER.info("Starting group id=" + group.getId() +
+                " #commands=" + commands.size());
 
             for (String command : commands) {
                 GCMD_LOGGER.debug("group id=" + group.getId() + " command= " +
@@ -102,7 +103,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
     static private boolean execute(String command) {
         try {
-            System.out.println("command=" + command);
+            System.out.println("executing command=" + command);
             Process p = Runtime.getRuntime()
                                .exec(new String[] { "sh", "-c", command });
             String line;
