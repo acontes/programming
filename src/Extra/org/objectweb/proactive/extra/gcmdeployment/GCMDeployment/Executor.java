@@ -6,12 +6,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Executor {
 	final static private Executor singleton = new Executor();
-
+	private List<Thread> threads;
+	
 	private Executor() {
 		GCMD_LOGGER.trace("Executor started");
+		threads = new ArrayList<Thread>();
 	}
 
 	static public synchronized Executor getExecutor() {
@@ -30,12 +34,20 @@ public class Executor {
 			InputStreamMonitor stderrM = new InputStreamMonitor(MonitorType.STDERR, p.getErrorStream(), command);
 			stderrM.start();
 			stdoutM.start();
+			threads.add(stdoutM);
+			threads.add(stderrM);
 			
 		} catch (IOException e) {
 			GCMD_LOGGER.warn("Cannot execute: " + command, e);
 		}
 	}
 
+	public void awaitTermination() throws InterruptedException {
+	    for(Thread t : threads) {
+	        t.join();
+	    }
+	}
+	
 	private enum MonitorType {
 		STDOUT,
 		STDERR;

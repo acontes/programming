@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
@@ -36,7 +35,7 @@ public class TestApplicationDescriptorParser {
             }
             System.out.println(file);
             GCMApplicationDescriptor gcma = new GCMApplicationDescriptorImpl(file);
-            gcma.waitAllProcessExited();
+            gcma.awaitTermination();
         }
     }
 

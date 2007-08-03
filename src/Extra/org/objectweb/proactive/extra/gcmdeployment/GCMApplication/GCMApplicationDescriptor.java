@@ -59,5 +59,5 @@ public interface GCMApplicationDescriptor {
     /**
      * Wait for all process
      */
-    public void waitAllProcessExited();
+    public void awaitTermination();
 }

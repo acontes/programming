@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
@@ -111,5 +112,20 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
     @SuppressWarnings("unused")
     static public class TestGCMApplicationDescriptorImpl {
+    }
+
+    public boolean allProcessExited() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void awaitTermination() {
+        try {
+            Executor.getExecutor().awaitTermination();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
     }
 }
