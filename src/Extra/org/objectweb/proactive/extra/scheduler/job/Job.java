@@ -327,14 +327,6 @@ public class Job implements Serializable, Comparable<Job> {
 	public void setTaskStatusModify(HashMap<TaskId,Status> taskStatusModify) {
 		jobInfo.setTaskStatusModify(taskStatusModify);
 	}
-	/**
-	 * To get the taskStatusModify
-	 * 
-	 * @return the taskStatusModify
-	 */
-	public Status getTaskStatusModify() {
-		return getTaskStatusModify();
-	}
 	
 	
 	/**
@@ -570,40 +562,58 @@ public class Job implements Serializable, Comparable<Job> {
 	 * Paused every running and submitted tasks in this pending job.
 	 */
 	public boolean setPaused() {
+		if (isPaused())
+			return false;
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
-		boolean change = false;
 		for (TaskDescriptor td : tasks.values()){
 			if (td.getStatus() == Status.SUBMITTED){
 				td.setStatus(Status.PAUSED_S);
-				change = true;
 			} else if (td.getStatus() == Status.PENDING){
 				td.setStatus(Status.PAUSED_P);
-				change = true;
 			}
 			hts.put(td.getId(), td.getStatus());
 		}
 		setTaskStatusModify(hts);
-		return change;
+		return true;
 	}
 
 	/**
 	 * State of every paused tasks becomes pending or submitted in this pending job.
 	 */
 	public boolean setUnPause() {
+		if (isRunning())
+			return false;
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
-		boolean change = false;
 		for (TaskDescriptor td : tasks.values()){
 			if (td.getStatus() == Status.PAUSED_S){
 				td.setStatus(Status.SUBMITTED);
-				change = true;
 			} else if (td.getStatus() == Status.PAUSED_P){
 				td.setStatus(Status.PENDING);
-				change = true;
 			}
 			hts.put(td.getId(), td.getStatus());
 		}
 		setTaskStatusModify(hts);
-		return change;
+		return true;
+	}
+	
+	
+	/**
+	 * To know if the job is paused.
+	 * 
+	 * @return true if the job is paused, false if not.
+	 */
+	public boolean isPaused(){
+		return jobInfo.isPaused();
+	}
+
+	 
+	 /**
+	  * To know if the job is running.
+	  * 
+	  * @return true if the job is running, false if not.
+	  */
+	public boolean isRunning(){
+		return !isPaused();
 	}
 	
 	

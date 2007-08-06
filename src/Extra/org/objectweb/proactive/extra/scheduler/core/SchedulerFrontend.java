@@ -423,7 +423,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).SchedulerImmediatePausedEvent(event);
+				schedulerListeners.get(id).SchedulerImmediatePausedEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -459,7 +459,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).SchedulerResumedEvent(event);
+				schedulerListeners.get(id).SchedulerResumedEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -477,7 +477,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).SchedulerShutDownEvent();
+				schedulerListeners.get(id).SchedulerShutDownEvent();
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -495,7 +495,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).SchedulerShuttingDownEvent();
+				schedulerListeners.get(id).SchedulerShuttingDownEvent();
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -513,7 +513,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).SchedulerStartedEvent();
+				schedulerListeners.get(id).SchedulerStartedEvent();
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -531,7 +531,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).SchedulerStoppedEvent();
+				schedulerListeners.get(id).SchedulerStoppedEvent();
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -549,7 +549,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).SchedulerkilledEvent();
+				schedulerListeners.get(id).SchedulerkilledEvent();
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -567,7 +567,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).jobKilledEvent(jobId);
+				schedulerListeners.get(id).jobKilledEvent(jobId);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -586,7 +586,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).jobPausedEvent(event);
+				schedulerListeners.get(id).jobPausedEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -604,7 +604,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).jobResumedEvent(event);
+				schedulerListeners.get(id).jobResumedEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -622,7 +622,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).newPendingJobEvent(job);
+				schedulerListeners.get(id).newPendingJobEvent(job);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -640,7 +640,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).pendingToRunningJobEvent(event);
+				schedulerListeners.get(id).pendingToRunningJobEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -658,7 +658,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).runningToFinishedJobEvent(event);
+				schedulerListeners.get(id).runningToFinishedJobEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -678,7 +678,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).removeFinishedJobEvent(event);
+				schedulerListeners.get(id).removeFinishedJobEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -696,7 +696,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).pendingToRunningTaskEvent(event);
+				schedulerListeners.get(id).pendingToRunningTaskEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -714,7 +714,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(iter.next()).runningToFinishedTaskEvent(event);
+				schedulerListeners.get(id).runningToFinishedTaskEvent(event);
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
