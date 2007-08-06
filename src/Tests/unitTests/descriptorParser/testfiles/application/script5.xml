@@ -9,7 +9,7 @@
 		<file path="../deployment/deployment0.xml" />
 	</resourceProvider>
 	
-	<executable count="onePerHost|onePerCapacity|onePerVM">
+	<executable instances="onePerHost">
 		<resourceProvider refid="INRIA_LAN" />
 		<command name="touch">
 			<arg>/tmp/a\ b\ c</arg>
