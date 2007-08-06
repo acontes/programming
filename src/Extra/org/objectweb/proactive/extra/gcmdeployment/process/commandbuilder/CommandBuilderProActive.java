@@ -1,12 +1,14 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement.PathBase;
 import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
@@ -15,6 +17,13 @@ import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public class CommandBuilderProActive implements CommandBuilder {
+    
+    public final static String DEFAULT_JAVAPATH = System.getProperty(
+            "java.home") + File.separator + "bin" + File.separator + "java";
+    public static String DEFAULT_POLICY_FILE = System.getProperty(
+            "java.security.policy");
+    public static String DEFAULT_LOG4J_FILE = System.getProperty(
+            "log4j.configuration");
 
     /** Path to the ProActive installation */
     private PathElement proActivePath;
@@ -23,7 +32,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     private Map<String, VirtualNodeInternal> vns;
 
     /** Path to ${java.home}/bin/java */
-    private PathElement javaPath;
+    private PathElement javaPath = new PathElement(DEFAULT_JAVAPATH);
 
     /** Arguments to be passed to java */
     private List<String> javaArgs;
@@ -42,11 +51,21 @@ public class CommandBuilderProActive implements CommandBuilder {
     private List<FileTransferBlock> fts;
 
     /** Security Policy file*/
-    private PathElement securityPolicy;
+    private PathElement securityPolicy = new PathElement(DEFAULT_POLICY_FILE);
 
     /** Log4j configuration file */
-    private PathElement log4jProperties;
+    private PathElement log4jProperties = new PathElement(DEFAULT_LOG4J_FILE);
 
+    static {
+        if (DEFAULT_POLICY_FILE != null) {
+            DEFAULT_POLICY_FILE = getAbsolutePath(DEFAULT_POLICY_FILE);
+        }
+        if (DEFAULT_LOG4J_FILE != null) {
+            DEFAULT_LOG4J_FILE = getAbsolutePath(DEFAULT_LOG4J_FILE);
+        }
+    }
+
+    
     public CommandBuilderProActive() {
         vns = new HashMap<String, VirtualNodeInternal>();
         fts = new ArrayList<FileTransferBlock>();
@@ -152,4 +171,19 @@ public class CommandBuilderProActive implements CommandBuilder {
 
         return null;
     }
+    
+    private static String getAbsolutePath(String path) {
+        if (path.startsWith("file:")) {
+            //remove file part to build absolute path
+            path = path.substring(5);
+        }
+        try {
+            return new File(path).getCanonicalPath();
+        } catch (IOException e) {
+            GCMDeploymentLoggers.GCMA_LOGGER.error(e.getMessage());
+            return path;
+        }
+    }
+
+    
 }
