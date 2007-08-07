@@ -25,7 +25,7 @@ public enum JobType implements java.io.Serializable {
 	 * Only the task that have their dependences finished
 	 * can be executed.
 	 */
-	TASKSFLOW ("Task Flow");
+	TASKSFLOW ("Tasks Flow");
 	
 	private String name;
 	

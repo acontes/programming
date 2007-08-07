@@ -150,9 +150,12 @@ public class JobFactory {
                 System.out.println("final = " + desc.isFinalTask());
 
                 // TASK RE RUNNABLE
-                desc.setRerunnable(
-                        Integer.parseInt((String) xpath.evaluate("@reRunnable", taskNode,
-                            XPathConstants.STRING)));
+                String rerunnable = (String) xpath.evaluate("@reRunnable", taskNode,
+                        XPathConstants.STRING);
+                if(rerunnable != "")
+                	desc.setRerunnable(Integer.parseInt(rerunnable));
+                else
+                	desc.setRerunnable(0);
                 System.out.println("reRun = " + desc.getRerunnable());
 
                 // TASK RUN TIME LIMIT

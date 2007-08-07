@@ -76,13 +76,15 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 		}
 		//now for each taskDescriptor, set the parents and children list
 		for (TaskDescriptor td : job.getTasks()){
-			LightTask lightTask = mem.get(td);
-			for(TaskDescriptor depends : td.getDependences()){
-				lightTask.addParent(mem.get(depends));
-			}
-			lightTask.setCount(td.getDependences().size());
-			for (LightTask lt : lightTask.getParents()){
-				lt.addChild(lightTask);
+			if (td.getDependences() != null){
+				LightTask lightTask = mem.get(td);
+				for(TaskDescriptor depends : td.getDependences()){
+					lightTask.addParent(mem.get(depends));
+				}
+				lightTask.setCount(td.getDependences().size());
+				for (LightTask lt : lightTask.getParents()){
+					lt.addChild(lightTask);
+				}
 			}
 		}
 	}
@@ -107,10 +109,12 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	public void terminate(TaskId taskId){
 		if (type == JobType.TASKSFLOW){
 			LightTask lt = runningTasks.get(taskId);
-			for (LightTask task : lt.getChildren()){
-				task.setCount(task.getCount()-1);
-				if (task.getCount() == 0){
-					eligibleTasks.put(task.getId(),(EligibleLightTask)task);
+			if (lt.getChildren() != null){
+				for (LightTask task : lt.getChildren()){
+					task.setCount(task.getCount()-1);
+					if (task.getCount() == 0){
+						eligibleTasks.put(task.getId(),(EligibleLightTask)task);
+					}
 				}
 			}
 		}
