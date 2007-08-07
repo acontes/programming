@@ -25,7 +25,7 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extra.scheduler.gui.composites;
 
 import java.util.Vector;
 
@@ -34,9 +34,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.FinishedTasksListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.RunningJobsListener;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
@@ -74,23 +78,40 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	// ---------------------- extends JobComposite ------------------------ //
 	// -------------------------------------------------------------------- //
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite#getJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#getJobs()
 	 */
 	@Override
 	public Vector<JobId> getJobs() {
-		return JobsController.getInstance().getRunningsJobs();
+		return JobsController.getLocalView().getRunningsJobs();
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite#sortJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#sortJobs()
 	 */
 	@Override
 	public void sortJobs() {
-		JobsController.getInstance().sortRunningsJobs();
+		JobsController.getLocalView().sortRunningsJobs();
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite#createTable(org.eclipse.swt.widgets.Composite, int)
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
+	 */
+	@Override
+	public void jobSelected(Job job) {
+		boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
+		// enabling/disabling button permitted with this job
+		ObtainJobOutputAction.getInstance().setEnabled(enabled);
+		PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
+		pauseResumeJobAction.setEnabled(enabled);
+		if(job.isPaused())
+			pauseResumeJobAction.setResumeMode();
+		else
+			pauseResumeJobAction.setPauseMode();
+		KillJobAction.getInstance().setEnabled(enabled);
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#createTable(org.eclipse.swt.widgets.Composite, int)
 	 */
 	@Override
 	protected Table createTable(Composite parent, int tableId) {
@@ -110,7 +131,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite#createItem(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#createItem(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	@Override
 	protected TableItem createItem(Job job) {
@@ -178,7 +199,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 						throw new IllegalArgumentException("the item which represent the job : " + taskEvent.getJobId() + " is unknown !");
 					
 					TableColumn[] cols = table.getColumns();
-					Job job = JobsController.getInstance().getJobById(taskEvent.getJobId());
+					Job job = JobsController.getLocalView().getJobById(taskEvent.getJobId());
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
 						if ((title != null) && (title.equals(COLUMN_TASK_TITLE))) {

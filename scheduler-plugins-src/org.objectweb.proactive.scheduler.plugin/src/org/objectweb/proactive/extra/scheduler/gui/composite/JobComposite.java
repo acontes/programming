@@ -25,7 +25,7 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extra.scheduler.gui.composites;
 
 import java.util.Vector;
 
@@ -43,6 +43,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
@@ -75,8 +78,8 @@ public abstract class JobComposite extends Composite {
 	public static final String COLUMN_NAME_TITLE = "Name";
 	/** the unique id and the title for the column "Description" */
 	public static final String COLUMN_DESCRIPTION_TITLE = "Description";
-	/** the unique id and the title for the column "Owner" */
-	public static final String COLUMN_OWNER_TITLE = "Owner";
+	/** the unique id and the title for the column "User" */
+	public static final String COLUMN_OWNER_TITLE = "User";
 
 	private Label label = null;
 	private Table table = null;
@@ -102,7 +105,7 @@ public abstract class JobComposite extends Composite {
 		this.title = title;
 		this.label = createLabel(parent, title);
 		this.table = createTable(parent, tableId);
-		//TODO setVisible(false);
+		// TODO setVisible(false);
 	}
 
 	// -------------------------------------------------------------------- //
@@ -139,7 +142,7 @@ public abstract class JobComposite extends Composite {
 
 	private void addJobInTable(JobId jobId) {
 		if (!isDisposed()) {
-			final Job job = JobsController.getInstance().getJobById(jobId);
+			final Job job = JobsController.getLocalView().getJobById(jobId);
 			getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -257,9 +260,10 @@ public abstract class JobComposite extends Composite {
 				// get the jobId
 				JobId jobId = (JobId) event.item.getData();
 				// get the job by jobId
-				Job job = JobsController.getInstance().getJobById(jobId);
+				Job job = JobsController.getLocalView().getJobById(jobId);
 
 				// show its output
+				// TODO ???
 				JobsOutputController.getInstance().showJobOutput(jobId);
 
 				// update its informations
@@ -271,6 +275,8 @@ public abstract class JobComposite extends Composite {
 				TaskView taskView = TaskView.getInstance();
 				if (taskView != null)
 					taskView.fullUpdate(job);
+
+				jobSelected(job);
 			}
 		});
 
@@ -380,6 +386,13 @@ public abstract class JobComposite extends Composite {
 						TaskView taskView = TaskView.getInstance();
 						if (taskView != null)
 							taskView.clear();
+						
+						// enabling/disabling button permitted with this job
+						ObtainJobOutputAction.getInstance().setEnabled(false);
+						PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
+						pauseResumeJobAction.setEnabled(false);
+						pauseResumeJobAction.setPauseResumeMode();
+						KillJobAction.getInstance().setEnabled(false);
 					}
 					table.remove(i);
 					decreaseCount();
@@ -412,6 +425,13 @@ public abstract class JobComposite extends Composite {
 	 * To sort jobs
 	 */
 	public abstract void sortJobs();
+	
+	/**
+	 * Call when a job is selected in a table
+	 * 
+	 * @param job the job selected
+	 */
+	public abstract void jobSelected(Job job);
 
 	// -------------------------------------------------------------------- //
 	// ------------------------ extends composite ------------------------- //

@@ -25,13 +25,18 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extra.scheduler.gui.composites;
 
 import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.PendingJobsListener;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 
 /**
@@ -62,23 +67,40 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	// ---------------------- extends JobComposite ------------------------ //
 	// -------------------------------------------------------------------- //
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite#getJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#getJobs()
 	 */
 	@Override
 	public Vector<JobId> getJobs() {
-		return JobsController.getInstance().getPendingsJobs();
+		return JobsController.getLocalView().getPendingsJobs();
 	}
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite#sortJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#sortJobs()
 	 */
 	@Override
 	public void sortJobs() {
-		JobsController.getInstance().sortPendingsJobs();
+		JobsController.getLocalView().sortPendingsJobs();
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
+	 */
+	@Override
+	public void jobSelected(Job job) {
+		boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
+		// enabling/disabling button permitted with this job
+		ObtainJobOutputAction.getInstance().setEnabled(enabled);
+		PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
+		pauseResumeJobAction.setEnabled(enabled);
+		if(job.isPaused())
+			pauseResumeJobAction.setResumeMode();
+		else
+			pauseResumeJobAction.setPauseMode();
+		KillJobAction.getInstance().setEnabled(enabled);
 	}
 
 	// -------------------------------------------------------------------- //
-	// ----------------- implements PendingJobsListener ------------------ //
+	// ----------------- implements PendingJobsListener ------------------- //
 	// -------------------------------------------------------------------- //
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.gui.data.PendingJobsListener#addPendingJob(org.objectweb.proactive.extra.scheduler.job.JobId)

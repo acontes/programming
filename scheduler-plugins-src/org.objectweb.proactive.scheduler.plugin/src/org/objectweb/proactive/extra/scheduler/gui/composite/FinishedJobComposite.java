@@ -25,18 +25,23 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extra.scheduler.gui.composites;
 
 import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.FinishedJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 
 /**
  * This class represents the finished jobs
- *
+ * 
  * @author ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
@@ -62,19 +67,33 @@ public class FinishedJobComposite extends JobComposite implements FinishedJobsLi
 	// ---------------------- extends JobComposite ------------------------ //
 	// -------------------------------------------------------------------- //
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite#getJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#getJobs()
 	 */
 	@Override
 	public Vector<JobId> getJobs() {
-		return JobsController.getInstance().getFinishedJobs();
+		return JobsController.getLocalView().getFinishedJobs();
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite#sortJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#sortJobs()
 	 */
 	@Override
 	public void sortJobs() {
-		JobsController.getInstance().sortFinishedJobs();
+		JobsController.getLocalView().sortFinishedJobs();
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
+	 */
+	@Override
+	public void jobSelected(Job job) {
+		// enabling/disabling button permitted with this job
+		ObtainJobOutputAction.getInstance().setEnabled(
+				SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
+		PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
+		pauseResumeJobAction.setEnabled(false);
+		pauseResumeJobAction.setPauseResumeMode();
+		KillJobAction.getInstance().setEnabled(false);
 	}
 
 	// -------------------------------------------------------------------- //

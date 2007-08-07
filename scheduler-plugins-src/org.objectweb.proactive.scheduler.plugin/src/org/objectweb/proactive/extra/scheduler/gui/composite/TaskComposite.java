@@ -25,7 +25,7 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extra.scheduler.gui.composites;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -276,7 +276,7 @@ public class TaskComposite extends Composite {
 				else if (title.equals(COLUMN_FINISHED_TIME_TITLE))
 					item.setText(i, Tools.getFormattedDate(taskDescriptor.getFinishedTime()));
 				else if (title.equals(COLUMN_RERUNNABLE_TITLE))
-					item.setText(i, taskDescriptor.isRerunnable() + "");
+					item.setText(i, taskDescriptor.getRerunnable() + "");
 				else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE))
 					item.setText(i, Tools.getFormattedDate(taskDescriptor.getRunTimeLimit()));
 				else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
