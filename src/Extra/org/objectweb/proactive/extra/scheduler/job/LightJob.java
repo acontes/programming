@@ -3,6 +3,8 @@ package org.objectweb.proactive.extra.scheduler.job;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map.Entry;
+
 import org.objectweb.proactive.extra.scheduler.task.EligibleLightTask;
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
@@ -31,7 +33,9 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	/** Job tasks to be able to be schedule */
 	private HashMap<TaskId,EligibleLightTask> eligibleTasks = new HashMap<TaskId,EligibleLightTask>();
 	/** Job running tasks */
-	private HashMap<TaskId,LightTask> runningTasks = new HashMap<TaskId,LightTask>(); 
+	private HashMap<TaskId,LightTask> runningTasks = new HashMap<TaskId,LightTask>();
+	/** Job paused tasks */
+	private HashMap<TaskId,LightTask> pausedTasks = new HashMap<TaskId,LightTask>();
 	
 	
 	/**
@@ -92,10 +96,11 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	
 	/**
 	 * Delete this task from eligible task view and add it to running view.
+	 * Visibility is package because user cannot use this method.
 	 * 
 	 * @param taskId the task that has just been started.
 	 */
-	public void start(TaskId taskId){
+	void start(TaskId taskId){
 		runningTasks.put(taskId,eligibleTasks.get(taskId));
 		eligibleTasks.remove(taskId);
 	}
@@ -103,10 +108,11 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	/**
 	 * Update the eligible list of task and dependencies if necessary.
 	 * This function considered that the taskId is in eligible task list.
+	 * Visibility is package because user cannot use this method.
 	 * 
 	 * @param taskId the task to remove from running task.
 	 */
-	public void terminate(TaskId taskId){
+	void terminate(TaskId taskId){
 		if (type == JobType.TASKSFLOW){
 			LightTask lt = runningTasks.get(taskId);
 			if (lt.getChildren() != null){
@@ -119,6 +125,25 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 			}
 		}
 		runningTasks.remove(taskId);
+	}
+	
+	
+	/**
+	 * Update the list of eligible tasks according to the status of each task.
+	 * This method is called only if user pause a job.
+	 * 
+	 * @param status the taskId with their current status.
+	 */
+	void update(HashMap<TaskId, Status> status){
+		for (Entry<TaskId,Status> tid : status.entrySet()){
+			if (tid.getValue() == Status.PAUSED_P || tid.getValue() == Status.PAUSED_S){
+				pausedTasks.put(tid.getKey(),eligibleTasks.get(tid.getKey()));
+				eligibleTasks.remove(tid.getKey());
+			} else if (tid.getValue() == Status.PENDING || tid.getValue() == Status.SUBMITTED){
+				eligibleTasks.put(tid.getKey(),(EligibleLightTask)pausedTasks.get(tid.getKey()));
+				pausedTasks.remove(tid.getKey());
+			}
+		}
 	}
 	
 	

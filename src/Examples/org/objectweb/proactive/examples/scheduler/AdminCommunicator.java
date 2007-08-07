@@ -87,6 +87,7 @@ public class AdminCommunicator {
         } catch (Exception e) {
             error("A fatal error has occured : " + e.getMessage() +
                 "\n Will shut down communicator.\n");
+            e.printStackTrace();
             System.exit(1);
         }
 

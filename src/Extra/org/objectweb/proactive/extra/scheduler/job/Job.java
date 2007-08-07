@@ -586,6 +586,7 @@ public class Job implements Serializable, Comparable<Job> {
 			}
 			hts.put(td.getId(), td.getStatus());
 		}
+		lightJob.update(hts);
 		setTaskStatusModify(hts);
 		return true;
 	}
@@ -606,6 +607,7 @@ public class Job implements Serializable, Comparable<Job> {
 			}
 			hts.put(td.getId(), td.getStatus());
 		}
+		lightJob.update(hts);
 		setTaskStatusModify(hts);
 		return true;
 	}
