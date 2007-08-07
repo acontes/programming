@@ -74,8 +74,10 @@ public class SelectSchedulerDialog extends Dialog {
 	private static String url = null;
 	private static String login = null;
 	private static String pwd = null;
+	private static Boolean logAsAdmin = null;
 	private static Combo urlCombo = null;
 	private static Combo loginCombo = null;
+	private Button adminCheck = null;
 	private Shell shell = null;
 	private Button okButton = null;
 	private Button cancelButton = null;
@@ -154,7 +156,25 @@ public class SelectSchedulerDialog extends Dialog {
 		pwdFormData.left = new FormAttachment(pwdLabel, 5);
 		pwdFormData.right = new FormAttachment(100, -5);
 		pwdText.setLayoutData(pwdFormData);
-
+		
+		
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		Label adminLabel = new Label(shell, SWT.NONE);
+		adminLabel.setText("log as admin");
+		adminCheck = new Button(shell, SWT.CHECK);
+		
+		FormData checkFormData = new FormData();
+		checkFormData.top = new FormAttachment(adminLabel, 0, SWT.CENTER);
+		checkFormData.left = new FormAttachment(50,-45);
+		adminCheck.setLayoutData(checkFormData);
+		
+		FormData textFormData = new FormData();
+		textFormData.top = new FormAttachment(loginCombo, 5);
+		textFormData.left = new FormAttachment(adminCheck, 5);
+		adminLabel.setLayoutData(textFormData);
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		
 		// button "OK"
 		okButton.setText("OK");
 		okButton.addListener(SWT.Selection, new Listener() {
@@ -164,11 +184,12 @@ public class SelectSchedulerDialog extends Dialog {
 				url = urlCombo.getText();
 				login = loginCombo.getText();
 				pwd = pwdText.getText();
+				logAsAdmin = adminCheck.getSelection();
 				shell.close();
 			}
 		});
 		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(loginCombo, 5);
+		okFormData.top = new FormAttachment(adminLabel, 5);
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
@@ -184,7 +205,7 @@ public class SelectSchedulerDialog extends Dialog {
 			}
 		});
 		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(loginCombo, 5);
+		cancelFormData.top = new FormAttachment(adminLabel, 5);
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);
@@ -314,7 +335,7 @@ public class SelectSchedulerDialog extends Dialog {
 				return null;
 			}
 			recordUrl(url);
-			return new SelectSchedulerDialogResult(url, login, pwd);
+			return new SelectSchedulerDialogResult(url, login, pwd, logAsAdmin);
 		}
 		return null;
 	}

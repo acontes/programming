@@ -30,16 +30,13 @@ package org.objectweb.proactive.extra.scheduler.gui.data;
 import java.util.Collections;
 import java.util.Vector;
 
-import javax.security.auth.login.LoginException;
-
 import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerEvent;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
+import org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
-import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
@@ -47,11 +44,8 @@ import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
-import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 /**
  * 
@@ -62,14 +56,13 @@ import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
  */
 public class JobsController implements SchedulerEventListener {
 
-	public static final int CONNECTED = 0;
-	public static final int LOGIN_OR_PASSWORD_WRONG = 1;
-	public static final int COULD_NOT_CONNECT_SCHEDULER = 2;
-
 	private static final long serialVersionUID = -160416757449171779L;
 
-	// The shared instance
-	private static JobsController instance = null;
+	// The shared instance view as a direct reference
+	private static JobsController localView = null;
+
+	// The shared instance view as an active object
+	private static JobsController activeView = null;
 
 	// jobs
 	private Vector<Job> jobs = null;
@@ -337,7 +330,7 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void SchedulerShutDownEvent() {
-		System.out.println("JobsController.SchedulerShutDownEvent()");
+		System.out.println("JobsController.SchedulerShutDownEvent() AVANT");
 	}
 
 	/**
@@ -378,31 +371,33 @@ public class JobsController implements SchedulerEventListener {
 	@Override
 	public void jobKilledEvent(JobId jobId) {
 		System.out.println("JobsController.jobKilledEvent() => " + jobId);
-
-		Vector<JobId> list = null;
-
-		if (pendingJobsIds.contains(jobId)) {
-			list = pendingJobsIds;
-			removePendingJobEventInternal(jobId);
-		} else if (runningJobsIds.contains(jobId)) {
-			list = runningJobsIds;
-			removeRunningJobEventInternal(jobId);
-		} else if (finishedJobsIds.contains(jobId)) {
-			list = finishedJobsIds;
-			removeFinishedJobEventInternal(jobId);
-		}
-
-		Job job = new Job();
-		job.setId(jobId);
-		if (!jobs.remove(job))
-			throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");
-
-		// remove job from the finished jobs list
-		if (!list.remove(jobId))
-			throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the list !");
-
-		// remove job's output
-		JobsOutputController.getInstance().removeJobOutput(jobId);
+//
+// Vector<JobId> list = null;
+//
+// if (pendingJobsIds.contains(jobId)) {
+// list = pendingJobsIds;
+// removePendingJobEventInternal(jobId);
+// } else if (runningJobsIds.contains(jobId)) {
+// list = runningJobsIds;
+// removeRunningJobEventInternal(jobId);
+// } else if (finishedJobsIds.contains(jobId)) {
+// list = finishedJobsIds;
+// removeFinishedJobEventInternal(jobId);
+// }
+//
+// Job job = new Job();
+// job.setId(jobId);
+// if (!jobs.remove(job))
+// throw new IllegalStateException("can't remove the job (id = " + jobId + ")
+// from the jobs list !");
+//
+// // remove job from the finished jobs list
+// if (!list.remove(jobId))
+// throw new IllegalStateException("can't remove the job (id = " + jobId + ")
+// from the list !");
+//
+// // remove job's output
+// JobsOutputController.getInstance().removeJobOutput(jobId);
 	}
 
 	/**
@@ -531,50 +526,70 @@ public class JobsController implements SchedulerEventListener {
 		return taskDescriptor;
 	}
 
-	public int setScheduler(SelectSchedulerDialogResult dialogResult) {
-		System.out.println("JobsController.setScheduler()");
-		try {
-			SchedulerAuthenticationInterface sai = SchedulerConnection.join(dialogResult.getUrl());
-			UserSchedulerInterface userScheduler = (UserSchedulerInterface) sai.logAsUser(dialogResult
-					.getLogin(), dialogResult.getPassword());
-			SchedulerState state = userScheduler
-					.addSchedulerEventListener(((SchedulerEventListener) ProActive.getStubOnThis()));
+	/**
+	 * Initiate the controller. Warning, this method must be synchronous.
+	 * 
+	 * @return true only if no error caught.
+	 */
+	public boolean init() {
+		SchedulerState state = SchedulerProxy.getInstance().addSchedulerEventListener(
+				((SchedulerEventListener) ProActive.getStubOnThis()));
 
-			SeparatedJobView.setUserScheduler(userScheduler);
+		if (state == null) // addSchedulerEventListener failed
+			return false;
 
-			jobs = new Vector<Job>();
-			pendingJobsIds = new Vector<JobId>();
-			runningJobsIds = new Vector<JobId>();
-			finishedJobsIds = new Vector<JobId>();
+		jobs = new Vector<Job>();
+		pendingJobsIds = new Vector<JobId>();
+		runningJobsIds = new Vector<JobId>();
+		finishedJobsIds = new Vector<JobId>();
 
-			Vector<Job> tmp = state.getPendingJobs();
-			for (Job job : tmp) {
-				jobs.add(job);
-				pendingJobsIds.add(job.getId());
-			}
-
-			tmp = state.getRunningJobs();
-			for (Job job : tmp) {
-				jobs.add(job);
-				runningJobsIds.add(job.getId());
-			}
-
-			tmp = state.getFinishedJobs();
-			for (Job job : tmp) {
-				jobs.add(job);
-				finishedJobsIds.add(job.getId());
-			}
-			return CONNECTED;
-		} catch (SchedulerException e) {
-			return COULD_NOT_CONNECT_SCHEDULER;
-		} catch (LoginException e) {
-			return LOGIN_OR_PASSWORD_WRONG;
+		Vector<Job> tmp = state.getPendingJobs();
+		for (Job job : tmp) {
+			jobs.add(job);
+			pendingJobsIds.add(job.getId());
 		}
+
+		tmp = state.getRunningJobs();
+		for (Job job : tmp) {
+			jobs.add(job);
+			runningJobsIds.add(job.getId());
+		}
+
+		tmp = state.getFinishedJobs();
+		for (Job job : tmp) {
+			jobs.add(job);
+			finishedJobsIds.add(job.getId());
+		}
+		// for synchronous call
+		return true;
 	}
 
-	public static JobsController getInstance() {
-		if (instance == null)
-			instance = new JobsController();
-		return instance;
+	public static JobsController getLocalView() {
+		if (localView == null)
+			localView = new JobsController();
+		return localView;
+	}
+
+	public static JobsController getActiveView() {
+		if (activeView == null)
+			turnActive();
+		return activeView;
+	}
+
+	public static JobsController turnActive() {
+		try {
+			activeView = (JobsController) ProActive.turnActive(getLocalView());
+			return activeView;
+		} catch (ActiveObjectCreationException e) {
+			e.printStackTrace();
+		} catch (NodeException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static void clearInstances() {
+		localView = null;
+		activeView = null;
 	}
 }

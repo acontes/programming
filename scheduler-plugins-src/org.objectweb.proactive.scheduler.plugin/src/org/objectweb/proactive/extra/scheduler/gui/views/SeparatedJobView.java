@@ -27,48 +27,33 @@
  */
 package org.objectweb.proactive.extra.scheduler.gui.views;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.gui.composite.FinishedJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.PendingJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.RunningJobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ChangeViewModeAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJob;
+import org.objectweb.proactive.extra.scheduler.gui.composites.FinishedJobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composites.PendingJobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composites.RunningJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
-import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialog;
-import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
-import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobFactory;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
-import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
-import org.xml.sax.SAXException;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 
 /**
  * This class display the state of the scheduler in real time
@@ -81,17 +66,16 @@ public class SeparatedJobView extends ViewPart {
 	/** the view part id */
 	public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView";
 	private static final long serialVersionUID = -6958852991395601640L;
-	private JobsController jobsController = null;
 	private JobComposite pendingJobComposite = null;
 	private JobComposite runningJobComposite = null;
 	private JobComposite finishedJobComposite = null;
 	private Action connectSchedulerAction = null;
 	private Action changeViewModeAction = null;
-	private Action getJobOutputAction = null;
+	private Action obtainJobOutputAction = null;
 	private Action submitJob = null;
-	public static Shell shell = null;
+	private Action pauseResumeJobAction = null;
+	private Action killJobAction = null;
 	private Composite parent = null;
-	private static UserSchedulerInterface userScheduler = null;
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -122,11 +106,20 @@ public class SeparatedJobView extends ViewPart {
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(connectSchedulerAction);
 		manager.add(changeViewModeAction);
-		// manager.add(new Separator());
-		manager.add(getJobOutputAction);
+		manager.add(new Separator());
 		manager.add(submitJob);
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		manager.add(pauseResumeJobAction);
+		manager.add(obtainJobOutputAction);
+		manager.add(killJobAction);
+		if(SchedulerProxy.getInstance().isAnAdmin()) {
+			manager.add(new Separator());
+			manager.add(submitJob);
+			manager.add(pauseResumeJobAction);
+			manager.add(obtainJobOutputAction);
+			manager.add(killJobAction);
+		}
+// // Other plug-ins can contribute there actions here
+// manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private void contributeToActionBars() {
@@ -137,120 +130,20 @@ public class SeparatedJobView extends ViewPart {
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(connectSchedulerAction);
 		manager.add(changeViewModeAction);
-		manager.add(getJobOutputAction);
+		manager.add(new Separator());
 		manager.add(submitJob);
+		manager.add(pauseResumeJobAction);
+		manager.add(obtainJobOutputAction);
+		manager.add(killJobAction);
 	}
 
 	private void makeActions() {
-		connectSchedulerAction = new Action() {
-			@Override
-			public void run() {
-				SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(shell);
-				if (dialogResult != null) {
-					shell = parent.getShell();
-					int result = 0;
-					try {
-						result = jobsController.setScheduler(dialogResult);
-					} catch (RuntimeException e) {
-						System.out.println("ERORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-						e.printStackTrace();
-					}
-					if (result == JobsController.LOGIN_OR_PASSWORD_WRONG)
-						MessageDialog.openError(shell, "Couldn't connect", "The login and/or the password are wrong !");
-					else if (result == JobsController.COULD_NOT_CONNECT_SCHEDULER)
-						MessageDialog.openError(shell, "Couldn't connect", "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl());
-					pendingJobComposite.initTable();
-					runningJobComposite.initTable();
-					finishedJobComposite.initTable();
-					changeViewModeAction.setEnabled(true);
-					getJobOutputAction.setEnabled(true);
-					submitJob.setEnabled(true);
-					setVisible(true);
-				}
-			}
-		};
-		connectSchedulerAction.setText("Connect to a scheduler");
-		connectSchedulerAction.setToolTipText("Connect to a started scheduler by its url");
-		connectSchedulerAction.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-				"icons/run.png"));
-
-		changeViewModeAction = new Action() {
-			@Override
-			public void run() {
-				FillLayout layout = (FillLayout) (parent.getLayout());
-				boolean isVertical = layout.type == SWT.VERTICAL;
-				layout.type = isVertical ? SWT.HORIZONTAL : SWT.VERTICAL;
-				if (isVertical) {
-					changeViewModeAction.setToolTipText("Switch view to horizontal mode");
-					changeViewModeAction.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-							"icons/horizontal.png"));
-				} else {
-					changeViewModeAction.setToolTipText("Switch view to vertical mode");
-					changeViewModeAction.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-							"icons/vertical.png"));
-				}
-				parent.layout();
-			}
-		};
-		changeViewModeAction.setText("Switch view mode");
-		changeViewModeAction.setToolTipText("Switch view to horizontal mode");
-		changeViewModeAction.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-				"icons/horizontal.png"));
-		changeViewModeAction.setEnabled(false);
-
-		getJobOutputAction = new Action() {
-			@Override
-			public void run() {
-				TableItem item = TableManager.getInstance().getLastSelectedItem();
-				if (item != null) {
-					JobId jobId = (JobId) item.getData();
-					JobsOutputController.getInstance().createJobOutput(jobId);
-				}
-			}
-		};
-		getJobOutputAction.setText("Get job output");
-		getJobOutputAction.setToolTipText("To get the job output");
-		getJobOutputAction.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-				"icons/output.png"));
-		getJobOutputAction.setEnabled(false);
-
-		submitJob = new Action() {
-			@Override
-			public void run() {
-				// TODO
-				FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
-				fileDialog.setFilterExtensions(new String[] { "*.xml" });
-				String fileName = fileDialog.open();
-
-				if (fileName != null) {
-					try {
-						// CREATE JOB
-						Job job = JobFactory.getFactory().createJob(fileName);
-						// SUBMIT JOB
-						job.setId(userScheduler.submit(job));
-					} catch (XPathExpressionException e) {
-						e.printStackTrace();
-					} catch (ParserConfigurationException e) {
-						e.printStackTrace();
-					} catch (SAXException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (InvalidScriptException e) {
-						e.printStackTrace();
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-					} catch (SchedulerException e) {
-						// TODO
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-		submitJob.setText("Submit a job");
-		submitJob.setToolTipText("Submit a job to the scheduler");
-		submitJob.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/submit.png"));
-		submitJob.setEnabled(false);
+		connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(this, parent);
+		changeViewModeAction = ChangeViewModeAction.newInstance(parent);
+		obtainJobOutputAction = ObtainJobOutputAction.newInstance();
+		submitJob = SubmitJob.newInstance(parent);
+		pauseResumeJobAction = PauseResumeJobAction.newInstance();
+		killJobAction = KillJobAction.newInstance();
 	}
 
 	// -------------------------------------------------------------------- //
@@ -271,31 +164,6 @@ public class SeparatedJobView extends ViewPart {
 		// TaskView taskView = TaskView.getInstance();
 		// if(taskView != null)
 		// taskView.setVisible(visible);
-	}
-
-	/**
-	 * Returns the user scheduler
-	 * 
-	 * @return the user scheduler
-	 */
-	public static UserSchedulerInterface getUserScheduler() {
-		return userScheduler;
-	}
-	
-	/**
-	 * set the user scheduler
-	 */
-	public static void setUserScheduler(UserSchedulerInterface userSchedulerInterface) {
-		 userScheduler = userSchedulerInterface;
-	}
-
-	/**
-	 * Returns the jobs controller
-	 * 
-	 * @return the jobs controller
-	 */
-	public JobsController getJobsController() {
-		return jobsController;
 	}
 
 	/**
@@ -333,27 +201,23 @@ public class SeparatedJobView extends ViewPart {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-		shell = parent.getShell();
 		this.parent = parent;
 
+		// It must be a FillLayout !
 		FillLayout layout = new FillLayout(SWT.HORIZONTAL);
 		layout.spacing = 5;
 		layout.marginHeight = 10;
 		layout.marginWidth = 10;
 		parent.setLayout(layout);
-		jobsController = JobsController.getInstance();
-		pendingJobComposite = new PendingJobComposite(parent, "Pending", jobsController);
-		runningJobComposite = new RunningJobComposite(parent, "Running", jobsController);
-		finishedJobComposite = new FinishedJobComposite(parent, "Finished", jobsController);
-		
-		try {
-			jobsController = (JobsController) (ProActive.turnActive(jobsController));
-		} catch (ActiveObjectCreationException e) {
-			e.printStackTrace();
-		} catch (NodeException e) {
-			e.printStackTrace();
-		}
-		
+
+		pendingJobComposite = new PendingJobComposite(parent, "Pending", JobsController.getLocalView());
+		runningJobComposite = new RunningJobComposite(parent, "Running", JobsController.getLocalView());
+		finishedJobComposite = new FinishedJobComposite(parent, "Finished", JobsController.getLocalView());
+
+		// I must turn active the jobsController after create
+		// pendingJobComposite, runningJobComposite and finishedJobComposite.
+		JobsController.turnActive();
+
 		makeActions();
 		hookContextMenu(parent);
 		contributeToActionBars();
@@ -364,7 +228,37 @@ public class SeparatedJobView extends ViewPart {
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
-	public void setFocus() {
+	public void setFocus() {}
 
+	@Override
+	public void dispose() {
+		TableManager.clearInstance();
+		TaskView taskView = TaskView.getInstance();
+		if (taskView != null)
+			taskView.clear();
+		JobInfo jobInfo = JobInfo.getInstance();
+		if (jobInfo != null)
+			jobInfo.clear();
+		JobsOutputController.clearInstance();
+		ProActive.terminateActiveObject(JobsController.getActiveView(), false);
+		ProActive.terminateActiveObject(SchedulerProxy.getInstance(), false);
+		JobsController.clearInstances();
+		SchedulerProxy.clearInstance();
+		super.dispose();
+	}
+
+	private void clearOnDisconnection() {
+		setVisible(false);
+		TaskView taskView = TaskView.getInstance();
+		if (taskView != null)
+			taskView.clear();
+		JobInfo jobInfo = JobInfo.getInstance();
+		
+		if (jobInfo != null)
+			jobInfo.clear();
+		JobsOutputController jobsOutputController = JobsOutputController.getInstance();
+		if (jobsOutputController != null)
+			jobsOutputController.removeAllJobOutput();
+		SchedulerProxy.clearInstance();
 	}
 }

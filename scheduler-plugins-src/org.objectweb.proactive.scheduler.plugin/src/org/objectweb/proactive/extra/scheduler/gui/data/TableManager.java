@@ -50,7 +50,7 @@ import org.objectweb.proactive.extra.scheduler.job.JobId;
 public class TableManager {
 
 	// The shared instance
-	private static TableManager tableManager = null;
+	private static TableManager instance = null;
 	// managed tables
 	private Vector<Table> tables = null;
 	private Table lastSelectedTable = null;
@@ -73,9 +73,13 @@ public class TableManager {
 	 * @return the shared instance
 	 */
 	public static TableManager getInstance() {
-		if (tableManager == null)
-			tableManager = new TableManager();
-		return tableManager;
+		if (instance == null)
+			instance = new TableManager();
+		return instance;
+	}
+	
+	public static void clearInstance() {
+		instance = null;
 	}
 
 	/**
@@ -131,7 +135,7 @@ public class TableManager {
 						table.select(i);
 
 						// get the job by jobId
-						Job job = JobsController.getInstance().getJobById(jId);
+						Job job = JobsController.getLocalView().getJobById(jId);
 
 						// update its informations
 						JobInfo jobInfo = JobInfo.getInstance();

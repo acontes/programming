@@ -204,7 +204,7 @@ public class JobInfo extends ViewPart {
 		if (tableManager != null) {
 			JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
 			if (jobId != null)
-				updateInfos(JobsController.getInstance().getJobById(jobId));
+				updateInfos(JobsController.getLocalView().getJobById(jobId));
 		}
 	}
 

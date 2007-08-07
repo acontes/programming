@@ -38,7 +38,6 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.Activator;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobOutput;
-import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 
 /**
@@ -54,7 +53,7 @@ public class JobsOutputController {
 	public static final String PREFIX_JOB_OUTPUT_TITLE = "Job #";
 
 	// The shared instance
-	private static JobsOutputController jobsOutputController = null;
+	private static JobsOutputController instance = null;
 	private Map<JobId, JobOutputAppender> appenders = null;
 
 	// -------------------------------------------------------------------- //
@@ -73,9 +72,16 @@ public class JobsOutputController {
 	 * @return the shared instance
 	 */
 	public static JobsOutputController getInstance() {
-		if (jobsOutputController == null)
-			jobsOutputController = new JobsOutputController();
-		return jobsOutputController;
+		if (instance == null)
+			instance = new JobsOutputController();
+		return instance;
+	}
+
+	public static void clearInstance() {
+		if (instance != null) {
+			instance.removeAllJobOutput();
+			instance = null;
+		}
 	}
 
 	/**
@@ -101,21 +107,17 @@ public class JobsOutputController {
 	 * Create an output for a job identified by the given jobId
 	 * 
 	 * @param jobId the jobId
+	 * @throws SchedulerException
 	 */
 	public void createJobOutput(JobId jobId) {
 		if (!showJobOutput(jobId)) {
+			SchedulerProxy.getInstance().listenLog(jobId, Activator.getHostname(), Activator.LISTEN_PORT);
 			JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId));
 			Logger log = Logger.getLogger(SchedulerCore.LOGGER_PREFIX + jobId);
 			log.setLevel(Level.ALL);
 			log.removeAllAppenders();
 			log.addAppender(joa);
 			appenders.put(jobId, joa);
-			try {
-				SeparatedJobView.getUserScheduler().listenLog(jobId, Activator.getHostname(),
-						Activator.LISTEN_PORT);
-			} catch (SchedulerException e) {
-				e.printStackTrace();
-			}
 			showJobOutput(jobId);
 		}
 	}
@@ -132,5 +134,14 @@ public class JobsOutputController {
 					new IConsole[] { joa.getJobOutput() });
 		}
 		appenders.remove(jobId);
+	}
+
+	/**
+	 * Remove all output ! This method clear the console.
+	 */
+	public void removeAllJobOutput() {
+		for (JobOutputAppender joa : appenders.values())
+			ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
+					new IConsole[] { joa.getJobOutput() });
 	}
 }

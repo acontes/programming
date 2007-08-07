@@ -30,7 +30,7 @@ package org.objectweb.proactive.extra.scheduler.gui.views;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.extra.scheduler.gui.composite.TaskComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composites.TaskComposite;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.job.Job;
@@ -148,8 +148,11 @@ public class TaskView extends ViewPart {
 		TableManager tableManager = TableManager.getInstance();
 		if(tableManager != null) {
 			JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
-			if(jobId != null)
-				fullUpdate(JobsController.getInstance().getJobById(jobId));
+			if(jobId != null) {
+				JobsController jobsController = JobsController.getLocalView();
+				if(jobsController != null)
+					fullUpdate(jobsController.getJobById(jobId));
+			}
 		}
 	}
 
