@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_with_dep" priority="normal" type="TASK_FLOW">
+<job name="job_with_dep" priority="normal" type="TASKSFLOW">
 	<description>Test of 8 tasks with variable durations and dependencies</description>
 	<tasks>
 		<task name="task1" reRunnable="2">
@@ -80,7 +80,7 @@
 				</javaProcess>
 			</process>
 		</task>
-		<task name="task7" depends="task6 task4 task5" reRunnable="true">
+		<task name="task7" depends="task6 task4 task5" reRunnable="2">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
 			<process>
