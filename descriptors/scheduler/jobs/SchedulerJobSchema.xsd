@@ -103,7 +103,7 @@
 									<xs:attribute name="name"
 										type="xs:string" use="required" />
 									<xs:attribute name="reRunnable"
-										type="xs:boolean" use="optional" />
+										type="xs:integer" use="optional" />
 									<xs:attribute name="finalTask"
 										type="xs:boolean" use="optional" />
 									<xs:attribute name="depends"

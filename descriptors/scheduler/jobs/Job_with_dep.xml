@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_with_dep" priority="normal" >
+<job name="job_with_dep" priority="normal" type="TASK_FLOW">
 	<description>Test of 8 tasks with variable durations and dependencies</description>
 	<tasks>
 		<task name="task1" reRunnable="2">
