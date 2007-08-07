@@ -153,7 +153,7 @@ public class JobFactory {
                 desc.setRerunnable(
                         Integer.parseInt((String) xpath.evaluate("@reRunnable", taskNode,
                             XPathConstants.STRING)));
-                System.out.println("reRun = " + desc.isRerunnable());
+                System.out.println("reRun = " + desc.getRerunnable());
 
                 // TASK RUN TIME LIMIT
                 String timeLimit = (String) xpath.evaluate("@runtimeLimit",

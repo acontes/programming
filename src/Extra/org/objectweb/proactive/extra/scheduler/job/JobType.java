@@ -13,19 +13,31 @@ public enum JobType implements java.io.Serializable {
 	 * Every tasks can communicate with each others.
 	 * So they all have to be executed in same time.
 	 */
-	APPLI,
+	APPLI ("Job Application"),
 	/**
 	 * Tasks can be executed one by one or all in same time but
 	 * every task represents the same native or java task.
 	 * Only the parameters given to the task will change. 
 	 */
-	PARAMETER_SWIPPING,
+	PARAMETER_SWIPPING ("Parameter Swipping"),
 	/** 
 	 * Tasks flow with dependences.
 	 * Only the task that have their dependences finished
 	 * can be executed.
 	 */
-	TASKSFLOW
+	TASKSFLOW ("Task Flow");
 	
+	private String name;
+	
+	
+	JobType (String name) {
+		this.name = name;
+	}
+	
+	
+	@Override
+    public String toString(){
+    	return name;
+    }
 	
 }
