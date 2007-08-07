@@ -2,6 +2,10 @@ package org.objectweb.proactive.extra.scheduler.gui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
+import org.objectweb.proactive.extra.scheduler.job.JobId;
 
 public class KillJobAction extends Action {
 
@@ -17,7 +21,13 @@ public class KillJobAction extends Action {
 	}
 
 	@Override
-	public void run() {}
+	public void run() {
+		TableItem item = TableManager.getInstance().getLastSelectedItem();
+		if (item != null) {
+			JobId jobId = (JobId) item.getData();
+			SchedulerProxy.getInstance().kill(jobId);
+		}
+	}
 
 	public static KillJobAction newInstance() {
 		instance = new KillJobAction();

@@ -2,6 +2,7 @@ package org.objectweb.proactive.extra.scheduler.gui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 
 public class KillSchedulerAction extends Action {
 
@@ -17,7 +18,10 @@ public class KillSchedulerAction extends Action {
 	}
 
 	@Override
-	public void run() {}
+	public void run() {
+		//TODO demander si c'est sur ou non ...
+		SchedulerProxy.getInstance().kill();
+	}
 
 	public static KillSchedulerAction newInstance() {
 		instance = new KillSchedulerAction();
