@@ -34,8 +34,7 @@
 			<xs:sequence>
 				<xs:element name="description" type="xs:string"
 					minOccurs="0" />
-				<xs:element name="owner" type="xs:string" minOccurs="0"
-					 />
+				<xs:element name="owner" type="xs:string" minOccurs="0"/>
 				<xs:element name="priority" default="normal"
 					minOccurs="0">
 					<xs:simpleType>
@@ -134,10 +133,9 @@
 			<xs:attribute name="type" use="required">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="SPMD" />
+						<xs:enumeration value="APPLI" />
 						<xs:enumeration value="TASK_FLOW" />
 						<xs:enumeration value="PARAMETER_SWEEPING" />
-						<xs:enumeration value="SIMPLE" />
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
