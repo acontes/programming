@@ -102,7 +102,9 @@
 					</element>
 				</sequence>
 				<attribute name="commandOptions" type="string"></attribute>
-				<attribute name="hostList" type="string" use="required"></attribute>
+				<attribute name="hostList" type="string"
+					use="required">
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -375,6 +377,40 @@
 				</element>
 			</all>
 		</complexType>
+
+		<!-- Groups refid/id key correctness -->
+		<!--  -->
+		<key name="idKeyGroups">
+			<selector xpath="pa:infrastructure/pa:groups/*" />
+			<field xpath="@id" />
+		</key>
+		<keyref name="refIdKeyGroups" refer="pa:idKeyGroups">
+			<selector xpath="pa:resources/pa:group"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
+
+		<!-- Bridges refid/id key correctness -->
+		<!--  -->
+		<key name="idKeyBridges">
+			<selector xpath="pa:infrastructure/pa:bridges/*" />
+			<field xpath="@id" />
+		</key>
+		<keyref name="refIdKeyBridge" refer="pa:idKeyBridges">
+			<selector xpath="pa:resources/pa:bridge"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
+
+		<!-- Hosts refid/id key correctness -->
+		<!--  -->
+		<key name="idKeyHosts">
+			<selector xpath="pa:infrastructure/pa:hosts/*" />
+			<field xpath="@id" />
+		</key>
+		<keyref name="refIdKeyHost" refer="pa:idKeyHosts">
+			<selector xpath="pa:resources/pa:host"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
+
 	</element>
 
 </schema>
