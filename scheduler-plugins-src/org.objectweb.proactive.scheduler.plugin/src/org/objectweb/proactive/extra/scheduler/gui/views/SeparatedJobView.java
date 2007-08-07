@@ -43,8 +43,10 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ChangeViewModeAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJob;
 import org.objectweb.proactive.extra.scheduler.gui.composites.FinishedJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite;
@@ -52,8 +54,8 @@ import org.objectweb.proactive.extra.scheduler.gui.composites.PendingJobComposit
 import org.objectweb.proactive.extra.scheduler.gui.composites.RunningJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
-import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 
 /**
  * This class display the state of the scheduler in real time
@@ -75,6 +77,9 @@ public class SeparatedJobView extends ViewPart {
 	private Action submitJob = null;
 	private Action pauseResumeJobAction = null;
 	private Action killJobAction = null;
+
+	private Action startStopSchedulerAction = null;
+	private Action killSchedulerAction = null;
 	private Composite parent = null;
 
 	// -------------------------------------------------------------------- //
@@ -111,12 +116,10 @@ public class SeparatedJobView extends ViewPart {
 		manager.add(pauseResumeJobAction);
 		manager.add(obtainJobOutputAction);
 		manager.add(killJobAction);
-		if(SchedulerProxy.getInstance().isAnAdmin()) {
+		if (SchedulerProxy.getInstance().isAnAdmin()) {
 			manager.add(new Separator());
-			manager.add(submitJob);
-			manager.add(pauseResumeJobAction);
-			manager.add(obtainJobOutputAction);
-			manager.add(killJobAction);
+			manager.add(startStopSchedulerAction);
+			manager.add(killSchedulerAction);
 		}
 // // Other plug-ins can contribute there actions here
 // manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -144,6 +147,9 @@ public class SeparatedJobView extends ViewPart {
 		submitJob = SubmitJob.newInstance(parent);
 		pauseResumeJobAction = PauseResumeJobAction.newInstance();
 		killJobAction = KillJobAction.newInstance();
+
+		startStopSchedulerAction = StartStopSchedulerAction.newInstance();
+		killSchedulerAction = KillSchedulerAction.newInstance();
 	}
 
 	// -------------------------------------------------------------------- //
@@ -253,7 +259,7 @@ public class SeparatedJobView extends ViewPart {
 		if (taskView != null)
 			taskView.clear();
 		JobInfo jobInfo = JobInfo.getInstance();
-		
+
 		if (jobInfo != null)
 			jobInfo.clear();
 		JobsOutputController jobsOutputController = JobsOutputController.getInstance();

@@ -33,21 +33,21 @@ public class PauseResumeJobAction extends Action {
 	
 	public void setPauseMode() {
 		paused = false; // If I set the text to "pause", so the job is running ! So not paused
-		this.setText("Pause");
-		this.setToolTipText("To pause this job");
+		this.setText("Pause job");
+		this.setToolTipText("To pause this job (this will finish all running tasks)");
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/pause.png"));
 	}
 	
 	public void setResumeMode() {
 		paused = true; // If I set the text to "resume", so the job is paused !
-		this.setText("Resume");
-		this.setToolTipText("To resume this job");
+		this.setText("Resume job");
+		this.setToolTipText("To resume this job (this will restart all paused tasks)");
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/resume.png"));
 	}
 	
 	public void setPauseResumeMode() {
 		this.setEnabled(false);
-		this.setText("Pause / Resume");
+		this.setText("Pause/Resume job");
 		this.setToolTipText("To pause or resume a job");
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/resume.png"));
 	}

@@ -46,6 +46,11 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
 				ChangeViewModeAction.getInstance().setEnabled(true);
 				SubmitJob.getInstance().setEnabled(true);
+				//TODO si le sched est deja en route mettre en stop
+				StartStopSchedulerAction startStopSchedulerAction = StartStopSchedulerAction.getInstance();
+				startStopSchedulerAction.setStartMode();
+				startStopSchedulerAction.setEnabled(true);
+				
 
 				separatedJobView.setVisible(true);
 			} else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {

@@ -370,34 +370,30 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobKilledEvent(JobId jobId) {
-		System.out.println("JobsController.jobKilledEvent() => " + jobId);
-//
-// Vector<JobId> list = null;
-//
-// if (pendingJobsIds.contains(jobId)) {
-// list = pendingJobsIds;
-// removePendingJobEventInternal(jobId);
-// } else if (runningJobsIds.contains(jobId)) {
-// list = runningJobsIds;
-// removeRunningJobEventInternal(jobId);
-// } else if (finishedJobsIds.contains(jobId)) {
-// list = finishedJobsIds;
-// removeFinishedJobEventInternal(jobId);
-// }
-//
-// Job job = new Job();
-// job.setId(jobId);
-// if (!jobs.remove(job))
-// throw new IllegalStateException("can't remove the job (id = " + jobId + ")
-// from the jobs list !");
-//
-// // remove job from the finished jobs list
-// if (!list.remove(jobId))
-// throw new IllegalStateException("can't remove the job (id = " + jobId + ")
-// from the list !");
-//
-// // remove job's output
-// JobsOutputController.getInstance().removeJobOutput(jobId);
+		Vector<JobId> list = null;
+
+		if (pendingJobsIds.contains(jobId)) {
+			list = pendingJobsIds;
+			removePendingJobEventInternal(jobId);
+		} else if (runningJobsIds.contains(jobId)) {
+			list = runningJobsIds;
+			removeRunningJobEventInternal(jobId);
+		} else if (finishedJobsIds.contains(jobId)) {
+			list = finishedJobsIds;
+			removeFinishedJobEventInternal(jobId);
+		}
+
+		Job job = new Job();
+		job.setId(jobId);
+		if (!jobs.remove(job))
+			throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");
+
+		// remove job from the specified jobs list
+		if (!list.remove(jobId))
+			throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the list !");
+
+		// remove job's output
+		JobsOutputController.getInstance().removeJobOutput(jobId);
 	}
 
 	/**

@@ -15,7 +15,7 @@ public class KillJobAction extends Action {
 
 	private KillJobAction() {
 		this.setText("Kill job");
-		this.setToolTipText("To kill a job");
+		this.setToolTipText("To kill a job (this will remove this job from the scheduler)");
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/kill.png"));
 		this.setEnabled(ENABLED_AT_CONSTRUCTION);
 	}

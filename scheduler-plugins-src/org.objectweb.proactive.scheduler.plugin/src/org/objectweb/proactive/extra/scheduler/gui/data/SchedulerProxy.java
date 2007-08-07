@@ -271,6 +271,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 			logAsAdmin = false;
 			return COULD_NOT_CONNECT_SCHEDULER;
 		} catch (LoginException e) {
+			userName = null;
+			logAsAdmin = false;
 			return LOGIN_OR_PASSWORD_WRONG;
 		}
 	}

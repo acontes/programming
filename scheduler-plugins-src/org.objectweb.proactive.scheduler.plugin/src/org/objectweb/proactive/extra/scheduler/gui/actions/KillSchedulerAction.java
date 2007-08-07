@@ -12,7 +12,7 @@ public class KillSchedulerAction extends Action {
 
 	private KillSchedulerAction() {
 		this.setText("Kill scheduler");
-		this.setToolTipText("To kill the scheduler");
+		this.setToolTipText("To kill the scheduler (this kill immediately the scheduler)");
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/kill.png"));
 		this.setEnabled(ENABLED_AT_CONSTRUCTION);
 	}
