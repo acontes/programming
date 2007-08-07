@@ -76,6 +76,7 @@ public class JobFactory {
         String name = null;
         String priority = null;
         String description = null;
+        JobType jt = null;
         Map<TaskDescriptor, String> tasks = new HashMap<TaskDescriptor, String>();
 
         // JOB
@@ -93,6 +94,16 @@ public class JobFactory {
                 node = jobAttr.getNamedItem("priority");
                 if (node != null) {
                     priority = node.getNodeValue();
+                }
+                // JOB TYPE
+                node = jobAttr.getNamedItem("type");
+                if (node != null) {
+                    String s = node.getNodeValue();
+                    jt = JobType.valueOf(s);
+                    if(jt == null) {
+                    	throw new SAXException("Invalid XML : Job must have a valid type");
+                    }
+                    
                 }
                 // JOB DESCRIPTION
                 description = (String) xpath.evaluate("/job/description", doc,
@@ -140,8 +151,8 @@ public class JobFactory {
 
                 // TASK RE RUNNABLE
                 desc.setRerunnable(
-                        ((String) xpath.evaluate("@reRunnable", taskNode,
-                            XPathConstants.STRING)).equals("true"));
+                        Integer.parseInt((String) xpath.evaluate("@reRunnable", taskNode,
+                            XPathConstants.STRING)));
                 System.out.println("reRun = " + desc.isRerunnable());
 
                 // TASK RUN TIME LIMIT
@@ -188,8 +199,12 @@ public class JobFactory {
         }
 
         // Job creation
-        Job job = new Job(name, getPriority(priority), -1,
-                JobType.APPLI, true, description );
+        Job job = new Job(name, 
+        		getPriority(priority), 
+        		-1,
+                (jt == null ? JobType.TASKSFLOW : jt), 
+                true, 
+                description );
         // Dependencies
         HashMap<String, TaskDescriptor> depends = 
         	new HashMap<String, TaskDescriptor>();
