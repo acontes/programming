@@ -36,15 +36,6 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
 	public int value() {
 		return id;
 	}
-
-	
-	/**
-	 * @see java.lang.Object#clone()
-	 */
-	@Override
-	public TaskId clone() {
-		return new TaskId(this.id);
-	}
 	
 	
 	/**

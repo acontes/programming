@@ -35,6 +35,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	
 	private String name;
 	private String description;
+	/** Parents list */
 	private ArrayList<TaskDescriptor> dependences = null;
 	private VerifyingScript verifyingScript;
 	private Script<?> preTask;

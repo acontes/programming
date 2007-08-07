@@ -20,6 +20,7 @@ import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.job.LightJob;
 import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
@@ -173,6 +174,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 			td.setJobInfo(job.getJobInfo());
 		}
 		jobs.put(job.getId(), new IdentifyJob(job.getId(),identifications.get(id)));
+		//make the light job
+		job.setLightJob(new LightJob(job));
 		scheduler.submit(job);
 		//stats
 		stats.increaseSubmittedJobCount(job.getType());
@@ -352,15 +355,15 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean pause(JobId jobId) {
+	public boolean pause(JobId jobId) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id))
-			return false;
+			throw new SchedulerException(ACCESS_DENIED);
 		IdentifyJob ij = jobs.get(jobId);
 		if (ij == null)
-			return false;
+			throw new SchedulerException("The job represented by this ID is unknow !");
 		if (!ij.hasRight(identifications.get(id)))
-			return false;
+			throw new SchedulerException("You do not have permission to pause  this job !");
 		return scheduler.pause(jobId).booleanValue();
 	}
 	
@@ -368,15 +371,15 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean resume(JobId jobId) {
+	public boolean resume(JobId jobId) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id))
-			return false;
+			throw new SchedulerException(ACCESS_DENIED);
 		IdentifyJob ij = jobs.get(jobId);
 		if (ij == null)
-			return false;
+			throw new SchedulerException("The job represented by this ID is unknow !");
 		if (!ij.hasRight(identifications.get(id)))
-			return false;
+			throw new SchedulerException("You do not have permission to resume this job !");
 		return scheduler.resume(jobId).booleanValue();
 	}
 
@@ -384,15 +387,15 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean kill(JobId jobId) {
+	public boolean kill(JobId jobId) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id))
-			return false;
+			throw new SchedulerException(ACCESS_DENIED);
 		IdentifyJob ij = jobs.get(jobId);
 		if (ij == null)
-			return false;
+			throw new SchedulerException("The job represented by this ID is unknow !");
 		if (!ij.hasRight(identifications.get(id)))
-			return false;
+			throw new SchedulerException("You do not have permission to kill this job !");
 		return scheduler.kill(jobId).booleanValue();
 	}
 

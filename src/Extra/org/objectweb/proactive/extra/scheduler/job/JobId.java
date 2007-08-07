@@ -51,15 +51,6 @@ public final class JobId implements Comparable<JobId>, Serializable, Cloneable {
 	public void setValue(int id) {
 		this.id = id;
 	}
-	
-	
-	/**
-	 * @see java.lang.Object#clone()
-	 */
-	@Override
-	public JobId clone() {
-		return new JobId(this.id);
-	}
 
 
 	/**

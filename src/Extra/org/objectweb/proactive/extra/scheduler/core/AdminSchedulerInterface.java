@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extra.scheduler.core;
 
+import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
+
 
 /**
  * Scheduler interface.
@@ -9,62 +12,69 @@ package org.objectweb.proactive.extra.scheduler.core;
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
-public interface AdminSchedulerInterface {
+public interface AdminSchedulerInterface extends UserSchedulerInterface {
 	
 
 	
 	/**
 	 * Start the scheduler.
 	 * 
-	 * @return true if success, false otherwise.
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean start();
+	public boolean start() throws SchedulerException;
 	
 	
 	/**
 	 * Stop the scheduler.
 	 * 
-	 * @return true if success, false otherwise.
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean stop();
+	public boolean stop() throws SchedulerException;
 	
 	
 	/**
 	 * Pause the scheduler by terminating running jobs.
 	 * 
-	 * @return true if success, false otherwise.
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean pause();
+	public boolean pause() throws SchedulerException;
 	
 	
 	/**
 	 * Pause the scheduler by terminating running tasks.
 	 * 
-	 * @return true if success, false otherwise.
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean pauseImmediate();
+	public boolean pauseImmediate() throws SchedulerException;
 	
 	
 	/**
 	 * Resume the scheduler.
 	 * 
-	 * @return true if success, false otherwise.
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean resume();
+	public boolean resume() throws SchedulerException;
 	
 	
 	/**
 	 * Shutdown the scheduler.
 	 * 
-	 * @return true if success, false otherwise.
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean shutdown();
+	public boolean shutdown() throws SchedulerException;
 	
 	
 	/**
 	 * kill the scheduler.
 	 * 
-	 * @return true if success, false otherwise.
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean kill();
+	public boolean kill() throws SchedulerException;
 }

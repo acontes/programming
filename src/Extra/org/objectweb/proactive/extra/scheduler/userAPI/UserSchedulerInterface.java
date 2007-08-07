@@ -92,9 +92,10 @@ public interface UserSchedulerInterface extends Serializable{
 	 * The job won't be terminated, it won't have result.
 	 * 
 	 * @param jobId the job to kill.
-	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean kill (JobId jobId);
+	public boolean kill (JobId jobId) throws SchedulerException;
 	
 	
 	/**
@@ -103,9 +104,10 @@ public interface UserSchedulerInterface extends Serializable{
 	 * The job will have to be resumed in order to finish.
 	 * 
 	 * @param jobId the job to pause.
-	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean pause (JobId jobId);
+	public boolean pause (JobId jobId) throws SchedulerException;
 	
 	
 	/**
@@ -113,7 +115,8 @@ public interface UserSchedulerInterface extends Serializable{
 	 * This method will restart every tasks of this job.
 	 * 
 	 * @param jobId the job to resume.
-	 * @return true if success, false otherwise. (false can be due to insufficient permission)
+	 * @return true if success, false if not.
+	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean resume (JobId jobId);
+	public boolean resume (JobId jobId) throws SchedulerException;
 }

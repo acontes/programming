@@ -153,26 +153,41 @@ public class AdminCommunicator {
             	output("killed the scheduler is impossible for the moment.\n");
             }
         }else if (command.startsWith(PAUSEJOB_CMD)) {
-            boolean success = scheduler.pause(new JobId(Integer.parseInt(command.split(" ")[1])));
-            if (success) {
-                output("Job paused.\n");
-            } else {
-                output("Paused job is impossible !!\n");
-            }
+        	try{
+	            boolean success = scheduler.pause(new JobId(Integer.parseInt(command.split(" ")[1])));
+	            if (success) {
+	                output("Job paused.\n");
+	            } else {
+	                output("Paused job is impossible !!\n");
+	            }
+        	}
+        	catch(SchedulerException e){
+        		output("Error while pausing this job !! : "+e.getMessage()+"\n");
+        	}
         }else if (command.startsWith(RESUMEJOB_CMD)) {
-            boolean success = scheduler.resume(new JobId(Integer.parseInt(command.split(" ")[1])));
-            if (success) {
-                output("Job resumed.\n");
-            } else {
-                output("Resume job is impossible !!\n");
-            }
+        	try{
+	            boolean success = scheduler.resume(new JobId(Integer.parseInt(command.split(" ")[1])));
+	            if (success) {
+	                output("Job resumed.\n");
+	            } else {
+	                output("Resume job is impossible !!\n");
+	            }
+        	}
+        	catch(SchedulerException e){
+        		output("Error while resuming this job !! : "+e.getMessage()+"\n");
+        	}
         }else if (command.startsWith(KILLJOB_CMD)) {
-            boolean success = scheduler.kill(new JobId(Integer.parseInt(command.split(" ")[1])));
-            if (success) {
-                output("Job killed.\n");
-            } else {
-                output("Kill job is impossible !!\n");
-            }
+        	try{
+	            boolean success = scheduler.kill(new JobId(Integer.parseInt(command.split(" ")[1])));
+	            if (success) {
+	                output("Job killed.\n");
+	            } else {
+	                output("Kill job is impossible !!\n");
+	            }
+        	}
+        	catch(SchedulerException e){
+        		output("Error while killing this job !! : "+e.getMessage()+"\n");
+        	}
         } else {
             output("UNKNOWN COMMAND!!... Please type '?' or 'help' to see the list of commands\n");
         }

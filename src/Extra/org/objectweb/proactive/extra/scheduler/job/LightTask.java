@@ -1,9 +1,10 @@
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.job;
 
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.TaskId;
 
 /**
  * This class represents a task for the policy.
@@ -22,6 +23,8 @@ public class LightTask implements Serializable {
 	private TaskId id;
 	/** job id */
 	private JobId jobId;
+	/** number of parents remaining (initial value must be 0) */
+	private int count = 0;
 	/** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
 	private Vector<LightTask> parents;
 	/** list of ordered children tasks for this task (null if jobType!=TASK_FLOW) */
@@ -34,17 +37,8 @@ public class LightTask implements Serializable {
 	 * @param td the taskDescriptor to shrink.
 	 */
 	public LightTask(TaskDescriptor td) {
-		this.id = td.getId().clone();
-		this.jobId = td.getJobId().clone();
-	}
-	
-	/**
-	 * Get a new light task using a taskId.
-	 * 
-	 * @param tid the id of a light task.
-	 */
-	public LightTask(TaskId tid) {
-		this.id = tid;
+		this.id = td.getId();
+		this.jobId = td.getJobId();
 	}
 
 
@@ -85,6 +79,26 @@ public class LightTask implements Serializable {
 	 */
 	public JobId getJobId() {
 		return jobId;
+	}
+	
+
+	/**
+	 * Return the number of parents remaining
+	 * 
+	 * @return the number of parents remaining.
+	 */
+	int getCount() {
+		return count;
+	}
+
+
+	/**
+	 * Set the number of parents remaining.
+	 * 
+	 * @param count the number of parents remaining.
+	 */
+	void setCount(int count) {
+		this.count = count;
 	}
 	
 	

@@ -30,9 +30,9 @@ import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.job.LightJob;
+import org.objectweb.proactive.extra.scheduler.job.LightTask;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
-import org.objectweb.proactive.extra.scheduler.task.LightTask;
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
@@ -178,21 +178,16 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	
 	private void schedule() {
 		// TODO en cours
-		// TODO réfléchir comment passer les dépendances en lecture seule et
-		// les tâches élligibles dans une liste.
 		// build light job list with eligible jobs (running and pending)
 		ArrayList<LightJob> LightJobList = new ArrayList<LightJob>();
 		for (Job j : runningJobs){
-			LightJobList.add(new LightJob(j));
+			LightJobList.add(j.getLightJob());
 		}
 		for (Job j : pendingJobs){
-			LightJobList.add(new LightJob(j));
+			LightJobList.add(j.getLightJob());
 		}
 		//ask the policy all the tasks to be schedule according to the jobs list.
-		Vector<LightTask> taskRetrivedFromPolicy = policy.getReadyTasks(LightJobList);
-		//TODO attention la liste (vector) dans un light job est modifiable
-		//et je me base la dessus pour maintenir les dépendances
-		//schedule the tasks
+		Vector<? extends LightTask> taskRetrivedFromPolicy = policy.getReadyTasks(LightJobList);
 		while (!taskRetrivedFromPolicy.isEmpty() && resourceManager.hasFreeResources().booleanValue()){
 			LightTask lightTask = taskRetrivedFromPolicy.remove(0);
 			Job currentJob = jobs.get(lightTask.getJobId());
@@ -222,8 +217,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 						// don't forget to set the task status modify to null after a Job.start() method;
 						currentJob.setTaskStatusModify(null);
 					}
-					currentJob.setNumberOfPendingTasks(currentJob.getNumberOfPendingTask()-1);
-					currentJob.setNumberOfRunningTasks(currentJob.getNumberOfRunningTask()+1);
+					currentJob.startTask(taskDescriptor.getId());
 					// set the different informations on task
 					taskDescriptor.setStatus(Status.RUNNNING);
 					taskDescriptor.setStartTime(System.currentTimeMillis());
@@ -232,6 +226,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					frontend.pendingToRunningTaskEvent(taskDescriptor.getTaskInfo());
 				} catch (Exception e) {
 					// TODO qué fa ? rendre le noeud et reessayer avec un autre.
+					// ne pas oublier de sauver dans une liste les tache qui ont merdé et les relancer
+					//autant qu'il le faut
 					e.printStackTrace();
 				}
 			}
@@ -387,8 +383,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//job info preparation for listener
 		HashMap<JobId,JobEvent> statusList = new HashMap<JobId,JobEvent>();
 		for (Job j : pendingJobs){
-			j.setPaused();
-			statusList.put(j.getId(), j.getJobInfo());
+			if (j.setPaused())
+				statusList.put(j.getId(), j.getJobInfo());
 		}
 		state = State.PAUSED;
 		logger.info("Scheduler has just been paused !");
@@ -413,12 +409,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//job info preparation for listener
 		HashMap<JobId,JobEvent> statusList = new HashMap<JobId,JobEvent>();
 		for (Job j : pendingJobs){
-			j.setPaused();
-			statusList.put(j.getId(), j.getJobInfo());
+			if (j.setPaused())
+				statusList.put(j.getId(), j.getJobInfo());
 		}
 		for (Job j : runningJobs){
-			j.setPaused();
-			statusList.put(j.getId(), j.getJobInfo());
+			if (j.setPaused())
+				statusList.put(j.getId(), j.getJobInfo());
 		}
 		state = State.PAUSED_IMMEDIATE;
 		logger.info("Scheduler has just been immediate paused !");

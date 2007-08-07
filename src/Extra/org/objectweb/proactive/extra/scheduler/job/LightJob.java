@@ -1,11 +1,12 @@
 package org.objectweb.proactive.extra.scheduler.job;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Vector;
-import org.objectweb.proactive.extra.scheduler.task.LightTask;
+import org.objectweb.proactive.extra.scheduler.task.EligibleLightTask;
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.TaskId;
 
 
 /**
@@ -28,10 +29,9 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	/** Job type */
 	private JobType type;
 	/** Job tasks to be able to be schedule */
-	private Vector<LightTask> eligibleTasks = new Vector<LightTask>(); 
-	
-	
-	private LightJob(){}
+	private HashMap<TaskId,EligibleLightTask> eligibleTasks = new HashMap<TaskId,EligibleLightTask>();
+	/** Job running tasks */
+	private HashMap<TaskId,LightTask> runningTasks = new HashMap<TaskId,LightTask>(); 
 	
 	
 	/**
@@ -41,17 +41,17 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	 * @param job the entire job to be lighted.
 	 */
 	public LightJob(Job job){
-		id = job.getId().clone();
+		id = job.getId();
 		priority = job.getPriority();
 		type = job.getType();
 		if (type == JobType.TASKSFLOW) {
 			//build dependence tree
 			makeTree(job);
-		} else { // type is not TASKSFLOW
+		} else {
 			//every tasks are eligible
 			for (TaskDescriptor td : job.getTasks()){
-				if (td.getStatus() == Status.SUBMITTED || td.getStatus() == Status.PENDING){
-					eligibleTasks.add(new LightTask(td));
+				if (td.getStatus() == Status.SUBMITTED){
+					eligibleTasks.put(td.getId(),new EligibleLightTask(td));
 				}
 			}
 		}
@@ -62,40 +62,59 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	 * Make a dependences tree of the job's tasks according to the dependence list
 	 * stored in taskDescriptor.
 	 * This list represents the ordered TaskDescriptor list of its parent tasks.
-	 * 
 	 */
 	private void makeTree(Job job){
 		HashMap<TaskDescriptor,LightTask> mem = new HashMap<TaskDescriptor, LightTask>();
 		//create lightTask list
 		for (TaskDescriptor td : job.getTasks()){
-			mem.put(td,new LightTask(td));
 			//if this task is a first task, put it in eligible tasks list
-			if (!td.hasDependences())
-				eligibleTasks.add(mem.get(td));
+			EligibleLightTask lt = new EligibleLightTask(td);
+			if (!td.hasDependences()){
+				eligibleTasks.put(td.getId(),lt);
+			} 
+			mem.put(td,lt);
 		}
-		//now for each taskDescriptor, set the parents list
+		//now for each taskDescriptor, set the parents and children list
 		for (TaskDescriptor td : job.getTasks()){
+			LightTask lightTask = mem.get(td);
 			for(TaskDescriptor depends : td.getDependences()){
-				mem.get(td).addParent(mem.get(depends));
+				lightTask.addParent(mem.get(depends));
+			}
+			lightTask.setCount(td.getDependences().size());
+			for (LightTask lt : lightTask.getParents()){
+				lt.addChild(lightTask);
 			}
 		}
-		//TODO make child dependence
 	}
-
+	
 	
 	/**
-	 * Clone this job.
-	 * Every modifications on the returned job won't have effect on the scheduler state.
-	 * @see java.lang.Object#clone()
+	 * Delete this task from eligible task view and add it to running view.
+	 * 
+	 * @param taskId the task that has just been started.
 	 */
-	@SuppressWarnings("unchecked")
-	public LightJob clone(){
-		LightJob lj = new LightJob();
-		lj.id = id.clone();
-		lj.priority = priority;
-		lj.type = type;
-		lj.eligibleTasks = (Vector<LightTask>)eligibleTasks.clone();
-		return lj;
+	public void start(TaskId taskId){
+		runningTasks.put(taskId,eligibleTasks.get(taskId));
+		eligibleTasks.remove(taskId);
+	}
+	
+	/**
+	 * Update the eligible list of task and dependencies if necessary.
+	 * This function considered that the taskId is in eligible task list.
+	 * 
+	 * @param taskId the task to remove from running task.
+	 */
+	public void terminate(TaskId taskId){
+		if (type == JobType.TASKSFLOW){
+			LightTask lt = runningTasks.get(taskId);
+			for (LightTask task : lt.getChildren()){
+				task.setCount(task.getCount()-1);
+				if (task.getCount() == 0){
+					eligibleTasks.put(task.getId(),(EligibleLightTask)task);
+				}
+			}
+		}
+		runningTasks.remove(taskId);
 	}
 	
 	
@@ -122,8 +141,8 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	 * 
 	 * @return the tasks
 	 */
-	public Vector<LightTask> getEligibleTasks() {
-		return eligibleTasks;
+	public Collection<EligibleLightTask> getEligibleTasks() {
+		return eligibleTasks.values();
 	}
 
 	/**

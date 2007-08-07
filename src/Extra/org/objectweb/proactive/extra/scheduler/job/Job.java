@@ -200,8 +200,20 @@ public class Job implements Serializable, Comparable<Job> {
 		}
 		return true;
 	}
+	
 
-
+	/**
+	 * Start a new task will set some count and update dependencies if necessary.
+	 * 
+	 * @param id the task which has just been started.
+	 */
+	public void startTask(TaskId id) {
+		setNumberOfPendingTasks(getNumberOfPendingTask()-1);
+		setNumberOfRunningTasks(getNumberOfRunningTask()+1);
+		lightJob.start(id);
+	}
+	
+	
 	/**
 	 * Terminate a task, change status, managing dependences
 	 * 
@@ -214,7 +226,7 @@ public class Job implements Serializable, Comparable<Job> {
 		descriptor.setStatus(Status.FINISHED);
 		setNumberOfRunningTasks(getNumberOfRunningTask()-1);
 		setNumberOfFinishedTasks(getNumberOfFinishedTask()+1);
-		//TODO mettre à jour les dependances
+		lightJob.terminate(taskId);
 		return descriptor;
 	}
 	
@@ -542,7 +554,7 @@ public class Job implements Serializable, Comparable<Job> {
 		this.lightJob = lightJob;
 	}
 	
-
+	
 	/**
 	 * @return the owner
 	 */
@@ -564,6 +576,7 @@ public class Job implements Serializable, Comparable<Job> {
 	public boolean setPaused() {
 		if (isPaused())
 			return false;
+		jobInfo.setPaused(true);
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
 			if (td.getStatus() == Status.SUBMITTED){
@@ -583,6 +596,7 @@ public class Job implements Serializable, Comparable<Job> {
 	public boolean setUnPause() {
 		if (isRunning())
 			return false;
+		jobInfo.setPaused(false);
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
 			if (td.getStatus() == Status.PAUSED_S){
