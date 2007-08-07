@@ -41,7 +41,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	private Script<?> preTask;
 	private Script<?> postTask;
 	private long runTimeLimit;
-	private boolean rerunnable;
+	private int rerunnable;
 	private boolean finalTask;
 	private TaskLauncher runningTask;
 	private TaskEvent taskInfo = new TaskEvent();
@@ -109,8 +109,8 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 					: ((int)(task.getFinishedTime()-getFinishedTime()));
 		case SORT_BY_RERUNNABLE:
 			return (currentOrder == ASC_ORDER)
-					? (new Boolean(isRerunnable()).compareTo(new Boolean(task.isRerunnable())))
-					: (new Boolean(task.isRerunnable()).compareTo(new Boolean(isRerunnable())));
+					? (new Integer(getRerunnable()).compareTo(new Integer(task.getRerunnable())))
+					: (new Integer(task.getRerunnable()).compareTo(new Integer(getRerunnable())));
 		case SORT_BY_RUN_TIME_LIMIT:
 			return (currentOrder == ASC_ORDER)
 					? ((int)(getRunTimeLimit()-task.getRunTimeLimit()))
@@ -218,15 +218,20 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	}
 
 	/**
-	 * To know if this task has to be reRun after failure or not.
+	 * Get the number of possible rerun for this task.
 	 * 
-	 * @return true if the task has to be reRun, false if not.
+	 * @return the number of possible rerun for this task.
 	 */
-	public boolean isRerunnable() {
+	public int getRerunnable() {
 		return rerunnable;
 	}
 	
-	public void setRerunnable(boolean reRunnable) {
+	/**
+	 * Set the number of possible rerun for this task.
+	 * 
+	 * @param reRunnable the number of rerun possible for this task.
+	 */
+	public void setRerunnable(int reRunnable) {
 		this.rerunnable = reRunnable;
 	}
 

@@ -69,12 +69,14 @@ public enum Status implements java.io.Serializable {
     
     private String name;
     
+    
+    Status (String name) {
+    	this.name = name;
+    }
+    
+    
     @Override
     public String toString(){
     	return name;
     }
-    
-    Status (String name) {
-		this.name = name;
-	}
 }
