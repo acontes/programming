@@ -17,6 +17,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeRSHParser;
@@ -38,8 +39,6 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
-    public static final String DEPLOYMENT_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd";
-    public static final String DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema";
     protected Document document;
     protected DocumentBuilderFactory domFactory;
     protected XPath xpath;
@@ -119,7 +118,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
             xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                    DESCRIPTOR_NAMESPACE));
+                    DEPLOYMENT_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

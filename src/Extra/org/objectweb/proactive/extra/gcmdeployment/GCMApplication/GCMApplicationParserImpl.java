@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,20 +17,18 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParserExecutable;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParserProactive;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
-import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderScript;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -46,8 +43,6 @@ import org.xml.sax.SAXException;
  *  - Write some comment to explain how it works
  */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
-    public static final String APPLICATION_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd";
-    public static final String DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema";
     protected File descriptor;
     protected Document document;
     protected DocumentBuilderFactory domFactory;
@@ -117,7 +112,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
             xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                    DESCRIPTOR_NAMESPACE));
+                    GCMParserConstants.APPLICATION_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
