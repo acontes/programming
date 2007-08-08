@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.BodyEventListener;
@@ -167,9 +168,17 @@ public class LocalBodyStore {
      * @see org.objectweb.proactive.core.body.Context
      */
     public Context popContext() {
+        if (isRmiThread()){
+            throw new ProActiveRuntimeException("RMI Thread pops a context ?? : CALL CHRISTIAN !!!!!!");
+        }
         return this.contexts.get().pop();
     }
 
+    
+    private boolean isRmiThread () {
+        return Thread.currentThread().getName().contains("RMI");
+    }
+    
     /**
      * Get the current context. The current context is not removed from the stack
      * associated to the calling thread. If no context is associated with the
