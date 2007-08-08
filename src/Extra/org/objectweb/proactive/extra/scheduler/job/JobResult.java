@@ -1,6 +1,8 @@
 package org.objectweb.proactive.extra.scheduler.job;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import org.objectweb.proactive.extra.scheduler.task.TaskResult;
 
 
 /**
@@ -15,8 +17,7 @@ public class JobResult implements Serializable {
 	/** Serial version UID */
 	private static final long serialVersionUID = 6287355063616273677L;
 	private JobId id = null;
-	private Object result = null;
-    private Throwable exception = null;
+	private HashMap<String,TaskResult> taskResults = null;
 
     
     /**
@@ -33,31 +34,10 @@ public class JobResult implements Serializable {
      * @param result the result associated with this result
      * @param 
      */
-    public JobResult(JobId id, Object result, Throwable exception){
+    public JobResult(JobId id){
     	this.id = id;
-    	this.result = result;
-    	this.exception = exception;
     }
     
-
-	/**
-	 * To get the exception
-	 * 
-	 * @return the exception
-	 */
-	public Throwable getException() {
-		return exception;
-	}
-
-	/**
-	 * To set the exception
-	 * 
-	 * @param exception the exception to set
-	 */
-	public void setException(Throwable exception) {
-		this.exception = exception;
-	}
-
 	/**
 	 * To get the id
 	 * 
@@ -66,43 +46,30 @@ public class JobResult implements Serializable {
 	public JobId getId() {
 		return id;
 	}
-
+	
+	
 	/**
-	 * To set the id
+	 * Add a new task result to this job result.
 	 * 
-	 * @param id the id to set
+	 * @param taskName user define name (in XML) of the task.
+	 * @param taskResult the corresponding result of the task.
 	 */
-	public void setId(JobId id) {
-		this.id = id;
-	}
-
-	/**
-	 * To get the result
-	 * 
-	 * @return the result
-	 */
-	public Object getResult() {
-		return result;
+	public void addTaskResult(String taskName, TaskResult taskResult){
+		if (taskResults == null)
+			taskResults = new HashMap<String, TaskResult>();
+		taskResults.put(taskName,taskResult);
 	}
 	
 	
 	/**
-	 * Return true if an exception has occured, false otherwise.
+	 * Return the task results of this job as a mapping between
+	 * user task name (in XML jo description) and its task result.
+	 * User that wants to get a specific result may get this map and ask for a specific mapping.
 	 * 
-	 * @return true if an exception has occured, false otherwise.
+	 * @return the task result as a map.
 	 */
-	public boolean exceptionOccured() {
-		return exception != null;
-	}
-	
-
-	/**
-	 * To set the result
-	 * 
-	 * @param result the result to set
-	 */
-	public void setResult(Object result) {
-		this.result = result;
+	public HashMap<String,TaskResult> getTaskResults(){
+		return taskResults;
 	}
 	
 }

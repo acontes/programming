@@ -80,7 +80,7 @@
 				</javaProcess>
 			</process>
 		</task>
-		<task name="task7" depends="task6 task4 task5" reRunnable="2">
+		<task name="task7" depends="task6 task4 task5" reRunnable="2" finalTask="true" >
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
 			<process>

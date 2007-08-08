@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.scheduler.job;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
@@ -39,8 +40,8 @@ public class Job implements Serializable, Comparable<Job> {
 	private String description = "";
 	// TODO envParameters
 	private HashMap<TaskId,TaskDescriptor> tasks = new HashMap<TaskId,TaskDescriptor>();
-	/** instance of the final task, important to know when the job is finished */
-	private TaskDescriptor finalTask;
+	/** Instances of the final task, important to know which results will be sent to user */
+	private Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
 	/** informations about job execution */
 	private JobEvent jobInfo = new JobEvent();
 	/** Light job for dependences management */
@@ -178,7 +179,7 @@ public class Job implements Serializable, Comparable<Job> {
 	public boolean addTask(TaskDescriptor task) {
 		task.setJobId(getId());
 		if (task.isFinalTask())
-			finalTask = task;
+			finalTasks.add(task);
 		boolean result = (tasks.put(task.getId(),task) == null);
 		if (result)
 			jobInfo.setTotalNumberOfTasks(jobInfo.getTotalNumberOfTasks()+1);
@@ -226,7 +227,15 @@ public class Job implements Serializable, Comparable<Job> {
 		descriptor.setStatus(Status.FINISHED);
 		setNumberOfRunningTasks(getNumberOfRunningTask()-1);
 		setNumberOfFinishedTasks(getNumberOfFinishedTask()+1);
+		//terminate this task
 		lightJob.terminate(taskId);
+		//creating list of status
+		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
+		for (TaskDescriptor td : tasks.values()){
+			hts.put(td.getId(), td.getStatus());
+		}
+		//updating light job for eligible task
+		lightJob.update(hts);
 		return descriptor;
 	}
 	
@@ -355,8 +364,8 @@ public class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @return the finalTask
 	 */
-	public TaskDescriptor getFinalTask() {
-		return finalTask;
+	public Vector<TaskDescriptor> getFinalTasks() {
+		return finalTasks;
 	}
 
 	/**

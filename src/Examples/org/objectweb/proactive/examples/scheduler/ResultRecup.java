@@ -2,9 +2,12 @@ package org.objectweb.proactive.examples.scheduler;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Map.Entry;
+
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
@@ -22,7 +25,7 @@ public class ResultRecup {
 				auth = SchedulerConnection.join(null);
 			}
 			
-			scheduler = auth.logAsUser("john", "john");
+			scheduler = auth.logAsUser("chri", "chri");
 
             InputStreamReader reader = new InputStreamReader(System.in);
 
@@ -46,10 +49,13 @@ public class ResultRecup {
             		try {
             			JobResult result = scheduler.getResult(new JobId(i));
             			if (result != null) {
-            				if (!result.exceptionOccured()) {
-            					System.out.println("Job "+i+" Result => "+result.getResult());
-            				} else {
-            					System.out.println("Job "+i+" Error => " + result.getException().getMessage());
+            				System.out.println("Job "+i+" Result => ");
+            				for (Entry<String,TaskResult> e : result.getTaskResults().entrySet()){
+            					TaskResult tRes = e.getValue();
+            					if (tRes.hadException())
+            						System.out.println("\t "+e.getKey()+" : "+tRes.getException().getMessage());
+            					else
+            						System.out.println("\t "+e.getKey()+" : "+tRes.value());
             				}
             			} else {
             				System.out.println("Job "+i+" is not finished or unknown !");

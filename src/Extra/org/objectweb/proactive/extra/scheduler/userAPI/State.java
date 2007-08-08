@@ -49,6 +49,7 @@ public enum State implements java.io.Serializable {
 	SHUTTING_DOWN ("Shutting down"),
 	/**
 	 * The scheduler has been killed, nothing can be done anymore.
+	 * (Similar to Ctrl-C)
 	 */
 	KILLED ("Killed");
 	

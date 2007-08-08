@@ -15,7 +15,6 @@ public class JobFactoryTest {
 			System.out.println("OK");
 			InputStream is = new FileInputStream(f);
 			Job j = JobFactory.getFactory().createJob(is);
-			System.out.println(j.getFinalTask().getName());
 			System.out.println(j.getTasks().size());
 		}
 	}

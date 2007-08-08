@@ -115,12 +115,10 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	void terminate(TaskId taskId){
 		if (type == JobType.TASKSFLOW){
 			LightTask lt = runningTasks.get(taskId);
-			if (lt.getChildren() != null){
-				for (LightTask task : lt.getChildren()){
-					task.setCount(task.getCount()-1);
-					if (task.getCount() == 0){
-						eligibleTasks.put(task.getId(),(EligibleLightTask)task);
-					}
+			for (LightTask task : lt.getChildren()){
+				task.setCount(task.getCount()-1);
+				if (task.getCount() == 0){
+					eligibleTasks.put(task.getId(),(EligibleLightTask)task);
 				}
 			}
 		}
@@ -137,11 +135,17 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	void update(HashMap<TaskId, Status> status){
 		for (Entry<TaskId,Status> tid : status.entrySet()){
 			if (tid.getValue() == Status.PAUSED_P || tid.getValue() == Status.PAUSED_S){
-				pausedTasks.put(tid.getKey(),eligibleTasks.get(tid.getKey()));
-				eligibleTasks.remove(tid.getKey());
+				LightTask lt = eligibleTasks.get(tid.getKey());
+				if (lt != null){
+					pausedTasks.put(tid.getKey(),eligibleTasks.get(tid.getKey()));
+					eligibleTasks.remove(tid.getKey());
+				}
 			} else if (tid.getValue() == Status.PENDING || tid.getValue() == Status.SUBMITTED){
-				eligibleTasks.put(tid.getKey(),(EligibleLightTask)pausedTasks.get(tid.getKey()));
-				pausedTasks.remove(tid.getKey());
+				EligibleLightTask lt = (EligibleLightTask)pausedTasks.get(tid.getKey());
+				if (lt != null){
+					eligibleTasks.put(tid.getKey(),lt);
+					pausedTasks.remove(tid.getKey());
+				}
 			}
 		}
 	}

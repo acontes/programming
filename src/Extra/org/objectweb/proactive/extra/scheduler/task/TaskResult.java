@@ -10,23 +10,18 @@ public class TaskResult implements Serializable {
 	private Object value = null;
 	private Throwable exception = null;
 
-	/**
-	 * ProActive empty constructor.
-	 * 
-	 */
+	/** ProActive empty constructor. */
 	public TaskResult(){}
 	
-	public TaskResult(TaskId id){
-		this.id = id;
-	}
 	
 	public TaskResult(TaskId id, Object value) {
-		this(id);
+		this.id = id;
 		this.value = value;
 	}
 
+	
 	public TaskResult(TaskId id, Throwable exception) {
-		this(id);
+		this.id = id;
 		this.exception = exception;
 	}
 
@@ -38,15 +33,7 @@ public class TaskResult implements Serializable {
 	public Throwable getException() {
 		return exception;
 	}
-
-	/**
-	 * To set the exception
-	 * 
-	 * @param exception the exception to set
-	 */
-	public void setException(Throwable exception) {
-		this.exception = exception;
-	}
+	
 
 	/**
 	 * To get the id
@@ -56,15 +43,7 @@ public class TaskResult implements Serializable {
 	public TaskId getTaskId() {
 		return id;
 	}
-
-	/**
-	 * To set the id
-	 * 
-	 * @param id the id to set
-	 */
-	public void setTaskId(TaskId id) {
-		this.id = id;
-	}
+	
 
 	/**
 	 * To get the value
@@ -75,12 +54,13 @@ public class TaskResult implements Serializable {
 		return value;
 	}
 
+	
 	/**
-	 * To set the value
+	 * To know if an exception has occured on this task.
 	 * 
-	 * @param value the value to set
+	 * @return true if an exception occured, false if not.
 	 */
-	public void setValue(Object value) {
-		this.value = value;
+	public boolean hadException(){
+		return exception != null;
 	}
 }

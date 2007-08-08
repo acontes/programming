@@ -14,10 +14,16 @@ public class WaitAndPrint extends JavaTask {
 	public Object execute(TaskResult... results) {
 		 String message;
 	        try {
-	        	System.out.println("Démarrage de la tache numero "+number);
+	        	System.err.println("Démarrage de la tache numero "+number);
+	        	System.out.println("Parameters are : ");
+	        	for(TaskResult tRes : results){
+	        		if (tRes.hadException())
+						System.out.println("\t "+tRes.getTaskId()+" : "+tRes.getException().getMessage());
+					else
+						System.out.println("\t "+tRes.getTaskId()+" : "+tRes.value());
+	        	}
 	            message = java.net.InetAddress.getLocalHost().toString();
 	            Thread.sleep(sleepTime * 1000);
-	            System.err.println("Fin d'attente de la tache numero "+number);
 	        } catch (Exception e) {
 	            message = "crashed";
 	            e.printStackTrace();
@@ -29,7 +35,6 @@ public class WaitAndPrint extends JavaTask {
 
 	@Override
 	public void init(Map<String, Object> args) {
-		//super.init(args);
 		sleepTime = Integer.parseInt((String)args.get("sleepTime"));
 		number = Integer.parseInt((String)args.get("number"));
 		for (String key : args.keySet()){

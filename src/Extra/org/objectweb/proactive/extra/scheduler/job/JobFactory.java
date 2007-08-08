@@ -230,9 +230,6 @@ public class JobFactory {
             job.addTask(task.getKey());
         }
         
-        if(job.getFinalTask() == null) {
-        	throw new SAXException("Invalid XML : must contain a final task");
-        }
         return job;
     }
 

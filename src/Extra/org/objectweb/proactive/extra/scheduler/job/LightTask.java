@@ -48,6 +48,7 @@ public class LightTask implements Serializable {
 	 * @return the children
 	 */
 	public Vector<LightTask> getChildren() {
+		if (children == null) return new Vector<LightTask>();
 		return children;
 	}
 
@@ -68,6 +69,7 @@ public class LightTask implements Serializable {
 	 * @return the parents
 	 */
 	public Vector<LightTask> getParents() {
+		if (parents == null) return new Vector<LightTask>();
 		return parents;
 	}
 

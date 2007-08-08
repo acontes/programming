@@ -29,6 +29,7 @@ import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.job.JobType;
 import org.objectweb.proactive.extra.scheduler.job.LightJob;
 import org.objectweb.proactive.extra.scheduler.job.LightTask;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
@@ -131,7 +132,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		ProActive.setImmediateService("listenLog");
 		Service service = new Service(body);
 		//set the filter for serveAll method
-		RequestFilter filter = new MainLoopRequestFilter("submit","terminate");
+		RequestFilter filter = new MainLoopRequestFilter("submit","pause","terminate");
 		do {
 			service.blockingServeOldest();
 			while(state == State.STARTED || state == State.PAUSED){
@@ -204,7 +205,17 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					}
 					taskDescriptor.setRunningTask(launcher);
 					//TODO gérer les résultats à faire suivre dans le cas d'un task flow
-					taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask()));
+					//if job is TASKSFLOW, preparing the list of parameters for this task.
+					int resultSize = lightTask.getParents().size();
+					if (currentJob.getType() == JobType.TASKSFLOW && resultSize > 0){
+						TaskResult[] params = new TaskResult[resultSize];
+						for (int i=0;i<resultSize;i++){
+							params[i] = taskResults.get(lightTask.getParents().get(i).getId());
+						}
+						taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask(),params));
+					} else {
+						taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask()));
+					}
 					logger.info(">>>>>>>> New task started on "+node.getNodeInformation().getHostName()+" [ "+taskDescriptor.getId()+" ]");
 					// set the different informations on job
 					if (currentJob.getStartTime() == -1){
@@ -249,19 +260,19 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		logger.info("<<<<<<<< Terminated task on job "+jobId+" [ "+taskId+" ]");
 		//The task is terminated but it's possible to have to
 		//wait for the futur of the task result (TaskResult).
+		//accessing to the taskResult could block current execution but for a little time.
+		//it is the time between the end of the task and the arrival of the futur from the task.
 		Job job = jobs.get(jobId);
 		TaskDescriptor descriptor = job.terminateTask(taskId);
 		frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
-		//TODO si y'a pas de tache finale, terminer quand toutes les taches sont finies
-		if (job.getFinalTask().equals(descriptor)){
-			//job is finished, creating jobResult
-			//accessing to the taskResult could block current execution but for a little time.
+		//store this result if the job is PARAMETER_SWIPPING or APPLI or if it is a final task.
+		if (job.getType() != JobType.TASKSFLOW || descriptor.isFinalTask()){
 			TaskResult res = taskResults.get(taskId);
-			JobResult jobResult = new JobResult(jobId,res.value(),res.getException());
-			//store the job result until user get it
-			results.put(jobId,jobResult);
-			//TODO être sur que toutes les listes sont vides lors de la terminaison d'un job
-			taskResults.remove(taskId);
+			results.get(job.getId()).addTaskResult(descriptor.getName(),res);
+		}
+		//if this job is finished (every task are finished)
+		if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()){
+			//TODO supprimer tous les task results dans la liste des taskResults
 			job.setFinishedTime(System.currentTimeMillis());
 			runningJobs.remove(job);
 			finishedJobs.add(job);
@@ -289,6 +300,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		job.setSubmittedTime(System.currentTimeMillis());
 		jobs.put(job.getId(), job);
 		pendingJobs.add(job);
+		//creating job result storage
+		JobResult jobResult = new JobResult(job.getId());
+		//store the job result until user get it
+		results.put(job.getId(),jobResult);
+		//sending event to client
 		frontend.newPendingJobEvent(job);
 		logger.info("New job added containing "+job.getTotalNumberOfTasks()+" tasks !");
 	}
@@ -343,9 +359,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#start()
 	 */
 	public BooleanWrapper coreStart() {
-		if (state == State.SHUTTING_DOWN || state == State.KILLED){
-			return new BooleanWrapper(false);
-		}
 		if (state != State.STOPPED)
 			return new BooleanWrapper(false);
 		state = State.STARTED;
@@ -359,10 +372,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#stop()
 	 */
 	public BooleanWrapper coreStop() {
-		if (state == State.SHUTTING_DOWN || state == State.KILLED){
-			return new BooleanWrapper(false);
-		}
-		if (state == State.STOPPED)
+		if (state == State.STOPPED || state == State.SHUTTING_DOWN || state == State.KILLED)
 			return new BooleanWrapper(false);
 		state = State.STOPPED;
 		logger.info("Scheduler has just been stopped, it will finish every submitted jobs...");
@@ -521,8 +531,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (state == State.SHUTTING_DOWN || state == State.KILLED){
 			return new BooleanWrapper(false);
 		}
-		boolean change = jobs.get(jobId).setPaused();
-		JobEvent event = jobs.get(jobId).getJobInfo();
+		Job job = jobs.get(jobId);
+		boolean change = job.setPaused();
+		JobEvent event = job.getJobInfo();
 		if (change)
 			logger.info("job "+jobId+" has just been paused !");
 		frontend.jobPausedEvent(event);
@@ -542,8 +553,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (state == State.SHUTTING_DOWN || state == State.KILLED){
 			return new BooleanWrapper(false);
 		}
-		boolean change = jobs.get(jobId).setUnPause();
-		JobEvent event = jobs.get(jobId).getJobInfo();
+		Job job = jobs.get(jobId);
+		boolean change = job.setUnPause();
+		JobEvent event = job.getJobInfo();
 		if (change)
 			logger.info("job "+jobId+" has just been resumed !");
 		frontend.jobResumedEvent(event);
@@ -565,6 +577,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			return new BooleanWrapper(false);
 		}
 		Job job = jobs.get(jobId);
+		jobs.remove(jobId);
 		for (TaskDescriptor td : job.getTasks()){
 			if (td.getRunningTask() != null){
 				ProActive.terminateActiveObject(td.getRunningTask(), true);
@@ -572,7 +585,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			}
 		}
 		if (runningJobs.remove(job) || pendingJobs.remove(job) || finishedJobs.remove(job));
-		jobs.remove(jobId);
 		results.remove(jobId);
 		logger.info("job "+jobId+" has just been killed !");
 		frontend.jobKilledEvent(jobId);
