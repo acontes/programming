@@ -2,7 +2,7 @@
 <job name="job_8_tasks" priority="normal" >
 	<description>Simple test of 8 tasks with variable durations</description>
 	<tasks>
-		<task name="task1" reRunnable="true">
+		<task name="task1" reRunnable="2">
 			<!-- Task human description -->
 			<description>This task will sleep 8s</description><!--
 			<preTask>
@@ -86,7 +86,7 @@
 				</javaProcess>
 			</process>
 		</task>
-		<task name="task6" reRunnable="true">
+		<task name="task6" reRunnable="1">
 			<!-- Task human description -->
 			<description>This task will sleep 5s</description>
 			<process>
