@@ -8,7 +8,7 @@ public class FileTransferBlock {
         return destination;
     }
 
-    protected void setDestination(String destination) {
+    public void setDestination(String destination) {
         this.destination = destination;
     }
 
@@ -16,7 +16,7 @@ public class FileTransferBlock {
         return source;
     }
 
-    protected void setSource(String source) {
+    public void setSource(String source) {
         this.source = source;
     }
 }

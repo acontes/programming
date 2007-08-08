@@ -5,6 +5,7 @@ import java.util.Iterator;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -16,6 +17,18 @@ public class GCMParserHelper {
         return (namedItem != null) ? namedItem.getNodeValue() : null;
     }
 
+    static public FileTransferBlock parseFileTransferNode(Node fileTransferNode) {
+        FileTransferBlock fileTransferBlock = new FileTransferBlock();
+        String source = GCMParserHelper.getAttributeValue(fileTransferNode,
+                "source");
+        fileTransferBlock.setSource(source);
+        String destination = GCMParserHelper.getAttributeValue(fileTransferNode,
+                "destination");
+        fileTransferBlock.setDestination(destination);
+
+        return fileTransferBlock;
+    }
+    
     static public class MyDefaultHandler extends DefaultHandler {
         private String errMessage = "";
 

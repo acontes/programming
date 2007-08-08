@@ -246,14 +246,10 @@
 		</attribute>
 	</complexType>
 
-	<complexType name="GCMApplicationType">
+	<complexType name="applicationType">
 		<sequence>
 			<element name="proactive" type="pa:proactiveType"
 				minOccurs="0">
-			</element>
-			<element name="resourceProvider"
-				type="pa:resourceProviderType" minOccurs="0"
-				maxOccurs="unbounded">
 			</element>
 			<element name="executable" type="pa:executableType"
 				minOccurs="0">
@@ -261,6 +257,43 @@
 		</sequence>
 	</complexType>
 
-	<element name="GCMApplication" type="pa:GCMApplicationType"></element>
+	<complexType name="ressourcesType">
+		<sequence>
+			<element name="resourceProvider"
+				type="pa:resourceProviderType" minOccurs="0"
+				maxOccurs="unbounded">
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="GCMApplicationType">
+		<sequence>
+			<element name="application" type="pa:applicationType"
+				minOccurs="1" maxOccurs="1">
+			</element>
+			<element name="resources" type="pa:ressourcesType"
+				minOccurs="1" maxOccurs="1">
+			</element>
+		</sequence>
+	</complexType>
+
+	<element name="GCMApplication" type="pa:GCMApplicationType">
+		<!-- resource providers refid/id key correctness -->
+		<!--  -->
+		<key name="idResourceProviders">
+			<selector xpath="pa:resources/pa:resourceProvider" />
+			<field xpath="@id" />
+		</key>
+		<keyref name="refIdKeyResourceProvider"
+			refer="pa:idResourceProviders">
+			<selector xpath="pa:application/pa:executable/pa:resourceProvider"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
+		<keyref name="refIdKeyResourceProvider2"
+			refer="pa:idResourceProviders">
+			<selector xpath="pa:application/pa:proactive/pa:virtualNode/pa:resourceProvider"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
+	</element>
 
 </schema>

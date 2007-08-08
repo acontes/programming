@@ -39,7 +39,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         }
 
         // 1. Load all GCM Deployment Descriptor
-        Set<GCMDeploymentDescriptor> gdds;
+        Map<String, GCMDeploymentDescriptor> gdds;
         gdds = gadParser.getResourceProviders();
 
         // 2. Get Virtual Node and Command Builder
@@ -51,7 +51,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         gdds = selectGCMD(virtualNodes, gdds);
 
         // 5. Start the deployment
-        for (GCMDeploymentDescriptor gdd : gdds) {
+        for (GCMDeploymentDescriptor gdd : gdds.values()) {
             gdd.start(commandBuilder);
         }
 
@@ -77,8 +77,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
      *            GCM Deployment Descriptor providing some resources
      * @return A
      */
-    static private Set<GCMDeploymentDescriptor> selectGCMD(
-        Map<String, VirtualNodeInternal> vns, Set<GCMDeploymentDescriptor> gdds) {
+    static private Map<String, GCMDeploymentDescriptor> selectGCMD(
+        Map<String, VirtualNodeInternal> vns, Map<String, GCMDeploymentDescriptor> gdds) {
         // TODO: Implement this method
         return gdds;
     }

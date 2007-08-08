@@ -23,7 +23,7 @@ public interface GCMApplicationParser extends GCMParserConstants {
      *
      * @return all the declared Resources Providers as ResourceProviderParams
      */
-    public Set<GCMDeploymentDescriptor> getResourceProviders();
+    public Map<String, GCMDeploymentDescriptor> getResourceProviders();
 
     /**
      * Returns all the Virtual Node
