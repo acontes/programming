@@ -7,7 +7,7 @@
 		Finally this last task will be the final result.
 	</description>
 	<tasks>
-		<task name="Computation1" finalTask="true">
+		<task name="Computation1">
 			<!-- Task human description -->
 			<description>Compute Pi and return it</description>
 			<process>
