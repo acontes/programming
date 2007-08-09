@@ -384,7 +384,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (state == State.STOPPED || state == State.SHUTTING_DOWN || state == State.KILLED)
 			return new BooleanWrapper(false);
 		state = State.STOPPED;
-		logger.info("Scheduler has just been stopped, it will finish every submitted jobs...");
+		logger.info("Scheduler has just been stopped, no tasks will be launched until start.");
 		frontend.schedulerStoppedEvent();
 		return new BooleanWrapper(true);
 	}
