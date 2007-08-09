@@ -168,8 +168,8 @@ public class LocalBodyStore {
      * @see org.objectweb.proactive.core.body.Context
      */
     public Context popContext() {
-        if (isRmiThread()){
-            throw new ProActiveRuntimeException("RMI Thread pops a context ?? : CALL CHRISTIAN !!!!!!");
+        if ((isRmiThread()) && (this.contexts.get().size()==1)){
+            throw new ProActiveRuntimeException("RMI Thread pops the last context ?? : CALL CHRISTIAN !!!!!! ");
         }
         return this.contexts.get().pop();
     }
