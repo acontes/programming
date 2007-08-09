@@ -15,12 +15,10 @@ public class ConnectDeconnectSchedulerAction extends Action {
 	public static final boolean ENABLED_AT_CONSTRUCTION = true;
 
 	private static ConnectDeconnectSchedulerAction instance = null;
-	private SeparatedJobView separatedJobView = null;
 	private Composite parent = null;
 
-	private ConnectDeconnectSchedulerAction(SeparatedJobView separatedJobView, Composite parent) {
+	private ConnectDeconnectSchedulerAction(Composite parent) {
 		this.parent = parent;
-		this.separatedJobView = separatedJobView;
 		this.setText("Connect to a scheduler");
 		this.setToolTipText("Connect to a started scheduler by its url");
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/run.png"));
@@ -40,19 +38,16 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
 				// the call "JobsController.getActiveView().init();"
 				// must be terminated here, before starting other call.
-				separatedJobView.getPendingJobComposite().initTable();
-				separatedJobView.getRunningJobComposite().initTable();
-				separatedJobView.getFinishedJobComposite().initTable();
+				SeparatedJobView.getPendingJobComposite().initTable();
+				SeparatedJobView.getRunningJobComposite().initTable();
+				SeparatedJobView.getFinishedJobComposite().initTable();
 
 				ChangeViewModeAction.getInstance().setEnabled(true);
-				SubmitJob.getInstance().setEnabled(true);
-				//TODO si le sched est deja en route mettre en stop
-				StartStopSchedulerAction startStopSchedulerAction = StartStopSchedulerAction.getInstance();
-				startStopSchedulerAction.setStartMode();
-				startStopSchedulerAction.setEnabled(true);
-				
+				SubmitJobAction.getInstance().setEnabled(true);
+				StartStopSchedulerAction.getInstance().setEnabled(true);
+				KillSchedulerAction.getInstance().setEnabled(true);
 
-				separatedJobView.setVisible(true);
+				SeparatedJobView.setVisible(true);
 			} else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
 				MessageDialog.openError(parent.getShell(), "Couldn't connect",
 						"The login and/or the password are wrong !");
@@ -63,8 +58,8 @@ public class ConnectDeconnectSchedulerAction extends Action {
 		}
 	}
 
-	public static ConnectDeconnectSchedulerAction newInstance(SeparatedJobView separatedJobView, Composite parent) {
-		instance = new ConnectDeconnectSchedulerAction(separatedJobView, parent);
+	public static ConnectDeconnectSchedulerAction newInstance(Composite parent) {
+		instance = new ConnectDeconnectSchedulerAction(parent);
 		return instance;
 	}
 

@@ -34,9 +34,19 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.core.SchedulerEvent;
+import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ResumeSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ShutdownSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
@@ -159,7 +169,8 @@ public class JobsController implements SchedulerEventListener {
 	@Override
 	public void pendingToRunningJobEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		getJobById(jobId).update(event);
+		Job job = getJobById(jobId);
+		job.update(event);
 
 		// remember if the job, which changing list, was selected
 		boolean remember = TableManager.getInstance().isJobSelectedInThisTable(jobId,
@@ -182,8 +193,11 @@ public class JobsController implements SchedulerEventListener {
 		addRunningJobEventInternal(jobId);
 
 		// if the job was selected, move its selection to an other table
-		if (remember)
+		if (remember) {
 			TableManager.getInstance().moveJobSelection(jobId, JobComposite.RUNNING_TABLE_ID);
+			// update the available buttons
+			SeparatedJobView.getRunningJobComposite().jobSelected(job);
+		}
 	}
 
 	/**
@@ -192,7 +206,8 @@ public class JobsController implements SchedulerEventListener {
 	@Override
 	public void runningToFinishedJobEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		getJobById(jobId).update(event);
+		Job job = getJobById(jobId);
+		job.update(event);
 
 		// remember if the job, which changing list, was selected
 		boolean remember = TableManager.getInstance().isJobSelectedInThisTable(jobId,
@@ -215,8 +230,11 @@ public class JobsController implements SchedulerEventListener {
 		addFinishedJobEventInternal(jobId);
 
 		// if the job was selected, move its selection to an other table
-		if (remember)
+		if (remember) {
 			TableManager.getInstance().moveJobSelection(jobId, JobComposite.FINISHED_TABLE_ID);
+			// update the available buttons
+			SeparatedJobView.getFinishedJobComposite().jobSelected(job);
+		}
 	}
 
 	/**
@@ -301,68 +319,165 @@ public class JobsController implements SchedulerEventListener {
 		}
 	}
 
+	// TODO trouver un nom quand même...
+	private void jeSaisPasLeNom() {
+		SubmitJobAction.getInstance().setEnabled(true);
+		TableManager tableManager = TableManager.getInstance();
+		JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
+		Job job = null;
+		if (jobId != null)
+			job = getJobById(jobId);
+		if (job == null) {
+			ObtainJobOutputAction.getInstance().setEnabled(false);
+			PauseResumeJobAction.getInstance().setEnabled(false);
+			KillJobAction.getInstance().setEnabled(false);
+		} else if (tableManager.isItTheLastSelectedTable(JobComposite.FINISHED_TABLE_ID)) {
+			ObtainJobOutputAction.getInstance().setEnabled(
+					SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
+			PauseResumeJobAction.getInstance().setEnabled(false);
+			PauseResumeJobAction.getInstance().setPauseResumeMode();
+			KillJobAction.getInstance().setEnabled(false);
+		} else { // The table selected is the pending or the running table
+			boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
+			// enabling/disabling button permitted with this job
+			ObtainJobOutputAction.getInstance().setEnabled(enabled);
+			PauseResumeJobAction.getInstance().setEnabled(enabled);
+			if (job.isPaused())
+				PauseResumeJobAction.getInstance().setResumeMode();
+			else
+				PauseResumeJobAction.getInstance().setPauseMode();
+			KillJobAction.getInstance().setEnabled(enabled);
+		}
+	}
+	
+	// TODO trouver un nom quand même...
+	public void jeNeSaisToujoursPas() {
+		TableManager tableManager = TableManager.getInstance();
+		JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
+		Job job = null;
+		if (jobId != null)
+			job = getJobById(jobId);
+		if (job == null) {
+			ObtainJobOutputAction.getInstance().setEnabled(false);
+			KillJobAction.getInstance().setEnabled(false);
+		} else if (tableManager.isItTheLastSelectedTable(JobComposite.FINISHED_TABLE_ID)) {
+			ObtainJobOutputAction.getInstance().setEnabled(
+					SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
+			KillJobAction.getInstance().setEnabled(false);
+		} else { // The table selected is the pending or the running table
+			boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
+			// enabling/disabling button permitted with this job
+			ObtainJobOutputAction.getInstance().setEnabled(enabled);
+			KillJobAction.getInstance().setEnabled(enabled);
+		}
+
+		SubmitJobAction.getInstance().setEnabled(false);
+		PauseResumeJobAction.getInstance().setEnabled(false);
+		PauseResumeJobAction.getInstance().setPauseResumeMode();
+	}
+
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
 	 */
 	@Override
-	public void SchedulerImmediatePausedEvent(SchedulerEvent event) {
-		event.update(jobs);
+	public void schedulerImmediatePausedEvent() {
+		jeSaisPasLeNom();
+
+		StartStopSchedulerAction.getInstance().setEnabled(false);
+		FreezeSchedulerAction.getInstance().setEnabled(false);
+		PauseSchedulerAction.getInstance().setEnabled(false);
+		ResumeSchedulerAction.getInstance().setEnabled(true);
+		ShutdownSchedulerAction.getInstance().setEnabled(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
 	 */
 	@Override
-	public void SchedulerPausedEvent(SchedulerEvent event) {
-		event.update(jobs);
+	public void schedulerPausedEvent() {
+		jeSaisPasLeNom();
+
+		StartStopSchedulerAction.getInstance().setEnabled(false);
+		FreezeSchedulerAction.getInstance().setEnabled(false);
+		PauseSchedulerAction.getInstance().setEnabled(false);
+		ResumeSchedulerAction.getInstance().setEnabled(true);
+		ShutdownSchedulerAction.getInstance().setEnabled(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
 	 */
 	@Override
-	public void SchedulerResumedEvent(SchedulerEvent event) {
-		event.update(jobs);
+	public void schedulerResumedEvent() {
+		jeSaisPasLeNom();
+
+		StartStopSchedulerAction.getInstance().setEnabled(true);
+		FreezeSchedulerAction.getInstance().setEnabled(true);
+		PauseSchedulerAction.getInstance().setEnabled(true);
+		ResumeSchedulerAction.getInstance().setEnabled(false);
+		ShutdownSchedulerAction.getInstance().setEnabled(true);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerShutDownEvent()
 	 */
 	@Override
-	public void SchedulerShutDownEvent() {
-		System.out.println("JobsController.SchedulerShutDownEvent() AVANT");
+	public void schedulerShutDownEvent() {
+		System.out.println("JobsController.SchedulerShutDownEvent() FINNNNNNNNNNNNNNNNNNNNNNNN");
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerShuttingDownEvent()
 	 */
 	@Override
-	public void SchedulerShuttingDownEvent() {
-		System.out.println("JobsController.SchedulerShuttingDownEvent()");
+	public void schedulerShuttingDownEvent() {
+		jeNeSaisToujoursPas();
+		
+		StartStopSchedulerAction.getInstance().setEnabled(false);
+		FreezeSchedulerAction.getInstance().setEnabled(false);
+		PauseSchedulerAction.getInstance().setEnabled(false);
+		ResumeSchedulerAction.getInstance().setEnabled(false);
+		ShutdownSchedulerAction.getInstance().setEnabled(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent()
 	 */
 	@Override
-	public void SchedulerStartedEvent() {
-		System.out.println("JobsController.SchedulerStartedEvent()");
+	public void schedulerStartedEvent() {
+		jeSaisPasLeNom();
+
+		StartStopSchedulerAction.getInstance().setEnabled(true);
+		StartStopSchedulerAction.getInstance().setStopMode();
+		FreezeSchedulerAction.getInstance().setEnabled(true);
+		PauseSchedulerAction.getInstance().setEnabled(true);
+		ResumeSchedulerAction.getInstance().setEnabled(false);
+		ShutdownSchedulerAction.getInstance().setEnabled(true);
+		KillSchedulerAction.getInstance().setEnabled(true);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent()
 	 */
 	@Override
-	public void SchedulerStoppedEvent() {
-		System.out.println("JobsController.SchedulerStoppedEvent()");
+	public void schedulerStoppedEvent() {
+		jeNeSaisToujoursPas();
+
+		StartStopSchedulerAction.getInstance().setEnabled(true);
+		StartStopSchedulerAction.getInstance().setStartMode();
+		FreezeSchedulerAction.getInstance().setEnabled(false);
+		PauseSchedulerAction.getInstance().setEnabled(false);
+		ResumeSchedulerAction.getInstance().setEnabled(false);
+		ShutdownSchedulerAction.getInstance().setEnabled(true);
+		KillSchedulerAction.getInstance().setEnabled(true);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent()
 	 */
 	@Override
-	public void SchedulerkilledEvent() {
-		System.out.println("JobsController.SchedulerkilledEvent()");
+	public void schedulerKilledEvent() {
+		System.out.println("JobsController.SchedulerkilledEvent() fiiiiiiinnnn VIOLENTE");
 	}
 
 	/**
@@ -401,7 +516,20 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobPausedEvent(JobEvent event) {
-		System.out.println("JobsController.jobPausedEvent() => " + event.getJobId());
+		final Job job = getJobById(event.getJobId());
+		job.update(event);
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				// update info
+				JobInfo jobInfo = JobInfo.getInstance();
+				if (jobInfo != null)
+					jobInfo.updateInfos(job);
+
+				TaskView taskView = TaskView.getInstance();
+				if (taskView != null)
+					taskView.fullUpdate(job);
+			}
+		});
 	}
 
 	/**
@@ -409,7 +537,28 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobResumedEvent(JobEvent event) {
-		System.out.println("JobsController.jobResumedEvent() => " + event.getJobId());
+		final Job job = getJobById(event.getJobId());
+		job.update(event);
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				// update info
+				JobInfo jobInfo = JobInfo.getInstance();
+				if (jobInfo != null)
+					jobInfo.updateInfos(job);
+
+				TaskView taskView = TaskView.getInstance();
+				if (taskView != null)
+					taskView.fullUpdate(job);
+			}
+		});
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 */
+	@Override
+	public void changeJobPriorityEvent(JobEvent event) {
+		// TODO Auto-generated method stub
 	}
 
 	// -------------------------------------------------------------------- //
@@ -525,7 +674,7 @@ public class JobsController implements SchedulerEventListener {
 	/**
 	 * Initiate the controller. Warning, this method must be synchronous.
 	 * 
-	 * @return true only if no error caught.
+	 * @return true only if no error caught, for synchronous call.
 	 */
 	public boolean init() {
 		SchedulerState state = SchedulerProxy.getInstance().addSchedulerEventListener(
@@ -533,6 +682,27 @@ public class JobsController implements SchedulerEventListener {
 
 		if (state == null) // addSchedulerEventListener failed
 			return false;
+
+		switch (state.getState()) {
+		case KILLED:
+			schedulerKilledEvent();
+			break;
+		case PAUSED:
+			schedulerPausedEvent();
+			break;
+		case PAUSED_IMMEDIATE:
+			schedulerImmediatePausedEvent();
+			break;
+		case SHUTTING_DOWN:
+			schedulerShuttingDownEvent();
+			break;
+		case STARTED:
+			schedulerStartedEvent();
+			break;
+		case STOPPED:
+			schedulerStoppedEvent();
+			break;
+		}
 
 		jobs = new Vector<Job>();
 		pendingJobsIds = new Vector<JobId>();

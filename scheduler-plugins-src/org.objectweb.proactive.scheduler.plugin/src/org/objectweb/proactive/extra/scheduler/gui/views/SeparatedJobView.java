@@ -37,17 +37,22 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ChangeViewModeAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ResumeSchedulerAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.ShutdownSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJob;
+import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.composites.FinishedJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composites.PendingJobComposite;
@@ -68,9 +73,9 @@ public class SeparatedJobView extends ViewPart {
 	/** the view part id */
 	public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView";
 	private static final long serialVersionUID = -6958852991395601640L;
-	private JobComposite pendingJobComposite = null;
-	private JobComposite runningJobComposite = null;
-	private JobComposite finishedJobComposite = null;
+	private static JobComposite pendingJobComposite = null;
+	private static JobComposite runningJobComposite = null;
+	private static JobComposite finishedJobComposite = null;
 	private Action connectSchedulerAction = null;
 	private Action changeViewModeAction = null;
 	private Action obtainJobOutputAction = null;
@@ -79,7 +84,12 @@ public class SeparatedJobView extends ViewPart {
 	private Action killJobAction = null;
 
 	private Action startStopSchedulerAction = null;
+	private Action freezeSchedulerAction = null;
+	private Action pauseSchedulerAction = null;
+	private Action resumeSchedulerAction = null;
+	private Action shutdownSchedulerAction = null;
 	private Action killSchedulerAction = null;
+
 	private Composite parent = null;
 
 	// -------------------------------------------------------------------- //
@@ -119,6 +129,10 @@ public class SeparatedJobView extends ViewPart {
 		if (SchedulerProxy.getInstance().isAnAdmin()) {
 			manager.add(new Separator());
 			manager.add(startStopSchedulerAction);
+			manager.add(freezeSchedulerAction);
+			manager.add(pauseSchedulerAction);
+			manager.add(resumeSchedulerAction);
+			manager.add(shutdownSchedulerAction);
 			manager.add(killSchedulerAction);
 		}
 // // Other plug-ins can contribute there actions here
@@ -141,15 +155,22 @@ public class SeparatedJobView extends ViewPart {
 	}
 
 	private void makeActions() {
-		connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(this, parent);
+		Shell shell = parent.getShell();
+
+		connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(parent);
 		changeViewModeAction = ChangeViewModeAction.newInstance(parent);
+
 		obtainJobOutputAction = ObtainJobOutputAction.newInstance();
-		submitJob = SubmitJob.newInstance(parent);
+		submitJob = SubmitJobAction.newInstance(parent);
 		pauseResumeJobAction = PauseResumeJobAction.newInstance();
-		killJobAction = KillJobAction.newInstance();
+		killJobAction = KillJobAction.newInstance(shell);
 
 		startStopSchedulerAction = StartStopSchedulerAction.newInstance();
-		killSchedulerAction = KillSchedulerAction.newInstance();
+		freezeSchedulerAction = FreezeSchedulerAction.newInstance();
+		pauseSchedulerAction = PauseSchedulerAction.newInstance();
+		resumeSchedulerAction = ResumeSchedulerAction.newInstance();
+		shutdownSchedulerAction = ShutdownSchedulerAction.newInstance(shell);
+		killSchedulerAction = KillSchedulerAction.newInstance(shell);
 	}
 
 	// -------------------------------------------------------------------- //
@@ -160,7 +181,7 @@ public class SeparatedJobView extends ViewPart {
 	 * 
 	 * @param visible
 	 */
-	public void setVisible(boolean visible) {
+	public static void setVisible(boolean visible) {
 		pendingJobComposite.setVisible(visible);
 		runningJobComposite.setVisible(visible);
 		finishedJobComposite.setVisible(visible);
@@ -177,7 +198,7 @@ public class SeparatedJobView extends ViewPart {
 	 * 
 	 * @return the pending job composite
 	 */
-	public JobComposite getPendingJobComposite() {
+	public static JobComposite getPendingJobComposite() {
 		return pendingJobComposite;
 	}
 
@@ -186,7 +207,7 @@ public class SeparatedJobView extends ViewPart {
 	 * 
 	 * @return the running job composite
 	 */
-	public JobComposite getRunningJobComposite() {
+	public static JobComposite getRunningJobComposite() {
 		return runningJobComposite;
 	}
 
@@ -195,7 +216,7 @@ public class SeparatedJobView extends ViewPart {
 	 * 
 	 * @return the finished job composite
 	 */
-	public JobComposite getFinishedJobComposite() {
+	public static JobComposite getFinishedJobComposite() {
 		return finishedJobComposite;
 	}
 

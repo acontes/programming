@@ -128,7 +128,7 @@ public class TableManager {
 				TableItem[] items = table.getItems();
 				for (int i = 0; i < items.length; i++)
 					if (((JobId) items[i].getData()).equals(jId)) {
-						// TODO on pourrait peut enlever tte les selection
+						// TODO on pourrait peut etre enlever tte les selection
 						// table.deselectAll(); sur toute les tables...
 
 						// select the job
@@ -164,6 +164,12 @@ public class TableManager {
 				|| (lastJobIdOfLastSelectedItem == null))
 			return false;
 		return lastJobIdOfLastSelectedItem.equals(jobId);
+	}
+	
+	public boolean isItTheLastSelectedTable(int tableId) {
+		if(lastSelectedTable == null)
+			return false;
+		return ((Integer) lastSelectedTable.getData()).equals(tableId);
 	}
 
 	// -------------------------------------------------------------------- //

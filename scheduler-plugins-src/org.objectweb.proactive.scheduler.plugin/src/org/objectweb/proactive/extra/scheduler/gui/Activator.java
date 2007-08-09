@@ -31,6 +31,7 @@ import java.net.UnknownHostException;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -82,6 +83,7 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		// TODO simpleLoggerServer.stop();
 
+		SchedulerProxy.getInstance().disconnect();
 		plugin = null;
 		super.stop(context);
 	}

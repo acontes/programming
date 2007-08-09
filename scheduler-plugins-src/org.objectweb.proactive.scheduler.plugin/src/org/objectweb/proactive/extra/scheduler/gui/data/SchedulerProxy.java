@@ -11,6 +11,7 @@ import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
@@ -115,9 +116,9 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	 *      java.lang.String, int)
 	 */
 	@Override
-	public void listenLog(JobId jobId, String arg1, int arg2) {
+	public void listenLog(JobId jobId, String hostname, int port) {
 		try {
-			scheduler.listenLog(jobId, arg1, arg2);
+			scheduler.listenLog(jobId, hostname, port);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
@@ -251,6 +252,19 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#changePriority(org.objectweb.proactive.extra.scheduler.job.JobId,
+	 *      org.objectweb.proactive.extra.scheduler.job.JobPriority)
+	 */
+	@Override
+	public void changePriority(JobId jobId, JobPriority priority) {
+		try {
+			scheduler.changePriority(jobId, priority);
+		} catch (SchedulerException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// -------------------------------------------------------------------- //
