@@ -9,6 +9,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
@@ -98,6 +99,14 @@ public class UserScheduler implements UserSchedulerInterface {
 		return schedulerFrontend.kill(jobId);
 	}
 	
+	
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#changePriority(org.objectweb.proactive.extra.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
+	 */
+	public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
+		schedulerFrontend.changePriority(jobId, priority);
+	}
+	
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#getStats()
@@ -105,5 +114,6 @@ public class UserScheduler implements UserSchedulerInterface {
 	public Stats getStats() throws SchedulerException {
 		return schedulerFrontend.getStats();
 	}
+
 	
 }

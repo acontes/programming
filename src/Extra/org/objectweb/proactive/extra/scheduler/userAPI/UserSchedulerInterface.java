@@ -1,11 +1,11 @@
 package org.objectweb.proactive.extra.scheduler.userAPI;
 
 import java.io.Serializable;
-
 import org.objectweb.proactive.extra.scheduler.core.Stats;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 
 /**
@@ -112,11 +112,20 @@ public interface UserSchedulerInterface extends Serializable{
 	
 	/**
 	 * Resume the job represented by jobId.
-	 * This method will restart every tasks of this job.
+	 * This method will restart every non-finished tasks of this job.
 	 * 
 	 * @param jobId the job to resume.
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
 	public boolean resume (JobId jobId) throws SchedulerException;
+	
+	
+	/**
+	 * Change the priority of the job represented by jobId.
+	 * 
+	 * @param jobId the job on whitch to change the priority.
+	 * @throws SchedulerException (can be due to insufficient permission)
+	 */
+	public void changePriority (JobId jobId, JobPriority priority) throws SchedulerException;
 }

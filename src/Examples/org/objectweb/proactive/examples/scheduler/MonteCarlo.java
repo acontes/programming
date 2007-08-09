@@ -25,14 +25,12 @@ public class MonteCarlo extends JavaTask {
         if (args.containsKey("steps")) {
             try {
                 steps = Long.parseLong(args.get("steps").toString());
-            } catch (NumberFormatException e) { /* Not grave */
-            }
+            } catch (NumberFormatException e) { }
         }
         if (args.containsKey("iterations")) {
             try {
             	iterations = Long.parseLong(args.get("iterations").toString());
-            } catch (NumberFormatException e) { /* Not grave */
-            }
+            } catch (NumberFormatException e) { }
         }
         if (args.containsKey("file")) {
             file = args.get("file").toString();

@@ -18,13 +18,13 @@ public interface SchedulerEventListener extends Serializable {
 	/**
 	 * Invoked when the scheduler has just been started.
 	 */
-	public void SchedulerStartedEvent();
+	public void schedulerStartedEvent();
 	
 	
 	/**
 	 * Invoked when the scheduler has just been stopped.
 	 */
-	public void SchedulerStoppedEvent();
+	public void schedulerStoppedEvent();
 	
 	
 	/**
@@ -33,25 +33,25 @@ public interface SchedulerEventListener extends Serializable {
 	 * @param event the scheduler informations about the status of every tasks.
 	 * 		use <code>SchedulerEvent.update(Vector<<Job>>)</code> to update your job.
 	 */
-	public void SchedulerPausedEvent();
+	public void schedulerPausedEvent();
 	
 	
 	/**
 	 * Invoked when the scheduler has received a paused immediate signal.
 	 */
-	public void SchedulerImmediatePausedEvent();
+	public void schedulerImmediatePausedEvent();
 	
 	
 	/**
 	 * Invoked when the scheduler has just been resumed.
 	 */
-	public void SchedulerResumedEvent();
+	public void schedulerResumedEvent();
 	
 	
 	/**
 	 * Invoked when the scheduler shutdown sequence is initialised.
 	 */
-	public void SchedulerShuttingDownEvent();
+	public void schedulerShuttingDownEvent();
 	
 	
 	/**
@@ -59,14 +59,14 @@ public interface SchedulerEventListener extends Serializable {
 	 * 
 	 * @param job the new scheduled job.
 	 */
-	public void SchedulerShutDownEvent();
+	public void schedulerShutDownEvent();
 	
 	
 	/**
 	 * Invoked when the scheduler has just been killed.
 	 * Scheduler is not reachable anymore.
 	 */
-	public void SchedulerkilledEvent();
+	public void schedulerKilledEvent();
 	
 	
 	/**
@@ -103,6 +103,7 @@ public interface SchedulerEventListener extends Serializable {
 	/**
 	 * Invoked when the scheduling of a job has just started.
 	 * The description of the job is contained in the jobEvent given.
+	 * Use Job.update(JobEvent) to update your job.
 	 * 
 	 * @param event the event describing the job concerned.
 	 */
@@ -111,6 +112,7 @@ public interface SchedulerEventListener extends Serializable {
 	/**
 	 * Invoked when the scheduling of a job has just been terminated.
 	 * The description of the job is contained in the jobEvent given.
+	 * Use Job.update(JobEvent) to update your job.
 	 * 
 	 * @param event the event describing the job concerned.
 	 */
@@ -119,6 +121,7 @@ public interface SchedulerEventListener extends Serializable {
 	/**
 	 * Invoked when the scheduler has removed a job due to result reclamation.
 	 * The description of the job is contained in the jobEvent given.
+	 * Use Job.update(JobEvent) to update your job.
 	 * 
 	 * @param event the event describing the job concerned.
 	 */
@@ -128,6 +131,7 @@ public interface SchedulerEventListener extends Serializable {
 	/**
 	 * Invoked when the scheduling of a task has just started.
 	 * The description of the task is contained in the TaskEvent given.
+	 * Use Job.update(TaskEvent) to update your job.
 	 * 
 	 * @param event the event describing the task concerned.
 	 */
@@ -136,9 +140,20 @@ public interface SchedulerEventListener extends Serializable {
 	/**
 	 * Invoked when the scheduling of a task has just finished.
 	 * The description of the task is contained in the TaskEvent given.
+	 * Use Job.update(TaskEvent) to update your job.
 	 * 
 	 * @param event the event describing the task concerned.
 	 */
 	public void runningToFinishedTaskEvent(TaskEvent event);
+	
+	
+	/**
+	 * Invoked when the scheduler has changed the priority of a job.
+	 * The description of the job is contained in the jobEvent given.
+	 * Use Job.update(JobEvent) to update your job.
+	 * 
+	 * @param event the event describing the job concerned.
+	 */
+	public void changeJobPriorityEvent(JobEvent event);
 	
 }

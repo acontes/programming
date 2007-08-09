@@ -33,8 +33,7 @@ public class Job implements Serializable, Comparable<Job> {
 	private static final long serialVersionUID = 1565033147327965656L;
 	private String owner = "";
 	private String name = "";
-	private JobPriority priority = JobPriority.NORMAL;
-	private JobType type = JobType.APPLI;
+	private JobType type = JobType.TASKSFLOW;
 	private long runtimeLimit = -1;
 	private boolean RunUntilCancel = false;
 	private String description = "";
@@ -74,7 +73,7 @@ public class Job implements Serializable, Comparable<Job> {
 			JobType type, boolean runUntilCancel, String description) {
 		super();
 		this.name = name;
-		this.priority = priority;
+		this.jobInfo.setPriority(priority);
 		this.runtimeLimit = runtimeLimit;
 		this.type = type;
 		this.RunUntilCancel = runUntilCancel;
@@ -153,9 +152,9 @@ public class Job implements Serializable, Comparable<Job> {
 			return (currentOrder == ASC_ORDER) ? (name.compareTo(job.name))
 					: (job.name.compareTo(name));
 		case SORT_BY_PRIORITY:
-			return (currentOrder == ASC_ORDER) ? (priority.getPriority() - job.priority
-					.getPriority())
-					: (job.priority.getPriority() - priority.getPriority());
+			return (currentOrder == ASC_ORDER) ?
+					(jobInfo.getPriority().getPriority() - job.jobInfo.getPriority().getPriority())
+					: (job.jobInfo.getPriority().getPriority() - jobInfo.getPriority().getPriority());
 		case SORT_BY_TYPE:
 			return (currentOrder == ASC_ORDER) ? (type.compareTo(job.type))
 					: (job.type.compareTo(type));
@@ -300,7 +299,15 @@ public class Job implements Serializable, Comparable<Job> {
 	 * @return the priority
 	 */
 	public JobPriority getPriority() {
-		return priority;
+		return jobInfo.getPriority();
+	}
+	
+	/**
+	 * To set the priority.
+	 */
+	public void setPriority(JobPriority priority) {
+		jobInfo.setPriority(priority);
+		lightJob.setPriority(priority);
 	}
 
 	/**

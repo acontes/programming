@@ -152,6 +152,16 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	
 	
 	/**
+	 * Set the priority of this light Job.
+	 * 
+	 * @param priority the new priority.
+	 */
+	void setPriority(JobPriority priority) {
+		this.priority = priority;
+	}
+	
+	
+	/**
 	 * To get the id
 	 * 
 	 * @return the id

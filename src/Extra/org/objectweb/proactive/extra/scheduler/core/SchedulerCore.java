@@ -28,6 +28,7 @@ import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.job.JobType;
 import org.objectweb.proactive.extra.scheduler.job.LightJob;
@@ -168,7 +169,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//shutdown resource manager proxy
 		resourceManager.shutdownProxy();
 		logger.info("Scheduler is now shutdown !");
-		frontend.SchedulerShutDownEvent();
+		frontend.schedulerShutDownEvent();
 		//destroying scheduler active objects
 		frontend.terminate();
 		ProActive.terminateActiveObject(true);
@@ -206,7 +207,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					} else {
 						launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{taskDescriptor.getId(),taskDescriptor.getJobId(),taskDescriptor.getPreTask(), host, port}, node);
 					}
-					taskDescriptor.setRunningTask(launcher);
+					taskDescriptor.setLauncher(launcher);
 					//if job is TASKSFLOW, preparing the list of parameters for this task.
 					int resultSize = lightTask.getParents().size();
 					if (currentJob.getType() == JobType.TASKSFLOW && resultSize > 0){
@@ -287,7 +288,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				frontend.runningToFinishedJobEvent(job.getJobInfo());
 			}
 			//free execution node
-			resourceManager.freeNode(descriptor.getRunningTask().getNode());
+			resourceManager.freeNode(descriptor.getLauncher().getNode());
 		} catch (NodeException e) {
 			e.printStackTrace();
 		} catch (NullPointerException eNull){
@@ -371,7 +372,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			return new BooleanWrapper(false);
 		state = State.STARTED;
 		logger.info("Scheduler has just been started !");
-		frontend.SchedulerStartedEvent();
+		frontend.schedulerStartedEvent();
 		return new BooleanWrapper(true);
 	}
 	
@@ -384,7 +385,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			return new BooleanWrapper(false);
 		state = State.STOPPED;
 		logger.info("Scheduler has just been stopped, it will finish every submitted jobs...");
-		frontend.SchedulerStoppedEvent();
+		frontend.schedulerStoppedEvent();
 		return new BooleanWrapper(true);
 	}
 	
@@ -400,7 +401,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			return new BooleanWrapper(false);
 		state = State.PAUSED;
 		logger.info("Scheduler has just been paused !");
-		frontend.SchedulerPausedEvent();
+		frontend.schedulerPausedEvent();
 		return new BooleanWrapper(true);
 	}
 	
@@ -416,7 +417,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			return new BooleanWrapper(false);
 		state = State.PAUSED_IMMEDIATE;
 		logger.info("Scheduler has just been immediate paused !");
-		frontend.SchedulerImmediatePausedEvent();
+		frontend.schedulerImmediatePausedEvent();
 		return new BooleanWrapper(true);
 	}
 	
@@ -432,7 +433,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			return new BooleanWrapper(false);
 		state = State.STARTED;
 		logger.info("Scheduler has just been resumed !");
-		frontend.SchedulerResumedEvent();
+		frontend.schedulerResumedEvent();
 		return new BooleanWrapper(true);
 	}
 	
@@ -441,11 +442,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#shutdown()
 	 */
 	public BooleanWrapper coreShutdown() {
+		//TODO si le scheduler est shutting down et qu'un job est en pause que fait on ?
+		//actuellement le job reste en pause et le scheduler s'arrete que lorsque tous les jobs sont finis.
+		//Le user ne peut pas non plus résumer son job, donc tout reste bloqué.
 		if (state == State.KILLED || state == State.SHUTTING_DOWN)
 			return new BooleanWrapper(false);
 		state = State.SHUTTING_DOWN;
 		logger.info("Scheduler is shutting down, this make take time to finish every jobs !");
-		frontend.SchedulerShuttingDownEvent();
+		frontend.schedulerShuttingDownEvent();
 		return new BooleanWrapper(true);
 	}
 	
@@ -460,7 +464,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		for (Job j : runningJobs){
 			for (TaskDescriptor td : j.getTasks()){
 				try {
-					ProActive.terminateActiveObject(td.getRunningTask(),true);
+					td.getLauncher().terminate();
 				} catch(Exception e) {}
 			}
 		}
@@ -474,7 +478,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//finally : shutdown
 		state = State.KILLED;
 		logger.info("Scheduler has just been killed !");
-		frontend.SchedulerkilledEvent();
+		frontend.schedulerKilledEvent();
 		return new BooleanWrapper(true);
 	}
 
@@ -539,8 +543,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		Job job = jobs.get(jobId);
 		jobs.remove(jobId);
 		for (TaskDescriptor td : job.getTasks()){
-			if (td.getRunningTask() != null){
-				ProActive.terminateActiveObject(td.getRunningTask(), true);
+			if (td.getLauncher() != null){
+				try{
+					td.getLauncher().terminate();
+				} catch (Exception e){}
 				taskResults.remove(td.getId());
 			}
 		}
@@ -549,6 +555,19 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		logger.info("job "+jobId+" has just been killed !");
 		frontend.jobKilledEvent(jobId);
 		return new BooleanWrapper(true);
+	}
+	
+	
+	/**
+	 * Change the priority of the job represented by jobId.
+	 * 
+	 * @param jobId the job on whitch to change the priority.
+	 * @throws SchedulerException (can be due to insufficient permission)
+	 */
+	public void changePriority(JobId jobId, JobPriority priority) {
+		Job job = jobs.get(jobId);
+		job.setPriority(priority);
+		frontend.changeJobPriorityEvent(job.getJobInfo());
 	}
 
 	

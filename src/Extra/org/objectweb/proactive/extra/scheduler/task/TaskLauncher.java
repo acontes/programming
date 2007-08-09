@@ -41,7 +41,6 @@ public class TaskLauncher implements InitActive, Serializable {
 
 	/**
 	 * ProActive empty constructor.
-	 * 
 	 */
 	public TaskLauncher() {}
 
@@ -51,6 +50,8 @@ public class TaskLauncher implements InitActive, Serializable {
 	 * 
 	 * @param taskId represents the task the launcher will execute.
 	 * @param jobId represents the job where the task is located.
+	 * @param host the host on witch to append the standard output/input.
+	 * @param port the port number on which to send the standard output/input. 
 	 */
 	public TaskLauncher(TaskId taskId, JobId jobId, String host, Integer port) {
 		this.taskId = taskId;
@@ -78,6 +79,7 @@ public class TaskLauncher implements InitActive, Serializable {
      */
 	public void initActivity(Body body) {
 		ProActive.setImmediateService("getNode");
+		ProActive.setImmediateService("terminate");
 	}
 	
 	
@@ -138,6 +140,15 @@ public class TaskLauncher implements InitActive, Serializable {
 	 */
 	public Node getNode() throws NodeException{
 		return ProActive.getNode();
+	}
+	
+	
+	/**
+	 * This method will terminate the task that has been launched.
+	 * In fact it will terminate the launcher.
+	 */
+	public void terminate(){
+		ProActive.terminateActiveObject(true);
 	}
 	
 }

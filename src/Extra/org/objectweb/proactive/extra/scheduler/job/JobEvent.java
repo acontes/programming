@@ -39,6 +39,8 @@ public class JobEvent implements Serializable{
 	private int numberOfRunningTasks = 0;
 	/** number of finished tasks */
 	private int numberOfFinishedTasks = 0;
+	/** job priority */
+	private JobPriority priority = JobPriority.NORMAL;
 	/** Pause state of the job */
 	private boolean paused = false;
 	/** If this status is not null, it means the task have to change their status */
@@ -216,6 +218,18 @@ public class JobEvent implements Serializable{
 	 */
 	public void setPaused(boolean paused) {
 		this.paused = paused;
+	}
+	/**
+	 * @return the priority
+	 */
+	public JobPriority getPriority() {
+		return priority;
+	}
+	/**
+	 * @param priority the priority to set
+	 */
+	public void setPriority(JobPriority priority) {
+		this.priority = priority;
 	}
 	
 }

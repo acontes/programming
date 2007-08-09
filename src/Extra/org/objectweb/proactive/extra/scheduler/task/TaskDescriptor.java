@@ -43,7 +43,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	private long runTimeLimit;
 	private int rerunnable;
 	private boolean finalTask;
-	private TaskLauncher runningTask;
+	private TaskLauncher launcher;
 	private TaskEvent taskInfo = new TaskEvent();
     
     
@@ -480,20 +480,20 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	/**
 	 * To get the active object where this task is running.
 	 * 
-	 * @return the runningTask
+	 * @return the launcher
 	 */
-	public TaskLauncher getRunningTask() {
-		return runningTask;
+	public TaskLauncher getLauncher() {
+		return launcher;
 	}
 
 
 	/**
 	 * To set the active object where this task will run.
 	 * 
-	 * @param runningTask the runningTask to set
+	 * @param launcher the launcher to set
 	 */
-	public void setRunningTask(TaskLauncher runningTask) {
-		this.runningTask = runningTask;
+	public void setLauncher(TaskLauncher launcher) {
+		this.launcher = launcher;
 	}
 
 
