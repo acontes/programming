@@ -11,8 +11,7 @@ public class MonteCarloAverage extends JavaTask {
 	public Object execute(TaskResult... results) {
 		double avrg = 0;
 		int count = 0;
-		System.out.println("Parameters are : ");
-		System.out.print("\t");
+		System.out.print("Parameters are : ");
 		for (TaskResult res : results){
 			if (!res.hadException()){
 				System.out.print(res.value()+" ");
