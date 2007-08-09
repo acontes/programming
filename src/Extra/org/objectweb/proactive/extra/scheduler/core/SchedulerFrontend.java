@@ -419,14 +419,14 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent()
 	 */
-	public void SchedulerImmediatePausedEvent(SchedulerEvent event) {
+	public void SchedulerImmediatePausedEvent() {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(id).SchedulerImmediatePausedEvent(event);
+				schedulerListeners.get(id).SchedulerImmediatePausedEvent();
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -437,14 +437,14 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent()
 	 */
-	public void SchedulerPausedEvent(SchedulerEvent event) {
+	public void SchedulerPausedEvent() {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(id).SchedulerPausedEvent(event);
+				schedulerListeners.get(id).SchedulerPausedEvent();
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);
@@ -455,14 +455,14 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent()
 	 */
-	public void SchedulerResumedEvent(SchedulerEvent event) {
+	public void SchedulerResumedEvent() {
 		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
-				schedulerListeners.get(id).SchedulerResumedEvent(event);
+				schedulerListeners.get(id).SchedulerResumedEvent();
 			} catch(Exception e){
 				iter.remove();
 				identifications.remove(id);

@@ -184,11 +184,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		for (Job j : runningJobs){
 			LightJobList.add(j.getLightJob());
 		}
-		for (Job j : pendingJobs){
-			LightJobList.add(j.getLightJob());
+		//if scheduler is paused it only finishes running jobs
+		if (state != State.PAUSED){
+			for (Job j : pendingJobs){
+				LightJobList.add(j.getLightJob());
+			}
 		}
 		//ask the policy all the tasks to be schedule according to the jobs list.
-		Vector<? extends LightTask> taskRetrivedFromPolicy = policy.getReadyTasks(LightJobList);
+		Vector<? extends LightTask> taskRetrivedFromPolicy = policy.getOrderedTasks(LightJobList);
 		while (!taskRetrivedFromPolicy.isEmpty() && resourceManager.hasFreeResources().booleanValue()){
 			LightTask lightTask = taskRetrivedFromPolicy.remove(0);
 			Job currentJob = jobs.get(lightTask.getJobId());
@@ -204,7 +207,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 						launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{taskDescriptor.getId(),taskDescriptor.getJobId(),taskDescriptor.getPreTask(), host, port}, node);
 					}
 					taskDescriptor.setRunningTask(launcher);
-					//TODO gérer les résultats à faire suivre dans le cas d'un task flow
 					//if job is TASKSFLOW, preparing the list of parameters for this task.
 					int resultSize = lightTask.getParents().size();
 					if (currentJob.getType() == JobType.TASKSFLOW && resultSize > 0){
@@ -257,33 +259,39 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @param jobId the executed task's job identification. 
 	 */
 	public void terminate(TaskId taskId, JobId jobId){
-		logger.info("<<<<<<<< Terminated task on job "+jobId+" [ "+taskId+" ]");
-		//The task is terminated but it's possible to have to
-		//wait for the futur of the task result (TaskResult).
-		//accessing to the taskResult could block current execution but for a little time.
-		//it is the time between the end of the task and the arrival of the futur from the task.
-		Job job = jobs.get(jobId);
-		TaskDescriptor descriptor = job.terminateTask(taskId);
-		frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
-		//store this result if the job is PARAMETER_SWIPPING or APPLI or if it is a final task.
-		if (job.getType() != JobType.TASKSFLOW || descriptor.isFinalTask()){
-			TaskResult res = taskResults.get(taskId);
-			results.get(job.getId()).addTaskResult(descriptor.getName(),res);
-		}
-		//if this job is finished (every task are finished)
-		if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()){
-			//TODO supprimer tous les task results dans la liste des taskResults
-			job.setFinishedTime(System.currentTimeMillis());
-			runningJobs.remove(job);
-			finishedJobs.add(job);
-			logger.info("<<<<<<<<<<<<<<<<<<< Terminated job "+jobId);
-			frontend.runningToFinishedJobEvent(job.getJobInfo());
-		}
-		//free execution node
 		try {
+			logger.info("<<<<<<<< Terminated task on job "+jobId+" [ "+taskId+" ]");
+			//The task is terminated but it's possible to have to
+			//wait for the futur of the task result (TaskResult).
+			//accessing to the taskResult could block current execution but for a little time.
+			//it is the time between the end of the task and the arrival of the futur from the task.
+			Job job = jobs.get(jobId);
+			TaskDescriptor descriptor = job.terminateTask(taskId);
+			frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
+			//store this result if the job is PARAMETER_SWIPPING or APPLI or if it is a final task.
+			if (job.getType() != JobType.TASKSFLOW || descriptor.isFinalTask()){
+				TaskResult res = taskResults.get(taskId);
+				results.get(job.getId()).addTaskResult(descriptor.getName(),res);
+			}
+			//if this job is finished (every task are finished)
+			if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()){
+				//deleting all task results
+				for (TaskDescriptor td : job.getTasks()){
+					taskResults.remove(td.getId());
+				}
+				//terminating job
+				job.setFinishedTime(System.currentTimeMillis());
+				runningJobs.remove(job);
+				finishedJobs.add(job);
+				logger.info("<<<<<<<<<<<<<<<<<<< Terminated job "+jobId);
+				frontend.runningToFinishedJobEvent(job.getJobInfo());
+			}
+			//free execution node
 			resourceManager.freeNode(descriptor.getRunningTask().getNode());
 		} catch (NodeException e) {
 			e.printStackTrace();
+		} catch (NullPointerException eNull){
+			//the task has been killed. Nothing to do anymore with this one.
 		}
 	}
 	
@@ -390,19 +398,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		}
 		if (state != State.PAUSED_IMMEDIATE && state != State.STARTED)
 			return new BooleanWrapper(false);
-		//job info preparation for listener
-		HashMap<JobId,JobEvent> statusList = new HashMap<JobId,JobEvent>();
-		for (Job j : pendingJobs){
-			if (j.setPaused())
-				statusList.put(j.getId(), j.getJobInfo());
-		}
 		state = State.PAUSED;
 		logger.info("Scheduler has just been paused !");
-		frontend.SchedulerPausedEvent(new SchedulerEvent(statusList));
-		//job info cleaning
-		for (Job j : pendingJobs){
-			j.setTaskStatusModify(null);
-		}
+		frontend.SchedulerPausedEvent();
 		return new BooleanWrapper(true);
 	}
 	
@@ -416,26 +414,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		}
 		if (state != State.PAUSED && state != State.STARTED)
 			return new BooleanWrapper(false);
-		//job info preparation for listener
-		HashMap<JobId,JobEvent> statusList = new HashMap<JobId,JobEvent>();
-		for (Job j : pendingJobs){
-			if (j.setPaused())
-				statusList.put(j.getId(), j.getJobInfo());
-		}
-		for (Job j : runningJobs){
-			if (j.setPaused())
-				statusList.put(j.getId(), j.getJobInfo());
-		}
 		state = State.PAUSED_IMMEDIATE;
 		logger.info("Scheduler has just been immediate paused !");
-		frontend.SchedulerImmediatePausedEvent(new SchedulerEvent(statusList));
-		//job info cleaning
-		for (Job j : pendingJobs){
-			j.setTaskStatusModify(null);
-		}
-		for (Job j : runningJobs){
-			j.setTaskStatusModify(null);
-		}
+		frontend.SchedulerImmediatePausedEvent();
 		return new BooleanWrapper(true);
 	}
 	
@@ -449,30 +430,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		}
 		if (state != State.PAUSED && state != State.PAUSED_IMMEDIATE && state != State.STARTED)
 			return new BooleanWrapper(false);
-		//job info preparation for listener
-		HashMap<JobId,JobEvent> statusList = new HashMap<JobId,JobEvent>();
-		for (Job j : pendingJobs){
-			j.setUnPause();
-			statusList.put(j.getId(), j.getJobInfo());
-		}
-		if (state == State.PAUSED_IMMEDIATE){
-			for (Job j : runningJobs){
-				j.setUnPause();
-				statusList.put(j.getId(), j.getJobInfo());
-			}
-		}
 		state = State.STARTED;
 		logger.info("Scheduler has just been resumed !");
-		frontend.SchedulerResumedEvent(new SchedulerEvent(statusList));
-		//job info cleaning
-		for (Job j : pendingJobs){
-			j.setTaskStatusModify(null);
-		}
-		if (state == State.PAUSED_IMMEDIATE){
-			for (Job j : runningJobs){
-				j.setTaskStatusModify(null);
-			}
-		}
+		frontend.SchedulerResumedEvent();
 		return new BooleanWrapper(true);
 	}
 	

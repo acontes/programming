@@ -1,8 +1,6 @@
 package org.objectweb.proactive.extra.scheduler.userAPI;
 
 import java.io.Serializable;
-
-import org.objectweb.proactive.extra.scheduler.core.SchedulerEvent;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
@@ -35,25 +33,19 @@ public interface SchedulerEventListener extends Serializable {
 	 * @param event the scheduler informations about the status of every tasks.
 	 * 		use <code>SchedulerEvent.update(Vector<<Job>>)</code> to update your job.
 	 */
-	public void SchedulerPausedEvent(SchedulerEvent event);
+	public void SchedulerPausedEvent();
 	
 	
 	/**
 	 * Invoked when the scheduler has received a paused immediate signal.
-	 * 
-	* @param event the scheduler informations about the status of every tasks.
-	 * 		use <code>event.update(Vector<<Job>>)</code> to update your job.
 	 */
-	public void SchedulerImmediatePausedEvent(SchedulerEvent event);
+	public void SchedulerImmediatePausedEvent();
 	
 	
 	/**
 	 * Invoked when the scheduler has just been resumed.
-	 * 
-	 * @param event the scheduler informations about the status of every tasks.
-	 * 		use <code>event.update(Vector<<Job>>)</code> to update your job.
 	 */
-	public void SchedulerResumedEvent(SchedulerEvent event);
+	public void SchedulerResumedEvent();
 	
 	
 	/**

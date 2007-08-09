@@ -25,6 +25,6 @@ public interface PolicyInterface extends Serializable {
 	 * @param jobs the list of light pending or running jobs. 
 	 * @return a vector of every tasks that are ready to be schedule.
 	 */
-	Vector<EligibleLightTask> getReadyTasks(List<LightJob> jobs);
+	Vector<EligibleLightTask> getOrderedTasks(List<LightJob> jobs);
 	
 }
