@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
+	elementFormDefault="qualified">
+
+
+	<complexType name="myapplicationType">
+		<attribute name="someattr" type="string"></attribute>
+	</complexType>
+	
+	<element name="myapplication" type="paext:myapplicationType"/>
+
+</schema>

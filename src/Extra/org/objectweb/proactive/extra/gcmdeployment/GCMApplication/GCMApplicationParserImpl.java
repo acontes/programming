@@ -17,17 +17,18 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParserExecutable;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParserProactive;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -46,6 +47,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected File descriptor;
     protected Document document;
     protected DocumentBuilderFactory domFactory;
+    protected List<String> schemas;
     protected XPath xpath;
     protected DocumentBuilder documentBuilder;
     protected CommandBuilder commandBuilder;
@@ -54,15 +56,21 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, ApplicationParser> applicationParsersMap;
 
     public GCMApplicationParserImpl(File descriptor) throws IOException {
+        this(descriptor, null);
+    }
+
+    public GCMApplicationParserImpl(File descriptor, List<String> userSchemas)
+        throws IOException {
         this.descriptor = descriptor;
         resourceProvidersMap = null;
         virtualNodes = null;
-
+        schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas)
+                                        : new ArrayList<String>();
         applicationParsersMap = new HashMap<String, ApplicationParser>();
-        
+
         registerDefaultApplicationParsers();
         registerUserApplicationParsers();
-        
+
         setup();
 
         InputSource inputSource = new InputSource(new FileInputStream(
@@ -70,8 +78,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         try {
             document = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
         }
     }
 
@@ -79,16 +86,15 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
      * override me
      */
     protected void registerUserApplicationParsers() {
-        // TODO Auto-generated method stub
-        
     }
 
     public void registerApplicationParser(ApplicationParser applicationParser) {
-        applicationParsersMap.put(applicationParser.getNodeName(), applicationParser);
+        applicationParsersMap.put(applicationParser.getNodeName(),
+            applicationParser);
     }
-    
+
     private void registerDefaultApplicationParsers() {
-        registerApplicationParser(new ApplicationParserProactive());        
+        registerApplicationParser(new ApplicationParserProactive());
         registerApplicationParser(new ApplicationParserExecutable());
     }
 
@@ -102,8 +108,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                                       .getResource(APPLICATION_DESC_LOCATION)
                                       .toString();
 
-        domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-            new Object[] { deploymentSchema });
+        schemas.add(0, deploymentSchema);
+
+        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
             documentBuilder = domFactory.newDocumentBuilder();
@@ -114,8 +121,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
                     GCMParserConstants.APPLICATION_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
         }
     }
 
@@ -174,8 +180,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                         resourceProviderParams));
             }
         } catch (XPathExpressionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
         }
 
         return resourceProvidersMap;
@@ -199,13 +204,18 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 }
 
                 ApplicationParser applicationParser = getApplicationParserForNode(commandNode);
-                applicationParser.parseApplicationNode(commandNode, this, xpath);
-                commandBuilder = applicationParser.getCommandBuilder();  
-                
+                if (applicationParser == null) {
+                    GCMDeploymentLoggers.GCMA_LOGGER.warn(
+                        "No application parser registered for node <" +
+                        commandNode.getNodeName() + ">");
+                } else {
+                    applicationParser.parseApplicationNode(commandNode, this,
+                        xpath);
+                    commandBuilder = applicationParser.getCommandBuilder();
+                }
             }
         } catch (XPathExpressionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
         }
 
         return commandBuilder;

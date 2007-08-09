@@ -100,5 +100,4 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
             e.printStackTrace();
         }
     }
-
 }

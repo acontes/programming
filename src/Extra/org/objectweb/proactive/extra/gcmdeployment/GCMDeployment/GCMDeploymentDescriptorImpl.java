@@ -1,7 +1,5 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +8,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;

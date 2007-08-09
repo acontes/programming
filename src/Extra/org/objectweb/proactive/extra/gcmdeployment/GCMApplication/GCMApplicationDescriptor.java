@@ -48,14 +48,14 @@ public interface GCMApplicationDescriptor {
      * @throws ProActiveException if a problem occurs when terminating all jvms
      */
     public void kill();
-    
+
     /**
-     * 
+     *
      * @return true is returned if all processes started by GCM Deployment have
      * exited. false is returned otherwise
      */
     public boolean allProcessExited();
-    
+
     /**
      * Wait for all process
      */

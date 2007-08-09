@@ -78,7 +78,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
      * @return A
      */
     static private Map<String, GCMDeploymentDescriptor> selectGCMD(
-        Map<String, VirtualNodeInternal> vns, Map<String, GCMDeploymentDescriptor> gdds) {
+        Map<String, VirtualNodeInternal> vns,
+        Map<String, GCMDeploymentDescriptor> gdds) {
         // TODO: Implement this method
         return gdds;
     }
@@ -126,6 +127,5 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
     }
 }

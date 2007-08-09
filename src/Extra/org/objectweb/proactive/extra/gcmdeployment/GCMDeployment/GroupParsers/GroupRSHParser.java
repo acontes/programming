@@ -8,8 +8,8 @@ import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupRSH;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupSSH;
 import org.w3c.dom.Node;
 
-public class GroupRSHParser extends AbstractGroupParser {
 
+public class GroupRSHParser extends AbstractGroupParser {
     static final String NODE_NAME = "rshGroup";
 
     public void parseGroupNode(Node groupNode, XPath xpath) {
@@ -49,5 +49,4 @@ public class GroupRSHParser extends AbstractGroupParser {
     public String getNodeName() {
         return NODE_NAME;
     }
-
 }

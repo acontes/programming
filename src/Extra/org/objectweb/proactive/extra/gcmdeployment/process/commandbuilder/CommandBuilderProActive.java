@@ -17,7 +17,6 @@ import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public class CommandBuilderProActive implements CommandBuilder {
-    
     public final static String DEFAULT_JAVAPATH = System.getProperty(
             "java.home") + File.separator + "bin" + File.separator + "java";
     public static String DEFAULT_POLICY_FILE = System.getProperty(
@@ -65,7 +64,6 @@ public class CommandBuilderProActive implements CommandBuilder {
         }
     }
 
-    
     public CommandBuilderProActive() {
         vns = new HashMap<String, VirtualNodeInternal>();
         fts = new ArrayList<FileTransferBlock>();
@@ -171,7 +169,7 @@ public class CommandBuilderProActive implements CommandBuilder {
 
         return null;
     }
-    
+
     private static String getAbsolutePath(String path) {
         if (path.startsWith("file:")) {
             //remove file part to build absolute path
@@ -184,6 +182,4 @@ public class CommandBuilderProActive implements CommandBuilder {
             return path;
         }
     }
-
-    
 }

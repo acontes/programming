@@ -28,7 +28,7 @@ public class GCMParserHelper {
 
         return fileTransferBlock;
     }
-    
+
     static public class MyDefaultHandler extends DefaultHandler {
         private String errMessage = "";
 

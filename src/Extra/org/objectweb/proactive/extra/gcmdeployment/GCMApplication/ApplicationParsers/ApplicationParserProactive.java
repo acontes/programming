@@ -6,9 +6,9 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
 import org.w3c.dom.Node;
@@ -16,6 +16,7 @@ import org.w3c.dom.Node;
 
 public class ApplicationParserProactive extends AbstractApplicationParser {
     protected static final String NODE_NAME = "proactive";
+
     @Override
     protected CommandBuilder createCommandBuilder() {
         return new CommandBuilderProActive();
@@ -25,7 +26,8 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         return NODE_NAME;
     }
 
-    public void parseApplicationNode(Node paNode, GCMApplicationParser applicationParser, XPath xpath) {
+    public void parseApplicationNode(Node paNode,
+        GCMApplicationParser applicationParser, XPath xpath) {
         super.parseApplicationNode(paNode, applicationParser, xpath);
 
         CommandBuilderProActive commandBuilderProActive = (CommandBuilderProActive) commandBuilder;
@@ -53,9 +55,8 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
                 parseProActiveConfiguration(xpath, commandBuilderProActive,
                     configNode);
             }
-            
+
             commandBuilderProActive.setVirtualNodes(applicationParser.getVirtualNodes());
-            
         } catch (XPathExpressionException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
