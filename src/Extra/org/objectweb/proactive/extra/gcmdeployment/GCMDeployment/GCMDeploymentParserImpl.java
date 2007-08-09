@@ -21,6 +21,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.B
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupSSHParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
@@ -67,8 +68,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         try {
             document = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         }
     }
 
@@ -118,8 +118,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
                     DEPLOYMENT_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         }
     }
 
@@ -348,7 +347,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     public GCMDeploymentEnvironment getEnvironment() {
-        // TODO Auto-generated method stub
         return environment;
     }
 
@@ -357,8 +355,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             try {
                 parseInfrastructure();
             } catch (XPathExpressionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
             }
         }
         return infrastructure;
@@ -369,11 +366,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             try {
                 parseResources();
             } catch (XPathExpressionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
             }
         }
 
