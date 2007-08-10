@@ -27,7 +27,7 @@ public abstract class AbstractApplicationParser implements ApplicationParser {
         return commandBuilder;
     }
 
-    public void parseApplicationNode(Node paNode,
+    public void parseApplicationNode(Node applicationNode,
         GCMApplicationParser applicationParser, XPath xpath) {
         this.xpath = xpath;
     }
