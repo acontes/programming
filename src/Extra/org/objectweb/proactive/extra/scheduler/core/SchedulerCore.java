@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.userAPI.State;
 
 /**
@@ -144,6 +144,15 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			}
 		} while (state != State.SHUTTING_DOWN && state != State.KILLED);
 		logger.info("Scheduler is shutting down...");
+		//FIXME for the moment if shutdown sequence is enable, paused job becomes running
+		for (Job job : jobs.values()){
+			if (job.isPaused()){
+				job.setUnPause();
+				JobEvent event = job.getJobInfo();
+				frontend.jobResumedEvent(event);
+				event.setTaskStatusModify(null);
+			}
+		}
 		//terminating jobs...
 		logger.info("Terminating jobs...");
 		while(runningJobs.size() + pendingJobs.size() > 0){
@@ -309,7 +318,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		jobs.put(job.getId(), job);
 		pendingJobs.add(job);
 		//creating job result storage
-		JobResult jobResult = new JobResult(job.getId());
+		JobResult jobResult = new JobResult(job.getId(),job.getName());
 		//store the job result until user get it
 		results.put(job.getId(),jobResult);
 		//sending event to client
@@ -323,8 +332,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * 
 	 * @return the scheduler current state with the pending, running, finished jobs list.
 	 */
-	public SchedulerState getSchedulerState() {
-		SchedulerState sState = new SchedulerState();
+	public SchedulerInitialState getSchedulerInitialState() {
+		SchedulerInitialState sState = new SchedulerInitialState();
 		sState.setPendingJobs(pendingJobs);
 		sState.setRunningJobs(runningJobs);
 		sState.setFinishedJobs(finishedJobs);

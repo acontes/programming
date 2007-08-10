@@ -36,7 +36,7 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	private HashMap<TaskId,LightTask> runningTasks = new HashMap<TaskId,LightTask>();
 	/** Job paused tasks */
 	private HashMap<TaskId,LightTask> pausedTasks = new HashMap<TaskId,LightTask>();
-	
+	//TODO penser à mettre ici un champ pour connaitre le nb de tache total du job.
 	
 	/**
 	 * Constructor of light job.

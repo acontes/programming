@@ -17,12 +17,12 @@ public class JobResult implements Serializable {
 	/** Serial version UID */
 	private static final long serialVersionUID = 6287355063616273677L;
 	private JobId id = null;
+	private String name = null;
 	private HashMap<String,TaskResult> taskResults = null;
 
     
     /**
      * ProActive empty constructor
-     * 
      */
     public JobResult() {}
 
@@ -32,11 +32,13 @@ public class JobResult implements Serializable {
      * 
      * @param id the jobId associated with this result
      * @param result the result associated with this result
-     * @param 
+     * @param name the name of the job that has generate this result.
      */
-    public JobResult(JobId id){
+    public JobResult(JobId id, String name){
     	this.id = id;
+    	this.name = name;
     }
+    
     
 	/**
 	 * To get the id
@@ -45,6 +47,16 @@ public class JobResult implements Serializable {
 	 */
 	public JobId getId() {
 		return id;
+	}
+	
+
+	/**
+	 * To get the name of the job that has generate this result.
+	 * 
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
 	}
 	
 	

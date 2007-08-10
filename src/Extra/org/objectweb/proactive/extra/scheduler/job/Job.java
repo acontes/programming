@@ -38,6 +38,8 @@ public class Job implements Serializable, Comparable<Job> {
 	private boolean RunUntilCancel = false;
 	private String description = "";
 	// TODO envParameters
+	// TODO un moyen pour le user de mettre n'importe quelles données dans le job et la retrouver dans la police.
+	//cela lui permettrai de moduler sa police en fonction de ces données
 	private HashMap<TaskId,TaskDescriptor> tasks = new HashMap<TaskId,TaskDescriptor>();
 	/** Instances of the final task, important to know which results will be sent to user */
 	private Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
