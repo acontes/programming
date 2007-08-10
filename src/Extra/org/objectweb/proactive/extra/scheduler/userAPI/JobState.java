@@ -32,7 +32,7 @@ public enum JobState implements java.io.Serializable {
 	PAUSED ("Paused"),
 	/**
 	 * The job has failed. One or more tasks have failed.
-	 * It can 
+	 * There is no more rerun left for a task.
 	 */
 	FAILED ("Failed");
 	
