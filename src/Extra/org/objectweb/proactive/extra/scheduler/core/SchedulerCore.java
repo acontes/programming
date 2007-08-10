@@ -290,7 +290,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					taskResults.remove(td.getId());
 				}
 				//terminating job
-				job.setFinishedTime(System.currentTimeMillis());
+				job.terminate();
 				runningJobs.remove(job);
 				finishedJobs.add(job);
 				logger.info("<<<<<<<<<<<<<<<<<<< Terminated job "+jobId);
@@ -316,6 +316,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.STOPPED)
 			throw new SchedulerException("Scheduler is stopped, cannot submit new job !");
 		job.setSubmittedTime(System.currentTimeMillis());
+		job.setState(JobState.PENDING);
 		jobs.put(job.getId(), job);
 		pendingJobs.add(job);
 		//creating job result storage

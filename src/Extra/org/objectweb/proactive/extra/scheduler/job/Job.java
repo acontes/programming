@@ -249,18 +249,27 @@ public class Job implements Serializable, Comparable<Job> {
 	
 	/**
 	 * Set all properties in order to start the job.
-	 * 
 	 */
 	public void start(){
 		setStartTime(System.currentTimeMillis());
 		setNumberOfPendingTasks(getTotalNumberOfTasks());
 		setNumberOfRunningTasks(0);
+		setState(JobState.RUNNING);
 		HashMap<TaskId,Status> status = new HashMap<TaskId,Status>();
 		for (TaskDescriptor td : getTasks()){
 			td.setStatus(Status.PENDING);
 			status.put(td.getId(), Status.PENDING);
 		}
 		setTaskStatusModify(status);
+	}
+	
+	
+	/**
+	 * Set all properties in order to terminate the job.
+	 */
+	public void terminate() {
+		setState(JobState.FINISHED);
+		setFinishedTime(System.currentTimeMillis());
 	}
 	
 	

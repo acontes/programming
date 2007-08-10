@@ -180,7 +180,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		//setting job informations
 		if (job.getTasks().size() == 0)
 			throw new SchedulerException("This job does not contain Tasks !! Insert tasks before submitting job.");
-		//setting the job id and owner
+		//setting the job properties
 		job.setId(new JobId(jobGlobalCount++));
 		job.setOwner(identifications.get(id).getUsername());
 		//setting the unique task IDs and jobId for each task
