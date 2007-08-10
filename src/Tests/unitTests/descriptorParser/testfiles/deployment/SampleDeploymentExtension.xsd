@@ -5,7 +5,7 @@
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="DeploymentDescriptorSchema.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"></import>
+	<import schemaLocation="../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"></import>
 
     <!--
      custom group

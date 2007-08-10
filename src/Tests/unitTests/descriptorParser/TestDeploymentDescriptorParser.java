@@ -94,7 +94,7 @@ public class TestDeploymentDescriptorParser {
                                        .getFile());
 
         String userSchema = getClass()
-                                .getResource("/org/objectweb/proactive/extra/gcmdeployment/schema/SampleDeploymentExtension.xsd")
+                                .getResource("/unitTests/descriptorParser/testfiles/deployment/SampleDeploymentExtension.xsd")
                                 .toString();
 
         ArrayList<String> schemas = new ArrayList<String>();

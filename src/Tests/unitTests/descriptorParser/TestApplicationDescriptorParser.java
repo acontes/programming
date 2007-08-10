@@ -23,7 +23,7 @@ public class TestApplicationDescriptorParser {
                                                                             .getResource("/unitTests/descriptorParser/testfiles/application")
                                                                             .getFile();
 
-    @Test
+    //    @Test
     public void test() throws IOException {
         for (File descriptor : getApplicationDescriptors()) {
             if (descriptor.toString().contains("script_ext")) {
@@ -73,7 +73,7 @@ public class TestApplicationDescriptorParser {
             System.out.println(file);
 
             String userSchema = getClass()
-                                    .getResource("/org/objectweb/proactive/extra/gcmdeployment/schema/SampleApplicationExtension.xsd")
+                                    .getResource("/unitTests/descriptorParser/testfiles/application/SampleApplicationExtension.xsd")
                                     .toString();
 
             ArrayList<String> schemas = new ArrayList<String>();
@@ -90,7 +90,7 @@ public class TestApplicationDescriptorParser {
         }
     }
 
-    @Test
+    //    @Test
     public void doit() throws IOException {
         for (File file : getApplicationDescriptors()) {
             if (!file.toString().contains("scriptHostname")) {

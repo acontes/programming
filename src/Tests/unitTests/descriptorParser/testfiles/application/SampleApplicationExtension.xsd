@@ -5,7 +5,7 @@
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="ApplicationDescriptorSchema.xsd"
+	<import schemaLocation="../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema">
 	</import>
 
