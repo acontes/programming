@@ -66,7 +66,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	@Override
 	public void disconnect() {
 		try {
-			scheduler.disconnect();
+			if(scheduler != null)
+				scheduler.disconnect();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}

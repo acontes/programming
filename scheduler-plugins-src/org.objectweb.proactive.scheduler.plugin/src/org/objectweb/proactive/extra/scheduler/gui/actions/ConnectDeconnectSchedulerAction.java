@@ -16,9 +16,11 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
 	private static ConnectDeconnectSchedulerAction instance = null;
 	private Composite parent = null;
+	private boolean isConnected = false;
 
 	private ConnectDeconnectSchedulerAction(Composite parent) {
 		this.parent = parent;
+		this.isConnected = false;
 		this.setText("Connect to a scheduler");
 		this.setToolTipText("Connect to a started scheduler by its url");
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/run.png"));
@@ -27,12 +29,24 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
 	@Override
 	public void run() {
+		if(isConnected)
+			disconnection();
+		else
+			connection();
+	}
+	
+	private void connection() {
 		SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(parent.getShell());
 		if (dialogResult != null) {
 
 			int res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
 
 			if (res == SchedulerProxy.CONNECTED) {
+				isConnected = true;
+				this.setText("Disconnect");
+				this.setToolTipText("Disconnect to the scheduler");
+				this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/run.png"));
+				
 				// active reference
 				JobsController.getActiveView().init();
 
@@ -56,6 +70,47 @@ public class ConnectDeconnectSchedulerAction extends Action {
 						"Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl());
 			}
 		}
+	}
+	
+	private void disconnection() {
+		isConnected = false;
+		this.setText("Connect to a scheduler");
+		this.setToolTipText("Connect to a started scheduler by its url");
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/run.png"));
+		
+		SeparatedJobView.clearOnDisconnection();
+		
+		// the follows actions can't be null
+		// if the user is not logged as an admin !
+		ChangeViewModeAction.getInstance().setEnabled(false);
+		KillJobAction.getInstance().setEnabled(false);
+		ObtainJobOutputAction.getInstance().setEnabled(false);
+		PauseResumeJobAction.getInstance().setEnabled(false);
+		SubmitJobAction.getInstance().setEnabled(false);
+		
+		FreezeSchedulerAction freezeSchedulerAction = FreezeSchedulerAction.getInstance();
+		if(freezeSchedulerAction != null)
+			freezeSchedulerAction.setEnabled(false);
+		
+		KillSchedulerAction killSchedulerAction = KillSchedulerAction.getInstance();
+		if(killSchedulerAction != null)
+			killSchedulerAction.setEnabled(false);
+		
+		PauseSchedulerAction pauseSchedulerAction = PauseSchedulerAction.getInstance();
+		if(pauseSchedulerAction != null)
+			pauseSchedulerAction.setEnabled(false);
+		
+		ResumeSchedulerAction resumeSchedulerAction = ResumeSchedulerAction.getInstance();
+		if(resumeSchedulerAction != null)
+			resumeSchedulerAction.setEnabled(false);
+		
+		ShutdownSchedulerAction shutdownSchedulerAction = ShutdownSchedulerAction.getInstance();
+		if(shutdownSchedulerAction != null)
+			shutdownSchedulerAction.setEnabled(false);
+		 
+		StartStopSchedulerAction startStopSchedulerAction = StartStopSchedulerAction.getInstance();
+		if(startStopSchedulerAction != null)
+			startStopSchedulerAction.setEnabled(false);
 	}
 
 	public static ConnectDeconnectSchedulerAction newInstance(Composite parent) {

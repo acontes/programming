@@ -268,24 +268,29 @@ public class SeparatedJobView extends ViewPart {
 			jobInfo.clear();
 		JobsOutputController.clearInstance();
 		ProActive.terminateActiveObject(JobsController.getActiveView(), false);
+		SchedulerProxy.getInstance().disconnect();
 		ProActive.terminateActiveObject(SchedulerProxy.getInstance(), false);
 		JobsController.clearInstances();
 		SchedulerProxy.clearInstance();
 		super.dispose();
 	}
 
-	private void clearOnDisconnection() {
+	public static void clearOnDisconnection() {
 		setVisible(false);
 		TaskView taskView = TaskView.getInstance();
 		if (taskView != null)
 			taskView.clear();
-		JobInfo jobInfo = JobInfo.getInstance();
 
+		JobInfo jobInfo = JobInfo.getInstance();
 		if (jobInfo != null)
 			jobInfo.clear();
+
 		JobsOutputController jobsOutputController = JobsOutputController.getInstance();
 		if (jobsOutputController != null)
 			jobsOutputController.removeAllJobOutput();
+
+		SchedulerProxy.getInstance().disconnect();
+		ProActive.terminateActiveObject(SchedulerProxy.getInstance(), false);
 		SchedulerProxy.clearInstance();
 	}
 }

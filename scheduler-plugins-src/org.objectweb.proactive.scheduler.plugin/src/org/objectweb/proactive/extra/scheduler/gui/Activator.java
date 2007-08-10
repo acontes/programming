@@ -83,7 +83,6 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		// TODO simpleLoggerServer.stop();
 
-		SchedulerProxy.getInstance().disconnect();
 		plugin = null;
 		super.stop(context);
 	}

@@ -36,7 +36,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
@@ -349,7 +348,7 @@ public class JobsController implements SchedulerEventListener {
 			KillJobAction.getInstance().setEnabled(enabled);
 		}
 	}
-	
+
 	// TODO trouver un nom quand même...
 	public void jeNeSaisToujoursPas() {
 		TableManager tableManager = TableManager.getInstance();
@@ -376,18 +375,39 @@ public class JobsController implements SchedulerEventListener {
 		PauseResumeJobAction.getInstance().setPauseResumeMode();
 	}
 
+	public void toujoursPasDeNom(Boolean startStopEnabled, Boolean freezeEnabled, Boolean pauseEnabled,
+			Boolean resumeEnabled, Boolean shutdownEnabled) {
+
+		StartStopSchedulerAction startStopSchedulerAction = StartStopSchedulerAction.getInstance();
+		if (startStopSchedulerAction == null)
+			startStopSchedulerAction.setEnabled(startStopEnabled);
+
+		FreezeSchedulerAction freezeSchedulerAction = FreezeSchedulerAction.getInstance();
+		if (freezeSchedulerAction == null)
+			freezeSchedulerAction.setEnabled(freezeEnabled);
+
+		PauseSchedulerAction pauseSchedulerAction = PauseSchedulerAction.getInstance();
+		if (pauseSchedulerAction == null)
+			pauseSchedulerAction.setEnabled(pauseEnabled);
+
+		ResumeSchedulerAction resumeSchedulerAction = ResumeSchedulerAction.getInstance();
+		if (resumeSchedulerAction == null)
+			resumeSchedulerAction.setEnabled(resumeEnabled);
+
+		ShutdownSchedulerAction shutdownSchedulerAction = ShutdownSchedulerAction.getInstance();
+		if (shutdownSchedulerAction == null)
+			shutdownSchedulerAction.setEnabled(shutdownEnabled);
+	}
+
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
 	 */
 	@Override
 	public void schedulerImmediatePausedEvent() {
+		System.out.println("JobsController.schedulerImmediatePausedEvent()");
 		jeSaisPasLeNom();
 
-		StartStopSchedulerAction.getInstance().setEnabled(false);
-		FreezeSchedulerAction.getInstance().setEnabled(false);
-		PauseSchedulerAction.getInstance().setEnabled(false);
-		ResumeSchedulerAction.getInstance().setEnabled(true);
-		ShutdownSchedulerAction.getInstance().setEnabled(false);
+		toujoursPasDeNom(false,false,false,true,false);
 	}
 
 	/**
@@ -395,13 +415,10 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerPausedEvent() {
+		System.out.println("JobsController.schedulerPausedEvent()");
 		jeSaisPasLeNom();
 
-		StartStopSchedulerAction.getInstance().setEnabled(false);
-		FreezeSchedulerAction.getInstance().setEnabled(false);
-		PauseSchedulerAction.getInstance().setEnabled(false);
-		ResumeSchedulerAction.getInstance().setEnabled(true);
-		ShutdownSchedulerAction.getInstance().setEnabled(false);
+		toujoursPasDeNom(false,false,false,true,false);
 	}
 
 	/**
@@ -409,13 +426,11 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerResumedEvent() {
+		System.out.println("JobsController.schedulerResumedEvent()");
 		jeSaisPasLeNom();
 
-		StartStopSchedulerAction.getInstance().setEnabled(true);
-		FreezeSchedulerAction.getInstance().setEnabled(true);
-		PauseSchedulerAction.getInstance().setEnabled(true);
-		ResumeSchedulerAction.getInstance().setEnabled(false);
-		ShutdownSchedulerAction.getInstance().setEnabled(true);
+		// TODO
+		toujoursPasDeNom(true,true,true,false,true);
 	}
 
 	/**
@@ -431,13 +446,10 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerShuttingDownEvent() {
+		System.out.println("JobsController.schedulerShuttingDownEvent()");
 		jeNeSaisToujoursPas();
-		
-		StartStopSchedulerAction.getInstance().setEnabled(false);
-		FreezeSchedulerAction.getInstance().setEnabled(false);
-		PauseSchedulerAction.getInstance().setEnabled(false);
-		ResumeSchedulerAction.getInstance().setEnabled(false);
-		ShutdownSchedulerAction.getInstance().setEnabled(false);
+
+		toujoursPasDeNom(false,false,false,false,false);
 	}
 
 	/**
@@ -445,15 +457,12 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerStartedEvent() {
+		System.out.println("JobsController.schedulerStartedEvent()");
 		jeSaisPasLeNom();
 
-		StartStopSchedulerAction.getInstance().setEnabled(true);
 		StartStopSchedulerAction.getInstance().setStopMode();
-		FreezeSchedulerAction.getInstance().setEnabled(true);
-		PauseSchedulerAction.getInstance().setEnabled(true);
-		ResumeSchedulerAction.getInstance().setEnabled(false);
-		ShutdownSchedulerAction.getInstance().setEnabled(true);
-		KillSchedulerAction.getInstance().setEnabled(true);
+
+		toujoursPasDeNom(true,true,true,false,true);
 	}
 
 	/**
@@ -461,15 +470,12 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerStoppedEvent() {
+		System.out.println("JobsController.schedulerStoppedEvent()");
 		jeNeSaisToujoursPas();
 
-		StartStopSchedulerAction.getInstance().setEnabled(true);
 		StartStopSchedulerAction.getInstance().setStartMode();
-		FreezeSchedulerAction.getInstance().setEnabled(false);
-		PauseSchedulerAction.getInstance().setEnabled(false);
-		ResumeSchedulerAction.getInstance().setEnabled(false);
-		ShutdownSchedulerAction.getInstance().setEnabled(true);
-		KillSchedulerAction.getInstance().setEnabled(true);
+
+		toujoursPasDeNom(true,false,false,false,true);
 	}
 
 	/**
@@ -485,6 +491,7 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobKilledEvent(JobId jobId) {
+		System.out.println("JobsController.jobKilledEvent()");
 		Vector<JobId> list = null;
 
 		if (pendingJobsIds.contains(jobId)) {
@@ -516,6 +523,7 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobPausedEvent(JobEvent event) {
+		System.out.println("JobsController.jobPausedEvent()");
 		final Job job = getJobById(event.getJobId());
 		job.update(event);
 		Display.getDefault().asyncExec(new Runnable() {
@@ -537,6 +545,7 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobResumedEvent(JobEvent event) {
+		System.out.println("JobsController.jobResumedEvent()");
 		final Job job = getJobById(event.getJobId());
 		job.update(event);
 		Display.getDefault().asyncExec(new Runnable() {
@@ -558,7 +567,8 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void changeJobPriorityEvent(JobEvent event) {
-		// TODO Auto-generated method stub
+		System.out.println("JobsController.changeJobPriorityEvent()");
+		getJobById(event.getJobId()).update(event);
 	}
 
 	// -------------------------------------------------------------------- //
