@@ -53,13 +53,23 @@ public enum State implements java.io.Serializable {
 	 */
 	KILLED ("Killed");
 	
+	
+	/** The textual definition of the state */
 	private String definition;
 	
+	/**
+	 * Default constructor.
+	 * @param def the textual definition of the state.
+	 */
 	State (String def){
 		definition = def;
 	}
 	
-	public String getDefinition(){
+	/**
+	 * @see java.lang.Enum#toString()
+	 */
+	@Override
+	public String toString(){
 		return definition;
 	}
 	
