@@ -12,7 +12,7 @@ package org.objectweb.proactive.extra.scheduler.userAPI;
  * @version 1.0, Jul 26, 2007
  * @since ProActive 3.2
  */
-public enum State implements java.io.Serializable {
+public enum SchedulerState implements java.io.Serializable {
 	
 	/**
 	 * The scheduler is running. Jobs can be submitted.
@@ -61,7 +61,7 @@ public enum State implements java.io.Serializable {
 	 * Default constructor.
 	 * @param def the textual definition of the state.
 	 */
-	State (String def){
+	SchedulerState (String def){
 		definition = def;
 	}
 	

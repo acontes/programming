@@ -1,57 +1,40 @@
-/**
- * 
- */
 package org.objectweb.proactive.extra.scheduler.userAPI;
 
 /**
- * State of the scheduler.
- * The state and what you can do with the scheduler according to the current state
- * are best described below.
+ * State of a job.
+ * The differents job states are described below.
  * 
  * @author ProActive Team
- * @version 1.0, Jul 26, 2007
+ * @version 1.0, Aug 10, 2007
  * @since ProActive 3.2
  */
 public enum JobState implements java.io.Serializable {
 	
 	/**
-	 * The scheduler is running. Jobs can be submitted.
-	 * Get the jobs results is possible.
-	 * It can be paused, stopped or shutdown.
+	 * The job is waiting to be scheduled.
 	 */
-	STARTED ("Started"),
+	PENDING ("Pending"),
 	/**
-	 * The scheduler is stopped. Jobs cannot be sumitted anymore.
-	 * It will terminate every submitted jobs.
-	 * Get the jobs results is possible.
-	 * It can be started or shutdown.
+	 * The job is running. Actually at least one of its task has been scheduled.
 	 */
-	STOPPED ("Stopped"),
+	RUNNING ("Running"),
 	/**
-	 * The scheduler is in immediate pause.
-	 * It means that every running tasks will be terminated,
-	 * but the running jobs will wait for the scheduler to resume.
-	 * It can be resumed, stopped, paused or shutdown.
+	 * The job is Rerunning, it means that one of its task has been rerunned.
 	 */
-	PAUSED_IMMEDIATE ("Paused"),
+	RERUNNING ("ReRunning"),
 	/**
-	 * The scheduler is paused.
-	 * It means that every running jobs will be terminated.
-	 * It can be resumed, stopped, paused immediate or shutdown.
+	 * The job is finished. Every tasks are finished.
+	 */
+	FINISHED ("Finished"),
+	/**
+	 * The job is paused waiting for user to resume it.
 	 */
 	PAUSED ("Paused"),
 	/**
-	 * The scheduler is shutting down,
-	 * It will terminate all running jobs (during this time, get jobs results is possible),
-	 * then it will serialize every remaining jobs results that still are in the finished queue.
-	 * Finally, it will shutdown the scheduler.
+	 * The job has failed. One or more tasks have failed.
+	 * It can 
 	 */
-	SHUTTING_DOWN ("Shutting down"),
-	/**
-	 * The scheduler has been killed, nothing can be done anymore.
-	 * (Similar to Ctrl-C)
-	 */
-	KILLED ("Killed");
+	FAILED ("Failed");
 	
 	
 	/** The textual definition of the state */

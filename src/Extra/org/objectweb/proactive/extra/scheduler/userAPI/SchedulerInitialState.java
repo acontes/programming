@@ -23,7 +23,7 @@ public final class SchedulerInitialState implements Serializable {
 	/** finished jobs */
 	private Vector<Job> finishedJobs = new Vector<Job>();
 	/** scheduler state */
-	private State state = State.STOPPED;
+	private SchedulerState state = SchedulerState.STOPPED;
 	
 	
 	/**
@@ -95,7 +95,7 @@ public final class SchedulerInitialState implements Serializable {
 	/**
 	 * @return the state
 	 */
-	public State getState() {
+	public SchedulerState getState() {
 		return state;
 	}
 
@@ -103,7 +103,7 @@ public final class SchedulerInitialState implements Serializable {
 	/**
 	 * @param state the state to set
 	 */
-	public void setState(State state) {
+	public void setState(SchedulerState state) {
 		this.state = state;
 	}
 	

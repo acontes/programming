@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
-import org.objectweb.proactive.extra.scheduler.userAPI.State;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -85,7 +85,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/** Job result storage */
 	private HashMap<JobId,JobResult> results = new HashMap<JobId,JobResult>();
 	/** Scheduler current state */
-	private State state = State.STOPPED;
+	private SchedulerState state = SchedulerState.STOPPED;
 	
 	
 	/**
@@ -136,13 +136,13 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		RequestFilter filter = new MainLoopRequestFilter("submit","pause","terminate");
 		do {
 			service.blockingServeOldest();
-			while(state == State.STARTED || state == State.PAUSED){
+			while(state == SchedulerState.STARTED || state == SchedulerState.PAUSED){
 				service.serveAll(filter);
 				schedule();
 	            //block the loop until a method is invoked and serve it
 				service.blockingServeOldest(SCHEDULER_TIME_OUT);
 			}
-		} while (state != State.SHUTTING_DOWN && state != State.KILLED);
+		} while (state != SchedulerState.SHUTTING_DOWN && state != SchedulerState.KILLED);
 		logger.info("Scheduler is shutting down...");
 		//FIXME for the moment if shutdown sequence is enable, paused job becomes running
 		for (Job job : jobs.values()){
@@ -162,14 +162,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			service.blockingServeOldest(SCHEDULER_TIME_OUT);
 		}
 		//if normal shutdown, serialize
-		if (state == State.SHUTTING_DOWN){
+		if (state == SchedulerState.SHUTTING_DOWN){
 			try {
 				logger.info("Serializing results...");
 				serializeResults(SERIALIZE_PATH);
 			} catch (Exception e) {
 				e.printStackTrace();
 				//if an error occurs during serialization, we wait until the result to be got back
-				while (results.size() > 0 && state == State.SHUTTING_DOWN){
+				while (results.size() > 0 && state == SchedulerState.SHUTTING_DOWN){
 					service.blockingServeOldest();
 				}
 			}
@@ -194,7 +194,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			LightJobList.add(j.getLightJob());
 		}
 		//if scheduler is paused it only finishes running jobs
-		if (state != State.PAUSED){
+		if (state != SchedulerState.PAUSED){
 			for (Job j : pendingJobs){
 				LightJobList.add(j.getLightJob());
 			}
@@ -312,7 +312,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @throws SchedulerException
 	 */
 	public void submit(Job job) throws SchedulerException {
-		if (state == State.SHUTTING_DOWN || state == State.STOPPED)
+		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.STOPPED)
 			throw new SchedulerException("Scheduler is stopped, cannot submit new job !");
 		job.setSubmittedTime(System.currentTimeMillis());
 		jobs.put(job.getId(), job);
@@ -376,9 +376,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#start()
 	 */
 	public BooleanWrapper coreStart() {
-		if (state != State.STOPPED)
+		if (state != SchedulerState.STOPPED)
 			return new BooleanWrapper(false);
-		state = State.STARTED;
+		state = SchedulerState.STARTED;
 		logger.info("Scheduler has just been started !");
 		frontend.schedulerStartedEvent();
 		return new BooleanWrapper(true);
@@ -389,9 +389,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#stop()
 	 */
 	public BooleanWrapper coreStop() {
-		if (state == State.STOPPED || state == State.SHUTTING_DOWN || state == State.KILLED)
+		if (state == SchedulerState.STOPPED || state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED)
 			return new BooleanWrapper(false);
-		state = State.STOPPED;
+		state = SchedulerState.STOPPED;
 		logger.info("Scheduler has just been stopped, no tasks will be launched until start.");
 		frontend.schedulerStoppedEvent();
 		return new BooleanWrapper(true);
@@ -402,12 +402,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#pause()
 	 */
 	public BooleanWrapper corePause() {
-		if (state == State.SHUTTING_DOWN || state == State.KILLED){
+		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
-		if (state != State.PAUSED_IMMEDIATE && state != State.STARTED)
+		if (state != SchedulerState.PAUSED_IMMEDIATE && state != SchedulerState.STARTED)
 			return new BooleanWrapper(false);
-		state = State.PAUSED;
+		state = SchedulerState.PAUSED;
 		logger.info("Scheduler has just been paused !");
 		frontend.schedulerPausedEvent();
 		return new BooleanWrapper(true);
@@ -418,12 +418,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#coreImmediatePause()
 	 */
 	public BooleanWrapper coreImmediatePause() {
-		if (state == State.SHUTTING_DOWN || state == State.KILLED){
+		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
-		if (state != State.PAUSED && state != State.STARTED)
+		if (state != SchedulerState.PAUSED && state != SchedulerState.STARTED)
 			return new BooleanWrapper(false);
-		state = State.PAUSED_IMMEDIATE;
+		state = SchedulerState.PAUSED_IMMEDIATE;
 		logger.info("Scheduler has just been immediate paused !");
 		frontend.schedulerImmediatePausedEvent();
 		return new BooleanWrapper(true);
@@ -434,12 +434,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#resume()
 	 */
 	public BooleanWrapper coreResume() {
-		if (state == State.SHUTTING_DOWN || state == State.KILLED){
+		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
-		if (state != State.PAUSED && state != State.PAUSED_IMMEDIATE && state != State.STARTED)
+		if (state != SchedulerState.PAUSED && state != SchedulerState.PAUSED_IMMEDIATE && state != SchedulerState.STARTED)
 			return new BooleanWrapper(false);
-		state = State.STARTED;
+		state = SchedulerState.STARTED;
 		logger.info("Scheduler has just been resumed !");
 		frontend.schedulerResumedEvent();
 		return new BooleanWrapper(true);
@@ -453,9 +453,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//TODO si le scheduler est shutting down et qu'un job est en pause que fait on ?
 		//actuellement le job reste en pause et le scheduler s'arrete que lorsque tous les jobs sont finis.
 		//Le user ne peut pas non plus résumer son job, donc tout reste bloqué.
-		if (state == State.KILLED || state == State.SHUTTING_DOWN)
+		if (state == SchedulerState.KILLED || state == SchedulerState.SHUTTING_DOWN)
 			return new BooleanWrapper(false);
-		state = State.SHUTTING_DOWN;
+		state = SchedulerState.SHUTTING_DOWN;
 		logger.info("Scheduler is shutting down, this make take time to finish every jobs !");
 		frontend.schedulerShuttingDownEvent();
 		return new BooleanWrapper(true);
@@ -466,7 +466,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#coreKill()
 	 */
 	public synchronized BooleanWrapper coreKill() {
-		if (state == State.KILLED)
+		if (state == SchedulerState.KILLED)
 			return new BooleanWrapper(false);
 		//destroying running active object launcher
 		for (Job j : runningJobs){
@@ -484,7 +484,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		taskResults.clear();
 		results.clear();
 		//finally : shutdown
-		state = State.KILLED;
+		state = SchedulerState.KILLED;
 		logger.info("Scheduler has just been killed !");
 		frontend.schedulerKilledEvent();
 		return new BooleanWrapper(true);
@@ -500,7 +500,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @return true if success, false otherwise.
 	 */
 	public BooleanWrapper pause(JobId jobId) {
-		if (state == State.SHUTTING_DOWN || state == State.KILLED){
+		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
 		Job job = jobs.get(jobId);
@@ -522,7 +522,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @return true if success, false otherwise.
 	 */
 	public BooleanWrapper resume(JobId jobId) {
-		if (state == State.SHUTTING_DOWN || state == State.KILLED){
+		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
 		Job job = jobs.get(jobId);
@@ -545,7 +545,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @return true if success, false otherwise.
 	 */
 	public BooleanWrapper kill(JobId jobId) {
-		if (state == State.SHUTTING_DOWN || state == State.KILLED){
+		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
 		Job job = jobs.get(jobId);
