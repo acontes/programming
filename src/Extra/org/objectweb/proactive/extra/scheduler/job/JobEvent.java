@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**
  * JobEvent provides some informations about a job.
@@ -41,8 +42,8 @@ public class JobEvent implements Serializable{
 	private int numberOfFinishedTasks = 0;
 	/** job priority */
 	private JobPriority priority = JobPriority.NORMAL;
-	/** Pause state of the job */
-	private boolean paused = false;
+	/** state of the job */
+	private JobState state = JobState.PENDING;
 	/** If this status is not null, it means the task have to change their status */
 	private HashMap<TaskId,Status> taskStatusModify = null;
 	
@@ -208,18 +209,6 @@ public class JobEvent implements Serializable{
 		this.totalNumberOfTasks = totalNumberOfTasks;
 	}
 	/**
-	 * @return the paused
-	 */
-	public boolean isPaused() {
-		return paused;
-	}
-	/**
-	 * @param paused the paused to set
-	 */
-	public void setPaused(boolean paused) {
-		this.paused = paused;
-	}
-	/**
 	 * @return the priority
 	 */
 	public JobPriority getPriority() {
@@ -230,6 +219,18 @@ public class JobEvent implements Serializable{
 	 */
 	public void setPriority(JobPriority priority) {
 		this.priority = priority;
+	}
+	/**
+	 * @return the state
+	 */
+	public JobState getState() {
+		return state;
+	}
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(JobState state) {
+		this.state = state;
 	}
 	
 }

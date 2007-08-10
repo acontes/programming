@@ -40,6 +40,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 
@@ -146,7 +147,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		logger.info("Scheduler is shutting down...");
 		//FIXME for the moment if shutdown sequence is enable, paused job becomes running
 		for (Job job : jobs.values()){
-			if (job.isPaused()){
+			if (job.getState() == JobState.PAUSED){
 				job.setUnPause();
 				JobEvent event = job.getJobInfo();
 				frontend.jobResumedEvent(event);
@@ -504,6 +505,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			return new BooleanWrapper(false);
 		}
 		Job job = jobs.get(jobId);
+		if (finishedJobs.contains(job)){
+			return new BooleanWrapper(false);
+		}
 		boolean change = job.setPaused();
 		JobEvent event = job.getJobInfo();
 		if (change)
@@ -526,6 +530,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			return new BooleanWrapper(false);
 		}
 		Job job = jobs.get(jobId);
+		if (finishedJobs.contains(job)){
+			return new BooleanWrapper(false);
+		}
 		boolean change = job.setUnPause();
 		JobEvent event = job.getJobInfo();
 		if (change)

@@ -9,6 +9,7 @@ import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**
  * 
@@ -25,6 +26,7 @@ public class Job implements Serializable, Comparable<Job> {
 	public static final int SORT_BY_TYPE = 4;
 	public static final int SORT_BY_DESCRIPTION = 5;
 	public static final int SORT_BY_OWNER = 6;
+	public static final int SORT_BY_STATE = 7;
 	public static final int ASC_ORDER = 1;
 	public static final int DESC_ORDER = 2;
 	private static int currentSort = SORT_BY_ID;
@@ -45,6 +47,7 @@ public class Job implements Serializable, Comparable<Job> {
 	private Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
 	/** informations about job execution */
 	private JobEvent jobInfo = new JobEvent();
+	private JobState oldState = JobState.PENDING;
 	/** Light job for dependences management */
 	private LightJob lightJob;
 
@@ -163,6 +166,9 @@ public class Job implements Serializable, Comparable<Job> {
 		case SORT_BY_OWNER:
 			return (currentOrder == ASC_ORDER) ? (owner.compareTo(job.owner))
 					: (job.owner.compareTo(owner));
+		case SORT_BY_STATE:
+			return (currentOrder == ASC_ORDER) ? (jobInfo.getState().compareTo(job.jobInfo.getState()))
+					: (job.jobInfo.getState().compareTo(jobInfo.getState()));
 		default:
 			return (currentOrder == ASC_ORDER) ? (getId().value() - job.getId().value())
 					: (job.getId().value() - getId().value());
@@ -587,14 +593,30 @@ public class Job implements Serializable, Comparable<Job> {
 		this.owner = owner;
 	}
 	
+	/**
+	 * To get the state of the job.
+	 * 
+	 * @return the state of the job.
+	 */
+	public JobState getState() {
+		return jobInfo.getState();
+	}
+	
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(JobState state) {
+		jobInfo.setState(state);
+	}
 
 	/**
 	 * Paused every running and submitted tasks in this pending job.
 	 */
 	public boolean setPaused() {
-		if (isPaused())
+		if (jobInfo.getState() == JobState.PAUSED)
 			return false;
-		jobInfo.setPaused(true);
+		oldState = jobInfo.getState();
+		jobInfo.setState(JobState.PAUSED);
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
 			if (td.getStatus() == Status.SUBMITTED){
@@ -613,9 +635,9 @@ public class Job implements Serializable, Comparable<Job> {
 	 * State of every paused tasks becomes pending or submitted in this pending job.
 	 */
 	public boolean setUnPause() {
-		if (isRunning())
+		if (jobInfo.getState() != JobState.PAUSED)
 			return false;
-		jobInfo.setPaused(false);
+		jobInfo.setState(oldState);
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
 			if (td.getStatus() == Status.PAUSED_S){
@@ -628,26 +650,6 @@ public class Job implements Serializable, Comparable<Job> {
 		lightJob.update(hts);
 		setTaskStatusModify(hts);
 		return true;
-	}
-	
-	
-	/**
-	 * To know if the job is paused.
-	 * 
-	 * @return true if the job is paused, false if not.
-	 */
-	public boolean isPaused(){
-		return jobInfo.isPaused();
-	}
-
-	 
-	 /**
-	  * To know if the job is running.
-	  * 
-	  * @return true if the job is running, false if not.
-	  */
-	public boolean isRunning(){
-		return !isPaused();
 	}
 	
 	
