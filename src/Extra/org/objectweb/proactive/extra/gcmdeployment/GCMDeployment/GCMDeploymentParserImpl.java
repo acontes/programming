@@ -3,7 +3,9 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,7 +24,6 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Gr
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupSSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -50,13 +51,21 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected GCMDeploymentResources resources;
     private boolean parsedResource = false;
     private boolean parsedInfrastructure = false;
+    protected List<String> schemas;
 
     public GCMDeploymentParserImpl(File descriptor) throws IOException {
+        this(descriptor, null);
+    }
+
+    public GCMDeploymentParserImpl(File descriptor, List<String> userSchemas)
+        throws IOException {
         infrastructure = new GCMDeploymentInfrastructure();
         resources = new GCMDeploymentResources();
         groupParserMap = new HashMap<String, GroupParser>();
         bridgeParserMap = new HashMap<String, BridgeParser>();
         environment = new GCMDeploymentEnvironment();
+        schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas)
+                                        : new ArrayList<String>();
 
         setup();
         registerDefaultGroupParsers();
@@ -106,8 +115,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                                       .getResource(DEPLOYMENT_DESC_LOCATION)
                                       .toString();
 
-        domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-            new Object[] { deploymentSchema });
+        schemas.add(0, deploymentSchema);
+
+        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
             documentBuilder = domFactory.newDocumentBuilder();
@@ -265,8 +275,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         for (int i = 0; i < groups.getLength(); ++i) {
             Node groupNode = groups.item(i);
             GroupParser groupParser = groupParserMap.get(groupNode.getNodeName());
-            groupParser.parseGroupNode(groupNode, xpath);
-            infrastructure.addGroup(groupParser.getGroup());
+            if (groupParser == null) {
+                GCMDeploymentLoggers.GCMA_LOGGER.warn(
+                    "No group parser registered for node <" +
+                    groupNode.getNodeName() + ">");
+            } else {
+                groupParser.parseGroupNode(groupNode, xpath);
+                infrastructure.addGroup(groupParser.getGroup());
+            }
         }
 
         //
@@ -278,8 +294,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         for (int i = 0; i < bridges.getLength(); ++i) {
             Node bridgeNode = bridges.item(i);
             BridgeParser bridgeParser = bridgeParserMap.get(bridgeNode.getNodeName());
-            bridgeParser.parseBridgeNode(bridgeNode, xpath);
-            infrastructure.addBrige(bridgeParser.getBridge());
+            if (bridgeParser == null) {
+                GCMDeploymentLoggers.GCMA_LOGGER.warn(
+                    "No bridge parser registered for node <" +
+                    bridgeNode.getNodeName() + ">");
+            } else {
+                bridgeParser.parseBridgeNode(bridgeNode, xpath);
+                infrastructure.addBrige(bridgeParser.getBridge());
+            }
         }
 
         parsedInfrastructure = true;

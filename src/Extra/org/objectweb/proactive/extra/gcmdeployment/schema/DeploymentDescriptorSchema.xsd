@@ -287,7 +287,7 @@
 		</complexContent>
 	</complexType>
 
-	<complexType name="deployersType">
+	<complexType name="groupsType">
 		<complexContent>
 			<extension base="pa:abstractInfrastructureType">
 				<sequence>
@@ -299,7 +299,10 @@
 		</complexContent>
 	</complexType>
 
-	<complexType name="abstractBridgeElementType"></complexType>
+	<complexType name="abstractBridgeElementType">
+		<attribute name="id" type="pa:idType" use="required" />
+	</complexType>
+	
 	<element name="abstractBridgeElement"
 		type="pa:abstractBridgeElementType">
 	</element>
@@ -307,7 +310,6 @@
 	<complexType name="bridgeTypeSSH">
 		<complexContent>
 			<extension base="pa:abstractBridgeElementType">
-				<attribute name="id" type="pa:idType" use="required" />
 				<attribute name="hostname" type="pa:hostnameType"
 					use="required" />
 				<attribute name="username" type="pa:usernameType"></attribute>
@@ -340,7 +342,7 @@
 		type="pa:hostsType">
 	</element>
 
-	<element name="groups" type="pa:deployersType"
+	<element name="groups" type="pa:groupsType"
 		substitutionGroup="pa:abstractInfrastructureElement">
 	</element>
 	<element name="bridges" type="pa:bridgesType"

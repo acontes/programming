@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-
-
 public class Executor {
     final static private Executor singleton = new Executor();
     private List<Thread> threads;

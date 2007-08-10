@@ -26,11 +26,10 @@ public class TestApplicationDescriptorParser {
     @Test
     public void test() throws IOException {
         for (File descriptor : getApplicationDescriptors()) {
-            
             if (descriptor.toString().contains("script_ext")) {
                 continue;
             }
-            
+
             GCMApplicationParserImpl parser = new GCMApplicationParserImpl(descriptor);
 
             parser.getCommandBuilder();
@@ -46,7 +45,6 @@ public class TestApplicationDescriptorParser {
      */
     protected static class UserApplicationNodeParser
         extends AbstractApplicationParser {
-        
         @Override
         protected CommandBuilder createCommandBuilder() {
             return new CommandBuilderScript();

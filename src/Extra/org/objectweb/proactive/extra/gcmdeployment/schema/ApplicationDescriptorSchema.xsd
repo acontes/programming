@@ -256,12 +256,21 @@
 		</complexContent>
 	</complexType>
 
+	<element name="abstractApplicationElement"
+		type="pa:applicationNodeType" />
+
+	<element name="executable" type="pa:executableType"
+		substitutionGroup="pa:abstractApplicationElement" />
+	<element name="proactive" type="pa:proactiveType"
+		substitutionGroup="pa:abstractApplicationElement" />
+
+
 	<complexType name="applicationType">
-		<choice>
-			<element name="proactive" type="pa:proactiveType" />
-			<element name="executable" type="pa:executableType" />
-			<any namespace="##other" />
-		</choice>
+		<sequence>
+			<element ref="pa:abstractApplicationElement" maxOccurs="1"
+				minOccurs="1">
+			</element>
+		</sequence>
 	</complexType>
 
 	<complexType name="ressourcesType">
