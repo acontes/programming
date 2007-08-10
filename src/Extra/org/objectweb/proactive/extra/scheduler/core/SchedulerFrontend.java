@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.scheduler.core;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
@@ -427,6 +428,15 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 			throw new SchedulerException(ACCESS_DENIED);
 		return stats;
 	}
+
+
+	/**
+	 * Terminate the schedulerConnexion active object and then this object.
+	 */
+	public void terminate() {
+		//TODO supprimer l'objet actif de connection
+		ProActive.terminateActiveObject(false);
+	}
 	
 	
 	/* ########################################################################################### */
@@ -436,11 +446,35 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/* ########################################################################################### */
 	
 
+	private void dispatch(String methodName, Class<?>[] types, Object... params){
+		try {
+			Method method = SchedulerEventListener.class.getMethod(methodName, types);
+			Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
+			while (iter.hasNext()){
+				UniqueID id = iter.next();
+				try{
+					method.invoke(schedulerListeners.get(id),params);
+				} catch(Exception e){
+					iter.remove();
+					identifications.remove(id);
+					logger.error(LISTENER_WARNING);
+				}
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent()
 	 */
 	public void schedulerImmediatePausedEvent() {
-		Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
+		dispatch("schedulerImmediatePausedEvent", new Class<?>[]{});
+		/*Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 		while (iter.hasNext()){
 			UniqueID id = iter.next();
 			try{
@@ -450,7 +484,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 				identifications.remove(id);
 				logger.error(LISTENER_WARNING);
 			}
-		}
+		}*/
 	}
 
 
@@ -760,15 +794,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 				logger.error(LISTENER_WARNING);
 			}
 		}
-	}
-
-
-	/**
-	 * Terminate the schedulerConnexion active object and then this object.
-	 */
-	public void terminate() {
-		//TODO supprimer l'objet actif de connection
-		ProActive.terminateActiveObject(false);
 	}
 
 }

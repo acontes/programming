@@ -179,8 +179,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
 	
 	private void schedule() {
-		// TODO en cours
-		// build light job list with eligible jobs (running and pending)
+		//get light job list with eligible jobs (running and pending)
 		ArrayList<LightJob> LightJobList = new ArrayList<LightJob>();
 		for (Job j : runningJobs){
 			LightJobList.add(j.getLightJob());

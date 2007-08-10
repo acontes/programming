@@ -18,7 +18,7 @@ public interface PolicyInterface extends Serializable {
 
 	
 	/**
-	 * Return the tasks that have to be schedule.
+	 * Return the tasks that have to be scheduled.
 	 * The tasks must be in the desired scheduling order.
 	 * The first task to be schedule must be the first in the returned Vector.
 	 * 
