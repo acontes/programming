@@ -12,7 +12,7 @@ import org.objectweb.proactive.extra.scheduler.job.Job;
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
  */
-public final class SchedulerState implements Serializable {
+public final class SchedulerInitialState implements Serializable {
 
 	/** serial version UID */
 	private static final long serialVersionUID = -7448663006621330188L;
@@ -29,7 +29,7 @@ public final class SchedulerState implements Serializable {
 	/**
 	 * ProActive Empty constructor.
 	 */
-	public SchedulerState(){}
+	public SchedulerInitialState(){}
 	
 	
 	/**
