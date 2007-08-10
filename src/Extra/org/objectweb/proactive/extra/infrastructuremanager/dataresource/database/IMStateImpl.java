@@ -2,8 +2,8 @@ package org.objectweb.proactive.extra.infrastructuremanager.dataresource.databas
 
 import java.util.List;
 
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMState;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 public class IMStateImpl implements IMState {
 	

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.infrastructuremanager.core;
+package org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -21,7 +21,7 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
     private String padName = null;
     private ProActiveDescriptor pad = null;
     private String[] vnNames = null;
-    private IMCore imCore = null;
+    private PADNodeSource nodeSource = null;
 
     //----------------------------------------------------------------------//
     // Construtors
@@ -31,8 +31,8 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      * @param padName : the name of the proactive descriptor
      * @param pad     : the proactive descriptor
      */
-    public IMDeploy(IMCore imCore, String padName, ProActiveDescriptor pad) {
-        this.imCore = imCore;
+    public IMDeploy(PADNodeSource nodeSource, String padName, ProActiveDescriptor pad) {
+        this.nodeSource = nodeSource;
         this.padName = padName;
         this.pad = pad;
     }
@@ -43,9 +43,9 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      * @param pad     : the proactive descriptor
      * @param vnNames : the name of the virtual nodes of this pad to deploy
      */
-    public IMDeploy(IMCore imCore, String padName, ProActiveDescriptor pad,
+    public IMDeploy(PADNodeSource nodeSource, String padName, ProActiveDescriptor pad,
         String[] vnNames) {
-        this.imCore = imCore;
+        this.nodeSource = nodeSource;
         this.padName = padName;
         this.pad = pad;
         this.vnNames = vnNames;
@@ -78,7 +78,7 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
                 logger.warn("NodeException : " + e, e);
             }
         }
-        this.imCore.addPAD(padName, pad);
+        this.nodeSource.addPAD(padName, pad);
     }
 
     /**
@@ -91,7 +91,7 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
         ProActiveRuntime par = node.getProActiveRuntime();
         try {
             String vnName = par.getVNName(node.getNodeInformation().getName());
-            this.imCore.addNode(node, vnName, padName);
+            this.nodeSource.addNode(node, vnName, padName);
         } catch (ProActiveException e) {
             logger.warn("ProActiveException : " + e, e);
         }

@@ -2,26 +2,22 @@ package org.objectweb.proactive.extra.infrastructuremanager.dataresource.databas
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMDataResource;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMState;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
@@ -34,174 +30,25 @@ public class IMDataResourceImpl2 implements IMDataResource, Serializable {
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_DATARESOURCE);
 
 	// Attributes
-	private HashMap<String, ProActiveDescriptor> listPad;
 	private IMNodeManager nodeManager;
-
-	// test EventListener
-	private ArrayList<IMEventListener> listeners;
 
 	//----------------------------------------------------------------------//
 	// CONSTRUCTORS
-	public IMDataResourceImpl2() {
-		init();
+	/** 
+	 * The {@link IMNodeManager} given in parameter must be not null.
+	 */
+	public IMDataResourceImpl2(IMNodeManager nodeManager) {
+		if(nodeManager == null)
+			this.nodeManager = new IMNodeManagerImpl();
+		else
+			this.nodeManager = nodeManager;
 	}
 
 	public void init() {
-		listeners = new ArrayList<IMEventListener>();
-		nodeManager = new IMNodeManagerImpl();
-		listPad = new HashMap<String, ProActiveDescriptor>();
-	}
-
-	//----------------------------------------------------------------------//
-	// ACCESSORS
-	public IntWrapper getSizeListFreeIMNode() {
-		return new IntWrapper(nodeManager.getNbFreeIMNode());
-	}
-
-	public IntWrapper getSizeListBusyIMNode() {
-		return new IntWrapper(nodeManager.getNbBusyIMNode() + nodeManager.getNbWaitingIMNode());
-	}
-
-	public IntWrapper getSizeListDownIMNode() {
-		return new IntWrapper(nodeManager.getNbDownIMNode());
-	}
-
-	public IntWrapper getSizeListPad() {
-		return new IntWrapper(listPad.size());
-	}
-
-	public IntWrapper getNbAllIMNode() {
-		return new IntWrapper(nodeManager.getNbAllIMNode());
-	}
-
-	public ArrayList<IMNode> getListFreeIMNode() {
-		return nodeManager.getListFreeIMNode();
-	}
-
-	public ArrayList<IMNode> getListBusyIMNode() {
-		ArrayList<IMNode> result = nodeManager.getListBusyIMNode();
-		result.addAll(nodeManager.getListWaitingIMNode());
-		return result;
-	}
-
-	public ArrayList<IMNode> getListDownIMNode() {
-		return nodeManager.getListDownIMNode();
-	}
-
-	public ArrayList<IMNode> getListAllIMNode() {
-		return nodeManager.getListAllIMNode();
-	}
-
-	public HashMap<String, ProActiveDescriptor> getListPad() {
-		return listPad;
-	}
-
-	public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
-		if (logger.isInfoEnabled()) {
-			logger.info("getDeployedVirtualNodeByPad");
-		}
-		HashMap<String, ArrayList<VirtualNode>> deployedVNodesByPadName = new HashMap<String, ArrayList<VirtualNode>>();
-
-		for (String padName : listPad.keySet()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("pad name : " + padName);
-			}
-			ProActiveDescriptor pad = listPad.get(padName);
-
-			ArrayList<VirtualNode> deployedVNodes = new ArrayList<VirtualNode>();
-			VirtualNode[] vns = pad.getVirtualNodes();
-			if (logger.isInfoEnabled()) {
-				logger.info("nb vnodes of this pad : " + vns.length);
-			}
-			for (VirtualNode vn : vns) {
-				if (logger.isInfoEnabled()) {
-					logger.info("virtualnode " + vn.getName() + " is actif ? " +
-							vn.isActivated());
-				}
-				if (vn.isActivated()) {
-					deployedVNodes.add(vn);
-				}
-			}
-			deployedVNodesByPadName.put(padName, deployedVNodes);
-		}
-		return deployedVNodesByPadName;
-	}
-
-	public ProActiveDescriptor getDeployedPad(String padName) {
-		return listPad.get(padName);
-	}
-
-	//----------------------------------------------------------------------//
-	// IS
-	public BooleanWrapper isDeployedPad(String padName) {
-		return new BooleanWrapper(listPad.containsKey(padName));
-	}
-
-	//----------------------------------------------------------------------//
-	// ADD
-	public void addNewDeployedNode(Node node, String vnName, String padName) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("Adding a node to IMNodeManager");
-		}
-		nodeManager.addIMNode(new IMNodeImpl(node, vnName, padName));
-	}
-
-	public void putPAD(String padName, ProActiveDescriptor pad) {
-		listPad.put(padName, pad);
-	}
-
-	//----------------------------------------------------------------------//
-	// REMOVE NODE BUSY AND FREE
-	public void removePad(String padName) {
-		// TODO anything else to do ? 
-		// what do we do for the IMNodes corresponding ?
-		listPad.remove(padName);
-	}
-
-	public void removeNode(String padName) {
-		ListIterator<IMNode> iterator = nodeManager.getListAllIMNode().listIterator();
-		ArrayList<IMNode> toRemove = new ArrayList<IMNode>();
-		while (iterator.hasNext()) {
-			IMNode imnode = iterator.next();
-			if (imnode.getPADName().equals(padName)) {
-				if (logger.isInfoEnabled()) {
-					logger.info("remove node : " + imnode.getNodeName());
-				}
-				toRemove.add(imnode);
-			}
-		}
-		nodeManager.removeIMNodes(toRemove);
-	}
-
-	public void removeNode(String padName, String vnName) {
-		ListIterator<IMNode> iterator = nodeManager.getListAllIMNode().listIterator();
-		ArrayList<IMNode> toRemove = new ArrayList<IMNode>();
-		while (iterator.hasNext()) {
-			IMNode imnode = iterator.next();
-			if (imnode.getPADName().equals(padName) &&
-					imnode.getVNodeName().equals(vnName)) {
-				if (logger.isInfoEnabled()) {
-					logger.info("remove node : " + imnode.getNodeName());
-				}
-				toRemove.add(imnode);
-			}
-		}
-		nodeManager.removeIMNodes(toRemove);
-	}
-
-	public void removeNode(String padName, String[] vnNames) {
-		for (String vnName : vnNames) {
-			removeNode(padName, vnName);
-		}
-	}
-
-	public IMState addIMEventListener(IMEventListener listener) {
-		listeners.add(listener);
-		return new IMStateImpl(getListFreeIMNode(), getListBusyIMNode(), getListDownIMNode());
 	}
 
 	public void freeNode(Node node) {
-		ListIterator<IMNode> iterator = nodeManager.getListBusyIMNode().listIterator();
+		ListIterator<IMNode> iterator = nodeManager.getBusyNodes().listIterator();
 		String nodeName = null;
 		try {
 			nodeName = node.getNodeInformation().getName();
@@ -226,7 +73,7 @@ public class IMDataResourceImpl2 implements IMDataResource, Serializable {
 	}
 
 	public void freeNodes(VirtualNode vnode) {
-		ListIterator<IMNode> iterator = nodeManager.getListBusyIMNode().listIterator();
+		ListIterator<IMNode> iterator = nodeManager.getBusyNodes().listIterator();
 		while (iterator.hasNext()) {
 			IMNode imnode = iterator.next();
 			if (imnode.getVNodeName().equals(vnode.getName())) {
@@ -237,7 +84,7 @@ public class IMDataResourceImpl2 implements IMDataResource, Serializable {
 	}
 
 	public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
-		ArrayList<IMNode> nodes = nodeManager.getNodesByScript(verifyingScript);
+		ArrayList<IMNode> nodes = nodeManager.getNodesByScript(verifyingScript, true);
 		String order = "";
 		for( IMNode n : nodes) order += n.getHostName()+ " ";
 		logger.info("Nodes = "+order);

@@ -16,11 +16,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMDataResource;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMState;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.database.IMDataResourceImpl;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.database.IMDataResourceImpl2;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdminImpl;
@@ -30,14 +29,20 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUserImpl;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSourceManager;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PADNSInterface;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
 public class IMCore implements InitActive, IMConstants, Serializable {
-    /**  */
-	private static final long serialVersionUID = -6005871512766524208L;
 
-	private final static Logger logger = ProActiveLogger.getLogger(Loggers.IM_CORE);
+    /**  */
+    private static final long serialVersionUID = -6005871512766524208L;
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.IM_CORE);
 
     // Attributes
     private Node nodeIM;
@@ -45,11 +50,12 @@ public class IMCore implements InitActive, IMConstants, Serializable {
     private IMMonitoring monitoring;
     private IMUser user;
     private IMDataResource dataresource;
+    private PADNodeSource padNS;
+    private IMNodeSourceManager nodeManager;
 
-   // test mkris
-    IMActivityNode act; 
-    
-    
+    // test mkris
+    IMActivityNode act;
+
     // ----------------------------------------------------------------------//
     // CONSTRUCTORS
 
@@ -63,10 +69,6 @@ public class IMCore implements InitActive, IMConstants, Serializable {
             logger.info("IMCore constructor");
         }
         this.nodeIM = nodeIM;
-        if (logger.isInfoEnabled()) {
-            logger.info("instanciation IMDataResourceImpl");
-        }
-        this.dataresource = new IMDataResourceImpl2();
     }
 
     // ----------------------------------------------------------------------//
@@ -98,10 +100,17 @@ public class IMCore implements InitActive, IMConstants, Serializable {
             }
             user = (IMUserImpl) ProActive.newActive(IMUserImpl.class.getName(),
                     new Object[] { ProActive.getStubOnThis() }, nodeIM);
-            
-            act = new IMActivityNode((IMCore)(ProActive.getStubOnThis()));
+
+            if (logger.isInfoEnabled()) {
+                logger.info("instanciation IMDataResourceImpl");
+            }
+            this.nodeManager = new IMNodeSourceManager("NSManager", nodeIM);
+            this.dataresource = new IMDataResourceImpl2(nodeManager);
+
+            padNS = nodeManager.getPADNodeSource();
+
+            act = new IMActivityNode((IMCore) (ProActive.getStubOnThis()));
             new Thread(act).start();
-            
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -151,7 +160,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
                 node.getNodeInformation().getName() + "\t\t vnName=" + vnName +
                 "\t\t padName=" + padName);
         }
-        this.dataresource.addNewDeployedNode(node, vnName, padName);
+        padNS.addNode(node, vnName, padName);
     }
 
     /**
@@ -160,25 +169,13 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @param pad     : the proactive descriptor
      */
     public void addPAD(String padName, ProActiveDescriptor pad) {
-        this.dataresource.putPAD(padName, pad);
+        padNS.addPAD(padName, pad);
     }
 
     // ----------------------------------------------------------------------//	
     // REDEPLOY
     // FIXME The redeploy (kill+activate) isn't support in the actualy 
     // version of ProActive
-    private void redeployVNode(VirtualNode vnode, String padName,
-        ProActiveDescriptor pad) throws RuntimeException {
-        if (vnode.isActivated()) {
-            vnode.killAll(false);
-            this.dataresource.removeNode(padName, vnode.getName());
-        }
-
-        // FIXME uncomment this line below when the problem of redeploy will be fix 
-        //IMDeploymentFactory.deployVirtualNode(this, padName, pad, vnode.getName());
-        throw new RuntimeException(
-            "The redeploy (kill+activate) isn't support in the actualy version of ProActive");
-    }
 
     /**
      * Redeploy not supported by the current version of ProActive
@@ -186,13 +183,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
      */
     public void redeploy(String padName) {
-        if (this.dataresource.isDeployedPad(padName).booleanValue()) {
-            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-            VirtualNode[] vnodes = pad.getVirtualNodes();
-            for (VirtualNode vnode : vnodes) {
-                redeployVNode(vnode, padName, pad);
-            }
-        }
+        padNS.redeploy(padName);
     }
 
     /**
@@ -202,11 +193,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
      */
     public void redeploy(String padName, String vnName) {
-        if (this.dataresource.isDeployedPad(padName).booleanValue()) {
-            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-            VirtualNode vnode = pad.getVirtualNode(vnName);
-            redeployVNode(vnode, padName, pad);
-        }
+        padNS.redeploy(padName, vnName);
     }
 
     /**
@@ -216,14 +203,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
      */
     public void redeploy(String padName, String[] vnNames) {
-        if (this.dataresource.isDeployedPad(padName).booleanValue()) {
-            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-            VirtualNode vnode;
-            for (String vnName : vnNames) {
-                vnode = pad.getVirtualNode(vnName);
-                redeployVNode(vnode, padName, pad);
-            }
-        }
+        padNS.redeploy(padName, vnNames);
     }
 
     // ----------------------------------------------------------------------//	
@@ -236,148 +216,127 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @exception ProActiveException
      */
     public void killPAD(String padName) throws ProActiveException {
-        if (this.dataresource.isDeployedPad(padName).booleanValue()) {
-            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-            pad.killall(false);
-            this.dataresource.removeNode(padName);
-            this.dataresource.removePad(padName);
-            // FIXME : delete the pad file
-            // find the temp directory but how ????
-            // File tempPAD = new File( tempDir + padName) 
-            // if ( tempPAD.exists() ) tempPAD.delete();
-        }
+        padNS.killPAD(padName);
     }
 
     /**
-    * Kill the virtual nodes of the proactive descriptors <I>padName>/I>
-    * @param padName : the name of the Proactive Descriptor
-    * @exception ProActiveException
-    */
+     * Kill the virtual nodes of the proactive descriptors <I>padName>/I>
+     * @param padName : the name of the Proactive Descriptor
+     * @exception ProActiveException
+     */
     public void killPAD(String padName, String vnName) {
-        if (this.dataresource.isDeployedPad(padName).booleanValue()) {
-            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-            VirtualNode vnode = pad.getVirtualNode(vnName);
-            vnode.killAll(false);
-            this.dataresource.removeNode(padName, vnName);
-        }
+        padNS.killPAD(padName, vnName);
     }
 
     /**
-    * Kill the virtual node <I>vnName</I> of the proactive descriptor <I>padName</I>
-    * @param padName : the name of the Proactive Descriptor
-    * @param vnName  : the name of the virtual node for killing
-    * @see  killPAD(String padName)
-    * @exception ProActiveException
-    */
+     * Kill the virtual node <I>vnName</I> of the proactive descriptor <I>padName</I>
+     * @param padName : the name of the Proactive Descriptor
+     * @param vnName  : the name of the virtual node for killing
+     * @see  killPAD(String padName)
+     * @exception ProActiveException
+     */
     public void killPAD(String padName, String[] vnNames) {
-        if (this.dataresource.isDeployedPad(padName).booleanValue()) {
-            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-            VirtualNode[] vnodes = pad.getVirtualNodes();
-            for (VirtualNode vnode : vnodes) {
-                vnode.killAll(false);
-            }
-            this.dataresource.removeNode(padName, vnNames);
-        }
+        padNS.killPAD(padName, vnNames);
     }
 
     /**
-    * Kill the virtual nodes <I>vnNames</I>
-    * of the proactive descriptor <I>padName</I>
-    * @param padName : the name of the Proactive Descriptor
-    * @param vnNames : the name of the virtual nodes for killing
-    * @see  killPAD(String padName)
-    * @exception ProActiveException
-    */
+     * Kill the virtual nodes <I>vnNames</I>
+     * of the proactive descriptor <I>padName</I>
+     * @param padName : the name of the Proactive Descriptor
+     * @param vnNames : the name of the virtual nodes for killing
+     * @see  killPAD(String padName)
+     * @exception ProActiveException
+     */
     public void killAll() throws ProActiveException {
-        for (String padName : this.dataresource.getListPad().keySet()) {
-            killPAD(padName);
-        }
+        padNS.killAll();
     }
 
     // ----------------------------------------------------------------------//
     // MONITORING
     public IntWrapper getSizeListFreeIMNode() {
-        System.out.println("IMCore.getSizeListFreeIMNode()");
-        return dataresource.getSizeListFreeIMNode();
+        return nodeManager.getNbFreeNodes();
     }
 
     public IntWrapper getSizeListBusyIMNode() {
-        return dataresource.getSizeListBusyIMNode();
+        return nodeManager.getNbBusyNodes();
     }
 
     public IntWrapper getSizeListDownIMNode() {
-        return dataresource.getSizeListDownIMNode();
+        return nodeManager.getNbDownNodes();
     }
 
     public IntWrapper getNbAllIMNode() {
-        return dataresource.getNbAllIMNode();
+        return nodeManager.getNbAllNodes();
     }
 
     public IntWrapper getSizeListPad() {
-        return dataresource.getSizeListPad();
+        return padNS.getSizeListPad();
     }
 
     public HashMap<String, ProActiveDescriptor> getListPAD() {
-        return this.dataresource.getListPad();
+        return padNS.getListPAD();
     }
 
     public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
-        return this.dataresource.getDeployedVirtualNodeByPad();
+        return padNS.getDeployedVirtualNodeByPad();
     }
 
     public ArrayList<IMNode> getListFreeIMNode() {
-        return this.dataresource.getListFreeIMNode();
+        return nodeManager.getFreeNodes();
     }
 
     public ArrayList<IMNode> getListBusyIMNode() {
-        return this.dataresource.getListBusyIMNode();
+        return nodeManager.getBusyNodes();
     }
 
     public ArrayList<IMNode> getListAllNodes() {
-        return this.dataresource.getListAllIMNode();
+        return nodeManager.getAllNodes();
     }
 
-	public IMState addIMEventListener(IMEventListener listener) {
-		return dataresource.addIMEventListener(listener);
-	}
+    public IMState addIMEventListener(IMEventListener listener) {
+        // FIXME return dataresource.addIMEventListener(listener);
+        return null;
+    }
 
     // ----------------------------------------------------------------------//
     // USER
 
     /**
-    * Reserves nb nodes, if the infrastructure manager (IM) don't have nb free nodes
-    * then it returns the max of free nodes
-    * @param nb the number of nodes
-    * @return an arraylist of nodes
-    * @throws NodeException
-    */
+     * Reserves nb nodes, if the infrastructure manager (IM) don't have nb free nodes
+     * then it returns the max of free nodes
+     * @param nb the number of nodes
+     * @return an arraylist of nodes
+     * @throws NodeException
+     */
     public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
         return this.dataresource.getAtMostNodes(nb, verifyingScript);
     }
-    
-    public NodeSet getExactlyNodes(IntWrapper nb, VerifyingScript verifyingScript) {
+
+    public NodeSet getExactlyNodes(IntWrapper nb,
+        VerifyingScript verifyingScript) {
         return this.dataresource.getExactlyNodes(nb, verifyingScript);
     }
 
     /**
-    * Release the node reserve by the user
-    * @param node : the node to release
-    * @throws NodeException
-    */
+     * Release the node reserve by the user
+     * @param node : the node to release
+     * @throws NodeException
+     */
     public void freeNode(Node node) {
         this.dataresource.freeNode(node);
     }
 
     /**
-    * Release the nodes reserve by the user
-    * @param nodes : a table of nodes to release
-    * @throws NodeException
-    */
+     * Release the nodes reserve by the user
+     * @param nodes : a table of nodes to release
+     * @throws NodeException
+     */
     public void freeNodes(NodeSet nodes) {
         this.dataresource.freeNodes(nodes);
     }
 
     public void nodeIsDown(IMNode imNode) {
+        //this.dataresource.nodeIsDown(imNode);
         this.dataresource.nodeIsDown(imNode);
     }
 
@@ -390,8 +349,39 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @exception ProActiveException
      */
     public void shutdown() throws ProActiveException {
-        killAll();
+        BooleanWrapper bool = nodeManager.shutdown();
+        try {
+            ProActive.waitFor(bool);
+            if (bool.booleanValue()) {
+                logger.info("Infrastructure Manager successfully shut down.");
+            } else {
+                logger.warn("Infrastructure Manager shut down with errors.");
+            }
+        } catch (Exception e) {
+            logger.error("Error during IM Shut down : ", e);
+        }
         ProActive.exitSuccess();
+    }
+
+    public ArrayList<DynamicNSInterface> getDynamicNodeSources() {
+        ArrayList<DynamicNSInterface> dns = new ArrayList<DynamicNSInterface>();
+        dns.addAll(nodeManager.getDynamicNodeSources());
+        return dns;
+    }
+
+    public PADNSInterface getPADNodeSource() {
+        return padNS;
+    }
+
+    public void removeDynamicNodeSources(DynamicNodeSource dns) {
+        nodeManager.removeDynamicNodeSource(dns);
+    }
+
+    public void addDynamicNodeSources(DynamicNodeSource dns) {
+        ArrayList<DynamicNodeSource> dynNS = nodeManager.getDynamicNodeSources();
+        if (!dynNS.contains(dns)) {
+            nodeManager.addDynamicNodeSource(dns);
+        }
     }
 
     // ----------------------------------------------------------------------//

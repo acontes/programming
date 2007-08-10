@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.infrastructuremanager.dataresource.database;
+package org.objectweb.proactive.extra.infrastructuremanager.imnode;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
@@ -33,10 +33,12 @@ public class IMNodeImpl implements IMNode, Serializable {
     private boolean free = true;
     private boolean down = false;
     private ScriptHandler handler = null;
+	private IMNodeSource nodeSource;
 
     // ----------------------------------------------------------------------//
     // CONSTRUCTOR
-    public IMNodeImpl(Node node, String vnodeName, String padName){
+    public IMNodeImpl(Node node, String vnodeName, String padName, IMNodeSource nodeSource){
+    	this.nodeSource = nodeSource;
         this.node = node;
         this.vnodeName = vnodeName;
         this.padName = padName;
@@ -182,4 +184,8 @@ public class IMNodeImpl implements IMNode, Serializable {
 	public HashMap<VerifyingScript, Integer> getScriptStatus(){
     	return scriptStatus;
     }
+
+	public IMNodeSource getNodeSource() {
+		return nodeSource;
+	}
 }

@@ -1,10 +1,11 @@
-package org.objectweb.proactive.extra.infrastructuremanager.dataresource;
+package org.objectweb.proactive.extra.infrastructuremanager.imnode;
 
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
@@ -104,4 +105,7 @@ public interface IMNode {
 	 * @return the map of Script and status
 	 */
 	public HashMap<VerifyingScript, Integer> getScriptStatus();
+	
+	public IMNodeSource getNodeSource();
+	
 }

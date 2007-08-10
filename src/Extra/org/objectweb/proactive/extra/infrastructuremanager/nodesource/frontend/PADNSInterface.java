@@ -1,0 +1,141 @@
+package org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+
+public interface PADNSInterface extends NodeSourceInterface {
+    // DEPLOY	
+
+    /**
+     * Deploy all vnode of the proactive descriptor giving by the paramter
+     *         <I>xmlDescriptor</I>.<BR/>
+     * This function need a node in your local machine for deploying the file.
+     * You can create the node with this instruction :<BR/>
+     * <code>Node node = NodeFactory.createNode("nodeName");</code>
+     * @param xmlDescriptor : the file proactive descriptor
+     * @param remoteNode    : the node in your local host for transfering
+     *         the file descriptor
+     * @exception Exception : Cannot pull the remote file
+     */
+    public void deployAllVirtualNodes(File xmlDescriptor, Node remoteNode)
+        throws Exception;
+
+    /**
+     * Deploy the virtual node <I>vnName</I> of the proactive descriptor giving by the paramter
+     *         <I>xmlDescriptor</I>.<BR/>
+     * This function need a node in your local machine for deploying the file.
+     * You can create the node with this instruction :<BR/>
+     * <code>Node node = NodeFactory.createNode("nodeName");</code>
+     * @param xmlDescriptor : the file proactive descriptor
+     * @param remoteNode    : the node in your local host for transfering
+     * @param vnName                 : the name of virtual node that you want to deploy
+     *         the file descriptor
+     * @exception Exception : Cannot pull the remote file
+     */
+    public void deployVirtualNode(File xmlDescriptor, Node remoteNode,
+        String vnName) throws Exception;
+
+    /**
+     * Deploy the virtual nodes giving by hte table<I>vnNames</I> of the proactive
+     * descriptor giving by the paramter <I>xmlDescriptor</I>.<BR/>
+     * This function need a node in your local machine for deploying the file.
+     * You can create the node with this instruction :<BR/>
+     * <code>Node node = NodeFactory.createNode("nodeName");</code>
+     * @param xmlDescriptor : the file proactive descriptor
+     * @param remoteNode    : the node in your local host for transfering
+     * @param vnNames                 : a table of the name of virtual nodes that you want to deploy
+     *         the file descriptor
+     * @exception Exception : Cannot pull the remote file
+     */
+    public void deployVirtualNodes(File xmlDescriptor, Node remoteNode,
+        String[] vnNames) throws Exception;
+	
+	/**
+     * Add the new deployed node in the dataresource
+     * @param node    : the new deployed node
+     * @param vnName  : the name of the virtual node
+     * @param padName : the name of the proactive descriptor
+     */
+    public void addNode(Node node, String vnName, String padName) ;
+
+    /**
+     * Add the new proactive descriptor in the dataresource
+     * @param padName : the name of the proactive descriptor
+     * @param pad     : the proactive descriptor
+     */
+    public void addPAD(String padName, ProActiveDescriptor pad) ;
+    
+    /**
+     * Redeploy not supported by the current version of ProActive
+     * @param padName : the name of the proactive descriptor to redeploy
+     * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
+     */
+    public void redeploy(String padName) ;
+    
+    /**
+     * Redeploy not supported by the current version of ProActive
+     * @param padName : the name of the proactive descriptor
+     * @param vnName  : the name of the virtual node of this pad to redeploy
+     * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
+     */
+    public void redeploy(String padName, String vnName) ;
+
+    /**
+     * Redeploy not supported by the current version of ProActive
+     * @param padName : the name of the proactive descriptor
+     * @param vnNames : the name of the virtual nodes of this pad to redeploy
+     * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
+     */
+    public void redeploy(String padName, String[] vnNames) ;
+
+    // ----------------------------------------------------------------------//	
+    // KILL
+
+    /**
+     * Kill all virtual nodes of them proactive descriptors
+     * TODO delete the pad file
+     * @param padName :  the name of the proactive descriptor
+     * @exception ProActiveException
+     */
+    public void killPAD(String padName) throws ProActiveException ;
+
+    /**
+    * Kill the virtual nodes of the proactive descriptors <I>padName>/I>
+    * @param padName : the name of the Proactive Descriptor
+    * @exception ProActiveException
+    */
+    public void killPAD(String padName, String vnName) ;
+
+    /**
+    * Kill the virtual node <I>vnName</I> of the proactive descriptor <I>padName</I>
+    * @param padName : the name of the Proactive Descriptor
+    * @param vnName  : the name of the virtual node for killing
+    * @see  killPAD(String padName)
+    * @exception ProActiveException
+    */
+    public void killPAD(String padName, String[] vnNames) ;
+
+    /**
+    * Kill the virtual nodes <I>vnNames</I>
+    * of the proactive descriptor <I>padName</I>
+    * @param padName : the name of the Proactive Descriptor
+    * @param vnNames : the name of the virtual nodes for killing
+    * @see  killPAD(String padName)
+    * @exception ProActiveException
+    */
+    public void killAll() throws ProActiveException ;
+
+    public IntWrapper getSizeListPad() ;
+
+    public HashMap<String, ProActiveDescriptor> getListPAD() ;
+
+    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() ;
+
+}

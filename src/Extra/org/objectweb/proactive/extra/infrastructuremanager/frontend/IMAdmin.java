@@ -9,6 +9,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PADNSInterface;
 
 
 /**
@@ -161,4 +164,23 @@ public interface IMAdmin extends Serializable {
      * @exception ProActiveException
      */
     public void shutdown() throws ProActiveException;
+    
+    /**
+     * Obtain the PAD Node Source administration interface, with which
+     * you can monitor activity for nodes from PADs, deploy other PAD,
+     * or kill some ones.
+     * @return the PAD NS Interface
+     */
+    public PADNSInterface getPADNodeSource();
+    
+    /**
+     * Return a list of the different Dynamic node sources in the IM.
+     * You can manage and monitor them just with that.
+     * @return
+     */
+    public ArrayList<DynamicNSInterface> getDynamicNodeSources();
+    
+    public void addDynamicNodeSources(DynamicNodeSource dns);
+    
+    public void removeDynamicNodeSources(DynamicNodeSource dns);
 }

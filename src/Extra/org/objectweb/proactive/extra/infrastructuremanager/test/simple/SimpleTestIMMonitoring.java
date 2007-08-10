@@ -10,8 +10,8 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 
 public class SimpleTestIMMonitoring {

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.infrastructuremanager.core;
+package org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,12 +21,12 @@ public class IMDeploymentFactory {
      * @param padName : the name of the proactive descriptor
      * @param pad     : the procative descriptor
      */
-    public static void deployAllVirtualNodes(IMCore imCore, String padName,
+    public static void deployAllVirtualNodes(PADNodeSource nodeSource, String padName,
         ProActiveDescriptor pad) {
         if (logger.isInfoEnabled()) {
             logger.info("deployAllVirtualNodes");
         }
-        IMDeploy d = new IMDeploy(imCore, padName, pad);
+        IMDeploy d = new IMDeploy(nodeSource, padName, pad);
         executor.execute(d);
     }
 
@@ -37,12 +37,12 @@ public class IMDeploymentFactory {
      * @param pad     : the procative descriptor
      * @param vnName  : the name of the virtual node to deploy
      */
-    public static void deployVirtualNode(IMCore imCore, String padName,
+    public static void deployVirtualNode(PADNodeSource nodeSource, String padName,
         ProActiveDescriptor pad, String vnName) {
         if (logger.isInfoEnabled()) {
             logger.info("deployVirtualNode : " + vnName);
         }
-        deployVirtualNodes(imCore, padName, pad, new String[] { vnName });
+        deployVirtualNodes(nodeSource, padName, pad, new String[] { vnName });
     }
 
     /**
@@ -52,7 +52,7 @@ public class IMDeploymentFactory {
      * @param pad     : the procative descriptor
      * @param vnNames : the name of the virtual nodes to deploy
      */
-    public static void deployVirtualNodes(IMCore imCore, String padName,
+    public static void deployVirtualNodes(PADNodeSource nodeSource, String padName,
         ProActiveDescriptor pad, String[] vnNames) {
         if (logger.isInfoEnabled()) {
             String concatVnNames = "";
@@ -61,7 +61,7 @@ public class IMDeploymentFactory {
             }
             logger.info("deployVirtualNodes : " + concatVnNames);
         }
-        IMDeploy d = new IMDeploy(imCore, padName, pad, vnNames);
+        IMDeploy d = new IMDeploy(nodeSource, padName, pad, vnNames);
         executor.execute(d);
     }
 }

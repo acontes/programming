@@ -1,6 +1,6 @@
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 public interface IMNodeEvent {
 	

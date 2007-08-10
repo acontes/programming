@@ -2,7 +2,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.simple;
 
 import java.util.Comparator;
 
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 /**
  * <p>This comparator allow to sort IMNode by :

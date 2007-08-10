@@ -7,7 +7,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 
 public class IMActivityNode implements Runnable {

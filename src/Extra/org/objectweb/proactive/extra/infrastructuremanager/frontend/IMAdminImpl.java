@@ -6,18 +6,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
-import org.objectweb.proactive.extra.infrastructuremanager.core.IMDeploymentFactory;
-import org.objectweb.proactive.filetransfer.FileTransfer;
-import org.objectweb.proactive.filetransfer.FileVector;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PADNSInterface;
 
 
 public class IMAdminImpl implements IMAdmin, Serializable {
@@ -55,51 +53,11 @@ public class IMAdminImpl implements IMAdmin, Serializable {
     // =======================================================//
 
     /**
-     * @param filePAD    : the file proactive descriptor
-     * @param remoteNode : the node in the host giving the file
-     */
-    private File pullPad(File filePAD, Node remoteNode)
-        throws Exception {
-        File localDest = File.createTempFile(filePAD.getName()
-                                                    .replaceFirst("\\.xml\\z",
-                    ""), ".xml");
-
-        FileVector filePulled = FileTransfer.pullFile(remoteNode, filePAD,
-                localDest);
-        filePulled.waitForAll();
-
-        if (logger.isInfoEnabled()) {
-            logger.info("name of the pulled file pad : " + localDest);
-        }
-
-        return localDest;
-    }
-
-    /**
      * @see the IMAdmin interface
      */
     public void deployAllVirtualNodes(File xmlDescriptor, Node remoteNode)
         throws Exception {
-        if (logger.isInfoEnabled()) {
-            logger.info("Starting deploying all virtual nodes of " +
-                xmlDescriptor);
-        }
-        File localCopyPad = null;
-        try {
-            localCopyPad = this.pullPad(xmlDescriptor, remoteNode);
-        } catch (Exception e) {
-            logger.warn("Cannot pull the remote file " + xmlDescriptor, e);
-            throw new Exception("Cannot pull the remote file " + xmlDescriptor,
-                e);
-        }
-        if (logger.isInfoEnabled()) {
-            logger.info("Succefully pull the remote file " + xmlDescriptor +
-                " to local file " + localCopyPad);
-        }
-        
-        ProActiveDescriptor pad = ProActive.getProactiveDescriptor(localCopyPad.getPath());
-        IMDeploymentFactory.deployAllVirtualNodes(this.imcore,
-            localCopyPad.getName(), pad);
+        imcore.getPADNodeSource().deployAllVirtualNodes(xmlDescriptor, remoteNode);
     }
 
     /**
@@ -107,26 +65,7 @@ public class IMAdminImpl implements IMAdmin, Serializable {
      */
     public void deployVirtualNode(File xmlDescriptor, Node remoteNode,
         String vnName) throws Exception {
-        if (logger.isInfoEnabled()) {
-            logger.info("Starting deploying all virtual nodes of " +
-                xmlDescriptor);
-        }
-        File localCopyPad = null;
-        try {
-            localCopyPad = this.pullPad(xmlDescriptor, remoteNode);
-        } catch (Exception e) {
-            logger.warn("Cannot pull the remote file " + xmlDescriptor, e);
-            throw new Exception("Cannot pull the remote file " + xmlDescriptor,
-                e);
-        }
-        if (logger.isInfoEnabled()) {
-            logger.info("Succefully pull the remote file " + xmlDescriptor +
-                " to local file " + localCopyPad);
-        }
-
-        ProActiveDescriptor pad = ProActive.getProactiveDescriptor(localCopyPad.getPath());
-        IMDeploymentFactory.deployVirtualNode(this.imcore,
-            localCopyPad.getName(), pad, vnName);
+        imcore.getPADNodeSource().deployVirtualNode(xmlDescriptor, remoteNode, vnName);
     }
 
     /**
@@ -134,26 +73,8 @@ public class IMAdminImpl implements IMAdmin, Serializable {
      */
     public void deployVirtualNodes(File xmlDescriptor, Node remoteNode,
         String[] vnNames) throws Exception {
-        if (logger.isInfoEnabled()) {
-            logger.info("Starting deploying all virtual nodes of " +
-                xmlDescriptor);
-        }
-        File localCopyPad = null;
-        try {
-            localCopyPad = this.pullPad(xmlDescriptor, remoteNode);
-        } catch (Exception e) {
-            logger.warn("Cannot pull the remote file " + xmlDescriptor, e);
-            throw new Exception("Cannot pull the remote file " + xmlDescriptor,
-                e);
-        }
-        if (logger.isInfoEnabled()) {
-            logger.info("Succefully pull the remote file " + xmlDescriptor +
-                " to local file " + localCopyPad);
-        }
-
-        ProActiveDescriptor pad = ProActive.getProactiveDescriptor(localCopyPad.getPath());
-        IMDeploymentFactory.deployVirtualNodes(this.imcore,
-            localCopyPad.getName(), pad, vnNames);
+    	imcore.getPADNodeSource().deployVirtualNodes(xmlDescriptor, remoteNode,
+        vnNames);
     }
 
     //----------------------------------------------------------------------//
@@ -232,4 +153,20 @@ public class IMAdminImpl implements IMAdmin, Serializable {
     public void shutdown() throws ProActiveException {
         this.imcore.shutdown();
     }
+
+	public ArrayList<DynamicNSInterface> getDynamicNodeSources() {
+		return imcore.getDynamicNodeSources();
+	}
+
+	public PADNSInterface getPADNodeSource() {
+		return imcore.getPADNodeSource();
+	}
+
+	public void addDynamicNodeSources(DynamicNodeSource dns) {
+		imcore.addDynamicNodeSources(dns);
+	}
+
+	public void removeDynamicNodeSources(DynamicNodeSource dns) {
+		imcore.removeDynamicNodeSources(dns);
+	}
 }
