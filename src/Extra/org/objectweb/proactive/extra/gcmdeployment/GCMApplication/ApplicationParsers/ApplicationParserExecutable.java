@@ -72,7 +72,8 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
                     XPathConstants.NODE);
             if (pathNode != null) {
                 // path tag is optional
-                commandBuilderScript.setPath(parsePathElementNode(pathNode));
+                commandBuilderScript.setPath(GCMParserHelper.parsePathElementNode(
+                        pathNode));
             }
 
             // command args

@@ -20,6 +20,8 @@ import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeSSHParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupPBSParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupSSHParser;
@@ -84,6 +86,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected void registerDefaultGroupParsers() {
         registerGroupParser(new GroupSSHParser());
         registerGroupParser(new GroupRSHParser());
+        registerGroupParser(new GroupOARParser());
+        registerGroupParser(new GroupPBSParser());
         // TODO add other group parsers here 
     }
 

@@ -1,12 +1,18 @@
 package org.objectweb.proactive.extra.gcmdeployment;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -82,5 +88,34 @@ public class GCMParserHelper {
         public Iterator getPrefixes(String uri) {
             throw new UnsupportedOperationException();
         }
+    }
+
+    static public List<PathElement> parseClasspath(XPath xpath,
+        Node classPathNode) throws XPathExpressionException {
+        NodeList pathElementNodes = (NodeList) xpath.evaluate("pa:pathElement",
+                classPathNode, XPathConstants.NODESET);
+
+        ArrayList<PathElement> res = new ArrayList<PathElement>();
+
+        for (int i = 0; i < pathElementNodes.getLength(); ++i) {
+            Node pathElementNode = pathElementNodes.item(i);
+            PathElement pathElement = parsePathElementNode(pathElementNode);
+            res.add(pathElement);
+        }
+
+        return res;
+    }
+
+    static public PathElement parsePathElementNode(Node pathElementNode) {
+        PathElement pathElement = new PathElement();
+        String attr = GCMParserHelper.getAttributeValue(pathElementNode,
+                "relpath");
+        pathElement.setRelPath(attr);
+        attr = GCMParserHelper.getAttributeValue(pathElementNode, "base");
+        if (attr != null) {
+            pathElement.setBase(attr);
+        }
+
+        return pathElement;
     }
 }

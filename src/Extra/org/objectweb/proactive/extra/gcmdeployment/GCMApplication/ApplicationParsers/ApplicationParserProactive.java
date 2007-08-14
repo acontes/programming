@@ -69,14 +69,16 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         Node classPathNode = (Node) xpath.evaluate("pa:proactiveClasspath",
                 configNode, XPathConstants.NODE);
 
-        List<PathElement> proactiveClassPath = parseClasspath(classPathNode);
+        List<PathElement> proactiveClassPath = GCMParserHelper.parseClasspath(xpath,
+                classPathNode);
 
         commandBuilderProActive.setProActiveClasspath(proactiveClassPath);
 
         classPathNode = (Node) xpath.evaluate("pa:applicationClasspath",
                 configNode, XPathConstants.NODE);
 
-        List<PathElement> applicationClassPath = parseClasspath(classPathNode);
+        List<PathElement> applicationClassPath = GCMParserHelper.parseClasspath(xpath,
+                classPathNode);
 
         commandBuilderProActive.setApplicationClasspath(applicationClassPath);
 
@@ -86,7 +88,7 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
                 configNode, XPathConstants.NODE);
 
         if (securityPolicyNode != null) {
-            PathElement pathElement = parsePathElementNode(securityPolicyNode);
+            PathElement pathElement = GCMParserHelper.parsePathElementNode(securityPolicyNode);
             commandBuilderProActive.setSecurityPolicy(pathElement);
         }
 
@@ -96,7 +98,7 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
                 configNode, XPathConstants.NODE);
 
         if (log4jPropertiesNode != null) {
-            PathElement pathElement = parsePathElementNode(log4jPropertiesNode);
+            PathElement pathElement = GCMParserHelper.parsePathElementNode(log4jPropertiesNode);
             commandBuilderProActive.setLog4jProperties(pathElement);
         }
     }
