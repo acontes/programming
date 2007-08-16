@@ -55,7 +55,8 @@ public class TableManager {
 	private Vector<Table> tables = null;
 	private Table lastSelectedTable = null;
 	private TableItem lastSelectedItem = null;
-	private JobId lastJobIdOfLastSelectedItem = null;
+	private JobId jobIdOfLastSelectedItem = null;
+	private Integer idOfLastSelectedTable = null;
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -107,7 +108,7 @@ public class TableManager {
 	 * @return the last jobId of the last selected item
 	 */
 	public JobId getLastJobIdOfLastSelectedItem() {
-		return lastJobIdOfLastSelectedItem;
+		return jobIdOfLastSelectedItem;
 	}
 
 	/**
@@ -161,15 +162,13 @@ public class TableManager {
 	 */
 	public boolean isJobSelectedInThisTable(JobId jobId, int tableId) {
 		if ((lastSelectedTable == null) || (lastSelectedItem == null)
-				|| (lastJobIdOfLastSelectedItem == null))
+				|| (jobIdOfLastSelectedItem == null))
 			return false;
-		return lastJobIdOfLastSelectedItem.equals(jobId);
+		return jobIdOfLastSelectedItem.equals(jobId);
 	}
 	
-	public boolean isItTheLastSelectedTable(int tableId) {
-		if(lastSelectedTable == null)
-			return false;
-		return ((Integer) lastSelectedTable.getData()).equals(tableId);
+	public boolean isItTheLastSelectedTable(Integer tableId) {
+		return tableId.equals(idOfLastSelectedTable);
 	}
 
 	// -------------------------------------------------------------------- //
@@ -203,10 +202,12 @@ public class TableManager {
 			if (items.length <= 0) {
 				// Normally impossible to be here...
 				lastSelectedItem = null;
-				lastJobIdOfLastSelectedItem = null;
+				jobIdOfLastSelectedItem = null;
+				idOfLastSelectedTable = null;
 			} else {
 				lastSelectedItem = items[0];
-				lastJobIdOfLastSelectedItem = (JobId) lastSelectedItem.getData();
+				jobIdOfLastSelectedItem = (JobId) lastSelectedItem.getData();
+				idOfLastSelectedTable = (Integer) lastSelectedTable.getData();
 			}
 		}
 	}

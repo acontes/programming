@@ -76,10 +76,10 @@ public abstract class JobComposite extends Composite {
 	public static final String COLUMN_PRIORITY_TITLE = "Priority";
 	/** the unique id and the title for the column "Name" */
 	public static final String COLUMN_NAME_TITLE = "Name";
-	/** the unique id and the title for the column "Description" */
-	public static final String COLUMN_DESCRIPTION_TITLE = "Description";
 	/** the unique id and the title for the column "User" */
 	public static final String COLUMN_OWNER_TITLE = "User";
+	/** the unique id and the title for the column "State" */
+	public static final String COLUMN_STATE_TITLE = "State";
 
 	private Label label = null;
 	private Table table = null;
@@ -201,10 +201,10 @@ public abstract class JobComposite extends Composite {
 
 		// creating TableColumn
 		TableColumn tc1 = new TableColumn(table, SWT.RIGHT);
+		TableColumn tc4 = new TableColumn(table, SWT.LEFT);
 		TableColumn tc5 = new TableColumn(table, SWT.LEFT);
 		TableColumn tc2 = new TableColumn(table, SWT.CENTER);
 		TableColumn tc3 = new TableColumn(table, SWT.CENTER);
-		TableColumn tc4 = new TableColumn(table, SWT.LEFT);
 		// addSelectionListener
 		tc1.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -227,7 +227,7 @@ public abstract class JobComposite extends Composite {
 		tc4.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, Job.SORT_BY_DESCRIPTION);
+				sort(event, Job.SORT_BY_STATE);
 			}
 		});
 		tc5.addSelectionListener(new SelectionAdapter() {
@@ -240,13 +240,13 @@ public abstract class JobComposite extends Composite {
 		tc1.setText(COLUMN_ID_TITLE);
 		tc2.setText(COLUMN_PRIORITY_TITLE);
 		tc3.setText(COLUMN_NAME_TITLE);
-		tc4.setText(COLUMN_DESCRIPTION_TITLE);
+		tc4.setText(COLUMN_STATE_TITLE);
 		tc5.setText(COLUMN_OWNER_TITLE);
 		// setWidth
 		tc1.setWidth(30);
 		tc2.setWidth(70);
 		tc3.setWidth(100);
-		tc4.setWidth(300);
+		tc4.setWidth(100);
 		tc5.setWidth(45);
 		// setMoveable
 		tc1.setMoveable(true);
@@ -298,8 +298,8 @@ public abstract class JobComposite extends Composite {
 		item.setData(job.getId());
 		for (int i = 0; i < cols.length; i++) {
 			String title = cols[i].getText();
-			if (title.equals(COLUMN_DESCRIPTION_TITLE))
-				item.setText(i, job.getDescription());
+			if (title.equals(COLUMN_STATE_TITLE))
+				item.setText(i, job.getState().toString());
 			else if (title.equals(COLUMN_ID_TITLE))
 				item.setText(i, job.getId().toString());
 			else if (title.equals(COLUMN_PRIORITY_TITLE))

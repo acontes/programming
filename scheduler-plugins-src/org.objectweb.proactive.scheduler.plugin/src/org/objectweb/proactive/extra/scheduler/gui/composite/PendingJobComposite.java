@@ -38,16 +38,17 @@ import org.objectweb.proactive.extra.scheduler.gui.data.PendingJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**
  * This class represents the pending jobs
- *
+ * 
  * @author ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class PendingJobComposite extends JobComposite implements PendingJobsListener {
-	
+
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
 	// -------------------------------------------------------------------- //
@@ -62,7 +63,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 		super(parent, title, jobsController, PENDING_TABLE_ID);
 		jobsController.addPendingJobsListener(this);
 	}
-	
+
 	// -------------------------------------------------------------------- //
 	// ---------------------- extends JobComposite ------------------------ //
 	// -------------------------------------------------------------------- //
@@ -73,7 +74,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	public Vector<JobId> getJobs() {
 		return JobsController.getLocalView().getPendingsJobs();
 	}
-	
+
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#sortJobs()
 	 */
@@ -87,15 +88,29 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	 */
 	@Override
 	public void jobSelected(Job job) {
-		boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
 		// enabling/disabling button permitted with this job
-		ObtainJobOutputAction.getInstance().setEnabled(enabled);
+		boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
 		PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
-		pauseResumeJobAction.setEnabled(enabled);
-		if(job.isPaused())
-			pauseResumeJobAction.setResumeMode();
-		else
-			pauseResumeJobAction.setPauseMode();
+
+		switch (JobsController.getSchedulerState()) {
+		case SHUTTING_DOWN:
+		case KILLED:
+			pauseResumeJobAction.setEnabled(false);
+			pauseResumeJobAction.setPauseResumeMode();
+			break;
+		default:
+			pauseResumeJobAction.setEnabled(enabled);
+			JobState jobState = job.getState();
+			if (jobState.equals(JobState.PAUSED)) {
+				pauseResumeJobAction.setResumeMode();
+			} else if(jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING) || jobState.equals(JobState.RERUNNING)) {
+				pauseResumeJobAction.setPauseMode();
+			} else {
+				pauseResumeJobAction.setPauseResumeMode();
+			}
+		}
+
+		ObtainJobOutputAction.getInstance().setEnabled(enabled);
 		KillJobAction.getInstance().setEnabled(enabled);
 	}
 

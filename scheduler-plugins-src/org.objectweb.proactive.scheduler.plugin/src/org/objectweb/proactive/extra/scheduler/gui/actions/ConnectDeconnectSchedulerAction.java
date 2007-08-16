@@ -56,9 +56,6 @@ public class ConnectDeconnectSchedulerAction extends Action {
 				SeparatedJobView.getRunningJobComposite().initTable();
 				SeparatedJobView.getFinishedJobComposite().initTable();
 
-				ChangeViewModeAction.getInstance().setEnabled(true);
-				SubmitJobAction.getInstance().setEnabled(true);
-				StartStopSchedulerAction.getInstance().setEnabled(true);
 				KillSchedulerAction.getInstance().setEnabled(true);
 
 				SeparatedJobView.setVisible(true);
@@ -73,44 +70,14 @@ public class ConnectDeconnectSchedulerAction extends Action {
 	}
 	
 	private void disconnection() {
+		SeparatedJobView.clearOnDisconnection(true);
+	}
+	
+	public void setDisconnectionMode() {
 		isConnected = false;
 		this.setText("Connect to a scheduler");
 		this.setToolTipText("Connect to a started scheduler by its url");
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/run.png"));
-		
-		SeparatedJobView.clearOnDisconnection();
-		
-		// the follows actions can't be null
-		// if the user is not logged as an admin !
-		ChangeViewModeAction.getInstance().setEnabled(false);
-		KillJobAction.getInstance().setEnabled(false);
-		ObtainJobOutputAction.getInstance().setEnabled(false);
-		PauseResumeJobAction.getInstance().setEnabled(false);
-		SubmitJobAction.getInstance().setEnabled(false);
-		
-		FreezeSchedulerAction freezeSchedulerAction = FreezeSchedulerAction.getInstance();
-		if(freezeSchedulerAction != null)
-			freezeSchedulerAction.setEnabled(false);
-		
-		KillSchedulerAction killSchedulerAction = KillSchedulerAction.getInstance();
-		if(killSchedulerAction != null)
-			killSchedulerAction.setEnabled(false);
-		
-		PauseSchedulerAction pauseSchedulerAction = PauseSchedulerAction.getInstance();
-		if(pauseSchedulerAction != null)
-			pauseSchedulerAction.setEnabled(false);
-		
-		ResumeSchedulerAction resumeSchedulerAction = ResumeSchedulerAction.getInstance();
-		if(resumeSchedulerAction != null)
-			resumeSchedulerAction.setEnabled(false);
-		
-		ShutdownSchedulerAction shutdownSchedulerAction = ShutdownSchedulerAction.getInstance();
-		if(shutdownSchedulerAction != null)
-			shutdownSchedulerAction.setEnabled(false);
-		 
-		StartStopSchedulerAction startStopSchedulerAction = StartStopSchedulerAction.getInstance();
-		if(startStopSchedulerAction != null)
-			startStopSchedulerAction.setEnabled(false);
 	}
 
 	public static ConnectDeconnectSchedulerAction newInstance(Composite parent) {

@@ -27,7 +27,7 @@ public class KillJobAction extends Action {
 	@Override
 	public void run() {
 		if (MessageDialog.openConfirm(shell, "Confirm please",
-				"Are you sure you want to Kill the scheduler ?")) {
+				"Are you sure you want to Kill this job ?")) {
 			TableItem item = TableManager.getInstance().getLastSelectedItem();
 			if (item != null) {
 				JobId jobId = (JobId) item.getData();

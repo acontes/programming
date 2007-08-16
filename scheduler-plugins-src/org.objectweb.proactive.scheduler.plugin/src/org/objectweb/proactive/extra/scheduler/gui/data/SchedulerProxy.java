@@ -16,7 +16,7 @@ import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 /**
@@ -51,7 +51,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
 	 */
 	@Override
-	public SchedulerState addSchedulerEventListener(SchedulerEventListener listener) {
+	public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener listener) {
 		try {
 			return scheduler.addSchedulerEventListener(listener);
 		} catch (SchedulerException e) {

@@ -7,6 +7,7 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 public class PauseResumeJobAction extends Action {
 
@@ -24,12 +25,15 @@ public class PauseResumeJobAction extends Action {
 		TableItem item = TableManager.getInstance().getLastSelectedItem();
 		if (item != null) {
 			JobId jobId = (JobId) item.getData();
-			if (JobsController.getLocalView().getJobById(jobId).isPaused()) {
+			JobState jobState = JobsController.getLocalView().getJobById(jobId).getState();
+			if (jobState.equals(JobState.PAUSED)) {
 				SchedulerProxy.getInstance().resume(jobId);
 				setPauseMode();
-			} else {
+			} else if(jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING) || jobState.equals(JobState.RERUNNING)) {
 				SchedulerProxy.getInstance().pause(jobId);
 				setResumeMode();
+			} else {
+				setPauseResumeMode();
 			}
 		}
 	}

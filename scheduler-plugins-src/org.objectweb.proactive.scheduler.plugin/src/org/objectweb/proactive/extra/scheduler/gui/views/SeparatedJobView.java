@@ -76,19 +76,21 @@ public class SeparatedJobView extends ViewPart {
 	private static JobComposite pendingJobComposite = null;
 	private static JobComposite runningJobComposite = null;
 	private static JobComposite finishedJobComposite = null;
-	private Action connectSchedulerAction = null;
-	private Action changeViewModeAction = null;
-	private Action obtainJobOutputAction = null;
-	private Action submitJob = null;
-	private Action pauseResumeJobAction = null;
-	private Action killJobAction = null;
+	private static Action connectSchedulerAction = null;
+	private static Action changeViewModeAction = null;
+	private static Action obtainJobOutputAction = null;
+	private static Action submitJob = null;
+	private static Action pauseResumeJobAction = null;
+	private static Action killJobAction = null;
+	
+	private static Action startStopSchedulerAction = null;
+	private static Action freezeSchedulerAction = null;
+	private static Action pauseSchedulerAction = null;
+	private static Action resumeSchedulerAction = null;
+	private static Action shutdownSchedulerAction = null;
+	private static Action killSchedulerAction = null;
 
-	private Action startStopSchedulerAction = null;
-	private Action freezeSchedulerAction = null;
-	private Action pauseSchedulerAction = null;
-	private Action resumeSchedulerAction = null;
-	private Action shutdownSchedulerAction = null;
-	private Action killSchedulerAction = null;
+	private static IToolBarManager toolBarManager = null;
 
 	private Composite parent = null;
 
@@ -126,14 +128,16 @@ public class SeparatedJobView extends ViewPart {
 		manager.add(pauseResumeJobAction);
 		manager.add(obtainJobOutputAction);
 		manager.add(killJobAction);
-		if (SchedulerProxy.getInstance().isAnAdmin()) {
-			manager.add(new Separator());
-			manager.add(startStopSchedulerAction);
-			manager.add(freezeSchedulerAction);
-			manager.add(pauseSchedulerAction);
-			manager.add(resumeSchedulerAction);
-			manager.add(shutdownSchedulerAction);
-			manager.add(killSchedulerAction);
+		if (SchedulerProxy.getInstance() != null) {
+			if (SchedulerProxy.getInstance().isAnAdmin()) {
+				manager.add(new Separator());
+				manager.add(startStopSchedulerAction);
+				manager.add(freezeSchedulerAction);
+				manager.add(pauseSchedulerAction);
+				manager.add(resumeSchedulerAction);
+				manager.add(shutdownSchedulerAction);
+				manager.add(killSchedulerAction);
+			}
 		}
 // // Other plug-ins can contribute there actions here
 // manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -145,6 +149,7 @@ public class SeparatedJobView extends ViewPart {
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
+		toolBarManager = manager;
 		manager.add(connectSchedulerAction);
 		manager.add(changeViewModeAction);
 		manager.add(new Separator());
@@ -220,6 +225,83 @@ public class SeparatedJobView extends ViewPart {
 		return finishedJobComposite;
 	}
 
+	public static void clearOnDisconnection(Boolean sendDisconnectMessage) {
+		setVisible(false);
+		ConnectDeconnectSchedulerAction.getInstance().setDisconnectionMode();
+		
+		TaskView taskView = TaskView.getInstance();
+		if (taskView != null)
+			taskView.clear();
+
+		JobInfo jobInfo = JobInfo.getInstance();
+		if (jobInfo != null)
+			jobInfo.clear();
+
+		JobsOutputController jobsOutputController = JobsOutputController.getInstance();
+		if (jobsOutputController != null)
+			jobsOutputController.removeAllJobOutput();
+
+		if(sendDisconnectMessage)
+			SchedulerProxy.getInstance().disconnect();
+		ProActive.terminateActiveObject(SchedulerProxy.getInstance(), false);
+		SchedulerProxy.clearInstance();
+		
+		// the follows actions can't be null
+		ChangeViewModeAction.getInstance().setEnabled(false);
+		KillJobAction.getInstance().setEnabled(false);
+		ObtainJobOutputAction.getInstance().setEnabled(false);
+		PauseResumeJobAction.getInstance().setEnabled(false);
+		SubmitJobAction.getInstance().setEnabled(false);
+		
+		// the follows actions can be null
+		// if the user is not logged as an admin !
+		FreezeSchedulerAction freezeSchedulerAction = FreezeSchedulerAction.getInstance();
+		if(freezeSchedulerAction != null)
+			freezeSchedulerAction.setEnabled(false);
+		
+		KillSchedulerAction killSchedulerAction = KillSchedulerAction.getInstance();
+		if(killSchedulerAction != null)
+			killSchedulerAction.setEnabled(false);
+		
+		PauseSchedulerAction pauseSchedulerAction = PauseSchedulerAction.getInstance();
+		if(pauseSchedulerAction != null)
+			pauseSchedulerAction.setEnabled(false);
+		
+		ResumeSchedulerAction resumeSchedulerAction = ResumeSchedulerAction.getInstance();
+		if(resumeSchedulerAction != null)
+			resumeSchedulerAction.setEnabled(false);
+		
+		ShutdownSchedulerAction shutdownSchedulerAction = ShutdownSchedulerAction.getInstance();
+		if(shutdownSchedulerAction != null)
+			shutdownSchedulerAction.setEnabled(false);
+		 
+		StartStopSchedulerAction startStopSchedulerAction = StartStopSchedulerAction.getInstance();
+		if(startStopSchedulerAction != null)
+			startStopSchedulerAction.setEnabled(false);
+	}
+	
+	public static void adminToolBarMode() {
+		userToolBarMode();
+		toolBarManager.add(new Separator());
+		toolBarManager.add(startStopSchedulerAction);
+		toolBarManager.add(freezeSchedulerAction);
+		toolBarManager.add(pauseSchedulerAction);
+		toolBarManager.add(resumeSchedulerAction);
+		toolBarManager.add(shutdownSchedulerAction);
+		toolBarManager.add(killSchedulerAction);
+	}
+	
+	public static void userToolBarMode() {
+		toolBarManager.removeAll();
+		toolBarManager.add(connectSchedulerAction);
+		toolBarManager.add(changeViewModeAction);
+		toolBarManager.add(new Separator());
+		toolBarManager.add(submitJob);
+		toolBarManager.add(pauseResumeJobAction);
+		toolBarManager.add(obtainJobOutputAction);
+		toolBarManager.add(killJobAction);
+	}
+
 	// -------------------------------------------------------------------- //
 	// ------------------------- extends viewPart ------------------------- //
 	// -------------------------------------------------------------------- //
@@ -273,24 +355,5 @@ public class SeparatedJobView extends ViewPart {
 		JobsController.clearInstances();
 		SchedulerProxy.clearInstance();
 		super.dispose();
-	}
-
-	public static void clearOnDisconnection() {
-		setVisible(false);
-		TaskView taskView = TaskView.getInstance();
-		if (taskView != null)
-			taskView.clear();
-
-		JobInfo jobInfo = JobInfo.getInstance();
-		if (jobInfo != null)
-			jobInfo.clear();
-
-		JobsOutputController jobsOutputController = JobsOutputController.getInstance();
-		if (jobsOutputController != null)
-			jobsOutputController.removeAllJobOutput();
-
-		SchedulerProxy.getInstance().disconnect();
-		ProActive.terminateActiveObject(SchedulerProxy.getInstance(), false);
-		SchedulerProxy.clearInstance();
 	}
 }

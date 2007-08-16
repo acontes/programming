@@ -84,6 +84,8 @@ public class JobInfo extends ViewPart {
 		Vector<Object> propertiesValue = new Vector<Object>();
 		propertiesName.add("Id");
 		propertiesValue.add(job.getId());
+		propertiesName.add("State");
+		propertiesValue.add("n/a");
 		propertiesName.add("Name");
 		propertiesValue.add(job.getName());
 		propertiesName.add("Priority");
@@ -118,6 +120,10 @@ public class JobInfo extends ViewPart {
 		propertiesValue.add(Tools.getFormattedDuration(job.getJobInfo().getSubmittedTime(), job.getJobInfo()
 				.getFinishedTime()));
 
+		// Others ******************************************************
+		propertiesName.add("Description");
+		propertiesValue.add(job.getDescription());
+		
 		if (propertiesName.size() != propertiesValue.size())
 			throw new IllegalArgumentException(
 					"The list propertiesName and propertiesValue must have the same size !");

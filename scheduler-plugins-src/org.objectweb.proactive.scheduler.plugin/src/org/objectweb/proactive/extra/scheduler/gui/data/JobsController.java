@@ -53,7 +53,9 @@ import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
+import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 
 /**
@@ -73,6 +75,8 @@ public class JobsController implements SchedulerEventListener {
 	// The shared instance view as an active object
 	private static JobsController activeView = null;
 
+	private static SchedulerState schedulerState = null;
+
 	// jobs
 	private Vector<Job> jobs = null;
 
@@ -86,6 +90,8 @@ public class JobsController implements SchedulerEventListener {
 	private Vector<RunningJobsListener> runningJobsListeners = null;
 	private Vector<FinishedJobsListener> finishedJobsListeners = null;
 	private Vector<FinishedTasksListener> finishedTasksListeners = null;
+	private Vector<EventJobsListener> eventJobsListeners = null;
+	private Vector<EventSchedulerListener> eventSchedulerListeners = null;
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -95,6 +101,8 @@ public class JobsController implements SchedulerEventListener {
 		runningJobsListeners = new Vector<RunningJobsListener>();
 		finishedJobsListeners = new Vector<FinishedJobsListener>();
 		finishedTasksListeners = new Vector<FinishedTasksListener>();
+		eventJobsListeners = new Vector<EventJobsListener>();
+		eventSchedulerListeners = new Vector<EventSchedulerListener>();
 	}
 
 	// -------------------------------------------------------------------- //
@@ -140,6 +148,72 @@ public class JobsController implements SchedulerEventListener {
 	private void runningToFinishedTaskEventInternal(TaskEvent event) {
 		for (FinishedTasksListener listener : finishedTasksListeners)
 			listener.finishedTaskEvent(event);
+	}
+
+	/** call "startedEvent" method on listeners */
+	private void schedulerStartedEventInternal() {
+		for (EventSchedulerListener listener : eventSchedulerListeners)
+			listener.startedEvent();
+	}
+
+	/** call "stoppedEvent" method on listeners */
+	private void schedulerStoppedEventInternal() {
+		for (EventSchedulerListener listener : eventSchedulerListeners)
+			listener.stoppedEvent();
+	}
+
+	/** call "pausedEvent" method on listeners */
+	private void schedulerPausedEventInternal() {
+		for (EventSchedulerListener listener : eventSchedulerListeners)
+			listener.pausedEvent();
+	}
+
+	/** call "freezeEvent" method on listeners */
+	private void schedulerFreezeEventInternal() {
+		for (EventSchedulerListener listener : eventSchedulerListeners)
+			listener.freezeEvent();
+	}
+
+	/** call "resumedEvent" method on listeners */
+	private void schedulerResumedEventInternal() {
+		for (EventSchedulerListener listener : eventSchedulerListeners)
+			listener.resumedEvent();
+	}
+
+	/** call "shuttingDownEvent" method on listeners */
+	private void schedulerShuttingDownEventInternal() {
+		for (EventSchedulerListener listener : eventSchedulerListeners)
+			listener.shuttingDownEvent();
+	}
+
+	/** call "shutDownEvent" method on listeners */
+	private void schedulerShutDownEventInternal() {
+		for (EventSchedulerListener listener : eventSchedulerListeners)
+			listener.shutDownEvent();
+	}
+
+	/** call "killedEvent" method on listeners */
+	private void schedulerKilledEventInternal() {
+		for (EventSchedulerListener listener : eventSchedulerListeners)
+			listener.killedEvent();
+	}
+
+	/** call "killedEvent" method on listeners */
+	private void jobKilledEventInternal(JobId jobId) {
+		for (EventJobsListener listener : eventJobsListeners)
+			listener.killedEvent(jobId);
+	}
+
+	/** call "pausedEvent" method on listeners */
+	private void jobPausedEventInternal(JobEvent event) {
+		for (EventJobsListener listener : eventJobsListeners)
+			listener.pausedEvent(event);
+	}
+
+	/** call "resumedEvent" method on listeners */
+	private void jobResumedEventInternal(JobEvent event) {
+		for (EventJobsListener listener : eventJobsListeners)
+			listener.resumedEvent(event);
 	}
 
 	// -------------------------------------------------------------------- //
@@ -341,16 +415,23 @@ public class JobsController implements SchedulerEventListener {
 			// enabling/disabling button permitted with this job
 			ObtainJobOutputAction.getInstance().setEnabled(enabled);
 			PauseResumeJobAction.getInstance().setEnabled(enabled);
-			if (job.isPaused())
+
+			JobState jobState = job.getState();
+			if (jobState.equals(JobState.PAUSED)) {
 				PauseResumeJobAction.getInstance().setResumeMode();
-			else
+			} else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)
+					|| jobState.equals(JobState.RERUNNING)) {
 				PauseResumeJobAction.getInstance().setPauseMode();
+			} else {
+				PauseResumeJobAction.getInstance().setPauseResumeMode();
+			}
+
 			KillJobAction.getInstance().setEnabled(enabled);
 		}
 	}
 
 	// TODO trouver un nom quand même...
-	public void jeNeSaisToujoursPas() {
+	private void jeNeSaisToujoursPas() {
 		TableManager tableManager = TableManager.getInstance();
 		JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
 		Job job = null;
@@ -375,27 +456,28 @@ public class JobsController implements SchedulerEventListener {
 		PauseResumeJobAction.getInstance().setPauseResumeMode();
 	}
 
-	public void toujoursPasDeNom(Boolean startStopEnabled, Boolean freezeEnabled, Boolean pauseEnabled,
+	// TODO trouver un nom quand même...
+	private void toujoursPasDeNom(Boolean startStopEnabled, Boolean freezeEnabled, Boolean pauseEnabled,
 			Boolean resumeEnabled, Boolean shutdownEnabled) {
 
 		StartStopSchedulerAction startStopSchedulerAction = StartStopSchedulerAction.getInstance();
-		if (startStopSchedulerAction == null)
+		if (startStopSchedulerAction != null)
 			startStopSchedulerAction.setEnabled(startStopEnabled);
 
 		FreezeSchedulerAction freezeSchedulerAction = FreezeSchedulerAction.getInstance();
-		if (freezeSchedulerAction == null)
+		if (freezeSchedulerAction != null)
 			freezeSchedulerAction.setEnabled(freezeEnabled);
 
 		PauseSchedulerAction pauseSchedulerAction = PauseSchedulerAction.getInstance();
-		if (pauseSchedulerAction == null)
+		if (pauseSchedulerAction != null)
 			pauseSchedulerAction.setEnabled(pauseEnabled);
 
 		ResumeSchedulerAction resumeSchedulerAction = ResumeSchedulerAction.getInstance();
-		if (resumeSchedulerAction == null)
+		if (resumeSchedulerAction != null)
 			resumeSchedulerAction.setEnabled(resumeEnabled);
 
 		ShutdownSchedulerAction shutdownSchedulerAction = ShutdownSchedulerAction.getInstance();
-		if (shutdownSchedulerAction == null)
+		if (shutdownSchedulerAction != null)
 			shutdownSchedulerAction.setEnabled(shutdownEnabled);
 	}
 
@@ -404,10 +486,13 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerImmediatePausedEvent() {
-		System.out.println("JobsController.schedulerImmediatePausedEvent()");
+		schedulerState = SchedulerState.PAUSED_IMMEDIATE;
 		jeSaisPasLeNom();
 
-		toujoursPasDeNom(false,false,false,true,false);
+		toujoursPasDeNom(false, false, false, true, false);
+
+		// call method on listeners
+		schedulerFreezeEventInternal();
 	}
 
 	/**
@@ -415,10 +500,13 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerPausedEvent() {
-		System.out.println("JobsController.schedulerPausedEvent()");
+		schedulerState = SchedulerState.PAUSED;
 		jeSaisPasLeNom();
 
-		toujoursPasDeNom(false,false,false,true,false);
+		toujoursPasDeNom(false, false, false, true, false);
+
+		// call method on listeners
+		schedulerPausedEventInternal();
 	}
 
 	/**
@@ -426,11 +514,13 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerResumedEvent() {
-		System.out.println("JobsController.schedulerResumedEvent()");
+		schedulerState = SchedulerState.STARTED;
 		jeSaisPasLeNom();
 
-		// TODO
-		toujoursPasDeNom(true,true,true,false,true);
+		toujoursPasDeNom(true, true, true, false, true);
+
+		// call method on listeners
+		schedulerResumedEventInternal();
 	}
 
 	/**
@@ -438,7 +528,15 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerShutDownEvent() {
-		System.out.println("JobsController.SchedulerShutDownEvent() FINNNNNNNNNNNNNNNNNNNNNNNN");
+		schedulerState = SchedulerState.KILLED;
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				SeparatedJobView.clearOnDisconnection(false);
+			}
+		});
+
+		// call method on listeners
+		schedulerShutDownEventInternal();
 	}
 
 	/**
@@ -446,10 +544,13 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerShuttingDownEvent() {
-		System.out.println("JobsController.schedulerShuttingDownEvent()");
+		schedulerState = SchedulerState.SHUTTING_DOWN;
 		jeNeSaisToujoursPas();
 
-		toujoursPasDeNom(false,false,false,false,false);
+		toujoursPasDeNom(false, false, false, false, false);
+
+		// call method on listeners
+		schedulerShuttingDownEventInternal();
 	}
 
 	/**
@@ -457,12 +558,15 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerStartedEvent() {
-		System.out.println("JobsController.schedulerStartedEvent()");
+		schedulerState = SchedulerState.STARTED;
 		jeSaisPasLeNom();
 
 		StartStopSchedulerAction.getInstance().setStopMode();
 
-		toujoursPasDeNom(true,true,true,false,true);
+		toujoursPasDeNom(true, true, true, false, true);
+
+		// call method on listeners
+		schedulerStartedEventInternal();
 	}
 
 	/**
@@ -470,12 +574,15 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerStoppedEvent() {
-		System.out.println("JobsController.schedulerStoppedEvent()");
+		schedulerState = SchedulerState.STOPPED;
 		jeNeSaisToujoursPas();
 
 		StartStopSchedulerAction.getInstance().setStartMode();
 
-		toujoursPasDeNom(true,false,false,false,true);
+		toujoursPasDeNom(true, false, false, false, true);
+
+		// call method on listeners
+		schedulerStoppedEventInternal();
 	}
 
 	/**
@@ -483,7 +590,15 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void schedulerKilledEvent() {
-		System.out.println("JobsController.SchedulerkilledEvent() fiiiiiiinnnn VIOLENTE");
+		schedulerState = SchedulerState.KILLED;
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				SeparatedJobView.clearOnDisconnection(false);
+			}
+		});
+
+		// call method on listeners
+		schedulerKilledEventInternal();
 	}
 
 	/**
@@ -491,7 +606,6 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobKilledEvent(JobId jobId) {
-		System.out.println("JobsController.jobKilledEvent()");
 		Vector<JobId> list = null;
 
 		if (pendingJobsIds.contains(jobId)) {
@@ -516,6 +630,9 @@ public class JobsController implements SchedulerEventListener {
 
 		// remove job's output
 		JobsOutputController.getInstance().removeJobOutput(jobId);
+
+		// call method on listeners
+		jobKilledEventInternal(jobId);
 	}
 
 	/**
@@ -523,7 +640,6 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobPausedEvent(JobEvent event) {
-		System.out.println("JobsController.jobPausedEvent()");
 		final Job job = getJobById(event.getJobId());
 		job.update(event);
 		Display.getDefault().asyncExec(new Runnable() {
@@ -538,6 +654,9 @@ public class JobsController implements SchedulerEventListener {
 					taskView.fullUpdate(job);
 			}
 		});
+
+		// call method on listeners
+		jobPausedEventInternal(event);
 	}
 
 	/**
@@ -545,7 +664,6 @@ public class JobsController implements SchedulerEventListener {
 	 */
 	@Override
 	public void jobResumedEvent(JobEvent event) {
-		System.out.println("JobsController.jobResumedEvent()");
 		final Job job = getJobById(event.getJobId());
 		job.update(event);
 		Display.getDefault().asyncExec(new Runnable() {
@@ -560,6 +678,9 @@ public class JobsController implements SchedulerEventListener {
 					taskView.fullUpdate(job);
 			}
 		});
+
+		// call method on listeners
+		jobResumedEventInternal(event);
 	}
 
 	/**
@@ -604,6 +725,22 @@ public class JobsController implements SchedulerEventListener {
 
 	public void removeFinishedTasksListener(FinishedTasksListener listener) {
 		finishedTasksListeners.remove(listener);
+	}
+
+	public void addEventJobsListener(EventJobsListener listener) {
+		eventJobsListeners.add(listener);
+	}
+
+	public void removeEventJobsListener(EventJobsListener listener) {
+		eventJobsListeners.remove(listener);
+	}
+
+	public void addEventSchedulerListener(EventSchedulerListener listener) {
+		eventSchedulerListeners.add(listener);
+	}
+
+	public void removeEventSchedulerListener(EventSchedulerListener listener) {
+		eventSchedulerListeners.remove(listener);
 	}
 
 	// -------------------------------------------------------------------- //
@@ -687,13 +824,19 @@ public class JobsController implements SchedulerEventListener {
 	 * @return true only if no error caught, for synchronous call.
 	 */
 	public boolean init() {
-		SchedulerState state = SchedulerProxy.getInstance().addSchedulerEventListener(
+		SchedulerInitialState state = SchedulerProxy.getInstance().addSchedulerEventListener(
 				((SchedulerEventListener) ProActive.getStubOnThis()));
 
 		if (state == null) // addSchedulerEventListener failed
 			return false;
 
-		switch (state.getState()) {
+		if (SchedulerProxy.getInstance().isAnAdmin())
+			SeparatedJobView.adminToolBarMode();
+		else
+			SeparatedJobView.userToolBarMode();
+
+		schedulerState = state.getState();
+		switch (schedulerState) {
 		case KILLED:
 			schedulerKilledEvent();
 			break;
@@ -767,5 +910,9 @@ public class JobsController implements SchedulerEventListener {
 	public static void clearInstances() {
 		localView = null;
 		activeView = null;
+	}
+
+	public static SchedulerState getSchedulerState() {
+		return schedulerState;
 	}
 }

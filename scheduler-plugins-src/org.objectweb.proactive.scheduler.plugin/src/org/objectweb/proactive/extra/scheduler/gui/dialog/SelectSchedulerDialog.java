@@ -112,6 +112,7 @@ public class SelectSchedulerDialog extends Dialog {
 		loginCombo = new Combo(shell, SWT.BORDER);
 		Label pwdLabel = new Label(shell, SWT.NONE);
 		final Text pwdText = new Text(shell, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+		adminCheck = new Button(shell, SWT.CHECK);
 		okButton = new Button(shell, SWT.NONE);
 		cancelButton = new Button(shell, SWT.NONE);
 
@@ -157,22 +158,12 @@ public class SelectSchedulerDialog extends Dialog {
 		pwdFormData.right = new FormAttachment(100, -5);
 		pwdText.setLayoutData(pwdFormData);
 		
-		
-		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		Label adminLabel = new Label(shell, SWT.NONE);
-		adminLabel.setText("log as admin");
-		adminCheck = new Button(shell, SWT.CHECK);
-		
+		// admin check
+		adminCheck.setText("log as admin");
 		FormData checkFormData = new FormData();
-		checkFormData.top = new FormAttachment(adminLabel, 0, SWT.CENTER);
+		checkFormData.top = new FormAttachment(loginCombo, 5);
 		checkFormData.left = new FormAttachment(50,-45);
 		adminCheck.setLayoutData(checkFormData);
-		
-		FormData textFormData = new FormData();
-		textFormData.top = new FormAttachment(loginCombo, 5);
-		textFormData.left = new FormAttachment(adminCheck, 5);
-		adminLabel.setLayoutData(textFormData);
-		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		
 		
 		// button "OK"
@@ -189,7 +180,7 @@ public class SelectSchedulerDialog extends Dialog {
 			}
 		});
 		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(adminLabel, 5);
+		okFormData.top = new FormAttachment(adminCheck, 5);
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
@@ -205,7 +196,7 @@ public class SelectSchedulerDialog extends Dialog {
 			}
 		});
 		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(adminLabel, 5);
+		cancelFormData.top = new FormAttachment(adminCheck, 5);
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);
