@@ -53,10 +53,10 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.ResumeSchedulerAction
 import org.objectweb.proactive.extra.scheduler.gui.actions.ShutdownSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.composites.FinishedJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composites.PendingJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composites.RunningJobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.FinishedJobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.PendingJobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.RunningJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;

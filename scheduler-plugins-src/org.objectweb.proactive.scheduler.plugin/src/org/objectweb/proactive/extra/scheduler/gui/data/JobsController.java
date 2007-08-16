@@ -43,13 +43,14 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.ResumeSchedulerAction
 import org.objectweb.proactive.extra.scheduler.gui.actions.ShutdownSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.TaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
@@ -321,7 +322,9 @@ public class JobsController implements SchedulerEventListener {
 		// call method on listeners
 		removeFinishedJobEventInternal(jobId);
 
-		Job job = new Job();
+		// I use TaskFlowJob arbitrarily, just for set the id and remove the good job !
+		// I can use any other class extends the abstract class Job !
+		Job job = new TaskFlowJob();
 		job.setId(jobId);
 		if (!jobs.remove(job))
 			throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");
@@ -619,7 +622,9 @@ public class JobsController implements SchedulerEventListener {
 			removeFinishedJobEventInternal(jobId);
 		}
 
-		Job job = new Job();
+		// I use TaskFlowJob arbitrarily, just for set the id and remove the good job !
+		// I can use any other class extends the abstract class Job !
+		Job job = new TaskFlowJob();
 		job.setId(jobId);
 		if (!jobs.remove(job))
 			throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");

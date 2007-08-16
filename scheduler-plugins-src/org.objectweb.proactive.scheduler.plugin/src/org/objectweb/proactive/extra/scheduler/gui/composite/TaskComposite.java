@@ -25,7 +25,7 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composites;
+package org.objectweb.proactive.extra.scheduler.gui.composite;
 
 import java.util.ArrayList;
 import java.util.Collections;

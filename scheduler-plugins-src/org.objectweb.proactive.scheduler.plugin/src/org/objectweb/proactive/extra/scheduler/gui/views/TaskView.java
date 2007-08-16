@@ -30,7 +30,7 @@ package org.objectweb.proactive.extra.scheduler.gui.views;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.extra.scheduler.gui.composites.TaskComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.TaskComposite;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.job.Job;

@@ -14,7 +14,7 @@ Export-Package: .,
  org.objectweb.proactive.extra.scheduler.gui;uses:="org.eclipse.ui.plugin,org.eclipse.swt.graphics,org.osgi.framework",
  org.objectweb.proactive.extra.scheduler.gui.actions;uses:="org.objectweb.proactive.extra.scheduler.gui.views,org.eclipse.jface.action,org.eclipse.swt.widgets",
  org.objectweb.proactive.extra.scheduler.gui.actions.icons,
- org.objectweb.proactive.extra.scheduler.gui.composites;
+ org.objectweb.proactive.extra.scheduler.gui.composite;
   uses:="org.objectweb.proactive.extra.scheduler.gui.data,
    org.objectweb.proactive.extra.scheduler.job,
    org.objectweb.proactive.extra.scheduler.task,
@@ -38,5 +38,6 @@ Export-Package: .,
    org.eclipse.swt.graphics,
    org.eclipse.ui.part,
    org.objectweb.proactive.extra.scheduler.task,
-   org.eclipse.swt.widgets"
+   org.eclipse.swt.widgets",
+ org.objectweb.proactive.extra.scheduler.gui.views.icons
 Eclipse-RegisterBuddy: org.objectweb.proactive.ic2d.lib
