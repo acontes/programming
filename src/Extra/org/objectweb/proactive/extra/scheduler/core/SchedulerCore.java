@@ -1,16 +1,9 @@
 package org.objectweb.proactive.extra.scheduler.core;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Vector;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
@@ -166,7 +159,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (state == SchedulerState.SHUTTING_DOWN){
 			try {
 				logger.info("Serializing results...");
-				serializeResults(SERIALIZE_PATH);
+				Serializer.serializeResults(results,SERIALIZE_PATH);
 			} catch (Exception e) {
 				e.printStackTrace();
 				//if an error occurs during serialization, we wait until the result to be got back
@@ -581,38 +574,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		Job job = jobs.get(jobId);
 		job.setPriority(priority);
 		frontend.changeJobPriorityEvent(job.getJobInfo());
-	}
-
-	
-	/**
-	 * Serialize every jobs results on hard drive before shutting down.
-	 * file will be named like that pattern : SCHED_{date}_{numJob}.result
-	 * 
-	 * @param path the path on which to saves the results.
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 */
-	private void serializeResults(String path) throws FileNotFoundException, IOException {
-		for (Entry<JobId,JobResult> e : results.entrySet()){
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(System.currentTimeMillis());
-			String f = path+"SCHED_"+String.format("%1$tm-%1$te-%1$tY", calendar)+"_"+e.getKey().value()+".result";
-			serialize(f, e.getValue());
-		}
-	}
-	
-	/**
-	 * Serialize the given object in the given file path.
-	 * 
-	 * @param path the path on which to saves the object.
-	 * @param toSerialize the object to serialize.
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void serialize(String path, Object toSerialize) throws FileNotFoundException, IOException {
-		ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(path));
-		objOut.writeObject(toSerialize);
-		objOut.close();
 	}
 
 }

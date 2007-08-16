@@ -2,7 +2,7 @@ package org.objectweb.proactive.extra.scheduler.userAPI;
 
 /**
  * State of a job.
- * The differents job states are described below.
+ * The differents job states are best described below.
  * 
  * @author ProActive Team
  * @version 1.0, Aug 10, 2007

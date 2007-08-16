@@ -41,7 +41,7 @@ public class Job implements Serializable, Comparable<Job> {
 	private String description = "";
 	// TODO envParameters
 	// TODO un moyen pour le user de mettre n'importe quelles données dans le job et la retrouver dans la police.
-	//cela lui permettrai de moduler sa police en fonction de ces données
+	// cela lui permettrai de moduler sa police en fonction de ces données
 	private HashMap<TaskId,TaskDescriptor> tasks = new HashMap<TaskId,TaskDescriptor>();
 	/** Instances of the final task, important to know which results will be sent to user */
 	private Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
@@ -60,19 +60,12 @@ public class Job implements Serializable, Comparable<Job> {
 	 * Create a new Job with the given parameters. It provides methods to add or
 	 * remove tasks.
 	 * 
-	 * @param name
-	 *            the current job name.
-	 * @param priority
-	 *            the priority of this job between 1 and 5.
-	 * @param runtimeLimit
-	 *            the maximum execution time for this job given in millisecond.
-	 * @param type
-	 *            the type of the job.
-	 * @param runUntilCancel
-	 *            true if the job has to run until its end or an user
-	 *            intervention.
-	 * @param description
-	 *            a short description of the job and what it will do.
+	 * @param name the current job name.
+	 * @param priority the priority of this job between 1 and 5.
+	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
+	 * @param type the type of the job.
+	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
+	 * @param description a short description of the job and what it will do.
 	 */
 	public Job(String name, JobPriority priority, long runtimeLimit,
 			JobType type, boolean runUntilCancel, String description) {
@@ -257,6 +250,8 @@ public class Job implements Serializable, Comparable<Job> {
 	
 	/**
 	 * Set all properties in order to start the job.
+	 * After this method and for better performances you may have to
+	 * set the taskStatusModify to "null" : setTaskStatusModify(null);
 	 */
 	public void start(){
 		setStartTime(System.currentTimeMillis());
@@ -283,6 +278,8 @@ public class Job implements Serializable, Comparable<Job> {
 
 	/**
 	 * Paused every running and submitted tasks in this pending job.
+	 * After this method and for better performances you may have to
+	 * set the taskStatusModify to "null" : setTaskStatusModify(null);
 	 */
 	public boolean setPaused() {
 		if (jobInfo.getState() == JobState.PAUSED)
@@ -301,6 +298,8 @@ public class Job implements Serializable, Comparable<Job> {
 
 	/**
 	 * State of every paused tasks becomes pending or submitted in this pending job.
+	 * After this method and for better performances you may have to
+	 * set the taskStatusModify to "null" : setTaskStatusModify(null);
 	 */
 	public boolean setUnPause() {
 		if (jobInfo.getState() != JobState.PAUSED)
