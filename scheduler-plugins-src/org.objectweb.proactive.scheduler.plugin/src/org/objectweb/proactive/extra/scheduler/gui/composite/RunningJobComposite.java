@@ -75,6 +75,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 		super(parent, title, jobsController, RUNNING_TABLE_ID);
 		jobsController.addRunningJobsListener(this);
 		jobsController.addFinishedTasksListener(this);
+		jobsController.addEventJobsListener(this);
 	}
 
 	// -------------------------------------------------------------------- //
