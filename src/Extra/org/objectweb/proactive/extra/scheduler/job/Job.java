@@ -218,6 +218,8 @@ public class Job implements Serializable, Comparable<Job> {
 	public void startTask(TaskId id) {
 		setNumberOfPendingTasks(getNumberOfPendingTask()-1);
 		setNumberOfRunningTasks(getNumberOfRunningTask()+1);
+		if (getState() == JobState.STALLED)
+			setState(JobState.RUNNING);
 		lightJob.start(id);
 	}
 	
@@ -234,6 +236,8 @@ public class Job implements Serializable, Comparable<Job> {
 		descriptor.setStatus(Status.FINISHED);
 		setNumberOfRunningTasks(getNumberOfRunningTask()-1);
 		setNumberOfFinishedTasks(getNumberOfFinishedTask()+1);
+		if (getNumberOfRunningTask() == 0)
+			setState(JobState.STALLED);
 		//terminate this task
 		lightJob.terminate(taskId);
 		//creating list of status

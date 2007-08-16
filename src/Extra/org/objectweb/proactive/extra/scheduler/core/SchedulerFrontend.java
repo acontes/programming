@@ -409,6 +409,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 */
 	public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to change the priority of this job !");
+		UserIdentification ui = identifications.get(ProActive.getContext().getCurrentRequest().getSourceBodyID());
+		if (!ui.isAdmin()){
+			if (priority == JobPriority.HIGHEST)
+				throw new SchedulerException("Only an administrator can change the priority to HIGHEST");
+			else if (priority == JobPriority.ABOVE_NORMAL)
+				throw new SchedulerException("Only an administrator can change the priority to ABOVE NORMAL");
+		}
 		scheduler.changePriority(jobId,priority);
 	}
 

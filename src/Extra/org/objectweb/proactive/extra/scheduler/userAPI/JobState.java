@@ -19,6 +19,10 @@ public enum JobState implements java.io.Serializable {
 	 */
 	RUNNING ("Running"),
 	/**
+	 * The job has been launched but no task are currently running.
+	 */
+	STALLED ("Stalled"),
+	/**
 	 * The job is Rerunning, it means that one of its task has been rerunned.
 	 */
 	RERUNNING ("ReRunning"),
