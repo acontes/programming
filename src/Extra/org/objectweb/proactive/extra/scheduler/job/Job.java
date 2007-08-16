@@ -213,14 +213,18 @@ public class Job implements Serializable, Comparable<Job> {
 	/**
 	 * Start a new task will set some count and update dependencies if necessary.
 	 * 
-	 * @param id the task which has just been started.
+	 * @param td the task which has just been started.
+	 * @param hostname the computer host name on which the task has been started.
 	 */
-	public void startTask(TaskId id) {
+	public void startTask(TaskDescriptor td, String hostName) {
 		setNumberOfPendingTasks(getNumberOfPendingTask()-1);
 		setNumberOfRunningTasks(getNumberOfRunningTask()+1);
 		if (getState() == JobState.STALLED)
 			setState(JobState.RUNNING);
-		lightJob.start(id);
+		lightJob.start(td.getId());
+		td.setStatus(Status.RUNNNING);
+		td.setStartTime(System.currentTimeMillis());
+		td.setExecutionHostName(hostName);
 	}
 	
 	
@@ -274,6 +278,46 @@ public class Job implements Serializable, Comparable<Job> {
 	public void terminate() {
 		setState(JobState.FINISHED);
 		setFinishedTime(System.currentTimeMillis());
+	}
+	
+
+	/**
+	 * Paused every running and submitted tasks in this pending job.
+	 */
+	public boolean setPaused() {
+		if (jobInfo.getState() == JobState.PAUSED)
+			return false;
+		oldState = jobInfo.getState();
+		jobInfo.setState(JobState.PAUSED);
+		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
+		for (TaskDescriptor td : tasks.values()){
+			td.setStatus(Status.PAUSED);
+			hts.put(td.getId(), td.getStatus());
+		}
+		lightJob.update(hts);
+		setTaskStatusModify(hts);
+		return true;
+	}
+
+	/**
+	 * State of every paused tasks becomes pending or submitted in this pending job.
+	 */
+	public boolean setUnPause() {
+		if (jobInfo.getState() != JobState.PAUSED)
+			return false;
+		jobInfo.setState(oldState);
+		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
+		for (TaskDescriptor td : tasks.values()){
+			if (jobInfo.getState() == JobState.PENDING){
+				td.setStatus(Status.SUBMITTED);
+			} else if (jobInfo.getState() == JobState.RUNNING){
+				td.setStatus(Status.PENDING);
+			}
+			hts.put(td.getId(), td.getStatus());
+		}
+		lightJob.update(hts);
+		setTaskStatusModify(hts);
+		return true;
 	}
 	
 	
@@ -622,49 +666,6 @@ public class Job implements Serializable, Comparable<Job> {
 		jobInfo.setState(state);
 	}
 
-	/**
-	 * Paused every running and submitted tasks in this pending job.
-	 */
-	public boolean setPaused() {
-		if (jobInfo.getState() == JobState.PAUSED)
-			return false;
-		oldState = jobInfo.getState();
-		jobInfo.setState(JobState.PAUSED);
-		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
-		for (TaskDescriptor td : tasks.values()){
-			if (td.getStatus() == Status.SUBMITTED){
-				td.setStatus(Status.PAUSED_S);
-			} else if (td.getStatus() == Status.PENDING){
-				td.setStatus(Status.PAUSED_P);
-			}
-			hts.put(td.getId(), td.getStatus());
-		}
-		lightJob.update(hts);
-		setTaskStatusModify(hts);
-		return true;
-	}
-
-	/**
-	 * State of every paused tasks becomes pending or submitted in this pending job.
-	 */
-	public boolean setUnPause() {
-		if (jobInfo.getState() != JobState.PAUSED)
-			return false;
-		jobInfo.setState(oldState);
-		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
-		for (TaskDescriptor td : tasks.values()){
-			if (td.getStatus() == Status.PAUSED_S){
-				td.setStatus(Status.SUBMITTED);
-			} else if (td.getStatus() == Status.PAUSED_P){
-				td.setStatus(Status.PENDING);
-			}
-			hts.put(td.getId(), td.getStatus());
-		}
-		lightJob.update(hts);
-		setTaskStatusModify(hts);
-		return true;
-	}
-	
 	
 	/**
 	 * @see java.lang.Object#hashCode()

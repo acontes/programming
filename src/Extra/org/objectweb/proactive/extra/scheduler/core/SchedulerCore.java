@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
@@ -35,7 +36,6 @@ import org.objectweb.proactive.extra.scheduler.job.LightJob;
 import org.objectweb.proactive.extra.scheduler.job.LightTask;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
-import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
@@ -240,11 +240,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 						// don't forget to set the task status modify to null after a Job.start() method;
 						currentJob.setTaskStatusModify(null);
 					}
-					currentJob.startTask(taskDescriptor.getId());
 					// set the different informations on task
-					taskDescriptor.setStatus(Status.RUNNNING);
-					taskDescriptor.setStartTime(System.currentTimeMillis());
-					taskDescriptor.setExecutionHostName(node.getNodeInformation().getHostName());
+					currentJob.startTask(taskDescriptor,node.getNodeInformation().getHostName());
 					// send task event to frontend
 					frontend.pendingToRunningTaskEvent(taskDescriptor.getTaskInfo());
 				} catch (Exception e) {

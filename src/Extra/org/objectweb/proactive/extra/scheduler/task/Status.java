@@ -47,13 +47,9 @@ public enum Status implements java.io.Serializable {
      */
     PENDING ("Pending"),
     /**
-     * The task is paused from a submitted status
+     * The task is paused.
      */
-    PAUSED_S ("Paused"),
-    /**
-     * The task is paused from a pending status
-     */
-    PAUSED_P ("Paused"),
+    PAUSED ("Paused"),
     /**
      * The task is executing
      */

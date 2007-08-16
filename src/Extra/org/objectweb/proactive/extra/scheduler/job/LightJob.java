@@ -134,7 +134,7 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	 */
 	void update(HashMap<TaskId, Status> status){
 		for (Entry<TaskId,Status> tid : status.entrySet()){
-			if (tid.getValue() == Status.PAUSED_P || tid.getValue() == Status.PAUSED_S){
+			if (tid.getValue() == Status.PAUSED){
 				LightTask lt = eligibleTasks.get(tid.getKey());
 				if (lt != null){
 					pausedTasks.put(tid.getKey(),eligibleTasks.get(tid.getKey()));
