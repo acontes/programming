@@ -12,13 +12,13 @@ import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**
- * 
+ * Abstract class job.
  * 
  * @author ProActive Team
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
-public class Job implements Serializable, Comparable<Job> {
+public abstract class Job implements Serializable, Comparable<Job> {
 
 	public static final int SORT_BY_ID = 1;
 	public static final int SORT_BY_NAME = 2;
@@ -35,7 +35,6 @@ public class Job implements Serializable, Comparable<Job> {
 	private static final long serialVersionUID = 1565033147327965656L;
 	private String owner = "";
 	private String name = "";
-	private JobType type = JobType.TASKSFLOW;
 	private long runtimeLimit = -1;
 	private boolean RunUntilCancel = false;
 	private String description = "";
@@ -47,6 +46,7 @@ public class Job implements Serializable, Comparable<Job> {
 	private Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
 	/** informations about job execution */
 	private JobEvent jobInfo = new JobEvent();
+	/** Use to save previous state of the job */
 	private JobState oldState = JobState.PENDING;
 	/** Light job for dependences management */
 	private LightJob lightJob;
@@ -63,17 +63,14 @@ public class Job implements Serializable, Comparable<Job> {
 	 * @param name the current job name.
 	 * @param priority the priority of this job between 1 and 5.
 	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
-	 * @param type the type of the job.
 	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 */
-	public Job(String name, JobPriority priority, long runtimeLimit,
-			JobType type, boolean runUntilCancel, String description) {
+	public Job(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
 		super();
 		this.name = name;
 		this.jobInfo.setPriority(priority);
 		this.runtimeLimit = runtimeLimit;
-		this.type = type;
 		this.RunUntilCancel = runUntilCancel;
 		this.description = description;
 	}
@@ -154,8 +151,8 @@ public class Job implements Serializable, Comparable<Job> {
 					(jobInfo.getPriority().getPriority() - job.jobInfo.getPriority().getPriority())
 					: (job.jobInfo.getPriority().getPriority() - jobInfo.getPriority().getPriority());
 		case SORT_BY_TYPE:
-			return (currentOrder == ASC_ORDER) ? (type.compareTo(job.type))
-					: (job.type.compareTo(type));
+			return (currentOrder == ASC_ORDER) ? (getType().compareTo(job.getType()))
+					: (job.getType().compareTo(getType()));
 		case SORT_BY_OWNER:
 			return (currentOrder == ASC_ORDER) ? (owner.compareTo(job.owner))
 					: (job.owner.compareTo(owner));
@@ -426,9 +423,7 @@ public class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @return the type
 	 */
-	public JobType getType() {
-		return type;
-	}
+	public abstract JobType getType();
 
 	/**
 	 * To get the finalTask

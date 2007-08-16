@@ -202,12 +202,13 @@ public class JobFactory {
         }
 
         // Job creation
-        Job job = new Job(name, 
-        		getPriority(priority), 
-        		-1,
-                (jt == null ? JobType.TASKSFLOW : jt), 
-                true, 
-                description );
+        Job job;
+        if (jt == JobType.APPLI)
+        	job = new ApplicationJob(name, getPriority(priority), -1, true, description);
+        else if (jt == JobType.PARAMETER_SWIPPING)
+        	job = new ParameterSwippingJob(name, getPriority(priority), -1, true, description);
+        else
+        	job = new TaskFlowJob(name, getPriority(priority), -1, true, description);
         // Dependencies
         HashMap<String, TaskDescriptor> depends = 
         	new HashMap<String, TaskDescriptor>();
