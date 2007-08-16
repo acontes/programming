@@ -18,6 +18,12 @@ public class TaskFlowJob extends Job {
 
 	
 	/**
+	 * 
+	 */
+	public TaskFlowJob(){}
+	
+	
+	/**
 	 * Create a new Tasks Flow Job with the given parameters. It provides methods to add or
 	 * remove tasks.
 	 * 
