@@ -23,6 +23,14 @@ public class GCMParserHelper {
         return (namedItem != null) ? namedItem.getNodeValue() : null;
     }
 
+    static public String getElementValue(Node node) {
+        if ((node != null) && (node.getTextContent() != null)) {
+            return node.getTextContent().trim();
+        }
+
+        return null;
+    }
+
     static public FileTransferBlock parseFileTransferNode(Node fileTransferNode) {
         FileTransferBlock fileTransferBlock = new FileTransferBlock();
         String source = GCMParserHelper.getAttributeValue(fileTransferNode,

@@ -4,56 +4,47 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.core.process.oar.OARGRIDSubProcess;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
-import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupOAR;
+import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupOARGrid;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupOARParser extends AbstractGroupParser {
+public class GroupOARGridParser extends AbstractGroupParser {
     @Override
     public AbstractGroup createGroup() {
-        return new GroupOAR();
+        return new GroupOARGrid();
     }
 
     public String getNodeName() {
-        return "oarProcess";
+        return "oarGridProcess";
     }
 
     @Override
     public void parseGroupNode(Node groupNode, XPath xpath) {
         super.parseGroupNode(groupNode, xpath);
 
-        GroupOAR oarGroup = (GroupOAR) getGroup();
-
-        String interactive = GCMParserHelper.getAttributeValue(groupNode,
-                "interactive");
-
-        if (interactive != null) {
-            oarGroup.setInteractive(interactive);
-        }
-
         String queueName = GCMParserHelper.getAttributeValue(groupNode, "queue");
 
+        GroupOARGrid oarGridSubProcess = (GroupOARGrid) getGroup();
+
         if (queueName != null) {
-            oarGroup.setQueueName(queueName);
+            oarGridSubProcess.setQueueName(queueName);
         }
 
         String accessProtocol = GCMParserHelper.getAttributeValue(groupNode,
                 "bookedNodesAccess");
 
         if (accessProtocol != null) {
-            oarGroup.setAccessProtocol(accessProtocol);
+            oarGridSubProcess.setAccessProtocol(accessProtocol);
         }
 
-        //
-        // Parse options
-        //
         try {
-            Node optionNode = (Node) xpath.evaluate("oarOption", groupNode,
+            Node optionNode = (Node) xpath.evaluate("oarGridOption", groupNode,
                     XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();
@@ -64,11 +55,14 @@ public class GroupOARParser extends AbstractGroupParser {
                 }
 
                 String nodeName = childNode.getNodeName();
+                String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
                 if (nodeName.equals("resources")) {
-                    oarGroup.setResources(GCMParserHelper.getElementValue(childNode));
+                    oarGridSubProcess.setResources(nodeExpandedValue);
+                } else if (nodeName.equals("walltime")) {
+                    oarGridSubProcess.setWallTime(nodeExpandedValue);
                 } else if (nodeName.equals("scriptPath")) {
                     PathElement path = GCMParserHelper.parsePathElementNode(childNode);
-                    oarGroup.setScriptLocation(path);
+                    oarGridSubProcess.setScriptLocation(path);
                 }
             }
         } catch (XPathExpressionException e) {

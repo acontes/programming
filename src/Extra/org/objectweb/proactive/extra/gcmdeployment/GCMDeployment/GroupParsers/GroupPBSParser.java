@@ -55,8 +55,7 @@ public class GroupPBSParser extends AbstractGroupParser {
                 }
 
                 String nodeName = childNode.getNodeName();
-                String nodeExpandedValue = (childNode.getFirstChild() != null)
-                    ? childNode.getFirstChild().getNodeValue() : "";
+                String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
                 if (nodeName.equals("hostlist")) {
                     pbsGroup.setHostList(nodeExpandedValue);
                 } else if (nodeName.equals("hostsNumber")) {
