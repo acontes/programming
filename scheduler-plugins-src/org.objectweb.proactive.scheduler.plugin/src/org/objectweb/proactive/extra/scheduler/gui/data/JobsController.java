@@ -842,16 +842,26 @@ public class JobsController implements SchedulerEventListener {
 	 * @return true only if no error caught, for synchronous call.
 	 */
 	public boolean init() {
+		System.out.println("JobsController.init() 0");
+		System.out.println(SchedulerProxy.getInstance().getClass().getName());
+		System.out.println("JobsController.init() 0000000");
+		SchedulerEventListener menfou = (SchedulerEventListener) ProActive.getStubOnThis();
+		System.out.println(menfou);
+		System.out.println("JobsController.init() 0000000000000000000000000");
+		
 		SchedulerInitialState state = SchedulerProxy.getInstance().addSchedulerEventListener(
 				((SchedulerEventListener) ProActive.getStubOnThis()));
+		System.out.println("JobsController.init() 1 => ");
 
 		if (state == null) // addSchedulerEventListener failed
 			return false;
+		System.out.println("JobsController.init() 2");
 
 		if (SchedulerProxy.getInstance().isAnAdmin())
 			SeparatedJobView.adminToolBarMode();
 		else
 			SeparatedJobView.userToolBarMode();
+		System.out.println("JobsController.init() 3");
 
 		schedulerState = state.getState();
 		switch (schedulerState) {

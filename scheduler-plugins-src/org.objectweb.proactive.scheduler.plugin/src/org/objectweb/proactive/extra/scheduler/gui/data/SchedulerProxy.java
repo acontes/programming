@@ -82,6 +82,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	 */
 	@Override
 	public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener listener) {
+		System.out.println("SchedulerProxy.addSchedulerEventListener()");
 		try {
 			return scheduler.addSchedulerEventListener(listener);
 		} catch (SchedulerException e) {
