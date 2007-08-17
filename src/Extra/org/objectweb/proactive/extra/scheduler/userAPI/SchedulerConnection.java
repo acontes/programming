@@ -71,7 +71,7 @@ public class SchedulerConnection implements Serializable{
 		SchedulerAuthenticationInterface schedulerAuth = null;
 		logger.info("******************* TRYING TO JOIN EXISTING SCHEDULER *****************");
 		if (schedulerURL == null){
-			logger.info("Scheduler URL was null, looking for scheduler on localhost...");
+			logger.info("Scheduler URL was null, looking for scheduler on localhost with the default scheduler name...");
 			schedulerURL = "//localhost/"+SCHEDULER_DEFAULT_NAME;
 		}
     	try {

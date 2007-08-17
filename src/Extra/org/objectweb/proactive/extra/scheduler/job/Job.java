@@ -260,7 +260,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		descriptor.setStatus(Status.FINISHED);
 		setNumberOfRunningTasks(getNumberOfRunningTask()-1);
 		setNumberOfFinishedTasks(getNumberOfFinishedTask()+1);
-		if (getNumberOfRunningTask() == 0)
+		if (getState() == JobState.RUNNING && getNumberOfRunningTask() == 0)
 			setState(JobState.STALLED);
 		//terminate this task
 		lightJob.terminate(taskId);
