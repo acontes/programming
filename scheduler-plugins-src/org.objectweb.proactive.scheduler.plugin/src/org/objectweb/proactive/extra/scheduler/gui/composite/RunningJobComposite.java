@@ -38,7 +38,7 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener;
-import org.objectweb.proactive.extra.scheduler.gui.data.FinishedTasksListener;
+import org.objectweb.proactive.extra.scheduler.gui.data.EventTasksListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.RunningJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
@@ -55,7 +55,7 @@ import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class RunningJobComposite extends JobComposite implements RunningJobsListener, FinishedTasksListener,
+public class RunningJobComposite extends JobComposite implements RunningJobsListener, EventTasksListener,
 		EventJobsListener {
 
 	/** the unique id and the title for the column "Progress" */
@@ -72,7 +72,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	 * @param jobsController
 	 */
 	public RunningJobComposite(Composite parent, String title, JobsController jobsController) {
-		super(parent, title, jobsController, RUNNING_TABLE_ID);
+		super(parent, title, RUNNING_TABLE_ID);
 		jobsController.addRunningJobsListener(this);
 		jobsController.addFinishedTasksListener(this);
 		jobsController.addEventJobsListener(this);
@@ -196,10 +196,19 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	// ----------------- implements FinishedTasksListener ----------------- //
 	// -------------------------------------------------------------------- //
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.data.FinishedTasksListener#finishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.gui.data.EventTasksListener#runningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+	 */
+	@Override
+	public void runningTaskEvent(TaskEvent event) {
+		super.stateUpdate(event.getJobId());
+	}
+	
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.data.EventTasksListener#finishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
 	 */
 	@Override
 	public void finishedTaskEvent(TaskEvent event) {
+		super.stateUpdate(event.getJobId());
 		if (!this.isDisposed()) {
 			final TaskEvent taskEvent = event;
 
@@ -224,8 +233,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
 						if ((title != null) && (title.equals(COLUMN_TASK_TITLE))) {
-							item
-									.setText(i, job.getNumberOfFinishedTask() + "/"
+							item.setText(i, job.getNumberOfFinishedTask() + "/"
 											+ job.getTotalNumberOfTasks());
 							break;
 						}
@@ -251,7 +259,10 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	 */
 	@Override
 	public void pausedEvent(JobEvent event) {
-		
+		JobId jobId = event.getJobId();
+		if(JobsController.getLocalView().getRunningsJobs().contains(jobId)) {
+			super.stateUpdate(jobId);
+		}
 	}
 
 	/**
@@ -259,6 +270,9 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	 */
 	@Override
 	public void resumedEvent(JobEvent event) {
-		
+		JobId jobId = event.getJobId();
+		if(JobsController.getLocalView().getRunningsJobs().contains(jobId)) {
+			super.stateUpdate(jobId);
+		}
 	}
 }

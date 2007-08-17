@@ -90,7 +90,7 @@ public class JobsController implements SchedulerEventListener {
 	private Vector<PendingJobsListener> pendingJobsListeners = null;
 	private Vector<RunningJobsListener> runningJobsListeners = null;
 	private Vector<FinishedJobsListener> finishedJobsListeners = null;
-	private Vector<FinishedTasksListener> finishedTasksListeners = null;
+	private Vector<EventTasksListener> eventTasksListeners = null;
 	private Vector<EventJobsListener> eventJobsListeners = null;
 	private Vector<EventSchedulerListener> eventSchedulerListeners = null;
 
@@ -101,7 +101,7 @@ public class JobsController implements SchedulerEventListener {
 		pendingJobsListeners = new Vector<PendingJobsListener>();
 		runningJobsListeners = new Vector<RunningJobsListener>();
 		finishedJobsListeners = new Vector<FinishedJobsListener>();
-		finishedTasksListeners = new Vector<FinishedTasksListener>();
+		eventTasksListeners = new Vector<EventTasksListener>();
 		eventJobsListeners = new Vector<EventJobsListener>();
 		eventSchedulerListeners = new Vector<EventSchedulerListener>();
 	}
@@ -144,10 +144,16 @@ public class JobsController implements SchedulerEventListener {
 		for (FinishedJobsListener listener : finishedJobsListeners)
 			listener.removeFinishedJob(jobId);
 	}
+	
+	/** call "runningTaskEvent" method on listeners */
+	private void pendingToRunningTaskEventInternal(TaskEvent event) {
+		for (EventTasksListener listener : eventTasksListeners)
+			listener.runningTaskEvent(event);
+	}
 
 	/** call "finishedTaskEvent" method on listeners */
 	private void runningToFinishedTaskEventInternal(TaskEvent event) {
-		for (FinishedTasksListener listener : finishedTasksListeners)
+		for (EventTasksListener listener : eventTasksListeners)
 			listener.finishedTaskEvent(event);
 	}
 
@@ -345,6 +351,10 @@ public class JobsController implements SchedulerEventListener {
 	public void pendingToRunningTaskEvent(TaskEvent event) {
 		JobId jobId = event.getJobId();
 		getJobById(jobId).update(event);
+		
+		// call method on listeners
+		pendingToRunningTaskEventInternal(event);
+		
 		final TaskEvent taskEvent = event;
 
 		// if this job is selected in the Running table
@@ -724,12 +734,12 @@ public class JobsController implements SchedulerEventListener {
 		finishedJobsListeners.remove(listener);
 	}
 
-	public void addFinishedTasksListener(FinishedTasksListener listener) {
-		finishedTasksListeners.add(listener);
+	public void addFinishedTasksListener(EventTasksListener listener) {
+		eventTasksListeners.add(listener);
 	}
 
-	public void removeFinishedTasksListener(FinishedTasksListener listener) {
-		finishedTasksListeners.remove(listener);
+	public void removeFinishedTasksListener(EventTasksListener listener) {
+		eventTasksListeners.remove(listener);
 	}
 
 	public void addEventJobsListener(EventJobsListener listener) {

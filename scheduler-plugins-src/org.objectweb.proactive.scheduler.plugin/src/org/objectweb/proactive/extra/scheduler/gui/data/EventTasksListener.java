@@ -36,8 +36,15 @@ import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public interface FinishedTasksListener {
+public interface EventTasksListener {
 
+	/**
+	 * Invoke by jobs controller when a task has just been started
+	 * 
+	 * @param event
+	 */
+	public void runningTaskEvent(TaskEvent event);
+	
 	/**
 	 * Invoke by jobs controller when a task has just been terminated
 	 * 

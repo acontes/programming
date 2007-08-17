@@ -59,7 +59,7 @@ public class FinishedJobComposite extends JobComposite implements FinishedJobsLi
 	 * @param jobsController
 	 */
 	public FinishedJobComposite(Composite parent, String title, JobsController jobsController) {
-		super(parent, title, jobsController, FINISHED_TABLE_ID);
+		super(parent, title, FINISHED_TABLE_ID);
 		jobsController.addFinishedJobsListener(this);
 	}
 

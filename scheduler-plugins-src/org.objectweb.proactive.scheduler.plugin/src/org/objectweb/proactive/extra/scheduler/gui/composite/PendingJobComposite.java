@@ -33,10 +33,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.PendingJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.job.Job;
+import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
@@ -47,7 +49,7 @@ import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class PendingJobComposite extends JobComposite implements PendingJobsListener {
+public class PendingJobComposite extends JobComposite implements PendingJobsListener, EventJobsListener {
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -60,7 +62,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	 * @param jobsController
 	 */
 	public PendingJobComposite(Composite parent, String title, JobsController jobsController) {
-		super(parent, title, jobsController, PENDING_TABLE_ID);
+		super(parent, title, PENDING_TABLE_ID);
 		jobsController.addPendingJobsListener(this);
 	}
 
@@ -131,5 +133,38 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	@Override
 	public void removePendingJob(JobId jobId) {
 		removeJob(jobId);
+	}
+
+	// -------------------------------------------------------------------- //
+	// ------------------- implements EventJobsListener ------------------- //
+	// -------------------------------------------------------------------- //
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener#killedEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 */
+	@Override
+	public void killedEvent(JobId jobId) {
+		// Do nothing
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 */
+	@Override
+	public void pausedEvent(JobEvent event) {
+		JobId jobId = event.getJobId();
+		if(JobsController.getLocalView().getRunningsJobs().contains(jobId)) {
+			super.stateUpdate(jobId);
+		}
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 */
+	@Override
+	public void resumedEvent(JobEvent event) {
+		JobId jobId = event.getJobId();
+		if(JobsController.getLocalView().getRunningsJobs().contains(jobId)) {
+			super.stateUpdate(jobId);
+		}
 	}
 }

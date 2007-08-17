@@ -85,7 +85,7 @@ public class JobInfo extends ViewPart {
 		propertiesName.add("Id");
 		propertiesValue.add(job.getId());
 		propertiesName.add("State");
-		propertiesValue.add("n/a");
+		propertiesValue.add(job.getState());
 		propertiesName.add("Name");
 		propertiesValue.add(job.getName());
 		propertiesName.add("Priority");

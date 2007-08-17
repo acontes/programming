@@ -99,7 +99,7 @@ public abstract class JobComposite extends Composite {
 	 * @param jobsController an instance of jobsController
 	 * @param tableId an unique id for the table
 	 */
-	public JobComposite(Composite parent, String title, JobsController jobsController, int tableId) {
+	public JobComposite(Composite parent, String title, int tableId) {
 		super(parent, SWT.NONE);
 		this.setLayout(new GridLayout());
 		this.title = title;
@@ -310,6 +310,40 @@ public abstract class JobComposite extends Composite {
 				item.setText(i, job.getOwner());
 		}
 		return item;
+	}
+	
+	protected void stateUpdate(JobId aJobId) {
+		if (!this.isDisposed()) {
+			final JobId jobId = aJobId;
+
+			getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					Table table = getTable();
+					TableItem[] items = table.getItems();
+					TableItem item = null;
+					for (TableItem it : items)
+						if (((JobId) (it.getData())).equals(jobId)) {
+							item = it;
+							break;
+						}
+
+					if (item == null)
+						throw new IllegalArgumentException("the item which represent the job : "
+								+ jobId + " is unknown !");
+
+					TableColumn[] cols = table.getColumns();
+					Job job = JobsController.getLocalView().getJobById(jobId);
+					for (int i = 0; i < cols.length; i++) {
+						String title = cols[i].getText();
+						if ((title != null) && (title.equals(COLUMN_STATE_TITLE))) {
+							item.setText(i, job.getState().toString());
+							break;
+						}
+					}
+				}
+			});
+		}
 	}
 
 	// -------------------------------------------------------------------- //
