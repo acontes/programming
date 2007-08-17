@@ -52,7 +52,7 @@ public class JobLauncher {
 			if (args.length > 2) {
 				jobUrl = args[0];
 				nbJob = Integer.parseInt(args[1]);
-				auth = SchedulerConnection.join("//" + args[2] + "/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME);
+				auth = SchedulerConnection.join(args[2]);
 			} else if (args.length > 1) {
 				jobUrl = args[0];
 				nbJob = Integer.parseInt(args[1]);
