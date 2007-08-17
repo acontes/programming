@@ -737,11 +737,11 @@ public class JobsController implements SchedulerEventListener {
 		finishedJobsListeners.remove(listener);
 	}
 
-	public void addFinishedTasksListener(EventTasksListener listener) {
+	public void addEventTasksListener(EventTasksListener listener) {
 		eventTasksListeners.add(listener);
 	}
 
-	public void removeFinishedTasksListener(EventTasksListener listener) {
+	public void removeEventTasksListener(EventTasksListener listener) {
 		eventTasksListeners.remove(listener);
 	}
 

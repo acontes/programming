@@ -77,7 +77,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	public RunningJobComposite(Composite parent, String title, JobsController jobsController) {
 		super(parent, title, RUNNING_TABLE_ID);
 		jobsController.addRunningJobsListener(this);
-		jobsController.addFinishedTasksListener(this);
+		jobsController.addEventTasksListener(this);
 		jobsController.addEventJobsListener(this);
 	}
 
@@ -263,7 +263,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	@Override
 	public void pausedEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		if(JobsController.getLocalView().getRunningsJobs().contains(jobId)) {
+		if(getJobs().contains(jobId)) {
 			super.stateUpdate(jobId);
 		}
 	}
@@ -274,7 +274,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	@Override
 	public void resumedEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		if(JobsController.getLocalView().getRunningsJobs().contains(jobId)) {
+		if(getJobs().contains(jobId)) {
 			super.stateUpdate(jobId);
 		}
 	}

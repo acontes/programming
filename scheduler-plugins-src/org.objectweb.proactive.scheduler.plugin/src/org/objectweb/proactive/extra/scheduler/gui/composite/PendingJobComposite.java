@@ -67,6 +67,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	public PendingJobComposite(Composite parent, String title, JobsController jobsController) {
 		super(parent, title, PENDING_TABLE_ID);
 		jobsController.addPendingJobsListener(this);
+		jobsController.addEventJobsListener(this);
 	}
 
 	// -------------------------------------------------------------------- //
@@ -155,7 +156,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	@Override
 	public void pausedEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		if(JobsController.getLocalView().getRunningsJobs().contains(jobId)) {
+		if(getJobs().contains(jobId)) {
 			super.stateUpdate(jobId);
 		}
 	}
@@ -166,7 +167,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	@Override
 	public void resumedEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		if(JobsController.getLocalView().getRunningsJobs().contains(jobId)) {
+		if(getJobs().contains(jobId)) {
 			super.stateUpdate(jobId);
 		}
 	}
