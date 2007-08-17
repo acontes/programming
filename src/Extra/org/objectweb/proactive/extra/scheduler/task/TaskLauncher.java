@@ -130,7 +130,7 @@ public class TaskLauncher implements InitActive, Serializable {
         PrintStream stderr = System.err;
        	// create logger
        	Logger l = Logger.getLogger(SchedulerCore.LOGGER_PREFIX+jobId);
-        l.removeAllAppenders();
+       	l.removeAllAppenders();
         l.addAppender(out);
         // redirect stdout and err
         System.setOut(new PrintStream(new LoggingOutputStream(l,Level.INFO), true));

@@ -44,13 +44,37 @@ public class JavaTaskDescriptor extends TaskDescriptor {
 
 	private static final long serialVersionUID = 1340022492862249182L;
 	private Class<Task> taskClass;
+	private Task task;
 	private Map<String, Object> args = new HashMap<String, Object>();
 	
+	
+	/**
+	 * ProActive empty constructor
+	 */
+	public JavaTaskDescriptor() {}
+	
+	
+	/**
+	 * @param task
+	 */
+	public JavaTaskDescriptor(Task task) {
+		this.task = task;
+	}
+
+	/**
+	 * @param taskClass
+	 */
+	public JavaTaskDescriptor(Class<Task> taskClass) {
+		this.taskClass = taskClass;
+	}
+
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.task.TaskDescriptor#getTask()
 	 */
 	@Override
 	public Task getTask() {
+		if (task != null)
+			return task;
 		try {
 			JavaTask task = (JavaTask)taskClass.newInstance();
 			task.init(args);
@@ -66,6 +90,10 @@ public class JavaTaskDescriptor extends TaskDescriptor {
 
 	public void setTaskClass(Class<Task> taskClass) {
 		this.taskClass = taskClass;
+	}
+	
+	public void setTask(Task task){
+		this.task = task;
 	}
 
 	public Map<String, Object> getArgs() {

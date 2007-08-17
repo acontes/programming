@@ -79,7 +79,6 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
     
 	/**
 	 * ProActive Empty constructor
-	 * 
 	 */
 	public TaskDescriptor(){}
 	

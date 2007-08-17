@@ -114,4 +114,18 @@ public class JobResult implements Serializable {
 		return taskResults;
 	}
 	
+	
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString(){
+		if (taskResults == null) return "No result available in this job !";
+		StringBuilder toReturn = new StringBuilder("\n");
+		for (TaskResult res : taskResults.values()){
+			toReturn.append("\t"+res.value()+"\n");
+		}
+		return toReturn.toString();
+	}
+	
 }

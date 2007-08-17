@@ -68,8 +68,8 @@ import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 
 /**
- * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
- * Scheduler core. This is the main active object of the scheduler implementation,
+ * <i><font size="-1" color="#FF0000">** Scheduler core ** </font></i>
+ * This is the main active object of the scheduler implementation,
  * it communicates with the entity manager to acquire nodes and with a policy
  * to insert and get jobs from the queue.
  * 
