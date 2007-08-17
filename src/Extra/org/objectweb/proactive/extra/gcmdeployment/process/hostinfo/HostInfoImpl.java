@@ -41,25 +41,22 @@ public class HostInfoImpl implements HostInfo {
      * @throws IllegalStateException If a required field has not been set
      */
     public void check() throws IllegalStateException {
-        boolean ready = true;
-
-        if (homeDirectory == null) {
-            ready &= false;
-        }
-
         if (id == null) {
-            ready &= false;
+        	throw new IllegalStateException("id field is not set in this HostInfo\n" + toString());
+        }
+        
+        if (homeDirectory == null) {
+        	throw new IllegalStateException("homeDirectory is not set for id=" + id + "\n" + toString());
         }
 
         if (os == null) {
-            ready &= false;
+        	throw new IllegalStateException("os is not set for id=" + id + "\n" + toString());
         }
 
-        if (!ready) {
-            throw new IllegalStateException("HostInfo not ready:\n " +
-                this.toString(), new Exception());
+        if (hostCapacity % vmCapacity != 0) {
+        	throw new IllegalStateException("hostCapacity is not a multiple of vmCapacity for HostInfo=" + id + "\n" + toString());
         }
-
+        
         // Theses fields are not mandatory
         if (username == null) {
             GCMD_LOGGER.debug("HostInfo is ready but username has not been set");
