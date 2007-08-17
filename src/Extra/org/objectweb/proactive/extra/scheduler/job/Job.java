@@ -274,6 +274,15 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		return descriptor;
 	}
 	
+
+	/**
+	 * Set all properties following a job submitting.
+	 */
+	public void submit() {
+		setSubmittedTime(System.currentTimeMillis());
+		setState(JobState.PENDING);
+	}
+	
 	
 	/**
 	 * Set all properties in order to start the job.

@@ -335,8 +335,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	public void submit(Job job) throws SchedulerException {
 		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.STOPPED)
 			throw new SchedulerException("Scheduler is stopped, cannot submit new job !");
-		job.setSubmittedTime(System.currentTimeMillis());
-		job.setState(JobState.PENDING);
+		job.submit();
 		jobs.put(job.getId(), job);
 		pendingJobs.add(job);
 		//creating job result storage
