@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.body.LocalBodyStrategy;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageEventProducer;
 import org.objectweb.proactive.core.component.representative.ItfID;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.security.PolicyServer;
 
 
@@ -116,6 +117,12 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
     public UniversalBody checkNewLocation(UniqueID uniqueID);
 
     /**
+     * Returns the MBean associated to this active object.
+     * @return the MBean associated to this active object.
+     */
+    public BodyWrapperMBean getMBean();
+
+    /**
      * Returns the body that is the target of this shortcut for this component interface
      * @param functionalItfID the id of the interface on which the shortcut is available
      * @return the body that is the target of this shortcut for this interface
@@ -180,4 +187,28 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * the ACThread is killed even if some ACs remain in the futurepool.
      */
     public void terminate(boolean completeACs);
+
+    /**
+     * Checks if a method methodName is declared by the reified object AND the method has the same parameters as parametersTypes
+     * Note that the called method should be <i>public</i>, since only the public methods
+     * can be called on an active object.
+     * Note also that a call to checkMethod(methodName, null) is different to a call to checkMethod(methodName, new Class[0])
+     * The former means that no checking is done on the parameters, whereas the latter means that we look for a method with no parameters.
+     * @param methodName the name of the method
+     * @param parametersTypes an array of parameter types
+     * @return true if the method exists, false otherwise
+     */
+    public boolean checkMethod(String methodName, Class[] parametersTypes);
+
+    /**
+     * Checks if a method methodName is declared by the reified object
+     * Note that the called method should be <i>public</i>, since only the public methods
+     * can be called on an active object.
+     * Note that this call is strictly equivalent to checkMethod(methodName, null);
+     * @param methodName the name of the method
+     * @return true if the method exists, false otherwise
+     */
+    public boolean checkMethod(String methodName);
+
+    public void registerIncomingFutures();
 }

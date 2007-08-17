@@ -33,14 +33,18 @@ package org.objectweb.proactive.core.body.request;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.event.RequestQueueEvent;
 import org.objectweb.proactive.core.group.spmd.MethodBarrier;
 import org.objectweb.proactive.core.group.spmd.MethodCallBarrierWithMethodName;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.profiling.Profiling;
@@ -190,10 +194,25 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
             TimerWarehouse.startTimer(this.ownerID,
                 TimerWarehouse.WAIT_FOR_REQUEST);
         }
+
+        // ProActiveEvent
         if (hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
                     RequestQueueEvent.WAIT_FOR_REQUEST));
         }
+
+        // END ProActiveEvent
+
+        // JMX Notification
+        Body body = LocalBodyStore.getInstance().getLocalBody(ownerID);
+        if (body != null) {
+            BodyWrapperMBean mbean = body.getMBean();
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.waitForRequest);
+            }
+        }
+
+        // END JMX Notification
         try {
             this.waitingForRequest = timeout == 0;
             this.wait(timeout);
@@ -326,10 +345,14 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 
     protected Request barrierRemoveOldest() {
         Request r = (Request) requestQueue.remove(indexOfRequestToServe());
+
+        // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
                     RequestQueueEvent.REMOVE_REQUEST));
         }
+
+        // END ProActiveEvent
         return r;
     }
 

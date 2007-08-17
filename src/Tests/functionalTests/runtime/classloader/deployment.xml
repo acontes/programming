@@ -43,7 +43,9 @@
 					</classpath>
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
+<!-- 
 						<parameter value="-Dlog4j.configuration=file:///proactive.home/compile/proactive-log4j"/>
+-->
 					</jvmParameters>
 					
 				</jvmProcess>

@@ -31,12 +31,17 @@
 package org.objectweb.proactive.core.mop;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 
 
 /**
@@ -475,24 +480,26 @@ public abstract class Utils extends Object {
         return ret;
     }
 
+    /**
+     * Make a deep copy of source object using a ProActiveObjectStream.
+     * @param source The object to copy.
+     * @return the copy.
+     * @throws java.io.IOException
+     */
     public static Object makeDeepCopy(Object source) throws java.io.IOException {
-        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-
-        //java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
-        java.io.ObjectOutputStream oos = new PAObjectOutputStream(baos);
-        oos.writeObject(source);
-        oos.flush();
-        oos.close();
-        java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(baos.toByteArray());
-
-        //    java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
-        java.io.ObjectInputStream ois = new PAObjectInputStream(bais);
+        if (source == null) {
+            return null;
+        }
         try {
-            Object result = ois.readObject();
-            ois.close();
-            return result;
+            return MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(source);
+        } catch (ProActiveException e) {
+            IOException exp = new IOException();
+            exp.initCause(e);
+            throw exp;
         } catch (ClassNotFoundException e) {
-            throw new java.io.IOException("ClassNotFoundException e=" + e);
+            IOException exp = new IOException();
+            exp.initCause(e);
+            throw exp;
         }
     }
 
@@ -748,5 +755,36 @@ public abstract class Utils extends Object {
                 classname);
             return null;
         }
+    }
+
+    /**
+     * Searches a method with the given parameters in the given reifiedClass
+     * Note that a call to checkMethodExistence(reifiedClass, methodName, null) is different to a call to checkMethodExistence(reifiedClass, methodName, new Class[0])
+     * The former means that no checking is done on the parameters, whereas the latter means that we look for a method with no parameters.
+     * @param reifiedClass the class where to search the method
+     * @param methodName the name of the method
+     * @param parametersTypes the parametersTypes list
+     * @return true if the method was found, false otherwise
+     */
+    public static boolean checkMethodExistence(Class reifiedClass,
+        String methodName, Class[] parametersTypes) {
+        Method[] methods = reifiedClass.getMethods();
+        for (Method m : methods) {
+            // is it the right method name
+            if (m.getName().equals(methodName)) {
+                // do we check the whole signature
+                if (parametersTypes != null) {
+                    // does the method has the right signature
+                    if (Arrays.equals(m.getParameterTypes(), parametersTypes)) {
+                        // the method exists with the right parameters 
+                        return true;
+                    }
+                } else {
+                    // the method exists, we don't bother about the parameters
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

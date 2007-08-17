@@ -57,6 +57,7 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
@@ -131,7 +132,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
         addFunctionalInterfaces(componentParameters, component_is_primitive);
 
         // put all in a table
-        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
+        interfaceReferences = interface_references_list.toArray(new Interface[interface_references_list.size()]);
         if (logger.isDebugEnabled()) {
             logger.debug("created component : " +
                 componentParameters.getControllerDescription().getName());
@@ -195,7 +196,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                 logger.debug("cannot create interface references : " +
                     e.getMessage());
             }
-
+            e.printStackTrace();
             throw new RuntimeException("cannot create interface references : " +
                 e.getMessage());
         }
@@ -422,10 +423,10 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      */
     public Type getFcType() {
         try {
-            return ((ComponentParametersController) getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                    .getComponentType();
+            return Fractive.getComponentParametersController(getFcItfOwner())
+                           .getComponentParameters().getComponentType();
         } catch (NoSuchInterfaceException nsie) {
-            throw new ProActiveRuntimeException("cannot retreive the type of the component",
+            throw new ProActiveRuntimeException("There is no component parameters controller for this component, cannot retreive the type of the component.",
                 nsie);
         }
     }
@@ -443,7 +444,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      */
     @Override
     public Component getFcItfOwner() {
-        return (Component) this;
+        return this;
     }
 
     /**
@@ -501,7 +502,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      * There should be no generic return type in the methods of the representative class
      */
     public ProActiveComponent getRepresentativeOnThis() {
-        // optimization : cache self reference 
+        // optimization : cache self reference
         if (representativeOnMyself != null) {
             return representativeOnMyself;
         }

@@ -42,19 +42,25 @@ public interface SlaveWatcher {
 
     /**
      * adds a slave to be watched
-     * @param slave
+     * @param slave slave which must be watched
      */
-    public void addSlaveToWatch(Slave slave);
+    void addSlaveToWatch(Slave slave);
 
     /**
      * stops watching a slave
-     * @param slave
+     * @param slave slaves which needn't be watched anymore
      */
-    public void removeSlaveToWatch(Slave slave);
+    void removeSlaveToWatch(Slave slave);
+
+    /**
+     * Sets the period at which ping messages are sent to the slaves <br/>
+     * @param periodMillis the new ping period
+     */
+    void setPingPeriod(long periodMillis);
 
     /**
      * terminates the watcher's activity
      * @return true if the object terminated successfully
      */
-    public BooleanWrapper terminate();
+    BooleanWrapper terminate();
 }

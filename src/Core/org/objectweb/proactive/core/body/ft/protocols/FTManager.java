@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
@@ -156,7 +157,7 @@ public abstract class FTManager implements java.io.Serializable {
                 }
             }
 
-            // the additional codebase is added to normal codebase 
+            // the additional codebase is added to normal codebase
             // ONLY during serialization for checkpoint !
             this.additionalCodebase = this.storage.getServerCodebase();
 
@@ -228,6 +229,7 @@ public abstract class FTManager implements java.io.Serializable {
             // send an adapter to suspectLocation: the suspected body could be local
             UniversalBody newLocation = this.location.searchObject(suspect,
                     suspectLocation.getRemoteAdapter(), this.ownerID);
+
             if (newLocation == null) {
                 while (newLocation == null) {
                     try {
@@ -245,6 +247,9 @@ public abstract class FTManager implements java.io.Serializable {
                 }
                 return newLocation;
             } else {
+                System.out.println(
+                    "FTManager.communicationFailed() : new location is not null ");
+
                 // newLocation is the new location of suspect
                 return newLocation;
             }
@@ -268,6 +273,13 @@ public abstract class FTManager implements java.io.Serializable {
             int res = r.send(destination);
             this.onSendReplyAfter(r, res, destination);
             return res;
+        } catch (BodyTerminatedException e) {
+            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
+                destination.getID() + " SUSPECTED ON REPLY SENDING : " +
+                e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(),
+                    destination, e);
+            return this.sendReply(r, newDestination);
         } catch (IOException e) {
             logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
                 destination.getID() + " SUSPECTED ON REPLY SENDING : " +
@@ -293,6 +305,13 @@ public abstract class FTManager implements java.io.Serializable {
             int res = r.send(destination);
             this.onSendRequestAfter(r, res, destination);
             return res;
+        } catch (BodyTerminatedException e) {
+            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
+                destination.getID() + " SUSPECTED ON REQUEST SENDING : " +
+                e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(),
+                    destination, e);
+            return this.sendRequest(r, newDestination);
         } catch (IOException e) {
             logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
                 destination.getID() + " SUSPECTED ON REQUEST SENDING : " +

@@ -30,17 +30,35 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-import org.apache.axis.NoEndPointException;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.filter.DefaultFilter;
+import org.objectweb.proactive.core.filter.Filter;
+import org.objectweb.proactive.core.jmx.mbean.NodeWrapper;
+import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -51,6 +69,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * and should not be used outside a runtime
  */
 public class LocalNode {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
     private String name;
     private ArrayList<UniqueID> activeObjectsId;
     private String jobId;
@@ -58,6 +77,9 @@ public class LocalNode {
     private String virtualNodeName;
     private Properties localProperties;
     private RemoteObjectExposer roe;
+
+    // JMX MBean
+    private NodeWrapperMBean mbean;
 
     public LocalNode(String nodeName, String jobId,
         ProActiveSecurityManager securityManager, String virtualNodeName) {
@@ -82,19 +104,47 @@ public class LocalNode {
                 this.virtualNodeName);
         }
 
-        roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
+        this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
                 ProActiveRuntimeImpl.getProActiveRuntime());
+
+        // JMX registration
+        String mbeanProperty = ProActiveConfiguration.getInstance()
+                                                     .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
+
+        if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
+            String runtimeUrl = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                    .getURL();
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName oname = FactoryName.createNodeObjectName(runtimeUrl,
+                    nodeName);
+            if (!mbs.isRegistered(oname)) {
+                mbean = new NodeWrapper(oname, this, runtimeUrl);
+                try {
+                    mbs.registerMBean(mbean, oname);
+                } catch (InstanceAlreadyExistsException e) {
+                    logger.error("A MBean with the object name " + oname +
+                        " already exists", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("Can't register the MBean of the LocalNode", e);
+                } catch (NotCompliantMBeanException e) {
+                    logger.error("The MBean of the LocalNode is not JMX compliant",
+                        e);
+                }
+            }
+        }
+
+        // END JMX registration
     }
 
-    public void activateProtocol(URI nodeURL) {
-        roe.activateProtocol(nodeURL);
+    public void activateProtocol(URI nodeURL) throws UnknownProtocolException {
+        this.roe.activateProtocol(nodeURL);
     }
 
     /**
      * @return Returns the active objects located inside the node.
      */
     public ArrayList<UniqueID> getActiveObjectsId() {
-        return activeObjectsId;
+        return this.activeObjectsId;
     }
 
     /**
@@ -109,7 +159,7 @@ public class LocalNode {
      * @return Returns the jobId.
      */
     public String getJobId() {
-        return jobId;
+        return this.jobId;
     }
 
     /**
@@ -123,7 +173,7 @@ public class LocalNode {
      * @return Returns the node name.
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -137,7 +187,7 @@ public class LocalNode {
      * @return Returns the node' security manager.
      */
     public ProActiveSecurityManager getSecurityManager() {
-        return securityManager;
+        return this.securityManager;
     }
 
     /**
@@ -152,7 +202,7 @@ public class LocalNode {
      * has been instancied if any.
      */
     public String getVirtualNodeName() {
-        return virtualNodeName;
+        return this.virtualNodeName;
     }
 
     /**
@@ -165,18 +215,31 @@ public class LocalNode {
     public void terminateActiveObjects() {
     }
 
-    public ArrayList getActiveObjects() {
-        ArrayList localBodies = new ArrayList();
+    /**
+     * Returns all active objects.
+     * Returns All active objects.
+     */
+    public List<List<Object>> getActiveObjects() {
+        return this.getActiveObjects(new DefaultFilter());
+    }
+
+    /**
+     * Retuns all active objects filtered.
+     * @param filter The filter
+     * @return all active objects filtered.
+     */
+    public List<List<Object>> getActiveObjects(Filter filter) {
+        List<List<Object>> localBodies = new ArrayList<List<Object>>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
 
-        if (activeObjectsId == null) {
+        if (this.activeObjectsId == null) {
             // Probably the node is killed
             return localBodies;
         }
 
-        synchronized (activeObjectsId) {
-            for (int i = 0; i < activeObjectsId.size(); i++) {
-                UniqueID bodyID = (UniqueID) activeObjectsId.get(i);
+        synchronized (this.activeObjectsId) {
+            for (int i = 0; i < this.activeObjectsId.size(); i++) {
+                UniqueID bodyID = this.activeObjectsId.get(i);
 
                 //check if the body is still on this vm
                 Body body = localBodystore.getLocalBody(bodyID);
@@ -185,19 +248,21 @@ public class LocalNode {
                     //runtimeLogger.warn("body null");
                     // the body with the given ID is not any more on this ProActiveRuntime
                     // unregister it from this ProActiveRuntime
-                    activeObjectsId.remove(bodyID);
+                    this.activeObjectsId.remove(bodyID);
                 } else {
-                    //the body is on this runtime then return adapter and class name of the reified
-                    //object to enable the construction of stub-proxy couple.
-                    ArrayList bodyAndObjectClass = new ArrayList(2);
+                    if (filter.filter(body)) {
+                        //the body is on this runtime then return adapter and class name of the reified
+                        //object to enable the construction of stub-proxy couple.
+                        ArrayList bodyAndObjectClass = new ArrayList(2);
 
-                    //adapter
-                    bodyAndObjectClass.add(0, body.getRemoteAdapter());
+                        //adapter
+                        bodyAndObjectClass.add(0, body.getRemoteAdapter());
 
-                    //className
-                    bodyAndObjectClass.add(1,
-                        body.getReifiedObject().getClass().getName());
-                    localBodies.add(bodyAndObjectClass);
+                        //className
+                        bodyAndObjectClass.add(1,
+                            body.getReifiedObject().getClass().getName());
+                        localBodies.add(bodyAndObjectClass);
+                    }
                 }
             }
         }
@@ -209,7 +274,7 @@ public class LocalNode {
      * @param bodyID The <code>UniqueID</code> to remove
      */
     public void unregisterBody(UniqueID bodyID) {
-        activeObjectsId.remove(bodyID);
+        this.activeObjectsId.remove(bodyID);
     }
 
     /**
@@ -218,7 +283,7 @@ public class LocalNode {
      * @param bodyID The body to register
      */
     public void registerBody(UniqueID bodyID) {
-        activeObjectsId.add(bodyID);
+        this.activeObjectsId.add(bodyID);
     }
 
     public void terminate() {
@@ -238,7 +303,36 @@ public class LocalNode {
             }
         }
 
-        roe.unregisterAll();
+        this.roe.unregisterAll();
+
+        // JMX Notification
+        ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                        .getMBean();
+        if (runtimeMBean != null) {
+            runtimeMBean.sendNotification(NotificationType.nodeDestroyed);
+        }
+
+        // END JMX Notification
+
+        // JMX unregistration
+        if (mbean != null) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName objectName = this.mbean.getObjectName();
+            if (mbs.isRegistered(objectName)) {
+                try {
+                    mbs.unregisterMBean(objectName);
+                } catch (InstanceNotFoundException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " was not found", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " can't be unregistered from the MBean server", e);
+                }
+            }
+            this.mbean = null;
+        }
+
+        // END JMX unregistration
     }
 
     /**

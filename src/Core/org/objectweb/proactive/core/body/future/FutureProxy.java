@@ -49,6 +49,9 @@ import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.exceptions.proxy.FutureTimeoutException;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
@@ -93,20 +96,22 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     protected transient boolean copyMode;
 
     /**
-     * The "evaluator" of the future. Used for its ID and for pinging it.
+     * Unique ID (not a UniqueID) of the future
      */
-    private UniversalBody creator;
-
-    /**
-     * ID of the future
-     * In fact, the sequence number of the request that generate this future
-     */
-    protected long ID;
+    private FutureID id;
 
     /**
      * Unique ID of the sender (in case of automatic continuation).
      */
     protected UniqueID senderID;
+
+    /**
+     * To monitor this future, this body will be pinged.
+     * transient to explicitely document that the serialisation of
+     * this attribute is custom: in case of automatic continuation,
+     * it references the previous element in the chain
+     */
+    private transient UniversalBody updater;
 
     /**
      * The exception level in the stack in which this future is
@@ -311,6 +316,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         UniqueID id = null;
 
+        // ProActiveEvent
         // send WAIT_BY_NECESSITY event to listeners if there are any
         if (futureEventProducer != null) {
             id = ProActive.getBodyOnThis().getID();
@@ -322,6 +328,24 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 id = null;
             }
         }
+
+        // END ProActiveEvent
+
+        // JMX Notification
+        BodyWrapperMBean mbean = null;
+        UniqueID bodyId = ProActive.getBodyOnThis().getID();
+        Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
+
+        // Send notification only if ActiveObject, not for HalfBodies
+        if (body != null) {
+            mbean = body.getMBean();
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.waitByNecessity,
+                    new FutureNotificationData(bodyId, getCreatorID()));
+            }
+        }
+
+        // END JMX Notification
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!isAvailable()) {
             if (time.isTimeoutElapsed()) {
@@ -335,12 +359,22 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
 
+        // ProActiveEvent
         // send RECEIVED_FUTURE_RESULT event to listeners if there are any
         if (id != null) {
             futureEventProducer.notifyListeners(id, getCreatorID(),
                 FutureEvent.RECEIVED_FUTURE_RESULT);
         }
 
+        // END ProActiveEvent
+
+        // JMX Notification
+        if (mbean != null) {
+            mbean.sendNotification(NotificationType.receivedFutureResult,
+                new FutureNotificationData(bodyId, getCreatorID()));
+        }
+
+        // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.stopTimer(ProActive.getBodyOnThis().getID(),
                 TimerWarehouse.WAIT_BY_NECESSITY);
@@ -348,23 +382,41 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     }
 
     public long getID() {
-        return ID;
+        return id.getID();
     }
 
     public void setID(long l) {
-        ID = l;
+        if (id == null) {
+            id = new FutureID();
+        }
+        id.setID(l);
     }
 
-    public UniversalBody getCreator() {
-        return this.creator;
+    public FutureID getFutureID() {
+        return this.id;
     }
 
-    public void setCreator(UniversalBody creator) {
-        this.creator = creator;
+    public void setCreatorID(UniqueID creatorID) {
+        if (id == null) {
+            id = new FutureID();
+        }
+        id.setCreatorID(creatorID);
     }
 
     public UniqueID getCreatorID() {
-        return this.creator.getID();
+        return id.getCreatorID();
+    }
+
+    public void setUpdater(UniversalBody updater) {
+        if (this.updater != null) {
+            new IllegalStateException("Updater already set to: " +
+                this.updater).printStackTrace();
+        }
+        this.updater = updater;
+    }
+
+    public UniversalBody getUpdater() {
+        return this.updater;
     }
 
     public void setSenderID(UniqueID i) {
@@ -428,6 +480,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     private synchronized void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
+        UniversalBody writtenUpdater = this.updater;
+
         if (!FuturePool.isInsideABodyForwarder()) {
             // if copy mode, no need for registering AC
             if (this.isAwaited() && !this.copyMode) {
@@ -447,10 +501,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 }
                 if (sender != null) { // else we are in a migration forwarder
                     if (continuation) {
+                        /* The written future will be updated by the writing body */
+                        writtenUpdater = ProActive.getBodyOnThis();
                         for (UniversalBody dest : FuturePool.getBodiesDestination()) {
                             sender.getFuturePool()
-                                  .addAutomaticContinuation(ID, getCreatorID(),
-                                dest);
+                                  .addAutomaticContinuation(id, dest);
                         }
                     } else {
                         // its not a copy and not a continuation: wait for the result
@@ -465,8 +520,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             if (futures != null) {
                 for (int i = 0; i < futures.size(); i++) {
                     Future fp = futures.get(i);
-                    if (fp.getCreatorID().equals(getCreatorID()) &&
-                            (fp.getID() == ID)) {
+                    if (fp.getFutureID().equals(this.getFutureID())) {
                         FuturePool.removeIncomingFutures();
                     }
                 }
@@ -478,17 +532,17 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         // Pass the result
         out.writeObject(target);
         // Pass the id
-        out.writeLong(ID);
-        //Pass the creator
-        out.writeObject(creator.getRemoteAdapter());
+        out.writeObject(id);
+        // Pass a reference to the updater
+        out.writeObject(writtenUpdater.getRemoteAdapter());
     }
 
     private synchronized void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         senderID = (UniqueID) in.readObject();
         target = (FutureResult) in.readObject();
-        ID = (long) in.readLong();
-        creator = (UniversalBody) in.readObject();
+        id = (FutureID) in.readObject();
+        updater = (UniversalBody) in.readObject();
         // register all incoming futures, even for migration or checkpoiting
         if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);

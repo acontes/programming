@@ -30,13 +30,20 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.BodyEventProducerImpl;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -95,8 +102,12 @@ public class LocalBodyStore {
      * events
      */
     private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
-    private ThreadLocal<Body> bodyPerThread = new ThreadLocal<Body>();
     private MetaObjectFactory halfBodyMetaObjectFactory = null;
+
+    /**
+     * Executions context associated to the calling thread.
+     */
+    private ThreadLocal<Stack<Context>> contexts = new ThreadLocal<Stack<Context>>();
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -121,48 +132,71 @@ public class LocalBodyStore {
     //
     public synchronized MetaObjectFactory getHalfBodyMetaObjectFactory() {
         if (this.halfBodyMetaObjectFactory == null) {
-            halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
+            this.halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
         }
-        return halfBodyMetaObjectFactory;
+        return this.halfBodyMetaObjectFactory;
     }
 
     public synchronized void setHalfBodyMetaObjectFactory(
         MetaObjectFactory factory) {
-        halfBodyMetaObjectFactory = factory;
+        this.halfBodyMetaObjectFactory = factory;
     }
 
     /**
-     * Returns the body associated with the thread calling the method. If no body is associated with the
-     * calling thread, an HalfBody is created to manage the futures.
-     * @return the body associated to the active object whose active thread is calling this method.
+     * Push a new context for the calling thread.
+     * @param c the new context
+     * @see org.objectweb.proactive.core.body.Context
      */
-    public Body getCurrentThreadBody() {
-        AbstractBody body = (AbstractBody) bodyPerThread.get();
-        if (body == null) {
-            // If we cannot find the body from the current thread we assume that the current thread
-            // is not the one from an active object. Therefore in this case we create an HalfBody
-            // that handle the futures
-            body = HalfBody.getHalfBody(this.getHalfBodyMetaObjectFactory());
-            bodyPerThread.set(body);
-            registerHalfBody(body);
+    public void pushContext(Context c) {
+        Stack<Context> s = this.contexts.get();
+        if (s == null) {
+            // cannot use initValue method
+            // see getContext()
+            s = new Stack<Context>();
+            s.push(c);
+            this.contexts.set(s);
+        } else {
+            s.push(c);
         }
-
-        return body;
     }
 
     /**
-     * Associates the body with the thread calling the method.
-     * @param body the body to associate to the active thread that calls this method.
+     * Pop the current context. The current context is popped from the stack
+     * associated to the calling thread and returned.
+     * @return the current context associated to the calling thread.
+     * @see org.objectweb.proactive.core.body.Context
      */
-    public void setCurrentThreadBody(Body body) {
-        bodyPerThread.set(body);
+    public Context popContext() {
+        return this.contexts.get().pop();
     }
 
     /**
-     * Remove the association between the body and the thread calling the method.
+     * Get the current context. The current context is not removed from the stack
+     * associated to the calling thread. If no context is associated with the
+     * calling thread, a HalfBody is created for the calling thread, and a new context
+     * is pushed for this HalfBody.
+     * @return the current context associated to the calling thread.
+     * @see org.objectweb.proactive.core.body.Context
      */
-    public void removeCurrentThreadBody() {
-        bodyPerThread.remove();
+    public Context getContext() {
+        Stack<Context> s = this.contexts.get();
+
+        // Note that the stack could have been created while being empty for RMI thread that have
+        // performed immediate services.
+        if ((s == null) || (s.isEmpty())) {
+            // If we cannot find a context for the current thread we assume that the current thread
+            // is not the one from an active object. Therefore in this case we create an HalfBody
+            // that handle the futures, and push a new context for this HalfBody.
+            AbstractBody body = HalfBody.getHalfBody(this.getHalfBodyMetaObjectFactory());
+            s = ((s == null) ? new Stack<Context>() : s);
+            Context c = new Context(body, null);
+            s.push(c);
+            this.contexts.set(s);
+            registerHalfBody(body);
+            return c;
+        } else {
+            return s.peek();
+        }
     }
 
     /**
@@ -172,7 +206,7 @@ public class LocalBodyStore {
      * @return the body with matching id or null
      */
     public Body getLocalBody(UniqueID bodyID) {
-        return (Body) localBodyMap.getBody(bodyID);
+        return (Body) this.localBodyMap.getBody(bodyID);
     }
 
     /**
@@ -182,7 +216,7 @@ public class LocalBodyStore {
      * @return the halfbody with matching id or null
      */
     public Body getLocalHalfBody(UniqueID bodyID) {
-        return (Body) localHalfBodyMap.getBody(bodyID);
+        return (Body) this.localHalfBodyMap.getBody(bodyID);
     }
 
     /**
@@ -192,7 +226,7 @@ public class LocalBodyStore {
      * @return the halfbody with matching id or null
      */
     public Body getForwarder(UniqueID bodyID) {
-        return (Body) localForwarderMap.getBody(bodyID);
+        return (Body) this.localForwarderMap.getBody(bodyID);
     }
 
     /**
@@ -200,7 +234,7 @@ public class LocalBodyStore {
      * @return all local Bodies in a new BodyMap
      */
     public BodyMap getLocalBodies() {
-        return (BodyMap) localBodyMap.clone();
+        return (BodyMap) this.localBodyMap.clone();
     }
 
     /**
@@ -208,7 +242,7 @@ public class LocalBodyStore {
      * @return all local HalfBodies in a new BodyMap
      */
     public BodyMap getLocalHalfBodies() {
-        return (BodyMap) localHalfBodyMap.clone();
+        return (BodyMap) this.localHalfBodyMap.clone();
     }
 
     /**
@@ -217,7 +251,7 @@ public class LocalBodyStore {
      * @param listener the listener of body events to add
      */
     public void addBodyEventListener(BodyEventListener listener) {
-        bodyEventProducer.addBodyEventListener(listener);
+        this.bodyEventProducer.addBodyEventListener(listener);
     }
 
     /**
@@ -225,23 +259,56 @@ public class LocalBodyStore {
      * @param listener the listener of body events to remove
      */
     public void removeBodyEventListener(BodyEventListener listener) {
-        bodyEventProducer.removeBodyEventListener(listener);
+        this.bodyEventProducer.removeBodyEventListener(listener);
     }
 
     //
     // -- FRIENDLY METHODS -----------------------------------------------
     //
     void registerBody(AbstractBody body) {
-        if (localBodyMap.getBody(body.getID()) != null) {
+        if (this.localBodyMap.getBody(body.getID()) != null) {
+            Thread.dumpStack();
             logger.warn("Body already registered in the body map");
         }
         localBodyMap.putBody(body.bodyID, body);
+
+        // ProActiveEvent
         bodyEventProducer.fireBodyCreated(body);
+        // END ProActiveEvent
+
+        // JMX Notification
+        if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                     .getMBean();
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.bodyCreated,
+                    new BodyNotificationData(body.getID(), body.getJobID(),
+                        body.getNodeURL(), body.getName()));
+            }
+        }
+
+        // END JMX Notification
     }
 
     void unregisterBody(AbstractBody body) {
         localBodyMap.removeBody(body.bodyID);
+
+        // ProActiveEvent
         bodyEventProducer.fireBodyRemoved(body);
+        // END ProActiveEvent
+
+        // JMX Notification
+        if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                     .getMBean();
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.bodyDestroyed,
+                    new BodyNotificationData(body.getID(), body.getJobID(),
+                        body.getNodeURL(), body.getName()));
+            }
+        }
+
+        // END ProActiveEvent
         if ((this.localBodyMap.size() == 0) &&
                 "true".equals(ProActiveConfiguration.getInstance()
                                                         .getProperty("proactive.exit_on_empty"))) {
@@ -250,25 +317,25 @@ public class LocalBodyStore {
     }
 
     void registerHalfBody(AbstractBody body) {
-        localHalfBodyMap.putBody(body.bodyID, body);
+        this.localHalfBodyMap.putBody(body.bodyID, body);
 
         //bodyEventProducer.fireBodyCreated(body);
     }
 
     void unregisterHalfBody(AbstractBody body) {
-        localHalfBodyMap.removeBody(body.bodyID);
+        this.localHalfBodyMap.removeBody(body.bodyID);
         //bodyEventProducer.fireBodyRemoved(body);
     }
 
     public void registerForwarder(AbstractBody body) {
-        if (localForwarderMap.getBody(body.bodyID) != null) {
+        if (this.localForwarderMap.getBody(body.bodyID) != null) {
             logger.debug("Forwarder already registered in the body map");
-            localForwarderMap.removeBody(body.bodyID);
+            this.localForwarderMap.removeBody(body.bodyID);
         }
-        localForwarderMap.putBody(body.bodyID, body);
+        this.localForwarderMap.putBody(body.bodyID, body);
     }
 
     public void unregisterForwarder(AbstractBody body) {
-        localForwarderMap.removeBody(body.bodyID);
+        this.localForwarderMap.removeBody(body.bodyID);
     }
 }

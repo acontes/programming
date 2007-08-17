@@ -41,12 +41,21 @@ public class SynchronousProxy implements Proxy, Serializable {
 
             return reply.getSynchResult();
         }
-        System.out.println("SynchronousProxy.reify()  " + c.getName() +
-            " void reply :" + reply);
+
+        return null;
+    }
+
+    public Object receiveMessage(Request m) throws Throwable {
+        SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(m);
+
         if (reply != null) {
-            System.out.println("SynchronousProxy.reify()  " + c.getName() +
-                " void reply result :" + reply.getSynchResult());
+            if (reply.getSynchResult() instanceof Throwable) {
+                throw (Throwable) reply.getSynchResult();
+            }
+
+            return reply.getSynchResult();
         }
+
         return null;
     }
 
@@ -57,5 +66,14 @@ public class SynchronousProxy implements Proxy, Serializable {
 
     public void setRemoteObject(RemoteObject ro) {
         this.remoteObject = ro;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof SynchronousProxy) {
+            return this.remoteObject.equals(((SynchronousProxy) o).remoteObject);
+        }
+
+        return false;
     }
 }

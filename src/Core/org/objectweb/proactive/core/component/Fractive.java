@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -59,12 +60,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.http.HttpBodyAdapter;
-import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
-import org.objectweb.proactive.core.body.rmi.RmiBodyAdapter;
-import org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter;
 import org.objectweb.proactive.core.component.body.ComponentBody;
-import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.controller.GathercastController;
 import org.objectweb.proactive.core.component.controller.MembraneController;
@@ -87,7 +83,8 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -105,7 +102,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class Fractive implements ProActiveGenericFactory, Component, Factory {
     private static Fractive instance = null;
-    private TypeFactory typeFactory = (TypeFactory) ProActiveTypeFactoryImpl.instance();
+    private TypeFactory typeFactory = ProActiveTypeFactoryImpl.instance();
     private Type type = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
@@ -426,15 +423,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                     controllerDesc, contentDesc, node);
             return fComponent(type, container);
         } catch (ActiveObjectCreationException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Active object creation error while creating component: ",
-                    e);
-            } else {
-                logger.info(
-                    "Active object creation error while creating component; throws exception with the following message: " +
-                    e.getMessage() +
-                    " Activate debug logger level for more information.");
-            }
+            logger.error(
+                "Active object creation error while creating component; throws exception with the following message: " +
+                e.getMessage() + ".", e);
             throw new InstantiationException(e.getMessage());
         } catch (NodeException e) {
             throw new InstantiationException(e.getMessage());
@@ -805,29 +796,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     public static ProActiveComponentRepresentative lookup(String url)
         throws IOException, NamingException {
         UniversalBody b = null;
-
-        String protocol = UrlBuilder.getProtocol(url);
-
-        // First step towards Body factory, will be introduced after the release
-        if (protocol.equals(
-                    org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER)) {
-            b = new RmiBodyAdapter().lookup(url);
-        } else if (protocol.equals(
-                    org.objectweb.proactive.core.Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
-            b = new SshRmiBodyAdapter().lookup(url);
-        } else if (protocol.equals(
-                    org.objectweb.proactive.core.Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            b = new HttpBodyAdapter().lookup(url);
-        } else if (protocol.equals(
-                    org.objectweb.proactive.core.Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            b = new IbisBodyAdapter().lookup(url);
-        } else {
-            throw new IOException("Protocol " + protocol + " not defined");
-        }
+        RemoteObject rmo;
+        URI uri = RemoteObjectHelper.expandURI(URI.create(url));
 
         try {
+            rmo = RemoteObjectHelper.lookup(uri);
+
+            b = (UniversalBody) RemoteObjectHelper.generatedObjectStub(rmo);
+
             StubObject stub = (StubObject) ProActive.createStubObject(ProActiveComponentRepresentative.class.getName(),
                     b);
+
             return ProActiveComponentRepresentativeFactory.instance()
                                                           .createComponentRepresentative(stub.getProxy());
         } catch (Throwable t) {
@@ -944,7 +923,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 componentParameters.getHierarchicalType(), myProxy,
                 componentParameters.getControllerDescription()
                                    .getControllersConfigFileLocation());
-        representative.setStubOnBaseObject((StubObject) ao);
+        representative.setStubOnBaseObject(ao);
         return representative;
     }
 
@@ -967,7 +946,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 componentParameters.getHierarchicalType(), myProxy,
                 componentParameters.getControllerDescription()
                                    .getControllersConfigFileLocation());
-        representative.setStubOnBaseObject((StubObject) ao);
+        representative.setStubOnBaseObject(ao);
         return representative;
     }
 
@@ -981,7 +960,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                         controllerDesc);
             } else { /*Non functional components*/
                 components = ProActiveComponentGroup.newNFComponentRepresentativeGroup((ComponentType) type,
-                        (ControllerDescription) controllerDesc);
+                        controllerDesc);
             }
             List<Component> componentsList = ProActiveGroup.getGroup(components);
             if (Constants.PRIMITIVE.equals(controllerDesc.getHierarchicalType())) {
@@ -1015,8 +994,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                     } else { /*Case of non functional components*/
                         for (int i = 0; i < nodes.length; i++) {
                             NFComponentBuilderTask task = new NFComponentBuilderTask(exceptions,
-                                    componentsList, i, type,
-                                    (ControllerDescription) controllerDesc,
+                                    componentsList, i, type, controllerDesc,
                                     original_component_name, contentDesc, nodes);
                             threadPool.execute(task);
                         }
@@ -1027,9 +1005,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                                 System.getProperty(
                                     "components.creation.timeout")),
                             TimeUnit.SECONDS);
-                    } catch (InterruptedException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
+                    } catch (InterruptedException e) {
+                        logger.info("Interruption when waiting for thread pool termination.",
+                            e);
                     }
                     if (!exceptions.isEmpty()) {
                         InstantiationException e = new InstantiationException(
@@ -1045,8 +1023,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                         componentsList.add(newFcInstance(type, controllerDesc,
                                 contentDesc[0], nodes[0]));
                     } else { /*Non functional components*/
-                        componentsList.add(newNFcInstance(type,
-                                (ControllerDescription) controllerDesc,
+                        componentsList.add(newNFcInstance(type, controllerDesc,
                                 contentDesc[0], nodes[0]));
                     }
                 }
@@ -1110,6 +1087,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 originalName, contentDesc, nodes);
         }
 
+        @Override
         public void run() {
             controllerDesc.setName(originalName + Constants.CYCLIC_NODE_SUFFIX +
                 indexInList);
@@ -1133,17 +1111,14 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     private static class MockComponent implements Component, Serializable {
         public Object getFcInterface(String interfaceName)
             throws NoSuchInterfaceException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Object[] getFcInterfaces() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Type getFcType() {
-            // TODO Auto-generated method stub
             return null;
         }
     }

@@ -36,26 +36,18 @@ import javax.management.MBeanServer;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
-import org.objectweb.proactive.extensions.jmx.ProActiveJMXConstants;
 
 
 /**
  * The active object representing the connector. This object is responsible of creating ProActive JMX Connections
  * @author vlegrand
  */
-
-/**
- * @author vlegrand
- *
- */
-
-/**
- * @author vlegrand
- *
- */
-public class ProActiveServerImpl implements Serializable {
+public class ProActiveServerImpl implements Serializable,
+    ProActiveInternalObject {
     private static final long serialVersionUID = -5189383875728195134L;
     private transient MBeanServer mbeanServer;
 

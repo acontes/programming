@@ -32,8 +32,10 @@ package org.objectweb.proactive;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
@@ -52,23 +54,21 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.body.BodyAdapter;
+import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
+import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FuturePool;
-import org.objectweb.proactive.core.body.http.HttpBodyAdapter;
-import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
-import org.objectweb.proactive.core.body.rmi.RmiBodyAdapter;
-import org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -78,7 +78,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
-import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.descriptor.parser.JaxpDescriptorParser;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
@@ -95,6 +96,9 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -108,8 +112,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.xml.VariableContract;
-
-import ibis.rmi.RemoteException;
 
 
 /**
@@ -205,11 +207,12 @@ import ibis.rmi.RemoteException;
 public class ProActive {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     public final static Logger loggerGroup = ProActiveLogger.getLogger(Loggers.GROUPS);
+    private final static Heartbeat hb = new Heartbeat();
 
     static {
         ProActiveConfiguration.load();
 
-        @SuppressWarnings("unused") // Execute RuntimeFactory's static blocks  
+        @SuppressWarnings("unused") // Execute RuntimeFactory's static blocks
 
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
     }
@@ -935,7 +938,7 @@ public class ProActive {
             }
             for (int i = 0; i < nodeTab.length; i++) {
                 Object tmp = newActive(classname, null, constructorParameters,
-                        (Node) nodeTab[i], activity, factory);
+                        nodeTab[i], activity, factory);
                 aoGroup.add(tmp);
             }
 
@@ -1313,7 +1316,7 @@ public class ProActive {
 
             for (int i = 0; i < nodeTab.length; i++) {
                 Object tmp = turnActive(target, genericParameters,
-                        nameOfTargetType, (Node) nodeTab[i], null, null);
+                        nameOfTargetType, nodeTab[i], null, null);
                 aoGroup.add(tmp);
             }
 
@@ -1339,11 +1342,17 @@ public class ProActive {
      */
     public static void register(Object obj, String url)
         throws java.io.IOException {
-        BodyAdapter body = getRemoteBody(obj);
-        body.register(url);
-        body.setRegistered(true);
-        if (logger.isInfoEnabled()) {
-            logger.info("Success at binding url " + url);
+        UniversalBody body = getRemoteBody(obj);
+
+        try {
+            body.register(url);
+            body.setRegistered(true);
+            if (logger.isInfoEnabled()) {
+                logger.info("Success at binding url " + url);
+            }
+        } catch (UnknownProtocolException e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -1355,24 +1364,21 @@ public class ProActive {
     public static void unregister(String url) throws java.io.IOException {
         String protocol = UrlBuilder.getProtocol(url);
 
-        // First step towards Body factory, will be introduced after the release
-        BodyAdapter ba;
-        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
-            ba = new RmiBodyAdapter();
-        } else if (protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
-            ba = new SshRmiBodyAdapter();
-        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            ba = new HttpBodyAdapter();
-        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            ba = new IbisBodyAdapter();
-        } else {
-            throw new IOException("Protocol " + protocol + " not defined");
-        }
-        UniversalBody ub = ba.lookup(url);
-        ba.unregister(url);
-        ub.setRegistered(false);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Success at unbinding url " + url);
+        RemoteObject rmo;
+        try {
+            rmo = RemoteObjectHelper.lookup(URI.create(url));
+            Object o = RemoteObjectHelper.generatedObjectStub(rmo);
+
+            if (o instanceof UniversalBody) {
+                UniversalBody ub = (UniversalBody) o;
+                ub.setRegistered(false);
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Success at unbinding url " + url);
+            }
+        } catch (ProActiveException e) {
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -1394,33 +1400,19 @@ public class ProActive {
      */
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
-        //    	try {
-        //    		// this ensures the class server is initialized,
-        //    		// which ensures that the java.rmi.server.codebase property is initialized,
-        //    		// which ensures parameters are annotated with the correct codebase in RMI communications
-        //			RuntimeFactory.getDefaultRuntime();
-        //		} catch (ProActiveException e1) {
-        //			throw new ActiveObjectCreationException("Exception occured when trying to get default runtime",e1);
-        //		}
-        UniversalBody b = null;
-
-        String protocol = UrlBuilder.getProtocol(url);
-
-        // First step towards Body factory, will be introduced after the release
-        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
-            b = new RmiBodyAdapter().lookup(url);
-        } else if (protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
-            b = new SshRmiBodyAdapter().lookup(url);
-        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            b = new HttpBodyAdapter().lookup(url);
-        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            b = new IbisBodyAdapter().lookup(url);
-        } else {
-            throw new IOException("Protocol " + protocol + " not defined");
-        }
+        RemoteObject rmo;
+        URI uri = RemoteObjectHelper.expandURI(URI.create(url));
 
         try {
-            return createStubObject(classname, b);
+            rmo = RemoteObjectHelper.lookup(uri);
+
+            Object o = RemoteObjectHelper.generatedObjectStub(rmo);
+
+            if (o instanceof UniversalBody) {
+                return createStubObject(classname, (UniversalBody) o);
+            }
+        } catch (ProActiveException e) {
+            throw new IOException(e.getMessage());
         } catch (MOPException e) {
             Throwable t = e;
 
@@ -1431,6 +1423,8 @@ public class ProActive {
             throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy",
                 t);
         }
+
+        return null;
     }
 
     /**
@@ -1444,20 +1438,15 @@ public class ProActive {
      */
     public static String[] listActive(String url) throws java.io.IOException {
         String[] activeNames = null;
-
-        String protocol = UrlBuilder.getProtocol(url);
-
-        // First step towards Body factory, will be introduced after the release
-        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
-            activeNames = new RmiBodyAdapter().list(url);
-        } else if (protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
-            activeNames = new SshRmiBodyAdapter().list(url);
-        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            activeNames = new HttpBodyAdapter().list(url);
-        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            activeNames = new IbisBodyAdapter().list(url);
-        } else {
-            throw new IOException("Protocol " + protocol + " not defined");
+        try {
+            URI[] uris = RemoteObjectHelper.list(URI.create(url));
+            activeNames = new String[uris.length];
+            for (int i = 0; i < uris.length; i++) {
+                activeNames[i] = uris[i].toString();
+            }
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         return activeNames;
@@ -1868,9 +1857,21 @@ public class ProActive {
      * is returned.
      * @return the body associated to the active object whose active thread is calling
      *     this method.
+     * @throws ProActiveException
      */
     public static Body getBodyOnThis() {
-        return LocalBodyStore.getInstance().getCurrentThreadBody();
+        return LocalBodyStore.getInstance().getContext().getBody();
+    }
+
+    /**
+     * Return the current execution context for the calling thread. The execution context
+     * contains a reference to the body associated to this thread, and some informations about
+     * the currently served request if any.
+     * @return the current execution context associated to the calling thread.
+     * @see org.objectweb.proactive.core.body.Context
+     */
+    public static Context getContext() {
+        return LocalBodyStore.getInstance().getContext();
     }
 
     /**
@@ -1989,8 +1990,8 @@ public class ProActive {
      */
     public static void migrateTo(Body bodyToMigrate, Node node,
         boolean isNFRequest) throws MigrationException {
-        //In the context of ProActive, migration of an active object is considered as a non functional request. 
-        //That's why "true" is set by default for the "isNFRequest" parameter. 
+        //In the context of ProActive, migration of an active object is considered as a non functional request.
+        //That's why "true" is set by default for the "isNFRequest" parameter.
         ProActive.migrateTo(bodyToMigrate, node, true,
             org.objectweb.proactive.core.body.request.Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
@@ -2244,6 +2245,11 @@ public class ProActive {
                 } else {
                     NonFunctionalServices.terminateAO(proxy);
                 }
+            } catch (BodyTerminatedException e) {
+                // the terminated body is already terminated
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Terminating already terminated body : " + e);
+                }
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -2262,6 +2268,30 @@ public class ProActive {
      */
     public static void terminateActiveObject(boolean immediate) {
         terminateActiveObject(ProActive.getStubOnThis(), immediate);
+    }
+
+    /**
+     * Ping the target active object. Note that this method does not take into account the
+     * state of the target object : pinging an inactive but reachable active object actually
+     * returns true.
+     * @param target the pinged active object.
+     * @return true if the active object is reachable, false otherwise.
+     */
+    public static boolean pingActiveObject(Object target) {
+        UniversalBody targetedBody = null;
+        try {
+            // reified object is checked in getRemoteBody
+            targetedBody = getRemoteBody(target);
+            targetedBody.receiveFTMessage(ProActive.hb);
+            return true;
+        } catch (IOException e) {
+            if (logger.isDebugEnabled()) {
+                // id should be cached locally
+                logger.debug("Active object " + targetedBody.getID() +
+                    " is unreachable.", e);
+            }
+            return false;
+        }
     }
 
     /**
@@ -2316,7 +2346,7 @@ public class ProActive {
      * @param obj
      * @return
      */
-    private static BodyAdapter getRemoteBody(Object obj) {
+    private static UniversalBody getRemoteBody(Object obj) {
         // Check if obj is really a reified object
         if (!(MOP.isReifiedObject(obj))) {
             throw new ProActiveRuntimeException("The given object " + obj +
@@ -2332,7 +2362,7 @@ public class ProActive {
         }
 
         BodyProxy myBodyProxy = (BodyProxy) myProxy;
-        BodyAdapter body = myBodyProxy.getBody().getRemoteAdapter();
+        UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
         return body;
     }
 
@@ -2370,9 +2400,9 @@ public class ProActive {
     }
 
     // -------------------------------------------------------------------------------------------
-    // 
+    //
     // STUB CREATION
-    // 
+    //
     // -------------------------------------------------------------------------------------------
     private static StubObject getStubForBody(Body body) {
         try {
@@ -2509,7 +2539,7 @@ public class ProActive {
     public static void addNFEListenerOnAO(Object ao, NFEListener listener) {
 
         /* Security hazard: arbitrary code execution by the ao... */
-        BodyAdapter body = getRemoteBody(ao);
+        UniversalBody body = getRemoteBody(ao);
         body.addNFEListener(listener);
     }
 
@@ -2520,7 +2550,7 @@ public class ProActive {
      * @param listener The listener to remove
      */
     public static void removeNFEListenerOnAO(Object ao, NFEListener listener) {
-        BodyAdapter body = getRemoteBody(ao);
+        UniversalBody body = getRemoteBody(ao);
         body.removeNFEListener(listener);
     }
 
@@ -2607,7 +2637,7 @@ public class ProActive {
      * @throws NodeException problem with the node.
      */
     public static Node getNode() throws NodeException {
-        BodyProxy destProxy = (BodyProxy) ((StubObject) getStubOnThis()).getProxy();
+        BodyProxy destProxy = (BodyProxy) (getStubOnThis()).getProxy();
 
         return NodeFactory.getNode(destProxy.getBody().getNodeURL());
     }

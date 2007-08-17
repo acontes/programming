@@ -310,7 +310,12 @@ public class MulticastControllerImpl extends AbstractProActiveController
                     clientSideEffectiveArguments[i], delegatee.size()));
         }
 
-        int max = dispatchSizes.get(0);
+        // -1 mean there are no suggested max dispatch size 
+        int max = -1;
+        if (dispatchSizes.size() > 0) {
+            max = dispatchSizes.get(0);
+        }
+
         for (int i = 1; i < dispatchSizes.size(); i++) {
             if (dispatchSizes.get(i) > max) {
                 max = dispatchSizes.get(i);
@@ -384,7 +389,8 @@ public class MulticastControllerImpl extends AbstractProActiveController
                 result.put(new MethodCall(matchingMethodInServerInterface,
                         mc.getGenericTypesMapping(),
                         individualEffectiveArguments, mc.getExceptionContext()),
-                    generatedMethodCallIndex % delegatee.size());
+                    generatedMethodCallIndex);
+                //                      generatedMethodCallIndex % delegatee.size());
                 // default is to do some round robin when nbGeneratedMethodCalls > nbReceivers
             }
         } catch (SecurityException e) {

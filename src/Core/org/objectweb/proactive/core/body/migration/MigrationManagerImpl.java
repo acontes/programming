@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.event.MigrationEvent;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.event.ProActiveEvent;
 import org.objectweb.proactive.core.event.ProActiveListener;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -122,11 +124,11 @@ public class MigrationManagerImpl extends AbstractEventProducer
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public void updateLocation(UniversalBody body) {
-        if (locationServer == null) {
+        if (this.locationServer == null) {
             this.locationServer = LocationServerFactory.getLocationServer();
         }
-        if (locationServer != null) {
-            locationServer.updateLocation(body.getID(),
+        if (this.locationServer != null) {
+            this.locationServer.updateLocation(body.getID(),
                 body.getRemoteAdapter(), this.migrationCounter);
         }
         resetNbOfMigrationWithoutUpdate();
@@ -138,9 +140,9 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
     public void launchTimeToLive(MigratableBody body, UniversalBody migratedBody) {
         if (this.ttl != INFINITE_TTL) {
-            ttlTimer = new Timer();
-            ttlTimer.schedule(new TimeToLiveTimerTask(this, body, migratedBody),
-                this.ttl);
+            this.ttlTimer = new Timer();
+            this.ttlTimer.schedule(new TimeToLiveTimerTask(this, body,
+                    migratedBody), this.ttl);
         }
     }
 
@@ -169,17 +171,29 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
     public UniversalBody migrateTo(Node node, Body body)
         throws MigrationException {
+        // ProActiveEvent
         if (hasListeners()) {
             notifyAllListeners(new MigrationEvent(body,
                     MigrationEvent.BEFORE_MIGRATION));
         }
+
+        // END ProActiveEvent
+
+        // JMX Notification
+        BodyWrapperMBean mbean = body.getMBean();
+        if (mbean != null) {
+            mbean.sendNotification(NotificationType.migrationAboutToStart,
+                node.getProActiveRuntime().getURL());
+        }
+
+        // End JMX Notification
         try {
             long l1 = 0;
             if (logger.isDebugEnabled()) {
                 l1 = System.currentTimeMillis();
             }
 
-            //      
+            //
             // UniversalBody remoteBody = node.receiveBody(body);
             // --------------------added lines---------------------------
             ProActiveRuntime part = node.getProActiveRuntime();
@@ -193,32 +207,57 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
             // --------------------added lines--------------------------
             // activityStopped();
-            //    
+            //
             long l2 = 0;
             if (logger.isDebugEnabled()) {
                 l2 = System.currentTimeMillis();
                 logger.debug("Migration took " + (l2 - l1));
             }
+
+            // ProActiveEvent
             if (hasListeners()) {
                 notifyAllListeners(new MigrationEvent(body,
                         MigrationEvent.AFTER_MIGRATION));
             }
 
+            // END ProActiveEvent
+
+            // JMX Notification
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.migrationFinished,
+                    node.getProActiveRuntime().getURL());
+            }
+
+            // End JMX Notification
+
             // we are not on this site anymore,
             // so there is no need to send this
             // position to the server
-            if (maxTimeOnSiteTimer != null) {
-                maxTimeOnSiteTimer.cancel();
+            if (this.maxTimeOnSiteTimer != null) {
+                this.maxTimeOnSiteTimer.cancel();
             }
 
             return remoteBody;
             //} catch (ProActiveException e) {
         } catch (Exception e) {
+            e.printStackTrace();
             MigrationException me = new MigrationException("Exception while sending the Object",
                     e.getCause());
+
+            // ProActiveEvent
             if (hasListeners()) {
                 notifyAllListeners(new MigrationEvent(me));
             }
+
+            // END ProActiveEvent
+
+            // JMX Notification
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.migrationExceptionThrown,
+                    me);
+            }
+
+            // END JMX Notification
             throw me;
         }
     }
@@ -252,11 +291,20 @@ public class MigrationManagerImpl extends AbstractEventProducer
     }
 
     public void startingAfterMigration(Body body) {
+        // ProActiveEvent
         if (hasListeners()) {
             notifyAllListeners(new MigrationEvent(body,
                     MigrationEvent.RESTARTING_AFTER_MIGRATING));
         }
 
+        // END ProActiveEvent
+
+        // JMX Notification
+        BodyWrapperMBean mbean = body.getMBean();
+        if (mbean != null) {
+            mbean.sendNotification(NotificationType.migratedBodyRestarted);
+        }
+        // END JMX Notification
         this.nbOfMigrationWithoutUpdate++;
         this.migrationCounter++;
         if (logger.isDebugEnabled()) {
@@ -270,9 +318,9 @@ public class MigrationManagerImpl extends AbstractEventProducer
         }
         // TTU : maxTimeOnSite
         else if (this.maxTimeOnSite != INFINITE_MAX_TIME_ON_SITE) {
-            maxTimeOnSiteTimer = new Timer();
-            maxTimeOnSiteTimer.schedule(new MaxTimeOnSiteTimerTask(this, body),
-                maxTimeOnSite);
+            this.maxTimeOnSiteTimer = new Timer();
+            this.maxTimeOnSiteTimer.schedule(new MaxTimeOnSiteTimerTask(this,
+                    body), this.maxTimeOnSite);
         }
     }
 
@@ -371,11 +419,11 @@ public class MigrationManagerImpl extends AbstractEventProducer
                 this.migrationManager.updateLocation(this.migratedBody.getRemoteAdapter());
             }
             //this.migrationManager.updateRemoteLocation(this.migratedBody.getRemoteAdapter());
-            LocalBodyStore.getInstance().unregisterForwarder(body);
+            LocalBodyStore.getInstance().unregisterForwarder(this.body);
 
             this.body.terminate();
-            body.setRequestReceiver(null);
-            body.setReplyReceiver(null);
+            this.body.setRequestReceiver(null);
+            this.body.setReplyReceiver(null);
         }
     }
 }

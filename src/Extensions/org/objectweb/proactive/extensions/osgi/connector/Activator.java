@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extensions.osgi.connector;
 
-import org.objectweb.proactive.extensions.jmx.server.ServerConnector;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -41,7 +41,8 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator implements BundleActivator {
     public void start(BundleContext arg0) throws Exception {
-        new ServerConnector();
+        ServerConnector serverConnector = new ServerConnector();
+        serverConnector.start();
     }
 
     public void stop(BundleContext arg0) throws Exception {

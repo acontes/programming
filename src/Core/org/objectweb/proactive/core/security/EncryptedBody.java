@@ -53,7 +53,9 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
@@ -70,7 +72,7 @@ public class EncryptedBody implements Body, Serializable {
     // specify if this body is encrypted or not
     protected boolean isEncrypted = false;
 
-    // session ID 
+    // session ID
     protected long sessionID;
 
     // serialized and encrypted body
@@ -438,5 +440,26 @@ public class EncryptedBody implements Body, Serializable {
      */
     public long getNextSequenceID() {
         return 0;
+    }
+
+    public BodyWrapperMBean getMBean() {
+        return null;
+    }
+
+    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+        return false;
+    }
+
+    public boolean checkMethod(String methodName) {
+        return false;
+    }
+
+    public void register(String url)
+        throws IOException, UnknownProtocolException {
+        // TODO Auto-generated method stub
+    }
+
+    public void registerIncomingFutures() {
+        // TODO Auto-generated method stub
     }
 }
