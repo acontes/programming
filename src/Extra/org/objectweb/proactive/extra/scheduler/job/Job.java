@@ -76,8 +76,6 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	private Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
 	/** informations about job execution */
 	private JobEvent jobInfo = new JobEvent();
-	/** Use to save previous state of the job */
-	private JobState oldState = JobState.PENDING;
 	/** Light job for dependences management */
 	private LightJob lightJob;
 
@@ -320,11 +318,11 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	public boolean setPaused() {
 		if (jobInfo.getState() == JobState.PAUSED)
 			return false;
-		oldState = jobInfo.getState();
 		jobInfo.setState(JobState.PAUSED);
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
-			td.setStatus(Status.PAUSED);
+			if (td.getStatus() != Status.FINISHED && td.getStatus() != Status.RUNNNING)
+				td.setStatus(Status.PAUSED);
 			hts.put(td.getId(), td.getStatus());
 		}
 		lightJob.update(hts);
@@ -340,13 +338,19 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	public boolean setUnPause() {
 		if (jobInfo.getState() != JobState.PAUSED)
 			return false;
-		jobInfo.setState(oldState);
+		if (getNumberOfPendingTask()+getNumberOfRunningTask()+getNumberOfFinishedTask()==0)
+			jobInfo.setState(JobState.PENDING);
+		else if(getNumberOfRunningTask() == 0)
+			jobInfo.setState(JobState.STALLED);
+		else
+			jobInfo.setState(JobState.RUNNING);
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
 			if (jobInfo.getState() == JobState.PENDING){
 				td.setStatus(Status.SUBMITTED);
-			} else if (jobInfo.getState() == JobState.RUNNING){
-				td.setStatus(Status.PENDING);
+			} else if (jobInfo.getState() == JobState.RUNNING || jobInfo.getState() == JobState.STALLED){
+				if (td.getStatus() != Status.FINISHED && td.getStatus() != Status.RUNNNING)
+					td.setStatus(Status.PENDING);
 			}
 			hts.put(td.getId(), td.getStatus());
 		}
