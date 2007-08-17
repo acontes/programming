@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
+ * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * version 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
+ * You should have received a copy of the GNU General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -46,16 +46,16 @@ public class UpdateCopyrightAndVersion {
         " * Contact: proactive@objectweb.org" + "\n" + 
         " *\n" +
         " * This library is free software; you can redistribute it and/or\n" +
-        " * modify it under the terms of the GNU Lesser General Public\n" +
+        " * modify it under the terms of the GNU General Public\n" +
         " * License as published by the Free Software Foundation; either\n" +
-        " * version 2.1 of the License, or any later version.\n" +
+        " * version 2 of the License, or any later version.\n" +
         " *\n" +
         " * This library is distributed in the hope that it will be useful,\n" +
         " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
         " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n" +
-        " * Lesser General Public License for more details.\n" +
+        " * General Public License for more details.\n" +
         " *\n" +
-        " * You should have received a copy of the GNU Lesser General Public\n" +
+        " * You should have received a copy of the GNU General Public\n" +
         " * License along with this library; if not, write to the Free Software\n" +
         " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n" +
         " * USA\n" + 
@@ -142,15 +142,18 @@ public class UpdateCopyrightAndVersion {
         if (packageStart == -1) {
             return;
         }
-        String copyright = program.substring(0, packageStart).toLowerCase();
-        if (copyright.contains("copyright") &&
-                !copyright.contains("proactive")) {
+        String copyrightInFile = program.substring(0, packageStart);
+        if (copyrightInFile.contains("Copyright") &&
+                !copyrightInFile.contains("ProActive")) {
             return;
         }
         System.out.println("Processing " + file);
 
         String uncopyrightedProgram = program.substring(packageStart);
         String copyrightedProgram = copyright + uncopyrightedProgram;
+        
+//        System.out.println("============" + copyright);
+        
         b = copyrightedProgram.getBytes();
         file.delete();
 
