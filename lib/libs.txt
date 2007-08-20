@@ -1,0 +1,96 @@
+bouncycastle.jar
+ganymed-ssh2-build210.jar
+javassist.jar
+log4j.jar
+xercesImpl.jar
+
+components:
+	asm-2.2.1.jar
+	dtdparser.jar
+	fractal-adl.jar
+	fractal-gui.jar
+	fractal.jar
+	fractal-swing.jar
+	julia-asm.jar
+	julia-mixins.jar
+	julia-runtime.jar
+	ow_deployment_scheduling.jar
+	SVGGraphics.jar
+
+examples:
+	clibwrapper_jiio.jar
+	jai_codec.jar
+	jai_core.jar
+	jai_imageio.jar
+	mlibwrapper_jai.jar
+
+glite:
+	classad.jar
+	glite-wms-jdlj.jar
+
+globus:
+	cog-jglobus-1.2.jar
+	cog-jglobus.jar
+	cog-ogce.jar
+	cryptix32.jar
+	cryptix-asn1.jar
+	cryptix.jar
+	puretls.jar
+
+ibis:
+	bcel-5.1-fixes-1.0.jar
+	bcel-5.1.jar
+	colobus-0.1.jar
+	ibis-1.4.jar
+	ibis-connect-1.0.jar
+	ibis-util-1.0.jar
+
+jung:
+	colt.jar
+	commons-collections-3.2.jar
+	concurrent.jar
+	jung-1.7.4.jar
+
+osgi:
+	http.jar
+	moduleloader.jar
+	oscar.jar
+	osgi.jar
+	servicebinder.jar
+	shell.jar
+
+scilab:
+	javasci
+	javasci.jar
+
+timit:
+	batik-awt-util.jar
+	batik-dom.jar
+	batik-svggen.jar
+	batik-util.jar
+	batik-xml.jar
+	commons-cli-1.0.jar
+	jcommon-1.0.6.jar
+	jdom.jar
+	jfreechart-1.0.2.jar
+
+unicore:
+	ajo.jar
+	client.jar
+	jh.jar
+	njs_client.jar
+	scriptPlugin.jar
+	SystemDefaults.txt
+
+ws:
+	activation.jar
+	axis.jar
+	commons-discovery.jar
+	commons-logging.jar
+	jaxrpc.jar
+	mail.jar
+	saaj-api.jar
+	servlet-api.jar
+	soap.jar
+	wsdl4j.jar
+	xml-apis.jar
