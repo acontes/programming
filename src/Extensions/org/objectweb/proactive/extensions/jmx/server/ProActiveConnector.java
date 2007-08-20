@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -49,9 +49,9 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
-import org.objectweb.proactive.extensions.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.extensions.jmx.listeners.ProActiveConnectionNotificationEmitter;
 
 
@@ -128,6 +128,8 @@ public class ProActiveConnector implements JMXConnector, Serializable,
                                                     .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
             String lookupUrl = UrlBuilder.buildUrl(hostname, serverName,
                     protocol, port);
+            System.out.println("ProActiveConnector.connect() lookup url = " +
+                lookupUrl);
             ProActiveServerImpl paServer = (ProActiveServerImpl) ProActive.lookupActive(ProActiveServerImpl.class.getName(),
                     lookupUrl);
 

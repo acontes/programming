@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -46,22 +46,22 @@ public class UpdateCopyrightAndVersion {
         " * Contact: proactive@objectweb.org" + "\n" + 
         " *\n" +
         " * This library is free software; you can redistribute it and/or\n" +
-        " * modify it under the terms of the GNU General Public\n" +
+        " * modify it under the terms of the GNU Lesser General Public\n" +
         " * License as published by the Free Software Foundation; either\n" +
-        " * version 2 of the License, or any later version.\n" +
+        " * version 2.1 of the License, or any later version.\n" +
         " *\n" +
         " * This library is distributed in the hope that it will be useful,\n" +
         " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
         " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n" +
-        " * General Public License for more details.\n" +
+        " * Lesser General Public License for more details.\n" +
         " *\n" +
-        " * You should have received a copy of the GNU General Public\n" +
+        " * You should have received a copy of the GNU Lesser General Public\n" +
         " * License along with this library; if not, write to the Free Software\n" +
         " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n" +
         " * USA\n" + 
 	" *\n" +
         " *  Initial developer(s):               The ProActive Team\n" +
-        " *                        http://www.inria.fr/oasis/ProActive/contacts.html\n" +
+        " *                        http://proactive.inria.fr/team_members.htm\n" +
         " *  Contributor(s):\n" + 
         " *\n" +
         " * ################################################################\n" +
@@ -145,15 +145,13 @@ public class UpdateCopyrightAndVersion {
         String copyrightInFile = program.substring(0, packageStart);
         if (copyrightInFile.contains("Copyright") &&
                 !copyrightInFile.contains("ProActive")) {
+        	System.out.println("Skipping " + file + ", other copyright exists.");
             return;
         }
         System.out.println("Processing " + file);
 
         String uncopyrightedProgram = program.substring(packageStart);
         String copyrightedProgram = copyright + uncopyrightedProgram;
-        
-//        System.out.println("============" + copyright);
-        
         b = copyrightedProgram.getBytes();
         file.delete();
 
@@ -180,11 +178,10 @@ public class UpdateCopyrightAndVersion {
             java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
                         file));
 
-            System.out.println("Replacing patterns in " + file);
-
             String currentText = filetext;
             filetext = null;
             int indexoffirstword = -1;
+            boolean anyReplacement = false;
 
             do {
                 indexoffirstword = -1;
@@ -201,6 +198,7 @@ public class UpdateCopyrightAndVersion {
                     	// we save the pattern which happens first
                         indexoffirstword = i;
                         lowestindex = indexfound;
+                        anyReplacement = true;
                     }
                 }
 
@@ -225,6 +223,9 @@ public class UpdateCopyrightAndVersion {
             } while (indexoffirstword != -1);
 
             out.close();
+            if (anyReplacement) {
+            System.out.println("Patterns replaced in " + file);
+            }
         }
     }
 

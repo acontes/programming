@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.AlreadyBoundException;
+import java.text.Annotation;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
@@ -64,7 +65,8 @@ public class ProActiveServicesImpl implements ProActiveService {
     private Node node;
     private Servlet servlet;
     private BundleContext bc;
-    private static final String aliasServlet = ClassServerServlet.SERVLET_NAME;
+    private static final String aliasServlet = "/" +
+        ClassServerServlet.SERVLET_NAME;
     private static final String OSGI_NODE_NAME = "OSGiNode";
     private HttpService http;
     private int port;
@@ -142,9 +144,11 @@ public class ProActiveServicesImpl implements ProActiveService {
      *
      */
     private void createNode() {
+        //    	System.out.println("url du class server = ");
         try {
-            this.node = NodeFactory.createNode(ClassServer.getUrl() + '/' +
-                    OSGI_NODE_NAME);
+            Thread.currentThread()
+                  .setContextClassLoader(ProActiveServicesImpl.class.getClassLoader());
+            this.node = NodeFactory.createNode(OSGI_NODE_NAME);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (AlreadyBoundException e) {
@@ -179,8 +183,7 @@ public class ProActiveServicesImpl implements ProActiveService {
                 };
 
             this.http.registerServlet(aliasServlet, this.servlet, null, null);
-            this.http.registerResources("/", aliasServlet + "doc", myContext);
-
+            //            this.http.registerResources("/", aliasServlet + "doc", myContext);
             return true;
         } catch (Throwable t) {
             t.printStackTrace();
@@ -196,7 +199,7 @@ public class ProActiveServicesImpl implements ProActiveService {
         /* kill Nodes */
         try {
             this.node.killAllActiveObjects();
-            ProActiveRuntimeImpl.getProActiveRuntime().killNode(OSGI_NODE_NAME);
+            //            ProActiveRuntimeImpl.getProActiveRuntime().killNode(OSGI_NODE_NAME);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -206,6 +209,17 @@ public class ProActiveServicesImpl implements ProActiveService {
         }
 
         /* unregister Servlet */
-        this.http.unregister(aliasServlet);
+        //this.http.unregister(aliasServlet);
+    }
+
+    public Object lookupActive(String className, String url) {
+        try {
+            return ProActive.lookupActive(className, url);
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

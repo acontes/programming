@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -42,8 +42,8 @@ import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.jmx.ProActiveJMXConstants;
 
 import com.sun.jmx.remote.util.EnvHelp;
 
@@ -125,10 +125,10 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
     /**
      * Activates the connector server, that is starts listening for client connections.
      * Calling this method when the connector server is already active has no effect.
-     *  Calling this method when the connector server has been stopped will generate an IOException.
-     *  The behaviour of this method when called for the first time depends on the parameters that were supplied at construction, as described below.
-       * First, an object of a subclass of ProActiveServerImpl is required, to export the connector server through ProActive:
-        * If an ProActiveServerImpl was supplied to the constructor, it is used.
+     * Calling this method when the connector server has been stopped will generate an IOException.
+     * The behaviour of this method when called for the first time depends on the parameters that were supplied at construction, as described below.
+     * First, an object of a subclass of ProActiveServerImpl is required, to export the connector server through ProActive:
+     * If an ProActiveServerImpl was supplied to the constructor, it is used.
      */
 
     //exposes the active object

@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -84,12 +84,12 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         //Create an array of the text and components to be displayed.
         Object[] array = {
-                "Please enter your name,", userTextField,
-                "and the C3DDispatcher host", hostNameTextField
+                "Please enter your name,", this.userTextField,
+                "and the C3DDispatcher host", this.hostNameTextField
             };
 
         //Create an array specifying the number of dialog buttons and their text.
-        Object[] options = { enterButtonString, cancelButtonString };
+        Object[] options = { this.enterButtonString, this.cancelButtonString };
 
         //Create the JOptionPane.
         this.optionPane = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE,
@@ -102,8 +102,9 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent we) {
-                    // handle closing behavior in propertyChange () 
-                    optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
+                    // handle closing behavior in propertyChange ()
+                    NameAndHostDialog.this.optionPane.setValue(new Integer(
+                            JOptionPane.CLOSED_OPTION));
                 }
             });
 
@@ -111,7 +112,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentShown(ComponentEvent ce) {
-                    userTextField.requestFocusInWindow();
+                    NameAndHostDialog.this.userTextField.requestFocusInWindow();
                 }
             });
 
@@ -146,13 +147,13 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
             this.optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 
             if (this.enterButtonString.equals(value)) {
-                this.userName = userTextField.getText();
+                this.userName = this.userTextField.getText();
 
                 if (this.userName.equals("")) { //userName text was invalid
-                    userName = "Bob";
+                    this.userName = "Bob";
                 }
 
-                // OK, now we've received enough information from the user. Let's try the lookup. 
+                // OK, now we've received enough information from the user. Let's try the lookup.
                 tryTheLookup();
             } else { //user closed dialog or clicked cancel
                 this.userName = null;
@@ -194,7 +195,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         for (int i = 0; i < registeredObjects.length; i++) {
             String name = UrlBuilder.getNameFromUrl(registeredObjects[i]);
 
-            if (name.indexOf("_VN") == -1) { // replace by (java 1.5 String.contains)
+            if (name.equals("Dispatcher") && (name.indexOf("_VN") == -1)) { // replace by (java 1.5 String.contains)
                 try {
                     this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(),
                             registeredObjects[i]);
