@@ -35,22 +35,57 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
-public interface NodeSourceInterface {
-	
-	// Free nodes
-	public ArrayList<IMNode> getFreeNodes();
-	public IntWrapper getNbFreeNodes();
-	
-	// Busy nodes
-	public ArrayList<IMNode> getBusyNodes();
-	public IntWrapper getNbBusyNodes();
-	
-	// Down nodes
-	public ArrayList<IMNode> getDownNodes();
-	public IntWrapper getNbDownNodes();
-	
-	// All Nodes
-	public ArrayList<IMNode> getAllNodes();
-	public IntWrapper getNbAllNodes();
 
+/**
+ * Inteface designed to monitor the Node Source activity.
+ * @author proactive team
+ *
+ */
+public interface NodeSourceInterface {
+    // Free nodes
+    /**
+     * Free nodes are nodes that are available.
+     * @return the free nodes.
+     */
+    public ArrayList<IMNode> getFreeNodes();
+
+    /**
+     * @return the number of free nodes.
+     */
+    public IntWrapper getNbFreeNodes();
+
+    // Busy nodes
+    /**
+     * Busy nodes are nodes allready in use by someone.
+     * @return the busy nodes.
+     */
+    public ArrayList<IMNode> getBusyNodes();
+
+    /**
+     * @return the number of busy nodes.
+     */
+    public IntWrapper getNbBusyNodes();
+
+    // Down nodes
+    /**
+     * Down nodes are nodes that no longer respond.
+     * @return the down nodes.
+     */
+    public ArrayList<IMNode> getDownNodes();
+
+    /**
+     * @return the number of down nodes.
+     */
+    public IntWrapper getNbDownNodes();
+
+    // All Nodes
+    /**
+     * @return all the nodes handled.
+     */
+    public ArrayList<IMNode> getAllNodes();
+
+    /**
+     * @return the number of nodes handled.
+     */
+    public IntWrapper getNbAllNodes();
 }

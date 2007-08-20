@@ -39,6 +39,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
+
 
 public interface PADNSInterface extends NodeSourceInterface {
     // DEPLOY	
@@ -86,36 +88,36 @@ public interface PADNSInterface extends NodeSourceInterface {
      */
     public void deployVirtualNodes(File xmlDescriptor, Node remoteNode,
         String[] vnNames) throws Exception;
-	
-	/**
-     * Add the new deployed node in the dataresource
-     * @param node    : the new deployed node
-     * @param vnName  : the name of the virtual node
-     * @param padName : the name of the proactive descriptor
-     */
-    public void addNode(Node node, String vnName, String padName) ;
+
+    /**
+    * Add the new deployed node in the dataresource
+    * @param node    : the new deployed node
+    * @param vnName  : the name of the virtual node
+    * @param padName : the name of the proactive descriptor
+    */
+    public void addNode(Node node, String vnName, String padName);
 
     /**
      * Add the new proactive descriptor in the dataresource
      * @param padName : the name of the proactive descriptor
      * @param pad     : the proactive descriptor
      */
-    public void addPAD(String padName, ProActiveDescriptor pad) ;
-    
+    public void addPAD(String padName, ProActiveDescriptor pad);
+
     /**
      * Redeploy not supported by the current version of ProActive
      * @param padName : the name of the proactive descriptor to redeploy
      * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
      */
-    public void redeploy(String padName) ;
-    
+    public void redeploy(String padName);
+
     /**
      * Redeploy not supported by the current version of ProActive
      * @param padName : the name of the proactive descriptor
      * @param vnName  : the name of the virtual node of this pad to redeploy
      * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
      */
-    public void redeploy(String padName, String vnName) ;
+    public void redeploy(String padName, String vnName);
 
     /**
      * Redeploy not supported by the current version of ProActive
@@ -123,7 +125,7 @@ public interface PADNSInterface extends NodeSourceInterface {
      * @param vnNames : the name of the virtual nodes of this pad to redeploy
      * @see redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad)
      */
-    public void redeploy(String padName, String[] vnNames) ;
+    public void redeploy(String padName, String[] vnNames);
 
     // ----------------------------------------------------------------------//	
     // KILL
@@ -134,14 +136,14 @@ public interface PADNSInterface extends NodeSourceInterface {
      * @param padName :  the name of the proactive descriptor
      * @exception ProActiveException
      */
-    public void killPAD(String padName) throws ProActiveException ;
+    public void killPAD(String padName) throws ProActiveException;
 
     /**
     * Kill the virtual nodes of the proactive descriptors <I>padName>/I>
     * @param padName : the name of the Proactive Descriptor
     * @exception ProActiveException
     */
-    public void killPAD(String padName, String vnName) ;
+    public void killPAD(String padName, String vnName);
 
     /**
     * Kill the virtual node <I>vnName</I> of the proactive descriptor <I>padName</I>
@@ -150,7 +152,7 @@ public interface PADNSInterface extends NodeSourceInterface {
     * @see  killPAD(String padName)
     * @exception ProActiveException
     */
-    public void killPAD(String padName, String[] vnNames) ;
+    public void killPAD(String padName, String[] vnNames);
 
     /**
     * Kill the virtual nodes <I>vnNames</I>
@@ -160,12 +162,20 @@ public interface PADNSInterface extends NodeSourceInterface {
     * @see  killPAD(String padName)
     * @exception ProActiveException
     */
-    public void killAll() throws ProActiveException ;
+    public void killAll() throws ProActiveException;
 
-    public IntWrapper getSizeListPad() ;
+    /**
+     * @return the number of PADs handled by this {@link PADNodeSource}
+     */
+    public IntWrapper getSizeListPad();
 
-    public HashMap<String, ProActiveDescriptor> getListPAD() ;
+    /**
+     * @return the list of PADs handled by this {@link PADNodeSource}
+     */
+    public HashMap<String, ProActiveDescriptor> getListPAD();
 
-    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() ;
-
+    /**
+     * @return The virtual nodes handled, ordered by PAD.
+     */
+    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad();
 }

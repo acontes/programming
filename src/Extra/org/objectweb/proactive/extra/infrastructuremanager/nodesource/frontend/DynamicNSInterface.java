@@ -31,18 +31,26 @@
 package org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend;
 
 
-public interface DynamicNSInterface extends NodeSourceInterface{
-	
-	public int getNbMaxNodes();
-	
-	public void setNbMaxNodes(int nb);
-	
-	public int getTimeToRelease();
-	
-	public void setTimeToRelease(int ttr);
-	
-	public int getNiceTime();
-	
-	public void setNiceTime(int nice);
+/**
+ * The Dynamic node source works on essentialy 3 parameters :
+ * <ul>
+ *         <li>NbMaxNodes: the number of nodes that we want to manage;
+ *                 we try to have this number of nodes most of the time.
+ *         </li>
+ *         <li>TimeToRelease: To be nice, we release the nodes
+ * @author proactive team
+ *
+ */
+public interface DynamicNSInterface extends NodeSourceInterface {
+    public int getNbMaxNodes();
 
+    public void setNbMaxNodes(int nb);
+
+    public int getTimeToRelease();
+
+    public void setTimeToRelease(int ttr);
+
+    public int getNiceTime();
+
+    public void setNiceTime(int nice);
 }

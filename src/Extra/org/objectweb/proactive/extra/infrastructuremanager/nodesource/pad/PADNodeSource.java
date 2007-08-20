@@ -61,130 +61,137 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 
-public class PADNodeSource extends IMNodeSource implements Serializable, InitActive, PADNSInterface {
 
-	private static final long serialVersionUID = 9195674290785820181L;
-	private final static Logger logger = ProActiveLogger.getLogger(Loggers.IM_CORE);
-	private static final String id = "PADNodeSource";
-	
-//	 FIELDS
-	/** Free Nodes **/
-	private ArrayList<IMNode> freeNodes;
-	/** Busy Nodes **/
-	private ArrayList<IMNode> busyNodes;
-	/** Down Nodes **/
-	private ArrayList<IMNode> downNodes;
-	/** PADs **/
-	private HashMap<String, ProActiveDescriptor> listPad;
-	
-	public PADNodeSource() {
-	}
+public class PADNodeSource extends IMNodeSource implements Serializable,
+    InitActive, PADNSInterface {
+    private static final long serialVersionUID = 9195674290785820181L;
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.IM_CORE);
+    private static final String id = "PADNodeSource";
 
-	public void initActivity(Body body) {
-		freeNodes = new ArrayList<IMNode>();
-		busyNodes = new ArrayList<IMNode>();
-		downNodes = new ArrayList<IMNode>();
-		listPad = new HashMap<String, ProActiveDescriptor>();
-	}
+    // FIELDS
+    /** Free Nodes **/
+    private ArrayList<IMNode> freeNodes;
 
-	/**
-	 * Return the nodes in a specific order : 
-	 * - if there is no script to verify, just return the free nodes ;
-	 * - if there is a script, tries to give the nodes in an efficient order :
-	 * 		-> First the nodes that verified the script before ;
-	 * 		-> Next, the nodes that haven't been tested ;
-	 * 		-> Next, the nodes that have allready verified the script, but no longer ;
-	 * 		-> To finish, the nodes that don't verify the script.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNodesByScript(org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
-	 */
-	public ArrayList<IMNode> getNodesByScript(VerifyingScript script, boolean ordered) {
-		ArrayList<IMNode> result = getFreeNodes();
-		if(script != null && ordered) {
-			Collections.sort(result, new IMNodeComparator(script));
-		} 
-		return result;
-	}
+    /** Busy Nodes **/
+    private ArrayList<IMNode> busyNodes;
 
-	/**
-	 * remove a node from the structure.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#removeIMNode(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
-	 */
-	public void removeIMNode(IMNode imnode) {
-		removeFromAllLists(imnode);
-	}
+    /** Down Nodes **/
+    private ArrayList<IMNode> downNodes;
 
-	/**
-	 * remove many nodes from the structure.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#removeIMNodes(java.util.Collection)
-	 */
-	public void removeIMNodes(Collection<IMNode> imnodes) {
-		for(IMNode imnode : imnodes) removeIMNode(imnode);
-	}
+    /** PADs **/
+    private HashMap<String, ProActiveDescriptor> listPad;
 
-	/**
-	 * Set the busy state, and move the node to the internal busy list.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setBusy(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
-	 */
-	public void setBusy(IMNode imnode) {
-		removeFromAllLists(imnode);
-		busyNodes.add(imnode);
-		try {
-			imnode.setBusy();
-		} catch (NodeException e1) {
-			// A down node shouldn't by busied...
-			e1.printStackTrace();
-		}		
-	}
+    public PADNodeSource() {
+    }
 
-	/**
-	 * Set the down state, and move the node to the internal down list.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setDown(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
-	 */
-	public void setDown(IMNode imnode) {
-		removeFromAllLists(imnode);
-		downNodes.add(imnode);
-		imnode.setDown(true);
-	}
+    public void initActivity(Body body) {
+        freeNodes = new ArrayList<IMNode>();
+        busyNodes = new ArrayList<IMNode>();
+        downNodes = new ArrayList<IMNode>();
+        listPad = new HashMap<String, ProActiveDescriptor>();
+    }
 
-	/**
-	 * Set the free state, and move the node to the internal free list.
-	 * Update the node status.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setFree(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
-	 */
-	public void setFree(IMNode imnode) {
-		removeFromAllLists(imnode);
-		freeNodes.add(imnode);
-		try {
-			imnode.setFree();
-		} catch (NodeException e) {
-			// A down node shouldn't by busied...
-			e.printStackTrace();
-		}
-		HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
-		for(Entry<VerifyingScript, Integer> entry : verifs.entrySet()) {
-			if(entry.getKey().isDynamic() && entry.getValue() == IMNode.VERIFIED_SCRIPT)
-				entry.setValue(IMNode.ALREADY_VERIFIED_SCRIPT);
-		}
+    /**
+     * Return the nodes in a specific order :
+     * - if there is no script to verify, just return the free nodes ;
+     * - if there is a script, tries to give the nodes in an efficient order :
+     *                 -> First the nodes that verified the script before ;
+     *                 -> Next, the nodes that haven't been tested ;
+     *                 -> Next, the nodes that have allready verified the script, but no longer ;
+     *                 -> To finish, the nodes that don't verify the script.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNodesByScript(org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
+     */
+    public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+        boolean ordered) {
+        ArrayList<IMNode> result = getFreeNodes();
+        if ((script != null) && ordered) {
+            Collections.sort(result, new IMNodeComparator(script));
+        }
+        return result;
+    }
 
-	}
+    /**
+     * remove a node from the structure.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#removeIMNode(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
+     */
+    public void removeIMNode(IMNode imnode) {
+        removeFromAllLists(imnode);
+    }
 
-	/**
-	 * Remove the imnode from all the lists it can appears. 
-	 * @param imnode
-	 * @return
-	 */
-	private boolean removeFromAllLists(IMNode imnode) {
-		// Free
-		boolean free = freeNodes.remove(imnode);
-		// Busy
-		boolean busy = busyNodes.remove(imnode);
-		// Down
-		boolean down = downNodes.remove(imnode);
+    /**
+     * remove many nodes from the structure.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#removeIMNodes(java.util.Collection)
+     */
+    public void removeIMNodes(Collection<IMNode> imnodes) {
+        for (IMNode imnode : imnodes)
+            removeIMNode(imnode);
+    }
 
-		return free || busy || down;
-	}
-	
+    /**
+     * Set the busy state, and move the node to the internal busy list.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setBusy(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
+     */
+    public void setBusy(IMNode imnode) {
+        removeFromAllLists(imnode);
+        busyNodes.add(imnode);
+        try {
+            imnode.setBusy();
+        } catch (NodeException e1) {
+            // A down node shouldn't by busied...
+            e1.printStackTrace();
+        }
+    }
 
+    /**
+     * Set the down state, and move the node to the internal down list.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setDown(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
+     */
+    public void setDown(IMNode imnode) {
+        removeFromAllLists(imnode);
+        downNodes.add(imnode);
+        imnode.setDown(true);
+    }
+
+    /**
+     * Set the free state, and move the node to the internal free list.
+     * Update the node status.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setFree(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
+     */
+    public void setFree(IMNode imnode) {
+        removeFromAllLists(imnode);
+        freeNodes.add(imnode);
+        try {
+            imnode.setFree();
+        } catch (NodeException e) {
+            // A down node shouldn't by busied...
+            e.printStackTrace();
+        }
+        HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
+        for (Entry<VerifyingScript, Integer> entry : verifs.entrySet()) {
+            if (entry.getKey().isDynamic() &&
+                    (entry.getValue() == IMNode.VERIFIED_SCRIPT)) {
+                entry.setValue(IMNode.ALREADY_VERIFIED_SCRIPT);
+            }
+        }
+    }
+
+    /**
+     * Remove the imnode from all the lists it can appears.
+     * @param imnode
+     * @return
+     */
+    private boolean removeFromAllLists(IMNode imnode) {
+        // Free
+        boolean free = freeNodes.remove(imnode);
+
+        // Busy
+        boolean busy = busyNodes.remove(imnode);
+
+        // Down
+        boolean down = downNodes.remove(imnode);
+
+        return free || busy || down;
+    }
 
     // ----------------------------------------------------------------------//
     // ADMIN
@@ -196,7 +203,8 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
      * @param padName : the name of the proactive descriptor
      */
     public void addNode(Node node, String vnName, String padName) {
-		freeNodes.add(new IMNodeImpl(node, vnName, padName, (PADNodeSource) ProActive.getStubOnThis()));
+        freeNodes.add(new IMNodeImpl(node, vnName, padName,
+                (PADNodeSource) ProActive.getStubOnThis()));
     }
 
     /**
@@ -205,7 +213,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
      * @param pad     : the proactive descriptor
      */
     public void addPAD(String padName, ProActiveDescriptor pad) {
-    	listPad.put(padName, pad);
+        listPad.put(padName, pad);
     }
 
     // ----------------------------------------------------------------------//	
@@ -217,18 +225,18 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
         if (vnode.isActivated()) {
             vnode.killAll(false);
             ListIterator<IMNode> iterator = getAllNodes().listIterator();
-    		ArrayList<IMNode> toRemove = new ArrayList<IMNode>();
-    		while (iterator.hasNext()) {
-    			IMNode imnode = iterator.next();
-    			if (imnode.getPADName().equals(padName) &&
-    					imnode.getVNodeName().equals(vnode.getName())) {
-    				if (logger.isInfoEnabled()) {
-    					logger.info("remove node : " + imnode.getNodeName());
-    				}
-    				toRemove.add(imnode);
-    			}
-    		}
-    		removeIMNodes(toRemove);
+            ArrayList<IMNode> toRemove = new ArrayList<IMNode>();
+            while (iterator.hasNext()) {
+                IMNode imnode = iterator.next();
+                if (imnode.getPADName().equals(padName) &&
+                        imnode.getVNodeName().equals(vnode.getName())) {
+                    if (logger.isInfoEnabled()) {
+                        logger.info("remove node : " + imnode.getNodeName());
+                    }
+                    toRemove.add(imnode);
+                }
+            }
+            removeIMNodes(toRemove);
         }
 
         // FIXME uncomment this line below when the problem of redeploy will be fix 
@@ -296,9 +304,10 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
         if (listPad.containsKey(padName)) {
             ProActiveDescriptor pad = listPad.get(padName);
             try {
-            	pad.killall(false);
-            }catch (ProActiveException e) {
-            	logger.error("error killing all active objects for pad "+padName, e);
+                pad.killall(false);
+            } catch (ProActiveException e) {
+                logger.error("error killing all active objects for pad " +
+                    padName, e);
             }
             removeNode(padName);
             removePad(padName);
@@ -350,185 +359,186 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
     * @exception ProActiveException
     */
     public void killAll() throws ProActiveException {
-    	ArrayList<String> pads = new ArrayList<String>();
-    	pads.addAll(listPad.keySet());
+        ArrayList<String> pads = new ArrayList<String>();
+        pads.addAll(listPad.keySet());
         for (String padName : pads) {
             killPAD(padName);
         }
     }
-	
+
     private void removePad(String padName) {
-		// TODO anything else to do ? 
-		// what do we do for the IMNodes corresponding ?
-		listPad.remove(padName);
-	}
+        // TODO anything else to do ? 
+        // what do we do for the IMNodes corresponding ?
+        listPad.remove(padName);
+    }
 
-	private void removeNode(String padName) {
-		ListIterator<IMNode> iterator = getAllNodes().listIterator();
-		ArrayList<IMNode> toRemove = new ArrayList<IMNode>();
-		while (iterator.hasNext()) {
-			IMNode imnode = iterator.next();
-			if (imnode.getPADName().equals(padName)) {
-				if (logger.isInfoEnabled()) {
-					logger.info("remove node : " + imnode.getNodeName());
-				}
-				toRemove.add(imnode);
-			}
-		}
-		removeIMNodes(toRemove);
-	}
+    private void removeNode(String padName) {
+        ListIterator<IMNode> iterator = getAllNodes().listIterator();
+        ArrayList<IMNode> toRemove = new ArrayList<IMNode>();
+        while (iterator.hasNext()) {
+            IMNode imnode = iterator.next();
+            if (imnode.getPADName().equals(padName)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("remove node : " + imnode.getNodeName());
+                }
+                toRemove.add(imnode);
+            }
+        }
+        removeIMNodes(toRemove);
+    }
 
-	private void removeNode(String padName, String vnName) {
-		ListIterator<IMNode> iterator = getAllNodes().listIterator();
-		ArrayList<IMNode> toRemove = new ArrayList<IMNode>();
-		while (iterator.hasNext()) {
-			IMNode imnode = iterator.next();
-			if (imnode.getPADName().equals(padName) &&
-					imnode.getVNodeName().equals(vnName)) {
-				if (logger.isInfoEnabled()) {
-					logger.info("remove node : " + imnode.getNodeName());
-				}
-				toRemove.add(imnode);
-			}
-		}
-		removeIMNodes(toRemove);
-	}
+    private void removeNode(String padName, String vnName) {
+        ListIterator<IMNode> iterator = getAllNodes().listIterator();
+        ArrayList<IMNode> toRemove = new ArrayList<IMNode>();
+        while (iterator.hasNext()) {
+            IMNode imnode = iterator.next();
+            if (imnode.getPADName().equals(padName) &&
+                    imnode.getVNodeName().equals(vnName)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("remove node : " + imnode.getNodeName());
+                }
+                toRemove.add(imnode);
+            }
+        }
+        removeIMNodes(toRemove);
+    }
 
-	private void removeNode(String padName, String[] vnNames) {
-		for (String vnName : vnNames) {
-			removeNode(padName, vnName);
-		}
-	}
+    private void removeNode(String padName, String[] vnNames) {
+        for (String vnName : vnNames) {
+            removeNode(padName, vnName);
+        }
+    }
 
-	/**
-	 * Comparator for imnodes :
-	 * compare two nodes by their chances to verify a script.
-	 * @author ProActive Team
-	 * @version 1.0, Jul 12, 2007
-	 * @since ProActive 3.2
-	 */
-	private class IMNodeComparator implements Comparator<IMNode>{
+    /**
+     * Comparator for imnodes :
+     * compare two nodes by their chances to verify a script.
+     * @author ProActive Team
+     * @version 1.0, Jul 12, 2007
+     * @since ProActive 3.2
+     */
+    private class IMNodeComparator implements Comparator<IMNode> {
+        private VerifyingScript script;
 
-		private VerifyingScript script;
+        public IMNodeComparator(VerifyingScript script) {
+            this.script = script;
+        }
 
-		public IMNodeComparator(VerifyingScript script) {
-			this.script = script;
-		}
+        public int compare(IMNode o1, IMNode o2) {
+            int status1 = IMNode.NEVER_TESTED;
+            if (o1.getScriptStatus().containsKey(script)) {
+                status1 = o1.getScriptStatus().get(script);
+            }
+            int status2 = IMNode.NEVER_TESTED;
+            if (o2.getScriptStatus().containsKey(script)) {
+                status2 = o2.getScriptStatus().get(script);
+            }
+            return status2 - status1;
+        }
+    }
 
-		public int compare(IMNode o1, IMNode o2) {
-			int status1 = IMNode.NEVER_TESTED;
-			if(o1.getScriptStatus().containsKey(script))
-				status1 = o1.getScriptStatus().get(script);
-			int status2 = IMNode.NEVER_TESTED;
-			if(o2.getScriptStatus().containsKey(script))
-				status2 = o2.getScriptStatus().get(script);
-			return status2 - status1;
-		}
+    @Override
+    public String getSourceId() {
+        return id;
+    }
 
-	}
+    @SuppressWarnings("unchecked")
+    public ArrayList<IMNode> getBusyNodes() {
+        return (ArrayList<IMNode>) busyNodes.clone();
+    }
 
-	@Override
-	public String getSourceId() {
-		return id;
-	}
+    @SuppressWarnings("unchecked")
+    public ArrayList<IMNode> getDownNodes() {
+        return (ArrayList<IMNode>) downNodes.clone();
+    }
 
-	@SuppressWarnings("unchecked")
-	public ArrayList<IMNode> getBusyNodes() {
-		return (ArrayList<IMNode>) busyNodes.clone();
-	}
+    @SuppressWarnings("unchecked")
+    public ArrayList<IMNode> getFreeNodes() {
+        return (ArrayList<IMNode>) freeNodes.clone();
+    }
 
-	@SuppressWarnings("unchecked")
-	public ArrayList<IMNode> getDownNodes() {
-		return (ArrayList<IMNode>) downNodes.clone();
-	}
+    public IntWrapper getNbBusyNodes() {
+        return new IntWrapper(busyNodes.size());
+    }
 
-	@SuppressWarnings("unchecked")
-	public ArrayList<IMNode> getFreeNodes() {
-		return (ArrayList<IMNode>) freeNodes.clone();
-	}
+    public IntWrapper getNbDownNodes() {
+        return new IntWrapper(downNodes.size());
+    }
 
-	public IntWrapper getNbBusyNodes() {
-		return new IntWrapper(busyNodes.size());
-	}
+    public IntWrapper getNbFreeNodes() {
+        return new IntWrapper(freeNodes.size());
+    }
 
-	public IntWrapper getNbDownNodes() {
-		return new IntWrapper(downNodes.size());
-	}
+    /**
+     * The list of all {@link IMNode} in the Node Manager
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getListAllIMNode()
+     */
+    public ArrayList<IMNode> getAllNodes() {
+        ArrayList<IMNode> result = new ArrayList<IMNode>();
+        result.addAll(freeNodes);
+        result.addAll(busyNodes);
+        result.addAll(downNodes);
+        return result;
+    }
 
-	public IntWrapper getNbFreeNodes() {
-		return new IntWrapper(freeNodes.size());
-	}
+    /**
+     * return the number of nodes in the node manager, including
+     * busy and waiting nodes.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNbAllIMNode()
+     */
+    public IntWrapper getNbAllNodes() {
+        return new IntWrapper(freeNodes.size() + busyNodes.size() +
+            downNodes.size());
+    }
 
-	/**
-	 * The list of all {@link IMNode} in the Node Manager
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getListAllIMNode()
-	 */
-	public ArrayList<IMNode> getAllNodes() {
-		ArrayList<IMNode> result = new ArrayList<IMNode>();
-		result.addAll(freeNodes);
-		result.addAll(busyNodes);
-		result.addAll(downNodes);
-		return result;
-	}
+    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
+        HashMap<String, ArrayList<VirtualNode>> deployedVNodesByPadName = new HashMap<String, ArrayList<VirtualNode>>();
 
-	/**
-	 * return the number of nodes in the node manager, including
-	 * busy and waiting nodes.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNbAllIMNode()
-	 */
-	public IntWrapper getNbAllNodes() {
-		return new IntWrapper(freeNodes.size() + busyNodes.size() + downNodes.size());
-	}
+        for (String padName : listPad.keySet()) {
+            if (logger.isInfoEnabled()) {
+                logger.info("pad name : " + padName);
+            }
+            ProActiveDescriptor pad = listPad.get(padName);
 
-	public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
+            ArrayList<VirtualNode> deployedVNodes = new ArrayList<VirtualNode>();
+            VirtualNode[] vns = pad.getVirtualNodes();
+            if (logger.isInfoEnabled()) {
+                logger.info("nb vnodes of this pad : " + vns.length);
+            }
+            for (VirtualNode vn : vns) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("virtualnode " + vn.getName() + " is actif ? " +
+                        vn.isActivated());
+                }
+                if (vn.isActivated()) {
+                    deployedVNodes.add(vn);
+                }
+            }
+            deployedVNodesByPadName.put(padName, deployedVNodes);
+        }
+        return deployedVNodesByPadName;
+    }
 
-		HashMap<String, ArrayList<VirtualNode>> deployedVNodesByPadName = new HashMap<String, ArrayList<VirtualNode>>();
+    public HashMap<String, ProActiveDescriptor> getListPAD() {
+        return listPad;
+    }
 
-		for (String padName : listPad.keySet()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("pad name : " + padName);
-			}
-			ProActiveDescriptor pad = listPad.get(padName);
+    public IntWrapper getSizeListPad() {
+        return new IntWrapper(listPad.size());
+    }
 
-			ArrayList<VirtualNode> deployedVNodes = new ArrayList<VirtualNode>();
-			VirtualNode[] vns = pad.getVirtualNodes();
-			if (logger.isInfoEnabled()) {
-				logger.info("nb vnodes of this pad : " + vns.length);
-			}
-			for (VirtualNode vn : vns) {
-				if (logger.isInfoEnabled()) {
-					logger.info("virtualnode " + vn.getName() + " is actif ? " +
-							vn.isActivated());
-				}
-				if (vn.isActivated()) {
-					deployedVNodes.add(vn);
-				}
-			}
-			deployedVNodesByPadName.put(padName, deployedVNodes);
-		}
-		return deployedVNodesByPadName;
-	}
+    public BooleanWrapper shutdown() {
+        logger.info("Shutting down PAD Node Source");
+        try {
+            killAll();
+            return new BooleanWrapper(true);
+        } catch (ProActiveException e) {
+            logger.error("Error during shutting down PAD Node Source : ", e);
+            return new BooleanWrapper(false);
+        }
+    }
 
-	public HashMap<String, ProActiveDescriptor> getListPAD() {
-		return listPad;
-	}
-
-	public IntWrapper getSizeListPad() {
-		return new IntWrapper(listPad.size());
-	}
-
-	public BooleanWrapper shutdown() {
-		logger.info("Shutting down PAD Node Source");
-		try{
-			killAll();
-			return new BooleanWrapper(true);
-		} catch(ProActiveException e) {
-			logger.error("Error during shutting down PAD Node Source : ",e);
-			return new BooleanWrapper(false);
-		}
-	}
-
-	public void deployAllVirtualNodes(File xmlDescriptor, Node remoteNode) throws Exception {
+    public void deployAllVirtualNodes(File xmlDescriptor, Node remoteNode)
+        throws Exception {
         if (logger.isInfoEnabled()) {
             logger.info("Starting deploying all virtual nodes of " +
                 xmlDescriptor);
@@ -545,13 +555,14 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
             logger.info("Succefully pull the remote file " + xmlDescriptor +
                 " to local file " + localCopyPad);
         }
-        
+
         ProActiveDescriptor pad = ProActive.getProactiveDescriptor(localCopyPad.getPath());
         IMDeploymentFactory.deployAllVirtualNodes((PADNodeSource) ProActive.getStubOnThis(),
             localCopyPad.getName(), pad);
-	}
+    }
 
-	public void deployVirtualNode(File xmlDescriptor, Node remoteNode, String vnName) throws Exception {
+    public void deployVirtualNode(File xmlDescriptor, Node remoteNode,
+        String vnName) throws Exception {
         if (logger.isInfoEnabled()) {
             logger.info("Starting deploying all virtual nodes of " +
                 xmlDescriptor);
@@ -572,9 +583,10 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
         ProActiveDescriptor pad = ProActive.getProactiveDescriptor(localCopyPad.getPath());
         IMDeploymentFactory.deployVirtualNode((PADNodeSource) ProActive.getStubOnThis(),
             localCopyPad.getName(), pad, vnName);
-	}
+    }
 
-	public void deployVirtualNodes(File xmlDescriptor, Node remoteNode, String[] vnNames) throws Exception {
+    public void deployVirtualNodes(File xmlDescriptor, Node remoteNode,
+        String[] vnNames) throws Exception {
         if (logger.isInfoEnabled()) {
             logger.info("Starting deploying all virtual nodes of " +
                 xmlDescriptor);
@@ -595,7 +607,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
         ProActiveDescriptor pad = ProActive.getProactiveDescriptor(localCopyPad.getPath());
         IMDeploymentFactory.deployVirtualNodes((PADNodeSource) ProActive.getStubOnThis(),
             localCopyPad.getName(), pad, vnNames);
-	}
+    }
 
     /**
      * @param filePAD    : the file proactive descriptor
@@ -617,5 +629,4 @@ public class PADNodeSource extends IMNodeSource implements Serializable, InitAct
 
         return localDest;
     }
-	
 }
