@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 

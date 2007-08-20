@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.gcmdeployment;
+package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 

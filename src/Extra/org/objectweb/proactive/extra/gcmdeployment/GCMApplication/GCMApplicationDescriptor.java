@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 
 /**

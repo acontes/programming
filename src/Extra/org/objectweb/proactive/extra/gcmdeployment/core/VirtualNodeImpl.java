@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.gcmdeployment;
+package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,4 +62,9 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
             throw new IllegalStateException("providers is empty in " + this);
         }
     }
+
+	public void checkDirectMode() throws IllegalStateException {
+		// TODO Auto-generated method stub
+		
+	}
 }

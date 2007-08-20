@@ -8,8 +8,8 @@ import java.util.Set;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNode;
-import org.objectweb.proactive.extra.gcmdeployment.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 
