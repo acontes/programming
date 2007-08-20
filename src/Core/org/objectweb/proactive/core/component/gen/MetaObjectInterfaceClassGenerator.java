@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -141,6 +141,7 @@ public class MetaObjectInterfaceClassGenerator
                 //interfacesToImplement.add(pool.get(StubObject.class.getName()));
                 List interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
                 addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
+
                 generatedCtClass.setSuperclass(pool.get(
                         ProActiveInterfaceImpl.class.getName()));
                 JavassistByteCodeStubBuilder.createStubObjectMethods(generatedCtClass);
@@ -235,8 +236,7 @@ public class MetaObjectInterfaceClassGenerator
                 //                                    generatedClassFullName);
                 byte[] bytecode = generatedCtClass.toBytecode();
                 ClassDataCache.instance()
-                              .addClassData(generatedClassFullName,
-                    generatedCtClass.toBytecode());
+                              .addClassData(generatedClassFullName, bytecode);
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassFullName +
                         " to cache");
@@ -259,6 +259,7 @@ public class MetaObjectInterfaceClassGenerator
 
             return reference;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new InterfaceGenerationFailedException(
                 "Cannot generate meta object representative on interface [" +
                 interfaceName + "] with signature [" +
@@ -285,7 +286,7 @@ public class MetaObjectInterfaceClassGenerator
             body += ")";
 
             body += ";";
-            body += "\n}";
+
             //            System.out.println("method : " + reifiedMethods[i].getName() +
             //                " : \n" + body);
             CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),

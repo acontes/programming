@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -105,6 +105,7 @@ public class RepresentativeInterfaceClassGenerator
 
             return reference;
         } catch (Exception e) {
+            //        	e.printStackTrace();
             throw new InterfaceGenerationFailedException(
                 "Cannot generate representative on interface [" +
                 interfaceName + "] with signature [" +
@@ -229,7 +230,7 @@ public class RepresentativeInterfaceClassGenerator
                     bodyForImplGetterAndSetter, generatedCtClass);
             generatedCtClass.addMethod(implGetter);
             CtMethod implSetter = CtNewMethod.make(
-                    "public Object setFcItfImpl() " +
+                    "public void setFcItfImpl(Object o) " +
                     bodyForImplGetterAndSetter, generatedCtClass);
             generatedCtClass.addMethod(implSetter);
 
@@ -301,8 +302,7 @@ public class RepresentativeInterfaceClassGenerator
             //                                        representativeClassName);
             byte[] bytecode = generatedCtClass.toBytecode();
             ClassDataCache.instance()
-                          .addClassData(representativeClassName,
-                generatedCtClass.toBytecode());
+                          .addClassData(representativeClassName, bytecode);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("added " + representativeClassName + " to cache");
@@ -311,6 +311,7 @@ public class RepresentativeInterfaceClassGenerator
             return bytecode;
         } catch (Exception e) {
             e.printStackTrace();
+
             logger.error("Cannot generate class : " + representativeClassName);
             return null;
         }
@@ -394,9 +395,9 @@ public class RepresentativeInterfaceClassGenerator
                 }
             }
 
-            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
+            body += (" myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
             "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-            ", parameters, null, getFcItfName(), senderItfID))");
+            ", parameters, null, getFcItfName(), senderItfID))  ");
 
             if (postWrap != null) {
                 body += postWrap;

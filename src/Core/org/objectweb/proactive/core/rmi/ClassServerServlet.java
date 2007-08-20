@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 
 public class ClassServerServlet extends HttpServlet {
     //	public static final String WEB_ROOT = "/proactive";
-    public static final String SERVLET_NAME = "/ProActiveHTTP";
+    public static final String SERVLET_NAME = "ProActiveHTTP";
     private String url;
     private ClassServer classServer;
     private HttpServletRequest request;
@@ -53,7 +53,6 @@ public class ClassServerServlet extends HttpServlet {
     private static int port;
 
     public ClassServerServlet(int newport) {
-        System.out.println("New Class Server Servlet");
         ClassServerServlet.port = newport;
         ClassServerHelper helper = new ClassServerHelper();
         System.setProperty("proactive.http.port", ClassServerServlet.port + "");
@@ -109,15 +108,17 @@ public class ClassServerServlet extends HttpServlet {
         try {
             //            int port = Integer.parseInt(System.getProperty(
             //                        "proactive.http.port"));
-            String url = UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
-                        java.net.InetAddress.getLocalHost()), "",
-                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port); /*+
-            "/" + SERVLET_NAME ;*/
+            String url = Constants.XMLHTTP_PROTOCOL_IDENTIFIER + "://" +
+                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
+                ':' + port + '/' + SERVLET_NAME;
 
-            if (url.charAt(url.length() - 1) == '/') {
-                url = url.substring(0, url.length() - 1);
-            }
-            url += SERVLET_NAME;
+            //                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port); /*+
+            //            "/" + SERVLET_NAME ;*/
+
+            //            if (url.charAt(url.length() - 1) == '/') {
+            //                url = url.substring(0, url.length() - 1);
+            //            }
+            //            url += SERVLET_NAME + '/';
             return url;
         } catch (UnknownHostException e) {
             e.printStackTrace();

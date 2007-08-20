@@ -1,38 +1,9 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
 package org.objectweb.proactive.core.jmx.mbean;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -45,12 +16,22 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.migration.Migratable;
+import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.profiling.TimerProvidable;
+import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 /**
@@ -112,7 +93,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         this.body = body;
 
         this.notifications = new ConcurrentLinkedQueue<Notification>();
-        // launchNotificationsThread();
+        launchNotificationsThread();
     }
 
     public UniqueID getID() {
@@ -155,6 +136,29 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         } else {
             notifications.add(notification);
         }
+    }
+
+    public Collection<BasicTimer> getTimersSnapshot(String[] timerNames) {
+        TimerProvidable container = TimerWarehouse.getTimerProvidable(getID());
+        if (container == null) {
+            throw new NullPointerException(
+                "The timers container is null, the body is not timed.");
+        }
+        return container.getSnapshot(timerNames);
+    }
+
+    public void migrateTo(String nodeUrl) throws MigrationException {
+        if (!(body instanceof Migratable)) {
+            throw new MigrationException("Object cannot Migrate");
+        }
+        Node node = null;
+        try {
+            node = NodeFactory.getNode(nodeUrl);
+        } catch (NodeException e) {
+            throw new MigrationException("Cannot find node " + nodeUrl, e);
+        }
+        ProActive.migrateTo(body, node, true,
+            Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
 
     //
@@ -278,6 +282,6 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                 e);
         }
 
-        // launchNotificationsThread();
+        launchNotificationsThread();
     }
 }

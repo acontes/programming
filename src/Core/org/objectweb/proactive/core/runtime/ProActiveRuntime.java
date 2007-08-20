@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -37,11 +37,13 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Job;
+import org.objectweb.proactive.annotation.Cache;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -79,6 +81,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public interface ProActiveRuntime extends Job, SecurityEntity {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
+    public static final long serialVersionUID = 104088081090593038L;
 
     /**
      * Creates a new Node in the same VM as this ProActiveRuntime
@@ -126,6 +129,7 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * retrieve all JVM information in one call to optimize performance.
      * @return the JVM information as one object
      */
+    @Cache
     public VMInformation getVMInformation();
 
     /**
@@ -206,7 +210,9 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
 
     /**
      * Returns the url of this ProActiveRuntime on the local or remote VM
+     * This information is cached
      */
+    @Cache
     public String getURL();
 
     /**
@@ -321,20 +327,6 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws ProActiveException;
 
-    /**
-     * Ask proActiveRuntimeDist for the process with given ids: padURL, creatorID, vmName.
-     * Used for hierarchical deployment.
-     * @param proActiveRuntimeDist
-     * @param creatorID
-     * @param vmName
-     * @param padURL
-     * @return the process with given ids: padURL, creatorID, vmName
-     * @throws ProActiveException
-     */
-    public ExternalProcess getProcessToDeploy(
-        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
-        String padURL) throws ProActiveException;
-
     // SECURITY
     public String getVNName(String Nodename) throws ProActiveException;
 
@@ -412,4 +404,30 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      */
     public String getLocalNodeProperty(String nodeName, String key)
         throws ProActiveException;
+
+    //
+    // --- JMX
+    //
+
+    /**
+    * Starts the JMX ServerConnector.
+    */
+    public void startJMXServerConnector();
+
+    /**
+     * Create the MBean associated to the ProActive Runtime.
+     */
+    public void createMBean();
+
+    /**
+     * Return the MBean associated to this ProActiveRuntime.
+     * @return the MBean associated to this ProActiveRuntime.
+     */
+    public ProActiveRuntimeWrapperMBean getMBean();
+
+    /**
+     * Returns the MBeans Server Name
+     * @return the MBeans Server Name
+     */
+    public String getMBeanServerName();
 }

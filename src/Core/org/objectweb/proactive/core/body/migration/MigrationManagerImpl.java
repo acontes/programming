@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -124,11 +124,11 @@ public class MigrationManagerImpl extends AbstractEventProducer
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public void updateLocation(UniversalBody body) {
-        if (locationServer == null) {
+        if (this.locationServer == null) {
             this.locationServer = LocationServerFactory.getLocationServer();
         }
-        if (locationServer != null) {
-            locationServer.updateLocation(body.getID(),
+        if (this.locationServer != null) {
+            this.locationServer.updateLocation(body.getID(),
                 body.getRemoteAdapter(), this.migrationCounter);
         }
         resetNbOfMigrationWithoutUpdate();
@@ -140,9 +140,9 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
     public void launchTimeToLive(MigratableBody body, UniversalBody migratedBody) {
         if (this.ttl != INFINITE_TTL) {
-            ttlTimer = new Timer();
-            ttlTimer.schedule(new TimeToLiveTimerTask(this, body, migratedBody),
-                this.ttl);
+            this.ttlTimer = new Timer();
+            this.ttlTimer.schedule(new TimeToLiveTimerTask(this, body,
+                    migratedBody), this.ttl);
         }
     }
 
@@ -193,7 +193,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
                 l1 = System.currentTimeMillis();
             }
 
-            //      
+            //
             // UniversalBody remoteBody = node.receiveBody(body);
             // --------------------added lines---------------------------
             ProActiveRuntime part = node.getProActiveRuntime();
@@ -207,7 +207,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
             // --------------------added lines--------------------------
             // activityStopped();
-            //    
+            //
             long l2 = 0;
             if (logger.isDebugEnabled()) {
                 l2 = System.currentTimeMillis();
@@ -233,13 +233,14 @@ public class MigrationManagerImpl extends AbstractEventProducer
             // we are not on this site anymore,
             // so there is no need to send this
             // position to the server
-            if (maxTimeOnSiteTimer != null) {
-                maxTimeOnSiteTimer.cancel();
+            if (this.maxTimeOnSiteTimer != null) {
+                this.maxTimeOnSiteTimer.cancel();
             }
 
             return remoteBody;
             //} catch (ProActiveException e) {
         } catch (Exception e) {
+            e.printStackTrace();
             MigrationException me = new MigrationException("Exception while sending the Object",
                     e.getCause());
 
@@ -317,9 +318,9 @@ public class MigrationManagerImpl extends AbstractEventProducer
         }
         // TTU : maxTimeOnSite
         else if (this.maxTimeOnSite != INFINITE_MAX_TIME_ON_SITE) {
-            maxTimeOnSiteTimer = new Timer();
-            maxTimeOnSiteTimer.schedule(new MaxTimeOnSiteTimerTask(this, body),
-                maxTimeOnSite);
+            this.maxTimeOnSiteTimer = new Timer();
+            this.maxTimeOnSiteTimer.schedule(new MaxTimeOnSiteTimerTask(this,
+                    body), this.maxTimeOnSite);
         }
     }
 
@@ -418,11 +419,11 @@ public class MigrationManagerImpl extends AbstractEventProducer
                 this.migrationManager.updateLocation(this.migratedBody.getRemoteAdapter());
             }
             //this.migrationManager.updateRemoteLocation(this.migratedBody.getRemoteAdapter());
-            LocalBodyStore.getInstance().unregisterForwarder(body);
+            LocalBodyStore.getInstance().unregisterForwarder(this.body);
 
             this.body.terminate();
-            body.setRequestReceiver(null);
-            body.setReplyReceiver(null);
+            this.body.setRequestReceiver(null);
+            this.body.setReplyReceiver(null);
         }
     }
 }

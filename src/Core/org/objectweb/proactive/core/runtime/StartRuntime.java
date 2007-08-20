@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -59,39 +59,29 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class StartRuntime {
-    //Name of the runtime that launched this class reading the ProActiveDescriptor
-    //private static final String DefaultRuntimeName = "PART_DEFAULT";
-    //Name of the runtime's host that launched this class reading the ProActiveDescriptor
     static Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
-    protected String defaultRuntimeURL;
-    protected String nodeURL;
-    protected String creatorID;
-    protected ProActiveRuntime proActiveRuntime;
 
-    //protected String acquisitionMethod;
-    protected String nodeNumber;
-    protected String vmName;
-    protected int nodenumber; //it is only the int value of nodeNumber
+    /** The VirtualNode that started this ProActive Runtime */
+    protected String creatorID;
+
+    /** The URL of the parent ProActive Runtime */
+    protected String defaultRuntimeURL;
+
+    /** The protocol to be used by this Runtime */
     protected String protocolId;
+
+    /** Name of the associated VirtualMachine */
+    protected String vmName;
 
     protected StartRuntime() {
     }
 
     private StartRuntime(String[] args) {
         if (args.length != 0) {
-            this.nodeURL = args[0];
             this.creatorID = args[0].trim();
-
-            //System.out.println(creatorID);
             this.defaultRuntimeURL = UrlBuilder.removeUsername(args[1]);
-
-            //this.acquisitionMethod = args[2];
-            this.nodeNumber = args[2];
-
-            //   this.portNumber = Integer.parseInt(args[4]);
-            this.nodenumber = (new Integer(this.nodeNumber)).intValue();
-            this.protocolId = args[3];
-            this.vmName = args[4];
+            this.protocolId = args[2];
+            this.vmName = args[3];
         }
     }
 
@@ -181,11 +171,11 @@ public class StartRuntime {
      */
     private void register(ProActiveRuntime PART) {
         try {
-            this.proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
-                                                                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+            ProActiveRuntime proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
+                                                                                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
 
-            PART.register(this.proActiveRuntime,
-                this.proActiveRuntime.getURL(), this.creatorID,
+            PART.register(proActiveRuntime, proActiveRuntime.getURL(),
+                this.creatorID,
                 ProActiveConfiguration.getInstance()
                                       .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
                 this.vmName);

@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -94,7 +94,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * @return the VMID part of this UniqueID
      */
     public java.rmi.dgc.VMID getVMID() {
-        return vmID;
+        return this.vmID;
     }
 
     /**
@@ -102,7 +102,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * @return the UID part of this UniqueID
      */
     public java.rmi.server.UID getUID() {
-        return id;
+        return this.id;
     }
 
     /**
@@ -129,7 +129,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
 
     public String getCanonString() {
         if (this.cachedCanonString == null) {
-            this.cachedCanonString = "" + id + " " + vmID;
+            this.cachedCanonString = "" + this.id + "--" + this.vmID;
         }
 
         return this.cachedCanonString;
@@ -146,7 +146,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      */
     @Override
     public int hashCode() {
-        return id.hashCode() + vmID.hashCode();
+        return this.id.hashCode() + this.vmID.hashCode();
     }
 
     /**
@@ -157,8 +157,8 @@ public class UniqueID implements java.io.Serializable, Comparable {
     public boolean equals(Object o) {
         //System.out.println("Now checking for equality");
         if (o instanceof UniqueID) {
-            return ((id.equals(((UniqueID) o).id)) &&
-            (vmID.equals(((UniqueID) o).vmID)));
+            return ((this.id.equals(((UniqueID) o).id)) &&
+            (this.vmID.equals(((UniqueID) o).vmID)));
         } else {
             return false;
         }
@@ -168,6 +168,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * for debug purpose
      */
     public void echo() {
-        logger.info("UniqueID The Id is " + id + " and the address is " + vmID);
+        logger.info("UniqueID The Id is " + this.id + " and the address is " +
+            this.vmID);
     }
 }

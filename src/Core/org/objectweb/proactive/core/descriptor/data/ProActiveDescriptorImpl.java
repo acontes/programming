@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
-import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
@@ -305,25 +304,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         return (ExternalProcess) processMapping.get(name);
     }
 
-    public ExternalProcess getHierarchicalProcess(String vmname) {
-        VirtualMachine vm = getVirtualMachine(vmname);
-
-        if (vm == null) {
-            logger.warn("" + vmname + "cannot be found");
-
-            return null;
-        }
-
-        if (vm.getProcess() instanceof HierarchicalProcess) {
-            return ((HierarchicalProcess) vm.getProcess()).getHierarchicalProcess();
-        } else {
-            logger.warn("" + vmname +
-                " does not contain a hierarchical process !");
-
-            return null;
-        }
-    }
-
     public UniversalService getService(String serviceID) {
         return serviceMapping.get(serviceID);
     }
@@ -520,17 +500,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    public void registerHierarchicalProcess(HierarchicalProcess hp,
-        String processID) {
-        ExternalProcess process = getProcess(processID);
-
-        if (process == null) {
-            addHierarchicalPendingProcess(processID, hp);
-        } else {
-            hp.setHierarchicalProcess(process);
-        }
-    }
-
     public void addService(String serviceID, UniversalService service) {
         ServiceUpdater serviceUpdater = (ServiceUpdater) pendingServiceMapping.remove(serviceID);
 
@@ -681,12 +650,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         addProcessUpdater(processID, updater);
     }
 
-    private void addHierarchicalPendingProcess(String processID,
-        HierarchicalProcess hp) {
-        ProcessUpdater updater = new HierarchicalProcessUpdater(hp);
-        addProcessUpdater(processID, updater);
-    }
-
     private void addSequentialPendingProcess(String processID,
         AbstractSequentialListProcessDecorator sp) {
         ProcessUpdater updater = new SequentialProcessUpdater(sp);
@@ -820,22 +783,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
             }
 
             compositeExternalProcess.setTargetProcess(p);
-        }
-    }
-
-    private class HierarchicalProcessUpdater implements ProcessUpdater {
-        private HierarchicalProcess hp;
-
-        public HierarchicalProcessUpdater(HierarchicalProcess hp) {
-            this.hp = hp;
-        }
-
-        public void updateProcess(ExternalProcess p) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Updating Hierarchical Process");
-            }
-
-            hp.setHierarchicalProcess(p);
         }
     }
 

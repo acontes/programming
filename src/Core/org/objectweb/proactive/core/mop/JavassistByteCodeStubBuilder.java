@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -50,6 +50,10 @@ import javassist.CtNewMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
+import org.objectweb.proactive.annotation.Cache;
+import org.objectweb.proactive.annotation.NoReify;
+import org.objectweb.proactive.annotation.Self;
+
 
 /**
  * This class generates the bytecode for proactive stubs using Javassist.
@@ -73,12 +77,14 @@ public class JavassistByteCodeStubBuilder {
     public static byte[] create(String className, Class[] genericParameters)
         throws NoClassDefFoundError {
         CtClass generatedCtClass = null;
+
         if (genericParameters == null) {
             genericParameters = new Class[0];
         }
         CtMethod[] reifiedMethodsWithoutGenerics;
         try {
             ClassPool pool = ClassPool.getDefault();
+
             generatedCtClass = pool.makeClass(Utils.convertClassNameToStubClassName(
                         className, genericParameters));
 
@@ -204,8 +210,7 @@ public class JavassistByteCodeStubBuilder {
             addSuperInterfaces(superCtClass, superInterfaces);
 
             CtClass[] implementedInterfacesTable = (superInterfaces.toArray(new CtClass[superInterfaces.size()]));
-            for (int i = 0; i < implementedInterfacesTable.length; i++) {
-            }
+
             for (int itfsIndex = 0;
                     itfsIndex < implementedInterfacesTable.length;
                     itfsIndex++) {
@@ -235,11 +240,11 @@ public class JavassistByteCodeStubBuilder {
                 }
             }
 
-            reifiedMethodsWithoutGenerics = (CtMethod[]) (temp.values()
-                                                              .toArray(new CtMethod[temp.size()]));
+            reifiedMethodsWithoutGenerics = (temp.values()
+                                                 .toArray(new CtMethod[temp.size()]));
 
             // Determines which reifiedMethods are valid for reification
-            // It is the responsibility of method checkMethod 
+            // It is the responsibility of method checkMethod
             // to decide if a method is valid for reification or not
             Vector<CtMethod> v = new Vector<CtMethod>();
             int initialNumberOfMethods = reifiedMethodsWithoutGenerics.length;
@@ -272,15 +277,20 @@ public class JavassistByteCodeStubBuilder {
 
             createReifiedMethods(generatedCtClass,
                 reifiedMethodsWithoutGenerics, superCtClass.isInterface());
-            //                        generatedClass.writeFile();
-            //                        System.out.println("[JAVASSIST] generated class : " + generatedClass.getName());
 
-            // detach to fix  "frozen class" errors encountered in some large scale deployments 
+            //                        generatedCtClass.debugWriteFile();
+            //                        System.out.println("[JAVASSIST] generated class : " +
+            //                generatedCtClass.getName());
+
+            // detach to fix  "frozen class" errors encountered in some large scale deployments
             byte[] bytecode = generatedCtClass.toBytecode();
+
             generatedCtClass.detach();
             return bytecode;
         } catch (Exception e) {
             e.printStackTrace();
+
+            //                        generatedCtClass.debugWriteFile();
             throw new NoClassDefFoundError("Cannot generated stub for class " +
                 className + " with javassist : " + e.getMessage());
         }
@@ -296,104 +306,142 @@ public class JavassistByteCodeStubBuilder {
         CtMethod[] reifiedMethods, boolean stubOnInterface)
         throws NotFoundException, CannotCompileException {
         for (int i = 0; i < reifiedMethods.length; i++) {
-            CtClass[] paramTypes = reifiedMethods[i].getParameterTypes();
-            String body = ("{\nObject[] parameters = new Object[" +
+            String body = "{";
+
+            if (hasSelfAnnotation(reifiedMethods[i])) {
+                body += "return this;";
+            } else {
+                CtClass[] paramTypes = reifiedMethods[i].getParameterTypes();
+
+                boolean fieldToCache = hasCacheAnnotation(reifiedMethods[i]);
+                CtField cachedField = null;
+
+                if (fieldToCache) {
+                    // the generated has to cache the method
+                    cachedField = new CtField(ClassPool.getDefault()
+                                                       .get(reifiedMethods[i].getReturnType()
+                                                                             .getName()),
+                            reifiedMethods[i].getName() + i, generatedClass);
+
+                    generatedClass.addField(cachedField);
+
+                    body += ("if (" + cachedField.getName() + " == null) { ");
+                }
+
+                body += ("\nObject[] parameters = new Object[" +
                 paramTypes.length + "];\n");
-            for (int j = 0; j < paramTypes.length; j++) {
-                if (paramTypes[j].isPrimitive()) {
-                    body += ("  parameters[" + j + "]=" +
-                    wrapPrimitiveParameter(paramTypes[j], "$" + (j + 1)) +
-                    ";\n");
-                } else {
-                    body += ("  parameters[" + j + "]=$" + (j + 1) + ";\n");
-                }
-            }
-            CtClass returnType = reifiedMethods[i].getReturnType();
-            String postWrap = null;
-            String preWrap = null;
 
-            if (returnType != CtClass.voidType) {
-                if (!returnType.isPrimitive()) {
-                    preWrap = "(" + returnType.getName() + ")";
-                } else {
-                    //boolean, byte, char, short, int, long, float, double
-                    if (returnType.equals(CtClass.booleanType)) {
-                        preWrap = "((Boolean)";
-                        postWrap = ").booleanValue()";
-                    }
-                    if (returnType.equals(CtClass.byteType)) {
-                        preWrap = "((Byte)";
-                        postWrap = ").byteValue()";
-                    }
-                    if (returnType.equals(CtClass.charType)) {
-                        preWrap = "((Character)";
-                        postWrap = ").charValue()";
-                    }
-                    if (returnType.equals(CtClass.shortType)) {
-                        preWrap = "((Short)";
-                        postWrap = ").shortValue()";
-                    }
-                    if (returnType.equals(CtClass.intType)) {
-                        preWrap = "((Integer)";
-                        postWrap = ").intValue()";
-                    }
-                    if (returnType.equals(CtClass.longType)) {
-                        preWrap = "((Long)";
-                        postWrap = ").longValue()";
-                    }
-                    if (returnType.equals(CtClass.floatType)) {
-                        preWrap = "((Float)";
-                        postWrap = ").floatValue()";
-                    }
-                    if (returnType.equals(CtClass.doubleType)) {
-                        preWrap = "((Double)";
-                        postWrap = ").doubleValue()";
-                    }
-                }
-                body += "return ";
-                if (preWrap != null) {
-                    body += preWrap;
-                }
-            }
-            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getMethodCall(" +
-            "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-            ", parameters, genericTypesMapping))");
-
-            //    	            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getMethodCall(" +
-            //    	            "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-            //    	            ", parameters))");
-            if (postWrap != null) {
-                body += postWrap;
-            }
-            body += ";";
-
-            // the following is for inserting conditional statement for method code executing
-            // within or outside the construction of the object
-            if (!stubOnInterface) {
-                String preReificationCode = "if (outsideOfConstructor) ";
-
-                // outside of constructor : object is already constructed
-                String postReificationCode = "\n} else {\n";
-
-                // if inside constructor (i.e. in a method called by a
-                // constructor from a super class)
-                if (!reifiedMethods[i].getReturnType().equals(CtClass.voidType)) {
-                    postReificationCode += "return ";
-                }
-                postReificationCode += ("super." + reifiedMethods[i].getName() +
-                "(");
                 for (int j = 0; j < paramTypes.length; j++) {
-                    postReificationCode += ("$" + (j + 1) +
-                    (((j + 1) < paramTypes.length) ? "," : ""));
+                    if (paramTypes[j].isPrimitive()) {
+                        body += ("  parameters[" + j + "]=" +
+                        wrapPrimitiveParameter(paramTypes[j], "$" + (j + 1)) +
+                        ";\n");
+                    } else {
+                        body += ("  parameters[" + j + "]=$" + (j + 1) + ";\n");
+                    }
                 }
 
-                postReificationCode += ");";
-                body = preReificationCode + body + postReificationCode;
+                CtClass returnType = reifiedMethods[i].getReturnType();
+
+                String postWrap = null;
+                String preWrap = null;
+
+                if (hasNoReifyAnnotation(reifiedMethods[i])) {
+                    body += "if (myproxy instanceof org.objectweb.proactive.core.remoteobject.SynchronousProxy) { return ($r) myproxy.receiveMessage($$); }  \n";
+                }
+
+                if (returnType != CtClass.voidType) {
+                    if (!returnType.isPrimitive()) {
+                        preWrap = "(" + returnType.getName() + ")";
+                    } else {
+                        //boolean, byte, char, short, int, long, float, double
+                        if (returnType.equals(CtClass.booleanType)) {
+                            preWrap = "((Boolean)";
+                            postWrap = ").booleanValue()";
+                        }
+                        if (returnType.equals(CtClass.byteType)) {
+                            preWrap = "((Byte)";
+                            postWrap = ").byteValue()";
+                        }
+                        if (returnType.equals(CtClass.charType)) {
+                            preWrap = "((Character)";
+                            postWrap = ").charValue()";
+                        }
+                        if (returnType.equals(CtClass.shortType)) {
+                            preWrap = "((Short)";
+                            postWrap = ").shortValue()";
+                        }
+                        if (returnType.equals(CtClass.intType)) {
+                            preWrap = "((Integer)";
+                            postWrap = ").intValue()";
+                        }
+                        if (returnType.equals(CtClass.longType)) {
+                            preWrap = "((Long)";
+                            postWrap = ").longValue()";
+                        }
+                        if (returnType.equals(CtClass.floatType)) {
+                            preWrap = "((Float)";
+                            postWrap = ").floatValue()";
+                        }
+                        if (returnType.equals(CtClass.doubleType)) {
+                            preWrap = "((Double)";
+                            postWrap = ").doubleValue()";
+                        }
+                    }
+
+                    if (fieldToCache) {
+                        body += (cachedField.getName() + "=");
+                    } else {
+                        body += "return ";
+                    }
+
+                    if (preWrap != null) {
+                        body += preWrap;
+                    }
+                }
+
+                body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getMethodCall(" +
+                "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
+                ", parameters, genericTypesMapping))");
+
+                if (postWrap != null) {
+                    body += postWrap;
+                }
+
+                if (fieldToCache) {
+                    body += (";\n } \n return " + cachedField.getName());
+                }
+
+                body += ";";
+
+                // the following is for inserting conditional statement for method code executing
+                // within or outside the construction of the object
+                if (!stubOnInterface &&
+                        !Modifier.isAbstract(reifiedMethods[i].getModifiers())) {
+                    String preReificationCode = "{if (outsideOfConstructor) ";
+
+                    // outside of constructor : object is already constructed
+                    String postReificationCode = "\n} else {";
+
+                    // if inside constructor (i.e. in a method called by a
+                    // constructor from a super class)
+                    if (!reifiedMethods[i].getReturnType()
+                                              .equals(CtClass.voidType)) {
+                        postReificationCode += "return ";
+                    }
+                    postReificationCode += ("super." +
+                    reifiedMethods[i].getName() + "($$);");
+                    postReificationCode += "}";
+                    body = preReificationCode + body + postReificationCode;
+                }
             }
+
             body += "\n}";
-            //    	            System.out.println("method : " + reifiedMethods[i].getName()
-            //    	                    + " : \n" + body);
+
             CtMethod methodToGenerate = null;
+
+            //                        System.out
+            //            					.println("JavassistByteCodeStubBuilder.createReifiedMethods() body " + reifiedMethods[i].getName() + " = " + body);
             try {
                 methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
                         reifiedMethods[i].getName(),
@@ -403,7 +451,16 @@ public class JavassistByteCodeStubBuilder {
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
+
             generatedClass.addMethod(methodToGenerate);
+
+            //            if (fieldToCache) {
+            //            	CtMethod proxySetterMethod = generatedClass.getMethod(proxySetter.getName(), proxySetter.getSignature());
+            //            	String statementsToAdd = "if (myProxy != null ) { \n" +  cachedField.getName() + " = null ; \n " + reifiedMethods[i].getName() + "(); } \n ";
+            //            	System.out
+            //						.println("JavassistByteCodeStubBuilder.createReifiedMethods() statementsToAdd " + statementsToAdd);
+            //            	proxySetterMethod.insertAfter(statementsToAdd);
+            //            }
         }
     }
 
@@ -603,5 +660,56 @@ public class JavassistByteCodeStubBuilder {
             superItfs.add(super_interfaces[i]);
             addSuperInterfaces(super_interfaces[i], superItfs);
         }
+    }
+
+    private static boolean hasCacheAnnotation(CtMethod method) {
+        try {
+            Object[] o = method.getAnnotations();
+            if (o != null) {
+                for (Object object : o) {
+                    if (object instanceof Cache) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean hasSelfAnnotation(CtMethod method) {
+        try {
+            Object[] o = method.getAnnotations();
+            if (o != null) {
+                for (Object object : o) {
+                    if (object instanceof Self) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean hasNoReifyAnnotation(CtMethod method) {
+        try {
+            Object[] o = method.getAnnotations();
+            if (o != null) {
+                for (Object object : o) {
+                    if (object instanceof NoReify) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
     }
 }

@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.request;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -203,10 +204,12 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         // END ProActiveEvent
 
         // JMX Notification
-        BodyWrapperMBean mbean = LocalBodyStore.getInstance()
-                                               .getLocalBody(ownerID).getMBean();
-        if (mbean != null) {
-            mbean.sendNotification(NotificationType.waitForRequest);
+        Body body = LocalBodyStore.getInstance().getLocalBody(ownerID);
+        if (body != null) {
+            BodyWrapperMBean mbean = body.getMBean();
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.waitForRequest);
+            }
         }
 
         // END JMX Notification

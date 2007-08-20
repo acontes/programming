@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -30,11 +30,7 @@
  */
 package org.objectweb.proactive.core.body.ibis;
 
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
-import org.objectweb.proactive.core.body.RemoteBodyFactory;
-import org.objectweb.proactive.core.body.UniversalBody;
 
 
 /**
@@ -91,24 +87,24 @@ public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    @Override
-    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        return new RemoteIbisBodyFactoryImpl();
-    }
+    //    @Override
+    //    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+    //        return new RemoteIbisBodyFactoryImpl();
+    //    }
 
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    protected static class RemoteIbisBodyFactoryImpl
-        implements RemoteBodyFactory, java.io.Serializable {
-        public UniversalBody newRemoteBody(UniversalBody body) {
-            try {
-                // 	System.out.println("Creating ibis remote body adapter");
-                return new IbisBodyAdapter(body);
-            } catch (ProActiveException e) {
-                throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ",
-                    e);
-            }
-        }
-    } // end inner class RemoteBodyFactoryImpl
+    //    protected static class RemoteIbisBodyFactoryImpl
+    //        implements RemoteBodyFactory, java.io.Serializable {
+    //        public UniversalBody newRemoteBody(UniversalBody body) {
+    //            try {
+    //                // 	System.out.println("Creating ibis remote body adapter");
+    //                return new IbisBodyAdapter(body);
+    //            } catch (ProActiveException e) {
+    //                throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ",
+    //                    e);
+    //            }
+    //        }
+    //    } // end inner class RemoteBodyFactoryImpl
 }

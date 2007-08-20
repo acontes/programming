@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -83,6 +83,9 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileTransfer;
@@ -210,6 +213,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private TechnicalService technicalService;
     private String descriptorURL;
 
+    //    protected RemoteObjectExposer roe = null;
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
@@ -217,13 +221,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * Contructs a new intance of VirtualNode
      */
-    VirtualNodeImpl() {
+    public VirtualNodeImpl() {
     }
 
     /**
      * Contructs a new intance of VirtualNode
      */
-    VirtualNodeImpl(String name,
+    public VirtualNodeImpl(String name,
         ProActiveSecurityManager proactiveSecurityManager, String padURL,
         boolean isMainVN, ProActiveDescriptorInternal descriptor) {
         // if we launch several times the same application
@@ -247,7 +251,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         this.fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
         this.overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
-
+        //        this.roe = new RemoteObjectExposer(VirtualNode.class.getName(),this);
         if (logger.isDebugEnabled()) {
             logger.debug("vn " + this.name + " registered on " +
                 this.proActiveRuntimeImpl.getVMInformation().getVMID().toString());
@@ -1450,12 +1454,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         //jobID = ProActive.getJobId();
         String protocolId = "";
-        int nodeNumber = new Integer(vm.getNbNodesOnCreatedVMs()).intValue();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("asked for " + nodeNumber + " nodes");
-        }
-
         protocolId = process.getProcessId();
 
         int cnt = process.getNodeNumber();
@@ -1463,7 +1461,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (cnt == UniversalProcess.UNKNOWN_NODE_NUMBER) {
             this.waitForTimeout = true;
         } else {
-            increaseNumberOfNodes(cnt * nodeNumber);
+            increaseNumberOfNodes(cnt * vm.getNbNodesOnCreatedVMs());
         }
 
         //When the virtualNode will be activated, it has to launch the process
@@ -1503,7 +1501,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
-                nodeNumber + " " + protocolId + " " + vm.getName());
+                protocolId + " " + vm.getName());
 
             // FAULT TOLERANCE settings
             if (this.ftService != null) {
@@ -1534,26 +1532,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @return ExternalProcess, the copy version of the process
      */
     private Object makeDeepCopy(Object process) {
-        //deepCopyTag = true;
-        Object result = null;
-
         try {
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
-            oos.writeObject(process);
-            oos.flush();
-            oos.close();
-
-            java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(baos.toByteArray());
-            java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
-            result = ois.readObject();
-            ois.close();
+            return MakeDeepCopy.WithObjectStream.makeDeepCopy(process);
         } catch (Exception e) {
+            //TODO dangerous code as the deep copy didn't occurs.
             e.printStackTrace();
         }
 
-        //deepCopyTag = false;
-        return result;
+        return null;
     }
 
     private String buildURL(String host, String name, String protocol, int port) {
@@ -1615,7 +1601,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // END ProActiveEvent
 
         // JMX Notification
-        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getMBean();
         if (mbean != null) {
             NodeNotificationData notificationData = new NodeNotificationData(url,
                     protocol, node.getNodeInformation().getHostName(),
@@ -1754,7 +1741,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // END ProActiveEvent
 
         // JMX Notification
-        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getMBean();
         if (mbean != null) {
             NodeInformation nodeInfo = newNode.getNodeInformation();
             NodeNotificationData notificationData = new NodeNotificationData(nodeInfo.getURL(),

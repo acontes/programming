@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -30,9 +30,7 @@
  */
 package org.objectweb.proactive.core.body.reply;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -47,6 +45,7 @@ import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 
 
 public class ReplyImpl extends MessageImpl implements Reply,
@@ -158,10 +157,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
             byte[] decryptedMethodCall = psm.decrypt(sessionID,
                     encryptedResult, Session.ACT_AS_CLIENT);
             try {
-                ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
-                ObjectInputStream in = new ObjectInputStream(bin);
-                result = (FutureResult) in.readObject();
-                in.close();
+                result = (FutureResult) ByteToObjectConverter.ObjectStream.convert(decryptedMethodCall);
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();

@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -68,7 +68,7 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
      * update our location on the Location Server
      */
     public void updateLocation(Body body) {
-        if (locationServer == null) {
+        if (this.locationServer == null) {
             this.locationServer = LocationServerFactory.getLocationServer();
         }
 
@@ -77,7 +77,20 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
             logger.debug("Updating location with this stub " +
                 body.getRemoteAdapter());
         }
-        locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
+
+        System.out.println(
+            "MigrationManagerWithLocationServer.updateLocation() location server" +
+            this.locationServer);
+
+        System.out.println(
+            "MigrationManagerWithLocationServer.updateLocation() body.getID()" +
+            body.getID());
+
+        System.out.println(
+            "MigrationManagerWithLocationServer.updateLocation() body.getremoteadapter() " +
+            body.getRemoteAdapter());
+
+        this.locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
         //   }
     }
 
@@ -87,8 +100,8 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     @Override
     public UniversalBody migrateTo(Node node, Body body)
         throws MigrationException {
-        locationServer = null;
-        if (myBody == null) {
+        this.locationServer = null;
+        if (this.myBody == null) {
             this.myBody = body;
         }
 
@@ -119,7 +132,7 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.updateLocation(myBody);
+        this.updateLocation(this.myBody);
         //	this.updateLocation();
     }
 }

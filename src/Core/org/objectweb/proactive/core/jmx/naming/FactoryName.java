@@ -1,33 +1,3 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
 package org.objectweb.proactive.core.jmx.naming;
 
 import javax.management.MalformedObjectNameException;
@@ -56,6 +26,9 @@ public class FactoryName {
     public static final String RUNTIME_TYPE = "Runtime";
     public static final String RUNTIME = "org.objectweb.proactive.core.runtimes:type=" +
         RUNTIME_TYPE;
+    public static final String VIRTUAL_NODE_TYPE = "VirtualNode";
+    public static final String VIRTUAL_NODE = "org.objectweb.proactive.core.virtualnode:type=" +
+        VIRTUAL_NODE_TYPE;
     public static final String AO_TYPE = "AO";
     public static final String AO = "org.objectweb.proactive.core.body:type=" +
         AO_TYPE;
@@ -127,6 +100,27 @@ public class FactoryName {
             logger.error("Can't create the objectName of the runtime", e);
         } catch (NullPointerException e) {
             logger.error("Can't create the objectName of the runtime", e);
+        }
+        return oname;
+    }
+
+    /**
+     * Creates a ObjectName corresponding to a Virutal Node.
+     * @param name The name of the Virutal Node.
+     * @param jobID The jobID of the Virutal Node.
+     * @return The ObjectName corresponding to the Virutal Node.
+     */
+    public static ObjectName createVirtualNodeObjectName(String name,
+        String jobID) {
+        ObjectName oname = null;
+        try {
+            oname = new ObjectName(FactoryName.VIRTUAL_NODE + ",name=" +
+                    name.replace(':', '-') + ", jobID=" +
+                    jobID.replace(':', '-'));
+        } catch (MalformedObjectNameException e) {
+            logger.error("Can't create the objectName of the virtual node", e);
+        } catch (NullPointerException e) {
+            logger.error("Can't create the objectName of the virtual node", e);
         }
         return oname;
     }

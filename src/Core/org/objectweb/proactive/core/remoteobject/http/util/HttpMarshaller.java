@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -30,12 +30,11 @@
  */
 package org.objectweb.proactive.core.remoteobject.http.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import sun.rmi.server.MarshalInputStream;
-import sun.rmi.server.MarshalOutputStream;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 
 
 /**
@@ -52,50 +51,26 @@ public class HttpMarshaller {
      * @return byte array representation of the object o
      */
     public static byte[] marshallObject(Object o) {
-        String result = null;
         byte[] buffer = null;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        MarshalOutputStream oos = null;
+
         try {
-            oos = new MarshalOutputStream(out);
-            oos.writeObject(o);
-            buffer = out.toByteArray();
-        } catch (IOException e) {
+            buffer = ObjectToByteConverter.MarshallStream.convert(o);
+        } catch (ProActiveException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                out.close();
-                oos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
-        result = new String(buffer);
+
         return buffer;
     }
 
     public static Object unmarshallObject(byte[] bytes) {
         Object o = null;
-        MarshalInputStream in = null;
-
         try {
-            in = new MarshalInputStream(new ByteArrayInputStream(bytes));
-            o = in.readObject();
-            return o;
+            o = ByteToObjectConverter.MarshallStream.convert(bytes);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
         }
-
-        return null;
+        return o;
     }
 }

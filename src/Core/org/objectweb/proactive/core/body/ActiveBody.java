@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -46,6 +46,7 @@ package org.objectweb.proactive.core.body;
  */
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
@@ -94,11 +95,12 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
     public ActiveBody(ConstructorCall c, String nodeURL, Active activity,
         MetaObjectFactory factory, String jobID)
         throws java.lang.reflect.InvocationTargetException,
-            ConstructorCallExecutionFailedException {
+            ConstructorCallExecutionFailedException,
+            ActiveObjectCreationException {
         // Creates the reified object
         super(c.execute(), nodeURL, activity, factory, jobID);
 
-        Object reifiedObject = localBodyStrategy.getReifiedObject();
+        Object reifiedObject = this.localBodyStrategy.getReifiedObject();
 
         // when building a component, encapsulate the functional activity
         // TODO_M read some flag before doing this?
@@ -108,27 +110,27 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
 
         // InitActive
         if ((activity != null) && activity instanceof InitActive) {
-            initActive = (InitActive) activity;
+            this.initActive = (InitActive) activity;
         } else if (reifiedObject instanceof InitActive) {
-            initActive = (InitActive) reifiedObject;
+            this.initActive = (InitActive) reifiedObject;
         }
 
         // RunActive
         if ((activity != null) && activity instanceof RunActive) {
-            runActive = (RunActive) activity;
+            this.runActive = (RunActive) activity;
         } else if (reifiedObject instanceof RunActive) {
-            runActive = (RunActive) reifiedObject;
+            this.runActive = (RunActive) reifiedObject;
         } else {
-            runActive = new FIFORunActive();
+            this.runActive = new FIFORunActive();
         }
 
         // EndActive
         if ((activity != null) && activity instanceof EndActive) {
-            endActive = (EndActive) activity;
+            this.endActive = (EndActive) activity;
         } else if (reifiedObject instanceof EndActive) {
-            endActive = (EndActive) reifiedObject;
+            this.endActive = (EndActive) reifiedObject;
         } else {
-            endActive = null;
+            this.endActive = null;
         }
 
         startBody();
@@ -154,9 +156,9 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         }
 
         // execute the initialization if needed. Only once
-        if (initActive != null) {
-            initActive.initActivity(this);
-            initActive = null; // we won't do it again
+        if (this.initActive != null) {
+            this.initActive.initActivity(this);
+            this.initActive = null; // we won't do it again
         }
 
         // run the activity of the body
@@ -193,8 +195,8 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
             terminate();
         } finally {
             // execute the end of activity if not after migration
-            if ((!hasJustMigrated) && (endActive != null)) {
-                endActive.endActivity(this);
+            if ((!this.hasJustMigrated) && (this.endActive != null)) {
+                this.endActive.endActivity(this);
             }
 
             if (isActive()) {
@@ -219,7 +221,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         Thread t = new Thread(this,
                 shortClassName(getName()) + " on " + getNodeURL() + inc);
 
-        // Wait for the registration of this Body inside the LocalBodyStore 
+        // Wait for the registration of this Body inside the LocalBodyStore
         // to avoid a race condition (t not yet scheduled and getActiveObjects() called)
         synchronized (this) {
             t.start();
@@ -239,10 +241,10 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
     @Override
     protected void activityStopped(boolean completeACs) {
         super.activityStopped(completeACs);
-        runActive = null;
+        this.runActive = null;
     }
 
-    // 
+    //
     // -- PRIVATE METHODS -----------------------------------------------
     //
     private static String shortClassName(String fqn) {
@@ -267,7 +269,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
             logger.debug("in = " + in);
         }
         in.defaultReadObject();
-        // FAULT-TOLERANCE: if this is a recovering checkpoint, 
+        // FAULT-TOLERANCE: if this is a recovering checkpoint,
         // activity will be started in ProActiveRuntimeImpl.receiveCheckpoint()
         if (this.ftmanager != null) {
             if (!this.ftmanager.isACheckpoint()) {

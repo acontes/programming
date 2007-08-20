@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -52,7 +52,7 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     private String name;
 
     /** number of nodes that will be deployed on this VM. One node is the default */
-    private String nbNodes = "1";
+    private int nbNodes = 1;
 
     /** indiquates if this machine results from a lookup or not  */
     private boolean hasProcess = true;
@@ -79,15 +79,11 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
-    public void setNbNodes(String nbNodes) throws java.io.IOException {
-        if (new Integer(nbNodes).intValue() < 1) {
-            throw new java.io.IOException(
-                "Cannot define nbNodes with a value < 1");
-        }
+    public void setNbNodes(int nbNodes) {
         this.nbNodes = nbNodes;
     }
 
-    public String getNbNodesOnCreatedVMs() {
+    public int getNbNodesOnCreatedVMs() {
         return this.nbNodes;
     }
 

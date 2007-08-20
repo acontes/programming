@@ -1,33 +1,3 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
 package org.objectweb.proactive.core.descriptor.parser;
 
 import java.io.CharArrayWriter;
@@ -72,7 +42,6 @@ import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentListProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
-import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcess.PriorityLevel;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
@@ -88,7 +57,6 @@ import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
-import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -614,7 +582,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             VirtualMachine currentVM = proActiveDescriptor.createVirtualMachine(jvmName);
             String ts = getNodeExpandedValue(t);
             if (ts != null) {
-                currentVM.setNbNodes(ts);
+                currentVM.setNbNodes(new Integer(ts));
             }
             proActiveDescriptor.registerProcess(currentVM,
                 getNodeExpandedValue(node.getAttributes().getNamedItem("refid")));
@@ -631,7 +599,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             VirtualMachine currentVM = proActiveDescriptor.createVirtualMachine(jvmName);
             String ts = getNodeExpandedValue(t);
             if (ts != null) {
-                currentVM.setNbNodes(ts);
+                currentVM.setNbNodes(new Integer(ts));
             }
             proActiveDescriptor.registerService(currentVM,
                 getNodeExpandedValue(node.getAttributes().getNamedItem("refid")));
@@ -677,8 +645,6 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 new GliteProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(OARGRID_PROCESS_TAG)) {
                 new OARGridProcessExtractor(node, infrastructureContext);
-            } else if (processType.equals(HIERARCHICAL_PROCESS_TAG)) {
-                new HierarchicalProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(MPI_PROCESS_TAG)) {
                 new MPIProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(DEPENDENT_PROCESS_SEQUENCE_TAG)) {
@@ -784,8 +750,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                 String[] peerList = new String[peerNodes.getLength()];
                 for (int pp = 0; pp < peerNodes.getLength(); ++pp) {
-                    peerList[pp] = peerNodes.item(pp).getFirstChild()
-                                            .getNodeValue();
+                    peerList[pp] = peerNodes.item(pp).getTextContent().trim();
                 }
                 p2pDescriptorService.setPeerList(peerList);
             } else if (serviceType.equals(FT_CONFIG_TAG)) {
@@ -1152,12 +1117,15 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     }
 
                     String nodeName = childNode.getNodeName();
-                    String nodeValue = getNodeExpandedValue(childNode);
                     if (nodeName.equals(HOST_LIST_TAG)) {
+                        String nodeValue = getNodeExpandedValue(childNode);
                         bSubProcess.setHostList(nodeValue);
                     } else if (nodeName.equals(PROCESSOR_TAG)) {
+                        String nodeValue = getNodeExpandedValue(childNode);
                         bSubProcess.setProcessorNumber(nodeValue);
                     } else if (nodeName.equals(RES_REQ_TAG)) {
+                        String nodeValue = getNodeExpandedValue(childNode.getAttributes()
+                                                                         .getNamedItem("value"));
                         bSubProcess.setRes_requirement(nodeValue);
                     } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
                         String path = getPath(childNode);
@@ -1287,22 +1255,17 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 }
 
                 String nodeName = child.getNodeName();
-                if (nodeName.equals(GLITE_CONFIG_TAG)) {
-                    String path = getPath(child);
-                    gliteProcess.setJobEnvironment(path);
-                } else {
-                    String nodeValue = getNodeExpandedValue(child);
-                    if (nodeName.equals(GLITE_ENVIRONMENT_TAG)) {
-                        gliteProcess.setJobEnvironment(nodeValue);
-                    } else if (nodeName.equals(GLITE_REQUIREMENTS_TAG)) {
-                        gliteProcess.setJobRequirements(nodeValue);
-                    } else if (nodeName.equals(GLITE_RANK_TAG)) {
-                        gliteProcess.setJobRank(nodeValue);
-                    } else if (nodeName.equals(GLITE_INPUTDATA_TAG)) {
-                        new GliteInputExtractor(gliteProcess, child);
-                    } else if (nodeName.equals(GLITE_PROCESS_OPTIONS_TAG)) {
-                        new GliteOptionsExtractor(gliteProcess, child);
-                    }
+                String nodeValue = getNodeExpandedValue(child);
+                if (nodeName.equals(GLITE_ENVIRONMENT_TAG)) {
+                    gliteProcess.setJobEnvironment(nodeValue);
+                } else if (nodeName.equals(GLITE_REQUIREMENTS_TAG)) {
+                    gliteProcess.setJobRequirements(nodeValue);
+                } else if (nodeName.equals(GLITE_RANK_TAG)) {
+                    gliteProcess.setJobRank(nodeValue);
+                } else if (nodeName.equals(GLITE_INPUTDATA_TAG)) {
+                    new GliteInputExtractor(gliteProcess, child);
+                } else if (nodeName.equals(GLITE_PROCESS_OPTIONS_TAG)) {
+                    new GliteOptionsExtractor(gliteProcess, child);
                 }
             }
         }
@@ -1693,8 +1656,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     }
 
                     String nodeName = childNode.getNodeName();
-                    String nodeExpandedValue = getNodeExpandedValue(childNode);
                     if (nodeName.equals(OAR_RESOURCE_TAG)) {
+                        String nodeExpandedValue = getNodeExpandedValue(childNode);
                         oarSubProcess.setResources(nodeExpandedValue);
                     } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
                         String path = getPath(childNode);
@@ -1746,36 +1709,12 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     if (nodeName.equals(OAR_RESOURCE_TAG)) {
                         oarGridSubProcess.setResources(nodeExpandedValue);
                     } else if (nodeName.equals(OARGRID_WALLTIME_TAG)) {
-                        oarGridSubProcess.setScriptLocation(nodeExpandedValue);
+                        oarGridSubProcess.setWallTime(nodeExpandedValue);
                     } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
                         String path = getPath(childNode);
                         oarGridSubProcess.setScriptLocation(path);
                     }
                 }
-            }
-        }
-    }
-
-    protected class HierarchicalProcessExtractor extends ProcessExtractor {
-        public HierarchicalProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
-            super(node, context);
-            String hostName = getNodeExpandedValue(node.getAttributes()
-                                                       .getNamedItem("hostname"));
-            String internalIP = getNodeExpandedValue(node.getAttributes()
-                                                         .getNamedItem("internal_ip"));
-
-            if ((hostName != null) && (internalIP != null)) {
-                HostsInfos.setSecondaryName(hostName, internalIP);
-            }
-
-            NodeList subProcessesRefIds = (NodeList) xpath.evaluate(XMLNS_PREFIX +
-                    HIERARCHICIAL_REFERENCE_TAG + "/@refid", node,
-                    XPathConstants.NODESET);
-            for (int i = 0; i < subProcessesRefIds.getLength(); ++i) {
-                Node refIdNode = subProcessesRefIds.item(i);
-                proActiveDescriptor.registerHierarchicalProcess((HierarchicalProcess) targetProcess,
-                    getNodeExpandedValue(refIdNode));
             }
         }
     }
@@ -1825,7 +1764,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         String path = getPath(childNode);
                         mpiProcess.setRemotePath(path);
                     } else if (nodeName.equals(PROCESS_NUMBER_TAG)) {
-                        String nodeExpandedValue = getNodeExpandedValue(childNode.getFirstChild());
+                        String nodeExpandedValue = getNodeExpandedValue(childNode);
                         mpiProcess.setHostsNumber(nodeExpandedValue);
                     }
                 }
@@ -2136,15 +2075,25 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     protected String interpolateVariables(String value)
         throws SAXException {
         if (org.objectweb.proactive.core.xml.VariableContract.xmlproperties != null) {
-            value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value);
+            value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value.trim());
         }
         return value;
     }
 
     protected String getNodeExpandedValue(Node n) throws SAXException {
-        if (checkNonEmptyNode(n)) {
+        if (n == null) {
+            return null;
+        }
+
+        if ((n.getNodeType() == Node.ATTRIBUTE_NODE) && checkNonEmptyNode(n)) {
             return interpolateVariables(n.getNodeValue());
         }
+
+        if ((n.getNodeType() == Node.ELEMENT_NODE) &&
+                checkNonEmptyString(n.getTextContent())) {
+            return interpolateVariables(n.getTextContent().trim());
+        }
+
         return null;
     }
 

@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.URI;
 import java.security.PublicKey;
@@ -40,7 +41,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.remoteobject.exception.RemoteObjectConnection;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -69,31 +69,25 @@ public class RemoteObjectAdapter implements RemoteObject {
     }
 
     public Reply receiveMessage(Request message)
-        throws ProActiveException, RenegotiateSessionException {
+        throws ProActiveException, RenegotiateSessionException, IOException {
         try {
-            //            System.out.println(" calling " + message.getMethodName() + " on " +
-            //                uri.toString());
-            if (message.isOneWay()) {
-                try {
-                    this.remoteObject.receiveMessage(message);
-                    return new SynchronousReplyImpl();
-                } catch (RemoteObjectConnection roc) {
-                    // unmarchalling exception could occurs
-                    // means that remote object has been killed
-                    return new SynchronousReplyImpl();
-                }
-            }
-
             return this.remoteObject.receiveMessage(message);
+        } catch (EOFException e) {
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
+                           .debug("EOFException while calling method " +
+                message.getMethodName());
+            return new SynchronousReplyImpl();
+        } catch (ProActiveException e) {
+            throw new IOException(e.getMessage());
         } catch (IOException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to contact remote object at " +
                 this.uri.toString() + " when calling " +
                 message.getMethodName());
-            //e.printStackTrace();
-            //            throw new ProActiveException(e.getMessage());
-            return new SynchronousReplyImpl();
+            return new SynchronousReplyImpl(e);
         }
+
+        //        return new SynchronousReplyImpl();
     }
 
     public X509Certificate getCertificate()
@@ -166,5 +160,77 @@ public class RemoteObjectAdapter implements RemoteObject {
         } catch (IOException e) {
             throw new ProActiveException(e);
         }
+    }
+
+    public Object getObjectProxy(RemoteRemoteObject rmo)
+        throws ProActiveException {
+        try {
+            if (this.stub == null) {
+                this.stub = this.remoteObject.getObjectProxy();
+            }
+            return this.stub;
+        } catch (IOException e) {
+            throw new ProActiveException(e);
+        }
+    }
+
+    public String getClassName() {
+        try {
+            return this.remoteObject.getClassName();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getProxyName() {
+        try {
+            return this.remoteObject.getProxyName();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof RemoteObjectAdapter) {
+            return remoteObject.equals(((RemoteObjectAdapter) o).remoteObject);
+        }
+        return false;
+    }
+
+    public Class getTargetClass() {
+        try {
+            return remoteObject.getTargetClass();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Class getAdapterClass() {
+        try {
+            return this.remoteObject.getAdapterClass();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 }

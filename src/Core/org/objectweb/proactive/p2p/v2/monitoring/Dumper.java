@@ -1,33 +1,3 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
 package org.objectweb.proactive.p2p.v2.monitoring;
 
 import java.io.BufferedReader;
@@ -80,7 +50,7 @@ public class Dumper {
         String source = info.getSender();
         for (int i = 0; i < acq.length; i++) {
             System.out.println(" Acquaintance: " + acq[i]);
-            //check that the destination is in our list 
+            //check that the destination is in our list
             //otherwise add them
             //            this.addAsSender(acq[i]);
             this.network.addAsSender(acq[i]);
@@ -105,8 +75,8 @@ public class Dumper {
      *   Link : L index sourceIndex destIndex
      */
     public void dumpAcqForOtter() {
-        HashMap<String, P2PNode> senders = network.getSenders();
-        HashMap<String, Link> links = network.getLinks();
+        HashMap<String, P2PNode> senders = this.network.getSenders();
+        HashMap<String, Link> links = this.network.getLinks();
         int index = senders.size();
         //first indicate the number of nodes and links
         System.out.println("t " + senders.size());
@@ -117,7 +87,7 @@ public class Dumper {
 
         //   System.out.println("f 1 max NOA");
         //dump the nodes with their indexes
-        Set<Map.Entry<String, P2PNode>> map = (Set<Map.Entry<String, P2PNode>>) senders.entrySet();
+        Set<Map.Entry<String, P2PNode>> map = senders.entrySet();
         Iterator it = map.iterator();
         while (it.hasNext()) {
             Map.Entry<String, P2PNode> entry = (Map.Entry<String, P2PNode>) it.next();
@@ -138,7 +108,7 @@ public class Dumper {
         //now dump the links
         int i = 0;
 
-        Set<Map.Entry<String, Link>> map2 = (Set<Map.Entry<String, Link>>) links.entrySet();
+        Set<Map.Entry<String, Link>> map2 = links.entrySet();
 
         it = map2.iterator();
         while (it.hasNext()) {
@@ -155,20 +125,20 @@ public class Dumper {
         int i = 0;
 
         //   HashMap<String, P2PNode> senders = network.getSenders();
-        //we use a hashtable because we will get collisions 
+        //we use a hashtable because we will get collisions
         HashMap<String, ArrayList<String>> sourceDest = new HashMap<String, ArrayList<String>>();
 
         //use to build the conversion name -> Integer
         HashMap<String, Integer> nameConversion = new HashMap<String, Integer>();
         int number = 1;
 
-        HashMap<String, Link> links = network.getLinks();
-        Set<Map.Entry<String, Link>> map2 = (Set<Map.Entry<String, Link>>) links.entrySet();
+        HashMap<String, Link> links = this.network.getLinks();
+        Set<Map.Entry<String, Link>> map2 = links.entrySet();
 
         //iterate over all the links
         Iterator<Map.Entry<String, Link>> it = map2.iterator();
         while (it.hasNext()) {
-            Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
+            Link entry = (it.next()).getValue();
 
             //            //  System.out.println("---- looking for sender " + entry.getSource());
             //          System.out.println(entry.getSource() + " <---> " +
@@ -207,7 +177,7 @@ public class Dumper {
 
         System.out.println("Total number of peers " + nameConversion.size());
         //        Set<String> sources = sourceDest.keySet();
-        //        
+        //
         //        for (String key : sources) {
         //        	System.out.println("Processing  "+ key);
         //        	String value = sourceDest.remove(key);
@@ -220,18 +190,18 @@ public class Dumper {
         //		}
         //        Iterator itSource = sources.iterator();
         //        while (itSource.hasNext()) {
-        //        	
+        //
         //        	//for each source, check all destinations
         //        	String key = (String) itSource.next();
-        //        	
+        //
         //        }
     }
 
     public void dumpAsText() {
         //now dump the links
         int i = 0;
-        HashMap<String, Link> links = network.getLinks();
-        Set<Map.Entry<String, Link>> map2 = (Set<Map.Entry<String, Link>>) links.entrySet();
+        HashMap<String, Link> links = this.network.getLinks();
+        Set<Map.Entry<String, Link>> map2 = links.entrySet();
 
         //iterate over all the links in the network
         Iterator it = map2.iterator();
@@ -334,7 +304,7 @@ public class Dumper {
                     //end of a new Peer
                     readingStatus = 0;
                 } else {
-                    //reading some peer name 
+                    //reading some peer name
                     switch (readingStatus) {
                     case 1: {
                         // example of string
@@ -353,7 +323,7 @@ public class Dumper {
                             //}
 
                             //s= s.substring(0, s.indexOf("current")-1);
-                            network.addAsSender(s,
+                            this.network.addAsSender(s,
                                 Integer.parseInt(matcher.group(2)),
                                 Integer.parseInt(matcher.group(3)));
                             current = s;
@@ -367,8 +337,8 @@ public class Dumper {
                             //System.out.println(s);
                             s = this.cleanURL(s);
 
-                            network.addAsSender(s);
-                            network.addLink(current, s);
+                            this.network.addAsSender(s);
+                            this.network.addLink(current, s);
                             try {
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -406,11 +376,12 @@ public class Dumper {
         if (s.indexOf("//") == -1) {
             s = "//" + s;
         }
-        return P2PService.getHostNameAndPortFromUrl(s); //.getHostNameFromUrl(s)+":"+UrlBuilder.getPortFromUrl(s); //getHostNameAndPortFromUrl(s);
-                                                        //        } catch (UnknownHostException e) {
-                                                        //            e.printStackTrace();
-                                                        //        }
-                                                        //return s;
+        return P2PService.getHostNameAndPortFromUrl(s.trim());
+        //.getHostNameFromUrl(s)+":"+UrlBuilder.getPortFromUrl(s); //getHostNameAndPortFromUrl(s);
+        //        } catch (UnknownHostException e) {
+        //            e.printStackTrace();
+        //        }
+        //return s;
     }
 
     public static void main(String[] args) {

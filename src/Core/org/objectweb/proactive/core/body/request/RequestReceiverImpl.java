@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -40,8 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.body.Context;
-import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.exceptions.InactiveBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -66,8 +65,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         this.inImmediateService = new AtomicInteger(0);
     }
 
-    public int receiveRequest(Request request, Body bodyReceiver)
-        throws java.io.IOException {
+    public int receiveRequest(Request request, Body bodyReceiver) {
         try {
             if (immediateExecution(request)) {
                 if (logger.isDebugEnabled()) {
@@ -75,13 +73,9 @@ public class RequestReceiverImpl implements RequestReceiver,
                         request.getMethodName());
                 }
                 this.inImmediateService.incrementAndGet();
-                // push a new context for the calling/executing thread owned by the called body
-//                LocalBodyStore.getInstance()
-//                              .pushContext(new Context(bodyReceiver, request));
                 try {
                     bodyReceiver.serve(request);
                 } finally {
-//                    LocalBodyStore.getInstance().popContext();
                     this.inImmediateService.decrementAndGet();
                 }
                 if (logger.isDebugEnabled()) {
@@ -93,7 +87,15 @@ public class RequestReceiverImpl implements RequestReceiver,
                 return FTManager.IMMEDIATE_SERVICE;
             } else {
                 request.notifyReception(bodyReceiver);
-                return bodyReceiver.getRequestQueue().add(request);
+                RequestQueue queue = null;
+                try {
+                    queue = bodyReceiver.getRequestQueue();
+                } catch (InactiveBodyException e) {
+                    throw new InactiveBodyException("Cannot add request \"" +
+                        request.getMethodName() +
+                        "\" because this body is inactive", e);
+                }
+                return queue.add(request);
             }
         } catch (Exception e) {
             e.printStackTrace();

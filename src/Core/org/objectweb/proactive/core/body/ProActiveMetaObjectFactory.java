@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -30,20 +30,14 @@
  */
 package org.objectweb.proactive.core.body;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
@@ -66,18 +60,18 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.SynchronousComponentRequestReceiver;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-// TODO JAVADOC SHOULD BE REWRITTEN 
+// TODO JAVADOC SHOULD BE REWRITTEN
 /**
  * <p>
  * This class provides singleton instances of all default factories
@@ -136,7 +130,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected RequestReceiverFactory requestReceiverFactoryInstance;
     protected RequestQueueFactory requestQueueFactoryInstance;
     protected MigrationManagerFactory migrationManagerFactoryInstance;
-    protected RemoteBodyFactory remoteBodyFactoryInstance;
+
+    //    protected RemoteBodyFactory remoteBodyFactoryInstance;
     protected ThreadStoreFactory threadStoreFactoryInstance;
     protected ProActiveSPMDGroupManagerFactory proActiveSPMDGroupManagerFactoryInstance;
     protected ProActiveComponentFactory componentFactoryInstance;
@@ -148,15 +143,15 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     // -- CONSTRUCTORS -----------------------------------------------
     //
     protected ProActiveMetaObjectFactory() {
-        requestFactoryInstance = newRequestFactorySingleton();
-        replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
-        requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
-        requestQueueFactoryInstance = newRequestQueueFactorySingleton();
-        migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
-        remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
-        threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-        proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
-        ftmanagerFactoryInstance = newFTManagerFactorySingleton();
+        this.requestFactoryInstance = newRequestFactorySingleton();
+        this.replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
+        this.requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
+        this.requestQueueFactoryInstance = newRequestQueueFactorySingleton();
+        this.migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
+        //        this.remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
+        this.threadStoreFactoryInstance = newThreadStoreFactorySingleton();
+        this.proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
+        this.ftmanagerFactoryInstance = newFTManagerFactorySingleton();
     }
 
     /**
@@ -168,16 +163,16 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         this.parameters = parameters;
         if (parameters.containsKey(COMPONENT_PARAMETERS_KEY)) {
             ComponentParameters initialComponentParameters = (ComponentParameters) parameters.get(COMPONENT_PARAMETERS_KEY);
-            componentFactoryInstance = newComponentFactorySingleton(initialComponentParameters);
-            requestFactoryInstance = newRequestFactorySingleton();
-            replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
-            requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
-            requestQueueFactoryInstance = newRequestQueueFactorySingleton();
-            migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
-            remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
-            threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-            proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
-            ftmanagerFactoryInstance = newFTManagerFactorySingleton();
+            this.componentFactoryInstance = newComponentFactorySingleton(initialComponentParameters);
+            this.requestFactoryInstance = newRequestFactorySingleton();
+            this.replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
+            this.requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
+            this.requestQueueFactoryInstance = newRequestQueueFactorySingleton();
+            this.migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
+            //            this.remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
+            this.threadStoreFactoryInstance = newThreadStoreFactorySingleton();
+            this.proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
+            this.ftmanagerFactoryInstance = newFTManagerFactorySingleton();
         }
     }
 
@@ -197,50 +192,49 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
      * @return the parameters of the factory
      */
     public Map getParameters() {
-        return parameters;
+        return this.parameters;
     }
 
     //
     // -- implements MetaObjectFactory -----------------------------------------------
     //
     public RequestFactory newRequestFactory() {
-        return requestFactoryInstance;
+        return this.requestFactoryInstance;
     }
 
     public ReplyReceiverFactory newReplyReceiverFactory() {
-        return replyReceiverFactoryInstance;
+        return this.replyReceiverFactoryInstance;
     }
 
     public RequestReceiverFactory newRequestReceiverFactory() {
-        return requestReceiverFactoryInstance;
+        return this.requestReceiverFactoryInstance;
     }
 
     public RequestQueueFactory newRequestQueueFactory() {
-        return requestQueueFactoryInstance;
+        return this.requestQueueFactoryInstance;
     }
 
     public MigrationManagerFactory newMigrationManagerFactory() {
-        return migrationManagerFactoryInstance;
+        return this.migrationManagerFactoryInstance;
     }
 
-    public RemoteBodyFactory newRemoteBodyFactory() {
-        return remoteBodyFactoryInstance;
-    }
-
+    //    public RemoteBodyFactory newRemoteBodyFactory() {
+    //        return this.remoteBodyFactoryInstance;
+    //    }
     public ThreadStoreFactory newThreadStoreFactory() {
-        return threadStoreFactoryInstance;
+        return this.threadStoreFactoryInstance;
     }
 
     public ProActiveSPMDGroupManagerFactory newProActiveSPMDGroupManagerFactory() {
-        return proActiveSPMDGroupManagerFactoryInstance;
+        return this.proActiveSPMDGroupManagerFactoryInstance;
     }
 
     public ProActiveComponentFactory newComponentFactory() {
-        return componentFactoryInstance;
+        return this.componentFactoryInstance;
     }
 
     public FTManagerFactory newFTManagerFactory() {
-        return ftmanagerFactoryInstance;
+        return this.ftmanagerFactoryInstance;
     }
 
     //
@@ -266,10 +260,9 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return new MigrationManagerFactoryImpl();
     }
 
-    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        return new RemoteBodyFactoryImpl();
-    }
-
+    //    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+    //        return new RemoteBodyFactoryImpl();
+    //    }
     protected ThreadStoreFactory newThreadStoreFactorySingleton() {
         return new ThreadStoreFactoryImpl();
     }
@@ -317,8 +310,9 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected class RequestReceiverFactoryImpl implements RequestReceiverFactory,
         java.io.Serializable {
         public RequestReceiver newRequestReceiver() {
-            if (parameters.containsKey(SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
-                    ((Boolean) parameters.get(
+            if (ProActiveMetaObjectFactory.this.parameters.containsKey(
+                        SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
+                    ((Boolean) ProActiveMetaObjectFactory.this.parameters.get(
                         ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
                 return new SynchronousComponentRequestReceiver();
             }
@@ -330,7 +324,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected class RequestQueueFactoryImpl implements RequestQueueFactory,
         java.io.Serializable {
         public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
-            if ("true".equals(parameters.get(
+            if ("true".equals(ProActiveMetaObjectFactory.this.parameters.get(
                             SYNCHRONOUS_COMPOSITE_COMPONENT_KEY))) {
                 return null;
             }
@@ -359,48 +353,48 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     // end inner class MigrationManagerFactoryImpl
-    protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory,
-        java.io.Serializable {
-        public UniversalBody newRemoteBody(UniversalBody body) {
-            try {
-                if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
-                            ProActiveConfiguration.getInstance()
-                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
-                            "Using ibis factory for creating remote body");
-                    }
-                    return new org.objectweb.proactive.core.body.ibis.IbisBodyAdapter(body);
-                } else if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(
-                            ProActiveConfiguration.getInstance()
-                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
-                            "Using http factory for creating remote body");
-                    }
-
-                    return new org.objectweb.proactive.core.body.http.HttpBodyAdapter(body);
-                } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(
-                            ProActiveConfiguration.getInstance()
-                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
-                            "Using rmissh factory for creating remote body");
-                    }
-                    return new org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter(body);
-                } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
-                            "Using rmi factory for creating remote body");
-                    }
-                    return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
-                }
-            } catch (ProActiveException e) {
-                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
-                    e);
-            }
-        }
-    }
+    //    protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory,
+    //        java.io.Serializable {
+    //        public UniversalBody newRemoteBody(UniversalBody body) {
+    //            try {
+    //                if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
+    //                            ProActiveConfiguration.getInstance()
+    //                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+    //                    if (logger.isDebugEnabled()) {
+    //                        logger.debug(
+    //                            "Using ibis factory for creating remote body");
+    //                    }
+    //                    return new org.objectweb.proactive.core.body.ibis.IbisBodyAdapter(body);
+    //                } else if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(
+    //                            ProActiveConfiguration.getInstance()
+    //                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+    //                    if (logger.isDebugEnabled()) {
+    //                        logger.debug(
+    //                            "Using http factory for creating remote body");
+    //                    }
+    //
+    //                    return new org.objectweb.proactive.core.body.http.HttpBodyAdapter(body);
+    //                } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(
+    //                            ProActiveConfiguration.getInstance()
+    //                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+    //                    if (logger.isDebugEnabled()) {
+    //                        logger.debug(
+    //                            "Using rmissh factory for creating remote body");
+    //                    }
+    //                    return new org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter(body);
+    //                } else {
+    //                    if (logger.isDebugEnabled()) {
+    //                        logger.debug(
+    //                            "Using rmi factory for creating remote body");
+    //                    }
+    //                    return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
+    //                }
+    //            } catch (ProActiveException e) {
+    //                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
+    //                    e);
+    //            }
+    //        }
+    //    }
 
     // end inner class RemoteBodyFactoryImpl
     protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory,
@@ -430,7 +424,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         }
 
         public ProActiveComponent newProActiveComponent(Body myBody) {
-            return new ProActiveComponentImpl(componentParameters, myBody);
+            return new ProActiveComponentImpl(this.componentParameters, myBody);
         }
     }
 
@@ -472,7 +466,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager() {
-        return proActiveSecurityManager;
+        return this.proActiveSecurityManager;
     }
 
     @Override
@@ -480,22 +474,12 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         ProActiveMetaObjectFactory clone = null;
 
         try {
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(bout);
-
-            out.writeObject(this);
-            out.flush();
-            bout.close();
-
-            bout.close();
-
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(
-                        bout.toByteArray()));
-
-            clone = (ProActiveMetaObjectFactory) ois.readObject();
+            return MakeDeepCopy.WithObjectStream.makeDeepCopy(this);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (ProActiveException e) {
             e.printStackTrace();
         }
 

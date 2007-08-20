@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -180,7 +180,7 @@ public abstract class RuntimeFactory {
                                                  .getRemoteObject(protocol);
 
         if (rro == null) {
-            URI url = RemoteObjectFactory.generateUrl(protocol,
+            URI url = RemoteObjectHelper.generateUrl(protocol,
                     URIBuilder.getNameFromURI(URI.create(
                             proActiveRuntime.getURL())));
             proActiveRuntime.getRemoteObjectExposer().activateProtocol(url);
@@ -190,7 +190,8 @@ public abstract class RuntimeFactory {
             //            throw new ProActiveException("Cannot create a ProActiveRuntime based on " + protocol);
         }
 
-        return (ProActiveRuntime) new RemoteObjectAdapter(rro).getObjectProxy();
+        return (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(new RemoteObjectAdapter(
+                rro));
     }
 
     /**
@@ -209,12 +210,11 @@ public abstract class RuntimeFactory {
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);
         //        RuntimeFactory factory = getFactory(protocol);
-        RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(protocol)
-                                             .lookup(URI.create(
+        RemoteObject ro = RemoteObjectHelper.lookup(URI.create(
                     proActiveRuntimeURL));
 
         //proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
-        return (ProActiveRuntime) ro.getObjectProxy();
+        return (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro);
     }
 
     //
@@ -319,8 +319,8 @@ public abstract class RuntimeFactory {
         throws ProActiveException {
         if (runtimeLogger.isDebugEnabled()) {
             runtimeLogger.debug("protocol1 = " + protocol);
-            //            
-            //            if (protocol.endsWith(":")) 
+            //
+            //            if (protocol.endsWith(":"))
             //            throw new RuntimeException();
         }
 

@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -28,19 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.runtime.rmi;
+package org.objectweb.proactive.core.remoteobject.exception;
 
-import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
+import org.objectweb.proactive.core.ProActiveException;
 
 
-/**
- * An RMI adapter for a ProActiveRuntime to be able to receive remote calls with RMI. This helps isolate
- * RMI specific code into a small set of specific classes.
- * @author ProActiveTeam
- * @version 1.0
- * @since ProActive 2.2
- * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
- */
-public interface RmiProActiveRuntime extends java.rmi.Remote,
-    RemoteProActiveRuntime {
+public class UnknownProtocolException extends ProActiveException {
+
+    /**
+    *
+    */
+    private static final long serialVersionUID = 2157668587034907154L;
+
+    public UnknownProtocolException() {
+        super();
+    }
+
+    public UnknownProtocolException(String message) {
+        super(message);
+    }
+
+    public UnknownProtocolException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public UnknownProtocolException(Throwable cause) {
+        super(cause);
+    }
 }

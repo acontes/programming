@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -38,6 +38,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Level;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.HalfBody;
@@ -70,6 +71,7 @@ public class HalfBodies extends GarbageCollector {
 
     /**
      * Build the singleton with a dummy half body
+     * @throws ActiveObjectCreationException
      */
     private HalfBodies() {
         super(HalfBody.getHalfBody(LocalBodyStore.getInstance()
@@ -89,7 +91,7 @@ public class HalfBodies extends GarbageCollector {
     private Set<Referenced> getReferenced() {
         Set<Referenced> refs = new TreeSet<Referenced>();
         synchronized (this.references) {
-            for (ConcurrentLinkedQueue<Referenced> c : references.values()) {
+            for (ConcurrentLinkedQueue<Referenced> c : this.references.values()) {
                 for (Referenced r : c) {
                     if (r.hasTerminated() || !r.isReferenced()) {
                         c.remove(r);
@@ -115,7 +117,7 @@ public class HalfBodies extends GarbageCollector {
         Vector<GCSimpleMessage> messages = new Vector<GCSimpleMessage>(refs.size());
         for (Referenced r : refs) {
             messages.add(new GCSimpleMessage(r, this.body.getID(), false,
-                    dummyActivity));
+                    this.dummyActivity));
         }
 
         return messages;

@@ -4,20 +4,20 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -53,8 +53,8 @@ public class Context implements Serializable {
 
     /**
      * Create a new context.
-     * @param owner
-     * @param currentRequest
+     * @param owner the body associated to this context.
+     * @param currentRequest the currently served request, null if any.
      */
     public Context(Body owner, Request currentRequest) {
         this.body = owner;
@@ -62,16 +62,31 @@ public class Context implements Serializable {
     }
 
     /**
-     * @return the body associated to this context
+     * @return the body associated to this context.
      */
     public Body getBody() {
         return body;
     }
 
     /**
-     * @return the currently served request, null if any
+     * @return the currently served request, null if any.
      */
     public Request getCurrentRequest() {
         return currentRequest;
+    }
+
+    /**
+     * Pretty printing.
+     */
+    public String toString() {
+        StringBuffer res = new StringBuffer("Execution context for body " +
+                this.body.getID() + " : ");
+        if (this.currentRequest == null) {
+            res.append("no current service.");
+        } else {
+            res.append("service of " + this.currentRequest.getMethodName() +
+                " from " + this.currentRequest.getSourceBodyID());
+        }
+        return res.toString();
     }
 }

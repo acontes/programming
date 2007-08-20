@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -39,13 +39,14 @@ import org.objectweb.proactive.core.event.MessageEventListener;
 
 
 public class BouncingRequestReceiver implements RequestReceiver {
-    protected static java.io.IOException REUSABLE_EXCEPTION = new java.io.IOException(
+    private static ObjectHasMigratedException REUSABLE_EXCEPTION = new ObjectHasMigratedException(
             "Object has migrated");
 
     public int receiveRequest(Request r, Body bodyReceiver)
         throws java.io.IOException {
         //System.out.println("BouncingRequestReceiver: receiveRequest()");
-        throw REUSABLE_EXCEPTION;
+        //        throw REUSABLE_EXCEPTION;
+        throw new ObjectHasMigratedException("Object has migrated");
     }
 
     public void addMessageEventListener(MessageEventListener listener) {

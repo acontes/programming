@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -28,27 +28,24 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.runtime.http.messages;
+package org.objectweb.proactive.core.jmx;
+
+import java.util.HashMap;
 
 
 /**
- * @author vlegrand
+ *  Constants for ProActive JMX ServerConnector
+ * @author ProActive Team
  *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class RuntimeReply implements java.io.Serializable {
-    private Object returnedObject;
+public class ProActiveJMXConstants {
+    public static final String PROTOCOL = "proactive";
+    public static final String VERSION = "ProActive 3.2";
+    public static final String SERVER_REGISTERED_NAME = "PAJMXServer";
+    public static final HashMap<String, String> PROACTIVE_JMX_ENV = new HashMap<String, String>();
 
-    public RuntimeReply() {
-        new RuntimeReply(null);
-    }
-
-    public RuntimeReply(Object o) {
-        this.returnedObject = o;
-    }
-
-    public Object getReturnedObject() {
-        return this.returnedObject;
+    static {
+        PROACTIVE_JMX_ENV.put("jmx.remote.protocol.provider.pkgs",
+            "org.objectweb.proactive.extensions.jmx.provider");
     }
 }

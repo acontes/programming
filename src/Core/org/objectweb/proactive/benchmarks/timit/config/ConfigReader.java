@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -55,7 +55,7 @@ public class ConfigReader {
     private Document document;
     private Element eTimit;
     private HashMap<String, String> globalVariables; // <variable name,value>
-    private Serie[] series;
+    private Series[] series;
 
     public ConfigReader(String filename) {
         // Get the <timit> root tag from configuration file
@@ -76,16 +76,16 @@ public class ConfigReader {
         }
 
         // Read and parse all <serie> tags
-        List serieList = this.eTimit.getChildren("serie");
+        List serieList = this.eTimit.getChildren("series");
         XMLHelper.replaceVariables(serieList, this.globalVariables);
-        this.series = Serie.toArray(serieList);
+        this.series = Series.toArray(serieList);
     }
 
     /**
      * Retrieve the serie of benchmarks generated from configuration file
-     * @return the Serie array
+     * @return the Series array
      */
-    public Serie[] getSeries() {
+    public Series[] getSeries() {
         return this.series.clone();
     }
 

@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.security.cert.X509Certificate;
@@ -38,7 +37,6 @@ import java.security.cert.X509Certificate;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureResult;
@@ -54,12 +52,11 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
-
-import sun.rmi.server.MarshalInputStream;
 
 
 public class RequestImpl extends MessageImpl implements Request,
@@ -151,10 +148,9 @@ public class RequestImpl extends MessageImpl implements Request,
         }
     }
 
-    // Constructor of synchronous requests 
+    // Constructor of synchronous requests
     public RequestImpl(MethodCall methodCall, boolean isOneWay) {
-        super(ProActive.getBodyOnThis().getID(), 0, isOneWay,
-            methodCall.getName());
+        super(null, 0, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
 
         if (enableStackTrace == null) {
@@ -177,12 +173,12 @@ public class RequestImpl extends MessageImpl implements Request,
     public int send(UniversalBody destinationBody)
         throws java.io.IOException, RenegotiateSessionException {
         //System.out.println("RequestSender: sendRequest  " + methodName + " to destination");
-        sendCounter++;
+        this.sendCounter++;
         return sendRequest(destinationBody);
     }
 
     public UniversalBody getSender() {
-        return sender;
+        return this.sender;
     }
 
     public Reply serve(Body targetBody) throws ServeException {
@@ -193,11 +189,11 @@ public class RequestImpl extends MessageImpl implements Request,
         if (logger.isDebugEnabled()) {
             logger.debug("result: " + result);
         }
-        if (isOneWay) { // || (sender == null)) {
+        if (this.isOneWay) { // || (sender == null)) {
             return null;
         }
-        result.augmentException(stackTrace);
-        stackTrace = null;
+        result.augmentException(this.stackTrace);
+        this.stackTrace = null;
         return createReply(targetBody, result);
     }
 
@@ -211,14 +207,14 @@ public class RequestImpl extends MessageImpl implements Request,
                 loggerNFE.debug("*** Result null");
             }
         }
-        if (isOneWay) { // || (sender == null)) {
+        if (this.isOneWay) { // || (sender == null)) {
             return null;
         }
         return createReply(targetBody, new FutureResult(null, null, nfe));
     }
 
     public boolean hasBeenForwarded() {
-        return sendCounter > 1;
+        return this.sendCounter > 1;
     }
 
     public void resetSendCounter() {
@@ -226,11 +222,11 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     public Object getParameter(int index) {
-        return methodCall.getParameter(index);
+        return this.methodCall.getParameter(index);
     }
 
     public MethodCall getMethodCall() {
-        return methodCall;
+        return this.methodCall;
     }
 
     public void notifyReception(UniversalBody bodyReceiver)
@@ -242,8 +238,8 @@ public class RequestImpl extends MessageImpl implements Request,
         //System.out.println("the request has been forwarded times");
         //we know c.res is a remoteBody since the call has been forwarded
         //if it is null, this is a one way call
-        if (sender != null) {
-            sender.updateLocation(bodyReceiver.getID(),
+        if (this.sender != null) {
+            this.sender.updateLocation(bodyReceiver.getID(),
                 bodyReceiver.getRemoteAdapter());
         }
     }
@@ -257,16 +253,16 @@ public class RequestImpl extends MessageImpl implements Request,
         Throwable exception = null;
         try {
             //loggerNFE.warn("CALL to " + targetBody);
-            result = methodCall.execute(targetBody.getReifiedObject());
+            result = this.methodCall.execute(targetBody.getReifiedObject());
         } catch (MethodCallExecutionFailedException e) {
             // e.printStackTrace();
             throw new ServeException("serve method " +
-                methodCall.getReifiedMethod().toString() + " failed", e);
+                this.methodCall.getReifiedMethod().toString() + " failed", e);
         } catch (java.lang.reflect.InvocationTargetException e) {
             exception = e.getTargetException();
-            if (isOneWay) {
+            if (this.isOneWay) {
                 throw new ServeException("serve method " +
-                    methodCall.getReifiedMethod().toString() + " failed",
+                    this.methodCall.getReifiedMethod().toString() + " failed",
                     exception);
             }
         }
@@ -277,8 +273,8 @@ public class RequestImpl extends MessageImpl implements Request,
     protected Reply createReply(Body targetBody, FutureResult result) {
         ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
 
-        return new ReplyImpl(targetBody.getID(), sequenceNumber, methodName,
-            result, psm);
+        return new ReplyImpl(targetBody.getID(), this.sequenceNumber,
+            this.methodName, result, psm);
     }
 
     public boolean crypt(ProActiveSecurityManager psm,
@@ -287,28 +283,28 @@ public class RequestImpl extends MessageImpl implements Request,
             if (logger.isDebugEnabled()) {
                 ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
                                .debug(" sending request " +
-                    methodCall.getName());
+                    this.methodCall.getName());
             }
-            if (!ciphered && !hasBeenForwarded()) {
-                sessionID = 0;
+            if (!this.ciphered && !hasBeenForwarded()) {
+                this.sessionID = 0;
 
-                if (sender == null) {
+                if (this.sender == null) {
                     logger.warn("sender is null but why ?");
                 }
 
                 byte[] certE = destinationBody.getCertificateEncoded();
                 X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                sessionID = psm.getSessionIDTo(cert);
-                if (sessionID != 0) {
-                    methodCallCiphered = psm.encrypt(sessionID, methodCall,
-                            Session.ACT_AS_CLIENT);
-                    ciphered = true;
-                    methodCall = null;
+                this.sessionID = psm.getSessionIDTo(cert);
+                if (this.sessionID != 0) {
+                    this.methodCallCiphered = psm.encrypt(this.sessionID,
+                            this.methodCall, Session.ACT_AS_CLIENT);
+                    this.ciphered = true;
+                    this.methodCall = null;
                     if (logger.isDebugEnabled()) {
                         ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
                                        .debug("methodcallciphered " +
-                            methodCallCiphered + ", ciphered " + ciphered +
-                            ", methodCall " + methodCall);
+                            this.methodCallCiphered + ", ciphered " +
+                            this.ciphered + ", methodCall " + this.methodCall);
                     }
                 }
             }
@@ -335,7 +331,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
     // security issue
     public boolean isCiphered() {
-        return ciphered;
+        return this.ciphered;
     }
 
     public boolean decrypt(ProActiveSecurityManager psm)
@@ -343,27 +339,22 @@ public class RequestImpl extends MessageImpl implements Request,
         //  String localCodeBase = null;
         //     if (ciphered) {
         ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
-                       .debug(" RequestImpl " + sessionID +
-            " decrypt : methodcallciphered " + methodCallCiphered +
-            ", ciphered " + ciphered + ", methodCall " + methodCall);
+                       .debug(" RequestImpl " + this.sessionID +
+            " decrypt : methodcallciphered " + this.methodCallCiphered +
+            ", ciphered " + this.ciphered + ", methodCall " + this.methodCall);
 
-        if ((ciphered) && (psm != null)) {
+        if ((this.ciphered) && (psm != null)) {
             try {
                 ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
                                .debug("ReceiveRequest : this body is " +
                     psm.getCertificate().getSubjectDN() + " " +
                     psm.getCertificate().getPublicKey());
-                byte[] decryptedMethodCall = psm.decrypt(sessionID,
-                        methodCallCiphered, Session.ACT_AS_SERVER);
+                byte[] decryptedMethodCall = psm.decrypt(this.sessionID,
+                        this.methodCallCiphered, Session.ACT_AS_SERVER);
 
                 //ProActiveLogger.getLogger("security.request").debug("ReceiveRequest :method call apres decryption : " +  ProActiveSecurityManager.displayByte(decryptedMethodCall));
-                ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
-                MarshalInputStream in = new MarshalInputStream(bin);
-
-                // ObjectInputStream in = new ObjectInputStream(bin);
-                methodCall = (MethodCall) in.readObject();
-                in.close();
-                ciphered = false;
+                this.methodCall = (MethodCall) ByteToObjectConverter.MarshallStream.convert(decryptedMethodCall);
+                this.ciphered = false;
 
                 //  logger.info("After decoding method call  seq id " +sequenceNumber + ":" + ciphered + ":" + sessionID + "  "+ methodCall + ":" +methodCallCiphered);
                 return true;
@@ -375,7 +366,7 @@ public class RequestImpl extends MessageImpl implements Request,
                 //			   		//		try {
                 //  MOPClassLoader currentClassLoader =	org.objectweb.proactive.core.mop.MOPClassLoader.createMOPClassLoader();
                 // this.getClass().getClassLoader().loadClass(className);
-                //    currentClassLoader.loadClass(className);  
+                //    currentClassLoader.loadClass(className);
                 this.decrypt(psm);
 
                 //		} catch (ClassNotFoundException ex) {
@@ -398,7 +389,7 @@ public class RequestImpl extends MessageImpl implements Request,
      * @see org.objectweb.proactive.core.body.request.Request#getSessionId()
      */
     public long getSessionId() {
-        return sessionID;
+        return this.sessionID;
     }
 
     //
@@ -407,7 +398,7 @@ public class RequestImpl extends MessageImpl implements Request,
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        if (Profiling.TIMERS_COMPILED) {
+        if ((Profiling.TIMERS_COMPILED) && (this.sourceID != null)) {
             TimerWarehouse.stopTimer(this.sourceID,
                 TimerWarehouse.BEFORE_SERIALIZATION);
             TimerWarehouse.startTimer(this.sourceID,
@@ -415,13 +406,13 @@ public class RequestImpl extends MessageImpl implements Request,
         }
 
         out.defaultWriteObject();
-        if (sender != null) {
-            out.writeObject(sender.getRemoteAdapter());
+        if (this.sender != null) {
+            out.writeObject(this.sender.getRemoteAdapter());
         } else {
-            out.writeObject(sender);
+            out.writeObject(this.sender);
         }
 
-        if (Profiling.TIMERS_COMPILED) {
+        if ((Profiling.TIMERS_COMPILED) && (this.sourceID != null)) {
             TimerWarehouse.stopTimer(this.sourceID, TimerWarehouse.SERIALIZATION);
             TimerWarehouse.startTimer(this.sourceID,
                 TimerWarehouse.AFTER_SERIALIZATION);
@@ -431,14 +422,14 @@ public class RequestImpl extends MessageImpl implements Request,
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
+        this.sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
     }
 
     //
     // -- METHODS DEALING WITH NON FUNCTIONAL REQUESTS
     //
     public boolean isFunctionalRequest() {
-        return isNFRequest;
+        return this.isNFRequest;
     }
 
     public void setFunctionalRequest(boolean isFunctionalRequest) {
@@ -450,6 +441,6 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     public int getNFRequestPriority() {
-        return nfRequestPriority;
+        return this.nfRequestPriority;
     }
 }

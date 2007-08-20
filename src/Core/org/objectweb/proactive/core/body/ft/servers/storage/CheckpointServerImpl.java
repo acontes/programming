@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -39,6 +39,9 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -49,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since 2.2
  */
 public abstract class CheckpointServerImpl implements CheckpointServer {
-    //logger
+    // logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // used memory
@@ -73,7 +76,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
 
         this.checkpointStorage = new Hashtable();
 
-        //classloader
+        // classloader
         try {
             CheckpointServerImpl.classServerHelper.setShouldCreateClassServer(true);
             this.codebase = CheckpointServerImpl.classServerHelper.initializeClassServer();
@@ -82,6 +85,13 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
         } catch (IOException e) {
             this.codebase = "NO CODEBASE";
             System.err.println("** ERROR ** Unable to launch FT server : ");
+            e.printStackTrace();
+        }
+
+        try {
+            Node n = NodeFactory.getDefaultNode();
+        } catch (NodeException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -110,8 +120,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
     }
 
     /*
-     * Return the memory actually used
-     * For debugging stuff.
+     * Return the memory actually used For debugging stuff.
      */
     protected long getUsedMem() {
         return (CheckpointServerImpl.runtime.totalMemory() -

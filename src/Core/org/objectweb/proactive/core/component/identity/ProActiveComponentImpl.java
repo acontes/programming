@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -132,7 +132,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
         addFunctionalInterfaces(componentParameters, component_is_primitive);
 
         // put all in a table
-        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
+        interfaceReferences = interface_references_list.toArray(new Interface[interface_references_list.size()]);
         if (logger.isDebugEnabled()) {
             logger.debug("created component : " +
                 componentParameters.getControllerDescription().getName());
@@ -196,7 +196,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                 logger.debug("cannot create interface references : " +
                     e.getMessage());
             }
-
+            e.printStackTrace();
             throw new RuntimeException("cannot create interface references : " +
                 e.getMessage());
         }
@@ -423,7 +423,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      */
     public Type getFcType() {
         try {
-            return Fractive.getComponentParametersController((ProActiveComponent) getFcItfOwner())
+            return Fractive.getComponentParametersController(getFcItfOwner())
                            .getComponentParameters().getComponentType();
         } catch (NoSuchInterfaceException nsie) {
             throw new ProActiveRuntimeException("There is no component parameters controller for this component, cannot retreive the type of the component.",
@@ -444,7 +444,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      */
     @Override
     public Component getFcItfOwner() {
-        return (Component) this;
+        return this;
     }
 
     /**
@@ -502,7 +502,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      * There should be no generic return type in the methods of the representative class
      */
     public ProActiveComponent getRepresentativeOnThis() {
-        // optimization : cache self reference 
+        // optimization : cache self reference
         if (representativeOnMyself != null) {
             return representativeOnMyself;
         }

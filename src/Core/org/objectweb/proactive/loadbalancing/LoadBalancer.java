@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -161,10 +161,13 @@ public class LoadBalancer implements ProActiveInternalObject {
 
             /***********  we have the Active Object with shortest queue, so we send the migration call ********/
             if ((minBody != null) && minBody.isActive()) {
-                /*logger.info("[Loadbalancer] Migrating ("+minBody.getReifiedObject().getClass().getName()+") from " +
-                    myNode.getNodeInformation().getURL() + " to " +
-                    destNode.getNodeInformation().getURL());
-                    */
+                if (logger.isDebugEnabled()) {
+                    logger.debug("[Loadbalancer] Migrating (" +
+                        minBody.getReifiedObject().getClass().getName() +
+                        ") from " + myNode.getNodeInformation().getURL() +
+                        " to " + destNode.getNodeInformation().getURL());
+                }
+
                 ProActive.migrateTo(minBody, destNode, false);
                 informationRecover.register(this.getName(),
                     this.metric.getLoad(),
@@ -206,7 +209,7 @@ public class LoadBalancer implements ProActiveInternalObject {
         }
         this.loadBalancers = loadBalancers;
         this.myThis = (LoadBalancer) ProActive.getStubOnThis();
-        this.balancerName = myNode.getNodeInformation().getHostName();
+        this.balancerName = myNode.getNodeInformation().getURL();
 
         // by now we use only Linux
         lm = new LoadMonitor(myThis, metric);
@@ -220,7 +223,7 @@ public class LoadBalancer implements ProActiveInternalObject {
         }
 
         int first = randomizer.nextInt(size);
-        for (int i = 0; (i < LoadBalancingConstants.SUBSET_SIZE) && (size > 0);
+        for (int i = 0; (i < LoadBalancingConstants.SUBSET_SIZE) && (i < size);
                 i++) {
             LoadBalancer remoteLb = loadBalancers.get((first + i) % size);
             try {

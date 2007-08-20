@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -112,22 +111,13 @@ public class StartNode {
     private StartNode(String[] args) {
         if (args.length == 0) {
             nodeURL = null;
+            printUsage();
         } else {
             nodeURL = args[0];
             registryPortNumber = UrlBuilder.getPortFromUrl(nodeURL);
             checkOptions(args, 1);
             readClassPath(args, 1);
         }
-
-        /*
-           // debug
-           System.out.println("Node name = "+nodeURL);
-           if (noRebind)
-             System.out.println(" - NoRebind");
-           if (noClassServer)
-             System.out.println(" - No ClassServer");
-           else System.out.println("ClassServer classpath = "+classpath);
-         */
     }
 
     //
@@ -171,16 +161,6 @@ public class StartNode {
         }
     }
 
-    //    /**
-    //     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-    //     * sets the properties needed for the node creation
-    //     */
-    //    protected void setProperties() {
-    //        //  System.setProperty("sun.rmi.dgc.checkInterval","400");
-    //        //  System.setProperty("java.rmi.dgc.leaseValue","800");
-    //        //  System.setProperty("sun.rmi.dgc.cleanInterval","400");
-    //        //  System.setProperty("sun.rmi.dgc.client.gcInterval","400");
-    //    }
     protected void createNode(String nodeURL, boolean noRebind)
         throws NodeException, AlreadyBoundException {
         int exceptionCount = 0;
@@ -192,11 +172,11 @@ public class StartNode {
                 if (nodeURL == null) {
                     node = NodeFactory.getDefaultNode();
                 } else {
-                    //TODO allow start alone node with security parameters 
                     node = NodeFactory.createNode(nodeURL, !noRebind, null, null);
                 }
 
                 logger.info("OK. Node " + node.getNodeInformation().getName() +
+                    " ( " + node.getNodeInformation().getURL() + " ) " +
                     " is created in VM id=" + UniqueID.getCurrentVMID());
 
                 break;
@@ -230,12 +210,6 @@ public class StartNode {
      */
     protected void run()
         throws java.io.IOException, NodeException, AlreadyBoundException {
-        //setProperties();
-        // set options on node factory
-        RmiRuntimeFactory.setShouldCreateClassServer(!noClassServer);
-        RmiRuntimeFactory.setShouldCreateRegistry(!noRegistry);
-        RmiRuntimeFactory.setRegistryPortNumber(registryPortNumber);
-
         // create node
         createNode(nodeURL, noRebind);
     }

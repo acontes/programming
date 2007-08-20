@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -56,9 +56,9 @@ public abstract class ReflectRequest extends HttpMessage {
      * @return an HasMap containing methods and parameters
      */
     protected static HashMap<String, Object> getHashMapReflect(Class theclass) {
-        // init the hashmap, that contains all the methods of  ProActiveRuntimeImpl 
-        // in 'Object' (value) and the name of funtions in key 
-        // (Warning two functions can t have the same name (for now)) 
+        // init the hashmap, that contains all the methods of  ProActiveRuntimeImpl
+        // in 'Object' (value) and the name of funtions in key
+        // (Warning two functions can t have the same name (for now))
         Method[] allmethods = theclass.getMethods();
         int numberOfMethods = allmethods.length;
         HashMap<String, Object> hMapMethods = new HashMap<String, Object>(numberOfMethods);
@@ -76,7 +76,7 @@ public abstract class ReflectRequest extends HttpMessage {
                     hMapMethods.put(methodname, array);
                 } else {
                     ((ArrayList<Method>) obj).add(allmethods[i]);
-                    hMapMethods.put(methodname, (ArrayList<Method>) obj);
+                    hMapMethods.put(methodname, obj);
                 }
             } else {
                 hMapMethods.put(methodname, allmethods[i]);
@@ -93,8 +93,8 @@ public abstract class ReflectRequest extends HttpMessage {
      * @param hashobjet  ???
      * @return a Method representing the method in the ProActiveRuntime
      */
-    protected Method getProActiveRuntimeMethod(String methodsearch,
-        ArrayList paramsearch, Object hashobjet) {
+    protected Method getMethod(String methodsearch, ArrayList paramsearch,
+        Object hashobjet) {
         Object mret = hashobjet;
 
         if (mret instanceof ArrayList) {
