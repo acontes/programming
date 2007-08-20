@@ -65,7 +65,8 @@ public class GroupOARParser extends AbstractGroupParser {
 
                 String nodeName = childNode.getNodeName();
                 if (nodeName.equals("resources")) {
-                    oarGroup.setResources(GCMParserHelper.getElementValue(childNode));
+                    oarGroup.setResources(GCMParserHelper.getElementValue(
+                            childNode));
                 } else if (nodeName.equals("scriptPath")) {
                     PathElement path = GCMParserHelper.parsePathElementNode(childNode);
                     oarGroup.setScriptLocation(path);

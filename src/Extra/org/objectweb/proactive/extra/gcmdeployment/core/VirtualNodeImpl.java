@@ -63,8 +63,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         }
     }
 
-	public void checkDirectMode() throws IllegalStateException {
-		// TODO Auto-generated method stub
-		
-	}
+    public void checkDirectMode() throws IllegalStateException {
+        // TODO Auto-generated method stub
+    }
 }
