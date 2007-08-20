@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
+import java.util.ArrayList;
+
+import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+
 /**
  * Class TaskFlowJob.
  * This is the definition of a tasks flow job.
@@ -62,6 +66,22 @@ public class TaskFlowJob extends Job {
 	 */
 	public TaskFlowJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
 		super(name,priority,runtimeLimit,runUntilCancel,description);
+	}
+	
+
+	/**
+	 * Append a list of tasks to this job.
+	 * 
+	 * @param tasks the list of tasks to add.
+	 * @return true if the list of tasks have been correctly added to the job,
+	 *         false if not.
+	 */
+	public boolean addTasks(ArrayList<TaskDescriptor> tasks) {
+		for (TaskDescriptor td : tasks) {
+			if (!addTask(td))
+				return false;
+		}
+		return true;
 	}
 	
 	

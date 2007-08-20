@@ -71,11 +71,11 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	// TODO envParameters
 	// TODO un moyen pour le user de mettre n'importe quelles données dans le job et la retrouver dans la police.
 	// cela lui permettrai de moduler sa police en fonction de ces données
-	private HashMap<TaskId,TaskDescriptor> tasks = new HashMap<TaskId,TaskDescriptor>();
+	protected HashMap<TaskId,TaskDescriptor> tasks = new HashMap<TaskId,TaskDescriptor>();
 	/** Instances of the final task, important to know which results will be sent to user */
-	private Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
+	protected Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
 	/** informations about job execution */
-	private JobEvent jobInfo = new JobEvent();
+	protected JobEvent jobInfo = new JobEvent();
 	/** Light job for dependences management */
 	private LightJob lightJob;
 
@@ -209,22 +209,6 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		if (result)
 			jobInfo.setTotalNumberOfTasks(jobInfo.getTotalNumberOfTasks()+1);
 		return result;
-	}
-
-	/**
-	 * Append a list of tasks to this job.
-	 * 
-	 * @param tasks
-	 *            the list of tasks to add.
-	 * @return true if the list of tasks have been correctly added to the job,
-	 *         false if not.
-	 */
-	public boolean addTasks(ArrayList<TaskDescriptor> tasks) {
-		for (TaskDescriptor td : tasks) {
-			if (!addTask(td))
-				return false;
-		}
-		return true;
 	}
 	
 

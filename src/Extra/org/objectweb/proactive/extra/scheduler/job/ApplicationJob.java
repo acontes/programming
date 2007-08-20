@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
+import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+
 /**
  * Class ApplicationJob.
  * This is the definition of an application job.
@@ -57,6 +59,20 @@ public class ApplicationJob extends Job {
 	 */
 	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
 		super(name,priority,runtimeLimit,runUntilCancel,description);
+	}
+	
+	
+	/**
+	 * Append a task to this job, only if no task has been added before.
+	 * 
+	 * @param task the task to add.
+	 * @return true if the task has been correctly added to the job, false if not.
+	 */
+	@Override
+	public boolean addTask(TaskDescriptor task) {
+		if (tasks.size() > 0)
+			return false;
+		return super.addTask(task);
 	}
 	
 	
