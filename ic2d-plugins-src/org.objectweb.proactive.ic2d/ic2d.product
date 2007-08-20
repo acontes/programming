@@ -16,7 +16,7 @@
       <vmArgs>-Dcom.sun.management.jmxremote
 -Xmx512M
 -Xms512M
--Djava.security.policy=${env_var:HOME}/.ic2d.java.policy</vmArgs>
+-Djava.security.policy=${env_var:HOME}/ic2d.java.policy</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.objectweb.proactive.ic2d/icons/alt_window_16.gif" i32="/org.objectweb.proactive.ic2d/icons/alt_window_32.gif"/>
@@ -33,6 +33,9 @@
          <bmp/>
       </win>
    </launcher>
+
+   <vm>
+   </vm>
 
    <plugins>
       <plugin id="P2P"/>
@@ -77,8 +80,8 @@
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
       <plugin id="org.eclipse.core.filesystem.hpux.PA_RISC"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.macosx"/>
       <plugin id="org.eclipse.core.filesystem.win32.x86"/>
       <plugin id="org.eclipse.core.jobs"/>
@@ -115,8 +118,8 @@
       <plugin id="org.eclipse.swt"/>
       <plugin id="org.eclipse.swt.carbon.macosx"/>
       <plugin id="org.eclipse.swt.gtk.linux.ppc"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
       <plugin id="org.eclipse.swt.gtk.solaris.sparc"/>
       <plugin id="org.eclipse.swt.motif.aix.ppc"/>
       <plugin id="org.eclipse.swt.motif.hpux.PA_RISC"/>
@@ -144,6 +147,9 @@
       <plugin id="org.mozilla.rhino"/>
       <plugin id="org.objectweb.proactive.ic2d"/>
       <plugin id="org.objectweb.proactive.ic2d.console"/>
+      <plugin id="org.objectweb.proactive.ic2d.dgc"/>
+      <plugin id="org.objectweb.proactive.ic2d.jobmonitoring"/>
+      <plugin id="org.objectweb.proactive.ic2d.launcher"/>
       <plugin id="org.objectweb.proactive.ic2d.lib"/>
       <plugin id="org.objectweb.proactive.ic2d.monitoring"/>
       <plugin id="org.objectweb.proactive.ic2d.timit"/>
@@ -158,6 +164,7 @@
       <feature id="org.objectweb.proactive.ic2d.dgc" version="1.0.0"/>
       <feature id="org.objectweb.proactive.ic2d.jobmonitoring" version="1.0.0"/>
       <feature id="org.objectweb.proactive.ic2d.monitoring" version="1.0.0"/>
+      <feature id="org.objectweb.proactive.ic2d.security" version="1.0.0"/>
    </features>
 
 </product>

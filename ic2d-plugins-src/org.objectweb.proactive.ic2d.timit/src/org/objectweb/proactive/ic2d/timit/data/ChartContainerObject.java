@@ -93,10 +93,14 @@ public class ChartContainerObject {
         }
 
         // Before ChartObject instanciation try to take a snapshot of timers
-        Collection<BasicTimer> timersCollection = ChartObject.performSnapshotInternal(aoObject);
+        Collection<BasicTimer> timersCollection = ChartObject.performSnapshotInternal(aoObject, ChartObject.PROACTIVE_BASIC_LEVEL_TIMERS_NAMES);
         if (timersCollection != null) {
             new ChartObject(this, timersCollection, aoObject);
         }
+    }
+    
+    public ChartObject getChartObjectById(UniqueID id){
+    	return this.childrenMap.get(id);
     }
 
     public List<ChartObject> getChildrenList() {

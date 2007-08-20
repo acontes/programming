@@ -50,7 +50,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.objectweb.proactive.ic2d.monitoring.extpoints.IActionExtPoint"/>
+                  <meta.attribute kind="java" basedOn="org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint"/>
                </appInfo>
             </annotation>
          </attribute>

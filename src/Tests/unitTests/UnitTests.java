@@ -3,8 +3,6 @@ package unitTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.objectweb.proactive.core.util.CircularArrayList.UnitTestCircularArrayList;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl.UnitTestHostInfoImpl;
 
 
 @RunWith(Suite.class)
@@ -18,8 +16,6 @@ import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl
  *  <li>Add this class to the following <b>SuiteClasses</b> annotation</li>
  * </ul>
  */
-@SuiteClasses({UnitTestCircularArrayList.class,
-    UnitTestHostInfoImpl.class
-})
+@SuiteClasses(org.objectweb.proactive.core.util.CircularArrayList.UnitTestCircularArrayList.class)
 public class UnitTests {
 }

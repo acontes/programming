@@ -64,7 +64,7 @@ public class Test extends FunctionalTest {
         // this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.NullMessageLogger());
         this.server.setClassname(
             "org.objectweb.proactive.core.body.ft.servers.StartFTServer");
-        this.server.setJvmOptions("-Dproactive.test=true");
+        this.server.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
         this.server.setParameters("-proto pml");
         this.server.startProcess();
         Thread.sleep(3000);
@@ -115,11 +115,13 @@ public class Test extends FunctionalTest {
         ReInt r = c.getResult();
         this.result = r.getValue();
 
+        System.out.println("Test.action() : LAAAAAAAAAAAAAA");
+
         //cleaning
         this.server.stopProcess();
         pad.killall(false);
 
-        //System.out.println(" ---------> RES = " + r.getValue()); 
+        //System.out.println(" ---------> RES = " + r.getValue());
         assertTrue(this.result == Test.AWAITED_RESULT);
     }
 }

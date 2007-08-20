@@ -3,11 +3,8 @@
 
 # The default logging level is INFO
 # The root logger logs in the test.log file
-log4j.rootLogger= INFO,FILE
 
-#Both tests packages log on the console
-log4j.logger.nonregressiontest=INFO, CONSOLE
-#log4j.logger.nonregressiontest=DEBUG, CONSOLE
+log4j.rootLogger=INFO,CONSOLE
 log4j.logger.testsuite=INFO, CONSOLE
 
 ########### The following are existing categories in ProActive
@@ -81,6 +78,10 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.configuration = DEBUG, CONSOLE
 #log4j.logger.proactive.remoteobject = DEBUG,CONSOLE
 
+#log4j.logger.proactive.jmx = DEBUG, CONSOLE
+#log4j.logger.proactive.jmx.mbean = DEBUG, CONSOLE
+#log4j.logger.proactive.jmx.notification = DEBUG, CONSOLE
+
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender
 log4j.appender.FILE.File=tests.log
@@ -104,5 +105,5 @@ log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 # %X{hostname} adds the hostname
 # %X{runtime} adds the runtime url
-#log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{runtime} - [%20.20c{2}] %m %n 
+#log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{runtime} - [%20.20c{2}] %m
 log4j.appender.CONSOLE.layout.ConversionPattern=%m %n

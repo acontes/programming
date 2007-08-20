@@ -88,7 +88,6 @@ import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
@@ -109,6 +108,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.security.securityentity.EntityCertificate;
 import org.objectweb.proactive.core.security.securityentity.EntityVirtualNode;
 import org.objectweb.proactive.core.util.ClassDataCache;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -156,14 +156,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
     }
 
-    private static SecureRandom prng = null; // new Random();
-
     // runtime security manager
     private static ProActiveSecurityManager runtimeSecurityManager;
 
     // map of local nodes, key is node name
     private java.util.Hashtable<String, LocalNode> nodeMap;
-    private String defaultNodeVirtualNode = null;
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------------------
@@ -258,14 +255,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // logging info
         MDC.remove("runtime");
         MDC.put("runtime", getURL());
-    }
-
-    public static synchronized int getNextInt() {
-        if (prng == null) {
-            prng = new SecureRandom();
-        }
-
-        return prng.nextInt(Integer.MAX_VALUE);
     }
 
     //
@@ -976,15 +965,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#setDefaultNodeVirtualNodeName(java.lang.String)
-     */
-    public void setDefaultNodeVirtualNodeName(String s) {
-        ProActiveLogger.getLogger(Loggers.SECURITY)
-                       .debug(" setting current node as currentJVM tag " + s);
-        this.defaultNodeVirtualNode = s;
-    }
-
-    /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(java.lang.String)
      */
     public ArrayList<Entity> getEntities(String nodeName) {
@@ -1354,7 +1334,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             //            this.name = "PA_JVM" +
             //                Integer.toString(new java.security.SecureRandom().nextInt()) +
             //                "_" + hostName;
-            String random = Integer.toString(ProActiveRuntimeImpl.getNextInt());
+            String random = Integer.toString(ProActiveRandom.nextPosInt());
 
             if (ProActiveConfiguration.getInstance()
                                           .getProperty("proactive.runtime.name") != null) {
