@@ -1,33 +1,3 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
- * ################################################################
- */
 package org.objectweb.proactive.ic2d.infrastructuremanager.views;
 
 import java.util.ArrayList;
@@ -48,7 +18,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.ic2d.infrastructuremanager.IMConstants;
 import org.objectweb.proactive.ic2d.infrastructuremanager.actions.IMActionCollapseAll;
 import org.objectweb.proactive.ic2d.infrastructuremanager.actions.IMActionExpandAll;
@@ -170,13 +140,14 @@ public class IMViewInfrastructure extends ViewPart {
 	}
 	
 	public void drawInfrastructure() {
-	    
+		
 		free = 0;
 		busy = 0;
 		down = 0;
 			
 		HashMap<String, Boolean> oldExpandItemState = new HashMap<String, Boolean>();
 		HashMap<String, ArrayList<String>> oldState = new HashMap<String, ArrayList<String>>();
+		
 		
 		// Remove old item
 		if(expandBar.getItemCount() != 0) {
@@ -287,10 +258,9 @@ public class IMViewInfrastructure extends ViewPart {
 			freeNodeLabel.setText(freeNodeText + free);
 			downNodeLabel.setText(downNodeText + down);
 			allNodeLabel.setText(allNodeText + (free+busy+down));
-			
+
 			
 			expandBar.redraw();
-			
 		}
 	}
 			
@@ -322,7 +292,7 @@ public class IMViewInfrastructure extends ViewPart {
 	public void shutdown() {
 		try {
 			imData.getAdmin().shutdown();
-			// TODO :  
+			// TODO : 
 			dispose();
 		} 
 		catch (ProActiveException e) {

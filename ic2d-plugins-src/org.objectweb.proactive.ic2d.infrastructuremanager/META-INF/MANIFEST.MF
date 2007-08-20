@@ -5,13 +5,13 @@ Bundle-SymbolicName: org.objectweb.proactive.ic2d.infrastructuremanager;singleto
 Bundle-Version: 1.0.0
 Bundle-Activator: org.objectweb.proactive.ic2d.infrastructuremanager.Activator
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.objectweb.proactive.ic2d.monitoring,
- org.eclipse.gef,
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ui.views,
+ org.eclipse.gef,
  org.objectweb.proactive.ic2d.console,
+ org.objectweb.proactive.ic2d.monitoring,
  org.objectweb.proactive.ic2d.lib
 Eclipse-LazyStart: true
 Bundle-ClassPath: .

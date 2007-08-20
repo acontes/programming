@@ -5,16 +5,10 @@
 	<import file="common.xml" />
 	<import file="doc.xml" />
 
-	<!-- Osgi properties -->
-	<property name="manifest.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/Manifest/" />
-	<property name="manifest.example.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
-	<property name="bundle.dir" value="${base.dir}/dist/bundle" />
-	<property name="osgi.res.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/res/"/>
-	<property name="manifest.connector.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/connector/Manifest/"/>
-
+	
 	<!-- Performance test properties -->
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest"/>
-
+	<property name="config.dir" value="${cl.proactive.dir}/${proactive.core.path}/config" />
 	<!-- emma -->
 	<path id="emma.lib" >
 		<pathelement location="${base.dir}/compile/lib/emma_ant.jar" />
@@ -31,7 +25,7 @@
 	<tstamp>
 		<format property="TODAY" pattern="yyyy-MM-dd" />
 	</tstamp>
-
+ 
 	<if name="version">
 		<property name="version_" value="${version}"/>
 		<else>
@@ -64,8 +58,13 @@
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
 
-	<target name="compile" depends="core, extensions, extra, util, examples" description="build the class files" />
+	<target name="compile" depends="core, extensions, extra, util, examples, tests" description="build the class files" />
 
+	<!-- ================================================================ -->
+	<!--                          Build all  (compile + docs              -->
+	<!--  =============================================================== -->
+
+	<target name="all" depends="compile,docs" description="build the class files and the documentation" />
 
 	<!-- ================================================================ -->
 	<!--                  Clean up generated files                        -->
@@ -81,7 +80,27 @@
 		<delete dir="${junit.dir}" />
 	</target>
 
-
+	<target name="tests"  depends="core, extra, extensions" description="Compiles functional and unit tests">
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="performanceTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+		<copy toDir="${cl.test.dir}">
+			<fileset dir="${src.test.dir}">
+				<include name="functionalTests/**/*.xml" />
+				<include name="functionalTests/**/*.fractal" />
+				<include name="functionalTests/**/*.properties" />
+				<include name="functionalTests/**/*.xsd" />
+                                <include name="performanceTests/**/*.xml" />
+			</fileset>
+		</copy>
+	</target>
+	
 	<target name="check" depends="-init,util">
 		<macrodef name="checkDir">
 			<attribute name="dir" />
@@ -182,13 +201,8 @@
 
 		<rmic base="${cl.proactive.dir}" sourcebase="${cl.proactive.dir}" stubversion="1.2">
 			<classpath refid="project.classpath" />
-			<include name="org/objectweb/proactive/core/body/jini/JiniRemoteBodyImpl.class"/>
-			<include name="org/objectweb/proactive/core/body/rmi/RmiRemoteBodyImpl.class"/>
-			<include name="org/objectweb/proactive/core/body/rmi/RmiRemoteBodyForwarderImp.class"/>
-			<include name="org/objectweb/proactive/core/body/ft/servers/FTServer.class"/>
-			<include name="org/objectweb/proactive/core/runtime/rmi/RmiProActiveRuntimeImpl.class"/>
-			<include name="org/objectweb/proactive/core/runtime/rmi/RmiProActiveRuntimeForwarderImpl.class"/>
-			<include name="org/objectweb/proactive/core/runtime/jini/JiniRuntimeImpl.class"/>
+			<include name="org/objectweb/proactive/core/body/ft/servers/FTServer.class"/>	
+			<include name="org/objectweb/proactive/core/remoteobject/rmi/RmiRemoteObjectImpl.class"/>
 		</rmic>
 
 		<echo message="Java primitive type wrapper stubs generating..." />
@@ -196,7 +210,23 @@
 			<classpath refid="project.classpath" />
 			<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
 		</java>
-
+	
+		
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+					<classpath refid="project.classpath" />
+					<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
+				</java>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
+			<arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/runtime/ProActiveRuntime" />
+		</java>
+		
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+		<classpath refid="project.classpath" />
+		    <arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/body/UniversalBody" />
+	    </java>
+	
+		
 		<!-- XXX: MPI should be in Extensions -->
 
 		<if>
@@ -321,21 +351,7 @@
 		<element name="jvmargs" optional="yes" />
 		<element name="additionalClasspath" optional="yes" />
 		<sequential>
-			<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
-				<classpath refid="project.classpath" />
-			</javac>
-			<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
-				<classpath refid="test.classpath" />
-			</javac>
-			<copy toDir="${cl.test.dir}">
-				<fileset dir="${src.test.dir}">
-					<include name="functionalTests/**/*.xml" />
-					<include name="functionalTests/**/*.fractal" />
-					<include name="functionalTests/**/*.properties" />
-					<include name="functionalTests/**/*.xsd" />
-				</fileset>
-			</copy>
-
+			
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
 
@@ -395,7 +411,7 @@
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
 	</target>
 
-	<target name="junit" depends="proActiveJar" description="Run all non regression tests on the current host only">
+	<target name="junit" depends="tests, proActiveJar" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
 
@@ -564,13 +580,17 @@
 			<fileset dir="${cl.extensions.dir}" includes="**"/>
 			<fileset dir="${cl.extra.dir}" includes="**"/>
 
+			<fileset dir="${config.dir}">
+					<include name="ProActiveConfiguration.xml" />
+			</fileset>
 			<fileset dir="${osgi.res.dir}" >
 				<include name="metadata.xml" />
 			</fileset>
 		</jar>
+
+
 	</target>
-
-
+	
 	<!-- ================================================================ -->
 	<!--           Generate ProActive stubs for all classes               -->
 	<!-- ================================================================ -->
@@ -766,18 +786,6 @@
 		</delete>
 		<java classname="ibis.frontend.rmi.Rmic"
 			  fork="true"
-			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/body/ibis/">
-			<classpath refid="project.classpath" />
-			<arg value="org.objectweb.proactive.core.body.ibis.IbisRemoteBodyImpl" />
-		</java>
-		<java classname="ibis.frontend.rmi.Rmic"
-			  fork="true"
-			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/runtime/ibis/">
-			<classpath refid="project.classpath" />
-			<arg value="org.objectweb.proactive.core.runtime.ibis.IbisProActiveRuntimeImpl" />
-		</java>
-		<java classname="ibis.frontend.rmi.Rmic"
-			  fork="true"
 			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/remoteobject/ibis/">
 			<classpath refid="project.classpath" />
 			<arg value="org.objectweb.proactive.core.remoteobject.ibis.IbisRemoteObjectImpl" />
@@ -855,11 +863,25 @@
 		<copy file="${PAdist.dir}/ProActive.jar" todir="${ic2d-plugin.dir}/${plugin.lib}" />
 	</target>
 
+
+	<!-- ================================================================ -->
+	<!--                      Compile JMX Connector                       -->
+	<!--  =============================================================== -->
+			<target name="proActiveConnectorBundle" >
+				<mkdir dir="${bundle.dir}"/>
+				<jar 
+					manifest="${manifest.connector.dir}/Manifest.mf" 
+					jarfile="${bundle.dir}/proactiveConnectorBundle.jar">				
+				</jar>			
+			</target> 
+
 	<!-- ================================================================ -->
 	<!--                          Performance test                        -->
 	<!-- ================================================================ -->
 
-	<target name="runPerformanceTest" depends="" description="Run performance test on the current host.">
+
+	<target name="runPerformanceTest" depends="tests" description="Run performance test on the current host.">
+
 		<property name="n" value="" />
 		<property name="o" value="" />
 		<property name="p" value="" />
@@ -882,5 +904,23 @@
 			<arg value="${x}" />
 		</java>
 	</target>
-
+		<!-- ================================================================ -->
+		<!--                      Compile JMX Connector                       -->
+		<!--  =============================================================== -->
+		
+		
+		<target name="OSGiBundles" depends="proActiveJar, librariesBundle, proActiveConnectorBundle, osgiMgt">
+		</target>
+	
+	<!-- ================================================================ -->
+	<!--                    Create OSGi  Management Bundle                -->
+	<!--  =============================================================== -->
+	<target name="osgiMgt" depends="compile"   >
+		<mkdir dir="${dist.dir}"/>
+		<jar jarfile="${bundle.dir}/OSGiManagement.jar" manifest="${manifest.example.management.dir}/Manifest.mf">
+			<fileset dir="${cl.examples.dir}/">
+			<include name="org/objectweb/proactive/examples/jmx/remote/**" />
+			</fileset>
+		</jar>		
+	</target>
 </project>

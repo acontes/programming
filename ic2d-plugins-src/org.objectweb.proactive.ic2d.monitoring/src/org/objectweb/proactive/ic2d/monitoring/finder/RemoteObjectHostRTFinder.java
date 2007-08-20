@@ -4,20 +4,20 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -38,7 +38,7 @@ import java.util.List;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
@@ -59,34 +59,40 @@ public class RemoteObjectHostRTFinder implements HostRTFinder{
 		/* List of ProActive runtime */
 		List<ProActiveRuntime> runtimes = new ArrayList<ProActiveRuntime>();
 
-		
+
 		URI [] uris = null;
 		try {
-			
+
 			 URI target = URIBuilder.buildURI(host.getHostName(), null, host.getProtocol(), host.getPort());
-			 uris = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).list(target);
+			 uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).list(target);
 
 			if (uris != null ) {
 			 /* Searchs all ProActive Runtimes */
 				for (int i = 0; i < uris.length; ++i) {
-			
+
 					URI url = uris[i];
-			
+
 					try {
-					    RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);
-					    Object stub = ro.getObjectProxy();
-                        
+					    RemoteObject ro = RemoteObjectHelper.lookup(url);
+
+
+//					    Object stub = ro.getObjectProxy();
+					    Object stub = RemoteObjectHelper.generatedObjectStub(ro);
+
+
 	                    if (stub instanceof ProActiveRuntime) {
+	                    	console.log("Found ProActive Runtime in registry at endpoint " + url);
 	                        runtimes.add((ProActiveRuntime ) stub);
 	                    }
 					} catch (ProActiveException pae) {
-					    // the lookup returned an active object, and an active object is 
+					    // the lookup returned an active object, and an active object is
 					    // not a remote object (for now...)
 					    // TODO : Arnaud, Active objects should become Remote Objects...
+						pae.printStackTrace();
 					    console.log("Found active object in registry at " + url);
 					}
-				}	
-					
+
+				}
 			}
 		} catch (Exception e) {
 			if(e instanceof ConnectException || e instanceof ConnectIOException) {
@@ -97,7 +103,7 @@ public class RemoteObjectHostRTFinder implements HostRTFinder{
 			return runtimes;
 		}
 
-		
+
 		return runtimes;
 	}
 }
