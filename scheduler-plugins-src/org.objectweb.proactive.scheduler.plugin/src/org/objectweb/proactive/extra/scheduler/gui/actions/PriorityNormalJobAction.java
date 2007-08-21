@@ -28,38 +28,40 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extra.scheduler.gui.actions;
 
-import org.objectweb.proactive.extra.scheduler.job.JobEvent;
+import org.eclipse.jface.action.Action;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 
-public interface EventJobsListener {
+public class PriorityNormalJobAction extends Action {
 
-	/**
-	 * Invoked when a job has been killed on the scheduler.
-	 * 
-	 * @param jobId the job to killed.
-	 */
-	public void killedEvent(JobId jobId);
+	public static final boolean ENABLED_AT_CONSTRUCTION = false;
 
-	/**
-	 * Invoked when a job has been paused on the scheduler.
-	 * 
-	 * @param event the informations on the paused job.
-	 */
-	public void pausedEvent(JobEvent event);
+	private static PriorityNormalJobAction instance = null;
 
-	/**
-	 * Invoked when a job has been resumed on the scheduler.
-	 * 
-	 * @param event the informations on the resumed job.
-	 */
-	public void resumedEvent(JobEvent event);
-	
-	/**
-	 * Invoked when a job priority has been changed.
-	 * 
-	 * @param event the informations on the resumed job.
-	 */
-	public void priorityChangedEvent(JobEvent event);
+	private PriorityNormalJobAction() {
+		this.setText("Normal");
+		this.setToolTipText("To set the job priority to \"normal\"");
+		//TODO this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/output.png"));
+		this.setEnabled(ENABLED_AT_CONSTRUCTION);
+	}
+
+	@Override
+	public void run() {
+		JobId jobId = TableManager.getInstance().getLastJobIdOfLastSelectedItem();
+		if(jobId != null)
+			SchedulerProxy.getInstance().changePriority(jobId, JobPriority.NORMAL);
+	}
+
+	public static PriorityNormalJobAction newInstance() {
+		instance = new PriorityNormalJobAction();
+		return instance;
+	}
+
+	public static PriorityNormalJobAction getInstance() {
+		return instance;
+	}
 }

@@ -49,6 +49,11 @@ import org.objectweb.proactive.extra.scheduler.gui.Colors;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityAboveNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityBelowNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
@@ -348,6 +353,40 @@ public abstract class JobComposite extends Composite {
 			});
 		}
 	}
+	
+	protected void priorityUpdate(JobId aJobId) {
+		if (!this.isDisposed()) {
+			final JobId jobId = aJobId;
+			
+			getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					Table table = getTable();
+					TableItem[] items = table.getItems();
+					TableItem item = null;
+					for (TableItem it : items)
+						if (((JobId) (it.getData())).equals(jobId)) {
+							item = it;
+							break;
+						}
+					
+					if (item == null)
+						throw new IllegalArgumentException("the item which represent the job : "
+								+ jobId + " is unknown !");
+					
+					TableColumn[] cols = table.getColumns();
+					Job job = JobsController.getLocalView().getJobById(jobId);
+					for (int i = 0; i < cols.length; i++) {
+						String title = cols[i].getText();
+						if ((title != null) && (title.equals(COLUMN_PRIORITY_TITLE))) {
+							item.setText(i, job.getPriority().toString());
+							break;
+						}
+					}
+				}
+			});
+		}
+	}
 
 	// -------------------------------------------------------------------- //
 	// ------------------------------ public ------------------------------ //
@@ -426,6 +465,11 @@ public abstract class JobComposite extends Composite {
 						
 						// enabling/disabling button permitted with this job
 						ObtainJobOutputAction.getInstance().setEnabled(false);
+						PriorityLowestJobAction.getInstance().setEnabled(false);
+						PriorityBelowNormalJobAction.getInstance().setEnabled(false);
+						PriorityNormalJobAction.getInstance().setEnabled(false);
+						PriorityAboveNormalJobAction.getInstance().setEnabled(false);
+						PriorityHighestJobAction.getInstance().setEnabled(false);
 						PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
 						pauseResumeJobAction.setEnabled(false);
 						pauseResumeJobAction.setPauseResumeMode();

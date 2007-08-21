@@ -63,6 +63,12 @@ public class KillSchedulerAction extends Action {
 				PauseResumeJobAction.getInstance().setEnabled(false);
 				KillJobAction.getInstance().setEnabled(false);
 
+				PriorityLowestJobAction.getInstance().setEnabled(false);
+				PriorityBelowNormalJobAction.getInstance().setEnabled(false);
+				PriorityNormalJobAction.getInstance().setEnabled(false);
+				PriorityAboveNormalJobAction.getInstance().setEnabled(false);
+				PriorityHighestJobAction.getInstance().setEnabled(false);
+				
 				StartStopSchedulerAction.getInstance().setEnabled(false);
 				FreezeSchedulerAction.getInstance().setEnabled(false);
 				PauseSchedulerAction.getInstance().setEnabled(false);

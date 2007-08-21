@@ -28,38 +28,40 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extra.scheduler.gui.actions;
 
-import org.objectweb.proactive.extra.scheduler.job.JobEvent;
+import org.eclipse.jface.action.Action;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 
-public interface EventJobsListener {
+public class PriorityHighestJobAction extends Action {
 
-	/**
-	 * Invoked when a job has been killed on the scheduler.
-	 * 
-	 * @param jobId the job to killed.
-	 */
-	public void killedEvent(JobId jobId);
+	public static final boolean ENABLED_AT_CONSTRUCTION = false;
 
-	/**
-	 * Invoked when a job has been paused on the scheduler.
-	 * 
-	 * @param event the informations on the paused job.
-	 */
-	public void pausedEvent(JobEvent event);
+	private static PriorityHighestJobAction instance = null;
 
-	/**
-	 * Invoked when a job has been resumed on the scheduler.
-	 * 
-	 * @param event the informations on the resumed job.
-	 */
-	public void resumedEvent(JobEvent event);
-	
-	/**
-	 * Invoked when a job priority has been changed.
-	 * 
-	 * @param event the informations on the resumed job.
-	 */
-	public void priorityChangedEvent(JobEvent event);
+	private PriorityHighestJobAction() {
+		this.setText("Highest");
+		this.setToolTipText("To set the job priority to \"highest\"");
+		//TODO this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/output.png"));
+		this.setEnabled(ENABLED_AT_CONSTRUCTION);
+	}
+
+	@Override
+	public void run() {
+		JobId jobId = TableManager.getInstance().getLastJobIdOfLastSelectedItem();
+		if(jobId != null)
+			SchedulerProxy.getInstance().changePriority(jobId, JobPriority.HIGHEST);
+	}
+
+	public static PriorityHighestJobAction newInstance() {
+		instance = new PriorityHighestJobAction();
+		return instance;
+	}
+
+	public static PriorityHighestJobAction getInstance() {
+		return instance;
+	}
 }

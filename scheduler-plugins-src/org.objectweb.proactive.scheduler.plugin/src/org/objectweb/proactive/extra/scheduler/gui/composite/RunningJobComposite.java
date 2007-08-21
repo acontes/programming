@@ -37,6 +37,11 @@ import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityAboveNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityBelowNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.EventTasksListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
@@ -109,10 +114,22 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 		switch (JobsController.getSchedulerState()) {
 		case SHUTTING_DOWN:
 		case KILLED:
+			PriorityLowestJobAction.getInstance().setEnabled(false);
+			PriorityBelowNormalJobAction.getInstance().setEnabled(false);
+			PriorityNormalJobAction.getInstance().setEnabled(false);
+			PriorityAboveNormalJobAction.getInstance().setEnabled(false);
+			PriorityHighestJobAction.getInstance().setEnabled(false);
+
 			pauseResumeJobAction.setEnabled(false);
 			pauseResumeJobAction.setPauseResumeMode();
 			break;
 		default:
+			PriorityLowestJobAction.getInstance().setEnabled(enabled);
+			PriorityBelowNormalJobAction.getInstance().setEnabled(enabled);
+			PriorityNormalJobAction.getInstance().setEnabled(enabled);
+			PriorityAboveNormalJobAction.getInstance().setEnabled(enabled);
+			PriorityHighestJobAction.getInstance().setEnabled(enabled);
+
 			pauseResumeJobAction.setEnabled(enabled);
 			JobState jobState = job.getState();
 			if (jobState.equals(JobState.PAUSED)) {
@@ -260,10 +277,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	 */
 	@Override
 	public void pausedEvent(JobEvent event) {
-		JobId jobId = event.getJobId();
-		if (getJobs().contains(jobId)) {
-			super.stateUpdate(jobId);
-		}
+		stateUpdate(event);
 	}
 
 	/**
@@ -271,6 +285,24 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	 */
 	@Override
 	public void resumedEvent(JobEvent event) {
+		stateUpdate(event);
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 */
+	@Override
+	public void priorityChangedEvent(JobEvent event) {
+		JobId jobId = event.getJobId();
+		if (getJobs().contains(jobId)) {
+			super.priorityUpdate(jobId);
+		}
+	}
+	
+	// -------------------------------------------------------------------- //
+	// ------------------- implements EventJobsListener ------------------- //
+	// -------------------------------------------------------------------- //
+	private void stateUpdate(JobEvent event) {
 		JobId jobId = event.getJobId();
 		if (getJobs().contains(jobId)) {
 			super.stateUpdate(jobId);
