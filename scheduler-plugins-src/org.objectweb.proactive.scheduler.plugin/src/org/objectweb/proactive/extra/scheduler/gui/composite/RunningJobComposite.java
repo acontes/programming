@@ -1,31 +1,28 @@
 /*
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
+ * 
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ * Initial developer(s): The ProActive Team
+ * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
+ * 
  * ################################################################
  */
 package org.objectweb.proactive.extra.scheduler.gui.composite;
@@ -121,7 +118,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 			if (jobState.equals(JobState.PAUSED)) {
 				pauseResumeJobAction.setResumeMode();
 			} else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)
-					|| jobState.equals(JobState.RERUNNING)) {
+					|| jobState.equals(JobState.RERUNNING) || jobState.equals(JobState.STALLED)) {
 				pauseResumeJobAction.setPauseMode();
 			} else {
 				pauseResumeJobAction.setPauseResumeMode();
@@ -205,7 +202,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	public void runningTaskEvent(TaskEvent event) {
 		super.stateUpdate(event.getJobId());
 	}
-	
+
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.gui.data.EventTasksListener#finishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
 	 */
@@ -236,7 +233,8 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
 						if ((title != null) && (title.equals(COLUMN_TASK_TITLE))) {
-							item.setText(i, job.getNumberOfFinishedTask() + "/"
+							item
+									.setText(i, job.getNumberOfFinishedTask() + "/"
 											+ job.getTotalNumberOfTasks());
 							break;
 						}
@@ -254,7 +252,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	 */
 	@Override
 	public void killedEvent(JobId jobId) {
-		// Do nothing
+	// Do nothing
 	}
 
 	/**
@@ -263,7 +261,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	@Override
 	public void pausedEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		if(getJobs().contains(jobId)) {
+		if (getJobs().contains(jobId)) {
 			super.stateUpdate(jobId);
 		}
 	}
@@ -274,7 +272,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	@Override
 	public void resumedEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		if(getJobs().contains(jobId)) {
+		if (getJobs().contains(jobId)) {
 			super.stateUpdate(jobId);
 		}
 	}
