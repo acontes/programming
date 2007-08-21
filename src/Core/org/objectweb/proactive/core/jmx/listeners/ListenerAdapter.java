@@ -1,6 +1,3 @@
-package org.objectweb.proactive.examples.jmx.remote.management.events;
-
-
 /*
  * ################################################################
  *
@@ -31,48 +28,32 @@ package org.objectweb.proactive.examples.jmx.remote.management.events;
  *
  * ################################################################
  */
-import java.io.IOException;
-import java.io.Serializable;
+package org.objectweb.proactive.core.jmx.listeners;
 
-import javax.management.InstanceNotFoundException;
 import javax.management.Notification;
 import javax.management.NotificationListener;
-import javax.management.ObjectName;
-
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.jmx.ProActiveConnection;
-import org.objectweb.proactive.examples.jmx.remote.management.client.entities.ManageableEntity;
 
 
-public class ActiveNotificationListener implements Serializable,
-    NotificationListener {
+/**
+ *
+ * @author ProActive Team
+ *
+ */
+public class ListenerAdapter implements NotificationListener {
+    private NotificationListener listener;
 
     /**
      *
+     * @param listener
      */
-    private static final long serialVersionUID = 8099866747677304010L;
-
-    public ActiveNotificationListener() {
+    public ListenerAdapter(NotificationListener listener) {
+        this.listener = listener;
     }
 
+    /**
+     * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
+     */
     public void handleNotification(Notification notification, Object handback) {
-        try {
-            EntitiesEventManager.getInstance().handleNotification(notification);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void listenTo(ManageableEntity entity) {
-        ObjectName name = entity.getObjectName();
-        ProActiveConnection connection = entity.getConnection();
-        try {
-            connection.addNotificationListener(name,
-                (NotificationListener) ProActive.getStubOnThis(), null, null);
-        } catch (InstanceNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.listener.handleNotification(notification, handback);
     }
 }

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,32 +28,20 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.listeners;
+package org.objectweb.proactive.core.body.exceptions;
 
-import javax.management.Notification;
-import javax.management.NotificationListener;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
 /**
- *
- * @author ProActive Team
- *
+ * Exception thrown by non active objects (e.g. main threads) when receiving a message.
+ * @author cdelbe
+ * @since 3.2.1
  */
-public class ListenerAdapter implements NotificationListener {
-    private NotificationListener listener;
+public class HalfBodyException extends ProActiveRuntimeException {
+    private static final String HALF_BODY_EXCEPTION_MESSAGE = "This method is not implemented in class HalfBody";
 
-    /**
-     *
-     * @param listener
-     */
-    public ListenerAdapter(NotificationListener listener) {
-        this.listener = listener;
-    }
-
-    /**
-     * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
-     */
-    public void handleNotification(Notification notification, Object handback) {
-        this.listener.handleNotification(notification, handback);
+    public HalfBodyException() {
+        super(HALF_BODY_EXCEPTION_MESSAGE);
     }
 }

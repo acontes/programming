@@ -32,7 +32,6 @@ package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -62,7 +61,6 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultInter
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveDeadListener;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveWatcher;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider;
@@ -199,14 +197,14 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * {@inheritDoc}
      */
     public void addResources(final Collection nodes) {
-        ((SlaveManagerAdmin) smanager).addResources(nodes);
+        ((SlaveManager) smanager).addResources(nodes);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addResources(final URL descriptorURL) {
-        ((SlaveManagerAdmin) smanager).addResources(descriptorURL);
+        ((SlaveManager) smanager).addResources(descriptorURL);
     }
 
     /**
@@ -214,15 +212,14 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public void addResources(final URL descriptorURL,
         final String virtualNodeName) {
-        ((SlaveManagerAdmin) smanager).addResources(descriptorURL,
-            virtualNodeName);
+        ((SlaveManager) smanager).addResources(descriptorURL, virtualNodeName);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addResources(final VirtualNode virtualnode) {
-        ((SlaveManagerAdmin) smanager).addResources(virtualnode);
+        ((SlaveManager) smanager).addResources(virtualnode);
     }
 
     /**
@@ -285,7 +282,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         launchedTasks = new HashSetQueue<Long>();
         resultQueue = new ResultQueue(Master.OrderingMode.CompletionOrder);
 
-        // Ignore NFEs occuring on ourself (send reply exceptions on dead slaves)
+        // Ignore NFEs occurring on ourself (send reply exceptions on dead slaves)
         ProActive.getBodyOnThis().addNFEListener(NFEListener.NOOP_LISTENER);
 
         // Slaves
@@ -374,9 +371,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     }
 
     /**
-     * {@inheritDoc}
+     * Record the given slave in our system
+     * @param slave the slave to record
+     * @param slaveName the name of the slave
      */
-    public boolean recordSlave(final Slave slave, final String slaveName) {
+    public void recordSlave(final Slave slave, final String slaveName) {
         // We record the slave in our system
         slavesByName.put(slaveName, slave);
         slavesByNameRev.put(slave, slaveName);
@@ -384,7 +383,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
 
         // We tell the pinger to watch for this new slave
         pinger.addSlaveToWatch(slave);
-        return true;
     }
 
     /**
@@ -418,6 +416,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
             maybeServePending();
         }
+        // we clear the service to avoid dirty pending requests 
+        service.flushAll();
+        // we block the communications because a getTask request might still be coming from a slave created just before the master termination
+        body.blockCommunication();
+        // we finally terminate the master
         body.terminate();
     }
 
@@ -545,36 +548,28 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @return true if completed successfully
      */
     public boolean terminateIntern(final boolean freeResources) {
-        terminated = true;
+        // We empty pending queues
+        pendingTasks.clear();
+
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating Master...");
         }
 
-        // We empty every queues
-        pendingTasks.clear();
+        // We terminate the pinger
+        ProActive.waitFor(pinger.terminate());
+        // We terminate the slave manager
+        ProActive.waitFor(smanager.terminate(freeResources));
+        if (logger.isDebugEnabled()) {
+            logger.debug("Master terminated...");
+        }
+
         launchedTasks.clear();
 
         slavesActivity.clear();
         slavesByName.clear();
         slavesByNameRev.clear();
 
-        // We give the slaves back to the resource manager
-        List<Slave> slavesToFree = new ArrayList<Slave>();
-        while (slaveGroup.size() > 0) {
-            Slave slaveToRemove = (Slave) slaveGroup.remove(0);
-            pinger.removeSlaveToWatch(slaveToRemove);
-            slavesToFree.add(slaveToRemove);
-        }
-        smanager.freeSlaves(slavesToFree);
-
-        // We terminate the pinger
-        ProActive.waitFor(pinger.terminate());
-        // We terminate the slave manager
-        ProActive.waitFor(((SlaveManagerAdmin) smanager).terminate(
-                freeResources));
-        if (logger.isDebugEnabled()) {
-            logger.debug("Master terminated...");
-        }
+        terminated = true;
         return true;
     }
 
@@ -674,7 +669,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
          * {@inheritDoc}
          */
         public boolean acceptRequest(final Request request) {
-            // We find all the requests that are not servable yet
+            // We find all the requests which can't be served yet
             String name = request.getMethodName();
             if (name.equals("waitOneResult")) {
                 return false;

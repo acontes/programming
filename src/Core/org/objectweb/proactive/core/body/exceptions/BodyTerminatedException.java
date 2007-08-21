@@ -39,19 +39,9 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
  * @since 3.2.1
  */
 public class BodyTerminatedException extends ProActiveRuntimeException {
+    private static final String TERMINATED_BODY_EXCEPTION_MESSAGE = "The body has been Terminated";
+
     public BodyTerminatedException() {
-        super();
-    }
-
-    public BodyTerminatedException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public BodyTerminatedException(String message) {
-        super(message);
-    }
-
-    public BodyTerminatedException(Throwable cause) {
-        super(cause);
+        super(TERMINATED_BODY_EXCEPTION_MESSAGE);
     }
 }

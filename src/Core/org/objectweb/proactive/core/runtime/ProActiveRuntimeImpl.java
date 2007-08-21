@@ -38,7 +38,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,8 +133,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveRuntimeImpl proActiveRuntime;
 
     // JMX
-    /** The MBean representing this ProActive Runtime */
-    private ProActiveRuntimeWrapperMBean mbean;
     private static boolean createMBean;
     private static Logger jmxLogger = ProActiveLogger.getLogger(Loggers.JMX);
 
@@ -185,6 +182,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /** The Server Connector to connect remotly to the JMX server */
     private ServerConnector serverConnector;
     private Object mutex = new Object();
+
+    /** The MBean representing this ProActive Runtime */
+    private ProActiveRuntimeWrapperMBean mbean;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------------------
@@ -265,7 +265,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-     * Return the ServerConnector associated to this ProActiveRuntime.
      * If no ServerConnector has been created, a new one is created and started.
      * Any ProActive JMX Connector Client can connect to it remotely and manage the MBeans.
      * @return the ServerConnector associated to this ProActiveRuntime
@@ -288,8 +287,18 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return mbean;
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getMBeanServerName()
+     */
     public String getMBeanServerName() {
         return UrlBuilder.getNameFromUrl(proActiveRuntime.getURL());
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getJMXServerConnector()
+     */
+    public ServerConnector getJMXServerConnector() {
+        return serverConnector;
     }
 
     //
@@ -1320,7 +1329,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //the Unique ID of the JVM
         private final java.rmi.dgc.VMID uniqueVMID;
         private String name;
-        private String processCreatorId;
         private String jobId;
         private final String hostName;
         private final DeployerTag deployerTag;
@@ -1329,11 +1337,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.uniqueVMID = UniqueID.getCurrentVMID();
             this.hostInetAddress = java.net.InetAddress.getLocalHost();
             this.hostName = UrlBuilder.getHostNameorIP(this.hostInetAddress);
-            this.processCreatorId = "jvm";
-
-            //            this.name = "PA_JVM" +
-            //                Integer.toString(new java.security.SecureRandom().nextInt()) +
-            //                "_" + hostName;
             String random = Integer.toString(ProActiveRandom.nextPosInt());
 
             if (ProActiveConfiguration.getInstance()
@@ -1378,14 +1381,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         public java.net.InetAddress getInetAddress() {
             return this.hostInetAddress;
-        }
-
-        public String getCreationProtocolID() {
-            return this.processCreatorId;
-        }
-
-        public void setCreationProtocolID(String protocolId) {
-            this.processCreatorId = protocolId;
         }
 
         /**
