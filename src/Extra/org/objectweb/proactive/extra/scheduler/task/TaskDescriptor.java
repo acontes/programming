@@ -32,6 +32,11 @@ package org.objectweb.proactive.extra.scheduler.task;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
@@ -39,7 +44,7 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
 /**
- * 
+ * Internal and global description of a task.
  * 
  * @author ProActive Team
  * @version 1.0, Jul 9, 2007
@@ -63,6 +68,9 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	private static int currentSort = SORT_BY_ID;
 	private static int currentOrder = ASC_ORDER;
 	
+	/** Number of nodes asked by the user. */
+	protected int numberOfNodesNeeded = 1;
+	
 	private String name;
 	private String description;
 	/** Parents list */
@@ -81,6 +89,34 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	 * ProActive Empty constructor
 	 */
 	public TaskDescriptor(){}
+	
+	
+	/**
+	 * Return the user task represented by this task descriptor.
+	 * 
+	 * @return the user task represented by this task descriptor.
+	 */
+	public abstract Task getTask();
+	
+	
+	/**
+	 * Create the launcher for this taskDescriptor.
+	 * 
+	 * @param host the hostname on which to send the log.
+	 * @param port the port on which to send the log.
+	 * @param node the node on which to create the launcher.
+	 * @return the created launcher as an activeObject.
+	 */
+	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException,NodeException{
+		TaskLauncher launcher;
+		if (getPreTask() == null){
+			launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{getId(),getJobId(), host, port}, node);
+		} else {
+			launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
+		}
+		setLauncher(launcher);
+		return launcher;
+	}
 	
 	
 	/**
@@ -155,6 +191,14 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 		}
 	}
 	
+
+	/**
+	 * @return the numberOfNodesNeeded
+	 */
+	public int getNumberOfNodesNeeded() {
+		return numberOfNodesNeeded;
+	}
+	
 	
 	/**
 	 * Add a dependence to the list of dependences for this taskDescriptor.
@@ -197,14 +241,6 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	public void update(TaskEvent taskInfo) {
 		this.taskInfo = taskInfo;
 	}
-
-	
-	/**
-	 * Return the user task represented by this task descriptor.
-	 * 
-	 * @return the user task represented by this task descriptor.
-	 */
-	public abstract Task getTask();
 
 
 	/**

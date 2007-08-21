@@ -30,11 +30,25 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import org.objectweb.proactive.core.node.Node;
 
+/**
+ * 
+ * 
+ * @author ProActive Team
+ * @version 1.0, Aug 21, 2007
+ * @since ProActive 3.2
+ */
+public abstract class ApplicationTask extends JavaTask {
 
-public interface Task extends Serializable {
-
-	public Object execute(TaskResult... results);
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.task.Task#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
+	 */
+	public final Object execute(TaskResult... results) {
+		throw new RuntimeException("This method should have NEVER been called in this context !!");
+	}
 	
+	public abstract Object execute(ArrayList<Node> nodes);
+
 }

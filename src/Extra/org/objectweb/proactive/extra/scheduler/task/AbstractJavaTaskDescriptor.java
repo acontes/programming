@@ -30,72 +30,79 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Description of a java task.
- * See also @see AbstractJavaTaskDescriptor
+ * Abstract definition of a java task.
+ * See also @see TaskDescriptor
  * 
  * @author ProActive Team
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
-public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
+public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 
-	/** Serial Version UID */
-	private static final long serialVersionUID = -6946803819032140410L;
-	/** the java task to launch */
-	private JavaTask task;
+	/** Serial Version UID  */
+	private static final long serialVersionUID = 1340022492862249182L;
+	/** Class instance of the class to instanciate. */
+	protected Class<Task> taskClass;
+	/** Arguments of the task as a map */
+	protected Map<String, Object> args = new HashMap<String, Object>();
 	
 	
 	/**
 	 * ProActive empty constructor
 	 */
-	public JavaTaskDescriptor() {}
+	public AbstractJavaTaskDescriptor() {}
 	
-	
-	/**
-	 * Create a new Java task descriptor using instantiated java task.
-	 * 
-	 * @param task the already instanciated java task.
-	 */
-	public JavaTaskDescriptor(JavaTask task) {
-		this.task = task;
-	}
 
-	
 	/**
-	 * Create a new Java task descriptor using a specific Class.
+	 * Create a new java task descriptor using the Class instance of the class to instanciate.
 	 * 
-	 * @param taskClass the class instance of the class to instanciate.
+	 * @param taskClass the Class instance of the class to instanciate.
 	 */
-	public JavaTaskDescriptor(Class<Task> taskClass) {
-		super(taskClass);
-	}
-
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.TaskDescriptor#getTask()
-	 */
-	@Override
-	public Task getTask() {
-		if (task != null)
-			return task;
-		try {
-			task = (JavaTask)taskClass.newInstance();
-			task.init(args);
-			return task;
-		} catch (Exception e) {
-			return null;
-		}
+	public AbstractJavaTaskDescriptor(Class<Task> taskClass) {
+		this.taskClass = taskClass;
 	}
 
 
 	/**
-	 * Set the instanciated java task.
+	 * Get the task Class instance.
 	 * 
-	 * @param task the instanciated java task.
+	 * @return the task Class instance.
 	 */
-	public void setTask(JavaTask task){
-		this.task = task;
+	public Class<Task> getTaskClass() {
+		return taskClass;
+	}
+	
+
+	/**
+	 * Set the task Class instance.
+	 * 
+	 * @param taskClass the task Class instance.
+	 */
+	public void setTaskClass(Class<Task> taskClass) {
+		this.taskClass = taskClass;
+	}
+
+	
+	/**
+	 * Get the task arguments as a map.
+	 * 
+	 * @return the task arguments.
+	 */
+	public Map<String, Object> getArgs() {
+		return args;
+	}
+
+	
+	/**
+	 * Set the task arguments as a map.
+	 * 
+	 * @param args the task arguments.
+	 */
+	public void setArgs(Map<String, Object> args) {
+		this.args = args;
 	}
 }

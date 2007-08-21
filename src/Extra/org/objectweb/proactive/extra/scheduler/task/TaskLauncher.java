@@ -63,11 +63,11 @@ import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 public class TaskLauncher implements InitActive, Serializable {
 
 	private static final long serialVersionUID = -9159607482957244049L;
-	private TaskId taskId;
-	private JobId jobId;
-	private Script<?> pre;
-	private String host;
-	private Integer port; 
+	protected TaskId taskId;
+	protected JobId jobId;
+	protected Script<?> pre;
+	protected String host;
+	protected Integer port; 
 
 	/**
 	 * ProActive empty constructor.

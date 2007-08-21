@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
+import org.objectweb.proactive.extra.scheduler.task.AppliTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 
 /**
@@ -45,11 +46,16 @@ public class ApplicationJob extends Job {
 
 	/** Serial version UID */
 	private static final long serialVersionUID = 5793055959400444968L;
-
+	
+	
+	/**
+	 * ProActive empty constructor.
+	 */
+	public ApplicationJob(){}
+	
 
 	/**
-	 * Create a new Application Job with the given parameters. It provides methods to add or
-	 * remove tasks.
+	 * Create a new Application Job with the given parameters. It provides method to get the created task.
 	 * 
 	 * @param name the current job name.
 	 * @param priority the priority of this job between 1 and 5.
@@ -59,20 +65,45 @@ public class ApplicationJob extends Job {
 	 */
 	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
 		super(name,priority,runtimeLimit,runUntilCancel,description);
+		AppliTaskDescriptor descriptor = new AppliTaskDescriptor();
+		descriptor.setFinalTask(true);
+		super.addTask(descriptor);
 	}
 	
 	
 	/**
-	 * Append a task to this job, only if no task has been added before.
+	 * Create a new Application Job with the given parameters.  It provides method to get the created task.
+	 * You can here had the number of nodes you want for your application.
 	 * 
-	 * @param task the task to add.
-	 * @return true if the task has been correctly added to the job, false if not.
+	 * @param name the current job name.
+	 * @param priority the priority of this job between 1 and 5.
+	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
+	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
+	 * @param description a short description of the job and what it will do.
+	 * @param numberOfNodesNeeded the number of node needed by the user.
+	 */
+	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded) {
+		this(name,priority,runtimeLimit,runUntilCancel,description);
+		getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
+	}
+	
+	
+	/**
+	 * Should never been called !
 	 */
 	@Override
 	public boolean addTask(TaskDescriptor task) {
-		if (tasks.size() > 0)
-			return false;
-		return super.addTask(task);
+		throw new RuntimeException("This method should have NEVER been called in ApplicationJob.");
+	}
+	
+	
+	/**
+	 * Get the application task created while application job creation.
+	 * 
+	 * @return the application task created while application job creation.
+	 */
+	public AppliTaskDescriptor getTask(){
+		return (AppliTaskDescriptor)getTasks().get(0);
 	}
 	
 	

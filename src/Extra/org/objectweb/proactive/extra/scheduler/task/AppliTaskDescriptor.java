@@ -30,45 +30,49 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 
 /**
- * Description of a java task.
+ * Description of an application java task.
  * See also @see AbstractJavaTaskDescriptor
  * 
  * @author ProActive Team
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
-public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
+public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
 
 	/** Serial Version UID */
 	private static final long serialVersionUID = -6946803819032140410L;
 	/** the java task to launch */
-	private JavaTask task;
+	private ApplicationTask task;
 	
 	
 	/**
 	 * ProActive empty constructor
 	 */
-	public JavaTaskDescriptor() {}
+	public AppliTaskDescriptor() {}
 	
 	
 	/**
-	 * Create a new Java task descriptor using instantiated java task.
+	 * Create a new Java application task descriptor using instantiated java task.
 	 * 
 	 * @param task the already instanciated java task.
 	 */
-	public JavaTaskDescriptor(JavaTask task) {
+	public AppliTaskDescriptor(ApplicationTask task) {
 		this.task = task;
 	}
 
 	
 	/**
-	 * Create a new Java task descriptor using a specific Class.
+	 * Create a new Java application task descriptor using a specific Class.
 	 * 
 	 * @param taskClass the class instance of the class to instanciate.
 	 */
-	public JavaTaskDescriptor(Class<Task> taskClass) {
+	public AppliTaskDescriptor(Class<Task> taskClass) {
 		super(taskClass);
 	}
 
@@ -81,21 +85,45 @@ public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
 		if (task != null)
 			return task;
 		try {
-			task = (JavaTask)taskClass.newInstance();
+			task = (ApplicationTask)taskClass.newInstance();
 			task.init(args);
 			return task;
 		} catch (Exception e) {
 			return null;
 		}
 	}
+	
+	
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.task.TaskDescriptor#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+	 */
+	@Override
+	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException, NodeException {
+		AppliTaskLauncher launcher;
+		if (getPreTask() == null){
+			launcher = (AppliTaskLauncher)ProActive.newActive(AppliTaskLauncher.class.getName(), new Object[]{getId(),getJobId(), host, port}, node);
+		} else {
+			launcher = (AppliTaskLauncher)ProActive.newActive(AppliTaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
+		}
+		setLauncher(launcher);
+		return launcher;
+	}
+	
+	
+	/**
+	 * Set the instanciated java application task.
+	 * 
+	 * @param task the instanciated java application task.
+	 */
+	public void setTask(ApplicationTask task){
+		this.task = task;
+	}
 
 
 	/**
-	 * Set the instanciated java task.
-	 * 
-	 * @param task the instanciated java task.
+	 * @param numberOfNodesNeeded the numberOfNodesNeeded to set
 	 */
-	public void setTask(JavaTask task){
-		this.task = task;
+	public void setNumberOfNodesNeeded(int numberOfNodesNeeded) {
+		this.numberOfNodesNeeded = numberOfNodesNeeded;
 	}
 }

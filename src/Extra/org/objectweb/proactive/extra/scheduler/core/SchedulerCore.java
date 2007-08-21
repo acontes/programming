@@ -34,6 +34,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
@@ -59,6 +60,9 @@ import org.objectweb.proactive.extra.scheduler.job.LightJob;
 import org.objectweb.proactive.extra.scheduler.job.LightTask;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
+import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
+import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
+import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
@@ -230,26 +234,33 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			Job currentJob = jobs.get(lightTask.getJobId());
 			TaskDescriptor taskDescriptor = currentJob.getHMTasks().get(lightTask.getId());
 			//TODO améliorer la demande de noeuds
-			NodeSet nodeSet = resourceManager.getAtMostNodes(1, taskDescriptor.getVerifyingScript());
-			for (Node node : nodeSet){
-				try {
-					TaskLauncher launcher;
-					if (taskDescriptor.getPreTask() == null){
-						launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{taskDescriptor.getId(),taskDescriptor.getJobId(), host, port}, node);
-					} else {
-						launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{taskDescriptor.getId(),taskDescriptor.getJobId(),taskDescriptor.getPreTask(), host, port}, node);
-					}
-					taskDescriptor.setLauncher(launcher);
-					//if job is TASKSFLOW, preparing the list of parameters for this task.
-					int resultSize = lightTask.getParents().size();
-					if (currentJob.getType() == JobType.TASKSFLOW && resultSize > 0){
-						TaskResult[] params = new TaskResult[resultSize];
-						for (int i=0;i<resultSize;i++){
-							params[i] = taskResults.get(lightTask.getParents().get(i).getId());
+			//il faut associer les scripts aux demandes histoire qu'on execute bien
+			//la bonne tache sur le bon noeud d'execution.
+			NodeSet nodeSet = resourceManager.getAtMostNodes(taskDescriptor.getNumberOfNodesNeeded(), taskDescriptor.getVerifyingScript());
+			try {
+				while (nodeSet.size() > 0){
+					Node node = nodeSet.remove(0);
+					//if the job is an application job and if all nodes can be launched at the same time
+					if (currentJob.getType() == JobType.APPLI && nodeSet.size() >= (taskDescriptor.getNumberOfNodesNeeded()-1)){
+						TaskLauncher launcher = taskDescriptor.createLauncher(host, port, node);
+						ArrayList<Node> nodes = new ArrayList<Node>();
+						for (int i=0;i<(taskDescriptor.getNumberOfNodesNeeded()-1);i++){
+							nodes.add(nodeSet.remove(0));
 						}
-						taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask(),params));
+						taskResults.put(taskDescriptor.getId(),((AppliTaskLauncher)launcher).doTask((SchedulerCore)ProActive.getStubOnThis(),(ApplicationTask)taskDescriptor.getTask(),nodes));
 					} else {
-						taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask()));
+						TaskLauncher launcher = taskDescriptor.createLauncher(host, port, node);
+						//if job is TASKSFLOW, preparing the list of parameters for this task.
+						int resultSize = lightTask.getParents().size();
+						if (currentJob.getType() == JobType.TASKSFLOW && resultSize > 0){
+							TaskResult[] params = new TaskResult[resultSize];
+							for (int i=0;i<resultSize;i++){
+								params[i] = taskResults.get(lightTask.getParents().get(i).getId());
+							}
+							taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask(),params));
+						} else {
+							taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask()));
+						}
 					}
 					logger.info(">>>>>>>> New task started on "+node.getNodeInformation().getHostName()+" [ "+taskDescriptor.getId()+" ]");
 					// set the different informations on job
@@ -267,12 +278,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					currentJob.startTask(taskDescriptor,node.getNodeInformation().getHostName());
 					// send task event to frontend
 					frontend.pendingToRunningTaskEvent(taskDescriptor.getTaskInfo());
-				} catch (Exception e) {
-					// TODO qué fa ? rendre le noeud et reessayer avec un autre.
-					// ne pas oublier de sauver dans une liste les tache qui ont merdé et les relancer
-					//autant qu'il le faut
-					e.printStackTrace();
 				}
+			} catch (Exception e) {
+				// TODO qué fa ? rendre le noeud et reessayer avec un autre.
+				// ne pas oublier de sauver dans une liste les tache qui ont merdé et les relancer
+				//autant qu'il le faut
+				e.printStackTrace();
 			}
 		}
 		
@@ -317,7 +328,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				frontend.runningToFinishedJobEvent(job.getJobInfo());
 			}
 			//free execution node
-			resourceManager.freeNode(descriptor.getLauncher().getNode());
+			if (job.getType() != JobType.APPLI){
+				resourceManager.freeNode(descriptor.getLauncher().getNode(),descriptor.getPostTask());
+			} else {
+				resourceManager.freeNodes(new NodeSet(((AppliTaskLauncher)descriptor.getLauncher()).getNodes()),descriptor.getPostTask());
+			}
 		} catch (NodeException e) {
 			e.printStackTrace();
 		} catch (NullPointerException eNull){
@@ -578,10 +593,18 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		Job job = jobs.get(jobId);
 		jobs.remove(jobId);
 		for (TaskDescriptor td : job.getTasks()){
-			if (td.getLauncher() != null){
+			if (td.getStatus() == Status.RUNNNING){
 				try{
 					td.getLauncher().terminate();
-				} catch (Exception e){}
+					//free execution node
+					if (job.getType() != JobType.APPLI){
+						resourceManager.freeNode(td.getLauncher().getNode(),td.getPostTask());
+					} else {
+						resourceManager.freeNodes(new NodeSet(((AppliTaskLauncher)td.getLauncher()).getNodes()),td.getPostTask());
+					}
+				} catch (Exception e){
+					e.printStackTrace();
+				}
 				taskResults.remove(td.getId());
 			}
 		}

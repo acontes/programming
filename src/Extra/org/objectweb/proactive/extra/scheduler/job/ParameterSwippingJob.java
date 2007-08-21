@@ -48,6 +48,12 @@ public class ParameterSwippingJob extends Job {
 	
 	
 	/**
+	 * ProActive empty constructor.
+	 */
+	public ParameterSwippingJob(){}
+	
+	
+	/**
 	 * Create a new Parameter Swipping Job with the given parameters. It provides methods to add or
 	 * remove tasks.
 	 * 
@@ -66,8 +72,7 @@ public class ParameterSwippingJob extends Job {
 	 * Append a task to this job, only if no task has been added before.
 	 * 
 	 * @param task the task to add.
-	 * @return true if the task has been correctly added to the job, false if
-	 *         not.
+	 * @return true if the task has been correctly added to the job, false if not.
 	 */
 	@Override
 	public boolean addTask(TaskDescriptor task) {

@@ -49,7 +49,7 @@ public class TaskFlowJob extends Job {
 
 	
 	/**
-	 * 
+	 * ProActive empty constructor.
 	 */
 	public TaskFlowJob(){}
 	
