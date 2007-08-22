@@ -54,7 +54,7 @@ import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class PendingJobComposite extends JobComposite implements PendingJobsListener, EventJobsListener {
+public class PendingJobComposite extends AbstractJobComposite implements PendingJobsListener, EventJobsListener {
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -76,7 +76,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	// ---------------------- extends JobComposite ------------------------ //
 	// -------------------------------------------------------------------- //
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#getJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#getJobs()
 	 */
 	@Override
 	public Vector<JobId> getJobs() {
@@ -84,7 +84,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#sortJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#sortJobs()
 	 */
 	@Override
 	public void sortJobs() {
@@ -92,7 +92,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	@Override
 	public void jobSelected(Job job) {

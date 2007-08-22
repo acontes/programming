@@ -51,7 +51,7 @@ public class StartStopSchedulerAction extends Action {
 	private StartStopSchedulerAction() {
 		this.setText("Start/Stop scheduler");
 		this.setToolTipText("To start or stop the scheduler");
-		this.setEnabled(false);
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/start.png"));
 		this.setEnabled(ENABLED_AT_CONSTRUCTION);
 	}
 

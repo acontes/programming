@@ -33,8 +33,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -58,10 +58,12 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.ResumeSchedulerAction
 import org.objectweb.proactive.extra.scheduler.gui.actions.ShutdownSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.composite.AbstractJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composite.FinishedJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composite.PendingJobComposite;
 import org.objectweb.proactive.extra.scheduler.gui.composite.RunningJobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.StatusLabel;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
@@ -78,9 +80,12 @@ public class SeparatedJobView extends ViewPart {
 	/** the view part id */
 	public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView";
 	private static final long serialVersionUID = -6958852991395601640L;
-	private static JobComposite pendingJobComposite = null;
-	private static JobComposite runningJobComposite = null;
-	private static JobComposite finishedJobComposite = null;
+
+	private static JobComposite jobComposite = null;
+
+	private static AbstractJobComposite pendingJobComposite = null;
+	private static AbstractJobComposite runningJobComposite = null;
+	private static AbstractJobComposite finishedJobComposite = null;
 
 	private static Action connectSchedulerAction = null;
 	private static Action changeViewModeAction = null;
@@ -178,20 +183,20 @@ public class SeparatedJobView extends ViewPart {
 		manager.add(obtainJobOutputAction);
 		manager.add(killJobAction);
 
-// toolBarManager.add(new Separator());
-// toolBarManager.add(startStopSchedulerAction);
-// toolBarManager.add(freezeSchedulerAction);
-// toolBarManager.add(pauseSchedulerAction);
-// toolBarManager.add(resumeSchedulerAction);
-// toolBarManager.add(shutdownSchedulerAction);
-// toolBarManager.add(killSchedulerAction);
+		manager.add(new Separator());
+		manager.add(startStopSchedulerAction);
+		manager.add(freezeSchedulerAction);
+		manager.add(pauseSchedulerAction);
+		manager.add(resumeSchedulerAction);
+		manager.add(shutdownSchedulerAction);
+		manager.add(killSchedulerAction);
 	}
 
 	private void makeActions() {
 		Shell shell = parent.getShell();
 
 		connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(parent);
-		changeViewModeAction = ChangeViewModeAction.newInstance(parent);
+		changeViewModeAction = ChangeViewModeAction.newInstance(jobComposite);
 
 		obtainJobOutputAction = ObtainJobOutputAction.newInstance();
 		submitJob = SubmitJobAction.newInstance(parent);
@@ -237,7 +242,7 @@ public class SeparatedJobView extends ViewPart {
 	 * 
 	 * @return the pending job composite
 	 */
-	public static JobComposite getPendingJobComposite() {
+	public static AbstractJobComposite getPendingJobComposite() {
 		return pendingJobComposite;
 	}
 
@@ -246,7 +251,7 @@ public class SeparatedJobView extends ViewPart {
 	 * 
 	 * @return the running job composite
 	 */
-	public static JobComposite getRunningJobComposite() {
+	public static AbstractJobComposite getRunningJobComposite() {
 		return runningJobComposite;
 	}
 
@@ -255,7 +260,7 @@ public class SeparatedJobView extends ViewPart {
 	 * 
 	 * @return the finished job composite
 	 */
-	public static JobComposite getFinishedJobComposite() {
+	public static AbstractJobComposite getFinishedJobComposite() {
 		return finishedJobComposite;
 	}
 
@@ -303,46 +308,47 @@ public class SeparatedJobView extends ViewPart {
 	public static void adminToolBarMode() {
 		System.out.println("ADMIN()");
 		userToolBarMode();
-//		IToolBarManager toolBarManager = instance.getViewSite().getActionBars().getToolBarManager();
-//		toolBarManager.add(new Separator());
-//		toolBarManager.add(startStopSchedulerAction);
-//		toolBarManager.add(freezeSchedulerAction);
-//		toolBarManager.add(pauseSchedulerAction);
-//		toolBarManager.add(resumeSchedulerAction);
-//		toolBarManager.add(shutdownSchedulerAction);
-//		toolBarManager.add(killSchedulerAction);
-//		Display.getDefault().asyncExec(new Runnable() {
-//			@Override
-//			public void run() {
-//				parent.redraw();
-//				parent.update();
-//				parent.getShell().redraw();
-//				parent.getShell().update();
-//			}
-//		});
+// IToolBarManager toolBarManager =
+// instance.getViewSite().getActionBars().getToolBarManager();
+// toolBarManager.add(new Separator());
+// toolBarManager.add(startStopSchedulerAction);
+// toolBarManager.add(freezeSchedulerAction);
+// toolBarManager.add(pauseSchedulerAction);
+// toolBarManager.add(resumeSchedulerAction);
+// toolBarManager.add(shutdownSchedulerAction);
+// toolBarManager.add(killSchedulerAction);
+// Display.getDefault().asyncExec(new Runnable() {
+// @Override
+// public void run() {
+// parent.redraw();
+// parent.update();
+// parent.getShell().redraw();
+// parent.getShell().update();
+// }
+// });
 	}
 
 	public static void userToolBarMode() {
 		System.out.println("USER()");
 		IToolBarManager toolBarManager = instance.getViewSite().getActionBars().getToolBarManager();
 		toolBarManager.removeAll();
-//		toolBarManager.add(connectSchedulerAction);
-//		toolBarManager.add(changeViewModeAction);
-//		toolBarManager.add(new Separator());
-//		toolBarManager.add(submitJob);
-//		toolBarManager.add(pauseResumeJobAction);
-//		toolBarManager.add(obtainJobOutputAction);
-//		toolBarManager.add(killJobAction);
-//		Display.getDefault().asyncExec(new Runnable() {
-//			@Override
-//			public void run() {
-//				parent.redraw();
-//				parent.update();
-//				parent.getShell().redraw();
-//				parent.getShell().update();
-//				System.out.println(".run()");
-//			}
-//		});
+// toolBarManager.add(connectSchedulerAction);
+// toolBarManager.add(changeViewModeAction);
+// toolBarManager.add(new Separator());
+// toolBarManager.add(submitJob);
+// toolBarManager.add(pauseResumeJobAction);
+// toolBarManager.add(obtainJobOutputAction);
+// toolBarManager.add(killJobAction);
+// Display.getDefault().asyncExec(new Runnable() {
+// @Override
+// public void run() {
+// parent.redraw();
+// parent.update();
+// parent.getShell().redraw();
+// parent.getShell().update();
+// System.out.println(".run()");
+// }
+// });
 	}
 
 	// -------------------------------------------------------------------- //
@@ -356,19 +362,33 @@ public class SeparatedJobView extends ViewPart {
 		parent = theParent;
 		instance = this;
 
-		// It must be a FillLayout !
-		FillLayout layout = new FillLayout(SWT.HORIZONTAL);
-		layout.spacing = 5;
-		layout.marginHeight = 10;
-		layout.marginWidth = 10;
-		parent.setLayout(layout);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
+		parent.setLayout(gridLayout);
 
-		pendingJobComposite = new PendingJobComposite(parent, "Pending", JobsController.getLocalView());
-		runningJobComposite = new RunningJobComposite(parent, "Running", JobsController.getLocalView());
-		finishedJobComposite = new FinishedJobComposite(parent, "Finished", JobsController.getLocalView());
+		jobComposite = new JobComposite(parent);
+
+		pendingJobComposite = new PendingJobComposite(jobComposite, "Pending", JobsController.getLocalView());
+		runningJobComposite = new RunningJobComposite(jobComposite, "Running", JobsController.getLocalView());
+		finishedJobComposite = new FinishedJobComposite(jobComposite, "Finished", JobsController
+				.getLocalView());
+
+		GridData gridData = new GridData();
+		gridData = new GridData();
+		gridData.verticalAlignment = GridData.FILL;
+		gridData.grabExcessVerticalSpace = true;
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		jobComposite.setLayoutData(gridData);
+
+		gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+
+		StatusLabel.newInstance(theParent, gridData, JobsController.getLocalView());
 
 		// I must turn active the jobsController after create
-		// pendingJobComposite, runningJobComposite and finishedJobComposite.
+		// pendingJobComposite, runningJobComposite, finishedJobComposite
+		// and before call newInstance on StatusLabel.
 		JobsController.turnActive();
 
 		makeActions();

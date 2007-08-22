@@ -50,6 +50,7 @@ public class Colors {
 	public static final Color GREEN;
 	public static final Color GRAY;
 	public static final Color BLACK;
+	public static final Color PURPLE;
 
 	static {
 		Display device = Display.getCurrent();
@@ -58,5 +59,6 @@ public class Colors {
 		GREEN = new Color(device, 180, 255, 180);
 		GRAY = new Color(device, 120, 120, 120);
 		BLACK = new Color(device, 0, 0, 0);
+		PURPLE = new Color(device, 128, 0, 250);
 	}
 }

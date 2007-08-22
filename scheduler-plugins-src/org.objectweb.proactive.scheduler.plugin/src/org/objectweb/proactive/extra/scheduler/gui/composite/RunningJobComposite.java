@@ -60,7 +60,7 @@ import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class RunningJobComposite extends JobComposite implements RunningJobsListener, EventTasksListener,
+public class RunningJobComposite extends AbstractJobComposite implements RunningJobsListener, EventTasksListener,
 		EventJobsListener {
 
 	/** the unique id and the title for the column "Progress" */
@@ -87,7 +87,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	// ---------------------- extends JobComposite ------------------------ //
 	// -------------------------------------------------------------------- //
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#getJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#getJobs()
 	 */
 	@Override
 	public Vector<JobId> getJobs() {
@@ -95,7 +95,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#sortJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#sortJobs()
 	 */
 	@Override
 	public void sortJobs() {
@@ -103,7 +103,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	@Override
 	public void jobSelected(Job job) {
@@ -147,7 +147,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#createTable(org.eclipse.swt.widgets.Composite,
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#createTable(org.eclipse.swt.widgets.Composite,
 	 *      int)
 	 */
 	@Override
@@ -168,7 +168,7 @@ public class RunningJobComposite extends JobComposite implements RunningJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#createItem(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#createItem(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	@Override
 	protected TableItem createItem(Job job) {
