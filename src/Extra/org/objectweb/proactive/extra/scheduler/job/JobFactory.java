@@ -53,6 +53,7 @@ import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.scripting.SimpleScript;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.task.AbstractJavaTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
 import org.objectweb.proactive.extra.scheduler.task.JavaTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.Task;
@@ -251,7 +252,7 @@ public class JobFactory {
 				TaskDescriptor td = tasks.keySet().iterator().next();
 				
 				job = new ApplicationJob(name, getPriority(priority), -1, true, description, jobAppliNeededNodes, (Class<ApplicationTask>) td.getTask().getClass());
-				TaskDescriptor td2 = ((ApplicationJob)job).getTask();
+				AbstractJavaTaskDescriptor td2 = ((ApplicationJob)job).getTask();
 				td2.setDescription(td.getDescription());
 //				td2.setFinalTask(td.isFinalTask()); DONT DO THIS SETTING
 				td2.setName(td.getName());
@@ -260,6 +261,8 @@ public class JobFactory {
 				td2.setRerunnable(td.getRerunnable());
 				td2.setRunTimeLimit(td.getRunTimeLimit());
 				td2.setVerifyingScript(td.getVerifyingScript());
+				td2.setArgs(((JavaTaskDescriptor)td).getArgs());
+				
 			}
 		} else if (jt == JobType.PARAMETER_SWIPPING){
 			job = new ParameterSwippingJob(name, getPriority(priority), -1, true, description);
