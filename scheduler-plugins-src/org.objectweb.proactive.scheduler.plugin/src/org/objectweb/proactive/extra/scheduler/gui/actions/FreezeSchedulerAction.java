@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extra.scheduler.gui.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 
 public class FreezeSchedulerAction extends Action {
@@ -43,7 +42,7 @@ public class FreezeSchedulerAction extends Action {
 	private FreezeSchedulerAction() {
 		this.setText("Freeze scheduler");
 		this.setToolTipText("To freeze the scheduler (Only all running Tasks will be terminated)");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/output.png"));
+		//this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/output.png"));
 		this.setEnabled(ENABLED_AT_CONSTRUCTION);
 	}
 

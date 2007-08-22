@@ -73,6 +73,10 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
 			if (res == SchedulerProxy.CONNECTED) {
 				isConnected = true;
+				
+				// connection successful, so record "valid" url and login
+				SelectSchedulerDialog.saveInformations();
+				
 				this.setText("Disconnect");
 				this.setToolTipText("Disconnect to the scheduler");
 				this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/run.png"));
