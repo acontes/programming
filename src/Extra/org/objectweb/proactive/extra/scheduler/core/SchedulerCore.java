@@ -594,15 +594,17 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		jobs.remove(jobId);
 		for (TaskDescriptor td : job.getTasks()){
 			if (td.getStatus() == Status.RUNNNING){
+				//free execution node
 				try{
 					td.getLauncher().terminate();
-					//free execution node
+				} catch (Exception e){}
+				try{
 					if (job.getType() != JobType.APPLI){
 						resourceManager.freeNode(td.getLauncher().getNode(),td.getPostTask());
 					} else {
 						resourceManager.freeNodes(new NodeSet(((AppliTaskLauncher)td.getLauncher()).getNodes()),td.getPostTask());
 					}
-				} catch (Exception e){
+				} catch (NodeException e){
 					e.printStackTrace();
 				}
 				taskResults.remove(td.getId());
