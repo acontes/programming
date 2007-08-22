@@ -53,6 +53,7 @@ import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.scripting.SimpleScript;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
 import org.objectweb.proactive.extra.scheduler.task.JavaTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.Task;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
@@ -92,6 +93,7 @@ public class JobFactory {
 		return createJob(new FileInputStream(f));
 	}
 
+	@SuppressWarnings("unchecked")
 	public Job createJob(InputStream input)
 	throws ParserConfigurationException, SAXException, IOException,
 	XPathExpressionException, InvalidScriptException,
@@ -174,8 +176,8 @@ public class JobFactory {
 						taskNode, XPathConstants.STRING));
 				System.out.println("desc = " + desc.getDescription());
 
-				// TASK NBNODES
-				String needstr = (String) xpath.evaluate("neededNodes",
+				// TASK NEEDED_NODES
+				String needstr = (String) xpath.evaluate("@neededNodes",
 						taskNode, XPathConstants.STRING);
 				try{
 					jobAppliNeededNodes = Integer.parseInt(needstr);
@@ -247,10 +249,11 @@ public class JobFactory {
 		if (jt == JobType.APPLI) {
 			if(!tasks.keySet().isEmpty()) {
 				TaskDescriptor td = tasks.keySet().iterator().next();
-				job = new ApplicationJob(name, getPriority(priority), -1, true, description, jobAppliNeededNodes, (Class<Task>) td.getTask().getClass());
+				
+				job = new ApplicationJob(name, getPriority(priority), -1, true, description, jobAppliNeededNodes, (Class<ApplicationTask>) td.getTask().getClass());
 				TaskDescriptor td2 = ((ApplicationJob)job).getTask();
 				td2.setDescription(td.getDescription());
-				td2.setFinalTask(td.isFinalTask());
+//				td2.setFinalTask(td.isFinalTask()); DONT DO THIS SETTING
 				td2.setName(td.getName());
 				td2.setPostTask(td.getPostTask());
 				td2.setPreTask(td.getPreTask());
@@ -258,30 +261,32 @@ public class JobFactory {
 				td2.setRunTimeLimit(td.getRunTimeLimit());
 				td2.setVerifyingScript(td.getVerifyingScript());
 			}
-		} else if (jt == JobType.PARAMETER_SWIPPING)
+		} else if (jt == JobType.PARAMETER_SWIPPING){
 			job = new ParameterSwippingJob(name, getPriority(priority), -1, true, description);
-		else
+		} else {
 			job = new TaskFlowJob(name, getPriority(priority), -1, true, description);
+		}
 		// Dependencies
 		HashMap<String, TaskDescriptor> depends = 
 			new HashMap<String, TaskDescriptor>();
 
 		for(TaskDescriptor td : tasks.keySet())
 			depends.put(td.getName(), td);
-
-		for (Entry<TaskDescriptor, String> task : tasks.entrySet()) {
-			task.getKey().setJobId(job.getId());
-			String depstr = task.getValue();
-			if (!depstr.matches("[ ]*")){
-				String[] deps = depstr.split(" ");
-				for(int i = 0 ; i <  deps.length ; i++) {
-					if(depends.containsKey(deps[i]))
-						task.getKey().addDependence(depends.get(deps[i]));
-					else
-						System.err.println("Can't resolve dependence : "+deps[i]);
+		if(job.getType() != JobType.APPLI){
+			for (Entry<TaskDescriptor, String> task : tasks.entrySet()) {
+				task.getKey().setJobId(job.getId());
+				String depstr = task.getValue();
+				if (!depstr.matches("[ ]*")){
+					String[] deps = depstr.split(" ");
+					for(int i = 0 ; i <  deps.length ; i++) {
+						if(depends.containsKey(deps[i]))
+							task.getKey().addDependence(depends.get(deps[i]));
+						else
+							System.err.println("Can't resolve dependence : "+deps[i]);
+					}
 				}
+				job.addTask(task.getKey());
 			}
-			job.addTask(task.getKey());
 		}
 
 		return job;
