@@ -9,7 +9,7 @@
 				<javaProcess
 					class="org.objectweb.proactive.examples.scheduler.ApplicationExample">
 					<initParameters>
-						<parameter name="numberToFind" value="5000" />
+						<parameter name="numberToFind" value="200" />
 					</initParameters>
 				</javaProcess>
 			</process>

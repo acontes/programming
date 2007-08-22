@@ -31,8 +31,6 @@
 package org.objectweb.proactive.extra.scheduler.task;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -42,6 +40,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 import org.objectweb.proactive.extra.scheduler.exception.UserException;
@@ -62,7 +61,7 @@ public class AppliTaskLauncher extends TaskLauncher {
 	/** Serial version UID */
 	private static final long serialVersionUID = 4655938634771399458L;
 	/** execution nodes list */
-	private ArrayList<Node> nodesList; 
+	private NodeSet nodesList; 
 	
 	
 	/**
@@ -105,9 +104,9 @@ public class AppliTaskLauncher extends TaskLauncher {
 	 * @return a task result representing the result of this task execution.
 	 */
 	@SuppressWarnings("unchecked")
-	public TaskResult doTask(SchedulerCore core, ApplicationTask task, ArrayList<Node> nodes) {
+	public TaskResult doTask(SchedulerCore core, ApplicationTask task, NodeSet nodes) {
 		nodesList = nodes;
-		try { nodesList.add(super.getNode()); } catch (NodeException e) { }
+		try { nodesList.add(super.getNodes().get(0)); } catch (NodeException e) { }
 		//handle loggers
        	Appender out = new SocketAppender(host,port);
        	// store stdout and err
@@ -120,16 +119,14 @@ public class AppliTaskLauncher extends TaskLauncher {
         // redirect stdout and err
         System.setOut(new PrintStream(new LoggingOutputStream(l,Level.INFO), true));
         System.setErr(new PrintStream(new LoggingOutputStream(l,Level.ERROR), true));
-		try {
+	    try {
 			//launch pre script
 			if (pre != null){
 				for (Node node : nodes){
 		        	ScriptHandler handler = ScriptLoader.createHandler(node);
 		        	ScriptResult<Object> res = handler.handle(pre);
 		        	if(res.errorOccured()){
-		        		System.err.println("Error on pre-script occured : ");
-		        		res.getException().printStackTrace();
-		        		throw new UserException("PreTask script has failed on the current node : "+node);
+		        		throw new UserException("PreTask script has failed on the current node : "+node,res.getException());
 		        	}
 				}
         	}
@@ -138,12 +135,14 @@ public class AppliTaskLauncher extends TaskLauncher {
             //return result
             return result;
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			return new TaskResult(taskId, ex);
 		} finally {
 			//Unhandle loggers
             LogManager.shutdown();
             System.setOut(stdout);
             System.setErr(stderr);
+            //terminate the task
 			core.terminate(taskId, jobId);	
 		}
 	}
@@ -154,7 +153,8 @@ public class AppliTaskLauncher extends TaskLauncher {
 	 * 
 	 * @return the nodesList.
 	 */
-	public ArrayList<Node> getNodes() {
+	@Override
+	public NodeSet getNodes() {
 		return nodesList;
 	}
 	

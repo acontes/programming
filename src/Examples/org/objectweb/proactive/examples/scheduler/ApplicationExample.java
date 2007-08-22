@@ -57,15 +57,16 @@ public class ApplicationExample extends ApplicationTask {
 	public void init(Map<String, Object> args) {
 		try {
 			numberToFind = Integer.parseInt(args.get("numberToFind").toString());
-		} catch (NumberFormatException e) { }
+		} catch (NumberFormatException e) { /* will stay to 5003 */ }
 	}
-
 
 
 	@Override
 	public Object execute(ArrayList<Node> nodes) {
+		
+		System.out.println("Application started !!");
 
-        // create workers (on local JVM)
+        // create workers (on local node)
         Vector<Worker> workers = new Vector<Worker>();
         for (Node node : nodes) {
 			try {
@@ -80,19 +81,18 @@ public class ApplicationExample extends ApplicationTask {
 
         // create controller
         Controller controller = new Controller(workers);
-
-		return controller.findNthPrimeNumber(numberToFind);
+        int result = controller.findNthPrimeNumber(numberToFind);
+		
+        System.out.println("last prime : "+result);
+        
+        return result;
 	}
 
-	
+
 	
 	private class Controller {
 	    // Managed workers 
 	    private Vector<Worker> workers;
-	
-	    // CONSTRUCTORS
-	    public Controller() {
-	    }
 	
 	    public Controller(Vector<Worker> workers) {
 	        this.workers = workers;
@@ -131,29 +131,4 @@ public class ApplicationExample extends ApplicationTask {
 	    }
 	}
 	
-	
-	
-	private class Worker implements java.io.Serializable {
-	    private static final long serialVersionUID = 6479587603886940747L;
-
-	    // primeNumbers already known by the worker
-	    private ArrayList<Integer> primeNumbers;
-
-	    public Worker() {
-	        this.primeNumbers = new ArrayList<Integer>();
-	    }
-
-	    public BooleanWrapper isPrime(int num) {
-	        for (Integer n : primeNumbers) {
-	            if ((num % n) == 0) {
-	                return new BooleanWrapper(false);
-	            }
-	        }
-	        return new BooleanWrapper(true);
-	    }
-
-	    public void addPrimeNumber(int num) {
-	        primeNumbers.add(num);
-	    }
-	}
 }

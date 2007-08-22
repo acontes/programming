@@ -32,7 +32,6 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import org.objectweb.proactive.extra.scheduler.task.AppliTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
-import org.objectweb.proactive.extra.scheduler.task.Task;
 import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 
 /**
@@ -102,7 +101,7 @@ public class ApplicationJob extends Job {
 	 * @param numberOfNodesNeeded the number of node needed by the user.
 	 * @param taskClass the Class instance of the class to instanciate.
 	 */
-	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded,Class<Task> taskClass) {
+	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded, Class<ApplicationTask> taskClass) {
 		this(name,priority,runtimeLimit,runUntilCancel,description,numberOfNodesNeeded);
 		getTask().setTaskClass(taskClass);
 	}

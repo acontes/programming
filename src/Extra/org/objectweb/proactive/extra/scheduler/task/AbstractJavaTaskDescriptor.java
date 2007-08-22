@@ -46,7 +46,7 @@ public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 	/** Serial Version UID  */
 	private static final long serialVersionUID = 1340022492862249182L;
 	/** Class instance of the class to instanciate. */
-	protected Class<Task> taskClass;
+	protected Class<? extends Task> taskClass;
 	/** Arguments of the task as a map */
 	protected Map<String, Object> args = new HashMap<String, Object>();
 	
@@ -62,7 +62,7 @@ public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 	 * 
 	 * @param taskClass the Class instance of the class to instanciate.
 	 */
-	public AbstractJavaTaskDescriptor(Class<Task> taskClass) {
+	public AbstractJavaTaskDescriptor(Class<? extends Task> taskClass) {
 		this.taskClass = taskClass;
 	}
 
@@ -72,7 +72,7 @@ public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 	 * 
 	 * @return the task Class instance.
 	 */
-	public Class<Task> getTaskClass() {
+	public Class<? extends Task> getTaskClass() {
 		return taskClass;
 	}
 	
@@ -82,7 +82,7 @@ public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 	 * 
 	 * @param taskClass the task Class instance.
 	 */
-	public void setTaskClass(Class<Task> taskClass) {
+	public void setTaskClass(Class<? extends Task> taskClass) {
 		this.taskClass = taskClass;
 	}
 

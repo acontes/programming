@@ -206,7 +206,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//shutdown resource manager proxy
 		resourceManager.shutdownProxy();
 		logger.info("Scheduler is now shutdown !");
-		frontend.schedulerShutDownEvent();
+		if (state == SchedulerState.SHUTTING_DOWN)
+			frontend.schedulerShutDownEvent();
 		//destroying scheduler active objects
 		frontend.terminate();
 		ProActive.terminateActiveObject(true);
@@ -243,7 +244,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					//if the job is an application job and if all nodes can be launched at the same time
 					if (currentJob.getType() == JobType.APPLI && nodeSet.size() >= (taskDescriptor.getNumberOfNodesNeeded()-1)){
 						TaskLauncher launcher = taskDescriptor.createLauncher(host, port, node);
-						ArrayList<Node> nodes = new ArrayList<Node>();
+						NodeSet nodes = new NodeSet();
 						for (int i=0;i<(taskDescriptor.getNumberOfNodesNeeded()-1);i++){
 							nodes.add(nodeSet.remove(0));
 						}
@@ -328,11 +329,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				frontend.runningToFinishedJobEvent(job.getJobInfo());
 			}
 			//free execution node
-			if (job.getType() != JobType.APPLI){
-				resourceManager.freeNode(descriptor.getLauncher().getNode(),descriptor.getPostTask());
-			} else {
-				resourceManager.freeNodes(new NodeSet(((AppliTaskLauncher)descriptor.getLauncher()).getNodes()),descriptor.getPostTask());
-			}
+			resourceManager.freeNodes(descriptor.getLauncher().getNodes(),descriptor.getPostTask());
 		} catch (NodeException e) {
 			e.printStackTrace();
 		} catch (NullPointerException eNull){
@@ -586,7 +583,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @param jobId the job to kill.
 	 * @return true if success, false otherwise.
 	 */
-	public BooleanWrapper kill(JobId jobId) {
+	public synchronized BooleanWrapper kill(JobId jobId) {
 		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
@@ -594,18 +591,17 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		jobs.remove(jobId);
 		for (TaskDescriptor td : job.getTasks()){
 			if (td.getStatus() == Status.RUNNNING){
-				//free execution node
+				NodeSet nodes = new NodeSet();
 				try{
+					//get the nodes that are used for this descriptor
+					nodes = td.getLauncher().getNodes();
+					//free execution node
 					td.getLauncher().terminate();
-				} catch (Exception e){}
+				} catch (Exception e){ /* Tested (nothing to do) */}
 				try{
-					if (job.getType() != JobType.APPLI){
-						resourceManager.freeNode(td.getLauncher().getNode(),td.getPostTask());
-					} else {
-						resourceManager.freeNodes(new NodeSet(((AppliTaskLauncher)td.getLauncher()).getNodes()),td.getPostTask());
-					}
-				} catch (NodeException e){
-					e.printStackTrace();
+					resourceManager.freeNodes(new NodeSet(nodes),td.getPostTask());
+				} catch (Exception e2){
+					e2.printStackTrace();
 				}
 				taskResults.remove(td.getId());
 			}

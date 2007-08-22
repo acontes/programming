@@ -68,7 +68,7 @@ public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
 	 * 
 	 * @param taskClass the class instance of the class to instanciate.
 	 */
-	public JavaTaskDescriptor(Class<Task> taskClass) {
+	public JavaTaskDescriptor(Class<JavaTask> taskClass) {
 		super(taskClass);
 	}
 
@@ -82,9 +82,15 @@ public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
 			return task;
 		try {
 			task = (JavaTask)taskClass.newInstance();
-			task.init(args);
+			try{
+				task.init(args);
+			} catch (Exception e){
+				System.err.println("WARING : INIT has failed for task "+task.getClass().getSimpleName());
+				e.printStackTrace();
+			}
 			return task;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
