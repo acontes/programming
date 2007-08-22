@@ -90,6 +90,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	private HashMap<UniqueID,UserIdentification> identifications = new HashMap<UniqueID,UserIdentification>();
 	/** Implementation of Resource Manager */
 	private InfrastructureManagerProxy resourceManager;
+	/** Authentication Interface */
+	private SchedulerAuthentication authenticationInterface;
 	/** Full name of the policy class */
 	private String policyFullName;
 	/** Implementation of scheduler main structure */
@@ -164,6 +166,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @param identification the identification of the connected user
 	 */
 	public void connect(UniqueID sourceBodyID, UserIdentification identification) throws SchedulerException {
+		if (authenticationInterface == null)
+			authenticationInterface = (SchedulerAuthentication)ProActive.getContext().getStubOnCaller();
 		if (identifications.containsKey(sourceBodyID)){
 			logger.warn("Active object already connected !");
 			throw new SchedulerException("This active object is already connected to the scheduler !");
@@ -454,8 +458,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * Terminate the schedulerConnexion active object and then this object.
 	 */
 	public void terminate() {
-		//TODO supprimer l'objet actif de connection
+		if (authenticationInterface != null)
+			authenticationInterface.terminate();
 		ProActive.terminateActiveObject(false);
+		logger.info("Scheduler frontend is now shutdown !");
 	}
 	
 	
