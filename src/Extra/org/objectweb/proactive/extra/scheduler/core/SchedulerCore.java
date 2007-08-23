@@ -513,6 +513,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	public synchronized BooleanWrapper coreKill() {
 		if (state == SchedulerState.KILLED)
 			return new BooleanWrapper(false);
+		frontend.schedulerKilledEvent();
 		//destroying running active object launcher
 		for (Job j : runningJobs){
 			for (TaskDescriptor td : j.getTasks()){
@@ -534,7 +535,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//finally : shutdown
 		state = SchedulerState.KILLED;
 		logger.info("Scheduler has just been killed !");
-		frontend.schedulerKilledEvent();
 		return new BooleanWrapper(true);
 	}
 
@@ -602,6 +602,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
+		frontend.jobKilledEvent(jobId);
 		Job job = jobs.get(jobId);
 		jobs.remove(jobId);
 		for (TaskDescriptor td : job.getTasks()){
@@ -621,7 +622,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (runningJobs.remove(job) || pendingJobs.remove(job) || finishedJobs.remove(job));
 		results.remove(jobId);
 		logger.info("job "+jobId+" has just been killed !");
-		frontend.jobKilledEvent(jobId);
 		return new BooleanWrapper(true);
 	}
 	
