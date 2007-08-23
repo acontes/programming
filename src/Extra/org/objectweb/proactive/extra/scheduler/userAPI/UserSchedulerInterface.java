@@ -31,6 +31,8 @@
 package org.objectweb.proactive.extra.scheduler.userAPI;
 
 import java.io.Serializable;
+
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.core.Stats;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
@@ -125,7 +127,7 @@ public interface UserSchedulerInterface extends Serializable{
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean kill (JobId jobId) throws SchedulerException;
+	public BooleanWrapper kill (JobId jobId) throws SchedulerException;
 	
 	
 	/**
@@ -137,7 +139,7 @@ public interface UserSchedulerInterface extends Serializable{
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean pause (JobId jobId) throws SchedulerException;
+	public BooleanWrapper pause (JobId jobId) throws SchedulerException;
 	
 	
 	/**
@@ -148,7 +150,7 @@ public interface UserSchedulerInterface extends Serializable{
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean resume (JobId jobId) throws SchedulerException;
+	public BooleanWrapper resume (JobId jobId) throws SchedulerException;
 	
 	
 	/**

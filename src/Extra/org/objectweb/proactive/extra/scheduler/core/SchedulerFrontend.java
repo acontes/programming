@@ -414,27 +414,27 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean pause(JobId jobId) throws SchedulerException {
+	public BooleanWrapper pause(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to pause this job !");
-		return scheduler.pause(jobId).booleanValue();
+		return scheduler.pause(jobId);
 	}
 	
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean resume(JobId jobId) throws SchedulerException {
+	public BooleanWrapper resume(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to resume this job !");
-		return scheduler.resume(jobId).booleanValue();
+		return scheduler.resume(jobId);
 	}
 
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean kill(JobId jobId) throws SchedulerException {
+	public BooleanWrapper kill(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to kill this job !");
-		return scheduler.kill(jobId).booleanValue();
+		return scheduler.kill(jobId);
 	}
 
 	

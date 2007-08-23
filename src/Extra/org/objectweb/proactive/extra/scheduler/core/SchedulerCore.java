@@ -182,7 +182,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			}
 		}
 		//terminating jobs...
-		logger.info("Terminating jobs...");
+		if (runningJobs.size() + pendingJobs.size() > 0)
+			logger.info("Terminating jobs...");
 		while(runningJobs.size() + pendingJobs.size() > 0){
 			service.serveAll("terminate");
 			schedule();
@@ -516,8 +517,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		for (Job j : runningJobs){
 			for (TaskDescriptor td : j.getTasks()){
 				try {
-					td.getLauncher().terminate();
-				} catch(Exception e) {}
+					NodeSet nodes = td.getLauncher().getNodes();
+					try { td.getLauncher().terminate();}
+					catch(Exception e) {/* Tested, nothing to do */}
+					resourceManager.freeNodes(nodes,td.getPostTask());
+				} catch(Exception e) {/* Tested, nothing to do */}
 			}
 		}
 		//cleaning all lists
@@ -607,9 +611,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					//get the nodes that are used for this descriptor
 					nodes = td.getLauncher().getNodes();
 					//free execution node
-					td.getLauncher().terminate();
+					try{ td.getLauncher().terminate();}
+					catch (Exception e){ /* Tested (nothing to do) */ }
 					resourceManager.freeNodes(new NodeSet(nodes),td.getPostTask());
-				} catch (Exception e2){ /* Tested (nothing to do) */ }
+				} catch (Exception e){ /* Tested (nothing to do) */ }
 				taskResults.remove(td.getId());
 			}
 		}

@@ -100,49 +100,49 @@ public class AdminCommunicator {
         } else if (command.equals(STAT_CMD)) {
             statScreen();
         } else if (command.equals(START_CMD)) {
-            boolean success = scheduler.start();
+            boolean success = scheduler.start().booleanValue();
             if (success) {
                 output("Scheduler started.\n");
             } else {
                 output("Start is impossible!!\n");
             }
         } else if (command.equals(STOP_CMD)) {
-            boolean success = scheduler.stop();
+            boolean success = scheduler.stop().booleanValue();
             if (success) {
                 output("Scheduler stopped.\n");
             } else {
                 output("Stop is impossible !!\n");
             }
         }else if (command.equals(PAUSE_CMD)) {
-            boolean success = scheduler.pause();
+            boolean success = scheduler.pause().booleanValue();
             if (success) {
                 output("Scheduler paused.\n");
             } else {
                 output("Pause is impossible !!\n");
             }
         }else if (command.equals(PAUSE_IM_CMD)) {
-            boolean success = scheduler.pauseImmediate();
+            boolean success = scheduler.pauseImmediate().booleanValue();
             if (success) {
                 output("Scheduler paused.\n");
             } else {
                 output("Pause is impossible !!\n");
             }
         }else if (command.equals(RESUME_CMD)) {
-            boolean success = scheduler.resume();
+            boolean success = scheduler.resume().booleanValue();
             if (success) {
                 output("Scheduler resumed.\n");
             } else {
                 output("Resume is impossible !!\n");
             }
         } else if (command.equals(SHUTDOWN_CMD)) {
-            if (scheduler.shutdown()){
+            if (scheduler.shutdown().booleanValue()){
             	output("Shutdown sequence initialized, it might take a while to finish all executions, communicator will exit.\n");
             	stopCommunicator = true;
             } else {
             	output("Shutdown the scheduler is impossible for the moment.\n");
             }
         } else if (command.equals(KILL_CMD)) {
-            if (scheduler.kill()){
+            if (scheduler.kill().booleanValue()){
             	output("Sheduler has just been killed, communicator will exit.\n");
             	stopCommunicator = true;
             } else {
@@ -150,7 +150,7 @@ public class AdminCommunicator {
             }
         }else if (command.startsWith(PAUSEJOB_CMD)) {
         	try{
-	            boolean success = scheduler.pause(new JobId(Integer.parseInt(command.split(" ")[1])));
+	            boolean success = scheduler.pause(new JobId(Integer.parseInt(command.split(" ")[1]))).booleanValue();
 	            if (success) {
 	                output("Job paused.\n");
 	            } else {
@@ -162,7 +162,7 @@ public class AdminCommunicator {
         	}
         }else if (command.startsWith(RESUMEJOB_CMD)) {
         	try{
-	            boolean success = scheduler.resume(new JobId(Integer.parseInt(command.split(" ")[1])));
+	            boolean success = scheduler.resume(new JobId(Integer.parseInt(command.split(" ")[1]))).booleanValue();
 	            if (success) {
 	                output("Job resumed.\n");
 	            } else {
@@ -174,7 +174,7 @@ public class AdminCommunicator {
         	}
         }else if (command.startsWith(KILLJOB_CMD)) {
         	try{
-	            boolean success = scheduler.kill(new JobId(Integer.parseInt(command.split(" ")[1])));
+	            boolean success = scheduler.kill(new JobId(Integer.parseInt(command.split(" ")[1]))).booleanValue();
 	            if (success) {
 	                output("Job killed.\n");
 	            } else {

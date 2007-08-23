@@ -36,6 +36,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
 import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
@@ -180,53 +181,53 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#start()
 	 */
-	public boolean start(){
-		return schedulerFrontend.coreStart().booleanValue();
+	public BooleanWrapper start(){
+		return schedulerFrontend.coreStart();
 	}
 	
 	
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#stop()
 	 */
-	public boolean stop(){
-		return schedulerFrontend.coreStop().booleanValue();
+	public BooleanWrapper stop(){
+		return schedulerFrontend.coreStop();
 	}
 	
 	
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pause()
 	 */
-	public boolean pause(){
-		return schedulerFrontend.corePause().booleanValue();
+	public BooleanWrapper pause(){
+		return schedulerFrontend.corePause();
 	}
 	
 	
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pauseImmediate()
 	 */
-	public boolean pauseImmediate(){
-		return schedulerFrontend.coreImmediatePause().booleanValue();
+	public BooleanWrapper pauseImmediate(){
+		return schedulerFrontend.coreImmediatePause();
 	}
 	
 	
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
 	 */
-	public boolean resume(){
-		return schedulerFrontend.coreResume().booleanValue();
+	public BooleanWrapper resume(){
+		return schedulerFrontend.coreResume();
 	}
 	
 	
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#shutdown()
 	 */
-	public boolean shutdown(){
-		return schedulerFrontend.coreShutdown().booleanValue();
+	public BooleanWrapper shutdown(){
+		return schedulerFrontend.coreShutdown();
 	}
 	
 	
-	public boolean kill(){
-		return schedulerFrontend.coreKill().booleanValue();
+	public BooleanWrapper kill(){
+		return schedulerFrontend.coreKill();
 	}
 	
 }
