@@ -14,6 +14,34 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 public class StatusLabel implements EventSchedulerListener {
 
 	public static final String INITIAL_TEXT = "clique droit + connect to scheduler...";
+	public static final Color INITIAL_COLOR = Colors.DARK_TURQUOISE;
+	
+	public static final String STARTED_TEXT = "STARTED";
+	public static final Color STARTED_COLOR = Colors.GOLD;
+	
+	public static final String STOPPED_TEXT = "STOPPED";
+	public static final Color STOPPED_COLOR = Colors.ORANGE_RED;
+	
+	public static final String FREEZED_TEXT = "FREEZED";
+	public static final Color FREEZED_COLOR = Colors.PURPLE;
+	
+	public static final String PAUSED_TEXT = "PAUSED";
+	public static final Color PAUSED_COLOR = Colors.BLUE3;
+	
+	public static final String RESUMED_TEXT = "RESUMED";
+	public static final Color RESUMED_COLOR = Colors.TOMATO4;
+	
+	public static final String SHUTTING_DOWN_TEXT = "SHUTTING_DOWN";
+	public static final Color SHUTTING_DOWN_COLOR = Colors.PURPLE;
+	
+	public static final String SHUTTED_DOWN_TEXT = "SHUTTED_DOWN";
+	public static final Color SHUTTED_DOWN_COLOR = Colors.PURPLE;
+	
+	public static final String KILLED_TEXT = "KILLED";
+	public static final Color KILLED_COLOR = Colors.GREY10;
+	
+	public static final String DISCONNECTED_TEXT = "DISCONNECTED";
+	public static final Color DISCONNECTED_COLOR = Colors.FOREST_GREEN;
 
 	private static StatusLabel instance = null;
 
@@ -22,7 +50,7 @@ public class StatusLabel implements EventSchedulerListener {
 	private StatusLabel(Composite parent, GridData gridData, JobsController jobsController) {
 		label = new Label(parent, SWT.CENTER | SWT.BORDER);
 		label.setText(INITIAL_TEXT);
-		label.setForeground(Colors.RED);
+		label.setForeground(INITIAL_COLOR);
 		label.setFont(new Font(Display.getDefault(), "", 12, SWT.BOLD));
 		label.setLayoutData(gridData);
 		jobsController.addEventSchedulerListener(this);
@@ -38,42 +66,46 @@ public class StatusLabel implements EventSchedulerListener {
 
 	@Override
 	public void freezeEvent() {
-		setText("freezeeeeeeeee", Colors.GREEN);
+		setText(FREEZED_TEXT, FREEZED_COLOR);
 	}
 
 	@Override
 	public void killedEvent() {
-		setText("killed", Colors.RED);
+		setText(KILLED_TEXT, KILLED_COLOR);
 	}
 
 	@Override
 	public void pausedEvent() {
-		setText("paused", Colors.GREEN);
+		setText(PAUSED_TEXT, PAUSED_COLOR);
 	}
 
 	@Override
 	public void resumedEvent() {
-		setText("resumed", Colors.PURPLE);
+		setText(RESUMED_TEXT, RESUMED_COLOR);
 	}
 
 	@Override
 	public void shutDownEvent() {
-		setText("shutdown...", Colors.RED);
+		setText(SHUTTED_DOWN_TEXT, SHUTTED_DOWN_COLOR);
 	}
 
 	@Override
 	public void shuttingDownEvent() {
-		setText("shutting down.........", Colors.BLUE);
+		setText(SHUTTING_DOWN_TEXT, SHUTTING_DOWN_COLOR);
 	}
 
 	@Override
 	public void startedEvent() {
-		setText("démarrer", Colors.PURPLE);
+		setText(STARTED_TEXT, STARTED_COLOR);
 	}
 
 	@Override
 	public void stoppedEvent() {
-		setText("stoppé...", Colors.PURPLE);
+		setText(STOPPED_TEXT, STOPPED_COLOR);
+	}
+	
+	public void disconnect() {
+		setText(DISCONNECTED_TEXT, DISCONNECTED_COLOR);
 	}
 
 	private void setText(String aText, Color aColor) {

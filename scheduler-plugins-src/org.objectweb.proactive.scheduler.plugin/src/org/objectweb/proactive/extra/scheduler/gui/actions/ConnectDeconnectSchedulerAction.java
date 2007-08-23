@@ -34,6 +34,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.StatusLabel;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialog;
@@ -105,6 +106,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
 	}
 	
 	private void disconnection() {
+		StatusLabel.getInstance().disconnect();
 		SeparatedJobView.clearOnDisconnection(true);
 	}
 	

@@ -36,6 +36,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
@@ -637,6 +638,25 @@ public class JobsController implements SchedulerEventListener {
 			}
 		});
 
+		// disable all buttons
+		SubmitJobAction.getInstance().setEnabled(false);
+		ObtainJobOutputAction.getInstance().setEnabled(true);
+		PauseResumeJobAction.getInstance().setEnabled(false);
+		KillJobAction.getInstance().setEnabled(false);
+
+		PriorityLowestJobAction.getInstance().setEnabled(false);
+		PriorityBelowNormalJobAction.getInstance().setEnabled(false);
+		PriorityNormalJobAction.getInstance().setEnabled(false);
+		PriorityAboveNormalJobAction.getInstance().setEnabled(false);
+		PriorityHighestJobAction.getInstance().setEnabled(false);
+		
+		StartStopSchedulerAction.getInstance().setEnabled(false);
+		FreezeSchedulerAction.getInstance().setEnabled(false);
+		PauseSchedulerAction.getInstance().setEnabled(false);
+		ResumeSchedulerAction.getInstance().setEnabled(false);
+		ShutdownSchedulerAction.getInstance().setEnabled(false);
+		KillSchedulerAction.getInstance().setEnabled(false);
+		
 		// call method on listeners
 		schedulerKilledEventInternal();
 	}
