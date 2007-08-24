@@ -9,7 +9,8 @@ int main(int argc, char**argv){
 	/* parsing args */
 	int nb = DEFAULT_WAIT_TIME;
 	if(argc > 1){
-		scanf("%d",&nb);
+		printf("argv[1]= %s\n", argv[1]);
+		sscanf(argv[1], "%d", &nb);
 		printf("Waiting time : %d s\n", nb);
 	}
 	int i;

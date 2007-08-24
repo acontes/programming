@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.task.descriptor;
 
-import java.io.IOException;
-
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import org.objectweb.proactive.extra.scheduler.task.NativeTask;
 import org.objectweb.proactive.extra.scheduler.task.Task;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
@@ -85,8 +85,16 @@ public class NativeTaskDescriptor extends TaskDescriptor {
 			public Object execute(TaskResult... results) {
 				try {
 					process = Runtime.getRuntime().exec(cmd);
+					//TODO ask cdelbe for better solution.
+					BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+					String str = null;
+					while((str = reader.readLine()) != null){
+						System.out.println(str);
+					}
+					process.waitFor();
 					return process.exitValue();
-				} catch (IOException e) {
+				} catch (Exception e) {
+					e.printStackTrace();
 					return 255;
 				}
 			}

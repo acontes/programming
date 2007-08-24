@@ -6,7 +6,7 @@
 			<!-- Task human description -->
 			<description>Will display 10 dots every 1s</description>
 			<process>
-				<nativeProcess command="/user/jlscheef/ProActiveSchedulerTempMerge2/classes/Examples/org/objectweb/proactive/examples/scheduler/NativTask">
+				<nativeProcess command="/user/jlscheef/home/ProActiveSchedulerTempMerge2/classes/Examples/org/objectweb/proactive/examples/scheduler/nativTask">
 					<initParameters>
 						<parameter value="1" />
 					</initParameters>
@@ -17,7 +17,7 @@
 			<!-- Task human description -->
 			<description>Will display 10 dots every 2s</description>
 			<process>
-				<nativeProcess command="/user/jlscheef/ProActiveSchedulerTempMerge2/classes/Examples/org/objectweb/proactive/examples/scheduler/NativTask">
+				<nativeProcess command="/user/jlscheef/home/ProActiveSchedulerTempMerge2/classes/Examples/org/objectweb/proactive/examples/scheduler/nativTask">
 					<initParameters>
 						<parameter value="2" />
 					</initParameters>
@@ -40,7 +40,7 @@
 			<!-- Task human description -->
 			<description>Will display 10 dots every 1s</description>
 			<process>
-				<nativeProcess command="/user/jlscheef/ProActiveSchedulerTempMerge2/classes/Examples/org/objectweb/proactive/examples/scheduler/NativTask">
+				<nativeProcess command="/user/jlscheef/home/ProActiveSchedulerTempMerge2/classes/Examples/org/objectweb/proactive/examples/scheduler/nativTask">
 					<initParameters>
 						<parameter value="1" />
 					</initParameters>
