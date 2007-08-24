@@ -47,13 +47,13 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
 public class IMNodeImpl implements IMNode, Serializable {
+
     /**  */
-	private static final long serialVersionUID = -7612176229370058091L;
-	private static Logger logger = ProActiveLogger.getLogger(Loggers.IM_DATARESOURCE);
-	
-	private HashMap<VerifyingScript, Integer> scriptStatus;
-	
-	// Attributes
+    private static final long serialVersionUID = -7612176229370058091L;
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.IM_DATARESOURCE);
+    private HashMap<VerifyingScript, Integer> scriptStatus;
+
+    // Attributes
     private Node node;
     private String nodeName;
     private String vnodeName;
@@ -63,12 +63,13 @@ public class IMNodeImpl implements IMNode, Serializable {
     private boolean free = true;
     private boolean down = false;
     private ScriptHandler handler = null;
-	private IMNodeSource nodeSource;
+    private IMNodeSource nodeSource;
 
     // ----------------------------------------------------------------------//
     // CONSTRUCTOR
-    public IMNodeImpl(Node node, String vnodeName, String padName, IMNodeSource nodeSource){
-    	this.nodeSource = nodeSource;
+    public IMNodeImpl(Node node, String vnodeName, String padName,
+        IMNodeSource nodeSource) {
+        this.nodeSource = nodeSource;
         this.node = node;
         this.vnodeName = vnodeName;
         this.padName = padName;
@@ -119,7 +120,7 @@ public class IMNodeImpl implements IMNode, Serializable {
     // ----------------------------------------------------------------------//
     // IS
     public boolean isFree() throws NodeException {
-    	// TODO Enlever cette Exception ne servant pas a grand chose
+        // TODO Enlever cette Exception ne servant pas a grand chose
         if (!isDown()) {
             return this.free;
         } else {
@@ -176,46 +177,52 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
         return mes;
     }
-    
+
     @SuppressWarnings("unchecked")
-	public ScriptResult<Boolean> executeScript(VerifyingScript script) {
-        if(handler == null)
+    public ScriptResult<Boolean> executeScript(VerifyingScript script) {
+        if (handler == null) {
             try {
                 handler = ScriptLoader.createHandler(this.node);
             } catch (Exception e) {
-                return new ScriptResult<Boolean>(new NodeException("Unable to create Script Handler on node ", e));
+                return new ScriptResult<Boolean>(new NodeException(
+                        "Unable to create Script Handler on node ", e));
             }
-       	return handler.handle(script);
+        }
+        return handler.handle(script);
     }
 
-	public void clean() {
-		handler = null;
-		try {
-			node.killAllActiveObjects();
-		} catch (Exception e) {
-			logger.error("Error cleanning the Node", e);
-		}
-	}
-	
+    public void clean() {
+        handler = null;
+        try {
+            node.killAllActiveObjects();
+        } catch (Exception e) {
+            logger.error("Error cleanning the Node", e);
+        }
+    }
+
     @Override
     public boolean equals(Object imnode) {
-    	if (imnode instanceof IMNode) {
-			return nodeName.equals(((IMNode) imnode).getNodeName());
-		}
-    	return false;
-    };
-    
+        if (imnode instanceof IMNode) {
+            return nodeName.equals(((IMNode) imnode).getNodeName());
+        }
+        return false;
+    }
+    ;
     @Override
     public int hashCode() {
-    	return nodeName.hashCode();
-    }
-    
-    @SuppressWarnings("unchecked")
-	public HashMap<VerifyingScript, Integer> getScriptStatus(){
-    	return scriptStatus;
+        return nodeName.hashCode();
     }
 
-	public IMNodeSource getNodeSource() {
-		return nodeSource;
-	}
+    @SuppressWarnings("unchecked")
+    public HashMap<VerifyingScript, Integer> getScriptStatus() {
+        return scriptStatus;
+    }
+
+    public IMNodeSource getNodeSource() {
+        return nodeSource;
+    }
+
+    public void setNodeSource(IMNodeSource nodeSource) {
+        this.nodeSource = nodeSource;
+    }
 }

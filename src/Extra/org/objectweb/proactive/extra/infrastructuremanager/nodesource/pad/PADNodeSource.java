@@ -66,7 +66,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
     InitActive, PADNSInterface {
     private static final long serialVersionUID = 9195674290785820181L;
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.IM_CORE);
-    private static final String id = "PADNodeSource";
+    private String id = "PADNodeSource";
 
     // FIELDS
     /** Free Nodes **/
@@ -82,6 +82,10 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
     private HashMap<String, ProActiveDescriptor> listPad;
 
     public PADNodeSource() {
+    }
+
+    public PADNodeSource(String id) {
+        this.id = id;
     }
 
     public void initActivity(Body body) {

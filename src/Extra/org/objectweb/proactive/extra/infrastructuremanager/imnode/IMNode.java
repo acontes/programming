@@ -44,17 +44,16 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
  * The <I>IMNode</I> is a object containing a node and its description.<BR/>
  */
 public interface IMNode {
-	// STATES
-	public static final int NOT_VERIFIED_SCRIPT = 0;
-	public static final int NO_LONGER_VERIFIED_SCRIPT = 1;
-	public static final int NEVER_TESTED = 2;
-	public static final int ALREADY_VERIFIED_SCRIPT = 3;
-	public static final int VERIFIED_SCRIPT = 4;
-	
-	// SCRIPTING
+    // STATES
+    public static final int NOT_VERIFIED_SCRIPT = 0;
+    public static final int NO_LONGER_VERIFIED_SCRIPT = 1;
+    public static final int NEVER_TESTED = 2;
+    public static final int ALREADY_VERIFIED_SCRIPT = 3;
+    public static final int VERIFIED_SCRIPT = 4;
 
-	public ScriptResult<Boolean> executeScript(VerifyingScript script) ;
-	
+    // SCRIPTING
+    public ScriptResult<Boolean> executeScript(VerifyingScript script);
+
     // ----------------------------------------------------------------------//
     // GET
 
@@ -127,15 +126,16 @@ public interface IMNode {
     /**
      * Cleaning method : remove all active objects on this node.
      */
-	public void clean();
-	
-	/**
-	 * Get a map of all Verifying script allready tested on this node,
-	 * and the responses given.
-	 * @return the map of Script and status
-	 */
-	public HashMap<VerifyingScript, Integer> getScriptStatus();
-	
-	public IMNodeSource getNodeSource();
-	
+    public void clean();
+
+    /**
+     * Get a map of all Verifying script allready tested on this node,
+     * and the responses given.
+     * @return the map of Script and status
+     */
+    public HashMap<VerifyingScript, Integer> getScriptStatus();
+
+    public IMNodeSource getNodeSource();
+
+    public void setNodeSource(IMNodeSource nodeSource);
 }

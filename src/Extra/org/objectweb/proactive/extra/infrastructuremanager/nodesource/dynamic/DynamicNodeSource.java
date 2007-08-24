@@ -34,27 +34,34 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeComparator;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
+import org.objectweb.proactive.extra.infrastructuremanager.utils.Heap;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
 public abstract class DynamicNodeSource extends IMNodeSource
-    implements DynamicNSInterface, Serializable, InitActive, RunActive, EndActive {
-	
-	private Map<IMNode, Long> nodes;
+    implements DynamicNSInterface, Serializable, InitActive, RunActive,
+        EndActive {
+    private Map<IMNode, Long> nodes;
+    private Heap<Long> niceTimes;
     private ArrayList<IMNode> freeNodes;
     private ArrayList<IMNode> busyNodes;
     private ArrayList<IMNode> downNodes;
@@ -62,9 +69,15 @@ public abstract class DynamicNodeSource extends IMNodeSource
     private int nbMax;
     private int nice;
     private int ttr;
+    private boolean running;
+    private int delay = 20000;
+    protected final static Logger logger = ProActiveLogger.getLogger(Loggers.IM_CORE);
 
-    public DynamicNodeSource(String id) {
+    public DynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr) {
         this.stringId = id;
+        this.nbMax = nbMaxNodes;
+        this.nice = nice;
+        this.ttr = ttr;
     }
 
     public DynamicNodeSource() {
@@ -74,23 +87,29 @@ public abstract class DynamicNodeSource extends IMNodeSource
         freeNodes = new ArrayList<IMNode>();
         busyNodes = new ArrayList<IMNode>();
         downNodes = new ArrayList<IMNode>();
+        niceTimes = new Heap<Long>(nbMax);
         nodes = new HashMap<IMNode, Long>();
+        running = true;
+        long currentTime = System.currentTimeMillis();
+        for (int i = 0; i < nbMax; i++) {
+            niceTimes.add((long) currentTime + ((i * delay) / nbMax));
+        }
     }
 
-	public void runActivity(Body body) {
-		Service service = new Service(body);
-		
-		while(true /* TODO running */) {
-			service.blockingServeOldest(3000 /* TODO TTR */);
-			// fait ce que t'as a faire periodiquement
-			
-		}
-	}
+    public void runActivity(Body body) {
+        Service service = new Service(body);
 
-	public void endActivity(Body body) {
-		// TODO
-		// Si pas shut down => shut down
-	}
+        while (running) {
+            service.blockingServeOldest(3000 /* TODO TTR */);
+            cleanAndGet();
+        }
+    }
+
+    public void endActivity(Body body) {
+        if (running) {
+            shutdown();
+        }
+    }
 
     @Override
     public String getSourceId() {
@@ -163,8 +182,6 @@ public abstract class DynamicNodeSource extends IMNodeSource
 
     public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
         boolean ordered) {
-    	// TODO un peu de nettoyage sur les free nodes
-    	
         ArrayList<IMNode> result = getFreeNodes();
         if ((script != null) && ordered) {
             Collections.sort(result, new IMNodeComparator(script));
@@ -173,8 +190,6 @@ public abstract class DynamicNodeSource extends IMNodeSource
     }
 
     public void setBusy(IMNode imnode) {
-    	// TODO 
-    	// juste mettre dans busy en théorie...
         removeFromAllLists(imnode);
         busyNodes.add(imnode);
         try {
@@ -187,24 +202,40 @@ public abstract class DynamicNodeSource extends IMNodeSource
 
     public void setDown(IMNode imnode) {
         //TODO 
-    	// ca depends des cas :
-    	// peut etre rendre directement le noeud a la source dynamique ?
+        // peut etre rendre directement le noeud a la source dynamique ?
         removeFromAllLists(imnode);
         downNodes.add(imnode);
         imnode.setDown(true);
     }
 
     public void setFree(IMNode imnode) {
-        //TODO 
-    	// verifier que le noeud n'est pas a rendre, sinon le rendre;
-    	//if(isNodeToRelease())
-    	// remettre dans free;
+        removeFromAllLists(imnode);
+        if (isNodeToRelease(imnode)) {
+            nodes.remove(imnode);
+            niceTimes.insert(System.currentTimeMillis() + nice);
+            releaseNode(imnode);
+        } else {
+            freeNodes.add(imnode);
+            try {
+                imnode.setFree();
+            } catch (NodeException e1) {
+                // A down node shouldn't by busied...
+                e1.printStackTrace();
+            }
+        }
     }
 
     public BooleanWrapper shutdown() {
-        // TODO
-    	// rendre tous les noeuds a la source
-        return null;
+        logger.info("Shutting down Node Source : " + getSourceId());
+        running = false;
+        try {
+            for (IMNode node : nodes.keySet())
+                releaseNode(node);
+            return new BooleanWrapper(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BooleanWrapper(false);
+        }
     }
 
     /**
@@ -224,18 +255,56 @@ public abstract class DynamicNodeSource extends IMNodeSource
 
         return free || busy || down;
     }
-    
-    // obtain new nodes
-    
-    // update nodes status
-    
-    // release node
+
     protected boolean isNodeToRelease(IMNode node) {
-    	// TODO
-    	return false;
+        Long stamp = nodes.get(node);
+        if (stamp == null) {
+            return false;
+        } else {
+            return System.currentTimeMillis() > stamp;
+        }
     }
-    
-    protected abstract void releaseNode(IMNode node) ;
-    
-    
+
+    private void cleanAndGet() {
+        long currentTime = System.currentTimeMillis();
+
+        // cleaning part
+        Iterator<Entry<IMNode, Long>> iter = nodes.entrySet().iterator();
+        long time = System.currentTimeMillis();
+        while (iter.hasNext()) {
+            Entry<IMNode, Long> entry = iter.next();
+            try {
+                if ((time > entry.getValue()) &&
+                        (entry.getKey().isDown() || entry.getKey().isFree())) {
+                    iter.remove();
+                    removeFromAllLists(entry.getKey());
+                    releaseNode(entry.getKey());
+                    niceTimes.insert(currentTime + nice);
+                }
+            } catch (NodeException e) {
+                logger.warn("Exception occured", e);
+                e.printStackTrace();
+            }
+        }
+
+        // Getting part
+        while ((nodes.size() <= nbMax) && (niceTimes.peek() != null) &&
+                (niceTimes.peek() < currentTime)) {
+            IMNode node = getNode();
+            if (node == null) {
+                niceTimes.extract();
+                niceTimes.add(System.currentTimeMillis() + nice);
+                break;
+            }
+            logger.info("new node from Dynamic source : " + node.getNodeName() +
+                " (total = " + (nodes.size() + 1) + ")");
+            nodes.put(node, currentTime + ttr);
+            freeNodes.add(node);
+            niceTimes.extract();
+        }
+    }
+
+    protected abstract IMNode getNode();
+
+    protected abstract void releaseNode(IMNode node);
 }

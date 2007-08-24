@@ -67,32 +67,33 @@ public abstract class IMNodeSource implements IMNodeManager {
         return false;
     }
 
-	/**
-	 * Update the node status.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setVerifyingScript(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode, org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
-	 */
-	public void setVerifyingScript(IMNode imnode, VerifyingScript script) {
-		HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
-		if(verifs.containsKey(script)){
-			verifs.remove(script);
-		}
-		verifs.put(script, IMNode.VERIFIED_SCRIPT);
-	}
+    /**
+     * Update the node status.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setVerifyingScript(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode, org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
+     */
+    public void setVerifyingScript(IMNode imnode, VerifyingScript script) {
+        HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
+        if (verifs.containsKey(script)) {
+            verifs.remove(script);
+        }
+        verifs.put(script, IMNode.VERIFIED_SCRIPT);
+    }
 
-	/**
-	 * Update the node status.
-	 * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setNotVerifyingScript(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode, org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
-	 */
-	public void setNotVerifyingScript(IMNode imnode, VerifyingScript script) {
-		HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
-		if(verifs.containsKey(script)){
-			int status = verifs.remove(script);
-			if(status == IMNode.NOT_VERIFIED_SCRIPT)
-				verifs.put(script, IMNode.NOT_VERIFIED_SCRIPT);
-			else
-				verifs.put(script, IMNode.NO_LONGER_VERIFIED_SCRIPT);
-		} else {
-			verifs.put(script, IMNode.NOT_VERIFIED_SCRIPT);
-		}
-	}
+    /**
+     * Update the node status.
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setNotVerifyingScript(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode, org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
+     */
+    public void setNotVerifyingScript(IMNode imnode, VerifyingScript script) {
+        HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
+        if (verifs.containsKey(script)) {
+            int status = verifs.remove(script);
+            if (status == IMNode.NOT_VERIFIED_SCRIPT) {
+                verifs.put(script, IMNode.NOT_VERIFIED_SCRIPT);
+            } else {
+                verifs.put(script, IMNode.NO_LONGER_VERIFIED_SCRIPT);
+            }
+        } else {
+            verifs.put(script, IMNode.NOT_VERIFIED_SCRIPT);
+        }
+    }
 }
