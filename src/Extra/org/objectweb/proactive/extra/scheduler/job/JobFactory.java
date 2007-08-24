@@ -57,6 +57,7 @@ import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
 import org.objectweb.proactive.extra.scheduler.task.Task;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.AbstractJavaTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.JavaTaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.NativeTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -163,10 +164,16 @@ public class JobFactory {
 				TaskDescriptor desc = null;
 				Node process = (Node) xpath.evaluate("process/javaProcess",
 						taskNode, XPathConstants.NODE);
-				if (process != null) {
+				if (process != null) { // JAVA TASK
 					desc = createJavaTask(process, xpath);
 				} else {
-					throw new RuntimeException("Unknow process !!");
+					process = (Node) xpath.evaluate("process/nativeProcess",
+							taskNode, XPathConstants.NODE);
+					if (process != null) { // NATIVE TASK
+						desc = createNativeTask(process, xpath);
+					} else {
+						throw new RuntimeException("Unknow process !!");
+					}
 				}
 
 				// TASK NAME
@@ -304,6 +311,29 @@ public class JobFactory {
 		else if(priority.equals("lowest")) return JobPriority.LOWEST;
 		else return JobPriority.NORMAL;
 	}
+
+	private TaskDescriptor createNativeTask(Node process, XPath xpath) 
+	throws XPathExpressionException, ClassNotFoundException, IOException {
+		String cmd = (String) xpath.evaluate("@command", process, XPathConstants.STRING);
+		NodeList args = (NodeList) xpath
+		.evaluate("initParameters/parameter",process,
+				XPathConstants.NODESET);
+		if (args != null) {
+			for (int i = 0; i < args.getLength(); i++) {
+				Node arg = args.item(i);
+				String value = (String) xpath.evaluate("@value", arg,
+						XPathConstants.STRING);
+//				String serializedFile = (String) xpath.evaluate("@serializedFile",
+//						arg, XPathConstants.STRING);
+				if (value != null) {
+					cmd += " "+value;
+				}
+			}
+		}
+		NativeTaskDescriptor desc = new NativeTaskDescriptor(cmd);
+		return desc;
+	}
+
 
 	@SuppressWarnings("unchecked")
 	private JavaTaskDescriptor createJavaTask(Node process, XPath xpath)
