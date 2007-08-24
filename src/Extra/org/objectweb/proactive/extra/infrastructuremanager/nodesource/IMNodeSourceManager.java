@@ -42,7 +42,6 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeComparator;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DummyNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;

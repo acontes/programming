@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.infrastructuremanager.core;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;

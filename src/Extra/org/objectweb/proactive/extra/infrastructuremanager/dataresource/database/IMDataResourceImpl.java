@@ -52,7 +52,7 @@ import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
-public class IMDataResourceImpl2 implements IMDataResource, Serializable {
+public class IMDataResourceImpl implements IMDataResource, Serializable {
 
     /**  */
     private static final long serialVersionUID = -3170872605593251201L;
@@ -67,7 +67,7 @@ public class IMDataResourceImpl2 implements IMDataResource, Serializable {
     /**
      * The {@link IMNodeManager} given in parameter must be not null.
      */
-    public IMDataResourceImpl2(IMNodeManager nodeManager) {
+    public IMDataResourceImpl(IMNodeManager nodeManager) {
         if (nodeManager == null) {
             this.nodeManager = new IMNodeManagerImpl();
         } else {

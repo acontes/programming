@@ -4,7 +4,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 
-
+/**
+ * Heap simple implementation
+ * @author proactive team
+ *
+ * @param <E> a {@link Comparable} class
+ */
 public class Heap<E extends Comparable<?super E>> {
     private Object[] nodes_; // the tree nodes, packed into an array
     private int count_ = 0; // number of used slots

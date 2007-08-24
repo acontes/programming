@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMDataResource;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMState;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.database.IMDataResourceImpl2;
+import org.objectweb.proactive.extra.infrastructuremanager.dataresource.database.IMDataResourceImpl;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdminImpl;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
@@ -135,7 +135,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
                 logger.info("instanciation IMDataResourceImpl");
             }
             this.nodeManager = new IMNodeSourceManager("NSManager", nodeIM);
-            this.dataresource = new IMDataResourceImpl2(nodeManager);
+            this.dataresource = new IMDataResourceImpl(nodeManager);
 
             padNS = nodeManager.getPADNodeSource();
 

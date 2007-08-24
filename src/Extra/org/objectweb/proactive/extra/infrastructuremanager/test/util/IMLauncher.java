@@ -33,12 +33,8 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 import java.io.File;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 
 
 public class IMLauncher {
@@ -49,10 +45,11 @@ public class IMLauncher {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-        IMFactory.startLocal();
+        System.out.println("STARTING INFRASTRUCTURE MANAGER: Press <ENTER> to Shutdown.");
+    	IMFactory.startLocal();
         IMAdmin admin = IMFactory.getAdmin();
-        IMUser user = IMFactory.getUser();
-        IMMonitoring monitor = IMFactory.getMonitoring();
+//        IMUser user = IMFactory.getUser();
+//        IMMonitoring monitor = IMFactory.getMonitoring();
         admin.deployAllVirtualNodes(new File("/user/jmartin/home/test.xml"),
             null);
         //        admin.deployAllVirtualNodes(new File(
