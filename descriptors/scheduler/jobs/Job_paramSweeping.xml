@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job name="job_parameterSweeping" priority="normal" type="PARAMETER_SWEEPING">
-	<description>A simple parameter swipping job</description>
+	<description>A simple parameter sweeping job</description>
 	<tasks>
 		<task name="sweepingTask">
 			<!-- Task human description -->
-			<description>Test of parameters swipping</description>
+			<description>Test of parameters sweeping</description>
 			<process>
 				<javaProcess
 					class="org.objectweb.proactive.examples.scheduler.ParameterSweepingExample">
