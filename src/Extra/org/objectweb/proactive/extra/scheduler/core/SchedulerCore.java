@@ -63,10 +63,10 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
 import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
 import org.objectweb.proactive.extra.scheduler.task.Status;
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
@@ -132,6 +132,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			this.resourceManager = imp;
 			this.frontend = frontend;
 			//logger
+			//TODO prendre un autre port si celui ci est utilisé (algo : demander à cmathieu)
 	    	host = java.net.InetAddress.getLocalHost().getHostName();
 	        SimpleLoggerServer slf = new SimpleLoggerServer(port);
 	        Thread slft  = new Thread(slf);
@@ -513,7 +514,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	public synchronized BooleanWrapper coreKill() {
 		if (state == SchedulerState.KILLED)
 			return new BooleanWrapper(false);
-		frontend.schedulerKilledEvent();
 		//destroying running active object launcher
 		for (Job j : runningJobs){
 			for (TaskDescriptor td : j.getTasks()){
@@ -535,6 +535,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//finally : shutdown
 		state = SchedulerState.KILLED;
 		logger.info("Scheduler has just been killed !");
+		frontend.schedulerKilledEvent();
 		return new BooleanWrapper(true);
 	}
 
@@ -602,19 +603,17 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
-		frontend.jobKilledEvent(jobId);
 		Job job = jobs.get(jobId);
 		jobs.remove(jobId);
 		for (TaskDescriptor td : job.getTasks()){
 			if (td.getStatus() == Status.RUNNNING){
-				NodeSet nodes = new NodeSet();
 				try{
 					//get the nodes that are used for this descriptor
-					nodes = td.getLauncher().getNodes();
+					NodeSet nodes = td.getLauncher().getNodes();
 					//free execution node
 					try{ td.getLauncher().terminate();}
 					catch (Exception e){ /* Tested (nothing to do) */ }
-					resourceManager.freeNodes(new NodeSet(nodes),td.getPostTask());
+					resourceManager.freeNodes(nodes,td.getPostTask());
 				} catch (Exception e){ /* Tested (nothing to do) */ }
 				taskResults.remove(td.getId());
 			}
@@ -622,6 +621,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (runningJobs.remove(job) || pendingJobs.remove(job) || finishedJobs.remove(job));
 		results.remove(jobId);
 		logger.info("job "+jobId+" has just been killed !");
+		frontend.jobKilledEvent(jobId);
 		return new BooleanWrapper(true);
 	}
 	

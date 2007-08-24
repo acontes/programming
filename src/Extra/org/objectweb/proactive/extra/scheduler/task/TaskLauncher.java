@@ -111,7 +111,7 @@ public class TaskLauncher implements InitActive, Serializable {
      * @param body the body of the active object being initialized
      */
 	public void initActivity(Body body) {
-		ProActive.setImmediateService("getNode");
+		ProActive.setImmediateService("getNodes");
 		ProActive.setImmediateService("terminate");
 	}
 	

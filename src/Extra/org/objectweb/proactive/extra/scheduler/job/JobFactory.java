@@ -53,11 +53,11 @@ import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.scripting.SimpleScript;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
-import org.objectweb.proactive.extra.scheduler.task.AbstractJavaTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
-import org.objectweb.proactive.extra.scheduler.task.JavaTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.Task;
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.AbstractJavaTaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.JavaTaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -165,6 +165,8 @@ public class JobFactory {
 						taskNode, XPathConstants.NODE);
 				if (process != null) {
 					desc = createJavaTask(process, xpath);
+				} else {
+					throw new RuntimeException("Unknow process !!");
 				}
 
 				// TASK NAME
@@ -264,8 +266,8 @@ public class JobFactory {
 				td2.setArgs(((JavaTaskDescriptor)td).getArgs());
 				
 			}
-		} else if (jt == JobType.PARAMETER_SWIPPING){
-			job = new ParameterSwippingJob(name, getPriority(priority), -1, true, description);
+		} else if (jt == JobType.PARAMETER_SWEEPING){
+			job = new ParameterSweepingJob(name, getPriority(priority), -1, true, description);
 		} else {
 			job = new TaskFlowJob(name, getPriority(priority), -1, true, description);
 		}

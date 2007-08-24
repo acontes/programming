@@ -28,7 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.task.descriptor;
+
+import org.objectweb.proactive.extra.scheduler.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.task.Task;
 
 
 /**
@@ -74,7 +77,7 @@ public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
 
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.TaskDescriptor#getTask()
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#getTask()
 	 */
 	@Override
 	public Task getTask() {

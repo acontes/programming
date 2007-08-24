@@ -35,9 +35,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 import org.objectweb.proactive.extra.scheduler.task.Status;
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**

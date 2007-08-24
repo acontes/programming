@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.task.descriptor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,6 +41,11 @@ import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.task.Status;
+import org.objectweb.proactive.extra.scheduler.task.Task;
+import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
+import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
 
 /**

@@ -30,17 +30,17 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
 /**
- * Class ParameterSwippingJob.
+ * Class ParameterSweepingJob.
  * This is the definition of a Parameter Swipping Job.
  * 
  * @author ProActive Team
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
-public class ParameterSwippingJob extends Job {
+public class ParameterSweepingJob extends Job {
 
 
 	/** Serial version UID */
@@ -50,7 +50,7 @@ public class ParameterSwippingJob extends Job {
 	/**
 	 * ProActive empty constructor.
 	 */
-	public ParameterSwippingJob(){}
+	public ParameterSweepingJob(){}
 	
 	
 	/**
@@ -63,7 +63,7 @@ public class ParameterSwippingJob extends Job {
 	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 */
-	public ParameterSwippingJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
+	public ParameterSweepingJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
 		super(name,priority,runtimeLimit,runUntilCancel,description);
 	}
 	
@@ -87,7 +87,7 @@ public class ParameterSwippingJob extends Job {
 	 */
 	@Override
 	public JobType getType() {
-		return JobType.PARAMETER_SWIPPING;
+		return JobType.PARAMETER_SWEEPING;
 	}
 
 }

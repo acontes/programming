@@ -93,7 +93,7 @@ public class Stats implements Serializable {
 	public void increaseSubmittedJobCount(JobType type){
 		increaseProperty("Jobs Submitted",1);
 		switch(type){
-			case PARAMETER_SWIPPING : increasePSJobCount(); break;
+			case PARAMETER_SWEEPING : increasePSJobCount(); break;
 			case APPLI : increasePAJobCount(); break;
 			case TASKSFLOW : increaseTFJobCount(); break;
 		}
@@ -144,7 +144,7 @@ public class Stats implements Serializable {
 	 */
 	private void increaseProperty(String propertyName, int inc){
 		if (!properties.containsKey(propertyName))
-			properties.put(propertyName, new Integer(0));
+			properties.put(propertyName, new Integer(1));
 		else
 			properties.put(propertyName, ((Integer)properties.get(propertyName))+inc);
 	}

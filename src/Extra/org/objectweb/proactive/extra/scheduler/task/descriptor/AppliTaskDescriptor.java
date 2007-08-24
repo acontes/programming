@@ -28,12 +28,16 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.task.descriptor;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
+import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
+import org.objectweb.proactive.extra.scheduler.task.Task;
+import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
 /**
  * Description of an application java task.
@@ -78,7 +82,7 @@ public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
 
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.TaskDescriptor#getTask()
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#getTask()
 	 */
 	@Override
 	public Task getTask() {
@@ -101,7 +105,7 @@ public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.TaskDescriptor#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
 	 */
 	@Override
 	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException, NodeException {

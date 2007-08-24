@@ -34,7 +34,10 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.node.Node;
 
 /**
- * 
+ * This is the execution entry point for the application task.
+ * User may override the execute(ArrayList<Node>) method.
+ * The content of this method will be executed. This method provides nodes to run activeObject on them.
+ * Note : the execute(TaskResult...) method is not used anymore from this class.
  * 
  * @author ProActive Team
  * @version 1.0, Aug 21, 2007
@@ -43,12 +46,25 @@ import org.objectweb.proactive.core.node.Node;
 public abstract class ApplicationTask extends JavaTask {
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.Task#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
+	 * <font color="red">Not used anymore in this context</font>
+	 * This method should never be called.
+	 * It is the last point for this method implemention.
+	 * That's why it is final. User cannot override/implement this one anymore.
+	 * Instead, implement the execute(ArrayList<Node>) method.
 	 */
 	public final Object execute(TaskResult... results) {
 		throw new RuntimeException("This method should have NEVER been called in this context !!");
 	}
 	
+	/**
+	 * The content of this method will be execute by the scheduler.
+	 * Make your own Proactive implementation using the given nodes.
+	 * Note : if you asked for 10 nodes, one will be used to start the task
+	 * and the other will be sent to you as parameters.
+	 * 
+	 * @param nodes the nodes you asked for.
+	 * @return any object from the user.
+	 */
 	public abstract Object execute(ArrayList<Node> nodes);
 
 }

@@ -30,4 +30,23 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-public abstract class NativeTask implements Task {}
+/**
+ * This is the execution entry point for the native task.
+ * The execute(TaskResult...) method will be override by the scheduler to launch the native process.
+ * This class provide a getProcess method that will return the current running native process.
+ * 
+ * @author ProActive Team
+ * @version 1.0, Aug 21, 2007
+ * @since ProActive 3.2
+ */
+public abstract class NativeTask implements Task {
+	
+	/**
+	 * Return the current nativ running process.
+	 * It is used by the scheduler to allow it to kill the process.
+	 * 
+	 * @return the current nativ running process.
+	 */
+	public abstract Process getProcess();
+	
+}

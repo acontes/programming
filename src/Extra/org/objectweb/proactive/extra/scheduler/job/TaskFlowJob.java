@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import java.util.ArrayList;
 
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
 /**
  * Class TaskFlowJob.

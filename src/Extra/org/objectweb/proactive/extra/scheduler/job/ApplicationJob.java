@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
-import org.objectweb.proactive.extra.scheduler.task.AppliTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.AppliTaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
 /**
  * Class ApplicationJob.
