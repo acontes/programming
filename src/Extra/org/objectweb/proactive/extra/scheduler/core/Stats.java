@@ -144,7 +144,7 @@ public class Stats implements Serializable {
 	 */
 	private void increaseProperty(String propertyName, int inc){
 		if (!properties.containsKey(propertyName))
-			properties.put(propertyName, new Integer(1));
+			properties.put(propertyName, new Integer(inc));
 		else
 			properties.put(propertyName, ((Integer)properties.get(propertyName))+inc);
 	}
