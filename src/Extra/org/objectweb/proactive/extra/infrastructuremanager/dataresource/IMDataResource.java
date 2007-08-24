@@ -39,7 +39,6 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
 public interface IMDataResource {
-
     //----------------------------------------------------------------------//
     // INIT
     public void init();
@@ -54,10 +53,10 @@ public interface IMDataResource {
 
     //----------------------------------------------------------------------//
     // GET NODE 
-
     public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript);
 
-    public NodeSet getExactlyNodes(IntWrapper nb, VerifyingScript verifyingScript);
+    public NodeSet getExactlyNodes(IntWrapper nb,
+        VerifyingScript verifyingScript);
 
     public void nodeIsDown(IMNode imNode);
 }
