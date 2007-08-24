@@ -102,6 +102,6 @@ public interface IMMonitoring {
      * @return the number of all resource IMNode
      */
     public IntWrapper getNumberOfAllResources();
-    
+
     public IMState addIMEventListener(IMEventListener listener);
 }

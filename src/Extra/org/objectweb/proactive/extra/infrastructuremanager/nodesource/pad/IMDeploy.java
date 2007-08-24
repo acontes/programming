@@ -61,7 +61,8 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      * @param padName : the name of the proactive descriptor
      * @param pad     : the proactive descriptor
      */
-    public IMDeploy(PADNodeSource nodeSource, String padName, ProActiveDescriptor pad) {
+    public IMDeploy(PADNodeSource nodeSource, String padName,
+        ProActiveDescriptor pad) {
         this.nodeSource = nodeSource;
         this.padName = padName;
         this.pad = pad;
@@ -73,8 +74,8 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      * @param pad     : the proactive descriptor
      * @param vnNames : the name of the virtual nodes of this pad to deploy
      */
-    public IMDeploy(PADNodeSource nodeSource, String padName, ProActiveDescriptor pad,
-        String[] vnNames) {
+    public IMDeploy(PADNodeSource nodeSource, String padName,
+        ProActiveDescriptor pad, String[] vnNames) {
         this.nodeSource = nodeSource;
         this.padName = padName;
         this.pad = pad;

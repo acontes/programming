@@ -172,7 +172,8 @@ public interface IMAdmin extends Serializable {
      * and the name of deployed virtual node(s)
      * @exception ProActiveException
      */
-    public void killPAD(String padName, String vnName) throws ProActiveException;
+    public void killPAD(String padName, String vnName)
+        throws ProActiveException;
 
     /**
      * Kill the virtual nodes <I>vnNames</I>
@@ -184,7 +185,8 @@ public interface IMAdmin extends Serializable {
      * and the name of deployed virtual node(s)
      * @exception ProActiveException
      */
-    public void killPAD(String padName, String[] vnNames) throws ProActiveException;
+    public void killPAD(String padName, String[] vnNames)
+        throws ProActiveException;
 
     //----------------------------------------------------------------------//
     // SHUTDOWN
@@ -194,7 +196,7 @@ public interface IMAdmin extends Serializable {
      * @exception ProActiveException
      */
     public void shutdown() throws ProActiveException;
-    
+
     /**
      * Obtain the PAD Node Source administration interface, with which
      * you can monitor activity for nodes from PADs, deploy other PAD,
@@ -202,15 +204,15 @@ public interface IMAdmin extends Serializable {
      * @return the PAD NS Interface
      */
     public PADNSInterface getPADNodeSource();
-    
+
     /**
      * Return a list of the different Dynamic node sources in the IM.
      * You can manage and monitor them just with that.
      * @return
      */
     public ArrayList<DynamicNSInterface> getDynamicNodeSources();
-    
+
     public void addDynamicNodeSources(DynamicNodeSource dns);
-    
+
     public void removeDynamicNodeSources(DynamicNodeSource dns);
 }

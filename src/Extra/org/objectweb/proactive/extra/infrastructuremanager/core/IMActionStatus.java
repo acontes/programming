@@ -37,9 +37,11 @@ import java.io.Serializable;
  * @deprecated
  */
 public class IMActionStatus implements Serializable {
+
     /**  */
-	private static final long serialVersionUID = 4031245901810564047L;
-	// Attributes
+    private static final long serialVersionUID = 4031245901810564047L;
+
+    // Attributes
     private boolean successAction;
     private String status;
     private Exception exception;

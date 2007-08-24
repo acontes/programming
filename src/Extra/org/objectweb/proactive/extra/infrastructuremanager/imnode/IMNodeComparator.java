@@ -34,6 +34,7 @@ import java.util.Comparator;
 
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
+
 /**
  * Comparator for imnodes :
  * compare two nodes by their chances to verify a script.
@@ -42,7 +43,6 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
  * @since ProActive 3.2
  */
 public class IMNodeComparator implements Comparator<IMNode> {
-
     private VerifyingScript script;
 
     public IMNodeComparator(VerifyingScript script) {

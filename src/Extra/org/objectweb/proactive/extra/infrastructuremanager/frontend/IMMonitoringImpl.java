@@ -131,8 +131,8 @@ public class IMMonitoringImpl implements IMMonitoring {
     public IntWrapper getNumberOfAllResources() {
         return this.imcore.getNbAllIMNode();
     }
-    
+
     public IMState addIMEventListener(IMEventListener listener) {
-    	return imcore.addIMEventListener(listener);
+        return imcore.addIMEventListener(listener);
     }
 }

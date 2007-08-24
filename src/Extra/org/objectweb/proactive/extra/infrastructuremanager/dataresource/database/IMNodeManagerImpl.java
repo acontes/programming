@@ -185,10 +185,11 @@ public class IMNodeManagerImpl implements IMNodeManager {
      *                 -> To finish, the nodes that don't verify the script.
      * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNodesByScript(org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
      */
-    public ArrayList<IMNode> getNodesByScript(VerifyingScript script, boolean ordered) {
+    public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+        boolean ordered) {
         ArrayList<IMNode> result = getFreeNodes();
         verifyWaitingNodes();
-        if (script != null && ordered) {
+        if ((script != null) && ordered) {
             Collections.sort(result, new IMNodeComparator(script));
         }
         return result;
@@ -386,6 +387,6 @@ public class IMNodeManagerImpl implements IMNodeManager {
 
     public BooleanWrapper shutdown() {
         // Something to do ?
-    	return new BooleanWrapper(true);
+        return new BooleanWrapper(true);
     }
 }

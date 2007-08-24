@@ -87,7 +87,8 @@ public class IMAdminImpl implements IMAdmin, Serializable {
      */
     public void deployAllVirtualNodes(File xmlDescriptor, Node remoteNode)
         throws Exception {
-        imcore.getPADNodeSource().deployAllVirtualNodes(xmlDescriptor, remoteNode);
+        imcore.getPADNodeSource()
+              .deployAllVirtualNodes(xmlDescriptor, remoteNode);
     }
 
     /**
@@ -95,7 +96,8 @@ public class IMAdminImpl implements IMAdmin, Serializable {
      */
     public void deployVirtualNode(File xmlDescriptor, Node remoteNode,
         String vnName) throws Exception {
-        imcore.getPADNodeSource().deployVirtualNode(xmlDescriptor, remoteNode, vnName);
+        imcore.getPADNodeSource()
+              .deployVirtualNode(xmlDescriptor, remoteNode, vnName);
     }
 
     /**
@@ -103,8 +105,8 @@ public class IMAdminImpl implements IMAdmin, Serializable {
      */
     public void deployVirtualNodes(File xmlDescriptor, Node remoteNode,
         String[] vnNames) throws Exception {
-    	imcore.getPADNodeSource().deployVirtualNodes(xmlDescriptor, remoteNode,
-        vnNames);
+        imcore.getPADNodeSource()
+              .deployVirtualNodes(xmlDescriptor, remoteNode, vnNames);
     }
 
     //----------------------------------------------------------------------//
@@ -184,19 +186,19 @@ public class IMAdminImpl implements IMAdmin, Serializable {
         this.imcore.shutdown();
     }
 
-	public ArrayList<DynamicNSInterface> getDynamicNodeSources() {
-		return imcore.getDynamicNodeSources();
-	}
+    public ArrayList<DynamicNSInterface> getDynamicNodeSources() {
+        return imcore.getDynamicNodeSources();
+    }
 
-	public PADNSInterface getPADNodeSource() {
-		return imcore.getPADNodeSource();
-	}
+    public PADNSInterface getPADNodeSource() {
+        return imcore.getPADNodeSource();
+    }
 
-	public void addDynamicNodeSources(DynamicNodeSource dns) {
-		imcore.addDynamicNodeSources(dns);
-	}
+    public void addDynamicNodeSources(DynamicNodeSource dns) {
+        imcore.addDynamicNodeSources(dns);
+    }
 
-	public void removeDynamicNodeSources(DynamicNodeSource dns) {
-		imcore.removeDynamicNodeSources(dns);
-	}
+    public void removeDynamicNodeSources(DynamicNodeSource dns) {
+        imcore.removeDynamicNodeSources(dns);
+    }
 }
