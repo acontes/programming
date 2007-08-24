@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -62,20 +62,27 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         String serverUrl = ProActiveConfiguration.getInstance()
                                                  .getLocationServerRmi();
-        server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
+
+        this.server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
-        Thread.sleep(3000);
-        a = (A) ProActive.newActive(A.class.getName(), null,
-                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                LocationServerMetaObjectFactory.newInstance());
-        migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
-                null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                LocationServerMetaObjectFactory.newInstance());
-        idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
-        migratableA.moveTo(TestNodes.getLocalVMNode());
+
         Thread.sleep(3000);
 
-        assertTrue(server.searchObject(idA) != null);
-        assertTrue(a.getName(migratableA).equals("toto"));
+        this.a = (A) ProActive.newActive(A.class.getName(), null,
+                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
+                LocationServerMetaObjectFactory.newInstance());
+
+        this.migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
+                null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
+                LocationServerMetaObjectFactory.newInstance());
+
+        this.idA = ((BodyProxy) ((StubObject) this.a).getProxy()).getBodyID();
+
+        this.migratableA.moveTo(TestNodes.getLocalVMNode());
+
+        Thread.sleep(3000);
+
+        assertTrue(this.server.searchObject(this.idA) != null);
+        assertTrue(this.a.getName(this.migratableA).equals("toto"));
     }
 }

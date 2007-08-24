@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.task;
 
 import org.objectweb.proactive.extra.scheduler.job.LightTask;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
 /**
  * This class represents an elligible task for the policy.

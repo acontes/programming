@@ -49,7 +49,7 @@ public enum JobType implements java.io.Serializable {
 	 * every task represents the same native or java task.
 	 * Only the parameters given to the task will change. 
 	 */
-	PARAMETER_SWIPPING ("Parameter Swipping"),
+	PARAMETER_SWEEPING ("Parameter Sweeping"),
 	/** 
 	 * Tasks flow with dependences.
 	 * Only the task that have their dependences finished

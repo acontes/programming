@@ -49,7 +49,9 @@ public class StartStopSchedulerAction extends Action {
 	private boolean started = false;
 
 	private StartStopSchedulerAction() {
-		setStartStopMode();
+		this.setText("Start/Stop scheduler");
+		this.setToolTipText("To start or stop the scheduler");
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/start.png"));
 		this.setEnabled(ENABLED_AT_CONSTRUCTION);
 	}
 
@@ -66,7 +68,7 @@ public class StartStopSchedulerAction extends Action {
 							// stopped !
 		this.setText("Start scheduler");
 		this.setToolTipText("To start the scheduler (this will finish start or restart the scheduler)");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/pause.png"));
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/start.png"));
 	}
 
 	public void setStopMode() {
@@ -74,14 +76,7 @@ public class StartStopSchedulerAction extends Action {
 						// started/running !
 		this.setText("Stop scheduler");
 		this.setToolTipText("To stop the scheduler (this will finish all pending and running jobs)");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/resume.png"));
-	}
-
-	public void setStartStopMode() {
-		this.setText("Start/Stop scheduler");
-		this.setToolTipText("To start or stop the scheduler");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/resume.png"));
-		this.setEnabled(false);
+		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/stop.png"));
 	}
 
 	public static StartStopSchedulerAction newInstance() {

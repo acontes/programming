@@ -33,8 +33,8 @@ package org.objectweb.proactive.extra.scheduler.job;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
 /**
  * This class represents a task for the policy.

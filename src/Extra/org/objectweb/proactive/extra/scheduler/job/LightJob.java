@@ -37,8 +37,8 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.scheduler.task.EligibleLightTask;
 import org.objectweb.proactive.extra.scheduler.task.Status;
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
 
 /**

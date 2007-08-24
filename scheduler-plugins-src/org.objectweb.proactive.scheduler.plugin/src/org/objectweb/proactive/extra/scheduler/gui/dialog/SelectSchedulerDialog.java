@@ -70,9 +70,12 @@ import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 public class SelectSchedulerDialog extends Dialog {
 
 	/** Name of the file which store the good url */
-	public static final String file = ".ProActive_Scheduler_url";
+	public static final String URL_FILE = ".ProActive_Scheduler_urls";
+	/** Name of the file which store the good login */
+	public static final String LOGIN_FILE = ".ProActive_Scheduler_logins";
 
 	private static List<String> urls = null;
+	private static List<String> logins = null;
 	private static boolean validate = false;
 	private static String url = null;
 	private static String login = null;
@@ -146,6 +149,7 @@ public class SelectSchedulerDialog extends Dialog {
 		loginFormData.left = new FormAttachment(loginLabel, 5);
 		loginFormData.right = new FormAttachment(40, 5);
 		loginCombo.setLayoutData(loginFormData);
+		loadLogins();
 
 		// label password
 		pwdLabel.setText("password :");
@@ -207,6 +211,8 @@ public class SelectSchedulerDialog extends Dialog {
 		shell.pack();
 		shell.open();
 
+		pwdText.setFocus();
+		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
 				display.sleep();
@@ -233,13 +239,20 @@ public class SelectSchedulerDialog extends Dialog {
 		urlCombo.setText("rmi://" + initialHostValue + ":" + port + "/"
 				+ SchedulerConnection.SCHEDULER_DEFAULT_NAME);
 	}
+	
+	private static void setInitialLogin() {
+		/* Get the user name */
+		String initialLogin = System.getProperty("user.name");
+		loginCombo.add(initialLogin);
+		loginCombo.setText(initialLogin);
+	}
 
 	/**
 	 * Load Urls
 	 */
 	private static void loadUrls() {
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(file));
+			BufferedReader reader = new BufferedReader(new FileReader(URL_FILE));
 			try {
 				urls = new ArrayList<String>();
 				String url = null;
@@ -273,25 +286,90 @@ public class SelectSchedulerDialog extends Dialog {
 	}
 
 	/**
-	 * Record an url
-	 * 
-	 * @param lastUrl
+	 * Record urls
 	 */
-	private static void recordUrl(String lastUrl) {
+	private static void recordUrls() {
 		BufferedWriter bw = null;
 		try {
-			bw = new BufferedWriter(new FileWriter(file, false));
+			bw = new BufferedWriter(new FileWriter(URL_FILE, false));
 			PrintWriter pw = new PrintWriter(bw, true);
 			// Record urls
 			if (urls != null) {
 				for (String s : urls) {
-					if (!s.equals(lastUrl))
+					if (!s.equals(url))
 						pw.println(s);
 				}
 			}
 			// Record the last URL used at the end of the file
 			// in order to find it easily for the next time
-			pw.println(lastUrl);
+			pw.println(url);
+		} catch (IOException e) {
+			/* Do-Nothing */
+		} finally {
+			try {
+				bw.close();
+			} catch (IOException e) {
+				/* Do-Nothing */
+			}
+		}
+	}
+	
+	/**
+	 * Load Logins
+	 */
+	private static void loadLogins() {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(LOGIN_FILE));
+			try {
+				logins = new ArrayList<String>();
+				String login = null;
+				String lastUrl = null;
+				while ((login = reader.readLine()) != null) {
+					logins.add(login);
+					lastUrl = login;
+				}
+				int size = logins.size();
+				if (size > 0) {
+					String[] hosts = new String[size];
+					logins.toArray(hosts);
+					Arrays.sort(hosts);
+					loginCombo.setItems(hosts);
+					loginCombo.setText(lastUrl);
+				} else {
+					setInitialLogin();
+				}
+			} catch (IOException e) {
+				/* Do-nothing */
+			} finally {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					/* Do-Nothing */
+				}
+			}
+		} catch (FileNotFoundException e) {
+			setInitialLogin();
+		}
+	}
+	
+	/**
+	 * Record an login
+	 */
+	private static void recordLogins() {
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(LOGIN_FILE, false));
+			PrintWriter pw = new PrintWriter(bw, true);
+			// Record logins
+			if (logins != null) {
+				for (String s : logins) {
+					if (!s.equals(login))
+						pw.println(s);
+				}
+			}
+			// Record the last Login used at the end of the file
+			// in order to find it easily for the next time
+			pw.println(login);
 		} catch (IOException e) {
 			/* Do-Nothing */
 		} finally {
@@ -310,9 +388,8 @@ public class SelectSchedulerDialog extends Dialog {
 	 * This method pop up a dialog for trying to connect a scheduler.
 	 * 
 	 * @param parent the parent
-	 * @return a UserScheduler if the connection is established, null otherwise.
+	 * @return a SelectSchedulerDialogResult which contain all needed informations.
 	 */
-	//TODO mettre a jour les commentaires ci dessus...
 	public static SelectSchedulerDialogResult showDialog(Shell parent) {
 		new SelectSchedulerDialog(parent);
 		if (validate) {
@@ -328,9 +405,16 @@ public class SelectSchedulerDialog extends Dialog {
 				MessageDialog.openError(parent, "Error", "The password is empty !");
 				return null;
 			}
-			recordUrl(url);
 			return new SelectSchedulerDialogResult(url, login, pwd, logAsAdmin);
 		}
 		return null;
+	}
+	
+	/**
+	 * For saving login and url in files.
+	 */
+	public static void saveInformations() {
+		recordLogins();
+		recordUrls();
 	}
 }

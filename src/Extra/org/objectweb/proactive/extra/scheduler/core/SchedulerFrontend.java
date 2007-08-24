@@ -55,9 +55,9 @@ import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.job.LightJob;
 import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
@@ -90,6 +90,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	private HashMap<UniqueID,UserIdentification> identifications = new HashMap<UniqueID,UserIdentification>();
 	/** Implementation of Resource Manager */
 	private InfrastructureManagerProxy resourceManager;
+	/** Authentication Interface */
+	private SchedulerAuthentication authenticationInterface;
 	/** Full name of the policy class */
 	private String policyFullName;
 	/** Implementation of scheduler main structure */
@@ -164,6 +166,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @param identification the identification of the connected user
 	 */
 	public void connect(UniqueID sourceBodyID, UserIdentification identification) throws SchedulerException {
+		if (authenticationInterface == null)
+			authenticationInterface = (SchedulerAuthentication)ProActive.getContext().getStubOnCaller();
 		if (identifications.containsKey(sourceBodyID)){
 			logger.warn("Active object already connected !");
 			throw new SchedulerException("This active object is already connected to the scheduler !");
@@ -410,27 +414,27 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean pause(JobId jobId) throws SchedulerException {
+	public BooleanWrapper pause(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to pause this job !");
-		return scheduler.pause(jobId).booleanValue();
+		return scheduler.pause(jobId);
 	}
 	
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean resume(JobId jobId) throws SchedulerException {
+	public BooleanWrapper resume(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to resume this job !");
-		return scheduler.resume(jobId).booleanValue();
+		return scheduler.resume(jobId);
 	}
 
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean kill(JobId jobId) throws SchedulerException {
+	public BooleanWrapper kill(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to kill this job !");
-		return scheduler.kill(jobId).booleanValue();
+		return scheduler.kill(jobId);
 	}
 
 	
@@ -454,8 +458,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * Terminate the schedulerConnexion active object and then this object.
 	 */
 	public void terminate() {
-		//TODO supprimer l'objet actif de connection
+		if (authenticationInterface != null)
+			authenticationInterface.terminate();
 		ProActive.terminateActiveObject(false);
+		logger.info("Scheduler frontend is now shutdown !");
 	}
 	
 	

@@ -36,6 +36,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityAboveNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityBelowNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.FinishedJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
@@ -49,7 +54,7 @@ import org.objectweb.proactive.extra.scheduler.job.JobId;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class FinishedJobComposite extends JobComposite implements FinishedJobsListener {
+public class FinishedJobComposite extends AbstractJobComposite implements FinishedJobsListener {
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -70,7 +75,7 @@ public class FinishedJobComposite extends JobComposite implements FinishedJobsLi
 	// ---------------------- extends JobComposite ------------------------ //
 	// -------------------------------------------------------------------- //
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#getJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#getJobs()
 	 */
 	@Override
 	public Vector<JobId> getJobs() {
@@ -78,7 +83,7 @@ public class FinishedJobComposite extends JobComposite implements FinishedJobsLi
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#sortJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#sortJobs()
 	 */
 	@Override
 	public void sortJobs() {
@@ -86,13 +91,20 @@ public class FinishedJobComposite extends JobComposite implements FinishedJobsLi
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	@Override
 	public void jobSelected(Job job) {
 		// enabling/disabling button permitted with this job
 		ObtainJobOutputAction.getInstance().setEnabled(
 				SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
+
+		PriorityLowestJobAction.getInstance().setEnabled(false);
+		PriorityBelowNormalJobAction.getInstance().setEnabled(false);
+		PriorityNormalJobAction.getInstance().setEnabled(false);
+		PriorityAboveNormalJobAction.getInstance().setEnabled(false);
+		PriorityHighestJobAction.getInstance().setEnabled(false);
+		
 		PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
 		pauseResumeJobAction.setEnabled(false);
 		pauseResumeJobAction.setPauseResumeMode();

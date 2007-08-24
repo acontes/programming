@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body; 
+package org.objectweb.proactive.core.body;
 
 /**
  * An object implementing this interface provides the minimum service a body offers

@@ -34,6 +34,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.StatusLabel;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialog;
@@ -73,6 +74,10 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
 			if (res == SchedulerProxy.CONNECTED) {
 				isConnected = true;
+				
+				// connection successful, so record "valid" url and login
+				SelectSchedulerDialog.saveInformations();
+				
 				this.setText("Disconnect");
 				this.setToolTipText("Disconnect to the scheduler");
 				this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/run.png"));
@@ -86,6 +91,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
 				SeparatedJobView.getRunningJobComposite().initTable();
 				SeparatedJobView.getFinishedJobComposite().initTable();
 
+				ChangeViewModeAction.getInstance().setEnabled(true);
 				KillSchedulerAction.getInstance().setEnabled(true);
 
 				SeparatedJobView.setVisible(true);
@@ -100,6 +106,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
 	}
 	
 	private void disconnection() {
+		StatusLabel.getInstance().disconnect();
 		SeparatedJobView.clearOnDisconnection(true);
 	}
 	

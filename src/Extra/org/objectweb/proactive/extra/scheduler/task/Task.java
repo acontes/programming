@@ -33,7 +33,25 @@ package org.objectweb.proactive.extra.scheduler.task;
 import java.io.Serializable;
 
 
+/**
+ * This is the main entry point of a task execution.
+ * Each executable java and native task may have to implements this method.
+ * Only the application job will implement its own execute.
+ * In this last case, the execute(TaskResult...) method will be shunted.
+ * 
+ * @author ProActive Team
+ * @version 1.0, Aug 24, 2007
+ * @since ProActive 3.2
+ */
 public interface Task extends Serializable {
 
-	Object execute(TaskResult... results);
+	/**
+	 * The content of this method will be executed once or more if asked.
+	 * This may generate an Object result. It can be whatever you want.
+	 * 
+	 * @param results the results (as a taskResult) from parent tasks.
+	 * @return any object from the user.
+	 */
+	public Object execute(TaskResult... results);
+	
 }

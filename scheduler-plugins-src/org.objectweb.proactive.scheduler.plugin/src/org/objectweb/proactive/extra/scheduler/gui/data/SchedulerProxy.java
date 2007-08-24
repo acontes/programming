@@ -1,31 +1,28 @@
 /*
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
+ * 
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ * Initial developer(s): The ProActive Team
+ * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
+ * 
  * ################################################################
  */
 package org.objectweb.proactive.extra.scheduler.gui.data;
@@ -35,6 +32,7 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.core.Stats;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
@@ -82,7 +80,6 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	 */
 	@Override
 	public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener listener) {
-		System.out.println("SchedulerProxy.addSchedulerEventListener()");
 		try {
 			return scheduler.addSchedulerEventListener(listener);
 		} catch (SchedulerException e) {
@@ -97,7 +94,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	@Override
 	public void disconnect() {
 		try {
-			if(scheduler != null)
+			if (scheduler != null)
 				scheduler.disconnect();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
@@ -134,13 +131,13 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	@Override
-	public boolean kill(JobId jobId) {
+	public BooleanWrapper kill(JobId jobId) {
 		try {
 			return scheduler.kill(jobId);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
@@ -160,26 +157,26 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	@Override
-	public boolean pause(JobId jobId) {
+	public BooleanWrapper pause(JobId jobId) {
 		try {
 			return scheduler.pause(jobId);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	@Override
-	public boolean resume(JobId jobId) {
+	public BooleanWrapper resume(JobId jobId) {
 		try {
 			return scheduler.resume(jobId);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
@@ -199,91 +196,91 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#kill()
 	 */
 	@Override
-	public boolean kill() {
+	public BooleanWrapper kill() {
 		try {
 			return ((AdminSchedulerInterface) scheduler).kill();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pause()
 	 */
 	@Override
-	public boolean pause() {
+	public BooleanWrapper pause() {
 		try {
 			return ((AdminSchedulerInterface) scheduler).pause();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pauseImmediate()
 	 */
 	@Override
-	public boolean pauseImmediate() {
+	public BooleanWrapper pauseImmediate() {
 		try {
 			return ((AdminSchedulerInterface) scheduler).pauseImmediate();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
 	 */
 	@Override
-	public boolean resume() {
+	public BooleanWrapper resume() {
 		try {
 			return ((AdminSchedulerInterface) scheduler).resume();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#shutdown()
 	 */
 	@Override
-	public boolean shutdown() {
+	public BooleanWrapper shutdown() {
 		try {
 			return ((AdminSchedulerInterface) scheduler).shutdown();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#start()
 	 */
 	@Override
-	public boolean start() {
+	public BooleanWrapper start() {
 		try {
 			return ((AdminSchedulerInterface) scheduler).start();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#stop()
 	 */
 	@Override
-	public boolean stop() {
+	public BooleanWrapper stop() {
 		try {
 			return ((AdminSchedulerInterface) scheduler).stop();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return new BooleanWrapper(false);
 	}
 
 	/**

@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.core;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
@@ -104,7 +105,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	 * @throws SchedulerException 
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean pause(JobId jobId) throws SchedulerException {
+	public BooleanWrapper pause(JobId jobId) throws SchedulerException {
 		return schedulerFrontend.pause(jobId);
 	}
 
@@ -113,7 +114,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	 * @throws SchedulerException 
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean resume(JobId jobId) throws SchedulerException {
+	public BooleanWrapper resume(JobId jobId) throws SchedulerException {
 		return schedulerFrontend.resume(jobId);
 	}
 
@@ -122,7 +123,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	 * @throws SchedulerException 
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public boolean kill(JobId jobId) throws SchedulerException {
+	public BooleanWrapper kill(JobId jobId) throws SchedulerException {
 		return schedulerFrontend.kill(jobId);
 	}
 	

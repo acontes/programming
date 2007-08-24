@@ -1,31 +1,28 @@
 /*
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
+ * 
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ * Initial developer(s): The ProActive Team
+ * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
+ * 
  * ################################################################
  */
 package org.objectweb.proactive.extra.scheduler.gui.composite;
@@ -36,6 +33,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityAboveNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityBelowNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.PendingJobsListener;
@@ -52,7 +54,7 @@ import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class PendingJobComposite extends JobComposite implements PendingJobsListener, EventJobsListener {
+public class PendingJobComposite extends AbstractJobComposite implements PendingJobsListener, EventJobsListener {
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -74,7 +76,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	// ---------------------- extends JobComposite ------------------------ //
 	// -------------------------------------------------------------------- //
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#getJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#getJobs()
 	 */
 	@Override
 	public Vector<JobId> getJobs() {
@@ -82,7 +84,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#sortJobs()
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#sortJobs()
 	 */
 	@Override
 	public void sortJobs() {
@@ -90,7 +92,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	}
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.JobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	@Override
 	public void jobSelected(Job job) {
@@ -101,15 +103,28 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 		switch (JobsController.getSchedulerState()) {
 		case SHUTTING_DOWN:
 		case KILLED:
+			PriorityLowestJobAction.getInstance().setEnabled(false);
+			PriorityBelowNormalJobAction.getInstance().setEnabled(false);
+			PriorityNormalJobAction.getInstance().setEnabled(false);
+			PriorityAboveNormalJobAction.getInstance().setEnabled(false);
+			PriorityHighestJobAction.getInstance().setEnabled(false);
+
 			pauseResumeJobAction.setEnabled(false);
 			pauseResumeJobAction.setPauseResumeMode();
 			break;
 		default:
+			PriorityLowestJobAction.getInstance().setEnabled(enabled);
+			PriorityBelowNormalJobAction.getInstance().setEnabled(enabled);
+			PriorityNormalJobAction.getInstance().setEnabled(enabled);
+			PriorityAboveNormalJobAction.getInstance().setEnabled(enabled);
+			PriorityHighestJobAction.getInstance().setEnabled(enabled);
+
 			pauseResumeJobAction.setEnabled(enabled);
 			JobState jobState = job.getState();
 			if (jobState.equals(JobState.PAUSED)) {
 				pauseResumeJobAction.setResumeMode();
-			} else if(jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING) || jobState.equals(JobState.RERUNNING)) {
+			} else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)
+					|| jobState.equals(JobState.RERUNNING)) {
 				pauseResumeJobAction.setPauseMode();
 			} else {
 				pauseResumeJobAction.setPauseResumeMode();
@@ -147,7 +162,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	 */
 	@Override
 	public void killedEvent(JobId jobId) {
-		// Do nothing
+	// Do nothing
 	}
 
 	/**
@@ -155,10 +170,7 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	 */
 	@Override
 	public void pausedEvent(JobEvent event) {
-		JobId jobId = event.getJobId();
-		if(getJobs().contains(jobId)) {
-			super.stateUpdate(jobId);
-		}
+		stateUpdate(event);
 	}
 
 	/**
@@ -166,8 +178,26 @@ public class PendingJobComposite extends JobComposite implements PendingJobsList
 	 */
 	@Override
 	public void resumedEvent(JobEvent event) {
+		stateUpdate(event);
+	}
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.gui.data.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 */
+	@Override
+	public void priorityChangedEvent(JobEvent event) {
 		JobId jobId = event.getJobId();
-		if(getJobs().contains(jobId)) {
+		if (getJobs().contains(jobId)) {
+			super.priorityUpdate(jobId);
+		}
+	}
+
+	// -------------------------------------------------------------------- //
+	// ------------------- implements EventJobsListener ------------------- //
+	// -------------------------------------------------------------------- //
+	private void stateUpdate(JobEvent event) {
+		JobId jobId = event.getJobId();
+		if (getJobs().contains(jobId)) {
 			super.stateUpdate(jobId);
 		}
 	}

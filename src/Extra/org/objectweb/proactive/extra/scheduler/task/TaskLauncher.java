@@ -32,6 +32,8 @@ package org.objectweb.proactive.extra.scheduler.task;
 
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -43,6 +45,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 import org.objectweb.proactive.extra.scheduler.exception.UserException;
@@ -63,11 +66,11 @@ import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 public class TaskLauncher implements InitActive, Serializable {
 
 	private static final long serialVersionUID = -9159607482957244049L;
-	private TaskId taskId;
-	private JobId jobId;
-	private Script<?> pre;
-	private String host;
-	private Integer port; 
+	protected TaskId taskId;
+	protected JobId jobId;
+	protected Script<?> pre;
+	protected String host;
+	protected Integer port; 
 
 	/**
 	 * ProActive empty constructor.
@@ -108,7 +111,7 @@ public class TaskLauncher implements InitActive, Serializable {
      * @param body the body of the active object being initialized
      */
 	public void initActivity(Body body) {
-		ProActive.setImmediateService("getNode");
+		ProActive.setImmediateService("getNodes");
 		ProActive.setImmediateService("terminate");
 	}
 	
@@ -157,19 +160,22 @@ public class TaskLauncher implements InitActive, Serializable {
             LogManager.shutdown();
             System.setOut(stdout);
             System.setErr(stderr);
+            //terminate the task
 			core.terminate(taskId, jobId);	
 		}
 	}
 	
 	
 	/**
-	 * To get the node on which this active object has been launched.
+	 * To get the node(s) on which this active object has been launched.
 	 * 
-	 * @return the node of this active object.
+	 * @return the node(s) of this active object.
 	 * @throws NodeException
 	 */
-	public Node getNode() throws NodeException{
-		return ProActive.getNode();
+	public NodeSet getNodes() throws NodeException{
+		Collection<Node> nodes = new ArrayList<Node>();
+		nodes.add(ProActive.getNode());
+		return new NodeSet(new ArrayList<Node>(nodes));
 	}
 	
 	

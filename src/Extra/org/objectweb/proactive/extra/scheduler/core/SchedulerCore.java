@@ -34,6 +34,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
@@ -59,10 +60,13 @@ import org.objectweb.proactive.extra.scheduler.job.LightJob;
 import org.objectweb.proactive.extra.scheduler.job.LightTask;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
-import org.objectweb.proactive.extra.scheduler.task.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
+import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
+import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
@@ -128,6 +132,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			this.resourceManager = imp;
 			this.frontend = frontend;
 			//logger
+			//TODO prendre un autre port si celui ci est utilisé (algo : demander à cmathieu)
 	    	host = java.net.InetAddress.getLocalHost().getHostName();
 	        SimpleLoggerServer slf = new SimpleLoggerServer(port);
 	        Thread slft  = new Thread(slf);
@@ -178,7 +183,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			}
 		}
 		//terminating jobs...
-		logger.info("Terminating jobs...");
+		if (runningJobs.size() + pendingJobs.size() > 0)
+			logger.info("Terminating jobs...");
 		while(runningJobs.size() + pendingJobs.size() > 0){
 			service.serveAll("terminate");
 			schedule();
@@ -201,11 +207,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		logger.info("Terminating...");
 		//shutdown resource manager proxy
 		resourceManager.shutdownProxy();
-		logger.info("Scheduler is now shutdown !");
-		frontend.schedulerShutDownEvent();
+		if (state == SchedulerState.SHUTTING_DOWN)
+			frontend.schedulerShutDownEvent();
 		//destroying scheduler active objects
 		frontend.terminate();
-		ProActive.terminateActiveObject(true);
+		ProActive.terminateActiveObject(false);
+		logger.info("Scheduler is now shutdown !");
 		//exit
 		System.exit(0);
 	}
@@ -230,49 +237,67 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			Job currentJob = jobs.get(lightTask.getJobId());
 			TaskDescriptor taskDescriptor = currentJob.getHMTasks().get(lightTask.getId());
 			//TODO améliorer la demande de noeuds
-			NodeSet nodeSet = resourceManager.getAtMostNodes(1, taskDescriptor.getVerifyingScript());
-			for (Node node : nodeSet){
-				try {
-					TaskLauncher launcher;
-					if (taskDescriptor.getPreTask() == null){
-						launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{taskDescriptor.getId(),taskDescriptor.getJobId(), host, port}, node);
-					} else {
-						launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{taskDescriptor.getId(),taskDescriptor.getJobId(),taskDescriptor.getPreTask(), host, port}, node);
-					}
-					taskDescriptor.setLauncher(launcher);
-					//if job is TASKSFLOW, preparing the list of parameters for this task.
-					int resultSize = lightTask.getParents().size();
-					if (currentJob.getType() == JobType.TASKSFLOW && resultSize > 0){
-						TaskResult[] params = new TaskResult[resultSize];
-						for (int i=0;i<resultSize;i++){
-							params[i] = taskResults.get(lightTask.getParents().get(i).getId());
+			//il faut associer les scripts aux demandes histoire qu'on execute bien
+			//la bonne tache sur le bon noeud d'execution.
+			NodeSet nodeSet = resourceManager.getAtMostNodes(taskDescriptor.getNumberOfNodesNeeded(), taskDescriptor.getVerifyingScript());
+			try {
+				while (nodeSet.size() > 0){
+					Node node = nodeSet.get(0);
+					TaskLauncher launcher = null;
+					//if the job is an application job and if all nodes can be launched at the same time
+					if (currentJob.getType() == JobType.APPLI && nodeSet.size() >= taskDescriptor.getNumberOfNodesNeeded()){
+						launcher = taskDescriptor.createLauncher(host, port, node);
+						NodeSet nodes = new NodeSet();
+						nodeSet.remove(0);
+						for (int i=0;i<(taskDescriptor.getNumberOfNodesNeeded()-1);i++){
+							nodes.add(nodeSet.remove(0));
 						}
-						taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask(),params));
+						taskResults.put(taskDescriptor.getId(),((AppliTaskLauncher)launcher).doTask((SchedulerCore)ProActive.getStubOnThis(),(ApplicationTask)taskDescriptor.getTask(),nodes));
+					} else if (currentJob.getType() != JobType.APPLI) {
+						launcher = taskDescriptor.createLauncher(host, port, node);
+						nodeSet.remove(0);
+						//if job is TASKSFLOW, preparing the list of parameters for this task.
+						int resultSize = lightTask.getParents().size();
+						if (currentJob.getType() == JobType.TASKSFLOW && resultSize > 0){
+							TaskResult[] params = new TaskResult[resultSize];
+							for (int i=0;i<resultSize;i++){
+								params[i] = taskResults.get(lightTask.getParents().get(i).getId());
+							}
+							taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask(),params));
+						} else {
+							taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask()));
+						}
+					}
+					//if a task has been launched
+					if (launcher != null){
+						logger.info(">>>>>>>> New task started on "+node.getNodeInformation().getHostName()+" [ "+taskDescriptor.getId()+" ]");
+						// set the different informations on job
+						if (currentJob.getStartTime() == -1){
+							// if it is the first task of this job
+							currentJob.start();
+							pendingJobs.remove(currentJob);
+							runningJobs.add(currentJob);
+							// send job event to frontend
+							frontend.pendingToRunningJobEvent(currentJob.getJobInfo());
+							// don't forget to set the task status modify to null after a Job.start() method;
+							currentJob.setTaskStatusModify(null);
+						}
+						// set the different informations on task
+						currentJob.startTask(taskDescriptor,node.getNodeInformation().getHostName());
+						// send task event to frontend
+						frontend.pendingToRunningTaskEvent(taskDescriptor.getTaskInfo());
 					} else {
-						taskResults.put(taskDescriptor.getId(),launcher.doTask((SchedulerCore)ProActive.getStubOnThis(),taskDescriptor.getTask()));
+						//if no task can be launched on this job, go to the next job.
+						resourceManager.freeNodes(nodeSet);
+						//and leave this loop
+						break;
 					}
-					logger.info(">>>>>>>> New task started on "+node.getNodeInformation().getHostName()+" [ "+taskDescriptor.getId()+" ]");
-					// set the different informations on job
-					if (currentJob.getStartTime() == -1){
-						// if it is the first task of this job
-						currentJob.start();
-						pendingJobs.remove(currentJob);
-						runningJobs.add(currentJob);
-						// send job event to frontend
-						frontend.pendingToRunningJobEvent(currentJob.getJobInfo());
-						// don't forget to set the task status modify to null after a Job.start() method;
-						currentJob.setTaskStatusModify(null);
-					}
-					// set the different informations on task
-					currentJob.startTask(taskDescriptor,node.getNodeInformation().getHostName());
-					// send task event to frontend
-					frontend.pendingToRunningTaskEvent(taskDescriptor.getTaskInfo());
-				} catch (Exception e) {
-					// TODO qué fa ? rendre le noeud et reessayer avec un autre.
-					// ne pas oublier de sauver dans une liste les tache qui ont merdé et les relancer
-					//autant qu'il le faut
-					e.printStackTrace();
 				}
+			} catch (Exception e) {
+				// TODO qué fa ? rendre le noeud et reessayer avec un autre.
+				// ne pas oublier de sauver dans une liste les tache qui ont merdé et les relancer
+				//autant qu'il le faut
+				e.printStackTrace();
 			}
 		}
 		
@@ -317,7 +342,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				frontend.runningToFinishedJobEvent(job.getJobInfo());
 			}
 			//free execution node
-			resourceManager.freeNode(descriptor.getLauncher().getNode());
+			resourceManager.freeNodes(descriptor.getLauncher().getNodes(),descriptor.getPostTask());
 		} catch (NodeException e) {
 			e.printStackTrace();
 		} catch (NullPointerException eNull){
@@ -493,8 +518,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		for (Job j : runningJobs){
 			for (TaskDescriptor td : j.getTasks()){
 				try {
-					td.getLauncher().terminate();
-				} catch(Exception e) {}
+					NodeSet nodes = td.getLauncher().getNodes();
+					try { td.getLauncher().terminate();}
+					catch(Exception e) {/* Tested, nothing to do */}
+					resourceManager.freeNodes(nodes,td.getPostTask());
+				} catch(Exception e) {/* Tested, nothing to do */}
 			}
 		}
 		//cleaning all lists
@@ -571,17 +599,22 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @param jobId the job to kill.
 	 * @return true if success, false otherwise.
 	 */
-	public BooleanWrapper kill(JobId jobId) {
+	public synchronized BooleanWrapper kill(JobId jobId) {
 		if (state == SchedulerState.SHUTTING_DOWN || state == SchedulerState.KILLED){
 			return new BooleanWrapper(false);
 		}
 		Job job = jobs.get(jobId);
 		jobs.remove(jobId);
 		for (TaskDescriptor td : job.getTasks()){
-			if (td.getLauncher() != null){
+			if (td.getStatus() == Status.RUNNNING){
 				try{
-					td.getLauncher().terminate();
-				} catch (Exception e){}
+					//get the nodes that are used for this descriptor
+					NodeSet nodes = td.getLauncher().getNodes();
+					//free execution node
+					try{ td.getLauncher().terminate();}
+					catch (Exception e){ /* Tested (nothing to do) */ }
+					resourceManager.freeNodes(nodes,td.getPostTask());
+				} catch (Exception e){ /* Tested (nothing to do) */ }
 				taskResults.remove(td.getId());
 			}
 		}

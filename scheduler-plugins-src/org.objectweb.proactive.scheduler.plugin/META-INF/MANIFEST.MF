@@ -38,6 +38,5 @@ Export-Package: .,
    org.eclipse.swt.graphics,
    org.eclipse.ui.part,
    org.objectweb.proactive.extra.scheduler.task,
-   org.eclipse.swt.widgets",
- org.objectweb.proactive.extra.scheduler.gui.views.icons
+   org.eclipse.swt.widgets"
 Eclipse-RegisterBuddy: org.objectweb.proactive.ic2d.lib

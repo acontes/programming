@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.infrastructuremanager.core;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -62,18 +61,30 @@ public class IMActivityNode implements Runnable {
                 logger.info("search down nodes");
             }
             ArrayList<IMNode> imNodes = this.imCore.getListAllNodes();
+            int free = 0;
+            int busy = 0;
+            int down = 0;
             for (IMNode imNode : imNodes) {
-//                String nodeURL;
-                @SuppressWarnings("unused")
-				Node node;
-                try {
-                    imNode.getNode().getNumberOfActiveObjects();
-                    //node = NodeFactory.getNode(nodeURL);
-                } catch (NodeException e) {
-                    this.imCore.nodeIsDown(imNode);
+                if (imNode.isDown()) {
+                    down++;
+                } else {
+                    try {
+                        imNode.getNode().getNumberOfActiveObjects();
+                        if (imNode.isFree()) {
+                            free++;
+                        } else {
+                            busy++;
+                        }
+                    } catch (NodeException e) {
+                        this.imCore.nodeIsDown(imNode);
+                    }
                 }
             }
 
+            if (logger.isInfoEnabled()) {
+                logger.info("IM State Report : free=" + free + " busy=" + busy +
+                    " down=" + down);
+            }
             try {
                 Thread.sleep(wait);
             } catch (InterruptedException e) {

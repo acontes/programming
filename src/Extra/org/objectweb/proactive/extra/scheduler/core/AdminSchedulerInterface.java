@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.core;
 
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
@@ -52,7 +53,7 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean start() throws SchedulerException;
+	public BooleanWrapper start() throws SchedulerException;
 	
 	
 	/**
@@ -61,7 +62,7 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean stop() throws SchedulerException;
+	public BooleanWrapper stop() throws SchedulerException;
 	
 	
 	/**
@@ -70,7 +71,7 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean pause() throws SchedulerException;
+	public BooleanWrapper pause() throws SchedulerException;
 	
 	
 	/**
@@ -79,7 +80,7 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean pauseImmediate() throws SchedulerException;
+	public BooleanWrapper pauseImmediate() throws SchedulerException;
 	
 	
 	/**
@@ -88,7 +89,7 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean resume() throws SchedulerException;
+	public BooleanWrapper resume() throws SchedulerException;
 	
 	
 	/**
@@ -97,7 +98,7 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean shutdown() throws SchedulerException;
+	public BooleanWrapper shutdown() throws SchedulerException;
 	
 	
 	/**
@@ -106,5 +107,5 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
 	 * @return true if success, false if not.
 	 * @throws SchedulerException (can be due to insufficient permission)
 	 */
-	public boolean kill() throws SchedulerException;
+	public BooleanWrapper kill() throws SchedulerException;
 }

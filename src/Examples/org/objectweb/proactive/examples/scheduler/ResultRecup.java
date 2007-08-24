@@ -83,7 +83,7 @@ public class ResultRecup {
             				for (Entry<String,TaskResult> e : result.getTaskResults().entrySet()){
             					TaskResult tRes = e.getValue();
             					if (tRes.hadException())
-            						System.out.println("\t "+e.getKey()+" : "+tRes.getException().getMessage());
+            						System.out.println("\t ERROR : "+e.getKey()+" : "+tRes.getException().getMessage());
             					else
             						System.out.println("\t "+e.getKey()+" : "+tRes.value());
             				}

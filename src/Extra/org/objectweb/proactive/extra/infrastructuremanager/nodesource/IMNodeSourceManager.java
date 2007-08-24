@@ -46,6 +46,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.Dy
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
+
 /**
  * The IMNodeSourceManager is made to manage differents IMNodeSource,
  * and is also seen like a IMNodeSource from the outside.
@@ -55,9 +56,10 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
  *
  */
 public class IMNodeSourceManager extends IMNodeSource {
-	private String id;
+    private String id;
     private PADNodeSource padNS;
     private ArrayList<DynamicNodeSource> dynNS;
+
     //private Map<IMNode, IMNodeSource> nodes;
 
     /**
@@ -67,9 +69,11 @@ public class IMNodeSourceManager extends IMNodeSource {
         throws ActiveObjectCreationException, NodeException {
         padNS = (PADNodeSource) ProActive.newActive(PADNodeSource.class.getCanonicalName(),
                 new Object[] {  }, nodeIM);
-        
+
         dynNS = new ArrayList<DynamicNodeSource>();
-        //nodes = new HashMap<IMNode, IMNodeSource>();
+        //        DynamicNodeSource d = (DynamicNodeSource) ProActive.newActive(DummyNodeSource.class.getCanonicalName(),
+        //                new Object[] { "PAD - Dummy", 10, 3000, 30000 });
+        //        dynNS.add(d);
         this.id = sourceId;
     }
 
@@ -87,129 +91,133 @@ public class IMNodeSourceManager extends IMNodeSource {
      * @param dns
      */
     @SuppressWarnings("unchecked")
-	public ArrayList<DynamicNodeSource> getDynamicNodeSources() {
-    	return (ArrayList<DynamicNodeSource>) dynNS.clone();
+    public ArrayList<DynamicNodeSource> getDynamicNodeSources() {
+        return (ArrayList<DynamicNodeSource>) dynNS.clone();
     }
-    
+
     /**
      * Add a new {@link DynamicNodeSource} to this manager.
      * @param dns
      */
     public void addDynamicNodeSource(DynamicNodeSource dns) {
-    	dynNS.add(dns);
+        dynNS.add(dns);
     }
-    
+
     /**
      * Remove the given {@link DynamicNodeSource} from the manager.
      * @param dns
      */
     public void removeDynamicNodeSource(DynamicNodeSource dns) {
-    	dynNS.remove(dns);
+        dynNS.remove(dns);
     }
-    
+
     // METHODS FROM IMNODEMANAGER
     /**
      * @see IMNodeManager#getNodesByScript(VerifyingScript, boolean)
      */
-    public ArrayList<IMNode> getNodesByScript(VerifyingScript script, boolean ordered) {
-    	ArrayList<IMNode> res = new ArrayList<IMNode>();
-    	res.addAll(padNS.getNodesByScript(script, false));
-    	for(DynamicNodeSource dns : dynNS) {
-    		 res.addAll(dns.getNodesByScript(script, false));
-    	}
-    	if(script != null && ordered) {
+    public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+        boolean ordered) {
+        ArrayList<IMNode> res = new ArrayList<IMNode>();
+        res.addAll(padNS.getNodesByScript(script, false));
+        for (DynamicNodeSource dns : dynNS) {
+            res.addAll(dns.getNodesByScript(script, false));
+        }
+        if ((script != null) && ordered) {
             Collections.sort(res, new IMNodeComparator(script));
-    	}
-    	return res;
+        }
+        return res;
     }
 
     public void setBusy(IMNode imnode) {
-    	IMNodeSource ns = imnode.getNodeSource();
-    	if(ns != null)
-    		ns.setBusy(imnode);
+        IMNodeSource ns = imnode.getNodeSource();
+        if (ns != null) {
+            ns.setBusy(imnode);
+        }
     }
 
     public void setDown(IMNode imnode) {
-    	IMNodeSource ns = imnode.getNodeSource();
-    	if(ns != null)
-    		ns.setDown(imnode);
+        IMNodeSource ns = imnode.getNodeSource();
+        if (ns != null) {
+            ns.setDown(imnode);
+        }
     }
 
     public void setFree(IMNode imnode) {
-    	IMNodeSource ns = imnode.getNodeSource();
-    	if(ns != null)
-    		ns.setFree(imnode);
+        IMNodeSource ns = imnode.getNodeSource();
+        if (ns != null) {
+            ns.setFree(imnode);
+        }
     }
 
     public BooleanWrapper shutdown() {
-    	Boolean res = padNS.shutdown().booleanValue();
-    	for(DynamicNodeSource dns : dynNS)
-    		res = res.booleanValue() && dns.shutdown().booleanValue();
-    	return new BooleanWrapper(res);
+        Boolean res = padNS.shutdown().booleanValue();
+        for (DynamicNodeSource dns : dynNS)
+            res = res.booleanValue() && dns.shutdown().booleanValue();
+        return new BooleanWrapper(res);
     }
 
-	@Override
-	public String getSourceId() {
-		return id;
-	}
+    @Override
+    public String getSourceId() {
+        return id;
+    }
 
-	public ArrayList<IMNode> getAllNodes() {
-		ArrayList<IMNode> nodes = new ArrayList<IMNode>();
-		nodes.addAll(padNS.getAllNodes());
-    	for(DynamicNodeSource dns : dynNS)
-    		nodes.addAll(dns.getAllNodes());
-    	return nodes;
-	}
+    public ArrayList<IMNode> getAllNodes() {
+        ArrayList<IMNode> nodes = new ArrayList<IMNode>();
+        nodes.addAll(padNS.getAllNodes());
+        for (DynamicNodeSource dns : dynNS)
+            nodes.addAll(dns.getAllNodes());
+        return nodes;
+    }
 
-	public ArrayList<IMNode> getBusyNodes() {
-		ArrayList<IMNode> nodes = new ArrayList<IMNode>();
-		nodes.addAll(padNS.getBusyNodes());
-    	for(DynamicNodeSource dns : dynNS)
-    		nodes.addAll(dns.getBusyNodes());
-    	return nodes;
-	}
+    public ArrayList<IMNode> getBusyNodes() {
+        ArrayList<IMNode> nodes = new ArrayList<IMNode>();
+        nodes.addAll(padNS.getBusyNodes());
+        for (DynamicNodeSource dns : dynNS)
+            nodes.addAll(dns.getBusyNodes());
+        return nodes;
+    }
 
-	public ArrayList<IMNode> getDownNodes() {
-		ArrayList<IMNode> nodes = new ArrayList<IMNode>();
-		nodes.addAll(padNS.getDownNodes());
-    	for(DynamicNodeSource dns : dynNS)
-    		nodes.addAll(dns.getDownNodes());
-    	return nodes;
-	}
+    public ArrayList<IMNode> getDownNodes() {
+        ArrayList<IMNode> nodes = new ArrayList<IMNode>();
+        nodes.addAll(padNS.getDownNodes());
+        for (DynamicNodeSource dns : dynNS)
+            nodes.addAll(dns.getDownNodes());
+        return nodes;
+    }
 
-	public ArrayList<IMNode> getFreeNodes() {
-		ArrayList<IMNode> nodes = new ArrayList<IMNode>();
-		nodes.addAll(padNS.getFreeNodes());
-    	for(DynamicNodeSource dns : dynNS)
-    		nodes.addAll(dns.getFreeNodes());
-    	return nodes;
-	}
+    public ArrayList<IMNode> getFreeNodes() {
+        ArrayList<IMNode> nodes = new ArrayList<IMNode>();
+        nodes.addAll(padNS.getFreeNodes());
+        for (DynamicNodeSource dns : dynNS)
+            nodes.addAll(dns.getFreeNodes());
+        return nodes;
+    }
 
-	public IntWrapper getNbAllNodes() {
-		int nb = padNS.getNbAllNodes().intValue();
-    	for(DynamicNodeSource dns : dynNS)
-    		nb += dns.getNbAllNodes().intValue();
-		return new IntWrapper(nb);
-	}
+    public IntWrapper getNbAllNodes() {
+        int nb = padNS.getNbAllNodes().intValue();
+        for (DynamicNodeSource dns : dynNS)
+            nb += dns.getNbAllNodes().intValue();
+        return new IntWrapper(nb);
+    }
 
-	public IntWrapper getNbBusyNodes() {
-		int nb = padNS.getNbBusyNodes().intValue();
-    	for(DynamicNodeSource dns : dynNS)
-    		nb += dns.getNbBusyNodes().intValue();
-		return new IntWrapper(nb);
-	}
+    public IntWrapper getNbBusyNodes() {
+        int nb = padNS.getNbBusyNodes().intValue();
+        for (DynamicNodeSource dns : dynNS)
+            nb += dns.getNbBusyNodes().intValue();
+        return new IntWrapper(nb);
+    }
 
-	public IntWrapper getNbDownNodes() {
-		int nb = padNS.getNbDownNodes().intValue();
-    	for(DynamicNodeSource dns : dynNS)
-    		nb += dns.getNbDownNodes().intValue();
-		return new IntWrapper(nb);
-	}
+    public IntWrapper getNbDownNodes() {
+        int nb = padNS.getNbDownNodes().intValue();
+        for (DynamicNodeSource dns : dynNS)
+            nb += dns.getNbDownNodes().intValue();
+        return new IntWrapper(nb);
+    }
 
-	public IntWrapper getNbFreeNodes() {
-		int nb = padNS.getNbFreeNodes().intValue();
-    	for(DynamicNodeSource dns : dynNS)
-    		nb += dns.getNbFreeNodes().intValue();
-		return new IntWrapper(nb);
-	}
+    public IntWrapper getNbFreeNodes() {
+        int nb = padNS.getNbFreeNodes().intValue();
+        for (DynamicNodeSource dns : dynNS)
+            nb += dns.getNbFreeNodes().intValue();
+        return new IntWrapper(nb);
+    }
 }

@@ -55,4 +55,11 @@ public interface EventJobsListener {
 	 * @param event the informations on the resumed job.
 	 */
 	public void resumedEvent(JobEvent event);
+	
+	/**
+	 * Invoked when a job priority has been changed.
+	 * 
+	 * @param event the informations on the resumed job.
+	 */
+	public void priorityChangedEvent(JobEvent event);
 }

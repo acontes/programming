@@ -138,28 +138,30 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
      * @param postScript
      */
     public void freeNode(Node node, Script<?> postScript) {
-        if (postScript == null) {
-            freeNode(node);
-        } else {
-            try {
-                ScriptHandler handler = ScriptLoader.createHandler(node);
-                nodes.put(node, handler.handle(postScript));
-                if (logger.isInfoEnabled()) {
-                    logger.info("Post Script handled on node" +
-                        node.getNodeInformation().getURL());
-                }
-            } catch (ActiveObjectCreationException e) {
-                // TODO Que faire si noeud mort ?
-                // CHOIX 1 : on retourne le noeud sans rien faire
-                e.printStackTrace();
-                freeNode(node);
-            } catch (NodeException e) {
-                // TODO Que faire si noeud mort ?
-                // CHOIX 1 : on retourne le noeud sans rien faire
-                e.printStackTrace();
-                freeNode(node);
-            }
-        }
+    	if (node != null){
+	        if (postScript == null) {
+	            freeNode(node);
+	        } else {
+	            try {
+	                ScriptHandler handler = ScriptLoader.createHandler(node);
+	                nodes.put(node, handler.handle(postScript));
+	                if (logger.isInfoEnabled()) {
+	                    logger.info("Post Script handled on node" +
+	                        node.getNodeInformation().getURL());
+	                }
+	            } catch (ActiveObjectCreationException e) {
+	                // TODO Que faire si noeud mort ?
+	                // CHOIX 1 : on retourne le noeud sans rien faire
+	                e.printStackTrace();
+	                freeNode(node);
+	            } catch (NodeException e) {
+	                // TODO Que faire si noeud mort ?
+	                // CHOIX 1 : on retourne le noeud sans rien faire
+	                e.printStackTrace();
+	                freeNode(node);
+	            }
+	        }
+    	}
     }
 
     /**

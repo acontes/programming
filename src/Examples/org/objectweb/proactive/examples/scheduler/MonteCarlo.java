@@ -75,7 +75,7 @@ public class MonteCarlo extends JavaTask {
         double res = 0;
         while (n > 0) {
             if (print < 0) {
-                System.out.println("Calcul intermediaire : Pi = " +
+                System.out.println("Calcul intermediaire ("+(100-((n*100)/iterations))+"%) : Pi = " +
                     (((double) 4 * res) / (((++nbPrint) * iterations) / steps)));
                 print = iterations / steps;
             }

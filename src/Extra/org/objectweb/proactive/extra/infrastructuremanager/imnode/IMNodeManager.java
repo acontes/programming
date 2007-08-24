@@ -45,8 +45,7 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
  * @version 1.0, Jul 11, 2007
  * @since ProActive 3.2
  */
-public interface IMNodeManager extends NodeSourceInterface{
-
+public interface IMNodeManager extends NodeSourceInterface {
     // SETTING NODE STATE
     /**
      * Set the {@link IMNode} in a busy state.
@@ -91,8 +90,9 @@ public interface IMNodeManager extends NodeSourceInterface{
      * The way to to get free nodes in the structure, ordered (or not) with the script.
      * The more a Node has chances to verify the script, the less it's far in the list.
      */
-    public ArrayList<IMNode> getNodesByScript(VerifyingScript script, boolean ordered);
-    
+    public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+        boolean ordered);
+
     /**
      * Shutting down Node Manager, and everything depending on it.
      */

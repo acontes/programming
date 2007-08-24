@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job name="job_application" priority="highest" type="APPLI">
+	<description>A job application that will find out the Nth first prime number where N is given as argument.</description>
+	<tasks>
+		<task name="Controller" neededNodes="5">
+			<!-- Task human description -->
+			<description>Will control the workers in order to find the prime number</description>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.examples.scheduler.ApplicationExample">
+					<initParameters>
+						<parameter name="numberToFind" value="200" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+	</tasks>
+</job>

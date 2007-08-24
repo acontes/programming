@@ -10,9 +10,8 @@ import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.job.TaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.task.JavaTask;
-import org.objectweb.proactive.extra.scheduler.task.JavaTaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.task.Task;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.JavaTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
@@ -50,7 +49,7 @@ public class SimpleHelloWorld {
 			
 			//******************** CREATE A NEW TASK ***********************
 			//creating a new task
-			Task task = new JavaTask(){
+			JavaTask task = new JavaTask(){
 				private static final long serialVersionUID = 1938122426482626365L;
 				public Object execute(TaskResult... results) {
 					System.out.println("Hello World !");

@@ -18,6 +18,12 @@
 					<vmName value="Jvm4"/>
 					<vmName value="Jvm5"/>
 					<vmName value="Jvm6"/>
+					<vmName value="Jvm7"/>
+					<vmName value="Jvm8"/>
+					<vmName value="Jvm9"/>
+					<vmName value="Jvm10"/>
+					<vmName value="Jvm11"/>
+					<vmName value="Jvm12"/>
 				</jvmSet>
 			</map>
 		</mapping>
@@ -52,6 +58,36 @@
 					<processReference refid="localJVM3"/>
 				</creation>
 			</jvm>
+			<jvm name="Jvm7">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm8">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm9">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm10">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm11">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm12">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
@@ -74,6 +110,27 @@
 				<sshProcess 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
 					hostname="noadcoco">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM4">
+				<sshProcess 
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="trans06">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM5">
+				<sshProcess 
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="oasis2">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM6">
+				<sshProcess 
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="macyavel">
 					<processReference refid="JVM"/>
 				</sshProcess>
 			</processDefinition>

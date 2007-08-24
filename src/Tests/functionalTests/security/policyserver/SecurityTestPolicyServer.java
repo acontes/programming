@@ -8,16 +8,16 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
@@ -30,16 +30,11 @@
  */
 package functionalTests.security.policyserver;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertNotNull;
@@ -57,20 +52,8 @@ public class SecurityTestPolicyServer extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ObjectOutput out = new ObjectOutputStream(bout);
-
-        out.writeObject(policyServer);
-        out.close();
-
-        // Get the bytes of the serialized object
-        byte[] buf = bout.toByteArray();
-
         // retrieve policyserver
-        ByteArrayInputStream bis = new ByteArrayInputStream(buf);
-        ObjectInputStream is = new ObjectInputStream(bis);
-
-        ps = (PolicyServer) is.readObject();
+        ps = (PolicyServer) MakeDeepCopy.WithObjectStream.makeDeepCopy(policyServer);
         assertNotNull(ps);
     }
 
