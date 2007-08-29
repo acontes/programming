@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:proactive:security:1.0" schemaVersion="1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:security:1.0 /user/nhouillo/home/ws/ProActive/src/Core/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd">
+	<ApplicationName>CN=Garden1</ApplicationName>
+	<PKCS12KeyStore>keystores/keystore1.p12</PKCS12KeyStore>
+	<CertificationAuthority>
+		<Certificate />
+	</CertificationAuthority>
+	<TrustedCertificationAuthority />
+	<Rules>
+		<Rule>
+			<From>
+				<Entity type="domain" name="CN=inria" />
+			</From>
+			<To>
+				<Entity type="domain" name="CN=inria" />
+			</To>
+			<Communication>
+				<Request value="authorized">
+					<Attributes authentication="optional"
+						integrity="optional" confidentiality="optional" />
+				</Request>
+				<Reply value="authorized">
+					<Attributes authentication="optional"
+						integrity="optional" confidentiality="optional" />
+				</Reply>
+			</Communication>
+			<Migration>authorized</Migration>
+			<OACreation>authorized</OACreation>
+		</Rule>
+	</Rules>
+</Policy>
