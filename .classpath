@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="classes/Core" path="src/Core"/>
+	<classpathentry kind="src" output="classes/dev" path="dev/security/keystore"/>
 	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" output="classes/Examples" path="src/Examples"/>
 	<classpathentry kind="src" output="classes/Extensions" path="src/Extensions"/>
 	<classpathentry kind="src" output="classes/Extra" path="src/Extra"/>
@@ -86,6 +87,6 @@
 	<classpathentry kind="lib" path="lib/ibis/ibis-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/ibis/ibis-connect-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ibis/ibis-util-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/sunxacml/lib/sunxacml.jar" sourcepath="lib/sunxacml/src"/>
+	<classpathentry kind="lib" path="lib/sunxacml/sunxacml.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

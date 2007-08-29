@@ -1,4 +1,3 @@
-package functionalTests.security.keystore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,10 +26,7 @@ import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.TypedCertificate;
 
 public class GenKeystore {
-
-	/**
-	 * @param args
-	 */
+	
 	public static void main(String[] args) {
 		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
 			Security.addProvider(new BouncyCastleProvider());
@@ -170,7 +166,7 @@ public class GenKeystore {
 				KeyStoreTools.newApplicationPrivateKey(store, new TypedCertificate(certs.get(k + 4), types.get(k+4), pairs.get(k + 4)
 						.getPrivate()));
 
-				File file = new File("keystores/keystore" + k + ".p12");
+				File file = new File("dev/security/keystores/keystore" + k + ".p12");
 				store.store(new FileOutputStream(file), "ha".toCharArray());
 			} catch (KeyStoreException e) {
 				e.printStackTrace();

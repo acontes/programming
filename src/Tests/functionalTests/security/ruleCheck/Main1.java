@@ -19,14 +19,14 @@ import sun.security.provider.PolicyFile;
 public class Main1 {
     public static void main(String[] args) {
         Policy policy = null;
-        String path = System.getProperty("user.dir") + "/jaas-cfg/";
+        String policyFile = System.getProperty("user.dir") + "/dev/security/jaas-cfg/allPerm.policy";
 
         // sets the policy to be used by the new jvms
-        System.setProperty("java.security.policy", path + "allPerm.policy");
+        System.setProperty("java.security.policy", policyFile);
 
         // sets the policy to be used for the current thread
         try {
-            policy = new PolicyFile(new URL("file:" + path + "allPerm.policy"));
+            policy = new PolicyFile(new URL("file:" + policyFile));
         } catch (MalformedURLException mue) {
             mue.printStackTrace();
             System.exit(-1);

@@ -1,4 +1,3 @@
-package functionalTests.security.keystore;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +24,7 @@ public class ReadKeystore {
 		}
 		try {
 			KeyStore store = KeyStore.getInstance("PKCS12", "BC");
-			store.load(new FileInputStream(new File("keystores/keystore1.p12")), "ha".toCharArray());
+			store.load(new FileInputStream(new File("dev/security/keystores/keystore1.p12")), "ha".toCharArray());
 			
 			Enumeration<String> e = store.aliases();
 			while (e.hasMoreElements()) {
