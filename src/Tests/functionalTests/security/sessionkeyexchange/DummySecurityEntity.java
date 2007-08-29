@@ -31,9 +31,9 @@
 package functionalTests.security.sessionkeyexchange;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -44,11 +44,16 @@ import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 public class DummySecurityEntity implements SecurityEntity {
-    private ProActiveSecurityManager securityManager;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5293341556904690052L;
+	private ProActiveSecurityManager securityManager;
 
     public DummySecurityEntity(ProActiveSecurityManager securityManager) {
         this.securityManager = securityManager;
@@ -71,9 +76,9 @@ public class DummySecurityEntity implements SecurityEntity {
         return securityManager.getCertificate();
     }
 
-    public ProActiveSecurityManager getProActiveSecurityManager() {
-        return securityManager.getProActiveSecurityManager();
-    }
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
+		return securityManager.getProActiveSecurityManager(user);
+	}
 
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, RenegotiateSessionException {
@@ -119,7 +124,7 @@ public class DummySecurityEntity implements SecurityEntity {
         return securityManager.getCertificateEncoded();
     }
 
-    public ArrayList<Entity> getEntities() throws SecurityNotAvailableException {
+    public Entities getEntities() throws SecurityNotAvailableException {
         return securityManager.getEntities();
     }
 }

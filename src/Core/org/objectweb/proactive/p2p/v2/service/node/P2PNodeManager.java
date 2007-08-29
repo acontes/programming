@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
@@ -278,7 +279,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
 
         //    try {
         newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
-                                  .generateSiblingCertificate(P2PConstants.VN_NAME);
+                                  .generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_NODE,
+                P2PConstants.VN_NAME);
         //        } catch (IOException e) {
         //            e.printStackTrace();
         //        } catch (SecurityNotAvailableException e) {

@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -280,7 +281,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
         ProActiveSecurityManager newNodeSecurityManager = null;
         if (psm != null) {
-            newNodeSecurityManager = psm.generateSiblingCertificate(P2PConstants.VN_NAME);
+            newNodeSecurityManager = psm.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_NODE,
+                    P2PConstants.VN_NAME);
         } else {
             ProActiveLogger.getLogger(Loggers.SECURITY_NODE)
                            .debug("Node created without security manager");

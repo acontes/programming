@@ -52,7 +52,7 @@ public class SecurityTestApplicationLifeCycle extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        psm = psm.generateSiblingCertificate("subcert");
+        psm = psm.generateSiblingCertificate(0, "subcert");
         psm2 = (ProActiveSecurityManager) MakeDeepCopy.WithObjectStream.makeDeepCopy(psm);
         assertNotNull(psm2);
     }
@@ -61,6 +61,6 @@ public class SecurityTestApplicationLifeCycle extends FunctionalTest {
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestApplicationLifeCycle.class.getResource(
                     "/functionalTests/security/applicationPolicy.xml").getPath());
-        psm = new ProActiveSecurityManager(ps);
+        psm = new ProActiveSecurityManager(0, ps);
     }
 }

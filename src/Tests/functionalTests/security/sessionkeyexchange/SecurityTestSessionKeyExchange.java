@@ -55,10 +55,12 @@ public class SecurityTestSessionKeyExchange extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        ProActiveSecurityManager psm1 = psm.generateSiblingCertificate("caller");
+        ProActiveSecurityManager psm1 = psm.generateSiblingCertificate(0,
+                "caller");
         DummySecurityEntity entity1 = new DummySecurityEntity(psm1);
 
-        ProActiveSecurityManager psm2 = psm.generateSiblingCertificate("Callee");
+        ProActiveSecurityManager psm2 = psm.generateSiblingCertificate(0,
+                "Callee");
         DummySecurityEntity entity2 = new DummySecurityEntity(psm2);
 
         entity1.initiateSession(1, entity2);
@@ -68,6 +70,6 @@ public class SecurityTestSessionKeyExchange extends FunctionalTest {
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestSessionKeyExchange.class.getResource(
                     "/functionalTests/security/applicationPolicy.xml").getPath());
-        psm = new ProActiveSecurityManager(ps);
+        psm = new ProActiveSecurityManager(0, ps);
     }
 }

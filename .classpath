@@ -40,7 +40,7 @@
 	<classpathentry kind="lib" path="lib/globus/cryptix.jar"/>
 	<classpathentry kind="lib" path="lib/globus/cryptix32.jar"/>
 	<classpathentry kind="lib" path="lib/globus/puretls.jar"/>
-	<classpathentry kind="lib" path="lib/javassist.jar"/>
+	<classpathentry kind="lib" path="lib/javassist.jar" sourcepath="/user/nhouillo/home/javassist-3.4/src/main/"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/osgi/http.jar"/>
 	<classpathentry kind="lib" path="lib/osgi/moduleloader.jar"/>
@@ -86,5 +86,6 @@
 	<classpathentry kind="lib" path="lib/ibis/ibis-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/ibis/ibis-connect-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ibis/ibis-util-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/sunxacml/lib/sunxacml.jar" sourcepath="lib/sunxacml/src"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

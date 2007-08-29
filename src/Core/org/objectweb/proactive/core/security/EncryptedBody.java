@@ -32,9 +32,9 @@ package org.objectweb.proactive.core.security;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -69,7 +70,12 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  * used for transparency call.
  */
 public class EncryptedBody implements Body, Serializable {
-    // specify if this body is encrypted or not
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2305678362325921164L;
+
+	// specify if this body is encrypted or not
     protected boolean isEncrypted = false;
 
     // session ID
@@ -363,7 +369,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
      */
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return null;
     }
@@ -466,4 +472,9 @@ public class EncryptedBody implements Body, Serializable {
     public void registerIncomingFutures() {
         // TODO Auto-generated method stub
     }
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

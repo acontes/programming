@@ -54,13 +54,18 @@ import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
+import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class HalfBody extends AbstractBody {
-    //
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 545137923222704906L;
+	//
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
     private static final String NAME = "Other thread";
@@ -90,8 +95,8 @@ public class HalfBody extends AbstractBody {
             this.securityManager = factory.getProActiveSecurityManager();
         }
 
-        if (this.securityManager != null) {
-            this.securityManager = this.securityManager.generateSiblingCertificate(
+        if (securityManager != null) {
+            securityManager = this.securityManager.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_OBJECT,
                     "HalfBody");
             this.securityManager.setBody(this);
             this.isSecurityOn = this.securityManager.getCertificate() != null;
@@ -217,7 +222,11 @@ public class HalfBody extends AbstractBody {
     private class HalfLocalBodyStrategy implements LocalBodyStrategy,
         java.io.Serializable {
 
-        /** A pool future that contains the pending future objects */
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 3183517822839330706L;
+		/** A pool future that contains the pending future objects */
         protected FuturePool futures;
         protected RequestFactory internalRequestFactory;
         private long absoluteSequenceID;

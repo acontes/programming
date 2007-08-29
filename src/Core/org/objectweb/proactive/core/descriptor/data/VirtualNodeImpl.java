@@ -83,6 +83,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
@@ -109,7 +110,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         RuntimeRegistrationEventListener, NodeCreationEventListener,
         ServiceUser {
 
-    /** Logger */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4112836381808692922L;
+	/** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     private final static Logger DEPLOYMENT_FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
@@ -1084,7 +1089,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 ProActiveSecurityManager siblingPSM = null;
 
                 if (this.proactiveSecurityManager != null) {
-                    siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(this.name);
+                    siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_NODE,
+                            this.name);
                 }
 
                 int registerAttempts = this.REGISTRATION_ATTEMPTS;
@@ -1221,7 +1227,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             ProActiveSecurityManager siblingPSM = null;
 
             if (this.proactiveSecurityManager != null) {
-                siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(this.name);
+                siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_NODE, this.name);
             }
 
             int registrationAttempts = this.REGISTRATION_ATTEMPTS;

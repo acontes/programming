@@ -68,7 +68,7 @@ public class SecurityTestContextPropagation extends FunctionalTest {
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestContextPropagation.class.getResource(
                     "/functionalTests/security/applicationPolicy.xml").getPath());
-        psm = new ProActiveSecurityManager(ps);
+        psm = new ProActiveSecurityManager(0, ps);
 
         // set the default security manager
         ProActiveMetaObjectFactory.newInstance().setProActiveSecurityManager(psm);

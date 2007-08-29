@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.core.security.securityentity.Entity;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -214,7 +214,7 @@ public interface RemoteProActiveRuntime extends Serializable {
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, java.io.IOException;
 
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, java.io.IOException;
 
     public void terminateSession(long sessionID)

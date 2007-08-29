@@ -69,7 +69,12 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Serializable {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 524923697097028320L;
+
+	protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     // note that we do not want to serialize this member but rather handle
     // the serialization by ourselve
@@ -249,7 +254,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             //            if (logger.isDebugEnabled()) {
             //                logger.debug("RemoteBodyProxy created bodyID=" + getBodyID() +
             //                    " from ConstructorCall");
-            //            }
+            //            } // TODO log causes exception
             return part.createBody(node.getNodeInformation().getName(),
                 bodyConstructorCall, false);
             //--------------added lines

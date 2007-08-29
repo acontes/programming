@@ -16,11 +16,9 @@
 			<xs:sequence>
 				<xs:element name="ApplicationName" minOccurs="1"
 					maxOccurs="1" type="xs:string" />
-				<xs:element name="Certificate" minOccurs="1"
+				<xs:element name="PKCS12KeyStore" minOccurs="1"
 					maxOccurs="1" type="xs:string" />
-				<xs:element name="PrivateKey" minOccurs="1"
-					maxOccurs="1" type="xs:string" />
-				<xs:element name="CertificationAuthority" minOccurs="1"
+				<xs:element name="CertificationAuthority" minOccurs="0"
 					maxOccurs="1" type="CertificateOwnerType" />
 				<xs:element name="TrustedCertificationAuthority"
 					minOccurs="0" maxOccurs="1" type="CertificateOwnerType" />
@@ -28,6 +26,14 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element ref="Rule" minOccurs="0"
+								maxOccurs="unbounded" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="AccessRights" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Entity" minOccurs="0"
 								maxOccurs="unbounded" />
 						</xs:sequence>
 					</xs:complexType>
@@ -126,6 +132,4 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
-
 </xs:schema>

@@ -33,9 +33,9 @@ package org.objectweb.proactive.core.remoteobject;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -118,7 +119,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getEntities();
@@ -298,4 +299,8 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         }
         return null;
     }
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
+		return psm.getProActiveSecurityManager(user);
+	}
 }

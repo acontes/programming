@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.security;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -40,16 +40,22 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.*;
-import java.security.interfaces.*;
-import java.security.spec.*;
-import java.util.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.pkcs.*;
-import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.jce.interfaces.*;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

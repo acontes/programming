@@ -32,10 +32,10 @@ package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 
@@ -81,12 +81,14 @@ import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.Secure;
+import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.AuthenticationException;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -712,7 +714,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected void startDefaultProActiveSecurityManager() {
         try {
             //     logger.info("starting a new psm ");
-            this.securityManager = new DefaultProActiveSecurityManager("vide ");
+            // TODO SECURITY check type (app/object/...)
+            this.securityManager = new DefaultProActiveSecurityManager(SecurityConstants.ENTITY_TYPE_APPLICATION,
+                    "vide");
             this.isSecurityOn = true;
             this.securityManager.setBody(this);
             this.internalBodySecurity = new InternalBodySecurity(null);
@@ -722,7 +726,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
@@ -848,7 +852,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         if (server != null) {
             if ((this.securityManager != null) &&
                     (this.securityManager.getPolicyServer() == null)) {
-                this.securityManager = new ProActiveSecurityManager(server);
+                this.securityManager = new ProActiveSecurityManager(SecurityConstants.ENTITY_TYPE_OBJECT,
+                        server);
                 this.isSecurityOn = true;
                 logger.debug("Security is on " + this.isSecurityOn);
                 this.securityManager.setBody(this);
@@ -1112,5 +1117,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
             }
         }
+    }
+    
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+    throws SecurityNotAvailableException, AccessControlException {
+    	return securityManager.getProActiveSecurityManager(user);
     }
 }

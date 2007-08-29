@@ -752,10 +752,10 @@ public class CertTools {
                 false, seq);
         }
 
-        X509Certificate selfcert = certgen.generate(caPrivateKey);
+        X509Certificate cert = certgen.generate(caPrivateKey);
 
-        return selfcert;
-    } //genselfCert
+        return cert;
+    } //genCert
 
     /**
      * Get the authority key identifier from a certificate extensions

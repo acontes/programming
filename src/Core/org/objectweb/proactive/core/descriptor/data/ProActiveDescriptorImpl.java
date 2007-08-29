@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -75,7 +76,11 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * @see VirtualMachine
  */
 public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
-    //
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3052592435278639241L;
+	//
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
@@ -577,12 +582,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
 
         try {
             policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
-            proactiveSecurityManager = new ProActiveSecurityManager(policyServer);
+            proactiveSecurityManager = new ProActiveSecurityManager(SecurityConstants.ENTITY_TYPE_APPLICATION,
+                    policyServer);
 
             // set the security policyserver to the default proactive meta object
             // by the way, the HalfBody will be associated to a security manager
             // derivated from this one.
-            ProActiveSecurityManager psm = proactiveSecurityManager.generateSiblingCertificate(
+            ProActiveSecurityManager psm = proactiveSecurityManager.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_OBJECT,
                     "HalfBody");
             ProActiveMetaObjectFactory.newInstance()
                                       .setProActiveSecurityManager(psm);

@@ -31,9 +31,8 @@
 package org.objectweb.proactive.core.security;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
-import org.objectweb.proactive.core.security.securityentity.Entity;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 
 
 /**
@@ -41,15 +40,19 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  *
  */
 public class SecurityContext implements Serializable {
-    public static int COMMUNICATION_SEND_REQUEST_TO = 0;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3210156951283073478L;
+	public static int COMMUNICATION_SEND_REQUEST_TO = 0;
     public static int COMMUNICATION_RECEIVE_REQUEST_FROM = 1;
     public static int COMMUNICATION_SEND_REPLY_TO = 2;
     public static int COMMUNICATION_RECEIVE_REPLY_FROM = 3;
     public static int MIGRATION_TO = 4;
     public static int MIGRATION_FROM = 5;
     public static int Validate_POLICY = 5;
-    protected ArrayList<Entity> entitiesFrom;
-    protected ArrayList<Entity> entitiesTo;
+    protected Entities entitiesFrom;
+    protected Entities entitiesTo;
     protected Communication sendRequest;
     protected Communication receiveRequest;
     protected Communication sendReply;
@@ -66,20 +69,19 @@ public class SecurityContext implements Serializable {
     public SecurityContext() {
     }
 
-    public SecurityContext(int type, ArrayList<Entity> entitiesFrom,
-        ArrayList<Entity> entitiesTo) {
+    public SecurityContext(int type, Entities entitiesFrom, Entities entitiesTo) {
         this.type = type;
         this.entitiesFrom = entitiesFrom;
         this.entitiesTo = entitiesTo;
     }
 
-    public void addEntityFrom(Entity entity) {
-        entitiesFrom.add(entity);
-    }
-
-    public void addEntityTo(Entity entity) {
-        entitiesTo.add(entity);
-    }
+    //    public void addEntityFrom(Entity entity) {
+    //        entitiesFrom = entity;
+    //    }
+    //
+    //    public void addEntityTo(Entity entity) {
+    //        entitiesTo = entity;
+    //    }
 
     /**
      * @return type of the interaction (migration, request, reply)
@@ -113,14 +115,14 @@ public class SecurityContext implements Serializable {
     /**
      * @return entities of the 'from' objects
      */
-    public ArrayList<Entity> getEntitiesFrom() {
+    public Entities getEntitiesFrom() {
         return entitiesFrom;
     }
 
     /**
      * @return entities of the 'to' objects
      */
-    public ArrayList<Entity> getEntitiesTo() {
+    public Entities getEntitiesTo() {
         return entitiesTo;
     }
 
@@ -176,15 +178,15 @@ public class SecurityContext implements Serializable {
     /**
      * @param list all entities from 'from'
      */
-    public void setEntitiesFrom(ArrayList<Entity> list) {
-        entitiesFrom = list;
+    public void setEntitiesFrom(Entities entities) {
+        entitiesFrom = entities;
     }
 
     /**
      * @param list all entities from 'to'
      */
-    public void setEntitiesTo(ArrayList<Entity> list) {
-        entitiesTo = list;
+    public void setEntitiesTo(Entities entities) {
+        entitiesTo = entities;
     }
 
     /**

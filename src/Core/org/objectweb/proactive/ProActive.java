@@ -103,6 +103,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.util.NodeCreationListenerForAoCreation;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
 import org.objectweb.proactive.core.util.ProcessForAoCreation;
@@ -742,11 +743,12 @@ public class ProActive {
             }
 
             ProActiveSecurityManager psm = clonedFactory.getProActiveSecurityManager();
-            psm = psm.generateSiblingCertificate(classname);
+            psm = psm.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_OBJECT,
+                    classname);
             clonedFactory.setProActiveSecurityManager(psm);
         }
 
-        //using default proactive node
+        // using default proactive node
         if (node == null) {
             node = NodeFactory.getDefaultNode();
         }
@@ -994,7 +996,8 @@ public class ProActive {
             }
 
             clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
-                                                             .generateSiblingCertificate(nameOfTargetType));
+                                                             .generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_OBJECT,
+                    nameOfTargetType));
 
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");
@@ -1257,7 +1260,8 @@ public class ProActive {
             }
 
             clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
-                                                             .generateSiblingCertificate(nameOfTargetType));
+                                                             .generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_OBJECT,
+                    nameOfTargetType));
 
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");

@@ -31,9 +31,9 @@
 package org.objectweb.proactive.extensions.mixedlocation;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -48,15 +48,21 @@ import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 public class UniversalBodyWrapper implements UniversalBody, Runnable {
-    protected UniversalBody wrappedBody;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7024758149949993234L;
+	protected UniversalBody wrappedBody;
     protected long time;
     protected UniqueID id;
     protected boolean stop;
@@ -261,7 +267,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.getPolicy(securityContext);
     }
 
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.wrappedBody.getEntities();
     }
@@ -291,4 +297,8 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         throws IOException, UnknownProtocolException {
         this.wrappedBody.register(url);
     }
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
+		return this.wrappedBody.getProActiveSecurityManager(user);
+	}
 }

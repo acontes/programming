@@ -16,12 +16,12 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 
-
 public class CertificateForm extends FormPage {
 
-
 	private FormToolkit toolkit;
+
 	private ScrolledForm form;
+
 	/**
 	 * The constructor.
 	 */
@@ -29,7 +29,6 @@ public class CertificateForm extends FormPage {
 		super(editor, "certificate", "Certificates"); //$NON-NLS-1$ //$NON-NLS-2$
 		// TODO Auto-generated constructor stub
 	}
-
 
 	@Override
 	protected void createFormContent(IManagedForm managedForm) {
@@ -40,18 +39,17 @@ public class CertificateForm extends FormPage {
 		layout.numColumns = 2;
 		form.getBody().setLayout(layout);
 		createTableSection(form, toolkit, "SecondPage.firstSection"); //$NON-NLS-1$
-		createTableSection(form, toolkit, "SecondPage.secondSection");		 //$NON-NLS-1$
+		createTableSection(form, toolkit, "SecondPage.secondSection"); //$NON-NLS-1$
 	}
 
-	private void createTableSection(final ScrolledForm form, FormToolkit toolkit, String title) {
-		Section section =
-			toolkit.createSection(
-				form.getBody(),
-				Section.TWISTIE | Section.DESCRIPTION);
-		section.setActiveToggleColor(
-			toolkit.getHyperlinkGroup().getActiveForeground());
-		section.setToggleColor(
-			toolkit.getColors().getColor(FormColors.SEPARATOR));
+	private void createTableSection(final ScrolledForm form,
+			FormToolkit toolkit, String title) {
+		Section section = toolkit.createSection(form.getBody(), Section.TWISTIE
+				| Section.DESCRIPTION);
+		section.setActiveToggleColor(toolkit.getHyperlinkGroup()
+				.getActiveForeground());
+		section.setToggleColor(toolkit.getColors().getColor(
+				FormColors.SEPARATOR));
 		toolkit.createCompositeSeparator(section);
 		Composite client = toolkit.createComposite(section, SWT.WRAP);
 		GridLayout layout = new GridLayout();
@@ -81,6 +79,4 @@ public class CertificateForm extends FormPage {
 		section.setLayoutData(gd);
 	}
 
-
 }
-

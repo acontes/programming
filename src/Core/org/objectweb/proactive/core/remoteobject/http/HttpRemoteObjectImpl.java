@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.remoteobject.http;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -49,10 +50,12 @@ import org.objectweb.proactive.core.remoteobject.http.message.RemoteObjectReques
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.remoteobject.http.util.messages.HttpRemoteObjectRequest;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -130,7 +133,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         }
     }
 
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
     }
@@ -263,4 +266,8 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
             }
         }
     }
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
+		return this.remoteObject.getProActiveSecurityManager(user);
+	}
 }

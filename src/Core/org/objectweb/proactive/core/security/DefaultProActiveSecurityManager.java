@@ -48,23 +48,29 @@ import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.objectweb.proactive.core.security.crypto.Session;
+import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
     implements Serializable {
-    private transient Logger logger;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6885646803779608858L;
+	private transient Logger logger;
 
-    public DefaultProActiveSecurityManager() {
+    public DefaultProActiveSecurityManager(int type) {
+        super(type);
         //	Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         //      Security.addProvider(myProvider);
         //		  Security.insertProviderAt(myProvider, 0);
     }
 
-    public DefaultProActiveSecurityManager(String vide)
+    public DefaultProActiveSecurityManager(int type, String vide)
         throws Exception {
-        super(vide);
+        super(type, vide);
         sessions = new Hashtable<Long, Session>();
         logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
@@ -119,11 +125,6 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
         //  new RuntimeException().printStackTrace();
         //   System.out.println("******************** instantiated DefaultPSM ao Thread " + Thread.currentThread().getName() + "******************");
         // throw new SecurityException();
-    }
-
-    @Override
-    public ProActiveSecurityManager getProActiveSecurityManager() {
-        return this;
     }
 
     public PolicyRule getPolicyTo(X509Certificate certificate) {

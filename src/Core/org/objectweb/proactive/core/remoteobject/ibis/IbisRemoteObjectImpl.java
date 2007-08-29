@@ -3,19 +3,21 @@ package org.objectweb.proactive.core.remoteobject.ibis;
 import java.io.IOException;
 import java.net.URI;
 import java.rmi.RemoteException;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -54,7 +56,7 @@ public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
         return this.remoteObject.getCertificateEncoded();
     }
 
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
     }
@@ -144,4 +146,8 @@ public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
     public Class getAdapterClass() throws ProActiveException, IOException {
         return this.remoteObject.getAdapterClass();
     }
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
+		return this.remoteObject.getProActiveSecurityManager(user);
+	}
 }

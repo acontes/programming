@@ -1,9 +1,9 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -19,10 +19,12 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -30,6 +32,11 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
     implements UniversalBody {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9091467877589392360L;
+
+	/**
      * Cache the ID of the Body locally for speed
      */
     protected UniqueID bodyID;
@@ -173,7 +180,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         return target.getCertificateEncoded();
     }
 
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return target.getEntities();
     }
@@ -222,4 +229,8 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         throws SecurityNotAvailableException, IOException {
         target.terminateSession(sessionID);
     }
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
+		return this.target.getProActiveSecurityManager(user);
+	}
 }

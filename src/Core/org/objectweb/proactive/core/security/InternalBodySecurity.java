@@ -31,14 +31,15 @@
 package org.objectweb.proactive.core.security;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -48,10 +49,14 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  *
  */
 public class InternalBodySecurity implements SecurityEntity {
-    protected SecurityEntity distantBody;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2486146998877256304L;
+	protected SecurityEntity distantBody;
 
     public InternalBodySecurity(UniversalBody distantBody) {
-        this.distantBody = (SecurityEntity) distantBody;
+        this.distantBody = distantBody;
     }
 
     public void terminateSession(long sessionID)
@@ -131,7 +136,7 @@ public class InternalBodySecurity implements SecurityEntity {
         return distantBody.getPolicy(securityContext);
     }
 
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return distantBody.getEntities();
     }
@@ -140,4 +145,8 @@ public class InternalBodySecurity implements SecurityEntity {
         throws SecurityNotAvailableException, IOException {
         return distantBody.getCertificateEncoded();
     }
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
+		return distantBody.getProActiveSecurityManager(user);
+	}
 }

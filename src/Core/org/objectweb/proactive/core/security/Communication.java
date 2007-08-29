@@ -40,10 +40,13 @@ import org.objectweb.proactive.core.security.exceptions.IncompatiblePolicyExcept
  *
  */
 public class Communication implements Serializable {
-    public static int REQUIRED = 1;
-    public static int DENIED = -1;
-    public static int OPTIONAL = 0;
-    public static int ALLOWED = 1;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4624752375050653382L;
+	public static final int REQUIRED = 1;
+    public static final int DENIED = -1;
+    public static final int OPTIONAL = 0;
 
     /* indicates if authentication is required,optional or denied */
     private int authentication;
@@ -55,21 +58,27 @@ public class Communication implements Serializable {
     private int integrity;
 
     /* indicates if communication between active objects is allowed or not */
-    private int communication;
-    private int migration;
-    private int aoCreation;
+    private boolean communication;
 
     /**
      * Default constructor, initialize a policy with communication attribute sets to allowed and
      * authentication,confidentiality and integrity set to optional
      */
     public Communication() {
-        authentication = 0;
-        confidentiality = 0;
-        integrity = 0;
-        communication = 1;
-        migration = 1;
-        aoCreation = 1;
+        authentication = DENIED;
+        confidentiality = DENIED;
+        integrity = DENIED;
+        communication = false;
+    }
+
+    /**
+     * Copy constructor
+     */
+    public Communication(Communication com) {
+        authentication = com.authentication;
+        confidentiality = com.confidentiality;
+        integrity = com.integrity;
+        communication = com.communication;
     }
 
     /**
@@ -78,7 +87,9 @@ public class Communication implements Serializable {
      * @param confidentiality specifies if confidentiality is required, optional, or denied
      * @param integrity specifies if integrity is required, optional, or denied
      */
-    public Communication(int authentication, int confidentiality, int integrity) {
+    public Communication(boolean allowed, int authentication,
+        int confidentiality, int integrity) {
+        this.communication = allowed;
         this.authentication = authentication;
         this.confidentiality = confidentiality;
         this.integrity = integrity;
@@ -89,7 +100,7 @@ public class Communication implements Serializable {
      * @return boolean true if authentication is required
      */
     public boolean isAuthenticationEnabled() {
-        return authentication == 1;
+        return authentication == REQUIRED;
     }
 
     /**
@@ -97,7 +108,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is required
      */
     public boolean isConfidentialityEnabled() {
-        return confidentiality == 1;
+        return confidentiality == REQUIRED;
     }
 
     /**
@@ -105,7 +116,7 @@ public class Communication implements Serializable {
      * @return boolean true if integrity is required
      */
     public boolean isIntegrityEnabled() {
-        return integrity == 1;
+        return integrity == REQUIRED;
     }
 
     /**
@@ -137,27 +148,13 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is allowed
      */
     public boolean isCommunicationAllowed() {
-        return communication == 1;
+        return communication;
     }
 
     @Override
     public String toString() {
         return "Com : " + communication + " Auth : " + authentication +
         " Conf : " + confidentiality + " Integrity : " + integrity + "\n";
-    }
-
-    /**
-     * @param i
-     */
-    public void setMigration(int i) {
-        migration = i;
-    }
-
-    /**
-     * @return migration
-     */
-    public int getMigration() {
-        return migration;
     }
 
     /**
@@ -182,38 +179,35 @@ public class Communication implements Serializable {
                     ((from.integrity == DENIED) && (to.integrity == REQUIRED))) {
                 throw new IncompatiblePolicyException("incompatible policies");
             }
+            return new Communication(true,
+                realValue(from.authentication + to.authentication),
+                realValue(from.confidentiality + to.confidentiality),
+                realValue(from.integrity + to.integrity));
         }
-
-        return new Communication(from.authentication + to.authentication,
-            from.confidentiality + to.confidentiality,
-            from.integrity + to.integrity);
+        return null;
     }
 
-    /**
-     * @param aocreation
-     */
-    public void setAOCreation(int aocreation) {
-        this.aoCreation = aocreation;
-    }
-
-    /**
-     *
-     */
-    public int getAOCreation() {
-        return this.aoCreation;
+    private static int realValue(int value) {
+        if (value > 0) {
+            return REQUIRED;
+        }
+        if (value < 0) {
+            return DENIED;
+        }
+        return OPTIONAL;
     }
 
     /**
      * @return communication
      */
-    public int getCommunication() {
+    public boolean getCommunication() {
         return communication;
     }
 
     /**
      * @param i
      */
-    public void setCommunication(int i) {
+    public void setCommunication(boolean i) {
         communication = i;
     }
 }

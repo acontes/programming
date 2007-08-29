@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 
 /**

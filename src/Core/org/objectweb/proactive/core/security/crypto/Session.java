@@ -325,7 +325,7 @@ public class Session implements Serializable {
 
         //
         // Load mac with previous MAC value.
-        // This forces each exchange into a chain
+        http://mypage.direct.ca/h/honl/ebored.html // This forces each exchange into a chain
         // so that if any of the blocks are replayed out
         // of sequence the replayed blocks will fail.
         //

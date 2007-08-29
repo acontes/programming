@@ -32,13 +32,14 @@ package org.objectweb.proactive.core.security;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -154,7 +155,7 @@ public interface SecurityEntity extends Serializable {
      * @return returns all the entity's ID which contain this entity plus this entity ID.
      * @throws SecurityNotAvailableException if the target entity does not support security
      */
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException;
 
     /**
@@ -164,4 +165,13 @@ public interface SecurityEntity extends Serializable {
      */
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException;
+
+    /**
+     * Returns the security manager of the entity
+     * @param user an antity representing the user asking for the security manager
+     * @throws SecurityNotAvailableException if security is not available
+     * @throws AccessControlException if the user does not have the right to see the security manager
+     */
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException, IOException;
 }

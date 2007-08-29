@@ -61,6 +61,6 @@ public class SecurityTestSecurityManager extends FunctionalTest {
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestSecurityManager.class.getResource(
                     "/functionalTests/security/applicationPolicy.xml").getPath());
-        psm = new ProActiveSecurityManager(ps);
+        psm = new ProActiveSecurityManager(0, ps);
     }
 }

@@ -35,6 +35,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.UnmarshalException;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -614,7 +616,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
         }
     }
 
-    public ArrayList<Entity> getEntities() throws SecurityNotAvailableException {
+    public Entities getEntities() throws SecurityNotAvailableException {
         try {
             return proActiveRuntime.getEntities();
         } catch (IOException e) {
@@ -688,6 +690,11 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     public String getMBeanServerName() {
         return null;
     }
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     public ServerConnector getJMXServerConnector() {
         return null;
