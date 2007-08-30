@@ -106,12 +106,15 @@ public class EntityTableComposite extends Composite {
 			}
 		});
 	}
-
-	public void setRulesTable(Table rulesTable) {
-		this.rulesTable = rulesTable;
+	
+	public void updateTable() {
+		updateTable(null);
 	}
 
-	public void updateTable() {
+	public void updateTable(Table newRulesTable) {
+		if (newRulesTable != null) {
+			rulesTable = newRulesTable;
+		}
 		entities.removeAll();
 		if (rulesTable.getSelectionIndex() != -1) {
 			if (isFrom) {

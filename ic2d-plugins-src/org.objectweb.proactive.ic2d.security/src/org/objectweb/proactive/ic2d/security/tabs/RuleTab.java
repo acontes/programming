@@ -35,6 +35,7 @@ import org.objectweb.proactive.ic2d.security.core.CertificateTree;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeList;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeMap;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeMapTransfer;
+import org.objectweb.proactive.ic2d.security.core.PolicyFile;
 import org.objectweb.proactive.ic2d.security.core.PolicyTools;
 import org.objectweb.proactive.ic2d.security.core.RuleConstants;
 import org.objectweb.proactive.ic2d.security.core.SimplePolicyRule;
@@ -421,11 +422,12 @@ public class RuleTab extends UpdatableTab {
 				FileDialog fd = new FileDialog(new Shell(), SWT.SAVE);
 				fd.setText("Save active Policy file");
 				fd.setFilterExtensions(new String[] { "*.policy", "*.*" });
-				String name = fd.open();
+				String fileName = fd.open();
 				try {
-					PolicyTools.writePolicyFile(name, applicationNameText
+					PolicyFile policy = new PolicyFile(applicationNameText
 							.getText(), keystoreText.getText(), rules,
 							authorizedUsers);
+					PolicyTools.writePolicyFile(fileName, policy);
 				} catch (FileNotFoundException e1) {
 					e1.printStackTrace();
 				}
@@ -446,9 +448,15 @@ public class RuleTab extends UpdatableTab {
 				fd.setText("Load Policy file");
 				fd.setFilterExtensions(new String[] { "*.policy", "*.*" });
 				String name = fd.open();
-				rules.addAll(PolicyTools.readPolicyFile(name, activeKeystore,
-						authorizedUsers));
+				PolicyFile policy = PolicyTools.readPolicyFile(name, activeKeystore);
 
+				rules.clear();
+				rules.addAll(policy.getRules());
+				applicationNameText.setText(policy.getApplicationName());
+				keystoreText.setText(policy.getKeystorePath());
+				authorizedUsers.clear();
+				authorizedUsers.addAll(policy.getAuthorizedUsers());
+				
 				updateRulesTable();
 				updateUsersTable();
 
@@ -461,17 +469,33 @@ public class RuleTab extends UpdatableTab {
 
 	private Composite createCompositeFields(Composite parent) {
 		Composite client = toolkit.createComposite(parent);
-		client.setLayout(new GridLayout(2, false));
+		client.setLayout(new GridLayout(3, false));
 
 		toolkit.createLabel(client, "Application name :");
 		applicationNameText = toolkit.createText(client, "");
 		applicationNameText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-				false));
+				false, 2, 1));
 
 		toolkit.createLabel(client, "Keystore :");
 		keystoreText = toolkit.createText(client, "");
 		keystoreText
 				.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		Button button = toolkit.createButton(client, "...", SWT.BUTTON1);
+		button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		button.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				FileDialog fd = new FileDialog(new Shell(), SWT.OPEN);
+				fd.setText("Choose keystore");
+				fd.setFilterExtensions(new String[] { "*.p12", "*.*" });
+				String name = fd.open();
+				if (name != null) {
+					keystoreText.setText(name);
+				}
+				
+				super.mouseUp(e);
+			}
+		});
 
 		return client;
 	}
@@ -593,10 +617,8 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private void updateRuleEditor() {
-		fromTable.setRulesTable(rulesTable);
-		toTable.setRulesTable(rulesTable);
-		fromTable.updateTable();
-		toTable.updateTable();
+		fromTable.updateTable(rulesTable);
+		toTable.updateTable(rulesTable);
 
 		if (rulesTable.getSelectionIndex() != -1) {
 			SimplePolicyRule selectedRule = rules.get(rulesTable

@@ -57,11 +57,11 @@ public class CertificateGenerationTab extends UpdatableTab {
 		createSectionKeyPair(body).setLayoutData(
 				new GridData(SWT.FILL, SWT.TOP, true, true));
 
-		createSectionCertTreeList(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-				true, true));
+		createSectionCertTreeList(body).setLayoutData(
+				new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		createSectionActiveKeystore(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-				true, true));
+		createSectionActiveKeystore(body).setLayoutData(
+				new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		setControl(body);
 	}
@@ -164,11 +164,16 @@ public class CertificateGenerationTab extends UpdatableTab {
 					System.out.println("nomcassai!!1oneeleven");
 					return;
 				}
-				System.out.println("Generate child certificate");
+				CertificateTree tree = certTreeListSection.getSelectionData();
+				if (tree.getCertificate().getPrivateKey() == null) {
+					System.out
+							.println("Impossible to create a child of a certificate without a private key.");
+					return;
+				}
+				System.out.println("Generating child certificate");
 				int type = SecurityConstants.typeToInt(typeCombo
 						.getItem(typeCombo.getSelectionIndex()));
-				certTreeListSection.getSelectionData().add(name, keySize,
-						validity, type);
+				tree.add(name, keySize, validity, type);
 
 				certTreeListSection.updateSection();
 			}
@@ -176,13 +181,13 @@ public class CertificateGenerationTab extends UpdatableTab {
 
 		return button;
 	}
-	
+
 	private Section createSectionCertTreeList(Composite parent) {
 		certTreeListSection = new CertificateTreeListSection(parent, toolkit,
 				"Certificate Tree", certTreeList, true, true, true, false);
 		return certTreeListSection.get();
 	}
-	
+
 	private Section createSectionActiveKeystore(Composite parent) {
 		activeKeystoreSection = new CertificateTreeListSection(parent, toolkit,
 				"ActiveKeystore", activeKeystore, true, true, true, false);

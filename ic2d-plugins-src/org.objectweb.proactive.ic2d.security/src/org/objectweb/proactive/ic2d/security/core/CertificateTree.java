@@ -40,15 +40,7 @@ public class CertificateTree implements Serializable {
 		children = new ArrayList<CertificateTree>();
 		certificate = null;
 		parent = null;
-	}
-
-	protected CertificateTree(TypedCertificate certificate) {
-		this();
-		this.certificate = certificate;
-	}
-
-	public CertificateTree(String name, int keySize, int validity, int type) {
-		this();
+		
 		if (keygen == null) {
 			if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
 				Security.addProvider(new BouncyCastleProvider());
@@ -62,6 +54,15 @@ public class CertificateTree implements Serializable {
 				e1.printStackTrace();
 			}
 		}
+	}
+
+	protected CertificateTree(TypedCertificate certificate) {
+		this();
+		this.certificate = certificate;
+	}
+
+	public CertificateTree(String name, int keySize, int validity, int type) {
+		this();
 
 		keygen.initialize(keySize);
 
@@ -153,7 +154,6 @@ public class CertificateTree implements Serializable {
 		X509Certificate parentCert = certificate.getCert();
 		PublicKey parentPublicKey = parentCert.getPublicKey();
 		PrivateKey parentPrivateKey = certificate.getPrivateKey();
-
 		String parentName = parentCert.getSubjectX500Principal().getName();
 
 		try {

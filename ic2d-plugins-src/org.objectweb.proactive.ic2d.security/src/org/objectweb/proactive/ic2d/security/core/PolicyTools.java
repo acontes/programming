@@ -37,9 +37,7 @@ public abstract class PolicyTools {
 	 * @throws FileNotFoundException
 	 */
 
-	public static void writePolicyFile(String filePath, String applicationName,
-			String keystorePath, List<SimplePolicyRule> rules,
-			List<TypedCertificate> authorizedUsers)
+	public static void writePolicyFile(String filePath, PolicyFile policy)
 			throws FileNotFoundException {
 		StreamResult sr = new StreamResult(new File(filePath));
 
@@ -58,8 +56,8 @@ public abstract class PolicyTools {
 			try {
 				th.startDocument();
 
-				policyTag(th, applicationName, keystorePath, rules,
-						authorizedUsers);
+				policyTag(th, policy.getApplicationName(), policy.getKeystorePath(), policy.getRules(),
+						policy.getAuthorizedUsers());
 
 				th.endDocument();
 			} catch (SAXException e) {
@@ -231,8 +229,8 @@ public abstract class PolicyTools {
 	 * @param path
 	 * @return
 	 */
-	public static List<SimplePolicyRule> readPolicyFile(String path,
-			CertificateTreeList ctl, List<TypedCertificate> users) {
+	public static PolicyFile readPolicyFile(String path,
+			CertificateTreeList ctl) {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -252,13 +250,22 @@ public abstract class PolicyTools {
 			e.printStackTrace();
 		}
 
-		return getPolicies(document, ctl, users);
+		return getPolicies(document, ctl);
 	}
 
-	private static List<SimplePolicyRule> getPolicies(Document doc,
-			CertificateTreeList ctl, List<TypedCertificate> users) {
+	private static PolicyFile getPolicies(Document doc,
+			CertificateTreeList ctl) {
 		List<SimplePolicyRule> rulesList = new ArrayList<SimplePolicyRule>();
+		List<TypedCertificate> users = new ArrayList<TypedCertificate>();
+		String appName = new String();
+		String keystore = new String();
 		for (Node policy : getChildrenNamed(doc, "Policy")) {
+			for (Node appNameNode : getChildrenNamed(policy, "ApplicationName")) {
+				appName += appNameNode.getFirstChild().getNodeValue();
+			}
+			for (Node keystoreNode : getChildrenNamed(policy, "PKCS12KeyStore")) {
+				keystore += keystoreNode.getFirstChild().getNodeValue();
+			}
 			for (Node rules : getChildrenNamed(policy, "Rules")) {
 				for (Node rule : getChildrenNamed(rules, "Rule")) {
 					try {
@@ -288,7 +295,7 @@ public abstract class PolicyTools {
 			}
 		}
 
-		return rulesList;
+		return new PolicyFile(appName, keystore, rulesList, users);
 	}
 
 	private static SimplePolicyRule getRule(Node ruleNode,
