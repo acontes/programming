@@ -50,6 +50,8 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
 /**
  * Internal and global description of a task.
+ * This class contains all informations about the task to launch.
+ * It also provides a method to create its own launcher.
  * 
  * @author ProActive Team
  * @version 1.0, Jul 9, 2007
@@ -58,6 +60,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Serializable {
 
 	
+	/** Sorting constant, this will allow the user to sort the descriptor. */
 	public static final int SORT_BY_ID = 1;
 	public static final int SORT_BY_NAME = 2;
 	public static final int SORT_BY_STATUS = 3;
@@ -76,17 +79,27 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	/** Number of nodes asked by the user. */
 	protected int numberOfNodesNeeded = 1;
 	
+	/**  Name of the task. */
 	private String name;
+	/** Description of the task. */
 	private String description;
-	/** Parents list */
+	/** Parents list : null if no dependences */
 	private ArrayList<TaskDescriptor> dependences = null;
+	/** Verifying script : can be launched before getting a node in order to verify some computer specificity. */
 	private VerifyingScript verifyingScript;
+	/** Pre-task script : can be used to launch script just before the task execution. */
 	private Script<?> preTask;
+	/** Pre-task script : can be used to launch script just after the task execution even if a problem occurs. */
 	private Script<?> postTask;
+	/** Maximum amount of time during which a job can be running. */
 	private long runTimeLimit;
+	/** Is this task rerunnable and how many times ? (0 if not) */
 	private int rerunnable;
+	/** Is this task a final task. */
 	private boolean finalTask;
+	/** Reference to the launcher of this task. */
 	private TaskLauncher launcher;
+	/** Task information : this is the informations that can change during process. */
 	private TaskEvent taskInfo = new TaskEvent();
     
     

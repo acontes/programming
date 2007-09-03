@@ -61,14 +61,24 @@ public enum Status implements java.io.Serializable {
      */
     FINISHED ("Finished");
     
+    
+    /** The name of the current status. */
     private String name;
     
     
+    /**
+     * Implicit constructor of a status.
+     * 
+     * @param name the name of the status.
+     */
     Status (String name) {
     	this.name = name;
     }
     
     
+    /**
+     * @see java.lang.Enum#toString()
+     */
     @Override
     public String toString(){
     	return name;

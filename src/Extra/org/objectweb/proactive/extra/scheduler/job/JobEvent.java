@@ -50,7 +50,7 @@ import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
  */
 public class JobEvent implements Serializable{
 	
-	/**  */
+	/** Serial version UID */
 	private static final long serialVersionUID = -7426315610231893158L;
 	/** job id */
 	private JobId jobId = new JobId(0);

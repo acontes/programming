@@ -58,6 +58,10 @@ import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 
 /**
  * Task Launcher.
+ * This is the most simple task launcher.
+ * It is able to launch a java task only.
+ * You can extend this launcher in order to create a specific launcher.
+ * With this default launcher, you can get the node on which the task is running and kill the task.
  * 
  * @author ProActive Team
  * @version 1.0, Jul 10, 2007
@@ -83,7 +87,7 @@ public class TaskLauncher implements InitActive, Serializable {
 	 * 
 	 * @param taskId represents the task the launcher will execute.
 	 * @param jobId represents the job where the task is located.
-	 * @param host the host on witch to append the standard output/input.
+	 * @param host the host on which to append the standard output/input.
 	 * @param port the port number on which to send the standard output/input. 
 	 */
 	public TaskLauncher(TaskId taskId, JobId jobId, String host, Integer port) {

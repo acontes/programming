@@ -44,9 +44,9 @@ public class AdminSchedulerException extends Exception {
 
 	/**
      * Attaches a message to the Exception
-     * @param arg0-message ataached
+     * @param msg message ataached
      */
-    public AdminSchedulerException(String arg0) {
-        super(arg0);
+    public AdminSchedulerException(String msg) {
+        super(msg);
     }
 }

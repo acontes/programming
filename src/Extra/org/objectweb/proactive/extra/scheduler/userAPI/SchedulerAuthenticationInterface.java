@@ -37,7 +37,7 @@ import org.objectweb.proactive.extra.scheduler.core.UserScheduler;
 import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 
 /**
- * Scheduler Authentification Interface provides method to connect the scheduler.
+ * Scheduler Authentification Interface provides method to connect to the scheduler.
  * 
  * @author ProActive Team
  * @version 1.0, Jul 24, 2007

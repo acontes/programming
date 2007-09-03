@@ -45,28 +45,16 @@ public class UserSchedulerException extends Exception {
 
 	/**
      * Attaches a message to the Exception
-     * @param arg0 message attached
+     * @param msg message attached
      */
-    public UserSchedulerException(String arg0) {
-        super(arg0);
+    public UserSchedulerException(String msg) {
+        super(msg);
     }
     
-
-	/**
-	 * 
-	 * 
-	 * @param message
-	 * @param cause
-	 */
 	public UserSchedulerException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	/**
-	 * 
-	 * 
-	 * @param cause
-	 */
 	public UserSchedulerException(Throwable cause) {
 		super(cause);
 	}

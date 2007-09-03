@@ -36,7 +36,10 @@ import org.objectweb.proactive.extra.scheduler.task.TaskResult;
 
 
 /**
- * 
+ * Class representing a job result.
+ * A job result is a map of task result.
+ * The key of the map is the name of the task on which to get the result.
+ * To identify the job result, it provides the id of the job in the scheduler and the job name.
  * 
  * @author ProActive Team
  * @version 1.0, Jul 5, 2007

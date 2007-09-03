@@ -46,6 +46,7 @@ import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 
 /**
  * Native Task Launcher.
+ * This launcher is the class that will launch a nativ class.
  * 
  * @author ProActive Team
  * @version 1.0, Jul 10, 2007
@@ -63,6 +64,14 @@ public class NativeTaskLauncher extends TaskLauncher {
 	public NativeTaskLauncher() {}
 
 	
+	/**
+	 * Constructor of the native task launcher.
+	 * 
+	 * @param taskId the task identification.
+	 * @param jobId the job identification.
+	 * @param host the host on which the task is launched.
+	 * @param port the port on which the task is launched.
+	 */
 	public NativeTaskLauncher(TaskId taskId, JobId jobId, String host, Integer port) {
 		super(taskId, jobId, host, port);
 	}

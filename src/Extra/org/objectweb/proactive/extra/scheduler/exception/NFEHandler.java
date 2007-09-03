@@ -36,6 +36,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import static org.objectweb.proactive.extra.scheduler.core.SchedulerCore.logger;
 
 
+/**
+*
+* Stack catcher for Non Fonctionnal Exception.
+* 
+* @author ProActive Team
+* @version 1.0, Jun 28, 2007
+* @since ProActive 3.2
+*
+*/
 public class NFEHandler implements NFEListener, java.io.Serializable {
 	
     /** Serial version UID */
@@ -50,12 +59,10 @@ public class NFEHandler implements NFEListener, java.io.Serializable {
     }
 
     public boolean handleNFE(NonFunctionalException e) {
-        //TODO: An optimal solution would be to handle the exception for eg if it is due to the fact that the user cant be reached from the user api, the result might need to be sent back tot the core or cached in the uaerapi
         logger.info("##" + source + "had an  NFE",e);
-//        e.printStackTrace();
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "follows is a print out of the stack trace, warning, hte exception is caught , this is just a printout" +
+                "follows is a print out of the stack trace, warning, the exception is caught , this is just a printout" +
                 ProActiveLogger.getStackTraceAsString(e));
         }
         return true;

@@ -42,6 +42,9 @@ import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**
  * Abstract class job.
+ * This class represents a job with no specification.
+ * Specific jobs may extend this class.
+ * It provides method to order the job and to set and get every needed properties.
  * 
  * @author ProActive Team
  * @version 1.0, Jun 7, 2007
@@ -113,8 +116,9 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		tasks.get(event.getTaskID()).update(event);
 	}
 
+	
 	/**
-	 * To set the jobInfo
+	 * To update the content of this job with a jobInfo.
 	 * 
 	 * @param jobInfo the jobInfo to set
 	 */

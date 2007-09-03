@@ -31,7 +31,8 @@
 package org.objectweb.proactive.extra.scheduler.job;
 
 /**
- * Type of the job.
+ * Class representing the type of the job.
+ * Type are best describe below.
  * 
  * @author ProActive Team
  * @version 1.0, Jun 11, 2007

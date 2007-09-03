@@ -33,7 +33,8 @@ package org.objectweb.proactive.extra.scheduler.task;
 import java.util.Map;
 
 /**
- * 
+ * A java task is a task representing a java .class file.
+ * Extends this abstract class if you want to create your own java task.
  * 
  * @author ProActive Team
  * @version 1.0, Jun 4, 2007

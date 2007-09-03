@@ -71,7 +71,7 @@ public interface UserSchedulerInterface extends Serializable{
 	 * Get the result for the given jobId.
 	 * A user can only get HIS result back.
 	 * 
-	 * @param jobId the job on witch the result will be send
+	 * @param jobId the job on which the result will be send
 	 * @return a job Result containing information about the result.
 	 * @throws SchedulerException
 	 */
