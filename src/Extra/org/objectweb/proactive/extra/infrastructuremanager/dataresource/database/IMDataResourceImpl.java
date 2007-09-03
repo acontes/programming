@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMDataResource;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
@@ -60,19 +60,15 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_DATARESOURCE);
 
     // Attributes
-    private IMNodeManager nodeManager;
+    private IMNodeSource nodeManager;
 
     //----------------------------------------------------------------------//
     // CONSTRUCTORS
     /**
      * The {@link IMNodeManager} given in parameter must be not null.
      */
-    public IMDataResourceImpl(IMNodeManager nodeManager) {
-        if (nodeManager == null) {
-            this.nodeManager = new IMNodeManagerImpl();
-        } else {
-            this.nodeManager = nodeManager;
-        }
+    public IMDataResourceImpl(IMNodeSource nodeSource) {
+        this.nodeManager = nodeSource;
     }
 
     public void init() {

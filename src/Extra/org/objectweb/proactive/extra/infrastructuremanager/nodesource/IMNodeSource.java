@@ -30,22 +30,28 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.nodesource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSourceInterface;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
 /**
  * A node Source is an entity that can provide nodes
  * to the Infrastructure Manager.
- * But the given nodes may be available only for some short time.
- * This is specially designed to be used with a ProActive P2P Network.
+ * The source may be based on ProActive Descriptors deployment, or on dynamic
+ * node allocation, with a p2p node source for example
+ * @see P2PNodeSource
+ * @see DynamicNodeSource
  *
  * @author proactive
  */
-public abstract class IMNodeSource implements IMNodeManager {
+public abstract class IMNodeSource implements NodeSourceInterface {
 
     /**
      * String identifying the NodeSource. This must be unique.
@@ -66,10 +72,46 @@ public abstract class IMNodeSource implements IMNodeManager {
         }
         return false;
     }
+    
+    /**
+     * Set the {@link IMNode} in a busy state.
+     * There is nothing to do more than that, like expressly setting
+     * busy state <i>a mano</i>.
+     * @param imnode
+     */
+    public abstract void setBusy(IMNode imnode);
 
     /**
-     * Update the node status.
-     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setVerifyingScript(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode, org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
+     * Set the {@link IMNode} in a free state.
+     * A free node can be used by IM.
+     * @param imnode
+     */
+    public abstract void setFree(IMNode imnode);
+
+    /**
+     * Set the {@link IMNode} in a down state.
+     * A Node is down when it's no longer responding.
+     * @param imnode
+     */
+    public abstract void setDown(IMNode imnode);
+    
+    /**
+     * The way to to get free nodes in the structure, ordered (or not) with the script.
+     * The more a Node has chances to verify the script, the less it's far in the list.
+     */
+    public abstract ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+        boolean ordered);
+
+    /**
+     * Shutting down Node Manager, and everything depending on it.
+     */
+    public abstract BooleanWrapper shutdown();
+
+    /**
+     * That's the way to say to the NodeManager that a Node verifies a script.
+     * This will help ordering nodes for future calls to {@link #getNodesByScript(VerifyingScript)}.
+     * @param imnode
+     * @param script
      */
     public void setVerifyingScript(IMNode imnode, VerifyingScript script) {
         HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
@@ -80,8 +122,10 @@ public abstract class IMNodeSource implements IMNodeManager {
     }
 
     /**
-     * Update the node status.
-     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setNotVerifyingScript(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode, org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
+     * That's the way to say to the NodeManager that a Node doesn't (or no longer) verifie a script.
+     * This will help ordering nodes for future calls to {@link #getNodesByScript(VerifyingScript)}.
+     * @param imnode
+     * @param script
      */
     public void setNotVerifyingScript(IMNode imnode, VerifyingScript script) {
         HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();

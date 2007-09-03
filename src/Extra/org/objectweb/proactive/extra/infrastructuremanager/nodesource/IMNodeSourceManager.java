@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeComparator;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
@@ -50,8 +49,8 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 /**
  * The IMNodeSourceManager is made to manage differents IMNodeSource,
  * and is also seen like a IMNodeSource from the outside.
-     * This object use the <i>Composite</i> Design Pattern : it's allow
-     * to manage different node sources as one.
+ * This object use the <i>Composite</i> Design Pattern : it's allow
+ * to manage different node sources as one.
  * @author proactive team
  *
  */
@@ -128,6 +127,9 @@ public class IMNodeSourceManager extends IMNodeSource {
         return res;
     }
 
+    /**
+     * delegate to the imnode's original nodesource.
+     */
     public void setBusy(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -135,6 +137,9 @@ public class IMNodeSourceManager extends IMNodeSource {
         }
     }
 
+    /**
+     * delegate to the imnode's original nodesource.
+     */
     public void setDown(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -142,6 +147,9 @@ public class IMNodeSourceManager extends IMNodeSource {
         }
     }
 
+    /**
+     * delegate to the imnode's original nodesource.
+     */
     public void setFree(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -149,6 +157,9 @@ public class IMNodeSourceManager extends IMNodeSource {
         }
     }
 
+    /**
+     * ShutDown all managed node sources.
+     */
     public BooleanWrapper shutdown() {
         Boolean res = padNS.shutdown().booleanValue();
         for (DynamicNodeSource dns : dynNS)
