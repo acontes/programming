@@ -60,20 +60,28 @@
 	<classpathentry exported="true" kind="lib" path="lib/ws/soap.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/wsdl4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/xml-apis.jar"/>
-	<classpathentry exported="true" kind="lib" path="ProActive.jar" sourcepath="/user/nhouillo/home/ws/ProActive"/>
-	<classpathentry kind="lib" path="lib/components/asm-2.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-awt-util.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-dom.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-svggen.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-util.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-xml.jar"/>
-	<classpathentry kind="lib" path="lib/timit/commons-cli-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/timit/jcommon-1.0.6.jar"/>
-	<classpathentry kind="lib" path="lib/timit/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/timit/jfreechart-1.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/components/asm-2.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/batik-awt-util.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/batik-dom.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/batik-svggen.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/batik-util.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/batik-xml.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/commons-cli-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/jcommon-1.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/jdom.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timit/jfreechart-1.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jung/colt.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jung/commons-collections-3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jung/concurrent.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jung/jung-1.7.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/osgi/bundlerepository.jar"/>
+	<classpathentry kind="lib" path="lib/osgi/servlet.jar"/>
+	<classpathentry kind="lib" path="lib/osgi/shellgui.jar"/>
+	<classpathentry kind="lib" path="lib/osgi/shellplugin.jar"/>
+	<classpathentry kind="lib" path="lib/osgi/shelltui.jar"/>
+	<classpathentry kind="lib" path="lib/osgi/simple.jar"/>
+	<classpathentry kind="lib" path="lib/osgi/tablelayout.jar"/>
+	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
+	<classpathentry kind="lib" path="ProActive.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
