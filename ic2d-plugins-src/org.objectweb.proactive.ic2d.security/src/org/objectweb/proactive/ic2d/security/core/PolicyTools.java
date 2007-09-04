@@ -84,7 +84,7 @@ public abstract class PolicyTools {
 						"",
 						"xsi:schemaLocation",
 						"CDATA",
-						"urn:proactive:security:1.0 /user/nhouillo/home/ws/ProActive/src/Core/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd");
+						"urn:proactive:security:1.0 http://www-sop.inria.fr/oasis/ProActive/schemas/security/1.0/security.xsd");
 
 		th.startElement("", "", "Policy", atts);
 
