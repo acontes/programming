@@ -42,9 +42,9 @@ public class TestDeployment {
 					System.out.println(mes);
 				}
 			}
-		} 
-		catch (ProActiveException e) { 
-			e.printStackTrace(); 
+		}
+		catch (ProActiveException e) {
+			e.printStackTrace();
 		}
 	}
 
