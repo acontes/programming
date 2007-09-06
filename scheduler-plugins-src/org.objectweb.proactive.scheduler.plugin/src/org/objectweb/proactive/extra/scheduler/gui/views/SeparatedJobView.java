@@ -49,9 +49,10 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityAboveNormalJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityBelowNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ResumeSchedulerAction;
@@ -204,9 +205,9 @@ public class SeparatedJobView extends ViewPart {
 		killJobAction = KillJobAction.newInstance(shell);
 
 		priorityLowestJobAction = PriorityLowestJobAction.newInstance();
-		priorityBelowNormalJobAction = PriorityBelowNormalJobAction.newInstance();
+		priorityBelowNormalJobAction = PriorityLowJobAction.newInstance();
 		priorityNormalJobAction = PriorityNormalJobAction.newInstance();
-		priorityAboveNormalJobAction = PriorityAboveNormalJobAction.newInstance();
+		priorityAboveNormalJobAction = PriorityHighJobAction.newInstance();
 		priorityHighestJobAction = PriorityHighestJobAction.newInstance();
 
 		startStopSchedulerAction = StartStopSchedulerAction.newInstance();
@@ -291,10 +292,11 @@ public class SeparatedJobView extends ViewPart {
 		PauseResumeJobAction.getInstance().setEnabled(false);
 		SubmitJobAction.getInstance().setEnabled(false);
 
+		PriorityIdleJobAction.getInstance().setEnabled(false);
 		PriorityLowestJobAction.getInstance().setEnabled(false);
-		PriorityBelowNormalJobAction.getInstance().setEnabled(false);
+		PriorityLowJobAction.getInstance().setEnabled(false);
 		PriorityNormalJobAction.getInstance().setEnabled(false);
-		PriorityAboveNormalJobAction.getInstance().setEnabled(false);
+		PriorityHighJobAction.getInstance().setEnabled(false);
 		PriorityHighestJobAction.getInstance().setEnabled(false);
 
 		FreezeSchedulerAction.getInstance().setEnabled(false);

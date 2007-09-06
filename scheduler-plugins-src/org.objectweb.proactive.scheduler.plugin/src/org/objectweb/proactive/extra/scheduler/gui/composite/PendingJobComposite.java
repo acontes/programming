@@ -33,8 +33,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityAboveNormalJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityBelowNormalJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
@@ -103,20 +104,22 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
 		switch (JobsController.getSchedulerState()) {
 		case SHUTTING_DOWN:
 		case KILLED:
+			PriorityIdleJobAction.getInstance().setEnabled(false);
 			PriorityLowestJobAction.getInstance().setEnabled(false);
-			PriorityBelowNormalJobAction.getInstance().setEnabled(false);
+			PriorityLowJobAction.getInstance().setEnabled(false);
 			PriorityNormalJobAction.getInstance().setEnabled(false);
-			PriorityAboveNormalJobAction.getInstance().setEnabled(false);
+			PriorityHighJobAction.getInstance().setEnabled(false);
 			PriorityHighestJobAction.getInstance().setEnabled(false);
 
 			pauseResumeJobAction.setEnabled(false);
 			pauseResumeJobAction.setPauseResumeMode();
 			break;
 		default:
+			PriorityIdleJobAction.getInstance().setEnabled(enabled);
 			PriorityLowestJobAction.getInstance().setEnabled(enabled);
-			PriorityBelowNormalJobAction.getInstance().setEnabled(enabled);
+			PriorityLowJobAction.getInstance().setEnabled(enabled);
 			PriorityNormalJobAction.getInstance().setEnabled(enabled);
-			PriorityAboveNormalJobAction.getInstance().setEnabled(enabled);
+			PriorityHighJobAction.getInstance().setEnabled(enabled);
 			PriorityHighestJobAction.getInstance().setEnabled(enabled);
 
 			pauseResumeJobAction.setEnabled(enabled);

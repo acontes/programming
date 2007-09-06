@@ -36,15 +36,15 @@ import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 
-public class PriorityAboveNormalJobAction extends Action {
+public class PriorityHighJobAction extends Action {
 
 	public static final boolean ENABLED_AT_CONSTRUCTION = false;
 
-	private static PriorityAboveNormalJobAction instance = null;
+	private static PriorityHighJobAction instance = null;
 
-	private PriorityAboveNormalJobAction() {
-		this.setText("Above Normal");
-		this.setToolTipText("To set the job priority to \"above normal\"");
+	private PriorityHighJobAction() {
+		this.setText("High");
+		this.setToolTipText("To set the job priority to \"high\"");
 		this.setEnabled(ENABLED_AT_CONSTRUCTION);
 	}
 
@@ -52,15 +52,15 @@ public class PriorityAboveNormalJobAction extends Action {
 	public void run() {
 		JobId jobId = TableManager.getInstance().getLastJobIdOfLastSelectedItem();
 		if(jobId != null)
-			SchedulerProxy.getInstance().changePriority(jobId, JobPriority.ABOVE_NORMAL);
+			SchedulerProxy.getInstance().changePriority(jobId, JobPriority.HIGH);
 	}
 
-	public static PriorityAboveNormalJobAction newInstance() {
-		instance = new PriorityAboveNormalJobAction();
+	public static PriorityHighJobAction newInstance() {
+		instance = new PriorityHighJobAction();
 		return instance;
 	}
 
-	public static PriorityAboveNormalJobAction getInstance() {
+	public static PriorityHighJobAction getInstance() {
 		return instance;
 	}
 }
