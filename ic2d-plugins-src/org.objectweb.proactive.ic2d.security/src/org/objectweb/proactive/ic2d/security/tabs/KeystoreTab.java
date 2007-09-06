@@ -176,10 +176,8 @@ public class KeystoreTab extends UpdatableTab {
 		b.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				Map<CertificateTree, Boolean> keepPrivateKeyMap = new HashMap<CertificateTree, Boolean>();
-				for (TreeItem item : activeKeystoreSection.getTree().getItems()) {
-					addSelected(item, keepPrivateKeyMap);
-				}
+
+				Map<CertificateTree, Boolean> keepPrivateKeyMap = getSelected();
 
 				FileDialog fd = new FileDialog(new Shell(), SWT.SAVE);
 				fd.setText("Save active Keystore");
@@ -208,18 +206,6 @@ public class KeystoreTab extends UpdatableTab {
 
 				super.mouseUp(e);
 			}
-
-			private void addSelected(TreeItem item,
-					Map<CertificateTree, Boolean> map) {
-				CertificateTree tree = (CertificateTree) item.getData();
-				if (item.getChecked()
-						&& tree.getCertificate().getPrivateKey() != null) {
-					map.put(tree, true);
-				}
-				for (TreeItem child : item.getItems()) {
-					addSelected(child, map);
-				}
-			}
 		});
 
 		return b;
@@ -238,6 +224,38 @@ public class KeystoreTab extends UpdatableTab {
 		section.setClient(client);
 
 		return section;
+	}
+
+	public Map<CertificateTree, Boolean> getSelected() {
+		Map<CertificateTree, Boolean> map = new HashMap<CertificateTree, Boolean>();
+		for (TreeItem item : activeKeystoreSection.getTree().getItems()) {
+			addSelected(item, map);
+		}
+		return map;
+	}
+
+	private void addSelected(TreeItem item, Map<CertificateTree, Boolean> map) {
+		CertificateTree tree = (CertificateTree) item.getData();
+		if (item.getChecked() && tree.getCertificate().getPrivateKey() != null) {
+			map.put(tree, true);
+		}
+		for (TreeItem child : item.getItems()) {
+			addSelected(child, map);
+		}
+	}
+	
+//	public void select() {
+//		for (TreeItem item : activeKeystoreSection.getTree().getItems()) {
+//			select(item);
+//		}
+//	}
+	
+	private void select(TreeItem item) {
+		CertificateTree tree = (CertificateTree) item.getData();
+		item.setChecked(tree.getCertificate().getPrivateKey() != null);
+		for (TreeItem child : item.getItems()) {
+			select(child);
+		}
 	}
 
 	private Tree createTreeKeystore(Composite parent) {

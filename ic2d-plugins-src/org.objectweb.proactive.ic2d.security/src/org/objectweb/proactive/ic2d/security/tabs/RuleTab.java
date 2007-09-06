@@ -29,15 +29,14 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.SecurityConstants;
-import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.ic2d.security.core.CertificateTree;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeList;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeMap;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeMapTransfer;
 import org.objectweb.proactive.ic2d.security.core.PolicyFile;
 import org.objectweb.proactive.ic2d.security.core.PolicyTools;
-import org.objectweb.proactive.ic2d.security.core.RuleConstants;
 import org.objectweb.proactive.ic2d.security.core.SimplePolicyRule;
 import org.objectweb.proactive.ic2d.security.widgets.CertificateTreeListSection;
 import org.objectweb.proactive.ic2d.security.widgets.EntityTableComposite;
@@ -49,7 +48,7 @@ public class RuleTab extends UpdatableTab {
 
 	private List<SimplePolicyRule> rules;
 
-	private List<TypedCertificate> authorizedUsers;
+	private List<String> authorizedUsers;
 
 	private FormToolkit toolkit;
 
@@ -89,21 +88,20 @@ public class RuleTab extends UpdatableTab {
 
 	private Text keystoreText;
 
-	public RuleTab(CTabFolder folder, CertificateTreeList keystore,
-			FormToolkit toolkit) {
+	public RuleTab(CTabFolder folder, CertificateTreeList keystore, FormToolkit toolkit) {
 		super(folder, SWT.NULL);
 		setText("Rule Editor");
 
 		this.activeKeystore = keystore;
+		this.rules = new ArrayList<SimplePolicyRule>();
 		this.toolkit = toolkit;
-		rules = new ArrayList<SimplePolicyRule>();
-		authorizedUsers = new ArrayList<TypedCertificate>();
+		authorizedUsers = new ArrayList<String>();
 
 		Composite body = toolkit.createComposite(folder);
 		body.setLayout(new GridLayout(3, true));
 
-		createSectionActiveKeystore(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-				true, true));
+		createSectionActiveKeystore(body).setLayoutData(
+				new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		createSectionRuleEdition(body).setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -115,7 +113,7 @@ public class RuleTab extends UpdatableTab {
 
 		setControl(body);
 	}
-	
+
 	private Section createSectionActiveKeystore(Composite parent) {
 		activeKeystoreSection = new CertificateTreeListSection(parent, toolkit,
 				"ActiveKeystore", activeKeystore, false, true, false, false);
@@ -181,32 +179,35 @@ public class RuleTab extends UpdatableTab {
 		toolkit.createLabel(client, "Confidentiality");
 		toolkit.createLabel(client, "Integrity");
 
-		reqAuthCombo = RuleConstants.createRODCombo(client);
+		reqAuthCombo = createRODCombo(client);
 		reqAuthCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rules.get(rulesTable.getSelectionIndex()).setReqAuth(
-						reqAuthCombo.getSelectionIndex());
+						Communication.valToInt(reqAuthCombo
+								.getItem(reqAuthCombo.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
 		});
-		reqConfCombo = RuleConstants.createRODCombo(client);
+		reqConfCombo = createRODCombo(client);
 		reqConfCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rules.get(rulesTable.getSelectionIndex()).setReqConf(
-						reqConfCombo.getSelectionIndex());
+						Communication.valToInt(reqConfCombo
+								.getItem(reqConfCombo.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
 		});
-		reqIntCombo = RuleConstants.createRODCombo(client);
+		reqIntCombo = createRODCombo(client);
 		reqIntCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rules.get(rulesTable.getSelectionIndex()).setReqInt(
-						reqIntCombo.getSelectionIndex());
+						Communication.valToInt(reqIntCombo.getItem(reqIntCombo
+								.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
@@ -239,38 +240,52 @@ public class RuleTab extends UpdatableTab {
 		toolkit.createLabel(client, "Confidentiality");
 		toolkit.createLabel(client, "Integrity");
 
-		repAuthCombo = RuleConstants.createRODCombo(client);
+		repAuthCombo = createRODCombo(client);
 		repAuthCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rules.get(rulesTable.getSelectionIndex()).setRepAuth(
-						repAuthCombo.getSelectionIndex());
+						Communication.valToInt(repAuthCombo
+								.getItem(repAuthCombo.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
 		});
-		repConfCombo = RuleConstants.createRODCombo(client);
+		repConfCombo = createRODCombo(client);
 		repConfCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rules.get(rulesTable.getSelectionIndex()).setRepConf(
-						repConfCombo.getSelectionIndex());
+						Communication.valToInt(repConfCombo
+								.getItem(repConfCombo.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
 		});
-		repIntCombo = RuleConstants.createRODCombo(client);
+		repIntCombo = createRODCombo(client);
 		repIntCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rules.get(rulesTable.getSelectionIndex()).setRepInt(
-						repIntCombo.getSelectionIndex());
+						Communication.valToInt(repIntCombo.getItem(repIntCombo
+								.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
 		});
 
 		return client;
+	}
+
+	public static Combo createRODCombo(Composite parent) {
+		Combo combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		combo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		combo.add(Communication.STRING_REQUIRED);
+		combo.add(Communication.STRING_OPTIONAL);
+		combo.add(Communication.STRING_DENIED);
+		combo.select(1);
+
+		return combo;
 	}
 
 	private Button createCheckAoCreation(Composite parent) {
@@ -342,7 +357,7 @@ public class RuleTab extends UpdatableTab {
 
 		return client;
 	}
-	
+
 	private Button createButtonUp(Composite parent) {
 		Button button = toolkit.createButton(parent, "^", SWT.BUTTON1);
 		button.addMouseListener(new MouseAdapter() {
@@ -362,7 +377,7 @@ public class RuleTab extends UpdatableTab {
 
 		return button;
 	}
-	
+
 	private Button createButtonDown(Composite parent) {
 		Button button = toolkit.createButton(parent, "v", SWT.BUTTON1);
 		button.addMouseListener(new MouseAdapter() {
@@ -382,7 +397,7 @@ public class RuleTab extends UpdatableTab {
 
 		return button;
 	}
-	
+
 	private Composite createCompositeButtons(Composite parent) {
 		Composite client = toolkit.createComposite(parent);
 		client.setLayout(new GridLayout(3, true));
@@ -448,7 +463,7 @@ public class RuleTab extends UpdatableTab {
 				fd.setText("Load Policy file");
 				fd.setFilterExtensions(new String[] { "*.policy", "*.*" });
 				String name = fd.open();
-				PolicyFile policy = PolicyTools.readPolicyFile(name, activeKeystore);
+				PolicyFile policy = PolicyTools.readPolicyFile(name);
 
 				rules.clear();
 				rules.addAll(policy.getRules());
@@ -456,7 +471,7 @@ public class RuleTab extends UpdatableTab {
 				keystoreText.setText(policy.getKeystorePath());
 				authorizedUsers.clear();
 				authorizedUsers.addAll(policy.getAuthorizedUsers());
-				
+
 				updateRulesTable();
 				updateUsersTable();
 
@@ -492,7 +507,7 @@ public class RuleTab extends UpdatableTab {
 				if (name != null) {
 					keystoreText.setText(name);
 				}
-				
+
 				super.mouseUp(e);
 			}
 		});
@@ -545,7 +560,8 @@ public class RuleTab extends UpdatableTab {
 
 					for (CertificateTree tree : map.keySet()) {
 						if (tree.getCertificate().getType() == SecurityConstants.ENTITY_TYPE_USER) {
-							authorizedUsers.add(tree.getCertificate());
+							authorizedUsers.add(tree.getCertificate()
+									.toString());
 						}
 					}
 
@@ -635,17 +651,17 @@ public class RuleTab extends UpdatableTab {
 
 			enableRequestEditor(selectedRule.isRequest());
 
-			reqAuthCombo.select(selectedRule.getReqAuth());
-			reqIntCombo.select(selectedRule.getReqInt());
-			reqConfCombo.select(selectedRule.getReqConf());
+			reqAuthCombo.select(-selectedRule.getReqAuth() + 1);
+			reqIntCombo.select(-selectedRule.getReqInt() + 1);
+			reqConfCombo.select(-selectedRule.getReqConf() + 1);
 
 			replyCheck.setSelection(selectedRule.isReply());
 
 			enableReplyEditor(selectedRule.isReply());
 
-			repAuthCombo.select(selectedRule.getRepAuth());
-			repIntCombo.select(selectedRule.getRepInt());
-			repConfCombo.select(selectedRule.getRepConf());
+			repAuthCombo.select(-selectedRule.getRepAuth() + 1);
+			repIntCombo.select(-selectedRule.getRepInt() + 1);
+			repConfCombo.select(-selectedRule.getRepConf() + 1);
 
 			aoCreationCheck.setSelection(selectedRule.isAoCreation());
 			migrationCheck.setSelection(selectedRule.isMigration());
@@ -675,9 +691,38 @@ public class RuleTab extends UpdatableTab {
 		repConfCombo.setEnabled(enable);
 	}
 
+	public void setAppName(String name) {
+		applicationNameText.setText(name);
+	}
+
+	public String getAppName() {
+		return applicationNameText.getText();
+	}
+	
+	public void setAuthorizedUsers(List<String> users) {
+		authorizedUsers.clear();
+		authorizedUsers.addAll(users);
+		updateUsersTable();
+	}
+
+	public List<String> getAuthorizedUsers() {
+		return authorizedUsers;
+	}
+
+	public List<SimplePolicyRule> getRules() {
+		return rules;
+	}
+
+	public void setRules(List<SimplePolicyRule> policies) {
+		rules.clear();
+		rules.addAll(policies);
+		updateRulesTable();
+	}
+
 	@Override
 	public void update() {
 		activeKeystoreSection.updateSection();
+		updateRulesTable();
 	}
 
 }

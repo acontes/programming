@@ -36,6 +36,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
@@ -127,4 +128,8 @@ public class DummySecurityEntity implements SecurityEntity {
     public Entities getEntities() throws SecurityNotAvailableException {
         return securityManager.getEntities();
     }
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		securityManager.setProActiveSecurityManager(user, policyServer);
+	}
 }

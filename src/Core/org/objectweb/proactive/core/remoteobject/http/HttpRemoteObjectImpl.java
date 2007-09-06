@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.remoteobject.http.message.RemoteObjectReques
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.remoteobject.http.util.messages.HttpRemoteObjectRequest;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -269,5 +270,9 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
 		return this.remoteObject.getProActiveSecurityManager(user);
+	}
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		this.remoteObject.setProActiveSecurityManager(user, policyServer);
 	}
 }

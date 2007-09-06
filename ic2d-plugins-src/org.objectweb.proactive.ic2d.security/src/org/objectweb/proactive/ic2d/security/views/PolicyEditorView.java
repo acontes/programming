@@ -1,7 +1,11 @@
 package org.objectweb.proactive.ic2d.security.views;
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -12,8 +16,9 @@ import org.eclipse.ui.forms.FormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.ic2d.security.core.CertificateTree;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeList;
-import org.objectweb.proactive.ic2d.security.core.KeystoreFile;
+import org.objectweb.proactive.ic2d.security.core.SimplePolicyRule;
 import org.objectweb.proactive.ic2d.security.tabs.CertificateGenerationTab;
 import org.objectweb.proactive.ic2d.security.tabs.KeystoreTab;
 import org.objectweb.proactive.ic2d.security.tabs.RuleTab;
@@ -28,9 +33,13 @@ public class PolicyEditorView extends ViewPart {
 	private CTabFolder tabFolder;
 
 	private ScrolledForm form;
+	
+	private CertificateGenerationTab cgt;
+	private KeystoreTab kt;
+	private RuleTab rt;
 
 	public PolicyEditorView() {
-		keystore = new KeystoreFile("", new CertificateTreeList());
+		keystore = new CertificateTreeList();
 	}
 
 	@Override
@@ -58,16 +67,62 @@ public class PolicyEditorView extends ViewPart {
 		});
 
 		toolkit.paintBordersFor(tabFolder);
-		new CertificateGenerationTab(tabFolder, keystore, toolkit);
-		new KeystoreTab(tabFolder, keystore, toolkit);
-		new RuleTab(tabFolder, keystore, toolkit);
+		cgt = new CertificateGenerationTab(tabFolder, keystore, toolkit);
+		kt = new KeystoreTab(tabFolder, keystore, toolkit);
+		rt = new RuleTab(tabFolder, keystore, toolkit);
 
 		tabFolder.setSelection(0);
+	}
+
+	public void update(CertificateTreeList list,
+			List<SimplePolicyRule> policies, String appName, List<String> authorizedUsers) {
+		if (list != null) {
+			keystore.clear();
+			keystore.addAll(list);
+		}
+
+		cgt.update();
+		
+		kt.update();
+//		kt.select();
+		
+		rt.update();
+		rt.setAppName(appName);
+		rt.setRules(policies);
+		rt.setAuthorizedUsers(authorizedUsers);
+	}
+
+	public CertificateTreeList getKeystore() {
+		return keystore;
+	}
+
+	public String getAppName() {
+		for (CTabItem item : tabFolder.getItems()) {
+			if (item instanceof RuleTab) {
+				RuleTab ruleTab = (RuleTab) item;
+				return ruleTab.getAppName();
+			}
+		}
+		return null;
+	}
+
+	public Map<CertificateTree, Boolean> getKeysToKeep() {
+		for (CTabItem item : tabFolder.getItems()) {
+			if (item instanceof KeystoreTab) {
+				KeystoreTab keystoreTab = (KeystoreTab) item;
+				return keystoreTab.getSelected();
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public void setFocus() {
 		form.setFocus();
+	}
+
+	public RuleTab getRt() {
+		return rt;
 	}
 
 }

@@ -40,6 +40,8 @@ public abstract class RuleEntity implements Serializable {
 
     abstract protected int match(Entity e);
     
+    abstract public String getName();
+    
     @Override
 	public String toString() {
     	return "RuleEnty :\n\tLevel : " + level;

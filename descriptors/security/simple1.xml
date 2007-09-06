@@ -34,7 +34,7 @@
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter
-							value='-Dproactive.runtime.security=descriptors/security/applicationPolicy1.xml' />
+							value='-Dproactive.runtime.security=descriptors/security/applicationPolicy1.xml -Dproactive.jmx.mbean=true' />
 							<!--
 						<parameter
 							value='-Xdebug' />

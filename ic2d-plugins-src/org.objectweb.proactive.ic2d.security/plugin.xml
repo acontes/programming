@@ -34,11 +34,16 @@
       <perspective
             class="org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective"
             id="org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective"
-            name="ProActive Security">
+            name="Security">
       </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
+   </extension>
+   <extension
+         point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
+      <action_class class="org.objectweb.proactive.ic2d.security.actions.GetSecurityManager"/>
+      <action_class class="org.objectweb.proactive.ic2d.security.actions.SetSecurityManager"/>
    </extension>
 
 </plugin>

@@ -47,6 +47,10 @@ public class Communication implements Serializable {
 	public static final int REQUIRED = 1;
     public static final int DENIED = -1;
     public static final int OPTIONAL = 0;
+    
+    public static final String STRING_REQUIRED = "required";
+	public static final String STRING_OPTIONAL = "optional";
+	public static final String STRING_DENIED = "denied";
 
     /* indicates if authentication is required,optional or denied */
     private int authentication;
@@ -124,7 +128,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is forbidden
      */
     public boolean isAuthenticationForbidden() {
-        return authentication == -1;
+        return authentication == DENIED;
     }
 
     /**
@@ -132,7 +136,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is forbidden
      */
     public boolean isConfidentialityForbidden() {
-        return confidentiality == -1;
+        return confidentiality == DENIED;
     }
 
     /**
@@ -140,7 +144,7 @@ public class Communication implements Serializable {
      * @return boolean true if integrity is forbidden
      */
     public boolean isIntegrityForbidden() {
-        return integrity == -1;
+        return integrity == DENIED;
     }
 
     /**
@@ -210,4 +214,40 @@ public class Communication implements Serializable {
     public void setCommunication(boolean i) {
         communication = i;
     }
+
+	public int getAuthentication() {
+		return authentication;
+	}
+
+	public int getConfidentiality() {
+		return confidentiality;
+	}
+
+	public int getIntegrity() {
+		return integrity;
+	}
+    
+    public static int valToInt(String val) {
+		if (val.equalsIgnoreCase(STRING_REQUIRED)) {
+			return REQUIRED;
+		} else if (val.equalsIgnoreCase(STRING_OPTIONAL)) {
+			return OPTIONAL;
+		} else if (val.equalsIgnoreCase(STRING_DENIED)) {
+			return DENIED;
+		}
+		return -1;
+	}
+
+	public static String valToString(int val) {
+		switch (val) {
+		case REQUIRED:
+			return STRING_REQUIRED;
+		case OPTIONAL:
+			return STRING_OPTIONAL;
+		case DENIED:
+			return STRING_DENIED;
+		default:
+			return null;
+		}
+	}
 }

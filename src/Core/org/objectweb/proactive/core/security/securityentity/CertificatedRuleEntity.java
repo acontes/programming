@@ -37,4 +37,9 @@ public class CertificatedRuleEntity extends RuleEntity {
 	public String toString() {
 		return super.toString() + "\n\tCertificate : " + certificate.toString();
 	}
+
+	@Override
+	public String getName() {
+		return certificate.toString();
+	}
 }

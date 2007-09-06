@@ -149,4 +149,8 @@ public class InternalBodySecurity implements SecurityEntity {
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
 		return distantBody.getProActiveSecurityManager(user);
 	}
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		distantBody.setProActiveSecurityManager(user, policyServer);
+	}
 }

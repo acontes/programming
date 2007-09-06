@@ -40,7 +40,7 @@ public class CertificateTree implements Serializable {
 		children = new ArrayList<CertificateTree>();
 		certificate = null;
 		parent = null;
-		
+
 		if (keygen == null) {
 			if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
 				Security.addProvider(new BouncyCastleProvider());
@@ -177,7 +177,8 @@ public class CertificateTree implements Serializable {
 		}
 	}
 
-	public TypedCertificate search(String name, int type) throws NotFoundException {
+	public TypedCertificate search(String name, int type)
+			throws NotFoundException {
 		if (type == certificate.getType()
 				&& certificate.getCert().getSubjectX500Principal().getName()
 						.equals(name)) {
@@ -192,7 +193,8 @@ public class CertificateTree implements Serializable {
 			}
 		}
 
-		throw new NotFoundException("Certificate " + name + " : " + type + " not found.");
+		throw new NotFoundException("Certificate " + name + " : " + type
+				+ " not found.");
 	}
 
 	public boolean remove() {

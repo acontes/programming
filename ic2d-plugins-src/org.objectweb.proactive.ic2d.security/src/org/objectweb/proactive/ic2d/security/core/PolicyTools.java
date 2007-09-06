@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javassist.NotFoundException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,8 +16,7 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import org.objectweb.proactive.core.security.SecurityConstants;
-import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.Communication;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -56,8 +53,9 @@ public abstract class PolicyTools {
 			try {
 				th.startDocument();
 
-				policyTag(th, policy.getApplicationName(), policy.getKeystorePath(), policy.getRules(),
-						policy.getAuthorizedUsers());
+				policyTag(th, policy.getApplicationName(), policy
+						.getKeystorePath(), policy.getRules(), policy
+						.getAuthorizedUsers());
 
 				th.endDocument();
 			} catch (SAXException e) {
@@ -70,7 +68,7 @@ public abstract class PolicyTools {
 
 	private static void policyTag(TransformerHandler th,
 			String applicationName, String keystorePath,
-			List<SimplePolicyRule> rules, List<TypedCertificate> authorizedUsers)
+			List<SimplePolicyRule> rules, List<String> authorizedUsers)
 			throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		atts.addAttribute("", "", "xmlns", "CDATA",
@@ -139,23 +137,23 @@ public abstract class PolicyTools {
 	}
 
 	private static void entityListTag(String tag, TransformerHandler th,
-			List<TypedCertificate> tcl) throws SAXException {
+			List<String> names) throws SAXException {
 		th.startElement("", "", tag, new AttributesImpl());
 
-		for (TypedCertificate cert : tcl) {
-			entityTag(th, cert);
+		for (String name : names) {
+			entityTag(th, name);
 		}
 
 		th.endElement("", "", tag);
 	}
 
-	private static void entityTag(TransformerHandler th, TypedCertificate cert)
+	private static void entityTag(TransformerHandler th, String name)
 			throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
-		atts.addAttribute("", "", "type", "CDATA", SecurityConstants
-				.typeToString(cert.getType()));
-		atts.addAttribute("", "", "name", "CDATA", cert.getCert()
-				.getSubjectX500Principal().getName());
+		atts.addAttribute("", "", "type", "CDATA", name.substring(0, name
+				.indexOf(':')));
+		atts.addAttribute("", "", "name", "CDATA", name.substring(name
+				.indexOf(':') + 1));
 
 		th.startElement("", "", "Entity", atts);
 		th.endElement("", "", "Entity");
@@ -190,11 +188,11 @@ public abstract class PolicyTools {
 	private static void attributesTag(TransformerHandler th, int auth,
 			int conf, int integ) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
-		atts.addAttribute("", "", "authentication", "CDATA", RuleConstants
+		atts.addAttribute("", "", "authentication", "CDATA", Communication
 				.valToString(auth));
-		atts.addAttribute("", "", "confidentiality", "CDATA", RuleConstants
+		atts.addAttribute("", "", "confidentiality", "CDATA", Communication
 				.valToString(conf));
-		atts.addAttribute("", "", "integrity", "CDATA", RuleConstants
+		atts.addAttribute("", "", "integrity", "CDATA", Communication
 				.valToString(integ));
 
 		th.startElement("", "", "Attributes", atts);
@@ -213,11 +211,11 @@ public abstract class PolicyTools {
 	}
 
 	private static void usersTag(TransformerHandler th,
-			List<TypedCertificate> authorizedUsers) throws SAXException {
+			List<String> authorizedUsers) throws SAXException {
 		th.startElement("", "", "AccessRights", new AttributesImpl());
 
-		for (TypedCertificate cert : authorizedUsers) {
-			entityTag(th, cert);
+		for (String name : authorizedUsers) {
+			entityTag(th, name);
 		}
 
 		th.endElement("", "", "AccessRights");
@@ -229,8 +227,7 @@ public abstract class PolicyTools {
 	 * @param path
 	 * @return
 	 */
-	public static PolicyFile readPolicyFile(String path,
-			CertificateTreeList ctl) {
+	public static PolicyFile readPolicyFile(String path) {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -250,13 +247,12 @@ public abstract class PolicyTools {
 			e.printStackTrace();
 		}
 
-		return getPolicies(document, ctl);
+		return getPolicies(document);
 	}
 
-	private static PolicyFile getPolicies(Document doc,
-			CertificateTreeList ctl) {
+	private static PolicyFile getPolicies(Document doc) {
 		List<SimplePolicyRule> rulesList = new ArrayList<SimplePolicyRule>();
-		List<TypedCertificate> users = new ArrayList<TypedCertificate>();
+		List<String> users = new ArrayList<String>();
 		String appName = new String();
 		String keystore = new String();
 		for (Node policy : getChildrenNamed(doc, "Policy")) {
@@ -268,29 +264,16 @@ public abstract class PolicyTools {
 			}
 			for (Node rules : getChildrenNamed(policy, "Rules")) {
 				for (Node rule : getChildrenNamed(rules, "Rule")) {
-					try {
-						rulesList.add(getRule(rule, ctl));
-					} catch (NotFoundException e) {
-						// a rule has invalid entities in From or To, it is
-						// ignored
-						e.printStackTrace();
-					}
-
+					rulesList.add(getRule(rule));
 				}
 			}
 			for (Node usersNode : getChildrenNamed(policy, "AccessRights")) {
 				for (Node entity : getChildrenNamed(usersNode, "Entity")) {
-					int type = SecurityConstants.typeToInt(entity
-							.getAttributes().getNamedItem("type")
-							.getNodeValue());
+					String type = entity.getAttributes().getNamedItem("type")
+							.getNodeValue();
 					String name = entity.getAttributes().getNamedItem("name")
 							.getNodeValue();
-					try {
-						users.add(ctl.search(name, type));
-					} catch (NotFoundException e) {
-						// someone will not get his access rights, too bad
-						e.printStackTrace();
-					}
+					users.add(type + ":" + name);
 				}
 			}
 		}
@@ -298,14 +281,13 @@ public abstract class PolicyTools {
 		return new PolicyFile(appName, keystore, rulesList, users);
 	}
 
-	private static SimplePolicyRule getRule(Node ruleNode,
-			CertificateTreeList ctl) throws NotFoundException {
+	private static SimplePolicyRule getRule(Node ruleNode) {
 		SimplePolicyRule rule = new SimplePolicyRule();
 		for (Node node : getChildrenNamed(ruleNode, "From")) {
-			setFrom(rule, node, ctl);
+			setFrom(rule, node);
 		}
 		for (Node node : getChildrenNamed(ruleNode, "To")) {
-			setTo(rule, node, ctl);
+			setTo(rule, node);
 		}
 		for (Node node : getChildrenNamed(ruleNode, "Communication")) {
 			setCommunication(rule, node);
@@ -320,25 +302,23 @@ public abstract class PolicyTools {
 		return rule;
 	}
 
-	private static void setFrom(SimplePolicyRule rule, Node fromNode,
-			CertificateTreeList ctl) throws NotFoundException {
+	private static void setFrom(SimplePolicyRule rule, Node fromNode) {
 		for (Node node : getChildrenNamed(fromNode, "Entity")) {
-			int type = SecurityConstants.typeToInt(node.getAttributes()
-					.getNamedItem("type").getNodeValue());
+			String type = node.getAttributes().getNamedItem("type")
+					.getNodeValue();
 			String name = node.getAttributes().getNamedItem("name")
 					.getNodeValue();
-			rule.addFrom(ctl.search(name, type));
+			rule.addFrom(type + ":" + name);
 		}
 	}
 
-	private static void setTo(SimplePolicyRule rule, Node toNode,
-			CertificateTreeList ctl) throws NotFoundException {
+	private static void setTo(SimplePolicyRule rule, Node toNode) {
 		for (Node node : getChildrenNamed(toNode, "Entity")) {
-			int type = SecurityConstants.typeToInt(node.getAttributes()
-					.getNamedItem("type").getNodeValue());
+			String type = node.getAttributes().getNamedItem("type")
+					.getNodeValue();
 			String name = node.getAttributes().getNamedItem("name")
 					.getNodeValue();
-			rule.addTo(ctl.search(name, type));
+			rule.addTo(type + ":" + name);
 		}
 	}
 
@@ -358,15 +338,15 @@ public abstract class PolicyTools {
 		for (Node node : getChildrenNamed(reqNode, "Attributes")) {
 			String auth = node.getAttributes().getNamedItem("authentication")
 					.getNodeValue();
-			rule.setReqAuth(RuleConstants.valToInt(auth));
+			rule.setReqAuth(Communication.valToInt(auth));
 
 			String conf = node.getAttributes().getNamedItem("confidentiality")
 					.getNodeValue();
-			rule.setReqConf(RuleConstants.valToInt(conf));
+			rule.setReqConf(Communication.valToInt(conf));
 
 			String integ = node.getAttributes().getNamedItem("integrity")
 					.getNodeValue();
-			rule.setReqInt(RuleConstants.valToInt(integ));
+			rule.setReqInt(Communication.valToInt(integ));
 		}
 	}
 
@@ -377,15 +357,15 @@ public abstract class PolicyTools {
 		for (Node node : getChildrenNamed(repNode, "Attributes")) {
 			String auth = node.getAttributes().getNamedItem("authentication")
 					.getNodeValue();
-			rule.setRepAuth(RuleConstants.valToInt(auth));
+			rule.setRepAuth(Communication.valToInt(auth));
 
 			String conf = node.getAttributes().getNamedItem("confidentiality")
 					.getNodeValue();
-			rule.setRepConf(RuleConstants.valToInt(conf));
+			rule.setRepConf(Communication.valToInt(conf));
 
 			String integ = node.getAttributes().getNamedItem("integrity")
 					.getNodeValue();
-			rule.setRepInt(RuleConstants.valToInt(integ));
+			rule.setRepInt(Communication.valToInt(integ));
 		}
 	}
 

@@ -51,7 +51,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.security.exceptions.ComputePolicyException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
@@ -72,9 +71,9 @@ public class PolicyServer implements Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = 6881821067929081660L;
 	static Logger log = ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER);
-    private static int REQUIRED = 1;
-    private static int DENIED = -1;
-    private static int OPTIONAL = 0;
+//    private static int REQUIRED = 1;
+//    private static int DENIED = -1;
+//    private static int OPTIONAL = 0;
     protected List<PolicyRule> policyRules;
     protected RuleEntities accessAuthorizations;
     protected String policyRulesFileLocation;
@@ -84,9 +83,16 @@ public class PolicyServer implements Serializable, Cloneable {
 
     public PolicyServer() {
         ProActiveSecurity.loadProvider();
+        policyRules = new ArrayList<PolicyRule>();
+        accessAuthorizations = new RuleEntities();
+        policyRulesFileLocation = new String();
+        applicationName = new String();
+        keyStore = null;
+        encodedKeyStore = null;
     }
 
     public PolicyServer(PolicyRule[] policyRules) {
+    	this();
         this.policyRules = new ArrayList<PolicyRule>();
         for (int i = 0; i < policyRules.length; i++) {
             this.policyRules.add(policyRules[i]);
@@ -94,24 +100,26 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     public PolicyServer(ArrayList<PolicyRule> policyRules) {
+    	this();
         this.policyRules = policyRules;
     }
 
-    public PolicyServer(KeyStore keyStore, ArrayList<PolicyRule> policyRules) {
+    public PolicyServer(KeyStore keyStore, List<PolicyRule> policyRules) {
+    	this();
         this.policyRules = policyRules;
         this.keyStore = keyStore;
     }
 
-    private int convert(String name) {
-        if (name.equals("required") || name.equals("allowed") ||
-                name.equals("authorized")) {
-            return REQUIRED;
-        } else if (name.equals("denied")) {
-            return DENIED;
-        } else {
-            return OPTIONAL;
-        }
-    }
+//    private int convert(String name) {
+//        if (name.equals("required") || name.equals("allowed") ||
+//                name.equals("authorized")) {
+//            return REQUIRED;
+//        } else if (name.equals("denied")) {
+//            return DENIED;
+//        } else {
+//            return OPTIONAL;
+//        }
+//    }
 
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException {
@@ -228,6 +236,7 @@ public class PolicyServer implements Serializable, Cloneable {
         return securityContext;
     }
 
+    @Deprecated
     public Communication getPolicyTo(String type, String virtualNodeFrom,
         String virtualNodeTo) throws SecurityNotAvailableException {
         // if (p == null) {
@@ -239,21 +248,25 @@ public class PolicyServer implements Serializable, Cloneable {
         }
         return null;
     }
-
-    public int[] computePolicy(int[] from, int[] to)
-        throws ComputePolicyException {
-        // logger.info("calculating composed policy");
-        if (((from[0] == REQUIRED) && (to[0] == DENIED)) ||
-                ((from[1] == REQUIRED) && (to[1] == DENIED)) ||
-                ((from[2] == REQUIRED) && (to[2] == DENIED)) ||
-                ((from[0] == DENIED) && (to[0] == REQUIRED)) ||
-                ((from[1] == DENIED) && (to[1] == REQUIRED)) ||
-                ((from[2] == DENIED) && (to[2] == REQUIRED))) {
-            throw new ComputePolicyException("incompatible policies");
-        }
-
-        return new int[] { from[0] + to[0], from[1] + to[1], from[2] + to[2] };
+    
+    public List<PolicyRule> getPolicies() {
+    	return policyRules;
     }
+
+//    public int[] computePolicy(int[] from, int[] to)
+//        throws ComputePolicyException {
+//        // logger.info("calculating composed policy");
+//        if (((from[0] == REQUIRED) && (to[0] == DENIED)) ||
+//                ((from[1] == REQUIRED) && (to[1] == DENIED)) ||
+//                ((from[2] == REQUIRED) && (to[2] == DENIED)) ||
+//                ((from[0] == DENIED) && (to[0] == REQUIRED)) ||
+//                ((from[1] == DENIED) && (to[1] == REQUIRED)) ||
+//                ((from[2] == DENIED) && (to[2] == REQUIRED))) {
+//            throw new ComputePolicyException("incompatible policies");
+//        }
+//
+//        return new int[] { from[0] + to[0], from[1] + to[1], from[2] + to[2] };
+//    }
 
     public boolean CanSendRequestTo(X509Certificate distantOA) {
         return false;
@@ -290,7 +303,7 @@ public class PolicyServer implements Serializable, Cloneable {
 //        }
 //    }
     
-    protected void setAccessAuthorization(RuleEntities entities) {
+    public void setAccessAuthorization(RuleEntities entities) {
     	accessAuthorizations = entities;
     }
     
@@ -300,6 +313,10 @@ public class PolicyServer implements Serializable, Cloneable {
     	}
     	
     	return accessAuthorizations.contains(user);
+    }
+    
+    public RuleEntities getAccessAuthorizations() {
+    	return accessAuthorizations;
     }
 
     @Override

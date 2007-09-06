@@ -32,6 +32,12 @@ public abstract class KeystoreUtils {
 				BouncyCastleProvider.PROVIDER_NAME);
 		store.load(new FileInputStream(new File(path)), password.toCharArray());
 
+		return listKeystore(store);
+	}
+
+	public static CertificateTreeList listKeystore(KeyStore store)
+			throws KeyStoreException, UnrecoverableKeyException,
+			NoSuchAlgorithmException {
 		CertificateTreeList list = new CertificateTreeList();
 		Enumeration<String> aliases = store.aliases();
 		while (aliases.hasMoreElements()) {
@@ -45,6 +51,17 @@ public abstract class KeystoreUtils {
 
 	public static void saveKeystore(String path, String password,
 			CertificateTreeList ctl,
+			Map<CertificateTree, Boolean> keepPrivateKeyMap)
+			throws KeyStoreException, NoSuchProviderException,
+			NoSuchAlgorithmException, CertificateException, IOException,
+			UnrecoverableKeyException {
+		KeyStore store = createKeystore(ctl, keepPrivateKeyMap);
+
+		store.store(new FileOutputStream(new File(path)), password
+				.toCharArray());
+	}
+
+	public static KeyStore createKeystore(CertificateTreeList ctl,
 			Map<CertificateTree, Boolean> keepPrivateKeyMap)
 			throws KeyStoreException, NoSuchProviderException,
 			NoSuchAlgorithmException, CertificateException, IOException,
@@ -63,14 +80,12 @@ public abstract class KeystoreUtils {
 				appNumber++;
 			}
 		}
-		boolean oneApp = appNumber == 1;
 
 		for (CertificateTree tree : ctl) {
-			addTreeToKeystore(store, tree, keepPrivateKeyMap, oneApp);
+			addTreeToKeystore(store, tree, keepPrivateKeyMap, appNumber == 1);
 		}
 
-		store.store(new FileOutputStream(new File(path)), password
-				.toCharArray());
+		return store;
 	}
 
 	private static void addTreeToKeystore(KeyStore store, CertificateTree tree,
@@ -78,7 +93,8 @@ public abstract class KeystoreUtils {
 			throws KeyStoreException, UnrecoverableKeyException,
 			NoSuchAlgorithmException {
 		if (keepPrivateKeyMap.containsKey(tree)) {
-			if (oneApp && tree.getCertificate().getType() == SecurityConstants.ENTITY_TYPE_APPLICATION) {
+			if (oneApp
+					&& tree.getCertificate().getType() == SecurityConstants.ENTITY_TYPE_APPLICATION) {
 				KeyStoreTools.newApplicationPrivateKey(store, tree
 						.getCertificate());
 			} else {

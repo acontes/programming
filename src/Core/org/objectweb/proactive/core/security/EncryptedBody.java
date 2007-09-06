@@ -477,4 +477,9 @@ public class EncryptedBody implements Body, Serializable {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
 }

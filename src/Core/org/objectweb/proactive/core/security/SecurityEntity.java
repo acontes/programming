@@ -167,11 +167,23 @@ public interface SecurityEntity extends Serializable {
         throws SecurityNotAvailableException, IOException;
 
     /**
-     * Returns the security manager of the entity
-     * @param user an antity representing the user asking for the security manager
+     * Returns this entity's security manager
+     * @param user an entity representing the user asking for the security manager
      * @throws SecurityNotAvailableException if security is not available
      * @throws AccessControlException if the user does not have the right to see the security manager
      */
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException, IOException;
+
+
+    /**
+     * Modifiy this entity's security manager
+     * @param user an entity representing the user modifying for the security manager
+     * @param policyServer The new policy server of the security manager
+     * @throws SecurityNotAvailableException if security is not available
+     * @throws AccessControlException if the user does not have the right to see the security manager
+     * @throws IOException
+     */
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
         throws SecurityNotAvailableException, AccessControlException, IOException;
 }

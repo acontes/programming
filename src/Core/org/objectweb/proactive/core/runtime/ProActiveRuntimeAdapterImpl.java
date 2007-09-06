@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -694,6 +695,11 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
+		// TODO Auto-generated method stub
+		
 	}
 
     public ServerConnector getJMXServerConnector() {

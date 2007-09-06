@@ -3,7 +3,7 @@ package org.objectweb.proactive.ic2d.security.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.Communication;
 
 public class SimplePolicyRule {
 
@@ -11,9 +11,9 @@ public class SimplePolicyRule {
 
 	private String name;
 
-	private List<TypedCertificate> from;
+	private List<String> from;
 
-	private List<TypedCertificate> to;
+	private List<String> to;
 
 	private boolean request;
 
@@ -44,26 +44,26 @@ public class SimplePolicyRule {
 	public SimplePolicyRule() {
 
 		name = "Rule " + ++num;
-		from = new ArrayList<TypedCertificate>();
-		to = new ArrayList<TypedCertificate>();
+		from = new ArrayList<String>();
+		to = new ArrayList<String>();
 
 		request = true;
-		reqAuth = RuleConstants.INT_OPTIONAL;
-		reqConf = RuleConstants.INT_OPTIONAL;
-		reqInt = RuleConstants.INT_OPTIONAL;
+		reqAuth = Communication.OPTIONAL;
+		reqConf = Communication.OPTIONAL;
+		reqInt = Communication.OPTIONAL;
 
 		reply = true;
-		repAuth = RuleConstants.INT_OPTIONAL;
-		repConf = RuleConstants.INT_OPTIONAL;
-		repInt = RuleConstants.INT_OPTIONAL;
+		repAuth = Communication.OPTIONAL;
+		repConf = Communication.OPTIONAL;
+		repInt = Communication.OPTIONAL;
 
 		aoCreation = true;
 		migration = true;
 	}
 
-	public void addFrom(TypedCertificate cert) {
-		if (cert != null) {
-			from.add(cert);
+	public void addFrom(String name) {
+		if (name != null) {
+			from.add(name);
 		}
 	}
 
@@ -71,9 +71,9 @@ public class SimplePolicyRule {
 		from.remove(i);
 	}
 
-	public void addTo(TypedCertificate cert) {
-		if (cert != null) {
-			to.add(cert);
+	public void addTo(String name) {
+		if (name != null) {
+			to.add(name);
 		}
 	}
 
@@ -150,11 +150,11 @@ public class SimplePolicyRule {
 		this.request = request;
 	}
 
-	public List<TypedCertificate> getFrom() {
+	public List<String> getFrom() {
 		return from;
 	}
 
-	public List<TypedCertificate> getTo() {
+	public List<String> getTo() {
 		return to;
 	}
 

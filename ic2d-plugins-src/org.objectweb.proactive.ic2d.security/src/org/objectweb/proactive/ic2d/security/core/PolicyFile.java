@@ -2,19 +2,18 @@ package org.objectweb.proactive.ic2d.security.core;
 
 import java.util.List;
 
-import org.objectweb.proactive.core.security.TypedCertificate;
-
-
 public class PolicyFile {
-	
+
 	private String applicationName;
+
 	private String keystorePath;
+
 	private List<SimplePolicyRule> rules;
-	private List<TypedCertificate> authorizedUsers;
-	
-	public PolicyFile(String applicationName,
-			String keystorePath, List<SimplePolicyRule> rules,
-			List<TypedCertificate> authorizedUsers) {
+
+	private List<String> authorizedUsers;
+
+	public PolicyFile(String applicationName, String keystorePath,
+			List<SimplePolicyRule> rules, List<String> authorizedUsers) {
 		this.applicationName = applicationName;
 		this.keystorePath = keystorePath;
 		this.rules = rules;
@@ -25,7 +24,7 @@ public class PolicyFile {
 		return applicationName;
 	}
 
-	public List<TypedCertificate> getAuthorizedUsers() {
+	public List<String> getAuthorizedUsers() {
 		return authorizedUsers;
 	}
 

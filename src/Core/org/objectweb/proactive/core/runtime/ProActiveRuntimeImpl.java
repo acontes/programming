@@ -1562,6 +1562,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 		return runtimeSecurityManager.getProActiveSecurityManager(user);
 	}
 
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+    	if (runtimeSecurityManager == null) {
+    		throw new SecurityNotAvailableException();
+    	}
+		runtimeSecurityManager.setProActiveSecurityManager(user, policyServer);
+	}
+
     public void setCapacity(long capacity) {
         if (vmInformation.getCapacity() > 0) {
             throw new IllegalStateException("setCapacity already set to " +

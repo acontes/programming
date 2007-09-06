@@ -94,10 +94,10 @@ public class EntityTableComposite extends Composite {
 					for (CertificateTree tree : map.keySet()) {
 						if (isFrom) {
 							rules.get(rulesTable.getSelectionIndex()).addFrom(
-									tree.getCertificate());
+									tree.getCertificate().toString());
 						} else {
 							rules.get(rulesTable.getSelectionIndex()).addTo(
-									tree.getCertificate());
+									tree.getCertificate().toString());
 						}
 					}
 
@@ -106,7 +106,7 @@ public class EntityTableComposite extends Composite {
 			}
 		});
 	}
-	
+
 	public void updateTable() {
 		updateTable(null);
 	}

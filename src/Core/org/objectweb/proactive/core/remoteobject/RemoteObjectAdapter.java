@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -238,5 +239,9 @@ public class RemoteObjectAdapter implements RemoteObject {
 
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
 		return remoteObject.getProActiveSecurityManager(user);
+	}
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		remoteObject.setProActiveSecurityManager(user, policyServer);
 	}
 }

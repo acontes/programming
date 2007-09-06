@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.1"?>
 
-<product name="IC2D" id="org.objectweb.proactive.ic2d.product" application="org.objectweb.proactive.ic2d.application" useFeatures="true">
+<product name="IC2D" id="org.objectweb.proactive.ic2d.product" application="org.objectweb.proactive.ic2d.application" useFeatures="false">
 
    <aboutInfo>
       <image path="/org.objectweb.proactive.ic2d/icons/alt_about.gif"/>
@@ -34,12 +34,9 @@
       </win>
    </launcher>
 
-   <vm>
-   </vm>
-
    <plugins>
-      <plugin id="P2P"/>
       <plugin id="com.ibm.icu"/>
+      <plugin id="com.ibm.icu34.data.update" fragment="true"/>
       <plugin id="com.lowagie.itext"/>
       <plugin id="org.apache.ant"/>
       <plugin id="org.apache.batik"/>
@@ -80,8 +77,8 @@
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
       <plugin id="org.eclipse.core.filesystem.hpux.PA_RISC"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64"/>
       <plugin id="org.eclipse.core.filesystem.macosx"/>
       <plugin id="org.eclipse.core.filesystem.win32.x86"/>
       <plugin id="org.eclipse.core.jobs"/>
@@ -118,8 +115,8 @@
       <plugin id="org.eclipse.swt"/>
       <plugin id="org.eclipse.swt.carbon.macosx"/>
       <plugin id="org.eclipse.swt.gtk.linux.ppc"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64"/>
       <plugin id="org.eclipse.swt.gtk.solaris.sparc"/>
       <plugin id="org.eclipse.swt.motif.aix.ppc"/>
       <plugin id="org.eclipse.swt.motif.hpux.PA_RISC"/>
@@ -146,13 +143,10 @@
       <plugin id="org.junit"/>
       <plugin id="org.mozilla.rhino"/>
       <plugin id="org.objectweb.proactive.ic2d"/>
+      <plugin id="org.objectweb.proactive.ic2d.JMXmonitoring"/>
       <plugin id="org.objectweb.proactive.ic2d.console"/>
-      <plugin id="org.objectweb.proactive.ic2d.dgc"/>
-      <plugin id="org.objectweb.proactive.ic2d.jobmonitoring"/>
-      <plugin id="org.objectweb.proactive.ic2d.launcher"/>
       <plugin id="org.objectweb.proactive.ic2d.lib"/>
-      <plugin id="org.objectweb.proactive.ic2d.monitoring"/>
-      <plugin id="org.objectweb.proactive.ic2d.timit"/>
+      <plugin id="org.objectweb.proactive.ic2d.security"/>
       <plugin id="org.w3c.sac"/>
    </plugins>
 
@@ -163,7 +157,6 @@
       <feature id="org.objectweb.proactive.ic2d.core" version="1.0.0"/>
       <feature id="org.objectweb.proactive.ic2d.dgc" version="1.0.0"/>
       <feature id="org.objectweb.proactive.ic2d.jobmonitoring" version="1.0.0"/>
-      <feature id="org.objectweb.proactive.ic2d.monitoring" version="1.0.0"/>
       <feature id="org.objectweb.proactive.ic2d.security" version="1.0.0"/>
    </features>
 

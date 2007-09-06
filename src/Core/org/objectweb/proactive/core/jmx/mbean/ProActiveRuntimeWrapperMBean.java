@@ -10,6 +10,9 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.security.PolicyServer;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 /**
@@ -63,4 +66,18 @@ public interface ProActiveRuntimeWrapperMBean extends Serializable {
      * @exception Exception if a problem occurs when killing this ProActiveRuntime
      */
     public void killRuntime() throws Exception;
+
+    /**
+     * Returns the security manager.
+     * @param user
+     * @return the security manager
+     */
+    public ProActiveSecurityManager getSecurityManager(Entity user);
+
+    /**
+     * Modify the security manager.
+     * @param user
+     * @param policyServer
+     */
+    public void setSecurityManager(Entity user, PolicyServer policyServer);
 }

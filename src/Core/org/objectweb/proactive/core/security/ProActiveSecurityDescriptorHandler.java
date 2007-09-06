@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+import org.objectweb.proactive.core.xml.io.StreamReader;
 import org.xml.sax.SAXException;
 
 
@@ -513,9 +514,9 @@ public class ProActiveSecurityDescriptorHandler
         @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
-            this.attributes[0] = convert(attributes.getValue("authentication"));
-            this.attributes[1] = convert(attributes.getValue("confidentiality"));
-            this.attributes[2] = convert(attributes.getValue("integrity"));
+            this.attributes[0] = Communication.valToInt(attributes.getValue("authentication"));
+            this.attributes[1] = Communication.valToInt(attributes.getValue("confidentiality"));
+            this.attributes[2] = Communication.valToInt(attributes.getValue("integrity"));
         }
 
         /* (non-Javadoc)
@@ -598,27 +599,13 @@ public class ProActiveSecurityDescriptorHandler
         }
     }
 
-    private int convert(String name) {
-        if (name == null) {
-            return Communication.OPTIONAL;
-        }
-        if (name.equals("required") || name.equals("allowed") ||
-                name.equals("authorized")) {
-            return Communication.REQUIRED;
-        } else if (name.equals("denied")) {
-            return Communication.DENIED;
-        } else {
-            return Communication.OPTIONAL;
-        }
-    }
-
     public static void main(String[] args)
         throws IOException, org.xml.sax.SAXException {
         InitialHandler h = new InitialHandler();
 
         // ProActiveSecurityDescriptorHandler h = new ProActiveSecurityDescriptorHandler();
         //        String uri = "/net/home/acontes/dev/ProActive/descriptors/scurrav2.xml";
-        org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
+        StreamReader sr = new StreamReader(new org.xml.sax.InputSource(
                     args[0]), h);
         sr.read();
     }

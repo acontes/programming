@@ -12,6 +12,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -149,5 +150,9 @@ public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
 
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
 		return this.remoteObject.getProActiveSecurityManager(user);
+	}
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		this.remoteObject.setProActiveSecurityManager(user, policyServer);
 	}
 }

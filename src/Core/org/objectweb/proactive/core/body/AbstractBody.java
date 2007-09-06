@@ -1123,4 +1123,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     throws SecurityNotAvailableException, AccessControlException {
     	return securityManager.getProActiveSecurityManager(user);
     }
+    
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+    	securityManager.setProActiveSecurityManager(user, policyServer);
+    }
 }

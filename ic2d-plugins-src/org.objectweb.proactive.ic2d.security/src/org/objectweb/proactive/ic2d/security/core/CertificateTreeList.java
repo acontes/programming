@@ -23,7 +23,8 @@ public class CertificateTreeList extends ArrayList<CertificateTree> {
 		addAll(list);
 	}
 
-	public TypedCertificate search(String name, int type) throws NotFoundException {
+	public TypedCertificate search(String name, int type)
+			throws NotFoundException {
 		for (CertificateTree ct : this) {
 			try {
 				return ct.search(name, type);
@@ -31,8 +32,9 @@ public class CertificateTreeList extends ArrayList<CertificateTree> {
 				// let's check the other trees
 			}
 		}
-		
-		throw new NotFoundException("Certificate " + name + " : " + type + " not found.");
+
+		throw new NotFoundException("Certificate " + name + " : " + type
+				+ " not found.");
 	}
 
 	@Override

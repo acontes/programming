@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.mop.ReifiedCastException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -302,5 +303,9 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
 
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
 		return psm.getProActiveSecurityManager(user);
+	}
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		psm.setProActiveSecurityManager(user, policyServer);
 	}
 }

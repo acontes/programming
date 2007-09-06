@@ -37,7 +37,7 @@ import org.objectweb.proactive.ic2d.security.views.PolicyEditorView;
 
 public class SecurityPerspective implements IPerspectiveFactory {
 
-	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.perspectives.SecurityPerspective";
+	public static final String ID = "org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective";
 
 	/** Top folder's id. */
 	public static final String FI_TOP = ID + ".topFolder";
@@ -54,7 +54,7 @@ public class SecurityPerspective implements IPerspectiveFactory {
 		IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
 				0.75f, editorAreaId);
 		topFolder.addView(PolicyEditorView.ID);
-		topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
+		// topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
 
 	}
 

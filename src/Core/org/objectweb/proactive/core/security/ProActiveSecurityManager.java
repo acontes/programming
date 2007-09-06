@@ -1629,12 +1629,26 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+	}
 
-    public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
-    	if (false && !this.policyServer.hasAccessRights(user)) { // TODO active protection
-        	throw new AccessControlException("User denied from accessing this security manager.");
-        }
-    	return this;
-    }
+    
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+			throws SecurityNotAvailableException, AccessControlException {
+		accessControl(user);
+		return this;
+	}
+
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		accessControl(user);
+		sessions.clear();
+		this.policyServer = policyServer; 
+	}
+	
+	private boolean accessControl(Entity user) {
+		if (false && !this.policyServer.hasAccessRights(user)) { // TODO active protection
+			throw new AccessControlException(
+					"User denied from accessing this security manager.");
+		}
+		return true;
+	}
 }

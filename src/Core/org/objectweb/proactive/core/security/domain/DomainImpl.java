@@ -148,4 +148,8 @@ public class DomainImpl implements SecurityDomain {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
 }

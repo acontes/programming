@@ -32,7 +32,7 @@ import org.objectweb.proactive.ic2d.security.core.CertificateTreeMap;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeMapTransfer;
 
 public class CertificateTreeListSection {
-	
+
 	private Section section;
 
 	private Tree tree;
@@ -132,41 +132,79 @@ public class CertificateTreeListSection {
 	}
 
 	public void updateSection() {
-		Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
+		// Get expansion state
+		Map<TypedCertificate, Boolean> expanded = new HashMap<TypedCertificate, Boolean>();
 		for (TreeItem item : tree.getItems()) {
-			state.putAll(getState(item));
+			expanded.putAll(getExpanded(item));
+		}
+		
+		//Get check state
+		Map<TypedCertificate, Boolean> checked = new HashMap<TypedCertificate, Boolean>();
+		for (TreeItem item : tree.getItems()) {
+			checked.putAll(getChecked(item));
 		}
 
 		tree.removeAll();
 		for (CertificateTree subTree : certTreeList) {
 			newTreeItem(tree, subTree);
 		}
+		
+		for (TreeItem item : tree.getItems()) {
+			setChecked(item, checked);
+		}
 
 		for (TreeItem item : tree.getItems()) {
-			setState(item, state);
+			setExpanded(item, expanded);
 		}
 	}
 
-	private Map<TypedCertificate, Boolean> getState(TreeItem item) {
+	private Map<TypedCertificate, Boolean> getExpanded(TreeItem item) {
 		Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
 
 		state.put(((CertificateTree) item.getData()).getCertificate(), item
 				.getExpanded());
 		for (TreeItem child : item.getItems()) {
-			state.putAll(getState(child));
+			state.putAll(getExpanded(child));
 		}
 
 		return state;
 	}
 
-	private void setState(TreeItem item, Map<TypedCertificate, Boolean> state) {
+	private Map<TypedCertificate, Boolean> getChecked(TreeItem item) {
+		Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
+
+		if (!item.getGrayed()) {
+			state.put(((CertificateTree) item.getData()).getCertificate(), item
+					.getChecked());
+		}
+		for (TreeItem child : item.getItems()) {
+			state.putAll(getChecked(child));
+		}
+
+		return state;
+	}
+
+	private void setExpanded(TreeItem item, Map<TypedCertificate, Boolean> expanded) {
 		TypedCertificate cert = ((CertificateTree) item.getData())
 				.getCertificate();
-		if (state.containsKey(cert)) {
-			item.setExpanded(state.get(cert));
+		if (expanded.containsKey(cert)) {
+			item.setExpanded(expanded.get(cert));
 			for (TreeItem child : item.getItems()) {
-				setState(child, state);
+				setExpanded(child, expanded);
 			}
+		}
+	}
+
+	private void setChecked(TreeItem item, Map<TypedCertificate, Boolean> checked) {
+		TypedCertificate cert = ((CertificateTree) item.getData())
+				.getCertificate();
+		if (checked.containsKey(cert)) {
+			item.setChecked(checked.get(cert));
+		} else if (!item.getGrayed()) {
+			item.setChecked(true);
+		}
+		for (TreeItem child : item.getItems()) {
+			setChecked(child, checked);
 		}
 	}
 
@@ -200,7 +238,7 @@ public class CertificateTreeListSection {
 	public CertificateTree getSelectionData() {
 		return (CertificateTree) tree.getSelection()[0].getData();
 	}
-	
+
 	public Section get() {
 		return section;
 	}
