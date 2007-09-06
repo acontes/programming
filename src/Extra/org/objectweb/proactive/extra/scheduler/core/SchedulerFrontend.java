@@ -80,7 +80,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/** Scheduler logger */
 	public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 	/** A repeated  warning message */
-	private static final String LISTENER_WARNING = "!!!!!!!!!!!!!! Scheduler has detected that a listener is not connected anymore !";
 	private static final String ACCESS_DENIED = "Access denied !";
 	/** Multiplicatif factor for job id (taskId will be : this_factor*jobID+taskID) */
 	public static final int JOB_FACTOR = 1000;
@@ -493,7 +492,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 				} catch(Exception e){
 					iter.remove();
 					identifications.remove(id);
-					logger.error(LISTENER_WARNING);
+					logger.error("!!!!!!!!!!!!!! Scheduler has detected that a listener is not connected anymore !");
 				}
 			}
 		} catch (SecurityException e) {
