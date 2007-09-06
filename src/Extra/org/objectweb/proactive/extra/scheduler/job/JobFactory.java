@@ -110,6 +110,7 @@ public class JobFactory {
 		String name = null;
 		String priority = null;
 		String description = null;
+		boolean cancelOnException = true;
 		JobType jt = null;
 		Map<TaskDescriptor, String> tasks = new HashMap<TaskDescriptor, String>();
 		int jobAppliNeededNodes = 0;
@@ -129,6 +130,11 @@ public class JobFactory {
 				node = jobAttr.getNamedItem("priority");
 				if (node != null) {
 					priority = node.getNodeValue();
+				}
+				// JOB CANCEL ON EXCEPTION
+				node = jobAttr.getNamedItem("cancelOnException");
+				if (node != null) {
+					cancelOnException = node.getNodeValue().equalsIgnoreCase("true");
 				}
 				// JOB TYPE
 				node = jobAttr.getNamedItem("type");
@@ -208,14 +214,13 @@ public class JobFactory {
 				if(rerunnable != "")
 					desc.setRerunnable(Integer.parseInt(rerunnable));
 				else
-					desc.setRerunnable(0);
+					desc.setRerunnable(1);
 				System.out.println("reRun = " + desc.getRerunnable());
 
 				// TASK RUN TIME LIMIT
 				String timeLimit = (String) xpath.evaluate("@runtimeLimit",
 						taskNode, XPathConstants.STRING);
 				System.out.println("time limit = " + timeLimit);
-				// TODO timeLimit
 
 				// TASK VERIF
 				Node verifNode = (Node) xpath.evaluate("verifyingTask/script",
@@ -241,11 +246,6 @@ public class JobFactory {
 					desc.setPostTask(createScript(postNode,
 							xpath));
 				}
-
-				// TASK IO FILES
-				// TODO Add IO files
-
-				// TODO Add more options to Task
 
 				// TASK DEPENDS
 				tasks.put(desc,
@@ -274,9 +274,9 @@ public class JobFactory {
 				
 			}
 		} else if (jt == JobType.PARAMETER_SWEEPING){
-			job = new ParameterSweepingJob(name, getPriority(priority), -1, true, description);
+			job = new ParameterSweepingJob(name, getPriority(priority), -1, cancelOnException, description);
 		} else {
-			job = new TaskFlowJob(name, getPriority(priority), -1, true, description);
+			job = new TaskFlowJob(name, getPriority(priority), -1, cancelOnException, description);
 		}
 		// Dependencies
 		HashMap<String, TaskDescriptor> depends = 
@@ -410,6 +410,7 @@ public class JobFactory {
 
 	private VerifyingScript createVerifyingScript(Node node, XPath xpath)
 	throws XPathExpressionException, InvalidScriptException {
+		// TODO Verify if script is dynamic or static (default : dynamic)
 		String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
 		if (url != null && url != "") {
 			try {
