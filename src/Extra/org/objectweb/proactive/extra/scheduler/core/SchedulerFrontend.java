@@ -213,6 +213,11 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		//setting job informations
 		if (job.getTasks().size() == 0)
 			throw new SchedulerException("This job does not contain Tasks !! Insert tasks before submitting job.");
+		//verifying that the user has right to set the given priority to his job. 
+		if (!identifications.get(id).isAdmin()){
+			if (job.getPriority().getPriority() > 3 || job.getPriority() == JobPriority.IDLE)
+				throw new SchedulerException("Only the administrator can submit a job with such priority : "+ job.getPriority());
+		}
 		//setting the job properties
 		job.setId(new JobId(jobGlobalCount++));
 		job.setOwner(identifications.get(id).getUsername());
@@ -446,8 +451,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		if (!ui.isAdmin()){
 			if (priority == JobPriority.HIGHEST)
 				throw new SchedulerException("Only an administrator can change the priority to HIGHEST");
-			else if (priority == JobPriority.ABOVE_NORMAL)
-				throw new SchedulerException("Only an administrator can change the priority to ABOVE NORMAL");
+			else if (priority == JobPriority.HIGH)
+				throw new SchedulerException("Only an administrator can change the priority to HIGH");
+			else if (priority == JobPriority.IDLE)
+				throw new SchedulerException("Only an administrator can change the priority to IDLE");
 		}
 		scheduler.changePriority(jobId,priority);
 	}

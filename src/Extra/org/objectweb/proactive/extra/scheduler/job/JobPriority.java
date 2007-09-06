@@ -39,14 +39,16 @@ package org.objectweb.proactive.extra.scheduler.job;
  */
 public enum JobPriority implements java.io.Serializable {
 	
+	/** Lowest priority : administrator only */
+	IDLE ("Idle",0),
 	/** Lowest priority */
 	LOWEST ("Lowest",1),
-	/** Below normal priority */
-	BELOW_NORMAL ("Below Normal",2),
+	/** Low priority */
+	LOW ("Low",2),
 	/** Normal Prority */
 	NORMAL ("Normal",3),
-	/** Above normal priority : administrator only */
-	ABOVE_NORMAL ("Above Normal",4),
+	/** High priority : administrator only */
+	HIGH ("High",4),
 	/** Highest priority : administrator only */
 	HIGHEST ("Highest",5);
 	

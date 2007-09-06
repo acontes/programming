@@ -306,9 +306,10 @@ public class JobFactory {
 
 	private JobPriority getPriority(String priority) {
 		if(priority.equals("highest")) return JobPriority.HIGHEST;
-		else if(priority.equals("high")) return JobPriority.ABOVE_NORMAL;
-		else if(priority.equals("low")) return JobPriority.BELOW_NORMAL;
+		else if(priority.equals("high")) return JobPriority.HIGH;
+		else if(priority.equals("low")) return JobPriority.LOW;
 		else if(priority.equals("lowest")) return JobPriority.LOWEST;
+		else if(priority.equals("idle")) return JobPriority.IDLE;
 		else return JobPriority.NORMAL;
 	}
 

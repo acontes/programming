@@ -336,7 +336,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			for (TaskDescriptor td : j.getTasks()){
 				if (td.getStatus() == Status.RUNNNING && !ProActive.pingActiveObject(td.getLauncher())){
 					logger.info("<<<<<<<< Node failed on job "+j.getId()+", task [ "+td.getId()+" ]");
-					j.reStartTask(td);
+					if (td.getRerunnable() > 0){
+						td.setRerunnable(td.getRerunnable()-1);
+						j.reStartTask(td);
+					} else {
+						failedJob(j,td,"An error has occured due to a node failure and the maximum amout of reRennable property has been reached.");
+					}
 					//free execution node even if it is dead
 					//resourceManager.freeNode(td.getNode());
 				}
@@ -344,7 +349,45 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		}
 	}
 	
-	
+
+	/**
+	 * Failed the given job due to the given task failure.
+	 * 
+	 * @param job the job to failed.
+	 * @param td the task who has been the caused of failing.
+	 * @param errorMsg the error message to send in the task result.
+	 */
+	private void failedJob(Job job, TaskDescriptor task, String errorMsg) {
+		for (TaskDescriptor td : job.getTasks()){
+			if (td.getStatus() == Status.RUNNNING){
+				try{
+					//get the nodes that are used for this descriptor
+					NodeSet nodes = td.getLauncher().getNodes();
+					//try to terminate the task
+					try{ td.getLauncher().terminate();}
+					catch (Exception e){ /* Tested (nothing to do) */ }
+					//free every execution nodes
+					resourceManager.freeNodes(nodes,td.getPostTask());
+				} catch (Exception e){ /* Tested (nothing to do) */ }
+				//deleting all task results
+				taskResults.remove(td.getId());
+			}
+		}
+		//failed the job
+		job.failed(task.getId());
+		//store the exception into jobResult
+		results.get(job.getId()).addTaskResult(task.getName(),new TaskResult(task.getId(),new Throwable(errorMsg)));
+		//move the job
+		runningJobs.remove(job);
+		finishedJobs.add(job);
+		//send event to listeners.
+		frontend.runningToFinishedJobEvent(job.getJobInfo());
+		//don't forget to set the task status modify to null after a job.failed(...) method.
+		job.setTaskStatusModify(null);
+		logger.info("<<<<<<<<<<<<<<<<<<< Terminated job (failed) "+job.getId());
+	}
+
+
 	/**
 	 * Invoke by a task when it is about to finish.
 	 * This method can be invoke just a little amount of time before the result arrival.
@@ -355,6 +398,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @param jobId the executed task's job identification. 
 	 */
 	public void terminate(TaskId taskId, JobId jobId){
+		TaskDescriptor descriptor = null;
 		try {
 			//The task is terminated but it's possible to have to
 			//wait for the futur of the task result (TaskResult).
@@ -368,8 +412,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			if (res != null){
 				ProActive.waitFor(res);
 				if (ProActive.isException(res)){
+					//in this case, it is a node error.
+					//this is not user exception or usage,
+					//so we restart independantly of rerunnable properties
 					logger.info("<<<<<<<< Node failed on job "+jobId+", task [ "+taskId+" ]");
-					TaskDescriptor descriptor = job.getHMTasks().get(taskId);
+					descriptor = job.getHMTasks().get(taskId);
 					job.reStartTask(descriptor);
 					//free execution node even if it is dead
 					//resourceManager.freeNode(descriptor.getNode());
@@ -377,7 +424,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				}
 			}
 			logger.info("<<<<<<<< Terminated task on job "+jobId+" [ "+taskId+" ]");
-			TaskDescriptor descriptor = job.terminateTask(taskId);
+			descriptor = job.terminateTask(taskId);
 			frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
 			//store this result if the job is PARAMETER_SWIPPING or APPLI or if it is a final task.
 			if (job.getType() != JobType.TASKSFLOW || descriptor.isFinalTask()){
@@ -396,11 +443,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				logger.info("<<<<<<<<<<<<<<<<<<< Terminated job "+jobId);
 				frontend.runningToFinishedJobEvent(job.getJobInfo());
 			}
-			//free execution node
+			//free every execution nodes
 			resourceManager.freeNodes(descriptor.getLauncher().getNodes(),descriptor.getPostTask());
 		} catch (NodeException e) {
-			System.out.println("SchedulerCore.terminate() ===============>>");
-			e.printStackTrace();
+			//if the getLauncher().getNodes() method throws an exception,
+			//just free the execution node.
+			resourceManager.freeNode(descriptor.getNode(),descriptor.getPostTask());
 		} catch (NullPointerException eNull){
 			//the task has been killed. Nothing to do anymore with this one.
 		}
@@ -664,9 +712,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				try{
 					//get the nodes that are used for this descriptor
 					NodeSet nodes = td.getLauncher().getNodes();
-					//free execution node
+					//try to terminate the task
 					try{ td.getLauncher().terminate();}
 					catch (Exception e){ /* Tested (nothing to do) */ }
+					//free every execution nodes
 					resourceManager.freeNodes(nodes,td.getPostTask());
 				} catch (Exception e){ /* Tested (nothing to do) */ }
 				taskResults.remove(td.getId());

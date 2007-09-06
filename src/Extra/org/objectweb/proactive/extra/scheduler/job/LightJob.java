@@ -169,6 +169,17 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 	
 	
 	/**
+	 * Failed this light job by removing every tasks from eligible and running list.
+	 * This function considered that the taskIds are in eligible tasks list.
+	 * Visibility is package because user cannot use this method.
+	 */
+	void failed(){
+		eligibleTasks.clear();
+		runningTasks.clear();
+	}
+	
+	
+	/**
 	 * Update the list of eligible tasks according to the status of each task.
 	 * This method is called only if user pause a job.
 	 * 

@@ -57,6 +57,10 @@ public enum Status implements java.io.Serializable {
      */
     RUNNNING ("Runnning"),
     /**
+     * The task is failed
+     */
+    FAILED ("Failed"),
+    /**
      * The task has finished execution
      */
     FINISHED ("Finished");

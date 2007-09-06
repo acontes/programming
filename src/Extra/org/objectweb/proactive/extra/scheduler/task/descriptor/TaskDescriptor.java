@@ -94,7 +94,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	/** Maximum amount of time during which a job can be running. */
 	private long runTimeLimit;
 	/** Is this task rerunnable and how many times ? (0 if not) */
-	private int rerunnable;
+	private int rerunnable = 1;
 	/** Is this task a final task. */
 	private boolean finalTask;
 	/** Reference to the launcher of this task. */

@@ -68,7 +68,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	private String owner = "";
 	private String name = "";
 	private long runtimeLimit = -1;
-	private boolean RunUntilCancel = false;
+	private boolean cancelOnException = true;
 	private String description = "";
 	// TODO envParameters
 	// TODO un moyen pour le user de mettre n'importe quelles données dans le job et la retrouver dans la police.
@@ -96,12 +96,12 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 */
-	public Job(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
+	public Job(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description) {
 		super();
 		this.name = name;
 		this.jobInfo.setPriority(priority);
 		this.runtimeLimit = runtimeLimit;
-		this.RunUntilCancel = runUntilCancel;
+		this.cancelOnException = cancelOnException;
 		this.description = description;
 	}
 
@@ -272,6 +272,33 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		return descriptor;
 	}
 	
+	
+	/**
+	 * Failed this job due to the given task failure.
+	 * 
+	 * @param taskId the task that has been the cause to failure.
+	 */
+	public void failed(TaskId taskId){
+		TaskDescriptor descriptor = tasks.get(taskId);
+		descriptor.setFinishedTime(System.currentTimeMillis());
+		setFinishedTime(System.currentTimeMillis());
+		setNumberOfPendingTasks(0);
+		setNumberOfRunningTasks(0);
+		descriptor.setStatus(Status.FAILED);
+		setNumberOfRunningTasks(0);
+		setState(JobState.FAILED);
+		//terminate this lightjob
+		lightJob.failed();
+		//creating list of status
+		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
+		for (TaskDescriptor td : tasks.values()){
+			if (td.getStatus() != Status.FINISHED)
+				td.setStatus(Status.FAILED);
+			hts.put(td.getId(), td.getStatus());
+		}
+		setTaskStatusModify(hts);
+	}
+	
 
 	/**
 	 * Set all properties following a job submitting.
@@ -424,12 +451,12 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	}
 
 	/**
-	 * To get the runUntilCancel
+	 * To get the cancelOnException
 	 * 
-	 * @return the runUntilCancel
+	 * @return the cancelOnException
 	 */
-	public boolean isRunUntilCancel() {
-		return RunUntilCancel;
+	public boolean isCancelOnException() {
+		return cancelOnException;
 	}
 
 	/**
@@ -587,12 +614,12 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	}
 
 	/**
-	 * To get the runUntilCancel
+	 * To get the cancelOnException
 	 * 
-	 * @return the runUntilCancel
+	 * @return the cancelOnException
 	 */
-	public boolean getRunUntilCancel() {
-		return RunUntilCancel;
+	public boolean getCancelOnException() {
+		return cancelOnException;
 	}
 
 	/**
