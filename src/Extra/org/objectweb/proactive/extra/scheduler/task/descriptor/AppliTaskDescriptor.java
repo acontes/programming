@@ -116,7 +116,7 @@ public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
 			launcher = (AppliTaskLauncher)ProActive.newActive(AppliTaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
 		}
 		setLauncher(launcher);
-		setNode(node);
+		setNodeName(node.getNodeInformation().getName());
 		return launcher;
 	}
 	

@@ -110,7 +110,7 @@ public class JobFactory {
 		String name = null;
 		String priority = null;
 		String description = null;
-		boolean cancelOnException = true;
+		boolean cancelOnException = false;
 		JobType jt = null;
 		Map<TaskDescriptor, String> tasks = new HashMap<TaskDescriptor, String>();
 		int jobAppliNeededNodes = 0;

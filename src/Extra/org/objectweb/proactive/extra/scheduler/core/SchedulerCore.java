@@ -44,6 +44,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -322,7 +323,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				//if we are here, it is that something happend while launching the current task.
 				logger.warn("Current node has failed during its initialisation or launching the task : "+node); 
 				//so get back the node to the resource manager
-				//resourceManager.freeNode(node);
+				resourceManager.freeDownNode(taskDescriptor.getNodeName());
 			}
 		}
 	}
@@ -343,7 +344,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 						failedJob(j,td,"An error has occured due to a node failure and the maximum amout of reRennable property has been reached.");
 					}
 					//free execution node even if it is dead
-					//resourceManager.freeNode(td.getNode());
+					resourceManager.freeDownNode(td.getNodeName());
 				}
 			}
 		}
@@ -351,7 +352,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	
 
 	/**
-	 * Failed the given job due to the given task failure.
+	 * Failed the given job following to the given task failure.
 	 * 
 	 * @param job the job to failed.
 	 * @param td the task who has been the caused of failing.
@@ -419,7 +420,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					descriptor = job.getHMTasks().get(taskId);
 					job.reStartTask(descriptor);
 					//free execution node even if it is dead
-					//resourceManager.freeNode(descriptor.getNode());
+					resourceManager.freeDownNode(descriptor.getNodeName());
 					return;
 				}
 			}
@@ -448,7 +449,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		} catch (NodeException e) {
 			//if the getLauncher().getNodes() method throws an exception,
 			//just free the execution node.
-			resourceManager.freeNode(descriptor.getNode(),descriptor.getPostTask());
+			try {
+				resourceManager.freeNode(NodeFactory.getNode(descriptor.getNodeName()),descriptor.getPostTask());
+			} catch (NodeException e1) {
+				System.out.println("SchedulerCore.terminate()");
+			}
 		} catch (NullPointerException eNull){
 			//the task has been killed. Nothing to do anymore with this one.
 		}

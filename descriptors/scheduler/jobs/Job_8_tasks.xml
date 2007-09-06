@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_8_tasks" priority="normal" >
+<job name="job_8_tasks" priority="normal">
 	<description>Simple test of 8 tasks with variable durations</description>
 	<tasks>
-		<task name="task1" reRunnable="2">
+		<task name="task1">
 			<!-- Task human description -->
 			<description>This task will sleep 8s</description><!--
 			<preTask>
@@ -47,9 +47,9 @@
 				</javaProcess>
 			</process>
 		</task>
-		<task name="task8" finalTask="true">
+		<task name="task8" finalTask="true" reRunnable="2">
 			<!-- Task human description -->
-			<description>This task will sleep 30s</description>
+			<description>This task will sleep 20s</description>
 			<process>
 				<javaProcess
 					class="org.objectweb.proactive.examples.scheduler.WaitAndPrint">
@@ -86,7 +86,7 @@
 				</javaProcess>
 			</process>
 		</task>
-		<task name="task6" reRunnable="1">
+		<task name="task6">
 			<!-- Task human description -->
 			<description>This task will sleep 5s</description>
 			<process>

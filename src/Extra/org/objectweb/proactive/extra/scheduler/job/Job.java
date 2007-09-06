@@ -68,7 +68,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	private String owner = "";
 	private String name = "";
 	private long runtimeLimit = -1;
-	private boolean cancelOnException = true;
+	private boolean cancelOnException = false;
 	private String description = "";
 	// TODO envParameters
 	// TODO un moyen pour le user de mettre n'importe quelles données dans le job et la retrouver dans la police.

@@ -99,8 +99,8 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	private boolean finalTask;
 	/** Reference to the launcher of this task. */
 	private TaskLauncher launcher;
-	/** Reference to the node of this task. */
-	private Node node;
+	/** Reference to the node name of this task. */
+	private String nodeName;
 	/** Task information : this is the informations that can change during process. */
 	private TaskEvent taskInfo = new TaskEvent();
     
@@ -135,7 +135,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 			launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
 		}
 		setLauncher(launcher);
-		setNode(node);
+		setNodeName(node.getNodeInformation().getName());
 		return launcher;
 	}
 	
@@ -584,18 +584,18 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	
 
 	/**
-	 * @return the node
+	 * @return the node name.
 	 */
-	public Node getNode() {
-		return node;
+	public String getNodeName() {
+		return nodeName;
 	}
 
 
 	/**
-	 * @param node the node to set
+	 * @param nodeName the node name to set
 	 */
-	public void setNode(Node node) {
-		this.node = node;
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
 	}
 
 

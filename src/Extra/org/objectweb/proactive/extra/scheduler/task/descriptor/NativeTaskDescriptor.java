@@ -129,7 +129,7 @@ public class NativeTaskDescriptor extends TaskDescriptor {
 			launcher = (NativeTaskLauncher)ProActive.newActive(NativeTaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
 		}
 		setLauncher(launcher);
-		setNode(node);
+		setNodeName(node.getNodeInformation().getName());
 		return launcher;
 	}
 	
