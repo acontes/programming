@@ -43,7 +43,7 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 
 public class StatusLabel implements EventSchedulerListener {
 
-	public static final String INITIAL_TEXT = "clique droit + connect to scheduler...";
+	public static final String INITIAL_TEXT = "right click -> connect to scheduler...";
 	public static final Color INITIAL_COLOR = Colors.DARK_TURQUOISE;
 	
 	public static final String STARTED_TEXT = "STARTED";

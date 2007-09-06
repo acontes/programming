@@ -95,10 +95,11 @@ public class SeparatedJobView extends ViewPart {
 	private static Action pauseResumeJobAction = null;
 	private static Action killJobAction = null;
 
+	private static Action priorityIdleJobAction = null;
 	private static Action priorityLowestJobAction = null;
-	private static Action priorityBelowNormalJobAction = null;
+	private static Action priorityLowJobAction = null;
 	private static Action priorityNormalJobAction = null;
-	private static Action priorityAboveNormalJobAction = null;
+	private static Action priorityHighJobAction = null;
 	private static Action priorityHighestJobAction = null;
 
 	private static Action startStopSchedulerAction = null;
@@ -146,14 +147,19 @@ public class SeparatedJobView extends ViewPart {
 		manager.add(pauseResumeJobAction);
 		IMenuManager subMenu = new MenuManager("Change job priority");
 		manager.add(subMenu);
+		if (SchedulerProxy.getInstance() != null) {
+			if (SchedulerProxy.getInstance().isAnAdmin()) {
+				subMenu.add(priorityIdleJobAction);
+			}
+		}
 		subMenu.add(priorityLowestJobAction);
-		subMenu.add(priorityBelowNormalJobAction);
+		subMenu.add(priorityLowJobAction);
 		subMenu.add(priorityNormalJobAction);
 		manager.add(obtainJobOutputAction);
 		manager.add(killJobAction);
 		if (SchedulerProxy.getInstance() != null) {
 			if (SchedulerProxy.getInstance().isAnAdmin()) {
-				subMenu.add(priorityAboveNormalJobAction);
+				subMenu.add(priorityHighJobAction);
 				subMenu.add(priorityHighestJobAction);
 				manager.add(new Separator());
 				manager.add(startStopSchedulerAction);
@@ -204,10 +210,11 @@ public class SeparatedJobView extends ViewPart {
 		pauseResumeJobAction = PauseResumeJobAction.newInstance();
 		killJobAction = KillJobAction.newInstance(shell);
 
+		priorityIdleJobAction = PriorityIdleJobAction.newInstance();
 		priorityLowestJobAction = PriorityLowestJobAction.newInstance();
-		priorityBelowNormalJobAction = PriorityLowJobAction.newInstance();
+		priorityLowJobAction = PriorityLowJobAction.newInstance();
 		priorityNormalJobAction = PriorityNormalJobAction.newInstance();
-		priorityAboveNormalJobAction = PriorityHighJobAction.newInstance();
+		priorityHighJobAction = PriorityHighJobAction.newInstance();
 		priorityHighestJobAction = PriorityHighestJobAction.newInstance();
 
 		startStopSchedulerAction = StartStopSchedulerAction.newInstance();

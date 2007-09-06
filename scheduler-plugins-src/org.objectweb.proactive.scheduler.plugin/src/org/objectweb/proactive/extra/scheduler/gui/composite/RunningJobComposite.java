@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.extra.scheduler.gui.Colors;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
@@ -67,7 +68,8 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 		EventTasksListener, EventJobsListener {
 
 	/** the unique id and the title for the column "Progress" */
-	public static final String COLUMN_TASK_TITLE = "Progress";
+	public static final String COLUMN_PROGRESS_TEXT_TITLE = "# Finished Tasks";
+	public static final String COLUMN_PROGRESS_BAR_TITLE = "Progress";
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -165,7 +167,13 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 // sort(event, Job.SORT_BY_ID);
 // }
 // });
-		tc.setText(COLUMN_TASK_TITLE);
+		tc.setText(COLUMN_PROGRESS_TEXT_TITLE);
+		tc.setWidth(70);
+		tc.setMoveable(true);
+		tc.setToolTipText("You can't sort by this column");
+		
+		tc = new TableColumn(table, SWT.NONE, 2);
+		tc.setText(COLUMN_PROGRESS_BAR_TITLE);
 		tc.setWidth(70);
 		tc.setMoveable(true);
 		tc.setToolTipText("You can't sort by this column");
@@ -182,8 +190,9 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 		TableColumn[] cols = table.getColumns();
 		for (int i = 0; i < cols.length; i++) {
 			String title = cols[i].getText();
-			if (title.equals(COLUMN_TASK_TITLE)) {
+			if (title.equals(COLUMN_PROGRESS_TEXT_TITLE)) {
 				ProgressBar bar = new ProgressBar(table, SWT.NONE);
+				bar.setForeground(Colors.GREEN);
 				bar.setMaximum(job.getTotalNumberOfTasks());
 				bar.setSelection(job.getNumberOfFinishedTask());
 				TableEditor editor = new TableEditor(table);
@@ -256,7 +265,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 					Job job = JobsController.getLocalView().getJobById(taskEvent.getJobId());
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
-						if ((title != null) && (title.equals(COLUMN_TASK_TITLE))) {
+						if ((title != null) && (title.equals(COLUMN_PROGRESS_TEXT_TITLE))) {
 //							item
 //									.setText(i, job.getNumberOfFinishedTask() + "/"
 //											+ job.getTotalNumberOfTasks());
