@@ -234,6 +234,19 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	
 	
 	/**
+	 * Set this task in restart mode, it will set the task to pending state and change task count.
+	 * 
+	 * @param task the task which has to be restarted.
+	 */
+	public void reStartTask(TaskDescriptor task) {
+		setNumberOfPendingTasks(getNumberOfPendingTask()+1);
+		setNumberOfRunningTasks(getNumberOfRunningTask()-1);
+		lightJob.reStart(task.getId());
+		task.setStatus(Status.PENDING);
+	}
+	
+	
+	/**
 	 * Terminate a task, change status, managing dependences
 	 * 
 	 * @param taskId the task to terminate.

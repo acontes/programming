@@ -32,8 +32,15 @@ package org.objectweb.proactive.extra.scheduler.task.descriptor;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.task.NativeTask;
+import org.objectweb.proactive.extra.scheduler.task.NativeTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.Task;
+import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResult;
 
 /**
@@ -107,6 +114,23 @@ public class NativeTaskDescriptor extends TaskDescriptor {
 			}
 		};
 		return nativeTask;
+	}
+	
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+	 */
+	@Override
+	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException, NodeException {
+		NativeTaskLauncher launcher;
+		if (getPreTask() == null){
+			launcher = (NativeTaskLauncher)ProActive.newActive(NativeTaskLauncher.class.getName(), new Object[]{getId(),getJobId(), host, port}, node);
+		} else {
+			launcher = (NativeTaskLauncher)ProActive.newActive(NativeTaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
+		}
+		setLauncher(launcher);
+		setNode(node);
+		return launcher;
 	}
 	
 }

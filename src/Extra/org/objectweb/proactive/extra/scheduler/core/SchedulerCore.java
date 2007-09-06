@@ -87,13 +87,22 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	private static final long serialVersionUID = 1581139478784832488L;
 	/** Scheduler logger */
 	public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+	/** Prefix for logger system redirection. */
 	public static final String LOGGER_PREFIX = "logger.scheduler.";
+	/** Default port for connection logger system */
 	public static final Integer CONNECTION_DEFAULT_PORT = 1337;
-	public static String SERIALIZE_PATH = "/tmp/";
-	private static Integer port = CONNECTION_DEFAULT_PORT;
-	private static String host = null;
-	/** scheduler main loop time out */	
+	/** Path for the result serialization */
+	public static final String SERIALIZING_PATH = "/tmp/";
+	/** Scheduler main loop time out */	
 	private static final int SCHEDULER_TIME_OUT = 2000;
+	/** Scheduler node ping frequency. It is based on the main loop time out.
+	 *  For exemple, if the frequency is X and the main loop time out is Y,
+	 *  so the maximum umount of time between each ping will be X*Y. */
+	private static final int SCHEDULER_NODE_PING_FREQUENCY = 50;
+	/** Selected port for connection logger system */
+	private static Integer port = CONNECTION_DEFAULT_PORT;
+	/** Host name of the scheduler for logger system. */
+	private static String host = null;
 	/** Implementation of Infrastructure Manager */
 	private InfrastructureManagerProxy resourceManager;
 	/** Scheduler frontend. */
@@ -132,8 +141,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			this.resourceManager = imp;
 			this.frontend = frontend;
 			//logger
-			//TODO prendre un autre port si celui ci est utilisé (algo : demander à cmathieu)
 	    	host = java.net.InetAddress.getLocalHost().getHostName();
+	    	//TODO choose an other port in case of unavailability (algo : ask cmathieu)
 	        SimpleLoggerServer slf = new SimpleLoggerServer(port);
 	        Thread slft  = new Thread(slf);
 	        slft.start();
@@ -159,6 +168,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
 	 */
 	public void runActivity(Body body) {
+		int pingFrequency = 0;
 		ProActive.setImmediateService("listenLog");
 		Service service = new Service(body);
 		//set the filter for serveAll method
@@ -170,6 +180,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				schedule();
 	            //block the loop until a method is invoked and serve it
 				service.blockingServeOldest(SCHEDULER_TIME_OUT);
+				if ((pingFrequency++) == SCHEDULER_NODE_PING_FREQUENCY){
+					pingFrequency = 0;
+					pingDeployedNodes();
+				}
 			}
 		} while (state != SchedulerState.SHUTTING_DOWN && state != SchedulerState.KILLED);
 		logger.info("Scheduler is shutting down...");
@@ -190,12 +204,17 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			schedule();
             //block the loop until a method is invoked and serve it
 			service.blockingServeOldest(SCHEDULER_TIME_OUT);
+			//search for down node and get back to the resources manager
+			if ((pingFrequency++) == SCHEDULER_NODE_PING_FREQUENCY){
+				pingFrequency = 0;
+				pingDeployedNodes();
+			}
 		}
 		//if normal shutdown, serialize
 		if (state == SchedulerState.SHUTTING_DOWN){
 			try {
 				logger.info("Serializing results...");
-				Serializer.serializeResults(results,SERIALIZE_PATH);
+				Serializer.serializeResults(results,SERIALIZING_PATH);
 			} catch (Exception e) {
 				e.printStackTrace();
 				//if an error occurs during serialization, we wait until the result to be got back
@@ -218,6 +237,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	}
 
 	
+	/**
+	 * Schedule computing method
+	 */
 	private void schedule() {
 		//get light job list with eligible jobs (running and pending)
 		ArrayList<LightJob> LightJobList = new ArrayList<LightJob>();
@@ -233,29 +255,30 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		//ask the policy all the tasks to be schedule according to the jobs list.
 		Vector<? extends LightTask> taskRetrivedFromPolicy = policy.getOrderedTasks(LightJobList);
 		while (!taskRetrivedFromPolicy.isEmpty() && resourceManager.hasFreeResources().booleanValue()){
-			LightTask lightTask = taskRetrivedFromPolicy.remove(0);
+			LightTask lightTask = taskRetrivedFromPolicy.get(0);
 			Job currentJob = jobs.get(lightTask.getJobId());
 			TaskDescriptor taskDescriptor = currentJob.getHMTasks().get(lightTask.getId());
-			//TODO améliorer la demande de noeuds
-			//il faut associer les scripts aux demandes histoire qu'on execute bien
-			//la bonne tache sur le bon noeud d'execution.
+			//TODO improve the way to get the node from the resources manager.
+			//it can be better to associate scripts and node to ask for more than one node each time,
+			//and to be sure that we give the right node with its right script
 			NodeSet nodeSet = resourceManager.getAtMostNodes(taskDescriptor.getNumberOfNodesNeeded(), taskDescriptor.getVerifyingScript());
+			Node node = null;
 			try {
 				while (nodeSet.size() > 0){
-					Node node = nodeSet.get(0);
+					node = nodeSet.get(0);
 					TaskLauncher launcher = null;
 					//if the job is an application job and if all nodes can be launched at the same time
 					if (currentJob.getType() == JobType.APPLI && nodeSet.size() >= taskDescriptor.getNumberOfNodesNeeded()){
+						nodeSet.remove(0);
 						launcher = taskDescriptor.createLauncher(host, port, node);
 						NodeSet nodes = new NodeSet();
-						nodeSet.remove(0);
 						for (int i=0;i<(taskDescriptor.getNumberOfNodesNeeded()-1);i++){
 							nodes.add(nodeSet.remove(0));
 						}
 						taskResults.put(taskDescriptor.getId(),((AppliTaskLauncher)launcher).doTask((SchedulerCore)ProActive.getStubOnThis(),(ApplicationTask)taskDescriptor.getTask(),nodes));
 					} else if (currentJob.getType() != JobType.APPLI) {
-						launcher = taskDescriptor.createLauncher(host, port, node);
 						nodeSet.remove(0);
+						launcher = taskDescriptor.createLauncher(host, port, node);
 						//if job is TASKSFLOW, preparing the list of parameters for this task.
 						int resultSize = lightTask.getParents().size();
 						if (currentJob.getType() == JobType.TASKSFLOW && resultSize > 0){
@@ -293,17 +316,35 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 						break;
 					}
 				}
+				//if everything were ok, removed this task from the processed task.
+				taskRetrivedFromPolicy.remove(0);
 			} catch (Exception e) {
-				// TODO qué fa ? rendre le noeud et reessayer avec un autre.
-				// ne pas oublier de sauver dans une liste les tache qui ont merdé et les relancer
-				//autant qu'il le faut
-				e.printStackTrace();
+				//if we are here, it is that something happend while launching the current task.
+				logger.warn("Current node has failed during its initialisation or launching the task : "+node); 
+				//so get back the node to the resource manager
+				//resourceManager.freeNode(node);
 			}
 		}
-		
 	}
 	
 
+	/**
+	 * Ping every nodes on which a task is currently running and repair the task if need.
+	 */
+	private void pingDeployedNodes() {
+		for (Job j : runningJobs){
+			for (TaskDescriptor td : j.getTasks()){
+				if (td.getStatus() == Status.RUNNNING && !ProActive.pingActiveObject(td.getLauncher())){
+					logger.info("<<<<<<<< Node failed on job "+j.getId()+", task [ "+td.getId()+" ]");
+					j.reStartTask(td);
+					//free execution node even if it is dead
+					//resourceManager.freeNode(td.getNode());
+				}
+			}
+		}
+	}
+	
+	
 	/**
 	 * Invoke by a task when it is about to finish.
 	 * This method can be invoke just a little amount of time before the result arrival.
@@ -315,17 +356,31 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 */
 	public void terminate(TaskId taskId, JobId jobId){
 		try {
-			logger.info("<<<<<<<< Terminated task on job "+jobId+" [ "+taskId+" ]");
 			//The task is terminated but it's possible to have to
 			//wait for the futur of the task result (TaskResult).
 			//accessing to the taskResult could block current execution but for a little time.
 			//it is the time between the end of the task and the arrival of the futur from the task.
 			Job job = jobs.get(jobId);
+			//check if the task result futur has an error due to node death.
+			//if the node has died, a runtimeException is sent instead of the result
+			TaskResult res = null;
+			res = taskResults.get(taskId);
+			if (res != null){
+				ProActive.waitFor(res);
+				if (ProActive.isException(res)){
+					logger.info("<<<<<<<< Node failed on job "+jobId+", task [ "+taskId+" ]");
+					TaskDescriptor descriptor = job.getHMTasks().get(taskId);
+					job.reStartTask(descriptor);
+					//free execution node even if it is dead
+					//resourceManager.freeNode(descriptor.getNode());
+					return;
+				}
+			}
+			logger.info("<<<<<<<< Terminated task on job "+jobId+" [ "+taskId+" ]");
 			TaskDescriptor descriptor = job.terminateTask(taskId);
 			frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
 			//store this result if the job is PARAMETER_SWIPPING or APPLI or if it is a final task.
 			if (job.getType() != JobType.TASKSFLOW || descriptor.isFinalTask()){
-				TaskResult res = taskResults.get(taskId);
 				results.get(job.getId()).addTaskResult(descriptor.getName(),res);
 			}
 			//if this job is finished (every task are finished)
@@ -344,6 +399,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			//free execution node
 			resourceManager.freeNodes(descriptor.getLauncher().getNodes(),descriptor.getPostTask());
 		} catch (NodeException e) {
+			System.out.println("SchedulerCore.terminate() ===============>>");
 			e.printStackTrace();
 		} catch (NullPointerException eNull){
 			//the task has been killed. Nothing to do anymore with this one.
@@ -408,7 +464,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	public JobResult getResults(JobId jobId) {
 		JobResult result = results.remove(jobId);
 		if (result != null) {
-			Job job = jobs.get(jobId);
+			Job job = jobs.remove(jobId);
 			job.setRemovedTime(System.currentTimeMillis());
 			finishedJobs.remove(job);
 			frontend.removeFinishedJobEvent(job.getJobInfo());
@@ -496,9 +552,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @see org.objectweb.proactive.extra.scheduler.core.SchedulerCoreInterface#shutdown()
 	 */
 	public BooleanWrapper coreShutdown() {
-		//TODO si le scheduler est shutting down et qu'un job est en pause que fait on ?
-		//actuellement le job reste en pause et le scheduler s'arrete que lorsque tous les jobs sont finis.
-		//Le user ne peut pas non plus résumer son job, donc tout reste bloqué.
+		//TODO of the scheduler is shutting down and a job is paused, what can we do for the job ?
 		if (state == SchedulerState.KILLED || state == SchedulerState.SHUTTING_DOWN)
 			return new BooleanWrapper(false);
 		state = SchedulerState.SHUTTING_DOWN;

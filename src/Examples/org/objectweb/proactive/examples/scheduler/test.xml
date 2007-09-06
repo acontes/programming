@@ -5,12 +5,13 @@
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="SchedulerVN" property="multiple"/>
+			<virtualNode name="SchedulerVN1" property="multiple"/>
+			<virtualNode name="SchedulerVN2" property="multiple"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
            <mapping>
-			<map virtualNode="SchedulerVN">
+			<map virtualNode="SchedulerVN1">
 				<jvmSet>
 					<vmName value="Jvm1"/>
 					<vmName value="Jvm2"/>
@@ -18,6 +19,10 @@
 					<vmName value="Jvm4"/>
 					<vmName value="Jvm5"/>
 					<vmName value="Jvm6"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="SchedulerVN2">
+				<jvmSet>
 					<vmName value="Jvm7"/>
 					<vmName value="Jvm8"/>
 					<vmName value="Jvm9"/>
@@ -30,104 +35,104 @@
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="localJVM"/>
+					<processReference refid="remoteJVM1"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
 				<creation>
-					<processReference refid="localJVM"/>
+					<processReference refid="remoteJVM1"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
 				<creation>
-					<processReference refid="localJVM2"/>
+					<processReference refid="remoteJVM2"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm4">
 				<creation>
-					<processReference refid="localJVM2"/>
+					<processReference refid="remoteJVM2"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm5">
 				<creation>
-					<processReference refid="localJVM3"/>
+					<processReference refid="remoteJVM3"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm6">
 				<creation>
-					<processReference refid="localJVM3"/>
+					<processReference refid="remoteJVM3"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm7">
 				<creation>
-					<processReference refid="localJVM4"/>
+					<processReference refid="remoteJVM4"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm8">
 				<creation>
-					<processReference refid="localJVM4"/>
+					<processReference refid="remoteJVM4"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm9">
 				<creation>
-					<processReference refid="localJVM5"/>
+					<processReference refid="remoteJVM5"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm10">
 				<creation>
-					<processReference refid="localJVM5"/>
+					<processReference refid="remoteJVM5"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm11">
 				<creation>
-					<processReference refid="localJVM6"/>
+					<processReference refid="remoteJVM6"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm12">
 				<creation>
-					<processReference refid="localJVM6"/>
+					<processReference refid="remoteJVM6"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<processDefinition id="localJVM">
+			<processDefinition id="remoteJVM1">
 				<sshProcess 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
 					hostname="nahuel">
 					<processReference refid="JVM"/>
 				</sshProcess>
 			</processDefinition>
-			<processDefinition id="localJVM2">
+			<processDefinition id="remoteJVM2">
 				<sshProcess 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
 					hostname="fiacre">
 					<processReference refid="JVM"/>
 				</sshProcess>
 			</processDefinition>
-			<processDefinition id="localJVM3">
+			<processDefinition id="remoteJVM3">
 				<sshProcess 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
 					hostname="noadcoco">
 					<processReference refid="JVM"/>
 				</sshProcess>
 			</processDefinition>
-			<processDefinition id="localJVM4">
+			<processDefinition id="remoteJVM4">
 				<sshProcess 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
 					hostname="trans06">
 					<processReference refid="JVM"/>
 				</sshProcess>
 			</processDefinition>
-			<processDefinition id="localJVM5">
+			<processDefinition id="remoteJVM5">
 				<sshProcess 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
 					hostname="oasis2">
 					<processReference refid="JVM"/>
 				</sshProcess>
 			</processDefinition>
-			<processDefinition id="localJVM6">
+			<processDefinition id="remoteJVM6">
 				<sshProcess 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
 					hostname="macyavel">

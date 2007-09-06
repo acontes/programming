@@ -135,6 +135,18 @@ public class LightJob implements Serializable, Comparable<LightJob> {
 		eligibleTasks.remove(taskId);
 	}
 	
+	
+	/**
+	 * Delete this task from running task view and add it to eligible view.
+	 * Visibility is package because user cannot use this method.
+	 * 
+	 * @param taskId the task that has just been started.
+	 */
+	void reStart(TaskId taskId){
+		eligibleTasks.put(taskId,(EligibleLightTask)runningTasks.remove(taskId));
+	}
+	
+	
 	/**
 	 * Update the eligible list of task and dependencies if necessary.
 	 * This function considered that the taskId is in eligible task list.
