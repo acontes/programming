@@ -287,4 +287,8 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
             user.freeNodes(ns);
         }
     }
+    
+    public void freeDownNode(String nodeName) {
+    	//imcore.freeDownNode(nodeName);
+    }
 }
