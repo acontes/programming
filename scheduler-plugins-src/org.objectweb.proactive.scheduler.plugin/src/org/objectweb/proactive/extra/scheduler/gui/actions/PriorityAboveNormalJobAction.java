@@ -45,7 +45,6 @@ public class PriorityAboveNormalJobAction extends Action {
 	private PriorityAboveNormalJobAction() {
 		this.setText("Above Normal");
 		this.setToolTipText("To set the job priority to \"above normal\"");
-		//TODO this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/output.png"));
 		this.setEnabled(ENABLED_AT_CONSTRUCTION);
 	}
 

@@ -113,7 +113,6 @@ public abstract class AbstractJobComposite extends Composite {
 		this.title = title;
 		this.label = createLabel(parent, title);
 		this.table = createTable(parent, tableId);
-		// TODO setVisible(false);
 	}
 
 	// -------------------------------------------------------------------- //
@@ -271,7 +270,7 @@ public abstract class AbstractJobComposite extends Composite {
 				Job job = JobsController.getLocalView().getJobById(jobId);
 
 				// show its output
-				// TODO ???
+				// TODO est-ce que je laisse ou pas ???
 				JobsOutputController.getInstance().showJobOutput(jobId);
 
 				// update its informations

@@ -95,7 +95,6 @@ public class TaskComposite extends Composite {
 		this.setLayout(new GridLayout());
 		this.label = createLabel(parent);
 		this.table = createTable(parent);
-		// TODO setVisible(false);
 	}
 
 	private Label createLabel(Composite parent) {

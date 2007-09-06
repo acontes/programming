@@ -207,7 +207,6 @@ public class JobInfo extends ViewPart {
 
 		tc1.setWidth(100);
 		tc2.setWidth(100);
-		// TODO setVisible(false);
 
 		TableManager tableManager = TableManager.getInstance();
 		if (tableManager != null) {
@@ -225,13 +224,13 @@ public class JobInfo extends ViewPart {
 	// TODO petit problème, Eclipse envoi 3 fois d'afiler le mm event
 	// setFocus quand la fenêtre a une fenetre "onglet" voisine...
 
-	// TableManager tableManager = TableManager.getInstance();
-	// if (tableManager != null) {
-	// TableItem item = tableManager.getLastSelectedItem();
-	// if (item != null)
-	// updateInfos(JobsController.getInstance().getJobById((IntWrapper)
-	// item.getData()));
-	// }
+//	 TableManager tableManager = TableManager.getInstance();
+//	 if (tableManager != null) {
+//	 TableItem item = tableManager.getLastSelectedItem();
+//	 if (item != null)
+//	 updateInfos(JobsController.getInstance().getJobById((IntWrapper)
+//	 item.getData()));
+//	 }
 	}
 
 	/**

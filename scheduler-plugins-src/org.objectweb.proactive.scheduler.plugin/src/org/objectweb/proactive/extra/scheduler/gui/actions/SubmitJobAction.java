@@ -56,7 +56,6 @@ public class SubmitJobAction extends Action {
 
 	@Override
 	public void run() {
-		// TODO
 		FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN);
 		fileDialog.setFilterExtensions(new String[] { "*.xml" });
 		String fileName = fileDialog.open();

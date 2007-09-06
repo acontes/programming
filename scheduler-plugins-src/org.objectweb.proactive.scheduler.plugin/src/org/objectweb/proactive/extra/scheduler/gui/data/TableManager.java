@@ -132,9 +132,6 @@ public class TableManager {
 				TableItem[] items = table.getItems();
 				for (int i = 0; i < items.length; i++)
 					if (((JobId) items[i].getData()).equals(jId)) {
-						// TODO on pourrait peut etre enlever tte les selection
-						// table.deselectAll(); sur toute les tables...
-
 						// select the job
 						table.select(i);
 

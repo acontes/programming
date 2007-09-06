@@ -45,7 +45,6 @@ public class PriorityHighestJobAction extends Action {
 	private PriorityHighestJobAction() {
 		this.setText("Highest");
 		this.setToolTipText("To set the job priority to \"highest\"");
-		//TODO this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/output.png"));
 		this.setEnabled(ENABLED_AT_CONSTRUCTION);
 	}
 
