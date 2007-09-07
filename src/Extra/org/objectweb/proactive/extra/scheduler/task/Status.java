@@ -61,9 +61,15 @@ public enum Status implements java.io.Serializable {
      */
     FAILED ("Failed"),
     /**
-     * The task could not be started
+     * The task could not be started.
+     * Warning, it means that the task could not be started due to
+     * dependences failure.
      */
     NOT_STARTED ("Could not start"),
+    /**
+     * The task has finished execution
+     */
+    CANCELLED ("Cancelled"),
     /**
      * The task has finished execution
      */

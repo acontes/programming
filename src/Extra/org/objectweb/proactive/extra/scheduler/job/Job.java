@@ -277,22 +277,23 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * Failed this job due to the given task failure.
 	 * 
 	 * @param taskId the task that has been the cause to failure.
+	 * @param jobState type of the failure on this job. (failed/cancelled)
 	 */
-	public void failed(TaskId taskId){
+	public void failed(TaskId taskId, JobState jobState){
 		TaskDescriptor descriptor = tasks.get(taskId);
 		descriptor.setFinishedTime(System.currentTimeMillis());
 		setFinishedTime(System.currentTimeMillis());
 		setNumberOfPendingTasks(0);
 		setNumberOfRunningTasks(0);
-		descriptor.setStatus(Status.FAILED);
+		descriptor.setStatus((jobState == JobState.FAILED)?Status.FAILED:Status.CANCELLED);
 		setNumberOfRunningTasks(0);
-		setState(JobState.FAILED);
+		setState(jobState);
 		//terminate this lightjob
 		lightJob.failed();
 		//creating list of status
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
-			if (td.getStatus() != Status.FINISHED && td.getStatus() != Status.FAILED)
+			if (td.getStatus() != Status.FINISHED && !td.getId().equals(taskId))
 				td.setStatus(Status.NOT_STARTED);
 			hts.put(td.getId(), td.getStatus());
 		}

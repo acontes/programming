@@ -53,10 +53,6 @@ public enum JobState implements java.io.Serializable {
 	 */
 	STALLED ("Stalled"),
 	/**
-	 * The job is Rerunning, it means that one of its task has been rerunned.
-	 */
-	RERUNNING ("ReRunning"),
-	/**
 	 * The job is finished. Every tasks are finished.
 	 */
 	FINISHED ("Finished"),
@@ -64,6 +60,12 @@ public enum JobState implements java.io.Serializable {
 	 * The job is paused waiting for user to resume it.
 	 */
 	PAUSED ("Paused"),
+	/**
+	 * The job has been cancelled due to user exception and order.
+	 * This state runs when a user exception occurs in a task
+	 * and when the user has asked to cancel on exception.
+	 */
+	CANCELLED ("Cancelled"),
 	/**
 	 * The job has failed. One or more tasks have failed.
 	 * There is no more rerun left for a task.

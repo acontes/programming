@@ -367,13 +367,13 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			for (TaskDescriptor td : job.getTasks()){
 				if (td.getStatus() == Status.RUNNNING && !ProActive.pingActiveObject(td.getLauncher())){
 					logger.info("<<<<<<<< Node failed on job "+job.getId()+", task [ "+td.getId()+" ]");
-					if (td.getReRunnableLeft() > 0){
-						td.setReRunnableLeft(td.getReRunnableLeft()-1);
+					if (td.getRerunnableLeft() > 0){
+						td.setRerunnableLeft(td.getRerunnableLeft()-1);
 						job.reStartTask(td);
 						//free execution node even if it is dead
 						resourceManager.freeDownNode(td.getNodeName());
 					} else {
-						failedJob(job,td,"An error has occured due to a node failure and the maximum amout of reRennable property has been reached.");
+						failedJob(job,td,"An error has occured due to a node failure and the maximum amout of reRennable property has been reached.",JobState.FAILED);
 						i--;
 						//free execution node even if it is dead
 						resourceManager.freeDownNode(td.getNodeName());
@@ -391,8 +391,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @param job the job to failed.
 	 * @param td the task who has been the caused of failing.
 	 * @param errorMsg the error message to send in the task result.
+	 * @param jobState the type of the failure for this job. (failed/cancelled)
 	 */
-	private void failedJob(Job job, TaskDescriptor task, String errorMsg) {
+	private void failedJob(Job job, TaskDescriptor task, String errorMsg, JobState jobState) {
+		TaskResult taskResult = null;
 		for (TaskDescriptor td : job.getTasks()){
 			if (td.getStatus() == Status.RUNNNING){
 				try{
@@ -405,13 +407,19 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					resourceManager.freeNodes(nodes,td.getPostTask());
 				} catch (Exception e){ /* Tested (nothing to do) */ }
 				//deleting task result
-				taskResults.remove(td.getId());
+				if (jobState == JobState.CANCELLED && td.getId().equals(task.getId()))
+					taskResult = taskResults.remove(td.getId());
+				else
+					taskResults.remove(td.getId());
 			}
 		}
 		//failed the job
-		job.failed(task.getId());
+		job.failed(task.getId(),jobState);
 		//store the exception into jobResult
-		results.get(job.getId()).addTaskResult(task.getName(),new TaskResult(task.getId(),new Throwable(errorMsg)));
+		if (jobState == JobState.FAILED)
+			results.get(job.getId()).addTaskResult(task.getName(),new TaskResult(task.getId(),new Throwable(errorMsg)));
+		else
+			results.get(job.getId()).addTaskResult(task.getName(),taskResult);
 		//move the job
 		runningJobs.remove(job);
 		finishedJobs.add(job);
@@ -419,7 +427,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		frontend.runningToFinishedJobEvent(job.getJobInfo());
 		//don't forget to set the task status modify to null after a job.failed(...) method.
 		job.setTaskStatusModify(null);
-		logger.info("<<<<<<<<<<<<<<<<<<< Terminated job (failed) "+job.getId());
+		logger.info("<<<<<<<<<<<<<<<<<<< Terminated job (failed/Cancelled) "+job.getId());
 	}
 
 
@@ -445,7 +453,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			TaskResult res = null;
 			res = taskResults.get(taskId);
 			if (res != null){
-				ProActive.waitFor(res);
 				if (ProActive.isException(res)){
 					//in this case, it is a node error.
 					//this is not user exception or usage,
@@ -459,6 +466,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				}
 			}
 			logger.info("<<<<<<<< Terminated task on job "+jobId+" [ "+taskId+" ]");
+			//if an exception occured and the user wanted to cancel on exception, cancel the job.
+			if (job.isCancelOnException() && res.hadException()){
+				failedJob(job, descriptor, "An error has occured due to a user exception caught in the task and user wanted to cancel on exception.",JobState.CANCELLED);
+				return;
+			}
 			descriptor = job.terminateTask(taskId);
 			frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
 			//store this result if the job is PARAMETER_SWIPPING or APPLI or if it is a final task.
