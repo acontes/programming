@@ -71,6 +71,10 @@ public enum Status implements java.io.Serializable {
      */
     CANCELLED ("Cancelled"),
     /**
+     * The task has been interrupted by an exception on an other task
+     */
+    INTERRUPTED ("Interrupted"),
+    /**
      * The task has finished execution
      */
     FINISHED ("Finished");

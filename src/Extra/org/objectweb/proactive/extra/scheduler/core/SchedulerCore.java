@@ -441,13 +441,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @param jobId the executed task's job identification. 
 	 */
 	public void terminate(TaskId taskId, JobId jobId){
-		TaskDescriptor descriptor = null;
+		Job job = jobs.get(jobId);
+		TaskDescriptor descriptor = job.getHMTasks().get(taskId);
 		try {
 			//The task is terminated but it's possible to have to
 			//wait for the futur of the task result (TaskResult).
 			//accessing to the taskResult could block current execution but for a little time.
 			//it is the time between the end of the task and the arrival of the futur from the task.
-			Job job = jobs.get(jobId);
+			//
 			//check if the task result futur has an error due to node death.
 			//if the node has died, a runtimeException is sent instead of the result
 			TaskResult res = null;
@@ -458,7 +459,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					//this is not user exception or usage,
 					//so we restart independantly of rerunnable properties
 					logger.info("<<<<<<<< Node failed on job "+jobId+", task [ "+taskId+" ]");
-					descriptor = job.getHMTasks().get(taskId);
 					job.reStartTask(descriptor);
 					//free execution node even if it is dead
 					resourceManager.freeDownNode(descriptor.getNodeName());

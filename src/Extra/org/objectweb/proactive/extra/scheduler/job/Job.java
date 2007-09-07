@@ -293,7 +293,9 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		//creating list of status
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
-			if (td.getStatus() != Status.FINISHED && !td.getId().equals(taskId))
+			if (td.getStatus() != Status.RUNNNING)
+				td.setStatus(Status.INTERRUPTED);
+			else if (td.getStatus() != Status.FINISHED && !td.getId().equals(taskId))
 				td.setStatus(Status.NOT_STARTED);
 			hts.put(td.getId(), td.getStatus());
 		}

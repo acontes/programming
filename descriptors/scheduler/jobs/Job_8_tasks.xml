@@ -62,12 +62,12 @@
 		</task>
 		<task name="task4">
 			<!-- Task human description -->
-			<description>This task will sleep 5s</description>
+			<description>This task will sleep 6s</description>
 			<process>
 				<javaProcess
 					class="org.objectweb.proactive.examples.scheduler.WaitAndPrint">
 					<initParameters>
-						<parameter name="sleepTime" value="5" />
+						<parameter name="sleepTime" value="6" />
 						<parameter name="number" value="4" />
 					</initParameters>
 				</javaProcess>
@@ -88,12 +88,12 @@
 		</task>
 		<task name="task6">
 			<!-- Task human description -->
-			<description>This task will sleep 5s</description>
+			<description>This task will sleep 4s</description>
 			<process>
 				<javaProcess
 					class="org.objectweb.proactive.examples.scheduler.WaitAndPrint">
 					<initParameters>
-						<parameter name="sleepTime" value="5" />
+						<parameter name="sleepTime" value="4" />
 						<parameter name="number" value="6" />
 					</initParameters>
 				</javaProcess>
