@@ -43,51 +43,51 @@ public class SimplePolicyRule {
 
 	public SimplePolicyRule() {
 
-		name = "Rule " + ++num;
-		from = new ArrayList<String>();
-		to = new ArrayList<String>();
+		this.name = "Rule " + ++num;
+		this.from = new ArrayList<String>();
+		this.to = new ArrayList<String>();
 
-		request = true;
-		reqAuth = Communication.OPTIONAL;
-		reqConf = Communication.OPTIONAL;
-		reqInt = Communication.OPTIONAL;
+		this.request = true;
+		this.reqAuth = Communication.OPTIONAL;
+		this.reqConf = Communication.OPTIONAL;
+		this.reqInt = Communication.OPTIONAL;
 
-		reply = true;
-		repAuth = Communication.OPTIONAL;
-		repConf = Communication.OPTIONAL;
-		repInt = Communication.OPTIONAL;
+		this.reply = true;
+		this.repAuth = Communication.OPTIONAL;
+		this.repConf = Communication.OPTIONAL;
+		this.repInt = Communication.OPTIONAL;
 
-		aoCreation = true;
-		migration = true;
+		this.aoCreation = true;
+		this.migration = true;
 	}
 
 	public void addFrom(String name) {
 		if (name != null) {
-			from.add(name);
+			this.from.add(name);
 		}
 	}
 
 	public void removeFrom(int i) {
-		from.remove(i);
+		this.from.remove(i);
 	}
 
 	public void addTo(String name) {
 		if (name != null) {
-			to.add(name);
+			this.to.add(name);
 		}
 	}
 
 	public void removeTo(int i) {
-		to.remove(i);
+		this.to.remove(i);
 	}
 
 	@Override
 	public String toString() {
-		return name;
+		return this.name;
 	}
 
 	public int getRepAuth() {
-		return repAuth;
+		return this.repAuth;
 	}
 
 	public void setRepAuth(int repAuth) {
@@ -95,7 +95,7 @@ public class SimplePolicyRule {
 	}
 
 	public int getRepConf() {
-		return repConf;
+		return this.repConf;
 	}
 
 	public void setRepConf(int repConf) {
@@ -103,7 +103,7 @@ public class SimplePolicyRule {
 	}
 
 	public int getRepInt() {
-		return repInt;
+		return this.repInt;
 	}
 
 	public void setRepInt(int repInt) {
@@ -111,7 +111,7 @@ public class SimplePolicyRule {
 	}
 
 	public boolean isReply() {
-		return reply;
+		return this.reply;
 	}
 
 	public void setReply(boolean reply) {
@@ -119,7 +119,7 @@ public class SimplePolicyRule {
 	}
 
 	public int getReqAuth() {
-		return reqAuth;
+		return this.reqAuth;
 	}
 
 	public void setReqAuth(int reqAuth) {
@@ -127,7 +127,7 @@ public class SimplePolicyRule {
 	}
 
 	public int getReqConf() {
-		return reqConf;
+		return this.reqConf;
 	}
 
 	public void setReqConf(int reqConf) {
@@ -135,7 +135,7 @@ public class SimplePolicyRule {
 	}
 
 	public int getReqInt() {
-		return reqInt;
+		return this.reqInt;
 	}
 
 	public void setReqInt(int reqInt) {
@@ -143,7 +143,7 @@ public class SimplePolicyRule {
 	}
 
 	public boolean isRequest() {
-		return request;
+		return this.request;
 	}
 
 	public void setRequest(boolean request) {
@@ -151,15 +151,15 @@ public class SimplePolicyRule {
 	}
 
 	public List<String> getFrom() {
-		return from;
+		return this.from;
 	}
 
 	public List<String> getTo() {
-		return to;
+		return this.to;
 	}
 
 	public boolean isAoCreation() {
-		return aoCreation;
+		return this.aoCreation;
 	}
 
 	public void setAoCreation(boolean aoCreation) {
@@ -167,7 +167,7 @@ public class SimplePolicyRule {
 	}
 
 	public boolean isMigration() {
-		return migration;
+		return this.migration;
 	}
 
 	public void setMigration(boolean migration) {

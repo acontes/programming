@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
@@ -34,11 +35,10 @@ public abstract class PolicyTools {
 	 * @throws FileNotFoundException
 	 */
 
-	public static void writePolicyFile(String filePath, PolicyFile policy)
-			throws FileNotFoundException {
+	public static void writePolicyFile(String filePath, PolicyFile policy) {
 		StreamResult sr = new StreamResult(new File(filePath));
 
-		SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory
+		SAXTransformerFactory tf = (SAXTransformerFactory) TransformerFactory
 				.newInstance();
 
 		// SAX2.0 ContentHandler.
@@ -226,18 +226,14 @@ public abstract class PolicyTools {
 	 * 
 	 * @param path
 	 * @return
+	 * @throws ParserConfigurationException 
 	 */
-	public static PolicyFile readPolicyFile(String path) {
+	public static PolicyFile readPolicyFile(String path) throws ParserConfigurationException {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
-		DocumentBuilder db = null;
-		try {
-			db = dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException pce) {
-			pce.printStackTrace();
-		}
-
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		
 		Document document = null;
 		try {
 			document = db.parse(path);

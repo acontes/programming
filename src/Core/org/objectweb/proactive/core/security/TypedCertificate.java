@@ -13,7 +13,7 @@ public class TypedCertificate implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -3389269734930919276L;
-	private X509Certificate cert;
+	private transient X509Certificate cert;
 	private int type;
 	private PrivateKey privateKey;
 	private byte[] encodedCert;
@@ -26,15 +26,15 @@ public class TypedCertificate implements Serializable {
 	}
 
 	public X509Certificate getCert() {
-		return cert;
+		return this.cert;
 	}
 
 	public PrivateKey getPrivateKey() {
-		return privateKey;
+		return this.privateKey;
 	}
 
 	public int getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setType(int type) {
@@ -53,27 +53,25 @@ public class TypedCertificate implements Serializable {
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		if (getCert() != null) {
             try {
-                encodedCert = cert.getEncoded();
+            	this.encodedCert = this.cert.getEncoded();
             } catch (CertificateEncodingException e) {
                 e.printStackTrace();
             }
         }
 
-        cert = null;
         out.defaultWriteObject();
-        cert = ProActiveSecurity.decodeCertificate(encodedCert);
-        encodedCert = null;
+        this.encodedCert = null;
 	}
 	
 
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        if (encodedCert != null) {
-            cert = ProActiveSecurity.decodeCertificate(encodedCert);
+        if (this.encodedCert != null) {
+        	this.cert = ProActiveSecurity.decodeCertificate(this.encodedCert);
         }
 
-        encodedCert = null;
+        this.encodedCert = null;
     }
     
     @Override

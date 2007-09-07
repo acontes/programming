@@ -23,13 +23,13 @@ import org.objectweb.proactive.ic2d.security.core.SimplePolicyRule;
 
 public class EntityTableComposite extends Composite {
 
-	private Table entities;
+	protected Table entities;
 
 	private TableViewer viewer;
 
-	private List<SimplePolicyRule> rules;
+	protected List<SimplePolicyRule> rules;
 
-	private Table rulesTable;
+	protected Table rulesTable;
 
 	private boolean isFrom;
 
@@ -37,24 +37,24 @@ public class EntityTableComposite extends Composite {
 			List<SimplePolicyRule> data, final boolean isFrom) {
 		super(parent, SWT.NULL);
 		toolkit.adapt(this);
-		rules = data;
+		this.rules = data;
 		this.isFrom = isFrom;
 		setLayout(new GridLayout());
 
-		entities = toolkit.createTable(this, SWT.NULL);
-		entities.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		viewer = new TableViewer(entities);
+		this.entities = toolkit.createTable(this, SWT.NULL);
+		this.entities.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		this.viewer = new TableViewer(this.entities);
 
-		entities.addKeyListener(new KeyAdapter() {
+		this.entities.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.character == SWT.DEL || e.character == SWT.BS) {
 					if (isFrom) {
-						rules.get(rulesTable.getSelectionIndex()).removeFrom(
-								entities.getSelectionIndex());
+						EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex()).removeFrom(
+								EntityTableComposite.this.entities.getSelectionIndex());
 					} else {
-						rules.get(rulesTable.getSelectionIndex()).removeTo(
-								entities.getSelectionIndex());
+						EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex()).removeTo(
+								EntityTableComposite.this.entities.getSelectionIndex());
 					}
 					updateTable();
 				}
@@ -64,7 +64,7 @@ public class EntityTableComposite extends Composite {
 		});
 
 		// drag n drop
-		DropTarget target = new DropTarget(entities, DND.DROP_DEFAULT
+		DropTarget target = new DropTarget(this.entities, DND.DROP_DEFAULT
 				| DND.DROP_COPY);
 
 		target.setTransfer(new Transfer[] { CertificateTreeMapTransfer
@@ -93,10 +93,10 @@ public class EntityTableComposite extends Composite {
 
 					for (CertificateTree tree : map.keySet()) {
 						if (isFrom) {
-							rules.get(rulesTable.getSelectionIndex()).addFrom(
+							EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex()).addFrom(
 									tree.getCertificate().toString());
 						} else {
-							rules.get(rulesTable.getSelectionIndex()).addTo(
+							EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex()).addTo(
 									tree.getCertificate().toString());
 						}
 					}
@@ -113,15 +113,15 @@ public class EntityTableComposite extends Composite {
 
 	public void updateTable(Table newRulesTable) {
 		if (newRulesTable != null) {
-			rulesTable = newRulesTable;
+			this.rulesTable = newRulesTable;
 		}
-		entities.removeAll();
-		if (rulesTable.getSelectionIndex() != -1) {
-			if (isFrom) {
-				viewer.add(rules.get(rulesTable.getSelectionIndex()).getFrom()
+		this.entities.removeAll();
+		if (this.rulesTable.getSelectionIndex() != -1) {
+			if (this.isFrom) {
+				this.viewer.add(this.rules.get(this.rulesTable.getSelectionIndex()).getFrom()
 						.toArray());
 			} else {
-				viewer.add(rules.get(rulesTable.getSelectionIndex()).getTo()
+				this.viewer.add(this.rules.get(this.rulesTable.getSelectionIndex()).getTo()
 						.toArray());
 			}
 		}

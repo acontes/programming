@@ -37,9 +37,9 @@ public class CertificateTree implements Serializable {
 	private TypedCertificate certificate;
 
 	private CertificateTree() {
-		children = new ArrayList<CertificateTree>();
-		certificate = null;
-		parent = null;
+		this.children = new ArrayList<CertificateTree>();
+		this.certificate = null;
+		this.parent = null;
 
 		if (keygen == null) {
 			if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
@@ -71,7 +71,7 @@ public class CertificateTree implements Serializable {
 		try {
 			X509Certificate cert = CertTools.genSelfCert(name, validity, null,
 					kp.getPrivate(), kp.getPublic(), true);
-			certificate = new TypedCertificate(cert, type, kp.getPrivate());
+			this.certificate = new TypedCertificate(cert, type, kp.getPrivate());
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (CertificateEncodingException e) {
@@ -86,17 +86,17 @@ public class CertificateTree implements Serializable {
 	}
 
 	public List<CertificateTree> getChildren() {
-		return children;
+		return this.children;
 	}
 
 	public List<TypedCertificate> getCertChain() {
 		List<TypedCertificate> chain;
-		if (parent != null) {
-			chain = parent.getCertChain();
+		if (this.parent != null) {
+			chain = this.parent.getCertChain();
 		} else {
 			chain = new ArrayList<TypedCertificate>();
 		}
-		chain.add(0, certificate);
+		chain.add(0, this.certificate);
 		return chain;
 	}
 
@@ -105,11 +105,11 @@ public class CertificateTree implements Serializable {
 	}
 
 	public TypedCertificate getCertificate() {
-		return certificate;
+		return this.certificate;
 	}
 
 	private CertificateTree getChild(TypedCertificate cert) {
-		for (CertificateTree child : children) {
+		for (CertificateTree child : this.children) {
 			if (child.getCertificate().equals(cert)) {
 				return child;
 			}
@@ -124,7 +124,7 @@ public class CertificateTree implements Serializable {
 
 		CertificateTree existingChild = getChild(newChild.getCertificate());
 		if (existingChild == null) {
-			children.add(newChild);
+			this.children.add(newChild);
 			newChild.setParent(this);
 		} else {
 			existingChild.merge(newChild);
@@ -137,9 +137,9 @@ public class CertificateTree implements Serializable {
 			return false;
 		}
 
-		if (certificate.getPrivateKey() == null
+		if (this.certificate.getPrivateKey() == null
 				&& tree.getCertificate().getPrivateKey() != null) {
-			certificate = tree.getCertificate();
+			this.certificate = tree.getCertificate();
 		}
 		for (CertificateTree newChild : tree.getChildren()) {
 			add(newChild);
@@ -151,9 +151,9 @@ public class CertificateTree implements Serializable {
 		keygen.initialize(keySize);
 		KeyPair childKP = keygen.genKeyPair();
 
-		X509Certificate parentCert = certificate.getCert();
+		X509Certificate parentCert = this.certificate.getCert();
 		PublicKey parentPublicKey = parentCert.getPublicKey();
-		PrivateKey parentPrivateKey = certificate.getPrivateKey();
+		PrivateKey parentPrivateKey = this.certificate.getPrivateKey();
 		String parentName = parentCert.getSubjectX500Principal().getName();
 
 		try {
@@ -179,13 +179,13 @@ public class CertificateTree implements Serializable {
 
 	public TypedCertificate search(String name, int type)
 			throws NotFoundException {
-		if (type == certificate.getType()
-				&& certificate.getCert().getSubjectX500Principal().getName()
+		if (type == this.certificate.getType()
+				&& this.certificate.getCert().getSubjectX500Principal().getName()
 						.equals(name)) {
-			return certificate;
+			return this.certificate;
 		}
 
-		for (CertificateTree child : children) {
+		for (CertificateTree child : this.children) {
 			try {
 				return child.search(name, type);
 			} catch (NotFoundException nfe) {
@@ -198,29 +198,29 @@ public class CertificateTree implements Serializable {
 	}
 
 	public boolean remove() {
-		if (parent == null) {
+		if (this.parent == null) {
 			return false;
 		}
 
-		return parent.removeChild(this);
+		return this.parent.removeChild(this);
 	}
 
 	public boolean removeChild(CertificateTree child) {
-		return children.remove(child);
+		return this.children.remove(child);
 	}
 
 	public String getName() {
-		String result = SecurityConstants.typeToString(certificate.getType());
+		String result = SecurityConstants.typeToString(this.certificate.getType());
 		result += ":";
-		result += certificate.getCert().getSubjectX500Principal().getName();
+		result += this.certificate.getCert().getSubjectX500Principal().getName();
 		return result;
 	}
 
 	public CertificateTree getRoot() {
-		if (parent == null) {
+		if (this.parent == null) {
 			return this;
 		}
-		return parent.getRoot();
+		return this.parent.getRoot();
 	}
 
 	public static CertificateTree newTree(

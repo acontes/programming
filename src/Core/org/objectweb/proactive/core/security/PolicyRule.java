@@ -55,24 +55,24 @@ public class PolicyRule implements Serializable {
      * optional
      */
     public PolicyRule() {
-        from = new RuleEntities();
-        to = new RuleEntities();
-        communicationReply = new Communication();
-        communicationRequest = new Communication();
-        migration = false;
-        aocreation = false;
+    	this.from = new RuleEntities();
+    	this.to = new RuleEntities();
+    	this.communicationReply = new Communication();
+    	this.communicationRequest = new Communication();
+    	this.migration = false;
+    	this.aocreation = false;
     }
     
     /**
      * Copy constructor.
      */
     public PolicyRule(PolicyRule policy) {
-        from = new RuleEntities(policy.getEntitiesFrom());
-        to = new RuleEntities(policy.getEntitiesTo());
-        communicationReply = new Communication(policy.getCommunicationReply());
-        communicationRequest = new Communication(policy.getCommunicationRequest());
-        migration = policy.isMigration();
-        aocreation = policy.isAocreation();
+    	this.from = new RuleEntities(policy.getEntitiesFrom());
+    	this.to = new RuleEntities(policy.getEntitiesTo());
+    	this.communicationReply = new Communication(policy.getCommunicationReply());
+    	this.communicationRequest = new Communication(policy.getCommunicationRequest());
+    	this.migration = policy.isMigration();
+    	this.aocreation = policy.isAocreation();
     }
 
     /**
@@ -93,14 +93,14 @@ public class PolicyRule implements Serializable {
      * @param object
      */
     public void setCommunicationRulesRequest(Communication object) {
-        communicationRequest = object;
+    	this.communicationRequest = object;
     }
 
     /**
      * @param object
      */
     public void setCommunicationRulesReply(Communication object) {
-        communicationReply = object;
+    	this. communicationReply = object;
     }
 
     @Override
@@ -108,20 +108,20 @@ public class PolicyRule implements Serializable {
         String vnFrom;
         String vnTo;
         vnFrom = vnTo = null;
-        if (from == null) {
+        if (this.from == null) {
             vnFrom = "all";
         } else {
-            vnFrom = from.toString();
+            vnFrom = this.from.toString();
         }
-        if (to == null) {
+        if (this.to == null) {
             vnTo = "all";
         } else {
-            vnTo = from.toString();
+            vnTo = this.from.toString();
         }
 
-        return vnFrom + "-->" + vnTo + "||  Request:" + communicationRequest +
-        " :: Reply : " + communicationReply + " || Migration :" + migration +
-        "|| AOCreation:" + aocreation;
+        return vnFrom + "-->" + vnTo + "||  Request:" + this.communicationRequest +
+        " :: Reply : " + this.communicationReply + " || Migration :" + this.migration +
+        "|| AOCreation:" + this.aocreation;
     }
 
     /**
@@ -133,47 +133,47 @@ public class PolicyRule implements Serializable {
     }
 
     public Communication getCommunicationReply() {
-        return communicationReply;
+        return this.communicationReply;
     }
 
     public Communication getCommunicationRequest() {
-        return communicationRequest;
+        return this.communicationRequest;
     }
 
     public RuleEntities getEntitiesFrom() {
-        return from;
+        return this.from;
     }
 
     public RuleEntities getEntitiesTo() {
-        return to;
+        return this.to;
     }
 
     /**
      * @return true if object creation is authorized
      */
     public boolean isAocreation() {
-        return aocreation;
+        return this.aocreation;
     }
 
     /**
      * @return true if migration is authorized
      */
     public boolean isMigration() {
-        return migration;
+        return this.migration;
     }
 
     /**
      * @param b
      */
     public void setAocreation(boolean b) {
-        aocreation = b;
+    	this.aocreation = b;
     }
 
     /**
      * @param b
      */
     public void setMigration(boolean b) {
-        migration = b;
+    	this.migration = b;
     }
 
     public static PolicyRule mergePolicies(List<PolicyRule> policies) {

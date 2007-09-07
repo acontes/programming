@@ -64,6 +64,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 		} catch (WorkbenchException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		}
 		IViewPart part = null;
 		try {
@@ -178,7 +179,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 		ps.setAccessAuthorization(users);
 
 		try {
-			object
+			this.object
 					.invoke(
 							"setSecurityManager",
 							new Object[] { null, ps },
@@ -203,9 +204,9 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 	public void setAbstractDataObject(AbstractData ref) {
 		System.out.println("SetSecurityManager.setAbstractDataObject()");
 
-		object = ref;
-		super.setEnabled((object instanceof ActiveObject)
-				|| (object instanceof RuntimeObject));
+		this.object = ref;
+		super.setEnabled((this.object instanceof ActiveObject)
+				|| (this.object instanceof RuntimeObject));
 	}
 
 	public void setActiveSelect(AbstractData ref) {

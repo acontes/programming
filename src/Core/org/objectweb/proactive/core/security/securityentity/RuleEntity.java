@@ -22,11 +22,11 @@ public abstract class RuleEntity implements Serializable {
     }
 
     protected int getLevel() {
-    	return level;
+    	return this.level;
     }
     
     public int getType() {
-    	return type;
+    	return this.type;
     }
 
     protected int match(Entities e) {
@@ -44,6 +44,6 @@ public abstract class RuleEntity implements Serializable {
     
     @Override
 	public String toString() {
-    	return "RuleEnty :\n\tLevel : " + level;
+    	return "RuleEnty :\n\tLevel : " + this.level;
     }
 }

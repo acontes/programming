@@ -41,11 +41,11 @@ public class NamedRuleEntity extends RuleEntity {
 
 	@Override
 	public String toString() {
-		return super.toString() + "\n\tName : " + name;
+		return super.toString() + "\n\tName : " + this.name;
 	}
 
 	@Override
 	public String getName() {
-		return name;
+		return this.name;
 	}
 }

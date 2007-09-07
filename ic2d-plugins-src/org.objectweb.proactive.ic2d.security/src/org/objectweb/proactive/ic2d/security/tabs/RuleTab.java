@@ -1,8 +1,9 @@
 package org.objectweb.proactive.ic2d.security.tabs;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -27,6 +28,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.core.security.Communication;
@@ -46,9 +48,9 @@ public class RuleTab extends UpdatableTab {
 
 	private CertificateTreeListSection activeKeystoreSection;
 
-	private List<SimplePolicyRule> rules;
+	protected List<SimplePolicyRule> rules;
 
-	private List<String> authorizedUsers;
+	protected List<String> authorizedUsers;
 
 	private FormToolkit toolkit;
 
@@ -56,46 +58,47 @@ public class RuleTab extends UpdatableTab {
 
 	private EntityTableComposite toTable;
 
-	private Button requestCheck;
+	protected Button requestCheck;
 
-	private Combo reqAuthCombo;
+	protected Combo reqAuthCombo;
 
-	private Combo reqIntCombo;
+	protected Combo reqIntCombo;
 
-	private Combo reqConfCombo;
+	protected Combo reqConfCombo;
 
-	private Button replyCheck;
+	protected Button replyCheck;
 
-	private Combo repAuthCombo;
+	protected Combo repAuthCombo;
 
-	private Combo repIntCombo;
+	protected Combo repIntCombo;
 
-	private Combo repConfCombo;
+	protected Combo repConfCombo;
 
-	private Button aoCreationCheck;
+	protected Button aoCreationCheck;
 
-	private Button migrationCheck;
+	protected Button migrationCheck;
 
-	private Table rulesTable;
+	protected Table rulesTable;
 
 	private TableViewer rulesTableViewer;
 
-	private Table usersTable;
+	protected Table usersTable;
 
 	private TableViewer usersTableViewer;
 
-	private Text applicationNameText;
+	protected Text applicationNameText;
 
-	private Text keystoreText;
+	protected Text keystoreText;
 
-	public RuleTab(CTabFolder folder, CertificateTreeList keystore, FormToolkit toolkit) {
+	public RuleTab(CTabFolder folder, CertificateTreeList keystore,
+			FormToolkit toolkit) {
 		super(folder, SWT.NULL);
 		setText("Rule Editor");
 
 		this.activeKeystore = keystore;
 		this.rules = new ArrayList<SimplePolicyRule>();
 		this.toolkit = toolkit;
-		authorizedUsers = new ArrayList<String>();
+		this.authorizedUsers = new ArrayList<String>();
 
 		Composite body = toolkit.createComposite(folder);
 		body.setLayout(new GridLayout(3, true));
@@ -115,25 +118,29 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Section createSectionActiveKeystore(Composite parent) {
-		activeKeystoreSection = new CertificateTreeListSection(parent, toolkit,
-				"ActiveKeystore", activeKeystore, false, true, false, false);
-		return activeKeystoreSection.get();
+		this.activeKeystoreSection = new CertificateTreeListSection(parent,
+				this.toolkit, "ActiveKeystore", this.activeKeystore, false,
+				true, false, false);
+		return this.activeKeystoreSection.get();
 	}
 
 	private Section createSectionRuleEdition(Composite parent) {
-		Section section = toolkit.createSection(parent, Section.TITLE_BAR);
+		Section section = this.toolkit.createSection(parent,
+				ExpandableComposite.TITLE_BAR);
 		section.setText("Rule edition");
 
-		Composite client = toolkit.createComposite(section);
+		Composite client = this.toolkit.createComposite(section);
 		client.setLayout(new GridLayout());
 
-		toolkit.createLabel(client, "From");
-		fromTable = new EntityTableComposite(client, toolkit, rules, true);
-		fromTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+		this.toolkit.createLabel(client, "From");
+		this.fromTable = new EntityTableComposite(client, this.toolkit,
+				this.rules, true);
+		this.fromTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		toolkit.createLabel(client, "To");
-		toTable = new EntityTableComposite(client, toolkit, rules, false);
-		toTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+		this.toolkit.createLabel(client, "To");
+		this.toTable = new EntityTableComposite(client, this.toolkit,
+				this.rules, false);
+		this.toTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		createCheckRequest(client);
 
@@ -155,59 +162,70 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Button createCheckRequest(Composite parent) {
-		requestCheck = toolkit.createButton(parent, "Authorize requests",
-				SWT.CHECK);
-		requestCheck.addSelectionListener(new SelectionAdapter() {
+		this.requestCheck = this.toolkit.createButton(parent,
+				"Authorize requests", SWT.CHECK);
+		this.requestCheck.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setRequest(
-						requestCheck.getSelection());
-				enableRequestEditor(requestCheck.getSelection());
+				RuleTab.this.rules.get(
+						RuleTab.this.rulesTable.getSelectionIndex())
+						.setRequest(RuleTab.this.requestCheck.getSelection());
+				enableRequestEditor(RuleTab.this.requestCheck.getSelection());
 
 				super.widgetSelected(e);
 			}
 		});
 
-		return requestCheck;
+		return this.requestCheck;
 	}
 
 	private Composite createCompositeRequest(Composite parent) {
-		Composite client = toolkit.createComposite(parent);
+		Composite client = this.toolkit.createComposite(parent);
 		client.setLayout(new GridLayout(3, true));
 
-		toolkit.createLabel(client, "Authentication");
-		toolkit.createLabel(client, "Confidentiality");
-		toolkit.createLabel(client, "Integrity");
+		this.toolkit.createLabel(client, "Authentication");
+		this.toolkit.createLabel(client, "Confidentiality");
+		this.toolkit.createLabel(client, "Integrity");
 
-		reqAuthCombo = createRODCombo(client);
-		reqAuthCombo.addSelectionListener(new SelectionAdapter() {
+		this.reqAuthCombo = createRODCombo(client);
+		this.reqAuthCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setReqAuth(
-						Communication.valToInt(reqAuthCombo
-								.getItem(reqAuthCombo.getSelectionIndex())));
-
-				super.widgetSelected(e);
-			}
-		});
-		reqConfCombo = createRODCombo(client);
-		reqConfCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setReqConf(
-						Communication.valToInt(reqConfCombo
-								.getItem(reqConfCombo.getSelectionIndex())));
+				RuleTab.this.rules
+						.get(RuleTab.this.rulesTable.getSelectionIndex())
+						.setReqAuth(
+								Communication
+										.valToInt(RuleTab.this.reqAuthCombo
+												.getItem(RuleTab.this.reqAuthCombo
+														.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
 		});
-		reqIntCombo = createRODCombo(client);
-		reqIntCombo.addSelectionListener(new SelectionAdapter() {
+		this.reqConfCombo = createRODCombo(client);
+		this.reqConfCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setReqInt(
-						Communication.valToInt(reqIntCombo.getItem(reqIntCombo
-								.getSelectionIndex())));
+				RuleTab.this.rules
+						.get(RuleTab.this.rulesTable.getSelectionIndex())
+						.setReqConf(
+								Communication
+										.valToInt(RuleTab.this.reqConfCombo
+												.getItem(RuleTab.this.reqConfCombo
+														.getSelectionIndex())));
+
+				super.widgetSelected(e);
+			}
+		});
+		this.reqIntCombo = createRODCombo(client);
+		this.reqIntCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				RuleTab.this.rules.get(
+						RuleTab.this.rulesTable.getSelectionIndex()).setReqInt(
+						Communication.valToInt(RuleTab.this.reqIntCombo
+								.getItem(RuleTab.this.reqIntCombo
+										.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
@@ -217,58 +235,70 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Button createCheckReply(Composite parent) {
-		replyCheck = toolkit.createButton(parent, "Authorize reply", SWT.CHECK);
-		replyCheck.addSelectionListener(new SelectionAdapter() {
+		this.replyCheck = this.toolkit.createButton(parent, "Authorize reply",
+				SWT.CHECK);
+		this.replyCheck.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setReply(
-						replyCheck.getSelection());
-				enableReplyEditor(replyCheck.getSelection());
+				RuleTab.this.rules.get(
+						RuleTab.this.rulesTable.getSelectionIndex()).setReply(
+						RuleTab.this.replyCheck.getSelection());
+				enableReplyEditor(RuleTab.this.replyCheck.getSelection());
 
 				super.widgetSelected(e);
 			}
 		});
 
-		return replyCheck;
+		return this.replyCheck;
 	}
 
 	private Composite createCompositeReply(Composite parent) {
-		Composite client = toolkit.createComposite(parent);
+		Composite client = this.toolkit.createComposite(parent);
 		client.setLayout(new GridLayout(3, true));
 
-		toolkit.createLabel(client, "Authentication");
-		toolkit.createLabel(client, "Confidentiality");
-		toolkit.createLabel(client, "Integrity");
+		this.toolkit.createLabel(client, "Authentication");
+		this.toolkit.createLabel(client, "Confidentiality");
+		this.toolkit.createLabel(client, "Integrity");
 
-		repAuthCombo = createRODCombo(client);
-		repAuthCombo.addSelectionListener(new SelectionAdapter() {
+		this.repAuthCombo = createRODCombo(client);
+		this.repAuthCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setRepAuth(
-						Communication.valToInt(repAuthCombo
-								.getItem(repAuthCombo.getSelectionIndex())));
-
-				super.widgetSelected(e);
-			}
-		});
-		repConfCombo = createRODCombo(client);
-		repConfCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setRepConf(
-						Communication.valToInt(repConfCombo
-								.getItem(repConfCombo.getSelectionIndex())));
+				RuleTab.this.rules
+						.get(RuleTab.this.rulesTable.getSelectionIndex())
+						.setRepAuth(
+								Communication
+										.valToInt(RuleTab.this.repAuthCombo
+												.getItem(RuleTab.this.repAuthCombo
+														.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
 		});
-		repIntCombo = createRODCombo(client);
-		repIntCombo.addSelectionListener(new SelectionAdapter() {
+		this.repConfCombo = createRODCombo(client);
+		this.repConfCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setRepInt(
-						Communication.valToInt(repIntCombo.getItem(repIntCombo
-								.getSelectionIndex())));
+				RuleTab.this.rules
+						.get(RuleTab.this.rulesTable.getSelectionIndex())
+						.setRepConf(
+								Communication
+										.valToInt(RuleTab.this.repConfCombo
+												.getItem(RuleTab.this.repConfCombo
+														.getSelectionIndex())));
+
+				super.widgetSelected(e);
+			}
+		});
+		this.repIntCombo = createRODCombo(client);
+		this.repIntCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				RuleTab.this.rules.get(
+						RuleTab.this.rulesTable.getSelectionIndex()).setRepInt(
+						Communication.valToInt(RuleTab.this.repIntCombo
+								.getItem(RuleTab.this.repIntCombo
+										.getSelectionIndex())));
 
 				super.widgetSelected(e);
 			}
@@ -289,40 +319,47 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Button createCheckAoCreation(Composite parent) {
-		aoCreationCheck = toolkit.createButton(parent, "AOCreation", SWT.CHECK);
-		aoCreationCheck.addSelectionListener(new SelectionAdapter() {
+		this.aoCreationCheck = this.toolkit.createButton(parent, "AOCreation",
+				SWT.CHECK);
+		this.aoCreationCheck.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setAoCreation(
-						aoCreationCheck.getSelection());
+				RuleTab.this.rules.get(
+						RuleTab.this.rulesTable.getSelectionIndex())
+						.setAoCreation(
+								RuleTab.this.aoCreationCheck.getSelection());
 
 				super.widgetSelected(e);
 			}
 		});
 
-		return aoCreationCheck;
+		return this.aoCreationCheck;
 	}
 
 	private Button createCheckMigration(Composite parent) {
-		migrationCheck = toolkit.createButton(parent, "Migration", SWT.CHECK);
-		migrationCheck.addSelectionListener(new SelectionAdapter() {
+		this.migrationCheck = this.toolkit.createButton(parent, "Migration",
+				SWT.CHECK);
+		this.migrationCheck.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				rules.get(rulesTable.getSelectionIndex()).setMigration(
-						migrationCheck.getSelection());
+				RuleTab.this.rules.get(
+						RuleTab.this.rulesTable.getSelectionIndex())
+						.setMigration(
+								RuleTab.this.migrationCheck.getSelection());
 
 				super.widgetSelected(e);
 			}
 		});
 
-		return migrationCheck;
+		return this.migrationCheck;
 	}
 
 	private Section createSectionRules(Composite parent) {
-		Section section = toolkit.createSection(parent, Section.TITLE_BAR);
+		Section section = this.toolkit.createSection(parent,
+				ExpandableComposite.TITLE_BAR);
 		section.setText("Rules");
 
-		Composite client = toolkit.createComposite(section);
+		Composite client = this.toolkit.createComposite(section);
 		client.setLayout(new GridLayout());
 
 		createTableRules(client).setLayoutData(
@@ -337,7 +374,7 @@ public class RuleTab extends UpdatableTab {
 		createCompositeFields(client).setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		toolkit.createLabel(client, "Authorized users :");
+		this.toolkit.createLabel(client, "Authorized users :");
 		createTableUsers(client).setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -346,7 +383,7 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Composite createCompositeOrderButtons(Composite parent) {
-		Composite client = toolkit.createComposite(parent);
+		Composite client = this.toolkit.createComposite(parent);
 		client.setLayout(new GridLayout(2, true));
 
 		createButtonUp(client).setLayoutData(
@@ -359,16 +396,17 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Button createButtonUp(Composite parent) {
-		Button button = toolkit.createButton(parent, "^", SWT.BUTTON1);
+		Button button = this.toolkit.createButton(parent, "^", SWT.BUTTON1);
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				int index = rulesTable.getSelectionIndex();
+				int index = RuleTab.this.rulesTable.getSelectionIndex();
 				if (index == -1 || index == 0) {
 					return;
 				}
-				rules.set(index, rules.set(index - 1, rules.get(index)));
-				rulesTable.setSelection(index - 1);
+				RuleTab.this.rules.set(index, RuleTab.this.rules.set(index - 1,
+						RuleTab.this.rules.get(index)));
+				RuleTab.this.rulesTable.setSelection(index - 1);
 				updateRulesTable();
 
 				super.mouseUp(e);
@@ -379,16 +417,17 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Button createButtonDown(Composite parent) {
-		Button button = toolkit.createButton(parent, "v", SWT.BUTTON1);
+		Button button = this.toolkit.createButton(parent, "v", SWT.BUTTON1);
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				int index = rulesTable.getSelectionIndex();
-				if (index == -1 || index == rules.size() - 1) {
+				int index = RuleTab.this.rulesTable.getSelectionIndex();
+				if (index == -1 || index == RuleTab.this.rules.size() - 1) {
 					return;
 				}
-				rules.set(index, rules.set(index + 1, rules.get(index)));
-				rulesTable.setSelection(index + 1);
+				RuleTab.this.rules.set(index, RuleTab.this.rules.set(index + 1,
+						RuleTab.this.rules.get(index)));
+				RuleTab.this.rulesTable.setSelection(index + 1);
 				updateRulesTable();
 
 				super.mouseUp(e);
@@ -399,7 +438,7 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Composite createCompositeButtons(Composite parent) {
-		Composite client = toolkit.createComposite(parent);
+		Composite client = this.toolkit.createComposite(parent);
 		client.setLayout(new GridLayout(3, true));
 
 		createButtonNewRule(client).setLayoutData(
@@ -415,11 +454,12 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Button createButtonNewRule(Composite parent) {
-		Button button = toolkit.createButton(parent, "New rule", SWT.BUTTON1);
+		Button button = this.toolkit.createButton(parent, "New rule",
+				SWT.BUTTON1);
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				rules.add(new SimplePolicyRule());
+				RuleTab.this.rules.add(new SimplePolicyRule());
 				updateRulesTable();
 
 				super.mouseUp(e);
@@ -430,7 +470,8 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Button createButtonSaveRules(Composite parent) {
-		Button button = toolkit.createButton(parent, "Save rules", SWT.BUTTON1);
+		Button button = this.toolkit.createButton(parent, "Save rules",
+				SWT.BUTTON1);
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
@@ -438,14 +479,11 @@ public class RuleTab extends UpdatableTab {
 				fd.setText("Save active Policy file");
 				fd.setFilterExtensions(new String[] { "*.policy", "*.*" });
 				String fileName = fd.open();
-				try {
-					PolicyFile policy = new PolicyFile(applicationNameText
-							.getText(), keystoreText.getText(), rules,
-							authorizedUsers);
-					PolicyTools.writePolicyFile(fileName, policy);
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				}
+				PolicyFile policy = new PolicyFile(
+						RuleTab.this.applicationNameText.getText(),
+						RuleTab.this.keystoreText.getText(),
+						RuleTab.this.rules, RuleTab.this.authorizedUsers);
+				PolicyTools.writePolicyFile(fileName, policy);
 
 				super.mouseUp(e);
 			}
@@ -455,7 +493,8 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Button createButtonLoadPolicy(Composite parent) {
-		Button button = toolkit.createButton(parent, "Load rules", SWT.BUTTON1);
+		Button button = this.toolkit.createButton(parent, "Load rules",
+				SWT.BUTTON1);
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
@@ -463,14 +502,21 @@ public class RuleTab extends UpdatableTab {
 				fd.setText("Load Policy file");
 				fd.setFilterExtensions(new String[] { "*.policy", "*.*" });
 				String name = fd.open();
-				PolicyFile policy = PolicyTools.readPolicyFile(name);
-
-				rules.clear();
-				rules.addAll(policy.getRules());
-				applicationNameText.setText(policy.getApplicationName());
-				keystoreText.setText(policy.getKeystorePath());
-				authorizedUsers.clear();
-				authorizedUsers.addAll(policy.getAuthorizedUsers());
+				PolicyFile policy = null;
+				try {
+					policy = PolicyTools.readPolicyFile(name);
+					RuleTab.this.rules.clear();
+					RuleTab.this.rules.addAll(policy.getRules());
+					RuleTab.this.applicationNameText.setText(policy
+							.getApplicationName());
+					RuleTab.this.keystoreText.setText(policy.getKeystorePath());
+					RuleTab.this.authorizedUsers.clear();
+					RuleTab.this.authorizedUsers.addAll(policy
+							.getAuthorizedUsers());
+				} catch (ParserConfigurationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 
 				updateRulesTable();
 				updateUsersTable();
@@ -483,19 +529,19 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Composite createCompositeFields(Composite parent) {
-		Composite client = toolkit.createComposite(parent);
+		Composite client = this.toolkit.createComposite(parent);
 		client.setLayout(new GridLayout(3, false));
 
-		toolkit.createLabel(client, "Application name :");
-		applicationNameText = toolkit.createText(client, "");
-		applicationNameText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-				false, 2, 1));
+		this.toolkit.createLabel(client, "Application name :");
+		this.applicationNameText = this.toolkit.createText(client, "");
+		this.applicationNameText.setLayoutData(new GridData(SWT.FILL, SWT.TOP,
+				true, false, 2, 1));
 
-		toolkit.createLabel(client, "Keystore :");
-		keystoreText = toolkit.createText(client, "");
-		keystoreText
-				.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		Button button = toolkit.createButton(client, "...", SWT.BUTTON1);
+		this.toolkit.createLabel(client, "Keystore :");
+		this.keystoreText = this.toolkit.createText(client, "");
+		this.keystoreText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
+				false));
+		Button button = this.toolkit.createButton(client, "...", SWT.BUTTON1);
 		button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		button.addMouseListener(new MouseAdapter() {
 			@Override
@@ -505,7 +551,7 @@ public class RuleTab extends UpdatableTab {
 				fd.setFilterExtensions(new String[] { "*.p12", "*.*" });
 				String name = fd.open();
 				if (name != null) {
-					keystoreText.setText(name);
+					RuleTab.this.keystoreText.setText(name);
 				}
 
 				super.mouseUp(e);
@@ -516,22 +562,23 @@ public class RuleTab extends UpdatableTab {
 	}
 
 	private Table createTableUsers(Composite parent) {
-		usersTable = toolkit.createTable(parent, SWT.NULL);
-		usersTable.addKeyListener(new KeyAdapter() {
+		this.usersTable = this.toolkit.createTable(parent, SWT.NULL);
+		this.usersTable.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.character == SWT.DEL || e.character == SWT.BS) {
-					authorizedUsers.remove(usersTable.getSelectionIndex());
+					RuleTab.this.authorizedUsers.remove(RuleTab.this.usersTable
+							.getSelectionIndex());
 					updateUsersTable();
 				}
 
 				super.keyPressed(e);
 			}
 		});
-		usersTableViewer = new TableViewer(usersTable);
+		this.usersTableViewer = new TableViewer(this.usersTable);
 
 		// drag n drop
-		DropTarget target = new DropTarget(usersTable, DND.DROP_DEFAULT
+		DropTarget target = new DropTarget(this.usersTable, DND.DROP_DEFAULT
 				| DND.DROP_COPY);
 
 		target.setTransfer(new Transfer[] { CertificateTreeMapTransfer
@@ -560,8 +607,8 @@ public class RuleTab extends UpdatableTab {
 
 					for (CertificateTree tree : map.keySet()) {
 						if (tree.getCertificate().getType() == SecurityConstants.ENTITY_TYPE_USER) {
-							authorizedUsers.add(tree.getCertificate()
-									.toString());
+							RuleTab.this.authorizedUsers.add(tree
+									.getCertificate().toString());
 						}
 					}
 
@@ -570,45 +617,45 @@ public class RuleTab extends UpdatableTab {
 			}
 		});
 
-		return usersTable;
+		return this.usersTable;
 	}
 
-	private void updateUsersTable() {
-		int selection = usersTable.getSelectionIndex();
-		usersTable.removeAll();
+	protected void updateUsersTable() {
+		int selection = this.usersTable.getSelectionIndex();
+		this.usersTable.removeAll();
 
-		usersTableViewer.add(authorizedUsers.toArray());
+		this.usersTableViewer.add(this.authorizedUsers.toArray());
 
-		if (usersTable.getItemCount() == 0) {
-			usersTable.deselectAll();
+		if (this.usersTable.getItemCount() == 0) {
+			this.usersTable.deselectAll();
 		} else {
-			if (selection >= usersTable.getItemCount()) {
+			if (selection >= this.usersTable.getItemCount()) {
 				selection--;
 			}
-			usersTable.setSelection(selection);
+			this.usersTable.setSelection(selection);
 		}
 	}
 
-	private void updateRulesTable() {
-		int selection = rulesTable.getSelectionIndex();
-		rulesTable.removeAll();
+	protected void updateRulesTable() {
+		int selection = this.rulesTable.getSelectionIndex();
+		this.rulesTable.removeAll();
 
-		rulesTableViewer.add(rules.toArray());
+		this.rulesTableViewer.add(this.rules.toArray());
 
-		if (rulesTable.getItemCount() == 0) {
-			rulesTable.deselectAll();
+		if (this.rulesTable.getItemCount() == 0) {
+			this.rulesTable.deselectAll();
 		} else {
-			if (selection >= rulesTable.getItemCount()) {
+			if (selection >= this.rulesTable.getItemCount()) {
 				selection--;
 			}
-			rulesTable.setSelection(selection);
+			this.rulesTable.setSelection(selection);
 		}
 		updateRuleEditor();
 	}
 
 	private Table createTableRules(Composite parent) {
-		rulesTable = toolkit.createTable(parent, SWT.NULL);
-		rulesTable.addSelectionListener(new SelectionAdapter() {
+		this.rulesTable = this.toolkit.createTable(parent, SWT.NULL);
+		this.rulesTable.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateRuleEditor();
@@ -616,112 +663,113 @@ public class RuleTab extends UpdatableTab {
 				super.widgetSelected(e);
 			}
 		});
-		rulesTable.addKeyListener(new KeyAdapter() {
+		this.rulesTable.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.character == SWT.DEL || e.character == SWT.BS) {
-					rules.remove(rulesTable.getSelectionIndex());
+					RuleTab.this.rules.remove(RuleTab.this.rulesTable
+							.getSelectionIndex());
 					updateRulesTable();
 				}
 
 				super.keyPressed(e);
 			}
 		});
-		rulesTableViewer = new TableViewer(rulesTable);
+		this.rulesTableViewer = new TableViewer(this.rulesTable);
 
-		return rulesTable;
+		return this.rulesTable;
 	}
 
-	private void updateRuleEditor() {
-		fromTable.updateTable(rulesTable);
-		toTable.updateTable(rulesTable);
+	protected void updateRuleEditor() {
+		this.fromTable.updateTable(this.rulesTable);
+		this.toTable.updateTable(this.rulesTable);
 
-		if (rulesTable.getSelectionIndex() != -1) {
-			SimplePolicyRule selectedRule = rules.get(rulesTable
+		if (this.rulesTable.getSelectionIndex() != -1) {
+			SimplePolicyRule selectedRule = this.rules.get(this.rulesTable
 					.getSelectionIndex());
 
-			requestCheck.setEnabled(true);
+			this.requestCheck.setEnabled(true);
 
-			replyCheck.setEnabled(true);
+			this.replyCheck.setEnabled(true);
 
-			aoCreationCheck.setEnabled(true);
-			migrationCheck.setEnabled(true);
+			this.aoCreationCheck.setEnabled(true);
+			this.migrationCheck.setEnabled(true);
 
-			requestCheck.setSelection(selectedRule.isRequest());
+			this.requestCheck.setSelection(selectedRule.isRequest());
 
 			enableRequestEditor(selectedRule.isRequest());
 
-			reqAuthCombo.select(-selectedRule.getReqAuth() + 1);
-			reqIntCombo.select(-selectedRule.getReqInt() + 1);
-			reqConfCombo.select(-selectedRule.getReqConf() + 1);
+			this.reqAuthCombo.select(-selectedRule.getReqAuth() + 1);
+			this.reqIntCombo.select(-selectedRule.getReqInt() + 1);
+			this.reqConfCombo.select(-selectedRule.getReqConf() + 1);
 
-			replyCheck.setSelection(selectedRule.isReply());
+			this.replyCheck.setSelection(selectedRule.isReply());
 
 			enableReplyEditor(selectedRule.isReply());
 
-			repAuthCombo.select(-selectedRule.getRepAuth() + 1);
-			repIntCombo.select(-selectedRule.getRepInt() + 1);
-			repConfCombo.select(-selectedRule.getRepConf() + 1);
+			this.repAuthCombo.select(-selectedRule.getRepAuth() + 1);
+			this.repIntCombo.select(-selectedRule.getRepInt() + 1);
+			this.repConfCombo.select(-selectedRule.getRepConf() + 1);
 
-			aoCreationCheck.setSelection(selectedRule.isAoCreation());
-			migrationCheck.setSelection(selectedRule.isMigration());
+			this.aoCreationCheck.setSelection(selectedRule.isAoCreation());
+			this.migrationCheck.setSelection(selectedRule.isMigration());
 		} else {
-			requestCheck.setEnabled(false);
+			this.requestCheck.setEnabled(false);
 
 			enableRequestEditor(false);
 
-			replyCheck.setEnabled(false);
+			this.replyCheck.setEnabled(false);
 
 			enableReplyEditor(false);
 
-			aoCreationCheck.setEnabled(false);
-			migrationCheck.setEnabled(false);
+			this.aoCreationCheck.setEnabled(false);
+			this.migrationCheck.setEnabled(false);
 		}
 	}
 
-	private void enableRequestEditor(boolean enable) {
-		reqAuthCombo.setEnabled(enable);
-		reqIntCombo.setEnabled(enable);
-		reqConfCombo.setEnabled(enable);
+	protected void enableRequestEditor(boolean enable) {
+		this.reqAuthCombo.setEnabled(enable);
+		this.reqIntCombo.setEnabled(enable);
+		this.reqConfCombo.setEnabled(enable);
 	}
 
-	private void enableReplyEditor(boolean enable) {
-		repAuthCombo.setEnabled(enable);
-		repIntCombo.setEnabled(enable);
-		repConfCombo.setEnabled(enable);
+	protected void enableReplyEditor(boolean enable) {
+		this.repAuthCombo.setEnabled(enable);
+		this.repIntCombo.setEnabled(enable);
+		this.repConfCombo.setEnabled(enable);
 	}
 
 	public void setAppName(String name) {
-		applicationNameText.setText(name);
+		this.applicationNameText.setText(name);
 	}
 
 	public String getAppName() {
-		return applicationNameText.getText();
+		return this.applicationNameText.getText();
 	}
-	
+
 	public void setAuthorizedUsers(List<String> users) {
-		authorizedUsers.clear();
-		authorizedUsers.addAll(users);
+		this.authorizedUsers.clear();
+		this.authorizedUsers.addAll(users);
 		updateUsersTable();
 	}
 
 	public List<String> getAuthorizedUsers() {
-		return authorizedUsers;
+		return this.authorizedUsers;
 	}
 
 	public List<SimplePolicyRule> getRules() {
-		return rules;
+		return this.rules;
 	}
 
 	public void setRules(List<SimplePolicyRule> policies) {
-		rules.clear();
-		rules.addAll(policies);
+		this.rules.clear();
+		this.rules.addAll(policies);
 		updateRulesTable();
 	}
 
 	@Override
 	public void update() {
-		activeKeystoreSection.updateSection();
+		this.activeKeystoreSection.updateSection();
 		updateRulesTable();
 	}
 

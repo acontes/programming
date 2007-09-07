@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.security;
 
-import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -53,7 +52,6 @@ import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-import org.objectweb.proactive.core.xml.io.StreamReader;
 import org.xml.sax.SAXException;
 
 
@@ -108,7 +106,7 @@ public class ProActiveSecurityDescriptorHandler
         super();
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         Security.addProvider(myProvider);
-        policyServer = new PolicyServer();
+        this.policyServer = new PolicyServer();
         //      addHandler(PRIVATE_KEY_TAG, new SingleValueUnmarshaller());
         //      addHandler(CERTIFICATE_TAG, new SingleValueUnmarshaller());
         addHandler(APPLICATION_NAME_TAG, new SingleValueUnmarshaller());
@@ -135,48 +133,31 @@ public class ProActiveSecurityDescriptorHandler
         //        } else 
         if (name.equals(RULES_TAG)) {
             List<PolicyRule> policyRules = (List<PolicyRule>) activeHandler.getResultObject();
-            policyServer.setPolicies(policyRules);
-        } else if (name.equals(ACCESS_TAG)) {
-            RuleEntities entities = (RuleEntities) activeHandler.getResultObject();
-            policyServer.setAccessAuthorization(entities);
+            this.policyServer.setPolicies(policyRules);
         } else if (name.equals(APPLICATION_NAME_TAG)) {
             String applicationName = (String) activeHandler.getResultObject();
-            policyServer.setApplicationName(applicationName);
+            this.policyServer.setApplicationName(applicationName);
         } else if (name.equals(PKCS12_KEYSTORE)) {
             String pkcs12Keystore = (String) activeHandler.getResultObject();
-            policyServer.setPKCS12Keystore(pkcs12Keystore);
+            this.policyServer.setPKCS12Keystore(pkcs12Keystore);
+        } else if (name.equals(ACCESS_TAG)) {
+            RuleEntities entities = (RuleEntities) activeHandler.getResultObject();
+            this.policyServer.setAccessAuthorization(entities);
         }
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
      */
-    public Object getResultObject() throws SAXException {
-        //        if (pkcs12Keystore != null) {
-        //            KeyStore keyStore = null;
-        //        
-        //        try {
-        //             keyStore = KeyStore.getInstance("PKCS12", "BC");
-        //        keyStore.load(new FileInputStream(pkcs12Keystore), "ha".toCharArray());
-        //        } catch (Exception e ) {
-        //            e.printStackTrace();
-        //        }
-        //        return new PolicyServer(keyStore, policyRules);
-        //    } else {
-        //        policyServer = new PolicyServer();
-        //        policyServer.setApplicationPrivateKey(applicationPrivateKeyPath);
-        //        policyServer.setApplicationCertificate(applicationCertificatePath);
-        //        policyServer.setPolicies(policyRules);
-        //        policyServer.setApplicationName(applicationName);
-        return policyServer;
-        //    }
+    public Object getResultObject() {
+        return this.policyServer;
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
      */
-    public void startContextElement(String name, Attributes attributes)
-        throws SAXException {
+    public void startContextElement(String name, Attributes attributes) {
+    	// nothing
     }
 
     /**
@@ -187,12 +168,11 @@ public class ProActiveSecurityDescriptorHandler
 
         public RulesHandler() {
             super();
-            policies = new ArrayList<PolicyRule>();
+            this.policies = new ArrayList<PolicyRule>();
             addHandler(RULE_TAG, new RuleHandler());
         }
 
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) {
             if (name.equals(RULE_TAG)) {
                 //policies.add(activeHandler.getResultObject());
                 // ruleHandler = new RuleHandler();
@@ -208,7 +188,7 @@ public class ProActiveSecurityDescriptorHandler
             if (name.equals(RULE_TAG)) {
             	Object resultObject = activeHandler.getResultObject();
             	if (resultObject != null) {
-            		policies.add((PolicyRule) resultObject);
+            		this.policies.add((PolicyRule) resultObject);
             	}
                 //	  ruleHandler = new RuleHandler();
             }
@@ -218,8 +198,8 @@ public class ProActiveSecurityDescriptorHandler
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
-        public Object getResultObject() throws SAXException {
-            return policies;
+        public Object getResultObject() {
+            return this.policies;
         }
     }
 
@@ -229,28 +209,27 @@ public class ProActiveSecurityDescriptorHandler
      * Receives deployment events
      */
     private static class InitialHandler extends AbstractUnmarshallerDecorator {
-        // line added to return a ProactiveDescriptorHandler object
-        protected PolicyServer ps;
+       protected PolicyServer ps;
 
-        private InitialHandler() {
+        protected InitialHandler() {
             super();
             this.addHandler(PROACTIVE_SECURITY_TAG,
             		new ProActiveSecurityDescriptorHandler());
         }
 
-        public Object getResultObject() throws org.xml.sax.SAXException {
-            return ps; //(PolicyServer) proActiveSecurityDescriptorHandler.getResultObject();
+        public Object getResultObject() {
+            return this.ps;
         }
 
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) {
+        	// nothing
         }
 
         @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equals(PROACTIVE_SECURITY_TAG)) {
-                ps = (PolicyServer) activeHandler.getResultObject();
+                this.ps = (PolicyServer) activeHandler.getResultObject();
             }
         }
     }
@@ -263,7 +242,7 @@ public class ProActiveSecurityDescriptorHandler
 
         public RuleHandler() {
             super();
-            policy = new PolicyRule();
+            this.policy = new PolicyRule();
             addHandler(ENTITY_FROM_TAG, new EntityCollector());
             addHandler(ENTITY_TO_TAG, new EntityCollector());
             addHandler(RULE_COMMUNICATION_TAG,
@@ -274,9 +253,8 @@ public class ProActiveSecurityDescriptorHandler
                 new SingleValueUnmarshaller());
         }
 
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
-            policy = new PolicyRule();
+        public void startContextElement(String name, Attributes attributes) {
+            this.policy = new PolicyRule();
         }
 
         /* (non-Javadoc)
@@ -287,26 +265,26 @@ public class ProActiveSecurityDescriptorHandler
 				UnmarshallerHandler activeHandler) throws SAXException {
 			Object resultObject = activeHandler.getResultObject();
 			if (resultObject == null) {
-				policy = null;
+				this.policy = null;
 			}
-			if (policy != null) {
+			if (this.policy != null) {
 				if (name.equals(ENTITY_FROM_TAG)) {
-					policy.setEntitiesFrom((RuleEntities) resultObject);
+					this.policy.setEntitiesFrom((RuleEntities) resultObject);
 				} else if (name.equals(ENTITY_TO_TAG)) {
-					policy.setEntitiesTo((RuleEntities) resultObject);
+					this.policy.setEntitiesTo((RuleEntities) resultObject);
 				} else if (name.equals(RULE_COMMUNICATION_TAG)) {
-					policy
+					this.policy
 							.setCommunicationRules((Communication[]) resultObject);
 				} else if (name.equals(RULE_COMMUNICATION_AOCREATION_TAG)) {
 					String value = (String) resultObject;
 					boolean b = value
 					.equals(RULE_AOCREATION_AUTHORIZED);
-					policy.setAocreation(b);
+					this.policy.setAocreation(b);
 				} else if (name.equals(RULE_COMMUNICATION_MIGRATION_TAG)) {
 					String value = (String) resultObject;
 					boolean b = value
 					.equals(RULE_MIGRATION_AUTHORIZED);
-					policy
+					this.policy
 							.setMigration(b);
 				}
 			}
@@ -317,8 +295,8 @@ public class ProActiveSecurityDescriptorHandler
 		 * 
 		 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
 		 */
-        public Object getResultObject() throws SAXException {
-            return policy;
+        public Object getResultObject() {
+            return this.policy;
         }
     }
 
@@ -327,7 +305,7 @@ public class ProActiveSecurityDescriptorHandler
         private RuleEntities entities;
 
         public EntityCollector() {
-            entities = new RuleEntities();
+        	this.entities = new RuleEntities();
             addHandler(ENTITY_TAG, new EntityHandler());
         }
 
@@ -339,25 +317,25 @@ public class ProActiveSecurityDescriptorHandler
             UnmarshallerHandler activeHandler) throws SAXException {
         	RuleEntity re = (RuleEntity) activeHandler.getResultObject();
         	if (re == null) {
-        		entities = null;
+        		this.entities = null;
         	}
-        	if (entities != null) {
-        		entities.add(re);
+        	if (this.entities != null) {
+        		this.entities.add(re);
         	}
         }
 
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
-        public Object getResultObject() throws SAXException {
-            return entities;
+        public Object getResultObject() {
+            return this.entities;
         }
 
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
          */
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) {
+        	// nothing
         }
     }
 
@@ -376,12 +354,12 @@ public class ProActiveSecurityDescriptorHandler
 				throws SAXException {
 			int type = SecurityConstants.typeToInt(attributes.getValue("type"));
 			String value = attributes.getValue("name");
-			KeyStore keystore = policyServer.getKeyStore();
+			KeyStore keystore = ProActiveSecurityDescriptorHandler.this.policyServer.getKeyStore();
 			
 			switch (type) {
 			case SecurityConstants.ENTITY_TYPE_NODE:
 				try {
-						entity = new NamedRuleEntity(type, keystore, value);
+					this.entity = new NamedRuleEntity(type, keystore, value);
 					} catch (KeyStoreException e1) {
 						e1.printStackTrace();
 					}
@@ -391,7 +369,7 @@ public class ProActiveSecurityDescriptorHandler
 			case SecurityConstants.ENTITY_TYPE_USER:
 			case SecurityConstants.ENTITY_TYPE_DOMAIN:
 				try {
-						entity = new CertificatedRuleEntity(type, keystore, value);
+					this.entity = new CertificatedRuleEntity(type, keystore, value);
 					} catch (KeyStoreException e) {
 						e.printStackTrace();
 					} catch (UnrecoverableKeyException e) {
@@ -410,8 +388,8 @@ public class ProActiveSecurityDescriptorHandler
 		 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
 		 */
         @Override
-        public Object getResultObject() throws SAXException {
-            return entity;
+        public Object getResultObject() {
+            return this.entity;
         }
     }
 
@@ -422,7 +400,7 @@ public class ProActiveSecurityDescriptorHandler
 
         public CommunicationCollectionHandler() {
             super();
-            communication = new Communication[2];
+            this.communication = new Communication[2];
             addHandler(RULE_COMMUNICATION_FROM_TAG, new CommunicationHandler());
             addHandler(RULE_COMMUNICATION_TO_TAG, new CommunicationHandler());
         }
@@ -434,25 +412,25 @@ public class ProActiveSecurityDescriptorHandler
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(RULE_COMMUNICATION_FROM_TAG)) {
-                communication[0] = (Communication) activeHandler.getResultObject();
+                this.communication[0] = (Communication) activeHandler.getResultObject();
                 //                System.out.println("TAG FROM !!!!" + communication[0]);
             } else if (name.equals(RULE_COMMUNICATION_TO_TAG)) {
-                communication[1] = (Communication) activeHandler.getResultObject();
+                this.communication[1] = (Communication) activeHandler.getResultObject();
             }
         }
 
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
-        public Object getResultObject() throws SAXException {
-            return communication;
+        public Object getResultObject() {
+            return this.communication;
         }
 
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
          */
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) {
+        	// nothing
         }
     }
 
@@ -473,9 +451,9 @@ public class ProActiveSecurityDescriptorHandler
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             if (attributes.getValue("value").equals("authorized")) {
-                allowed = true;
+                this.allowed = true;
             } else {
-                allowed = false;
+            	this.allowed = false;
             }
         }
 
@@ -487,16 +465,16 @@ public class ProActiveSecurityDescriptorHandler
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(RULE_COMMUNICATION_ATTRIBUTES_TAG)) {
                 int[] attr = (int[]) activeHandler.getResultObject();
-                comm = new Communication(allowed, attr[0], attr[1], attr[2]);
+                this.comm = new Communication(this.allowed, attr[0], attr[1], attr[2]);
             }
         }
 
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
-        public Object getResultObject() throws SAXException {
+        public Object getResultObject() {
             //logger.info(" communication : "+ communication);
-            return comm;
+            return this.comm;
         }
     }
 
@@ -508,7 +486,7 @@ public class ProActiveSecurityDescriptorHandler
 
         public CommunicationAttributesHandler() {
             super();
-            attributes = new int[3];
+            this.attributes = new int[3];
         }
 
         @Override
@@ -523,8 +501,8 @@ public class ProActiveSecurityDescriptorHandler
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
         @Override
-        public Object getResultObject() throws SAXException {
-            return attributes;
+        public Object getResultObject() {
+            return this.attributes;
         }
     }
 
@@ -535,12 +513,11 @@ public class ProActiveSecurityDescriptorHandler
 
         public AccessHandler() {
             super();
-            entities = new RuleEntities();
+            this.entities = new RuleEntities();
             addHandler(ENTITY_TAG, new EntityHandler());
         }
 
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) {
             if (name.equals(RULE_TAG)) {
                 //policies.add(activeHandler.getResultObject());
                 // ruleHandler = new RuleHandler();
@@ -556,7 +533,7 @@ public class ProActiveSecurityDescriptorHandler
             if (name.equals(ENTITY_TAG)) {
             	RuleEntity entity = (RuleEntity) activeHandler.getResultObject();
             	if (entity != null && entity.getType() == SecurityConstants.ENTITY_TYPE_USER) {
-            		entities.add(entity);
+            		this.entities.add(entity);
             	}
                 //	  ruleHandler = new RuleHandler();
             }
@@ -566,8 +543,8 @@ public class ProActiveSecurityDescriptorHandler
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
-        public Object getResultObject() throws SAXException {
-            return entities;
+        public Object getResultObject() {
+            return this.entities;
         }
     }
 
@@ -599,14 +576,14 @@ public class ProActiveSecurityDescriptorHandler
         }
     }
 
-    public static void main(String[] args)
-        throws IOException, org.xml.sax.SAXException {
-        InitialHandler h = new InitialHandler();
-
-        // ProActiveSecurityDescriptorHandler h = new ProActiveSecurityDescriptorHandler();
-        //        String uri = "/net/home/acontes/dev/ProActive/descriptors/scurrav2.xml";
-        StreamReader sr = new StreamReader(new org.xml.sax.InputSource(
-                    args[0]), h);
-        sr.read();
-    }
+//    public static void main(String[] args)
+//        throws IOException, org.xml.sax.SAXException {
+//        InitialHandler h = new InitialHandler();
+//
+//        // ProActiveSecurityDescriptorHandler h = new ProActiveSecurityDescriptorHandler();
+//        //        String uri = "/net/home/acontes/dev/ProActive/descriptors/scurrav2.xml";
+//        StreamReader sr = new StreamReader(new org.xml.sax.InputSource(
+//                    args[0]), h);
+//        sr.read();
+//    }
 }

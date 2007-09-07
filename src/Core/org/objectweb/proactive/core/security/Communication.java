@@ -69,20 +69,20 @@ public class Communication implements Serializable {
      * authentication,confidentiality and integrity set to optional
      */
     public Communication() {
-        authentication = DENIED;
-        confidentiality = DENIED;
-        integrity = DENIED;
-        communication = false;
+    	this.authentication = DENIED;
+    	this.confidentiality = DENIED;
+    	this.integrity = DENIED;
+    	this.communication = false;
     }
 
     /**
      * Copy constructor
      */
     public Communication(Communication com) {
-        authentication = com.authentication;
-        confidentiality = com.confidentiality;
-        integrity = com.integrity;
-        communication = com.communication;
+    	this.authentication = com.authentication;
+    	this.confidentiality = com.confidentiality;
+    	this.integrity = com.integrity;
+    	this.communication = com.communication;
     }
 
     /**
@@ -104,7 +104,7 @@ public class Communication implements Serializable {
      * @return boolean true if authentication is required
      */
     public boolean isAuthenticationEnabled() {
-        return authentication == REQUIRED;
+        return this.authentication == REQUIRED;
     }
 
     /**
@@ -112,7 +112,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is required
      */
     public boolean isConfidentialityEnabled() {
-        return confidentiality == REQUIRED;
+        return this.confidentiality == REQUIRED;
     }
 
     /**
@@ -120,7 +120,7 @@ public class Communication implements Serializable {
      * @return boolean true if integrity is required
      */
     public boolean isIntegrityEnabled() {
-        return integrity == REQUIRED;
+        return this.integrity == REQUIRED;
     }
 
     /**
@@ -128,7 +128,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is forbidden
      */
     public boolean isAuthenticationForbidden() {
-        return authentication == DENIED;
+        return this.authentication == DENIED;
     }
 
     /**
@@ -136,7 +136,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is forbidden
      */
     public boolean isConfidentialityForbidden() {
-        return confidentiality == DENIED;
+        return this.confidentiality == DENIED;
     }
 
     /**
@@ -144,7 +144,7 @@ public class Communication implements Serializable {
      * @return boolean true if integrity is forbidden
      */
     public boolean isIntegrityForbidden() {
-        return integrity == DENIED;
+        return this.integrity == DENIED;
     }
 
     /**
@@ -152,13 +152,13 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is allowed
      */
     public boolean isCommunicationAllowed() {
-        return communication;
+        return this.communication;
     }
 
     @Override
     public String toString() {
-        return "Com : " + communication + " Auth : " + authentication +
-        " Conf : " + confidentiality + " Integrity : " + integrity + "\n";
+        return "Com : " + this.communication + " Auth : " + this.authentication +
+        " Conf : " + this.confidentiality + " Integrity : " + this.integrity + "\n";
     }
 
     /**
@@ -205,26 +205,26 @@ public class Communication implements Serializable {
      * @return communication
      */
     public boolean getCommunication() {
-        return communication;
+        return this.communication;
     }
 
     /**
      * @param i
      */
     public void setCommunication(boolean i) {
-        communication = i;
+    	this.communication = i;
     }
 
 	public int getAuthentication() {
-		return authentication;
+		return this.authentication;
 	}
 
 	public int getConfidentiality() {
-		return confidentiality;
+		return this.confidentiality;
 	}
 
 	public int getIntegrity() {
-		return integrity;
+		return this.integrity;
 	}
     
     public static int valToInt(String val) {

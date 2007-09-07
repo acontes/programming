@@ -91,7 +91,7 @@ public abstract class CertTools {
 		oids.put("emailaddress", X509Name.EmailAddress);
 		oids.put("e", X509Name.EmailAddress);
 		oids.put("email", X509Name.EmailAddress);
-	};
+	}
 
 	private static final String[] dNObjectsForward = { "emailaddress", "e",
 			"email", "uid", "cn", "sn", "serialnumber", "gn", "givenname",

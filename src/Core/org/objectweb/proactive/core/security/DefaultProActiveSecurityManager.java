@@ -48,7 +48,6 @@ import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.objectweb.proactive.core.security.crypto.Session;
-import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -71,8 +70,8 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
     public DefaultProActiveSecurityManager(int type, String vide)
         throws Exception {
         super(type, vide);
-        sessions = new Hashtable<Long, Session>();
-        logger = ProActiveLogger.getLogger(Loggers.SECURITY);
+        this.sessions = new Hashtable<Long, Session>();
+        this.logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         Security.addProvider(myProvider);
@@ -127,22 +126,22 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
         // throw new SecurityException();
     }
 
-    public PolicyRule getPolicyTo(X509Certificate certificate) {
-        //   logger.info("asked for my policy TO, replied default policy");
-        return new PolicyRule();
-    }
+//    public PolicyRule getPolicyTo(X509Certificate certificate) {
+//        //   logger.info("asked for my policy TO, replied default policy");
+//        return new PolicyRule();
+//    }
 
-    @Override
-    public Communication getPolicyTo(String type, String from, String to) {
-        //   logger.info("asked for my policy TO, replied default policy");
-        return new Communication();
-    }
+//    @Override
+//    public Communication getPolicyTo(String type, String from, String to) {
+//        //   logger.info("asked for my policy TO, replied default policy");
+//        return new Communication();
+//    }
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
         //System.out.println("reconstruit un DPSM");
-        logger = ProActiveLogger.getLogger(Loggers.SECURITY);
+        this.logger = ProActiveLogger.getLogger(Loggers.SECURITY);
     }
 }

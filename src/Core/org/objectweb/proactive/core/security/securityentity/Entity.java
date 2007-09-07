@@ -63,23 +63,23 @@ public class Entity implements Serializable {
     }
 
     public int getType() {
-        return certChain.get(0).getType();
+        return this.certChain.get(0).getType();
     }
 
     public String getName() {
-        return certChain.get(0).getCert().getSubjectX500Principal()
+        return this.certChain.get(0).getCert().getSubjectX500Principal()
 		.getName();
     }
 
     public TypedCertificateList getCertificateChain() {
-        return certChain;
+        return this.certChain;
     }
 
     public TypedCertificate getCertificate() {
-        if (certChain == null) {
+        if (this.certChain == null) {
             return null;
         }
-        return certChain.get(0);
+        return this.certChain.get(0);
     }
 
     @Override

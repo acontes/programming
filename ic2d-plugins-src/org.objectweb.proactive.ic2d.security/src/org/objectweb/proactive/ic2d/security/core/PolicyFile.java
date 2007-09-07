@@ -21,18 +21,18 @@ public class PolicyFile {
 	}
 
 	public String getApplicationName() {
-		return applicationName;
+		return this.applicationName;
 	}
 
 	public List<String> getAuthorizedUsers() {
-		return authorizedUsers;
+		return this.authorizedUsers;
 	}
 
 	public String getKeystorePath() {
-		return keystorePath;
+		return this.keystorePath;
 	}
 
 	public List<SimplePolicyRule> getRules() {
-		return rules;
+		return this.rules;
 	}
 }

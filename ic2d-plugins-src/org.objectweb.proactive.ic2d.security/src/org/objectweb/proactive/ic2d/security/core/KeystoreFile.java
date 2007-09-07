@@ -15,7 +15,7 @@ public class KeystoreFile extends CertificateTreeList {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -24,6 +24,6 @@ public class KeystoreFile extends CertificateTreeList {
 
 	@Override
 	public String toString() {
-		return name;
+		return this.name;
 	}
 }
