@@ -47,7 +47,7 @@
 				</javaProcess>
 			</process>
 		</task>
-		<task name="task8" finalTask="true" reRunnable="2">
+		<task name="task8" finalTask="true" reRunnable="4">
 			<!-- Task human description -->
 			<description>This task will sleep 20s</description>
 			<process>

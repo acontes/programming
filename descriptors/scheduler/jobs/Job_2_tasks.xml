@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_2_tasks" priority="highest" >
+<job name="job_2_tasks" priority="normal" >
 	<description>2 tasks with variable durations</description>
 	<tasks>
 		<task name="task1">

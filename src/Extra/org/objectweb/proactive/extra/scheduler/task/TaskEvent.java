@@ -60,6 +60,8 @@ public class TaskEvent implements Serializable{
 	private long startTime = -1;
 	/** task finished time */
 	private long finishedTime = -1;
+	/** Number of reRunnable left */
+	private int reRunnableLeft = 1;
 	/** Current status of the task */
 	private Status status = Status.SUBMITTED;
 	/** name of the host where the task is executed */
@@ -198,6 +200,22 @@ public class TaskEvent implements Serializable{
 	 */
 	public void setExecutionHostName(String executionHostName) {
 		this.executionHostName = executionHostName;
+	}
+	/**
+	 * Get the number of rerun left.
+	 * 
+	 * @return the reRunnableLeft
+	 */
+	public int getReRunnableLeft() {
+		return reRunnableLeft;
+	}
+	/**
+	 * Set the number of rerunn left.
+	 * 
+	 * @param reRunnableLeft the reRunnableLeft to set
+	 */
+	public void setReRunnableLeft(int reRunnableLeft) {
+		this.reRunnableLeft = reRunnableLeft;
 	}
 	
 	

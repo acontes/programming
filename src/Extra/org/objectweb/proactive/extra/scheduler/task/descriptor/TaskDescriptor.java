@@ -319,6 +319,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	 */
 	public void setRerunnable(int reRunnable) {
 		this.rerunnable = reRunnable;
+		this.taskInfo.setReRunnableLeft(reRunnable);
 	}
 
 	/**
@@ -598,6 +599,24 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 		this.nodeName = nodeName;
 	}
 
+	
+	/**
+	 * Get the number of rerun left.
+	 * 
+	 * @return the reRunnableLeft
+	 */
+	public int getReRunnableLeft() {
+		return taskInfo.getReRunnableLeft();
+	}
+	/**
+	 * Set the number of rerunn left.
+	 * 
+	 * @param reRunnableLeft the reRunnableLeft to set
+	 */
+	public void setReRunnableLeft(int reRunnableLeft) {
+		taskInfo.setReRunnableLeft(reRunnableLeft);
+	}
+	
 
 	/**
 	 * @see java.lang.Object#toString()

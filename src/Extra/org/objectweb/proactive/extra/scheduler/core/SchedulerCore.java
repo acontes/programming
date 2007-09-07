@@ -99,7 +99,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/** Scheduler node ping frequency. It is based on the main loop time out.
 	 *  For exemple, if the frequency is X and the main loop time out is Y,
 	 *  so the maximum umount of time between each ping will be X*Y. */
-	private static final int SCHEDULER_NODE_PING_FREQUENCY = 50;
+	private static final int SCHEDULER_NODE_PING_FREQUENCY = 30000;
 	/** Selected port for connection logger system */
 	private static Integer port = CONNECTION_DEFAULT_PORT;
 	/** Host name of the scheduler for logger system. */
@@ -124,6 +124,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	private HashMap<JobId,JobResult> results = new HashMap<JobId,JobResult>();
 	/** Scheduler current state */
 	private SchedulerState state = SchedulerState.STOPPED;
+	/** Thread that will ping the running nodes */
+	private Thread pinger;
 	
 	
 	/**
@@ -166,24 +168,45 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	
 	
 	/**
+	 * Create the pinger thread to detect unActivity on nodes.
+	 */
+	private void createPingThread() {
+		pinger = new Thread(){
+			@Override
+			public void run(){
+				while (!isInterrupted()){
+					try {
+						Thread.sleep(SCHEDULER_NODE_PING_FREQUENCY);
+						pingDeployedNodes();
+					} catch (InterruptedException e) { }
+				}
+			}
+		};
+		pinger.start();
+	}
+	
+	
+	/**
 	 * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
 	 */
 	public void runActivity(Body body) {
-		int pingFrequency = 0;
 		ProActive.setImmediateService("listenLog");
 		Service service = new Service(body);
 		//set the filter for serveAll method
 		RequestFilter filter = new MainLoopRequestFilter("submit","pause","terminate");
+		createPingThread();
 		do {
 			service.blockingServeOldest();
 			while(state == SchedulerState.STARTED || state == SchedulerState.PAUSED){
-				service.serveAll(filter);
-				schedule();
-	            //block the loop until a method is invoked and serve it
-				service.blockingServeOldest(SCHEDULER_TIME_OUT);
-				if ((pingFrequency++) == SCHEDULER_NODE_PING_FREQUENCY){
-					pingFrequency = 0;
-					pingDeployedNodes();
+				try {
+					service.serveAll(filter);
+					schedule();
+		            //block the loop until a method is invoked and serve it
+					service.blockingServeOldest(SCHEDULER_TIME_OUT);
+				}
+				catch (Exception e){
+					System.out.println("SchedulerCore.runActivity(MAIN_LOOP)");
+					e.printStackTrace();
 				}
 			}
 		} while (state != SchedulerState.SHUTTING_DOWN && state != SchedulerState.KILLED);
@@ -201,16 +224,19 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		if (runningJobs.size() + pendingJobs.size() > 0)
 			logger.info("Terminating jobs...");
 		while(runningJobs.size() + pendingJobs.size() > 0){
-			service.serveAll("terminate");
-			schedule();
-            //block the loop until a method is invoked and serve it
-			service.blockingServeOldest(SCHEDULER_TIME_OUT);
-			//search for down node and get back to the resources manager
-			if ((pingFrequency++) == SCHEDULER_NODE_PING_FREQUENCY){
-				pingFrequency = 0;
-				pingDeployedNodes();
+			try{
+				service.serveAll("terminate");
+				schedule();
+	            //block the loop until a method is invoked and serve it
+				service.blockingServeOldest(SCHEDULER_TIME_OUT);
+			}
+			catch (Exception e){
+				System.out.println("SchedulerCore.runActivity(SHUTTING_DOWN)");
+				e.printStackTrace();
 			}
 		}
+		//stop the pinger thread.
+		pinger.interrupt();
 		//if normal shutdown, serialize
 		if (state == SchedulerState.SHUTTING_DOWN){
 			try {
@@ -237,7 +263,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		System.exit(0);
 	}
 
-	
+
 	/**
 	 * Schedule computing method
 	 */
@@ -333,18 +359,24 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * Ping every nodes on which a task is currently running and repair the task if need.
 	 */
 	private void pingDeployedNodes() {
-		for (Job j : runningJobs){
-			for (TaskDescriptor td : j.getTasks()){
+		logger.info("SCHEDULER >>> Search for down nodes !");
+		for (int i=0;i<runningJobs.size();i++){
+			Job job = runningJobs.get(i);
+			for (TaskDescriptor td : job.getTasks()){
 				if (td.getStatus() == Status.RUNNNING && !ProActive.pingActiveObject(td.getLauncher())){
-					logger.info("<<<<<<<< Node failed on job "+j.getId()+", task [ "+td.getId()+" ]");
-					if (td.getRerunnable() > 0){
-						td.setRerunnable(td.getRerunnable()-1);
-						j.reStartTask(td);
+					logger.info("<<<<<<<< Node failed on job "+job.getId()+", task [ "+td.getId()+" ]");
+					if (td.getReRunnableLeft() > 0){
+						td.setReRunnableLeft(td.getReRunnableLeft()-1);
+						job.reStartTask(td);
+						//free execution node even if it is dead
+						resourceManager.freeDownNode(td.getNodeName());
 					} else {
-						failedJob(j,td,"An error has occured due to a node failure and the maximum amout of reRennable property has been reached.");
+						failedJob(job,td,"An error has occured due to a node failure and the maximum amout of reRennable property has been reached.");
+						//i--;
+						//free execution node even if it is dead
+						resourceManager.freeDownNode(td.getNodeName());
+						break;
 					}
-					//free execution node even if it is dead
-					resourceManager.freeDownNode(td.getNodeName());
 				}
 			}
 		}
@@ -370,7 +402,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					//free every execution nodes
 					resourceManager.freeNodes(nodes,td.getPostTask());
 				} catch (Exception e){ /* Tested (nothing to do) */ }
-				//deleting all task results
+				//deleting task result
 				taskResults.remove(td.getId());
 			}
 		}

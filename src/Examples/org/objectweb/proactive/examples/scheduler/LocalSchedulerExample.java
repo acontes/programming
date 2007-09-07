@@ -70,7 +70,7 @@ public class LocalSchedulerExample {
             	String xmlURL = SimpleResourceManager.class.getResource("/org/objectweb/proactive/examples/scheduler/test.xml").getPath();
             	admin.deployAllVirtualNodes(new File(xmlURL), null);
             	
-            	imp = InfrastructureManagerProxy.getProxy(new URI("rmi://localhost:1099/"));
+            	imp = InfrastructureManagerProxy.getProxy(new URI("rmi://localhost:"+System.getProperty("proactive.rmi.port")+"/"));
             	
             	
                 logger.info("ResourceManager created on " + ProActive.getActiveObjectNodeUrl(imp));
