@@ -104,6 +104,7 @@ public class MonteCarlo extends JavaTask {
                 }
             }
         }
+        n = 3/0;
         return result;
     }
 }
