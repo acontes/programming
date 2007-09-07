@@ -19,6 +19,7 @@ public class HostInfoImpl implements HostInfo {
     private int vmCapacity;
     private OperatingSystem os;
     private Set<Tool> tools;
+    private long nodeId;
 
     public HostInfoImpl() {
         username = null;
@@ -28,6 +29,7 @@ public class HostInfoImpl implements HostInfo {
         vmCapacity = 0;
         os = null;
         tools = new HashSet<Tool>();
+        nodeId = 0;
     }
 
     public HostInfoImpl(String id) {
@@ -119,26 +121,34 @@ public class HostInfoImpl implements HostInfo {
     }
 
     public void setHomeDirectory(String homeDirectory) {
+        GCMD_LOGGER.trace("HostInfo " + id + ".homeDirectory <-- " +
+            homeDirectory);
         this.homeDirectory = homeDirectory;
     }
 
     public void setId(String id) {
+        GCMD_LOGGER.trace("HostInfo " + id + " created");
         this.id = id;
     }
 
     public void setOs(OperatingSystem os) {
+        GCMD_LOGGER.trace("HostInfo " + id + ".os <-- " + os);
         this.os = os;
     }
 
     public void setHostCapacity(int hostCapacity) {
+        GCMD_LOGGER.trace("HostInfo " + id + ".hostCapacity <-- " +
+            hostCapacity);
         this.hostCapacity = hostCapacity;
     }
 
     public void setVmCapacity(int vmCapacity) {
+        GCMD_LOGGER.trace("HostInfo " + id + ".vmCapacity <-- " + vmCapacity);
         this.vmCapacity = vmCapacity;
     }
 
     public void addTool(Tool tool) {
+        GCMD_LOGGER.trace("HostInfo " + id + " added tool: " + tool);
         this.tools.add(tool);
     }
 
@@ -243,5 +253,13 @@ public class HostInfoImpl implements HostInfo {
         public void checkReadygetHomeDirectory() {
             notInitialized.check();
         }
+    }
+
+    public void setNodeId(long nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public long getNodeId() {
+        return nodeId;
     }
 }
