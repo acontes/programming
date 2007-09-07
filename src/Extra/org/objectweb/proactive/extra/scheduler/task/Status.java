@@ -61,6 +61,10 @@ public enum Status implements java.io.Serializable {
      */
     FAILED ("Failed"),
     /**
+     * The task could not be started
+     */
+    NOT_STARTED ("Could not start"),
+    /**
      * The task has finished execution
      */
     FINISHED ("Finished");

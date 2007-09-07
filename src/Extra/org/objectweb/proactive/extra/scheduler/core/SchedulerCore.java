@@ -99,7 +99,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/** Scheduler node ping frequency. It is based on the main loop time out.
 	 *  For exemple, if the frequency is X and the main loop time out is Y,
 	 *  so the maximum umount of time between each ping will be X*Y. */
-	private static final int SCHEDULER_NODE_PING_FREQUENCY = 30000;
+	private static final int SCHEDULER_NODE_PING_FREQUENCY = 45000;
 	/** Selected port for connection logger system */
 	private static Integer port = CONNECTION_DEFAULT_PORT;
 	/** Host name of the scheduler for logger system. */
@@ -177,7 +177,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				while (!isInterrupted()){
 					try {
 						Thread.sleep(SCHEDULER_NODE_PING_FREQUENCY);
-						pingDeployedNodes();
+						if (runningJobs.size() > 0){
+							pingDeployedNodes();
+						}
 					} catch (InterruptedException e) { }
 				}
 			}
@@ -372,7 +374,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 						resourceManager.freeDownNode(td.getNodeName());
 					} else {
 						failedJob(job,td,"An error has occured due to a node failure and the maximum amout of reRennable property has been reached.");
-						//i--;
+						i--;
 						//free execution node even if it is dead
 						resourceManager.freeDownNode(td.getNodeName());
 						break;

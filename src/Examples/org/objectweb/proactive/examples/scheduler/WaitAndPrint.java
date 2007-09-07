@@ -53,12 +53,12 @@ public class WaitAndPrint extends JavaTask {
 						System.out.println("\t "+tRes.getTaskId()+" : "+tRes.value());
 	        	}
 	            message = java.net.InetAddress.getLocalHost().toString();
-//	            if (sleepTime == 20){
-//	            	Thread.sleep(sleepTime * 50);
-//	            	System.exit(1);
-//	            } else {
+	            if (sleepTime == 5){
+	            	Thread.sleep(sleepTime * 100);
+	            	System.exit(1);
+	            } else {
 	            	Thread.sleep(sleepTime * 1000);
-//	            }
+	            }
 	        } catch (Exception e) {
 	            message = "crashed";
 	            e.printStackTrace();

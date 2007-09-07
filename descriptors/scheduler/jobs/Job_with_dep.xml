@@ -41,14 +41,14 @@
 				</javaProcess>
 			</process>
 		</task>
-		<task name="task4" depends="task1 task2">
+		<task name="task4" depends="task1 task2" reRunnable="2">
 			<!-- Task human description -->
-			<description>This task will sleep 4s</description>
+			<description>This task will sleep 5s</description>
 			<process>
 				<javaProcess
 					class="org.objectweb.proactive.examples.scheduler.WaitAndPrint">
 					<initParameters>
-						<parameter name="sleepTime" value="4" />
+						<parameter name="sleepTime" value="5" />
 						<parameter name="number" value="4" />
 					</initParameters>
 				</javaProcess>
