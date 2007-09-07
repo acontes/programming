@@ -35,6 +35,7 @@ import java.util.Vector;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -50,9 +51,9 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
@@ -62,6 +63,7 @@ import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**
  * This class represents a composite which will be able to display many
@@ -89,6 +91,8 @@ public abstract class AbstractJobComposite extends Composite {
 	public static final String COLUMN_OWNER_TITLE = "User";
 	/** the unique id and the title for the column "State" */
 	public static final String COLUMN_STATE_TITLE = "State";
+	/** the background color of failed jobs */
+	public static final Color JOB_FAILED_BACKGROUND_COLOR = Colors.RED;
 
 	private Label label = null;
 	private Table table = null;
@@ -304,6 +308,9 @@ public abstract class AbstractJobComposite extends Composite {
 		TableColumn[] cols = table.getColumns();
 		TableItem item = new TableItem(table, SWT.NONE);
 		item.setData(job.getId());
+		//TODO 
+		if(job.getState().equals(JobState.FAILED))
+			item.setBackground(JOB_FAILED_BACKGROUND_COLOR);
 		for (int i = 0; i < cols.length; i++) {
 			String title = cols[i].getText();
 			if (title.equals(COLUMN_STATE_TITLE))
@@ -345,6 +352,8 @@ public abstract class AbstractJobComposite extends Composite {
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
 						if ((title != null) && (title.equals(COLUMN_STATE_TITLE))) {
+							if(job.getState().equals(JobState.FAILED))
+								item.setBackground(JOB_FAILED_BACKGROUND_COLOR);
 							item.setText(i, job.getState().toString());
 							break;
 						}

@@ -1,31 +1,28 @@
 /*
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
+ * 
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ * Initial developer(s): The ProActive Team
+ * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
+ * 
  * ################################################################
  */
 package org.objectweb.proactive.extra.scheduler.gui.composite;
@@ -37,6 +34,7 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -48,6 +46,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extra.scheduler.core.Tools;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
@@ -78,6 +77,8 @@ public class TaskComposite extends Composite {
 	public static final String COLUMN_FINISHED_TIME_TITLE = "Finished time";
 	/** the unique id and the title for the column "host name" */
 	public static final String COLUMN_HOST_NAME_TITLE = "Host name";
+	/** the background color of failed tasks */
+	public static final Color TASKS_FAILED_BACKGROUND_COLOR = Colors.RED;
 
 	private List<TaskDescriptor> tasks = null;
 	private Label label = null;
@@ -263,6 +264,8 @@ public class TaskComposite extends Composite {
 			// moveable !
 			// So i don't know if the column "Id" is at the first or the "nth"
 			// position
+			if (taskDescriptor.getStatus().equals(Status.FAILED))
+				item.setBackground(TASKS_FAILED_BACKGROUND_COLOR);
 			for (int i = 0; i < cols.length; i++) {
 				String title = cols[i].getText();
 				if (title.equals(COLUMN_ID_TITLE))
@@ -283,7 +286,7 @@ public class TaskComposite extends Composite {
 					item.setText(i, Tools.getFormattedDate(taskDescriptor.getRunTimeLimit()));
 				else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
 					String hostName = taskDescriptor.getExecutionHostName();
-					if(hostName == null)
+					if (hostName == null)
 						item.setText(i, "n/a");
 					else
 						item.setText(i, hostName);
