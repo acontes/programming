@@ -35,7 +35,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
@@ -96,10 +95,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	/** Scheduler main loop time out */	
 	private static final int SCHEDULER_TIME_OUT = 2000;
 	/** Scheduler node ping frequency. It is based on the main loop time out.
-	 *  For exemple, if the frequency is X and the main loop time out is Y,
+	 *  For example, if the frequency is X and the main loop time out is Y,
 	 *  so the maximum umount of time between each ping will be X*Y. */
 	private static final int SCHEDULER_NODE_PING_FREQUENCY = 45000;
-	
 	/** Selected port for connection logger system */
 	private int port;
 	/** Host name of the scheduler for logger system. */
@@ -354,7 +352,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				//if we are here, it is that something happend while launching the current task.
 				logger.warn("Current node has failed during its initialisation or launching the task : "+node); 
 				//so get back the node to the resource manager
-				resourceManager.freeDownNode(taskDescriptor.getNodeName());
+				resourceManager.freeDownNode(taskDescriptor.getExecuterInformations().getNodeName());
 			}
 		}
 	}
@@ -368,18 +366,18 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		for (int i=0;i<runningJobs.size();i++){
 			Job job = runningJobs.get(i);
 			for (TaskDescriptor td : job.getTasks()){
-				if (td.getStatus() == Status.RUNNNING && !ProActive.pingActiveObject(td.getLauncher())){
+				if (td.getStatus() == Status.RUNNNING && !ProActive.pingActiveObject(td.getExecuterInformations().getLauncher())){
 					logger.info("<<<<<<<< Node failed on job "+job.getId()+", task [ "+td.getId()+" ]");
 					if (td.getRerunnableLeft() > 0){
 						td.setRerunnableLeft(td.getRerunnableLeft()-1);
 						job.reStartTask(td);
 						//free execution node even if it is dead
-						resourceManager.freeDownNode(td.getNodeName());
+						resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
 					} else {
 						failedJob(job,td,"An error has occured due to a node failure and the maximum amout of reRennable property has been reached.",JobState.FAILED);
 						i--;
 						//free execution node even if it is dead
-						resourceManager.freeDownNode(td.getNodeName());
+						resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
 						break;
 					}
 				}
@@ -402,13 +400,15 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			if (td.getStatus() == Status.RUNNNING){
 				try{
 					//get the nodes that are used for this descriptor
-					NodeSet nodes = td.getLauncher().getNodes();
+					NodeSet nodes = td.getExecuterInformations().getLauncher().getNodes();
 					//try to terminate the task
-					try{ td.getLauncher().terminate();}
+					try{ td.getExecuterInformations().getLauncher().terminate();}
 					catch (Exception e){ /* Tested (nothing to do) */ }
 					//free every execution nodes
 					resourceManager.freeNodes(nodes,td.getPostTask());
-				} catch (Exception e){ /* Tested (nothing to do) */ }
+				} catch (Exception e){ 
+					resourceManager.freeNode(td.getExecuterInformations().getNode());
+				}
 				//deleting task result
 				if (jobState == JobState.CANCELLED && td.getId().equals(task.getId()))
 					taskResult = taskResults.remove(td.getId());
@@ -464,7 +464,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					logger.info("<<<<<<<< Node failed on job "+jobId+", task [ "+taskId+" ]");
 					job.reStartTask(descriptor);
 					//free execution node even if it is dead
-					resourceManager.freeDownNode(descriptor.getNodeName());
+					resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
 					return;
 				}
 			}
@@ -494,12 +494,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 				frontend.runningToFinishedJobEvent(job.getJobInfo());
 			}
 			//free every execution nodes
-			resourceManager.freeNodes(descriptor.getLauncher().getNodes(),descriptor.getPostTask());
+			resourceManager.freeNodes(descriptor.getExecuterInformations().getLauncher().getNodes(),descriptor.getPostTask());
 		} catch (NodeException e) {
 			//if the getLauncher().getNodes() method throws an exception,
 			//just free the execution node.
 			try {
-				resourceManager.freeNode(NodeFactory.getNode(descriptor.getNodeName()),descriptor.getPostTask());
+				resourceManager.freeNode(NodeFactory.getNode(descriptor.getExecuterInformations().getNodeName()),descriptor.getPostTask());
 			} catch (NodeException e1) {
 				System.out.println("SchedulerCore.terminate()");
 			}
@@ -674,11 +674,13 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		for (Job j : runningJobs){
 			for (TaskDescriptor td : j.getTasks()){
 				try {
-					NodeSet nodes = td.getLauncher().getNodes();
-					try { td.getLauncher().terminate();}
+					NodeSet nodes = td.getExecuterInformations().getLauncher().getNodes();
+					try { td.getExecuterInformations().getLauncher().terminate();}
 					catch(Exception e) {/* Tested, nothing to do */}
 					resourceManager.freeNodes(nodes,td.getPostTask());
-				} catch(Exception e) {/* Tested, nothing to do */}
+				} catch(Exception e) {
+					resourceManager.freeNode(td.getExecuterInformations().getNode());
+				}
 			}
 		}
 		//cleaning all lists
@@ -765,13 +767,15 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			if (td.getStatus() == Status.RUNNNING){
 				try{
 					//get the nodes that are used for this descriptor
-					NodeSet nodes = td.getLauncher().getNodes();
+					NodeSet nodes = td.getExecuterInformations().getLauncher().getNodes();
 					//try to terminate the task
-					try{ td.getLauncher().terminate();}
+					try{ td.getExecuterInformations().getLauncher().terminate();}
 					catch (Exception e){ /* Tested (nothing to do) */ }
 					//free every execution nodes
 					resourceManager.freeNodes(nodes,td.getPostTask());
-				} catch (Exception e){ /* Tested (nothing to do) */ }
+				} catch (Exception e){
+					resourceManager.freeNode(td.getExecuterInformations().getNode());
+				}
 				taskResults.remove(td.getId());
 			}
 		}

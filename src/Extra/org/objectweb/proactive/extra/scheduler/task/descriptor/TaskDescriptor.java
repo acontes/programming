@@ -97,10 +97,8 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	private int rerunnable = 1;
 	/** Is this task a final task. */
 	private boolean finalTask;
-	/** Reference to the launcher of this task. */
-	private TaskLauncher launcher;
-	/** Reference to the node name of this task. */
-	private String nodeName;
+	/** Informations about the launcher and node */
+	private ExecuterInformations executerInformations;
 	/** Task information : this is the informations that can change during process. */
 	private TaskEvent taskInfo = new TaskEvent();
     
@@ -134,8 +132,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 		} else {
 			launcher = (TaskLauncher)ProActive.newActive(TaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
 		}
-		setLauncher(launcher);
-		setNodeName(node.getNodeInformation().getName());
+		setExecuterInformations(new ExecuterInformations(launcher,node));
 		return launcher;
 	}
 	
@@ -561,44 +558,27 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	public void setExecutionHostName(String executionHostName) {
 		taskInfo.setExecutionHostName(executionHostName);
 	}
-	
 
 
 	/**
-	 * To get the active object where this task is running.
+	 * To get the executer informations
 	 * 
-	 * @return the launcher
+	 * @return the executerInformations
 	 */
-	public TaskLauncher getLauncher() {
-		return launcher;
+	public ExecuterInformations getExecuterInformations() {
+		return executerInformations;
 	}
 
 
 	/**
-	 * To set the active object where this task will run.
+	 * To set the executer informations.
 	 * 
-	 * @param launcher the launcher to set
+	 * @param executerInformations the executerInformations to set
 	 */
-	public void setLauncher(TaskLauncher launcher) {
-		this.launcher = launcher;
+	public void setExecuterInformations(ExecuterInformations executerInformations) {
+		this.executerInformations = executerInformations;
 	}
 	
-
-	/**
-	 * @return the node name.
-	 */
-	public String getNodeName() {
-		return nodeName;
-	}
-
-
-	/**
-	 * @param nodeName the node name to set
-	 */
-	public void setNodeName(String nodeName) {
-		this.nodeName = nodeName;
-	}
-
 	
 	/**
 	 * Get the number of rerun left.
