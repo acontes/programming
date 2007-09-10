@@ -189,10 +189,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 			throw new SchedulerException("The job represented by this ID is unknow !");
 		if (!ij.hasRight(identifications.get(id)))
 			throw new SchedulerException("You do not have permission to access this job !");
+		if (!ij.isFinished())
+			return null;
 		//asking the scheduler for the result
 		JobResult result = scheduler.getResults(jobId);
 		if (result == null)
-			throw new SchedulerException("The job represented by this ID is not finished or unknow !");
+			throw new SchedulerException("Error while getting the result of this job !");
 		//removing jobs from the global list : this job is no more managed
 		jobs.remove(jobId);
 		return result;
@@ -620,6 +622,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 */
 	public void runningToFinishedJobEvent(JobEvent event) {
 		dispatch("runningToFinishedJobEvent", new Class<?>[]{JobEvent.class},event);
+		jobs.get(event.getJobId()).setFinished(true);
 		//stats
 		stats.increaseFinishedJobCount(event.getNumberOfFinishedTasks());
 	}

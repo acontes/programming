@@ -48,6 +48,8 @@ public class IdentifyJob implements Serializable {
 	private JobId jobId;
 	/** User identification */
 	private UserIdentification userIdentification;
+	/** is this job finished */
+	private boolean finished = false;
 	
 	
 	/**
@@ -92,6 +94,26 @@ public class IdentifyJob implements Serializable {
 		if (userIdentification == null)
 			return false;
 		return userId.isAdmin() || userIdentification.equals(userId);
+	}
+	
+
+	/**
+	 * Return true if the job isFinished, false otherwise.
+	 * 
+	 * @return the finished state of the job.
+	 */
+	public boolean isFinished() {
+		return finished;
+	}
+
+
+	/**
+	 * Set the finish state of the job.
+	 * 
+	 * @param finished the finish state to set.
+	 */
+	public void setFinished(boolean finished) {
+		this.finished = finished;
 	}
 	
 	

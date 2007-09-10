@@ -734,7 +734,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	public void setState(JobState state) {
 		jobInfo.setState(state);
 	}
-
+	
 	
 	/**
 	 * @see java.lang.Object#hashCode()
