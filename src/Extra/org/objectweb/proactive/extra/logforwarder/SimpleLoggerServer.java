@@ -36,134 +36,162 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Iterator;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
+
 public class SimpleLoggerServer implements Runnable {
 
-	/** The default port number of remote logging server (4560) */
-	static final int DEFAULT_PORT = 4560;
+    // socket port
+    private int port;
+    private boolean terminate = false;
 
-	// socket port
-	private int port = DEFAULT_PORT;
-	private boolean terminate = false;
+    // to close sockets
+    private Vector<ConnectionHandler> connections;
 
-	// to close sockets
-	private Vector<ConnectionHandler> connections;
+    // connection
+    private ServerSocket serverSocket;
 
-	public SimpleLoggerServer() {}
+    
+    
+    /**
+     * Create a new logger server on any free port. This port can be
+     * retreived using getPort().
+     * @return the created server.
+     * @throws IOException
+     */
+    public static SimpleLoggerServer createLoggerServer() throws IOException {
+        SimpleLoggerServer simpleLoggerServer = new SimpleLoggerServer();
+        Thread simpleLoggerServerThread = new Thread(simpleLoggerServer);
+        simpleLoggerServerThread.start();
+        return simpleLoggerServer;
+    }
 
-	/**
-	 * Create a log server.
-	 * 
-	 * @param port
-	 *            the port on which incoming log connection are performed
-	 */
-	public SimpleLoggerServer(int port) {
-		this.port = port;
-		this.connections = new Vector<ConnectionHandler>();
-	}
+    
+    
+    /**
+     * Create a logger server on a given port.
+     * @param port the binding port of the created server.
+     * @throws IOException
+     */
+    public SimpleLoggerServer(int port) throws IOException {
+        this.connections = new Vector<ConnectionHandler>();
+        this.serverSocket = new ServerSocket(port);
+        this.port = this.serverSocket.getLocalPort();
+    }
 
-	@Override
-	public void run() {
-		ServerSocket serverSocket = null;
+    /**
+     * Create a logger server on any free port. This port can be
+     * retreived using getPort().
+     * @throws IOException
+     */
+    public SimpleLoggerServer() throws IOException {
+        this(0);
+    }
 
-		try {
-			serverSocket = new ServerSocket(port);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		while (!terminate) {
-			try {
-				Socket s = serverSocket.accept();
-				ConnectionHandler ch = new ConnectionHandler(s);
-				this.connections.add(ch);
-				new Thread(ch).start();
-				// new Thread(new
-				// SocketNode(s,LogManager.getLoggerRepository()));
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		// close connection
-		try {
-			serverSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    /**
+     * Return the binding port of the created server.
+     * @return the binding port of the created server.
+     */
+    public int getPort() {
+        return this.port;
+    }
+    
+    /**
+     * Stop this logger server.
+     */
+    public synchronized void stop() {
+        for (ConnectionHandler c : this.connections) {
+            c.stop();
+        }
+        this.terminate = true;
+    }
 
-	public synchronized void stop() {
-		for (ConnectionHandler c : this.connections) {
-			c.stop();
-		}
-		this.terminate = true;
-	}
+    
+    @Override
+    public void run() {
+        while (!terminate) {
+            try {
+                Socket s = this.serverSocket.accept();
+                ConnectionHandler ch = new ConnectionHandler(s);
+                this.connections.add(ch);
+                new Thread(ch).start();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
 
-	/**
-	 * Thread for handling incoming blocking connection.
-	 * 
-	 * @author cdelbe
-	 * @since 2.2
-	 */
-	private class ConnectionHandler implements Runnable {
+        // close connection
+        try {
+            this.serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    
+    /**
+     * Thread for handling incoming blocking connection.
+     *
+     * @author cdelbe
+     * @since 2.2
+     */
+    private class ConnectionHandler implements Runnable {
+        private Socket input;
+        private ObjectInputStream inputStream;
+        private boolean terminate;
 
-		private Socket input;
-		private ObjectInputStream inputStream;
-		private boolean terminate;
+        public ConnectionHandler(Socket input) {
+            try {
+                this.input = input;
+                this.inputStream = new ObjectInputStream(new BufferedInputStream(
+                            input.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-		public ConnectionHandler(Socket input) {
-			try {
-				this.input = input;
-				this.inputStream = new ObjectInputStream(new BufferedInputStream(input.getInputStream()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+        @Override
+        public void run() {
+            LoggingEvent currentEvent;
+            Logger localLogger;
 
-		@Override
-		public void run() {
-			LoggingEvent currentEvent;
-			Logger localLogger;
+            try {
+                while (!terminate) {
+                    // read an event from the wire
+                    currentEvent = (LoggingEvent) inputStream.readObject();
+                    // get the local logger. The name of the logger is taken to
+                    // be the name contained in the event.
+                    localLogger = Logger.getLogger(currentEvent.getLoggerName());
+                    // apply the logger-level filter
+                    if (currentEvent.getLevel()
+                                        .isGreaterOrEqual(localLogger.getEffectiveLevel())) {
+                        // finally log the event as if was generated locally
+                        localLogger.callAppenders(currentEvent);
+                    }
+                }
+            } catch (EOFException e) {
+                // normal case ...
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
 
-			try {
-				while (!terminate) {
-					// read an event from the wire
-					currentEvent = (LoggingEvent) inputStream.readObject();
-					// get the local logger. The name of the logger is taken to
-					// be the name contained in the event.
-					localLogger = Logger.getLogger(currentEvent.getLoggerName());
-					// apply the logger-level filter
-					if (currentEvent.getLevel().isGreaterOrEqual(localLogger.getEffectiveLevel())) {
-						// finally log the event as if was generated locally
-						localLogger.callAppenders(currentEvent);
-					}
-				}
-			} catch (EOFException e) {
-				// normal case ...
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-			// close stream
-			try {
-				System.out.println(this + " is terminating...");
-				this.inputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+            // close stream
+            try {
+                System.out.println(this + " is terminating...");
+                this.inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-		public synchronized void stop() {
-			this.terminate = true;
-		}
-
-	}
-
+        public synchronized void stop() {
+            this.terminate = true;
+        }
+    }
 }

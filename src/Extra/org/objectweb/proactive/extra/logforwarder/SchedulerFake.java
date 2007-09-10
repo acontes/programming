@@ -51,8 +51,6 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 public class SchedulerFake {
 
     public static final String LOGGER_PREFIX = "logger.test.";
-    public static final int CONNECTION_PORT = 1337;
-    
     
     // loggers associated to each tasks
     private java.util.Hashtable<String, Logger> loggers = 
@@ -61,6 +59,8 @@ public class SchedulerFake {
     private SimpleLoggerServer slf; 
     
     private String hostname;
+    
+    private int port;
     
     public SchedulerFake(){}
     
@@ -170,9 +170,13 @@ public class SchedulerFake {
     
     private void initLogServer(){
         // incoming logs from scheduled tasks
-        slf = new SimpleLoggerServer(CONNECTION_PORT);
-        Thread slft  = new Thread(slf);
-        slft.start();
+        try {
+            slf = SimpleLoggerServer.createLoggerServer();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        this.port = slf.getPort();
     }
     
     
@@ -180,7 +184,7 @@ public class SchedulerFake {
     private void addLogger(RemoteTask t, String id){
         Logger l = Logger.getLogger(LOGGER_PREFIX+id);
         this.loggers.put(id, l);
-        t.initLogger(LOGGER_PREFIX+id, this.hostname, CONNECTION_PORT);
+        t.initLogger(LOGGER_PREFIX+id, this.hostname, this.port);
     }
     
     

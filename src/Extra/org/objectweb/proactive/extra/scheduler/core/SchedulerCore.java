@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.core;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,8 +91,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 	/** Prefix for logger system redirection. */
 	public static final String LOGGER_PREFIX = "logger.scheduler.";
-	/** Default port for connection logger system */
-	public static final Integer CONNECTION_DEFAULT_PORT = 1337;
 	/** Path for the result serialization */
 	public static final String SERIALIZING_PATH = "/tmp/";
 	/** Scheduler main loop time out */	
@@ -100,8 +99,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 *  For exemple, if the frequency is X and the main loop time out is Y,
 	 *  so the maximum umount of time between each ping will be X*Y. */
 	private static final int SCHEDULER_NODE_PING_FREQUENCY = 45000;
+	
 	/** Selected port for connection logger system */
-	private static Integer port = CONNECTION_DEFAULT_PORT;
+	private int port;
 	/** Host name of the scheduler for logger system. */
 	private static String host = null;
 	/** Implementation of Infrastructure Manager */
@@ -145,10 +145,13 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 			this.frontend = frontend;
 			//logger
 	    	host = java.net.InetAddress.getLocalHost().getHostName();
-	    	//TODO choose an other port in case of unavailability (algo : ask cmathieu)
-	        SimpleLoggerServer slf = new SimpleLoggerServer(port);
-	        Thread slft  = new Thread(slf);
-	        slft.start();
+            try {
+                SimpleLoggerServer slf = SimpleLoggerServer.createLoggerServer();
+                this.port = slf.getPort();
+            } catch (IOException e) {
+                logger.error("Cannot create logger server : " + e.getMessage());
+                throw new RuntimeException(e);
+            }
 			this.policy = (PolicyInterface)Class.forName(policyFullName).newInstance();
 			logger.info("Scheduler Core ready !");
 		} catch (InstantiationException e) {
