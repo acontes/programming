@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.core;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javax.security.auth.login.LoginException;
@@ -84,7 +85,12 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
 	 * @param scheduler the scheduler front-end on which to connect the user after authentication success.
 	 */
 	public SchedulerAuthentication(String loginFile, String groupFile, SchedulerFrontend scheduler){
-		System.setProperty("java.security.auth.login.config",Login.class.getResource("jaas.config").getFile());
+		URL jaasConfig = Login.class.getResource("jaas.config");
+		if (jaasConfig == null){
+			throw new RuntimeException("The file 'jaas.config' has not been found and have to be at the following directory :\n"+
+					"\tclasses/Extra/org/objectweb/proactive/extra/security/");
+		}
+		System.setProperty("java.security.auth.login.config",jaasConfig.getFile());
 		this.loginFile = loginFile;
 		this.groupFile = groupFile;
 		this.scheduler = scheduler;
