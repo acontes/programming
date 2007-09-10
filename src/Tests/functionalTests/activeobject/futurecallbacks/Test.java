@@ -28,50 +28,30 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.masterslave.interfaces.internal;
+package functionalTests.activeobject.futurecallbacks;
 
-import java.io.Serializable;
+import org.objectweb.proactive.ProActive;
+
+import functionalTests.FunctionalTest;
 
 
-/**
- * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * Internal view of a task in the Master/Slave API<br/>
- * Adds the possibility to set the result for a task<br/>
- * Adds the notion of a "Task ID"<br/>
- * @author fviale
- *
- * @param <R>
- */
-public interface ResultIntern<R extends Serializable> extends Identifiable,
-    Serializable {
+public class Test extends FunctionalTest {
+    @org.junit.Test
+    public void action() throws Exception {
+        A a1 = (A) ProActive.newActive(A.class.getName(), null);
+        A a2 = (A) ProActive.newActive(A.class.getName(), null);
+        a1.giveBrother(a2);
+        a1.start();
+        synchronized (A.class) {
+            while (A.counter != 2) {
+                A.class.wait();
+            }
+        }
+    }
 
-    /**
-     * get the result of the task
-     * @return the result
-     */
-    R getResult();
-
-    /**
-     * sets the result of the task
-     * @param res the result
-     */
-    void setResult(R res);
-
-    /**
-     * tells if the task threw a functional exception
-     * @return answer
-     */
-    boolean threwException();
-
-    /**
-     * returns the actual functional exception thrown by the task
-     * @return the exception
-     */
-    Throwable getException();
-
-    /**
-     * sets the exception thrown by the task
-     * @param e the exception
-     */
-    void setException(Throwable e);
+    public static void main(String[] args) throws Exception {
+        Test t = new Test();
+        t.action();
+        System.out.println("OK");
+    }
 }

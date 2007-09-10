@@ -112,7 +112,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * The method corresponding to the call
      */
     private transient Method reifiedMethod;
-
     private String key;
     private transient MethodCallExceptionContext exceptioncontext;
     ComponentMethodCallMetadata componentMetaData = null;
@@ -311,33 +310,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * Builds a new MethodCall object. This constructor is a <b>shallow</b> copy constructor.
-     * Fields of the object are not copied.
-     * Please, consider use the factory method  <code>getMethodCall</code>
-     * instead of build a new MethodCall object.
-     * @param mc - the MethodCall object to copy
-     */
-    public MethodCall(MethodCall mc) {
-        this.componentMetaData = mc.componentMetaData;
-        this.reifiedMethod = mc.getReifiedMethod();
-        if (mc.serializedEffectiveArguments == null) {
-            this.serializedEffectiveArguments = null;
-        } else {
-            byte[] source = mc.serializedEffectiveArguments;
-            this.serializedEffectiveArguments = new byte[source.length];
-            for (int i = 0; i < this.serializedEffectiveArguments.length;
-                    i++) {
-                this.serializedEffectiveArguments[i] = source[i];
-            }
-        }
-        this.effectiveArguments = mc.effectiveArguments;
-        this.genericTypesMapping = mc.getGenericTypesMapping();
-        this.key = MethodCall.buildKey(mc.getReifiedMethod(),
-                mc.getGenericTypesMapping());
-        this.exceptioncontext = mc.exceptioncontext;
-    }
-
-    /**
      * Builds a new MethodCall object.
      */
     protected MethodCall() {
@@ -345,6 +317,25 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         this.effectiveArguments = null;
         this.serializedEffectiveArguments = null;
         this.exceptioncontext = null;
+    }
+
+    /**
+     * Builds a new MethodCall object that is a <b>shallow</b> copy of this.
+     * Fields of the object are not copied.
+     * Please, consider use the factory method  <code>getMethodCall</code>
+     * instead of build a new MethodCall object.
+     * @return a shallow copy of this
+     */
+    public MethodCall getShallowCopy() {
+        MethodCall mc = new MethodCall();
+        mc.componentMetaData = this.componentMetaData;
+        mc.reifiedMethod = this.getReifiedMethod();
+        mc.serializedEffectiveArguments = this.serializedEffectiveArguments;
+        mc.effectiveArguments = this.effectiveArguments;
+        mc.genericTypesMapping = this.getGenericTypesMapping();
+        mc.key = this.key;
+        mc.exceptioncontext = this.exceptioncontext;
+        return mc;
     }
 
     /**
@@ -473,25 +464,34 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     // build a key for uniquely identifying methods, including parameterized ones
     private static String buildKey(Method reifiedMethod,
         Map<TypeVariable, Class> genericTypesMapping) {
-        String sb = "";
-        sb += (reifiedMethod.getDeclaringClass().getName());
+        //TODO It seems genericTypesMapping is always an empty map, It is either useless or not correctly built.
+        final StringBuffer sb = new StringBuffer((reifiedMethod.getDeclaringClass()
+                                                               .getName()));
+
         // return type
-        Type returnType = reifiedMethod.getGenericReturnType();
+        final Type returnType = reifiedMethod.getGenericReturnType();
         if ((genericTypesMapping != null) &&
                 genericTypesMapping.containsKey(returnType)) {
-            sb += genericTypesMapping.get(returnType);
+            sb.append(genericTypesMapping.get(returnType));
         } else {
-            sb += returnType;
+            sb.append(returnType);
         }
-        sb += (reifiedMethod.getName());
-        // params
-        Type[] parameters = reifiedMethod.getGenericParameterTypes();
-        for (int i = 0; i < parameters.length; i++) {
-            sb += (((genericTypesMapping != null) &&
-            genericTypesMapping.containsKey(parameters[i]))
-            ? genericTypesMapping.get(parameters[i]).getName() : parameters[i]);
-        }
+        sb.append(reifiedMethod.getName());
 
+        final Type[] parameters = reifiedMethod.getGenericParameterTypes();
+
+        // extracting conditional test from the loop reduce runtime by 20 to 30 %
+        if ((genericTypesMapping != null) && (!genericTypesMapping.isEmpty())) {
+            for (int i = 0; i < parameters.length; i++) {
+                sb.append((genericTypesMapping.containsKey(parameters[i]))
+                    ? genericTypesMapping.get(parameters[i]).getName()
+                    : parameters[i]);
+            }
+        } else {
+            for (int i = 0; i < parameters.length; i++) {
+                sb.append(parameters[i]);
+            }
+        }
         return sb.toString();
     }
 
