@@ -174,6 +174,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
                     if (res.errorOccured()) {
                         // nothing to do, just let the node in the free list
+                        logger.info("Error occured executing verifying script", res.getException());
                     } else if (res.getResult()) {
                         // Result OK
                         nodeManager.setVerifyingScript(imnode, verifyingScript);
@@ -217,7 +218,6 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                 scriptResults.add(nodes.get(0).executeScript(verifyingScript));
                 nodes.remove(0);
             }
-
             // Recupere les resultats
             while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
                     (found < nb.intValue())) {
@@ -228,6 +228,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
                     if (res.errorOccured()) {
                         // nothing to do, just let the node in the free list
+                        logger.info("Error occured executing verifying script", res.getException());
                     } else if (res.getResult()) {
                         // Result OK
                         nodeManager.setVerifyingScript(imnode, verifyingScript);
