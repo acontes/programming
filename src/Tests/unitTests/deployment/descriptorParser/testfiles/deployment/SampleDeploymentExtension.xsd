@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"></import>
+	<import schemaLocation="../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/CommonTypes.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"></import>
+
+    <!--
+     custom group
+      -->
+	<complexType name="myGroupType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<attribute name="someattr" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="myGroup" substitutionGroup="pa:abstractShElement" type="paext:myGroupType" />
+
+
+    <!--
+     custom bridge
+      -->
+	<complexType name="myBridgeType">
+		<complexContent>
+			<extension base="pa:abstractBridgeElementType">
+				<attribute name="someattr" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="myBridge" substitutionGroup="pa:abstractBridgeElement" type="paext:myBridgeType" />
+
+</schema>

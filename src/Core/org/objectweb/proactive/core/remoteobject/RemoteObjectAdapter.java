@@ -80,11 +80,9 @@ public class RemoteObjectAdapter implements RemoteObject {
         } catch (ProActiveException e) {
             throw new IOException(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to contact remote object at " +
-                this.uri.toString() + " when calling " +
-                message.getMethodName());
+                this.uri + " when calling " + message.getMethodName());
             return new SynchronousReplyImpl(e);
         }
 

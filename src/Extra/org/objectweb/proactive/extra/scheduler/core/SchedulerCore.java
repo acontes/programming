@@ -323,7 +323,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					}
 					//if a task has been launched
 					if (launcher != null){
-						logger.info(">>>>>>>> New task started on "+node.getNodeInformation().getHostName()+" [ "+taskDescriptor.getId()+" ]");
+						logger.info(">>>>>>>> New task started on "+node.getNodeInformation().getVMInformation().getHostName()+" [ "+taskDescriptor.getId()+" ]");
 						// set the different informations on job
 						if (currentJob.getStartTime() == -1){
 							// if it is the first task of this job
@@ -336,7 +336,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 							currentJob.setTaskStatusModify(null);
 						}
 						// set the different informations on task
-						currentJob.startTask(taskDescriptor,node.getNodeInformation().getHostName());
+						currentJob.startTask(taskDescriptor,node.getNodeInformation().getVMInformation().getHostName());
 						// send task event to frontend
 						frontend.pendingToRunningTaskEvent(taskDescriptor.getTaskInfo());
 					} else {

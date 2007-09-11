@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import org.objectweb.proactive.Job;
-
 
 /**
  * <p>
@@ -43,7 +41,7 @@ import org.objectweb.proactive.Job;
  * @since   ProActive 0.9
  *
  */
-public interface VMInformation extends java.io.Serializable, Job {
+public interface VMInformation extends java.io.Serializable {
 
     /**
      * Returns the VMID of the VM the node belongs to
@@ -59,22 +57,10 @@ public interface VMInformation extends java.io.Serializable, Job {
 
     /**
      * Returns the given name (identifier) of this VM.
-     * For some reasson this has been used to get the name of the Node!
-     * when using de NodeInformation class.
-     * To really get the name of the VM use getVmName();
+     *
      * @return the given name (identifier) of this VM
      */
     public String getName();
-
-    /**
-     * Returns an Identifier for the process that originates this VM creation
-     */
-    public String getCreationProtocolID();
-
-    /**
-     * Sets an Identifier for the process that originates this VM creation
-     */
-    public void setCreationProtocolID(String protocolId);
 
     /**
      * Returns the host where the vm is located
@@ -98,6 +84,13 @@ public interface VMInformation extends java.io.Serializable, Job {
      *  &lt;/deployment&gt;
      *  </pre>
      * @return The java virtual machine name if created with a descriptor file, null otherwise.
+     *
+     */
+
+    /* TODO cmathieu, mleyton: Remove this method ?
+     *         Implementations of this method are utterly broken and wrong.
+     *         Basically, they all return the same result than getName()
+     *         See why FT use it & fix or delete this method
      */
     public String getDescriptorVMName();
 
@@ -106,4 +99,12 @@ public interface VMInformation extends java.io.Serializable, Job {
      * @return the Group Information of this VM
      */
     public DeployerTag getDeployerTag();
+
+    /**
+     * Returns the capacity of the ProActive Runtime
+     *
+     * Capacity corresponds to the number of node created by default on the runtime.
+     * Usually capacity corresponds to the number of cores on which the JVM runs.
+     */
+    public long getCapacity();
 }

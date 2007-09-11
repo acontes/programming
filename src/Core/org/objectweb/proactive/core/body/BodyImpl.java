@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
@@ -72,7 +72,9 @@ import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
@@ -173,16 +175,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-        String ftstate = ProActiveConfiguration.getInstance().getFTState();
-        if ("enable".equals(ftstate)) {
+        if (PAProperties.PA_FT.isTrue()) {
             // if the object is a ProActive internal object, FT is disabled
             if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
                 // if the object is not serilizable, FT is disabled
                 if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
                     try {
                         // create the fault tolerance manager
-                        int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getInstance()
-                                                                                                .getFTProtocol());
+                        int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL.getValue());
                         this.ftmanager = factory.newFTManagerFactory()
                                                 .newFTManager(protocolSelector);
                         this.ftmanager.init(this);
@@ -251,12 +251,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
-            RequestNotificationData requestNotificationData = new RequestNotificationData(request.getSourceBodyID(),
-                    request.getSender().getNodeURL(), this.bodyID,
-                    this.nodeURL, request.getMethodName(),
-                    getRequestQueue().size() + 1);
-            this.mbean.sendNotification(NotificationType.requestReceived,
-                requestNotificationData);
+            // If the node is not a HalfBody
+            if (!(request.getSender().getNodeURL().equals("LOCAL"))) {
+                RequestNotificationData requestNotificationData = new RequestNotificationData(request.getSourceBodyID(),
+                        request.getSender().getNodeURL(), this.bodyID,
+                        this.nodeURL, request.getMethodName(),
+                        getRequestQueue().size() + 1);
+                this.mbean.sendNotification(NotificationType.requestReceived,
+                    requestNotificationData);
+            }
         }
 
         // END JMX Notification
@@ -688,6 +691,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 future.setID(sequenceID);
                 this.futures.receiveFuture(future);
             }
+
             // ProActiveEvent
             messageEventProducer.notifyListeners(request,
                 MessageEvent.REQUEST_SENT, destinationBody.getID());
@@ -696,10 +700,20 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // JMX Notification
             // TODO Write this section, after the commit of Arnaud
             // TODO Send a notification only if the destination doesn't implement ProActiveInternalObject
-
-            /*if (!isProActiveInternalObject && (mbean != null)) {
-                           mbean.sendNotification(NotificationType.requestSent, request.getSequenceNumber());
-            }*/
+            if (!isProActiveInternalObject && (mbean != null)) {
+                ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                      .getJMXServerConnector();
+                if (serverConnector != null) {
+                    UniqueID connectorID = serverConnector.getUniqueID();
+                    if (!connectorID.equals(destinationBody.getID())) {
+                        mbean.sendNotification(NotificationType.requestSent,
+                            new RequestNotificationData(BodyImpl.this.bodyID,
+                                BodyImpl.this.getNodeURL(),
+                                destinationBody.getID(), null,
+                                methodCall.getName(), -1));
+                    }
+                }
+            }
 
             // END JMX Notification
 

@@ -519,17 +519,6 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     }
 
     //
-    // Implements Job Interface
-    //
-
-    /**
-     * @see org.objectweb.proactive.Job#getJobID()
-     */
-    public String getJobID() {
-        return vmInformation.getJobID();
-    }
-
-    //
     // Implements SecurityEntity Interface
     //
     public X509Certificate getCertificate()
@@ -697,6 +686,10 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     }
 
     public String getMBeanServerName() {
+        return null;
+    }
+
+    public ServerConnector getJMXServerConnector() {
         return null;
     }
 }

@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
@@ -124,6 +123,8 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	 * to VMObject (the real type of the model).
 	 * @return the casted model
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public RuntimeObject getCastedModel(){
 		if(castedModel==null){
 			castedModel = (RuntimeObject)getModel();
@@ -136,6 +137,8 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	  * to VMFigure (the real type of the figure).
 	  * @return the casted figure
 	  */
+	@SuppressWarnings("unchecked")
+	@Override
 	public VMFigure getCastedFigure(){
 		if(castedFigure == null)
 			castedFigure = (VMFigure)getFigure();

@@ -37,7 +37,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
@@ -476,14 +475,11 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         try {
             return MakeDeepCopy.WithObjectStream.makeDeepCopy(this);
         } catch (IOException e) {
-            e.printStackTrace();
+            //TODO replace by CloneNotSupportedException(Throwable e) java 1.6
+            throw (CloneNotSupportedException) new CloneNotSupportedException(e.getMessage()).initCause(e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (ProActiveException e) {
-            e.printStackTrace();
+            throw (CloneNotSupportedException) new CloneNotSupportedException(e.getMessage()).initCause(e);
         }
-
-        return clone;
     }
 
     public void setTimItReductor(Object timItReductor) {

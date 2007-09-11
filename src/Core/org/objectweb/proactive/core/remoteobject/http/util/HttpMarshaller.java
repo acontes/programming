@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.remoteobject.http.util;
 
 import java.io.IOException;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 
@@ -55,7 +54,7 @@ public class HttpMarshaller {
 
         try {
             buffer = ObjectToByteConverter.MarshallStream.convert(o);
-        } catch (ProActiveException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

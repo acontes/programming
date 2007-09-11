@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 
 
@@ -108,9 +107,9 @@ public abstract class Utils extends Object {
     /**
      * Removes the keyword 'native' from the String given as argument.
      *
-     * We assume there is only one occurence of 'native' in the string.
+     * We assume there is only one occurrence of 'native' in the string.
      *
-     * @return the input String minus the first occurence of 'native'.
+     * @return the input String minus the first occurrence of 'native'.
      * @param  in The String the keyword 'native' is to be removed from.
      */
     static public String getRidOfNative(String in) {
@@ -360,7 +359,7 @@ public abstract class Utils extends Object {
 
         packageName = Utils.getPackageName(className);
 
-        indexOfDot = packageName.indexOf((int) '.', 0);
+        indexOfDot = packageName.indexOf('.', 0);
         result = "";
         indexOfLastDot = 0;
 
@@ -368,7 +367,7 @@ public abstract class Utils extends Object {
             result = result + File.separator +
                 packageName.substring(indexOfLastDot, indexOfDot);
             indexOfLastDot = indexOfDot + 1;
-            indexOfDot = packageName.indexOf((int) '.', indexOfDot + 1);
+            indexOfDot = packageName.indexOf('.', indexOfDot + 1);
             if (indexOfDot == -1) {
                 result = result + File.separator +
                     packageName.substring(indexOfLastDot, packageName.length());
@@ -492,14 +491,8 @@ public abstract class Utils extends Object {
         }
         try {
             return MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(source);
-        } catch (ProActiveException e) {
-            IOException exp = new IOException();
-            exp.initCause(e);
-            throw exp;
         } catch (ClassNotFoundException e) {
-            IOException exp = new IOException();
-            exp.initCause(e);
-            throw exp;
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
 
@@ -641,7 +634,7 @@ public abstract class Utils extends Object {
                 } else {
                     i++;
                     switch (stubClassName.charAt(i)) {
-                    // one char Flags : 'STUB_ESCAPE_CHAR''a_char' 
+                    // one char Flags : 'STUB_ESCAPE_CHAR''a_char'
                     case STUB_PACKAGE_SEPARATOR_CHAR:
                         sb.append('.');
                         break;
@@ -776,7 +769,7 @@ public abstract class Utils extends Object {
                 if (parametersTypes != null) {
                     // does the method has the right signature
                     if (Arrays.equals(m.getParameterTypes(), parametersTypes)) {
-                        // the method exists with the right parameters 
+                        // the method exists with the right parameters
                         return true;
                     }
                 } else {

@@ -44,10 +44,10 @@ import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
@@ -79,7 +79,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.91
  *
  */
-public interface ProActiveRuntime extends Job, SecurityEntity {
+public interface ProActiveRuntime extends SecurityEntity {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
     public static final long serialVersionUID = 104088081090593038L;
 
@@ -87,8 +87,11 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * Creates a new Node in the same VM as this ProActiveRuntime
      * @param nodeName the name of the node to create localy
      * @param replacePreviousBinding
+     * @param jobId the jobId of this node. If null the node will belong to
+     *         the default jobID
      * @return the url of the newly created node in the target VM
      * @exception NodeException if the new node cannot be created
+     * @see Job
      */
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
@@ -158,6 +161,22 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
     public void unregister(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
         String vmName) throws ProActiveException;
+
+    /**
+     * Returns all the ProActiveRuntime registered on this ProActiveRuntime on this VM
+     * @return all the ProActiveRuntime registered on this ProActiveRuntime on this VM
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
+     */
+    public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException;
+
+    /**
+     * Returns the ProActiveRuntime of specified name
+     * @param proActiveRuntimeName the name of the ProActiveruntime to return
+     * @return the ProActiveRuntime of specified name
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
+     */
+    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
+        throws ProActiveException;
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -414,4 +433,10 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * @return the MBeans Server Name
      */
     public String getMBeanServerName();
+
+    /**
+     * Returns the JMX Server connector
+     * @return the JMX Server connector
+     */
+    public ServerConnector getJMXServerConnector();
 }

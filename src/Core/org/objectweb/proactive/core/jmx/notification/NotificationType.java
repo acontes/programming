@@ -6,12 +6,14 @@ package org.objectweb.proactive.core.jmx.notification;
  */
 public class NotificationType {
     public final static String unknown = "unknown";
+    public final static String setOfNotifications = "setOfNotifications";
 
     // --- Corresponds to the RequestQueueEvent --------------------
-    public final static String requestQueueModified = "requestQueueModified";
-    public final static String addRequest = "addRequest";
+    /* Not Used */
+    // public final static String requestQueueModified = "requestQueueModified";
+    // public final static String addRequest = "addRequest";
+    // public final static String removeRequest = "removeRequest";
     public final static String waitForRequest = "waitForRequest";
-    public final static String removeRequest = "removeRequest";
 
     // --- Corresponds to the MessageEvent -------------------------
     public final static String replyReceived = "replyReceived";
@@ -36,7 +38,8 @@ public class NotificationType {
     public final static String nodeDestroyed = "nodeDestroyed";
 
     // --- Corresponds to the BodyEventListener --------------------
-    public final static String bodyChanged = "bodyChanged";
+    /* Not Used */
+    // public final static String bodyChanged = "bodyChanged";
     public final static String bodyCreated = "bodyCreated";
     public final static String bodyDestroyed = "bodyDestroyed";
 
@@ -44,6 +47,11 @@ public class NotificationType {
     public final static String runtimeRegistered = "runtimeRegistered";
     public final static String runtimeUnregistered = "runtimeUnregistered";
     public final static String runtimeAcquired = "runtimeAcquired";
-    public final static String forwarderRuntimeRegistered = "forwarderRuntimeRegistered";
+
+    /* TODO Send this notification */
+    // public final static String forwarderRuntimeRegistered = "forwarderRuntimeRegistered";
     public final static String runtimeDestroyed = "runtimeDestroyed";
+
+    // --- Used in the message of the JMX notifications -------------
+    public final static String migrationMessage = "Migration Finished";
 }

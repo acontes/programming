@@ -73,7 +73,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
 
         // try-catch block added by AdC for P2P
         try {
-            object = this.memberList.get(this.index);
+            object = this.memberList.get(this.index % getMemberListSize());
         } catch (ArrayIndexOutOfBoundsException e) {
             return;
         }
@@ -106,7 +106,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                     } else if (objectIsLocal) {
                         if (!(mc instanceof MethodCallControlForGroup)) {
                             ((StubObject) object).getProxy()
-                             .reify(new MethodCall(this.mc));
+                             .reify(this.mc.getShallowCopy());
                         } else {
                             ((StubObject) object).getProxy().reify(this.mc);
                         }

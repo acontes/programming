@@ -45,7 +45,7 @@ public class ActiveObject extends AbstractData{
 	private State currentState = State.UNKNOWN;
 
 	/** request queue length */
-	private int requestQueueLength = -1; // -1 = not known		
+	private int requestQueueLength = -1; // -1 = not known
 
 	// -------------------------------------------
 	// --- Constructor ---------------------------
@@ -192,7 +192,7 @@ public class ActiveObject extends AbstractData{
 				+ nodeTargetURL);
 		return true;
 	}
-	
+
 	/**
 	 * Say to the model that a MigrationException occured during a migration of this active object.
 	 * @param migrationException
@@ -211,7 +211,7 @@ public class ActiveObject extends AbstractData{
 	public String getKey() {
 		return this.id.toString();
 	}
-	
+
 	@Override
 	public String getType() {
 		return "active object";
@@ -235,28 +235,53 @@ public class ActiveObject extends AbstractData{
 	/**
 	 * Adds a communication to this object.
 	 * Warning: This active object is the destination of the communication.
-	 * @param communication
+	 * @param aoSource Source active object.
 	 */
-	public void addCommunication(UniqueID sourceID){
-		ActiveObject source = getWorldObject().findActiveObject(sourceID);
-		if(source==null){
-			//TODO A faire Traiter l'erreur
-			System.err.println("Don't find the id: "+sourceID);
-			return;
-		}
+	public void addCommunication(ActiveObject aoSource){
 		setChanged();
 		Set<ActiveObject> comm = new HashSet<ActiveObject>();
-		comm.add(source);
-		notifyObservers(comm);	
+		comm.add(aoSource);
+		notifyObservers(comm);
 		/*synchronized (communications) {
 			communications.add(source);
 		}*/
 	}
 
+	/**
+	 * Adds a communication to this object.
+	 * Warning: This active object is the destination of the communication.
+	 * @param sourceID The unique id of the source of the request.
+	 */
+	public void addCommunicationFrom(UniqueID sourceID){
+		ActiveObject source = getWorldObject().findActiveObject(sourceID);
+		if(source == null){
+			//TODO A faire Traiter l'erreur
+			System.err.println("Don't find the id: "+sourceID);
+			return;
+		}
+		this.addCommunication(source);
+	}
+
+	/**
+	 * Adds a communication to this object.
+	 * Warning: This active object is the source of the communication.
+	 * @param destinationID The unique id of the destination of the request.
+	 */
+	public void addCommunicationTo(UniqueID destinationID){
+		ActiveObject destination = getWorldObject().findActiveObject(destinationID);
+		if(destination == null){
+			//TODO A faire Traiter l'erreur
+			System.err.println("Don't find the id: "+destinationID);
+			return;
+		}
+		destination.addCommunication(this);
+	}
+
 	@Override
 	public void resetCommunications() {
+		System.out.println("ActiveObject.resetCommunications() "+this);
 		setChanged();
-		notifyObservers(new HashSet<ActiveObject>());	
+		notifyObservers(new HashSet<ActiveObject>());
 	}
 
 	public void addRequest(){
@@ -291,7 +316,7 @@ public class ActiveObject extends AbstractData{
 		/**
 		 * Compare two active objects. (For Example: ao#3 and ao#5 give -1
 		 * because ao#3 has been discovered before ao#5.)
-		 * 
+		 *
 		 * @return -1, 0, or 1 as the first argument is less than, equal to, or
 		 *         greater than the second.
 		 */
@@ -300,5 +325,8 @@ public class ActiveObject extends AbstractData{
 			String ao2Name = ao2;
 			return -(ao1Name.compareTo(ao2Name));
 		}
+	}
+	public String getJobId () {
+		return this.getParent().getJobId();
 	}
 }

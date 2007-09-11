@@ -107,14 +107,15 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                         /* add the return value into the result group */
                         this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
                             ((StubObject) object).getProxy()
-                             .reify(new MethodCall(this.mc)), this.index);
+                             .reify(this.mc.getShallowCopy()), this.index);
                     }
                 }
             } catch (Throwable e) {
                 /* when an exception occurs, put it in the result group instead of the (unreturned) value */
                 this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                    new ExceptionInGroup(this.memberList.get(this.index),
-                        this.index, e.fillInStackTrace()), this.index);
+                    new ExceptionInGroup(this.memberList.get(
+                            this.index % getMemberListSize()), this.index,
+                        e.fillInStackTrace()), this.index);
             }
         } else {
             /* when there is a Throwable instead of an Object, a method call is impossible, add null to the result group */

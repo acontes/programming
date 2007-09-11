@@ -1,8 +1,10 @@
 package org.objectweb.proactive.examples.masterslave.nqueens;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.Vector;
 
+import org.apache.commons.cli.HelpFormatter;
 import org.objectweb.proactive.examples.masterslave.AbstractExample;
 import org.objectweb.proactive.examples.masterslave.nqueens.query.Query;
 import org.objectweb.proactive.examples.masterslave.nqueens.query.QueryExtern;
@@ -11,6 +13,7 @@ import org.objectweb.proactive.examples.masterslave.util.Pair;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
+import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 
 
 /**
@@ -19,25 +22,20 @@ import org.objectweb.proactive.extra.masterslave.TaskException;
  *
  */
 public class NQueensExample extends AbstractExample {
+    private static final int DEFAULT_BOARD_SIZE = 18;
+    private static final int DEFAULT_ALGORITHM_DEPTH = 1;
     public static int nqueen_board_size;
     public static int nqueen_algorithm_depth;
     private ProActiveMaster<QueryExtern, Pair<Long, Long>> master;
 
-    public ProActiveMaster getMaster() {
-        return master;
-    }
-
+    @SuppressWarnings("unchecked")
     public static void main(String[] args)
         throws MalformedURLException, TaskAlreadySubmittedException {
         NQueensExample instance = new NQueensExample();
 
-        // Getting command line parameters
-        instance.init(args, 2, " nqueen_board_size nqueen_algorithm_depth");
+        //   Getting command line parameters and creating the master (see AbstractExample)
+        instance.init(args);
 
-        // Creating the Master
-        instance.master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>();
-        // Register shutdown process
-        instance.registerHook();
         instance.master.addResources(instance.descriptor_url, instance.vn_name);
 
         System.out.println("Launching NQUEENS solutions finder for n = " +
@@ -97,8 +95,34 @@ public class NQueensExample extends AbstractExample {
     }
 
     @Override
-    protected void init_specialized(String[] args) {
-        nqueen_board_size = Integer.parseInt(args[2]);
-        nqueen_algorithm_depth = Integer.parseInt(args[3]);
+    protected void after_init() {
+        String board_sizeString = cmd.getOptionValue("s");
+        if (board_sizeString == null) {
+            nqueen_board_size = DEFAULT_BOARD_SIZE;
+        } else {
+            nqueen_board_size = Integer.parseInt(board_sizeString);
+        }
+
+        String algodepthString = cmd.getOptionValue("D");
+        if (algodepthString == null) {
+            nqueen_algorithm_depth = DEFAULT_ALGORITHM_DEPTH;
+        } else {
+            nqueen_algorithm_depth = Integer.parseInt(algodepthString);
+        }
+    }
+
+    @Override
+    protected void before_init() {
+        command_options.addOption("s", true, "nqueen board size");
+        command_options.addOption("D", true, "nqueen algorithm depth");
+        // automatically generate the help statement
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("NQueensExample", command_options);
+    }
+
+    @Override
+    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation() {
+        master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>();
+        return (ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable>) master;
     }
 }

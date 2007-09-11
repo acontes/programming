@@ -141,7 +141,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 					SchedulerCore.class.getName(),
 					new Object[] { resourceManager, ProActive.getStubOnThis(), policyFullName });
 			ProActive.addNFEListenerOnAO(scheduler, new NFEHandler("Scheduler Core"));
-			logger.info("Scheduler successfully created on "+ProActive.getNode().getNodeInformation().getHostName());
+			logger.info("Scheduler successfully created on "+ProActive.getNode().getNodeInformation().getVMInformation().getHostName());
 		} catch (ActiveObjectCreationException e) {
 			e.printStackTrace();
 		} catch (NodeException e) {

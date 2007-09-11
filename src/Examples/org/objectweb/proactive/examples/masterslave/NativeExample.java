@@ -1,13 +1,16 @@
 package org.objectweb.proactive.examples.masterslave;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.cli.HelpFormatter;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
+import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
 
 
@@ -28,13 +31,8 @@ public class NativeExample extends AbstractExample {
         throws MalformedURLException, TaskAlreadySubmittedException {
         NativeExample instance = new NativeExample();
 
-        // Getting command line parameters
+        //   Getting command line parameters and creating the master (see AbstractExample)
         instance.init(args);
-
-        // Creating the Master
-        instance.master = new ProActiveMaster<SimpleNativeTask, String[]>();
-        instance.registerHook();
-        instance.master.addResources(instance.descriptor_url, instance.vn_name);
 
         // Creating the tasks to be solved
         List<SimpleNativeTask> tasks = new ArrayList<SimpleNativeTask>();
@@ -68,18 +66,32 @@ public class NativeExample extends AbstractExample {
      *
      */
     public static class SimpleNativeTask extends NativeTask {
+
+        /**
+                 *
+                 */
+        private static final long serialVersionUID = 9148096019099167195L;
+
         public SimpleNativeTask(String command) {
             super(command);
         }
     }
 
     @Override
-    protected void init_specialized(String[] args) {
+    protected void before_init() {
+        // automatically generate the help statement
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("NativeExample", command_options);
+    }
+
+    @Override
+    protected void after_init() {
         // nothing to do
     }
 
     @Override
-    protected ProActiveMaster getMaster() {
-        return master;
+    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation() {
+        master = new ProActiveMaster<SimpleNativeTask, String[]>();
+        return (ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable>) master;
     }
 }

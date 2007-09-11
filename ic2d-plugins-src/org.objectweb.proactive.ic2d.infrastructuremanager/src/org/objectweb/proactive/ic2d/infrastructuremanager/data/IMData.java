@@ -8,9 +8,9 @@ import java.util.Collections;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
+import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.test.simple.ComparatorIMNode;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.infrastructuremanager.Activator;
@@ -70,8 +70,8 @@ public class IMData implements Runnable {
 
 	public void updateInfrastructure() {
 		infrastructure = monitoring.getListAllIMNodes();
-		freeNode = monitoring.getNumberOfFreeResource().intValue();
-		busyNode = monitoring.getNumberOfBusyResource().intValue();
+		freeNode = monitoring.getNumberOfFreeResource();
+		busyNode = monitoring.getNumberOfBusyResource();
 		
 		Collections.sort(infrastructure, new ComparatorIMNode());
 	}

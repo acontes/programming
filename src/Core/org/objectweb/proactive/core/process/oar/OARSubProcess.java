@@ -65,7 +65,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 2.0.1
  */
 public class OARSubProcess extends AbstractExternalProcessDecorator {
-    public final static String DEFAULT_OARSUBPATH = "/usr/local/bin/oarsub";
+    public final static String DEFAULT_OARSUBPATH = "oarsub";
     private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
             "user.home") + File.separator + "ProActive" + File.separator +
         "scripts" + File.separator + "unix" + File.separator + "cluster" +
@@ -117,11 +117,14 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
      * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
      */
     public int getNodeNumber() {
-        if (hostNumber.equals("all")) {
+        try {
+            return (new Integer(hostNumber).intValue() * new Integer(weight).intValue());
+        } catch (NumberFormatException e) {
+            if (!hostNumber.matches("all")) {
+                logger.warn(hostname + " is not an integer", e);
+            }
             return UniversalProcess.UNKNOWN_NODE_NUMBER;
         }
-
-        return (new Integer(hostNumber).intValue() * new Integer(weight).intValue());
     }
 
     /**

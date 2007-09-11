@@ -23,6 +23,8 @@ import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.gc.GarbageCollector;
+import org.objectweb.proactive.core.gc.ObjectGraph;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.Node;
@@ -66,7 +68,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     private boolean shouldNotify = true;
 
     /** Timeout between updates */
-    private long updateFrequence = 3000;
+    private long updateFrequence = 300;
 
     /** Used by the JMX notifications */
     private long counter = 1;
@@ -86,9 +88,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      * @param oname
      * @param body
      */
-    public BodyWrapper(ObjectName oname, AbstractBody body) {
+    public BodyWrapper(ObjectName oname, AbstractBody body, UniqueID id) {
         this.objectName = oname;
-        this.id = body.getID();
+        this.id = id;
         this.nodeUrl = body.getNodeURL();
         this.body = body;
 
@@ -108,6 +110,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     }
 
     public ObjectName getObjectName() {
+        if (this.objectName == null) {
+            this.objectName = FactoryName.createActiveObjectName(getID());
+        }
         return this.objectName;
     }
 
@@ -130,9 +135,11 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
 
+        // If the migration is finished, we need to inform the JMXNotificationManager
         if (type.equals(NotificationType.migrationFinished)) {
             sendNotifications();
-            sendNotification(notification);
+            notifications.add(notification);
+            sendNotifications(NotificationType.migrationMessage);
         } else {
             notifications.add(notification);
         }
@@ -172,6 +179,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      */
     private void launchNotificationsThread() {
         new Thread() {
+                @Override
                 public void run() {
                     while (shouldNotify) {
                         try {
@@ -190,14 +198,22 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      * Sends a notification containing all stored notifications.
      */
     private void sendNotifications() {
+        this.sendNotifications(null);
+    }
+
+    /**
+     * Sends a notification containing all stored notifications.
+     * @param userMessage The message to send with the set of notifications.
+     */
+    private void sendNotifications(String userMessage) {
         if (notifications == null) {
             this.notifications = new ConcurrentLinkedQueue<Notification>();
         }
         synchronized (notifications) {
             if (!notifications.isEmpty()) {
                 ObjectName source = getObjectName();
-                Notification n = new Notification(NotificationType.unknown,
-                        source, counter++);
+                Notification n = new Notification(NotificationType.setOfNotifications,
+                        source, counter++, userMessage);
                 n.setUserData(notifications);
                 super.sendNotification(n);
                 notifications.clear();
@@ -283,5 +299,29 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         }
 
         launchNotificationsThread();
+    }
+
+    /**
+     *  returns a list of outgoing active object references.
+     */
+    public Collection<UniqueID> getReferenceList() {
+        return ObjectGraph.getReferenceList(this.getID());
+    }
+
+    public String getDgcState() {
+        return GarbageCollector.getDgcState(this.getID());
+    }
+
+    public Object[] getTimersSnapshotFromBody(String[] timerNames)
+        throws Exception {
+        org.objectweb.proactive.core.util.profiling.TimerProvidable container = org.objectweb.proactive.core.util.profiling.TimerWarehouse.getTimerProvidable(this.id);
+        if (container == null) {
+            throw new NullPointerException(
+                "The timers container is null, the body is not timed.");
+        }
+        return new Object[] {
+            container.getSnapshot(timerNames), // The list of timers
+            System.nanoTime() // The nano timestamp on this machine used to stop all timers at the caller side
+        };
     }
 }

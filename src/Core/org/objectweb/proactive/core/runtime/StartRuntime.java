@@ -36,8 +36,8 @@ import java.net.URL;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -67,9 +67,6 @@ public class StartRuntime {
     /** The URL of the parent ProActive Runtime */
     protected String defaultRuntimeURL;
 
-    /** The protocol to be used by this Runtime */
-    protected String protocolId;
-
     /** Name of the associated VirtualMachine */
     protected String vmName;
 
@@ -80,24 +77,22 @@ public class StartRuntime {
         if (args.length != 0) {
             this.creatorID = args[0].trim();
             this.defaultRuntimeURL = UrlBuilder.removeUsername(args[1]);
-            this.protocolId = args[2];
-            this.vmName = args[3];
+            this.vmName = args[2];
         }
     }
 
     public static void main(String[] args) {
-        if ("true".equals(System.getProperty("log4j.defaultInitOverride")) &&
-                (System.getProperty("log4j.configuration") != null)) {
+        if (PAProperties.LOG4J_DEFAULT_INIT_OVERRIDE.isTrue() &&
+                PAProperties.LOG4J.isSet()) {
             // configure log4j here to avoid classloading problems with log4j classes
             try {
-                String log4jConfiguration = System.getProperty(
-                        "log4j.configuration");
+                String log4jConfiguration = PAProperties.LOG4J.getValue();
                 File f = new File(log4jConfiguration);
                 PropertyConfigurator.configure(new URL(f.getPath()));
             } catch (IOException e) {
                 System.out.println(
                     "Error : incorrect path for log4j configuration : " +
-                    System.getProperty("log4j.configuration"));
+                    PAProperties.LOG4J.getValue());
             }
         }
 
@@ -118,7 +113,7 @@ public class StartRuntime {
         }
 
         new StartRuntime(args).run();
-        if (System.getProperty("proactive.runtime.stayalive") != null) {
+        if (PAProperties.PA_RUNTIME_STAYALIVE.isTrue()) {
             Object o = new Object();
             synchronized (o) {
                 try {
@@ -136,8 +131,7 @@ public class StartRuntime {
      * node once the creation is completed.
      */
     private void run() {
-        ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        impl.getVMInformation().setCreationProtocolID(this.protocolId);
+        ProActiveRuntimeImpl impl = ProActiveRuntimeImpl.getProActiveRuntime();
 
         if (this.defaultRuntimeURL != null) {
             ProActiveRuntime PART;
@@ -171,14 +165,11 @@ public class StartRuntime {
      */
     private void register(ProActiveRuntime PART) {
         try {
-            ProActiveRuntime proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
-                                                                                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+            ProActiveRuntime proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
 
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
                 this.creatorID,
-                ProActiveConfiguration.getInstance()
-                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
-                this.vmName);
+                PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(), this.vmName);
         } catch (ProActiveException e) {
             e.printStackTrace();
 

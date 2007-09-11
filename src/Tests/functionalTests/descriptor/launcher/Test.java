@@ -31,8 +31,7 @@
 package functionalTests.descriptor.launcher;
 
 import org.junit.After;
-import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.Launcher;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -55,8 +54,7 @@ public class Test extends FunctionalTest {
     private static String XML_LOCATION;
 
     static {
-        if ("ibis".equals(ProActiveConfiguration.getInstance()
-                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+        if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             XML_LOCATION = Test.class.getResource(
                     "/functionalTests/descriptor/launcher/TestLauncherIbis.xml")
                                      .getPath();
@@ -101,15 +99,15 @@ public class Test extends FunctionalTest {
         assertTrue(vnMain.getJobID()
                          .equals(nodeTab2[0].getNodeInformation().getJobID()));
 
-        // 3) all nodes must be in differents VM, and mainNode in current VM
-        assertFalse((nodeTab[0].getNodeInformation().getVMID()
-                               .equals(nodeTab2[0].getNodeInformation().getVMID())));
-        assertFalse(nodeTab[0].getNodeInformation().getVMID()
-                              .equals(mainNode.getNodeInformation().getVMID()));
-        assertFalse(nodeTab2[0].getNodeInformation().getVMID()
-                               .equals(mainNode.getNodeInformation().getVMID()));
+        // 3) all nodes must be in different VM, and mainNode in current VM
+        assertFalse((nodeTab[0].getVMInformation().getVMID()
+                               .equals(nodeTab2[0].getVMInformation().getVMID())));
+        assertFalse(nodeTab[0].getVMInformation().getVMID()
+                              .equals(mainNode.getVMInformation().getVMID()));
+        assertFalse(nodeTab2[0].getVMInformation().getVMID()
+                               .equals(mainNode.getVMInformation().getVMID()));
         assertTrue(part.getVMInformation().getVMID()
-                       .equals(mainNode.getNodeInformation().getVMID()));
+                       .equals(mainNode.getVMInformation().getVMID()));
     }
 
     @After

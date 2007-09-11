@@ -5,8 +5,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -20,20 +22,16 @@ public class FutureMonitoring implements Runnable {
     private static int TTM = 21000;
 
     /**
-     * For each node, the list of futures to monitor. We ping a single body in
-     * each node for all of the futures from the node. This implies that the
-     * outcome of the ping for a single body will be replicated on the other
-     * bodies. We ping the updater, so we should detect a broken automatic
-     * continuations chain.
+     * For each body, the list of futures to monitor. We ping the updater body,
+     * so we should detect a broken automatic continuations chain.
      */
-    private static final ConcurrentHashMap<String, ConcurrentLinkedQueue<FutureProxy>> futuresToMonitor =
-        new ConcurrentHashMap<String, ConcurrentLinkedQueue<FutureProxy>>();
+    private static final ConcurrentHashMap<UniqueID, ConcurrentLinkedQueue<FutureProxy>> futuresToMonitor =
+        new ConcurrentHashMap<UniqueID, ConcurrentLinkedQueue<FutureProxy>>();
 
     static {
 
         /* Dynamically configurable to make shorter tests */
-        String ttm = ProActiveConfiguration.getInstance()
-                                           .getProperty("proactive.futuremonitoring.ttm");
+        String ttm = PAProperties.PA_FUTUREMONITORING_TTM.getValue();
         if (ttm != null) {
             TTM = Integer.parseInt(ttm);
         }
@@ -52,29 +50,6 @@ public class FutureMonitoring implements Runnable {
     }
 
     /**
-     * Remove available futures, and nodes with no more futures to monitor
-     * @param url of the node
-     */
-    private static void cleanUpFutures(String url) {
-        ConcurrentLinkedQueue<FutureProxy> futures = futuresToMonitor.get(url);
-        for (FutureProxy fp : futures) {
-            if (fp.isAvailable()) {
-                futures.remove(fp);
-            }
-        }
-        synchronized (futuresToMonitor) {
-
-            /*
-             * Manual synchronization here of the ConcurrentXXX to avoid a race
-             * with an insertion between the test and the removal
-             */
-            if (futures.isEmpty()) {
-                futuresToMonitor.remove(url);
-            }
-        }
-    }
-
-    /**
      * The FT Message used to test the communication
      */
     private static Heartbeat HEARTBEAT_MSG = new Heartbeat();
@@ -82,10 +57,20 @@ public class FutureMonitoring implements Runnable {
     /**
      * @return true iff a body has been pinged
      */
-    private static boolean pingBody(String url) {
+    private static boolean pingBody(UniqueID bodyId) {
         boolean pinged = false;
         FutureMonitoringPingFailureException bodyException = null;
-        for (FutureProxy fp : futuresToMonitor.get(url)) {
+        Collection<FutureProxy> futures = futuresToMonitor.get(bodyId);
+        if (futures == null) {
+
+            /*
+             * By the time we got to iterate over these futures, they have all
+             * been updated, so the body entry was removed.
+             */
+            return false;
+        }
+
+        for (FutureProxy fp : futures) {
             if (!pinged) {
 
                 /* Not yet pinged somebody */
@@ -127,9 +112,8 @@ public class FutureMonitoring implements Runnable {
     public void run() {
         for (;;) {
             boolean pingedOneBody = false;
-            for (String url : futuresToMonitor.keySet()) {
-                boolean pingedThisBody = pingBody(url);
-                cleanUpFutures(url);
+            for (UniqueID bodyId : futuresToMonitor.keySet()) {
+                boolean pingedThisBody = pingBody(bodyId);
                 if (pingedThisBody) {
                     pingedOneBody = true;
                     monitoringDelay();
@@ -141,25 +125,51 @@ public class FutureMonitoring implements Runnable {
         }
     }
 
-    public static void monitorFutureProxy(FutureProxy fp) {
+    private static UniqueID getUpdaterBodyId(FutureProxy fp) {
         if (isFTEnabled()) {
-            return;
+            return null;
         }
         UniversalBody body = fp.getUpdater();
         if (body == null) {
             new Exception("Cannot monitor this future, unknown updater body").printStackTrace();
+            return null;
+        }
+        return body.getID();
+    }
+
+    public static void removeFuture(FutureProxy fp) {
+        UniqueID updaterId = getUpdaterBodyId(fp);
+        if (updaterId == null) {
             return;
         }
-        String url = body.getNodeURL();
+        synchronized (futuresToMonitor) {
+            /*
+             * Avoid a race with monitorFutureProxy(FutureProxy)
+             */
+            ConcurrentLinkedQueue<FutureProxy> futures = futuresToMonitor.get(updaterId);
+            if (futures != null) {
+                futures.remove(fp);
+                if (futures.isEmpty()) {
+                    futuresToMonitor.remove(updaterId);
+                }
+            }
+        }
+    }
+
+    public static void monitorFutureProxy(FutureProxy fp) {
+        UniqueID updaterId = getUpdaterBodyId(fp);
+        if (updaterId == null) {
+            return;
+        }
         synchronized (futuresToMonitor) {
             /*
              * Avoid a race with the suppression in the ConcurrentHashMap when the
              * ConcurrentLinkedQueue is empty.
              */
-            ConcurrentLinkedQueue<FutureProxy> futures = futuresToMonitor.get(url);
+            ConcurrentLinkedQueue<FutureProxy> futures = futuresToMonitor.get(updaterId);
             if (futures == null) {
                 futures = new ConcurrentLinkedQueue<FutureProxy>();
-                futuresToMonitor.put(url, futures);
+                futuresToMonitor.put(updaterId, futures);
             }
             if (fp.isAwaited() && !futures.contains(fp)) {
                 futures.add(fp);
@@ -189,12 +199,12 @@ public class FutureMonitoring implements Runnable {
      * disable the monitoring if FT is enabled.
      */
     private static int lastNumberOfNodes = 0;
-    private static boolean FTEnabled = "enable".equals(ProActiveConfiguration.getInstance()
-                                                                             .getFTState());
+    private static boolean FTEnabled = PAProperties.PA_FT.isTrue();
 
     private static boolean isFTEnabled() {
         if (!FTEnabled) {
-            Collection<LocalNode> nodes = ((ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime()).getLocalNodes();
+            Collection<LocalNode> nodes = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                              .getLocalNodes();
             if (nodes.size() != lastNumberOfNodes) {
                 lastNumberOfNodes = nodes.size();
                 for (LocalNode node : nodes) {

@@ -9,6 +9,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
@@ -36,8 +37,13 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     Serializable {
 
     /**
-     * pinger log4j logger
-     */
+         *
+         */
+    private static final long serialVersionUID = -7489033564540496244L;
+
+    /**
+    * pinger log4j logger
+    */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVES);
 
     /**
@@ -68,7 +74,12 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     /**
      * Slave group
      */
-    protected Group slaveGroup;
+    protected Group<Slave> slaveGroup;
+
+    /**
+     * for internal use
+     */
+    private Thread localThread;
 
     /**
      * ProActive empty constructor
@@ -83,8 +94,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     public AOPinger(final SlaveDeadListener listener) {
         this.listener = listener;
         terminated = false;
-        pingPeriod = Long.parseLong(System.getProperty(
-                    "proactive.masterslave.pingperiod"));
+        pingPeriod = Long.parseLong(PAProperties.PA_MASTERSLAVE_PINGPERIOD.getValue());
     }
 
     /**
@@ -97,11 +107,13 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
         try {
             slaveGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
             slaveGroup = ProActiveGroup.getGroup(slaveGroupStub);
             stubOnThis = (AOPinger) ProActive.getStubOnThis();
+            body.setImmediateService("terminate");
 
             ProActive.addNFEListenerOnGroup(slaveGroupStub,
                 new DetectMissingGroup());
@@ -123,6 +135,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
      * {@inheritDoc}
      */
     public void runActivity(final Body body) {
+        localThread = Thread.currentThread();
         Service service = new Service(body);
         while (!terminated) {
             // we serve everything
@@ -133,7 +146,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
             try {
                 Thread.sleep(pingPeriod);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                // do not print message, pinger is terminating
             }
         }
         body.terminate();
@@ -168,6 +181,8 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
      */
     public BooleanWrapper terminate() {
         this.terminated = true;
+        localThread.interrupt();
+
         if (logger.isDebugEnabled()) {
             logger.debug("Pinger terminated...");
         }
@@ -181,10 +196,15 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     public class DetectMissingGroup implements NFEListener {
 
         /**
-         * {@inheritDoc}
-         */
+                 *
+                 */
+        private static final long serialVersionUID = -3218967627910771077L;
+
+        /**
+        * {@inheritDoc}
+        */
         public boolean handleNFE(final NonFunctionalException nfe) {
-            Iterator exceptions;
+            Iterator<ExceptionInGroup> exceptions;
             ExceptionListException exceptionList;
 
             try {

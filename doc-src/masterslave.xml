@@ -249,7 +249,6 @@
                 </figure>
             </para>
             <para />
-            <xref linkend="XML_Descriptors" />
         </sect2>
 
         <sect2 id="ms_principle_gathering">
@@ -507,30 +506,30 @@
         </sect2>
 
         <sect2>
-            <title>Specifying result reception order</title>
-
-        </sect2>
-        <para>
-            Result reception order can be switched from
-            <emphasis>Completion</emphasis>
-            order to
-            <emphasis>Submission</emphasis>
-            order using the following method :
-        </para>
-        <programlisting lang="java"><![CDATA[    /**
+        	<title>Specifying result reception order</title>
+        	<para>
+        		Result reception order can be switched from
+        		<emphasis>Completion</emphasis>
+        		order to
+        		<emphasis>Submission</emphasis>
+        		order using the following method :
+        	</para>
+        	<programlisting lang="java"><![CDATA[    /**
      * Sets the current ordering mode <br/>
      * If reception mode is switched while computations are in progress,<br/>
      * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
      * @param mode the new mode for result gathering
      */
     void setResultReceptionOrder(OrderingMode mode);]]></programlisting>
-        <para>
-            The default mode of the M/S API is
-            <emphasis>Completion</emphasis>
-            order. The mode can be switched dynamically, which means
-            that subsequent calls to waitXXX methods (see below), will
-            be done according to the new mode.
-        </para>
+        	<para>
+        		The default mode of the M/S API is
+        		<emphasis>Completion</emphasis>
+        		order. The mode can be switched dynamically, which means
+        		that subsequent calls to waitXXX methods (see below),
+        		will be done according to the new mode.
+        	</para>
+        </sect2>
+
 
         <sect2>
             <title>Collecting results</title>
@@ -629,14 +628,9 @@
         <title>A Simple Example</title>
 
         <para>
-            This very simple example tells if a given number is prime or
-            not. It computes the answer by trying to divide this
-            candidate by every integer from 2 to the candidate. Of
-            course, this algorithm is very naive and inefficient as
-            there are many faster ways of telling if a number is prime.
-            The complete example is available (a slightly optimized
-            version), along with more complex ones under the following
-            package in the
+            This very simple example computes PI using the Monte-Carlo
+            method. The complete example is available, along with more complex ones under the
+            following package in the
             <emphasis>Examples</emphasis>
             source directory:
         </para>
@@ -644,34 +638,31 @@
         <screen><![CDATA[org.objectweb.proactive.examples.masterslave]]></screen>
 
         <para>
-            First, the task definition: it tests if any number of a
-            given interval divides the prime candidate.
+            First, the task definition: creates randomly a set of points
+            belonging to the [0, 1[x[0, 1[ interval and tests how many
+            points are inside the uniter circle.
         </para>
 
-        <programlisting lang="java"><![CDATA[    /**
-     * Task to find if any number in a specified interval divides the given candidate
-     */
-    public static class FindPrimeTask implements Task<Boolean> {
-        private long begin;
-        private long end;
-        private long candidate;
-
-        public FindPrimeTask(long candidate, long begin, long end) {
-            this.begin = begin;
-            this.end = end;
-            this.candidate = candidate;
+        <programlisting lang="java"><![CDATA[    public static class ComputePIMonteCarlo implements Task<Long> {
+        public ComputePIMonteCarlo() {
         }
 
-        /* (non-Javadoc)
-         * @see org.objectweb.proactive.extra.masterslave.interfaces.Task#run(org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory)
-         */
-        public Boolean run(SlaveMemory memory) {
-            for (long divider = begin; divider < end; divider++) {
-                if ((candidate % divider) == 0) {
-                    return new Boolean(false);
+        public Long run(SlaveMemory memory) throws Exception {
+            long remaining = NUMBER_OF_EXPERIENCES;
+            long successes = 0;
+            while (remaining > 0) {
+                remaining--;
+                if (experience()) {
+                    successes++;
                 }
             }
-            return new Boolean(true);
+            return successes;
+        }
+
+        public boolean experience() {
+            double x = Math.random();
+            double y = Math.random();
+            return Math.hypot(x, y) < 1;
         }
     }]]></programlisting>
 
@@ -680,60 +671,43 @@
             are added using a deployment descriptor .
         </para>
 
-        <programlisting lang="java"><![CDATA[        //      Creating the Master
-        master = new ProActiveMaster<FindPrimeTask, Boolean>();
-
-        //      Adding resources to the master
-        master.addResources("ProActive/src/Examples/org/objectweb/proactive/examples/masterslave/RSHListbyHost_Example.xml", "matrixNode");]]></programlisting>
+        <programlisting lang="java"><![CDATA[    	// creation of the master
+        ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
+        
+        // adding resources
+        master.addResources(PIExample.class.getResource(
+                "/org/objectweb/proactive/examples/masterslave/WorkersLocal.xml"));]]></programlisting>
 
         <para>
             Then, the tasks are created and submitted to the master.
-            First the method which divides the interval [2, candidate-1]
-            into n subintervals
         </para>
 
-        <programlisting lang="java"><![CDATA[    /**
-     * Creates the prime computation tasks to be solved
-     * @return
-     */
-    public List<FindPrimeTask> createTasks(long prime_to_find, int number_of_intervals) {
-        List<FindPrimeTask> tasks = new ArrayList<FindPrimeTask>();
-
-        tasks.add(new FindPrimeTask(prime_to_find, 2,
-                prime_to_find / number_of_intervals));
-        for (int i = 1; i < (number_of_intervals - 1); i++) {
-            tasks.add(new FindPrimeTask(prime_to_find,
-                    ((prime_to_find / number_of_intervals) * i) + 1,
-                    (prime_to_find / number_of_intervals) * (i + 1)));
+        <programlisting lang="java"><![CDATA[         // defining tasks
+        Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();
+        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
+            tasks.add(new ComputePIMonteCarlo());
         }
-        tasks.add(new FindPrimeTask(prime_to_find,
-                (prime_to_find / number_of_intervals) * (number_of_intervals -
-                1), prime_to_find));
-        return tasks;
-    }]]></programlisting>
 
-        <para>Then, the task submission in the main method:</para>
-
-        <programlisting lang="java"><![CDATA[        // Creating and Submitting the tasks
-        master.solve(createTasks(22974513717, 20));]]></programlisting>
-
+        // adding tasks to the queue
+        master.solve(tasks);]]></programlisting>
 
         <para>
             Then, the results are gathered and the result is displayed.
         </para>
 
-        <programlisting lang="java"><![CDATA[        // Collecting the results
-        List<Boolean> results = master.waitAllResults();
+        <programlisting lang="java"><![CDATA[        // waiting for results
+        List<Long> successesList = master.waitAllResults();
 
-        // Displaying result
-        boolean prime = true;
+        // computing PI using the results
+        long sumSuccesses = 0;
 
-        for (Boolean result : results) {
-            prime = prime && result;
+        for (long successes : successesList) {
+            sumSuccesses += successes;
         }
 
-        System.out.println("" + prime_to_find +
-            (prime ? " is prime." : " is not prime."));]]></programlisting>
+        double pi = (4 * sumSuccesses) / ((double) NUMBER_OF_EXPERIENCES * NUMBER_OF_TASKS);
+
+        System.out.println("Computed PI by Monte-Carlo method : " + pi);]]></programlisting>
 
 
         <para>
@@ -763,7 +737,7 @@
                 </para>
                 <para>
                     In order to change this default value, the method
-                    described underneath must be called :
+                    described underneath can be called :
                 </para>
                 <programlisting lang="java"><![CDATA[    /**
      * Sets the period at which ping messages are sent to the slaves <br/>

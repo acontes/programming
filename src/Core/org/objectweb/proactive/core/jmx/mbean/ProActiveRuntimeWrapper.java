@@ -67,7 +67,8 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
     }
 
     public void killRuntime() throws Exception {
-        runtime.killRT(false);
+        notificationsLogger.debug("ProActiveRuntimeWrapper.killRuntime()");
+        runtime.killRT(true);
     }
 
     public List<ObjectName> getNodes()

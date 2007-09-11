@@ -34,8 +34,8 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -89,8 +89,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                         "org.objectweb.proactive.p2p.service.StartP2PService");
 
                     if (this.acquistion == null) {
-                        this.acquistion = ProActiveConfiguration.getInstance()
-                                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+                        this.acquistion = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
                     }
 
                     process.setParameters("-port " + this.port + " -acq " +
@@ -120,10 +119,8 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      */
     private P2PService getPrecedentService() {
         String url = UrlBuilder.buildUrl("localhost", P2P_NODE_NAME,
-                ProActiveConfiguration.getInstance()
-                                      .getProperty(PROPERTY_ACQUISITION),
-                Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                       .getProperty(PROPERTY_PORT)));
+                PAProperties.PA_P2P_ACQUISITION.getValue(),
+                Integer.parseInt(PAProperties.PA_P2P_PORT.getValue()));
 
         try {
             Node serviceNode = NodeFactory.getNode(url);

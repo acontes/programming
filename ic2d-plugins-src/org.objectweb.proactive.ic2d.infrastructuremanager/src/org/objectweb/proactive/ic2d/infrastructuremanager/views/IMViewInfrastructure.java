@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.ic2d.infrastructuremanager.IMConstants;
 import org.objectweb.proactive.ic2d.infrastructuremanager.actions.IMActionCollapseAll;
 import org.objectweb.proactive.ic2d.infrastructuremanager.actions.IMActionExpandAll;

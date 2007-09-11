@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
@@ -44,14 +45,13 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -82,7 +82,7 @@ public class HalfBody extends AbstractBody {
     //
     private HalfBody(MetaObjectFactory factory)
         throws ActiveObjectCreationException {
-        super(null, "LOCAL", factory, getRuntimeJobID());
+        super(null, "LOCAL", factory, Job.DEFAULT_JOBID);
 
         //SECURITY
         if (this.securityManager == null) {
@@ -105,12 +105,10 @@ public class HalfBody extends AbstractBody {
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-        String ftstate = ProActiveConfiguration.getInstance().getFTState();
-        if ("enable".equals(ftstate)) {
+        if (PAProperties.PA_FT.isTrue()) {
             try {
                 // create the fault-tolerance manager
-                int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getInstance()
-                                                                                        .getFTProtocol());
+                int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL.getValue());
                 this.ftmanager = factory.newFTManagerFactory()
                                         .newHalfFTManager(protocolSelector);
                 this.ftmanager.init(this);
@@ -203,11 +201,7 @@ public class HalfBody extends AbstractBody {
      */
     @Override
     public String getJobID() {
-        return getRuntimeJobID();
-    }
-
-    private static String getRuntimeJobID() {
-        return ProActiveRuntimeImpl.getProActiveRuntime().getJobID();
+        return jobID;
     }
 
     public void updateNodeURL(String newNodeURL) {

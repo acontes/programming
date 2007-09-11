@@ -42,8 +42,8 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.event.FutureEvent;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
@@ -75,10 +75,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
-
-    /** Static point for management of events related to futures.
-     * This FutureEventProducer is responsible for all FutureProxys of this VM */
-    private static FutureEventProducerImpl futureEventProducer;
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -177,25 +173,20 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         return result;
     }
 
-    /** Returns the <code>FutureEventProducer</code> that is responsible for the
-     * FutureProxys of this VM. Listeners can register themselves here. */
-    public static FutureEventProducer getFutureEventProducer() {
-        if (futureEventProducer == null) {
-            futureEventProducer = new FutureEventProducerImpl();
-        }
-        return futureEventProducer;
-    }
-
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
     @Override
     public boolean equals(Object obj) {
-        //we test if we have a future object
-        if (isFutureObject(obj)) {
-            return (((StubObject) obj).getProxy().hashCode() == this.hashCode());
+        if (obj instanceof FutureProxy) {
+            return this.id.equals(((FutureProxy) obj).id);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
     }
 
     //
@@ -217,9 +208,15 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         target = obj;
         ExceptionHandler.addResult(this);
+        FutureMonitoring.removeFuture(this);
         ProxyNonFunctionalException nfe = target.getNFE();
         if (nfe != null) {
             NFEManager.fireNFE(nfe, originatingProxy);
+        }
+
+        if (this.callbacks != null) {
+            this.callbacks.run();
+            this.callbacks = null;
         }
 
         originatingProxy = null;
@@ -278,8 +275,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
             /* First time, hopefully the configuration file has been read */
             try {
-                futureMaxDelay = Long.parseLong(ProActiveConfiguration.getInstance()
-                                                                      .getProperty("proactive.future.maxdelay"));
+                futureMaxDelay = Long.parseLong(PAProperties.PA_FUTURE_MAXDELAY.getValue());
             } catch (IllegalArgumentException iea) {
                 /* The property is not set, that's not a problem */
                 futureMaxDelay = 0;
@@ -316,21 +312,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         UniqueID id = null;
 
-        // ProActiveEvent
-        // send WAIT_BY_NECESSITY event to listeners if there are any
-        if (futureEventProducer != null) {
-            id = ProActive.getBodyOnThis().getID();
-            if (LocalBodyStore.getInstance().getLocalBody(id) != null) {
-                // send event only if ActiveObject, not for HalfBodies
-                futureEventProducer.notifyListeners(id, getCreatorID(),
-                    FutureEvent.WAIT_BY_NECESSITY);
-            } else {
-                id = null;
-            }
-        }
-
-        // END ProActiveEvent
-
         // JMX Notification
         BodyWrapperMBean mbean = null;
         UniqueID bodyId = ProActive.getBodyOnThis().getID();
@@ -358,15 +339,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 e.printStackTrace();
             }
         }
-
-        // ProActiveEvent
-        // send RECEIVED_FUTURE_RESULT event to listeners if there are any
-        if (id != null) {
-            futureEventProducer.notifyListeners(id, getCreatorID(),
-                FutureEvent.RECEIVED_FUTURE_RESULT);
-        }
-
-        // END ProActiveEvent
 
         // JMX Notification
         if (mbean != null) {
@@ -585,6 +557,22 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     public void setExceptionLevel(ExceptionMaskLevel exceptionLevel) {
         this.exceptionLevel = exceptionLevel;
+    }
+
+    private transient LocalFutureUpdateCallbacks callbacks;
+
+    public synchronized void addCallback(String methodName)
+        throws NoSuchMethodException {
+        if (this.callbacks == null) {
+            this.callbacks = new LocalFutureUpdateCallbacks(this);
+        }
+
+        this.callbacks.add(methodName);
+
+        if (this.isAvailable()) {
+            this.callbacks.run();
+            this.callbacks = null;
+        }
     }
 
     //////////////////////////

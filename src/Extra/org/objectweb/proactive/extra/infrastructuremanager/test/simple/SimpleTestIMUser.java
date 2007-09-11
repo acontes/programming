@@ -48,10 +48,10 @@ public class SimpleTestIMUser {
             String mes = "#[SimpleTestIMUser] NodeInformation : \n";
             mes += "+--------------------------------------------------------------------\n";
             mes += ("+--> getCreationProtocolID : " +
-            nodeInfo.getCreationProtocolID() + "\n");
+            nodeInfo.getProtocol() + "\n");
             mes += ("+--> getDescriptorVMName   : " +
-            nodeInfo.getDescriptorVMName() + "\n");
-            mes += ("+--> getHostName           : " + nodeInfo.getHostName() +
+            nodeInfo.getVMInformation().getDescriptorVMName() + "\n");
+            mes += ("+--> getHostName           : " + nodeInfo.getVMInformation().getHostName() +
             "\n");
             mes += ("+--> getJobID              : " + nodeInfo.getJobID() +
             "\n");

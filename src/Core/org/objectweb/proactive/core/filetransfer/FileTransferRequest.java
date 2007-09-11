@@ -32,9 +32,9 @@ package org.objectweb.proactive.core.filetransfer;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Random;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 
 
 /**
@@ -68,9 +68,7 @@ public class FileTransferRequest implements Serializable {
         this.operationFuture = futureDstFile;
         this.sourceFTS = srcFTS;
         this.destinationFTS = dstFTS;
-
-        Random generator = new Random();
-        this.id = generator.nextInt();
+        this.id = ProActiveRandom.nextInt();
     }
 
     public OperationStatus getOperationFuture() {

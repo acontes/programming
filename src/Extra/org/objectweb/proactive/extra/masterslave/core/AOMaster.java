@@ -32,7 +32,6 @@ package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,16 +52,19 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
+import org.objectweb.proactive.extra.masterslave.interfaces.Task;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.MasterIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveDeadListener;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveWatcher;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider;
@@ -76,12 +78,17 @@ import org.objectweb.proactive.extra.masterslave.util.HashSetQueue;
  * Literally : the entity to which an user can submit tasks to be solved<br>
  * @author fviale
  */
-public class AOMaster implements Serializable, TaskProvider, InitActive,
-    RunActive, Master, SlaveDeadListener {
+public class AOMaster implements Serializable, TaskProvider<Serializable>,
+    InitActive, RunActive, MasterIntern, SlaveDeadListener {
 
     /**
-     * log4j logger for the master
-     */
+         *
+         */
+    private static final long serialVersionUID = -5623997488806806210L;
+
+    /**
+    * log4j logger for the master
+    */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
 
     // Global variables
@@ -110,7 +117,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * The repository where to locate tasks
      */
-    protected TaskRepository repository;
+    protected TaskRepository<Task<Serializable>> repository;
 
     // Slaves resources
     /**
@@ -121,7 +128,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * Group of slaves
      */
-    protected Group slaveGroup;
+    protected Group<Slave> slaveGroup;
 
     /**
      * Initial memory of the slaves
@@ -137,7 +144,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * Group of sleeping slaves
      */
-    protected Group sleepingGroup;
+    protected Group<Slave> sleepingGroup;
 
     /**
      * Associations of slaves and slaves names
@@ -169,7 +176,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * tasks that are completed
      */
-    protected ResultQueue resultQueue;
+    protected ResultQueue<Serializable> resultQueue;
 
     /**
      * if there is a pending request from the client
@@ -188,7 +195,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @param repository repository where the tasks can be found
      * @param initialMemory initial memory of the slaves
      */
-    public AOMaster(final TaskRepository repository,
+    public AOMaster(final TaskRepository<Task<Serializable>> repository,
         final Map<String, Object> initialMemory) {
         this.initialMemory = initialMemory;
         this.repository = repository;
@@ -198,15 +205,15 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * {@inheritDoc}
      */
-    public void addResources(final Collection nodes) {
-        ((SlaveManagerAdmin) smanager).addResources(nodes);
+    public void addResources(Collection<Node> nodes) {
+        ((SlaveManager) smanager).addResources(nodes);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addResources(final URL descriptorURL) {
-        ((SlaveManagerAdmin) smanager).addResources(descriptorURL);
+        ((SlaveManager) smanager).addResources(descriptorURL);
     }
 
     /**
@@ -214,15 +221,14 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public void addResources(final URL descriptorURL,
         final String virtualNodeName) {
-        ((SlaveManagerAdmin) smanager).addResources(descriptorURL,
-            virtualNodeName);
+        ((SlaveManager) smanager).addResources(descriptorURL, virtualNodeName);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addResources(final VirtualNode virtualnode) {
-        ((SlaveManagerAdmin) smanager).addResources(virtualnode);
+        ((SlaveManager) smanager).addResources(virtualnode);
     }
 
     /**
@@ -243,7 +249,9 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * {@inheritDoc}
      */
-    public TaskIntern getTask(final Slave slave, final String slaveName) {
+    @SuppressWarnings("unchecked")
+    public TaskIntern<Serializable> getTask(final Slave slave,
+        final String slaveName) {
         // if we don't know him, we record the slave in our system
         if (!slavesByName.containsKey(slaveName)) {
             recordSlave(slave, slaveName);
@@ -265,8 +273,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             // We add the task inside the launched list
             launchedTasks.add(taskId);
             slavesActivity.put(slaveName, taskId);
-            TaskIntern taskfuture = repository.getTask(taskId);
-            TaskIntern realTask = (TaskIntern) ProActive.getFutureValue(taskfuture);
+            TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
+            TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) ProActive.getFutureValue(taskfuture);
             repository.saveTask(taskId);
 
             return realTask;
@@ -276,6 +284,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
         stubOnThis = ProActive.getStubOnThis();
         // General initializations
@@ -283,9 +292,9 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         // Queues
         pendingTasks = new HashSetQueue<Long>();
         launchedTasks = new HashSetQueue<Long>();
-        resultQueue = new ResultQueue(Master.OrderingMode.CompletionOrder);
+        resultQueue = new ResultQueue<Serializable>(Master.OrderingMode.CompletionOrder);
 
-        // Ignore NFEs occuring on ourself (send reply exceptions on dead slaves)
+        // Ignore NFEs occurring on ourself (send reply exceptions on dead slaves)
         ProActive.getBodyOnThis().addNFEListener(NFEListener.NOOP_LISTENER);
 
         // Slaves
@@ -374,9 +383,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     }
 
     /**
-     * {@inheritDoc}
+     * Record the given slave in our system
+     * @param slave the slave to record
+     * @param slaveName the name of the slave
      */
-    public boolean recordSlave(final Slave slave, final String slaveName) {
+    public void recordSlave(final Slave slave, final String slaveName) {
         // We record the slave in our system
         slavesByName.put(slaveName, slave);
         slavesByNameRev.put(slave, slaveName);
@@ -384,7 +395,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
 
         // We tell the pinger to watch for this new slave
         pinger.addSlaveToWatch(slave);
-        return true;
     }
 
     /**
@@ -418,14 +428,19 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
             maybeServePending();
         }
+        // we clear the service to avoid dirty pending requests 
+        service.flushAll();
+        // we block the communications because a getTask request might still be coming from a slave created just before the master termination
+        body.blockCommunication();
+        // we finally terminate the master
         body.terminate();
     }
 
     /**
      * {@inheritDoc}
      */
-    public TaskIntern sendResultAndGetTask(final ResultIntern result,
-        final String originatorName) {
+    public TaskIntern<Serializable> sendResultAndGetTask(
+        final ResultIntern<Serializable> result, final String originatorName) {
         long taskId = result.getId();
         if (launchedTasks.contains(taskId)) {
             if (logger.isDebugEnabled()) {
@@ -439,8 +454,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         }
 
         // We assign a new task to the slave
-        TaskIntern newTask = getTask(slavesByName.get(originatorName),
-                originatorName);
+        TaskIntern<Serializable> newTask = getTask(slavesByName.get(
+                    originatorName), originatorName);
         return newTask;
     }
 
@@ -501,10 +516,12 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * {@inheritDoc}
      */
-    public void solve(final List tasks) {
-        logger.debug("Adding " + tasks.size() + " tasks...");
+    public void solveIds(final List<Long> taskIds) {
+        logger.debug("Adding " + taskIds.size() + " tasks by " +
+            Thread.currentThread() + " and body is " +
+            ProActive.getContext().getBody());
 
-        for (Long taskId : (List<Long>) tasks) {
+        for (Long taskId : taskIds) {
             solve(taskId);
         }
     }
@@ -545,43 +562,36 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @return true if completed successfully
      */
     public boolean terminateIntern(final boolean freeResources) {
-        terminated = true;
+        // We empty pending queues
+        pendingTasks.clear();
+
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating Master...");
         }
 
-        // We empty every queues
-        pendingTasks.clear();
+        // We terminate the pinger
+        ProActive.waitFor(pinger.terminate());
+        // We terminate the slave manager
+        ProActive.waitFor(smanager.terminate(freeResources));
+        if (logger.isDebugEnabled()) {
+            logger.debug("Master terminated...");
+        }
+
         launchedTasks.clear();
 
         slavesActivity.clear();
         slavesByName.clear();
         slavesByNameRev.clear();
 
-        // We give the slaves back to the resource manager
-        List<Slave> slavesToFree = new ArrayList<Slave>();
-        while (slaveGroup.size() > 0) {
-            Slave slaveToRemove = (Slave) slaveGroup.remove(0);
-            pinger.removeSlaveToWatch(slaveToRemove);
-            slavesToFree.add(slaveToRemove);
-        }
-        smanager.freeSlaves(slavesToFree);
-
-        // We terminate the pinger
-        ProActive.waitFor(pinger.terminate());
-        // We terminate the slave manager
-        ProActive.waitFor(((SlaveManagerAdmin) smanager).terminate(
-                freeResources));
-        if (logger.isDebugEnabled()) {
-            logger.debug("Master terminated...");
-        }
+        terminated = true;
         return true;
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<ResultIntern> waitAllResults() throws TaskException {
+    public List<ResultIntern<Serializable>> waitAllResults()
+        throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException(
                 "Already waiting for a wait request");
@@ -595,7 +605,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * {@inheritDoc}
      */
-    public List<ResultIntern> waitKResults(final int k)
+    public List<ResultIntern<Serializable>> waitKResults(final int k)
         throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException(
@@ -616,18 +626,18 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * {@inheritDoc}
      */
-    public ResultIntern waitOneResult() throws TaskException {
+    public ResultIntern<Serializable> waitOneResult() throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException(
                 "Already waiting for a wait request");
         }
-        ResultIntern task = resultQueue.getNext();
+        ResultIntern<Serializable> res = resultQueue.getNext();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Result of task " + task.getId() +
+            logger.debug("Result of task " + res.getId() +
                 " received by the user.");
         }
-        return task;
+        return res;
     }
 
     /**
@@ -637,8 +647,13 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     protected class FindWaitFilter implements RequestFilter {
 
         /**
-         * Creates a filter
-         */
+                 *
+                 */
+        private static final long serialVersionUID = -9077989348627519335L;
+
+        /**
+        * Creates a filter
+        */
         public FindWaitFilter() {
         }
 
@@ -665,8 +680,13 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     protected class FindNotWaitFilter implements RequestFilter {
 
         /**
-         * Creates the filter
-         */
+                 *
+                 */
+        private static final long serialVersionUID = -1650163314641695052L;
+
+        /**
+        * Creates the filter
+        */
         public FindNotWaitFilter() {
         }
 
@@ -674,7 +694,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
          * {@inheritDoc}
          */
         public boolean acceptRequest(final Request request) {
-            // We find all the requests that are not servable yet
+            // We find all the requests which can't be served yet
             String name = request.getMethodName();
             if (name.equals("waitOneResult")) {
                 return false;
@@ -684,5 +704,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
                 return !(name.equals("waitKResults"));
             }
         }
+    }
+
+    public void solve(List<TaskIntern<ResultIntern<Serializable>>> tasks)
+        throws TaskAlreadySubmittedException {
+        throw new UnsupportedOperationException("Illegal call");
     }
 }

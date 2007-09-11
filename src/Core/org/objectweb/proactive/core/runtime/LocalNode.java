@@ -45,10 +45,10 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.filter.DefaultFilter;
 import org.objectweb.proactive.core.filter.Filter;
 import org.objectweb.proactive.core.jmx.mbean.NodeWrapper;
@@ -84,7 +84,7 @@ public class LocalNode {
     public LocalNode(String nodeName, String jobId,
         ProActiveSecurityManager securityManager, String virtualNodeName) {
         this.name = nodeName;
-        this.jobId = jobId;
+        this.jobId = ((jobId != null) ? jobId : Job.DEFAULT_JOBID);
         this.securityManager = securityManager;
         this.virtualNodeName = virtualNodeName;
         this.activeObjectsId = new ArrayList<UniqueID>();
@@ -108,10 +108,7 @@ public class LocalNode {
                 ProActiveRuntimeImpl.getProActiveRuntime());
 
         // JMX registration
-        String mbeanProperty = ProActiveConfiguration.getInstance()
-                                                     .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
-
-        if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
+        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
             String runtimeUrl = ProActiveRuntimeImpl.getProActiveRuntime()
                                                     .getURL();
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -308,8 +305,9 @@ public class LocalNode {
         // JMX Notification
         ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getProActiveRuntime()
                                                                         .getMBean();
-        if (runtimeMBean != null) {
-            runtimeMBean.sendNotification(NotificationType.nodeDestroyed);
+        if ((runtimeMBean != null) && (this.mbean != null)) {
+            runtimeMBean.sendNotification(NotificationType.nodeDestroyed,
+                this.mbean.getURL());
         }
 
         // END JMX Notification

@@ -59,12 +59,7 @@ public class FactoryName {
      */
     public static ObjectName createNodeObjectName(String runtimeUrl,
         String nodeName) {
-        String host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
-        String name = UrlBuilder.getNameFromUrl(runtimeUrl);
-        String protocol = UrlBuilder.getProtocol(runtimeUrl);
-        int port = UrlBuilder.getPortFromUrl(runtimeUrl);
-
-        runtimeUrl = UrlBuilder.buildUrl(host, name, protocol, port);
+        runtimeUrl = getCompleteUrl(runtimeUrl);
 
         ObjectName oname = null;
         try {
@@ -85,12 +80,7 @@ public class FactoryName {
      * @return The ObjectName corresponding to the given url.
      */
     public static ObjectName createRuntimeObjectName(String url) {
-        String host = UrlBuilder.getHostNameFromUrl(url);
-        String name = UrlBuilder.getNameFromUrl(url);
-        String protocol = UrlBuilder.getProtocol(url);
-        int port = UrlBuilder.getPortFromUrl(url);
-
-        url = UrlBuilder.buildUrl(host, name, protocol, port);
+        url = getCompleteUrl(url);
 
         ObjectName oname = null;
         try {
@@ -105,10 +95,10 @@ public class FactoryName {
     }
 
     /**
-     * Creates a ObjectName corresponding to a Virutal Node.
-     * @param name The name of the Virutal Node.
-     * @param jobID The jobID of the Virutal Node.
-     * @return The ObjectName corresponding to the Virutal Node.
+     * Creates a ObjectName corresponding to a Virtual Node.
+     * @param name The name of the Virtual Node.
+     * @param jobID The jobID of the Virtual Node.
+     * @return The ObjectName corresponding to the Virtual Node.
      */
     public static ObjectName createVirtualNodeObjectName(String name,
         String jobID) {
@@ -123,5 +113,21 @@ public class FactoryName {
             logger.error("Can't create the objectName of the virtual node", e);
         }
         return oname;
+    }
+
+    /**
+     * Creates a complete url 'protocol://host:port/path'
+     * @param url
+     * @return A complete url
+     */
+    public static String getCompleteUrl(String url) {
+        String host = UrlBuilder.getHostNameFromUrl(url);
+        String name = UrlBuilder.getNameFromUrl(url);
+        String protocol = UrlBuilder.getProtocol(url);
+        int port = UrlBuilder.getPortFromUrl(url);
+
+        String newUrl = UrlBuilder.buildUrl(host, name, protocol, port);
+
+        return newUrl;
     }
 }

@@ -32,10 +32,10 @@ package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
 import java.util.List;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
 
 /**
  * @author Mich&egrave;le Reynier and Jean-Michael Legait
@@ -46,41 +46,41 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart {
 	//
 	// -- CONSTRUCTOR ------------------------------------------------
 	//
-	
+
 	/**
 	 * @param model
 	 */
-	public JVMTreeEditPart(AbstractDataObject model) {
+	public JVMTreeEditPart(AbstractData model) {
 		super(model);
 	}
 
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
-	
+
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
 	 */
 	@Override
 	protected List getModelChildren() {
-		return JobMonitoringTreeUtil.getJVMChildren(getCastedModel(), 
+		return JobMonitoringTreeUtil.getJVMChildren(getCastedModel(),
 				(VNObject)getParent().getParent().getModel());
 	}
-	
+
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
 	 */
 	@Override
 	protected String getText() {
-		return getCastedModel().getFullName()+" ("+getCastedModel().getJobID()+")";
+		return getCastedModel().getName();
 	}
-	
+
 	//
 	// -- PRIVATE METHODS -------------------------------------------
 	//
-	
-	private VMObject getCastedModel() {
-		return (VMObject)getModel();
+
+	private RuntimeObject  getCastedModel() {
+		return (RuntimeObject)getModel();
 	}
-	
+
 }

@@ -64,6 +64,7 @@ import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FuturePool;
+import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
@@ -73,6 +74,7 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -809,8 +811,8 @@ public class ProActive {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(new Integer(ProActiveConfiguration.getInstance()
-                                                                          .getProperty("components.creation.timeout")),
+            threadPool.awaitTermination(new Integer(
+                    PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -862,8 +864,8 @@ public class ProActive {
         }
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(new Integer(ProActiveConfiguration.getInstance()
-                                                                          .getProperty("components.creation.timeout")),
+            threadPool.awaitTermination(new Integer(
+                    PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -1463,6 +1465,28 @@ public class ProActive {
     }
 
     /**
+     * Register a method in the calling active object to be called when the
+     * specified future is updated. The registered method takes a FutureResult
+     * as parameter.
+     *
+     * @param future the future to watch
+     * @param methodName the name of the method to call on the current active object
+     * @throws NoSuchMethodException if the method could not be found
+     */
+    public static void addFutureCallback(Object future, String methodName)
+        throws NoSuchMethodException {
+        FutureProxy f;
+        try {
+            f = (FutureProxy) ((StubObject) future).getProxy();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Expected a future, got a " +
+                future.getClass());
+        }
+
+        f.addCallback(methodName);
+    }
+
+    /**
      * Find out if the object contains an exception that should be thrown
      * @param future the future object that is examinated
      * @return true iff an exception should be thrown when accessing the object
@@ -1543,8 +1567,7 @@ public class ProActive {
      */
     public static ProActiveDescriptorInternal getProactiveDescriptor()
         throws ProActiveException, IOException {
-        String padURL = ProActiveConfiguration.getInstance()
-                                              .getProperty("proactive.pad");
+        String padURL = PAProperties.PA_PAD.getValue();
 
         //System.out.println("pad propertie : " + padURL) ;
         if (padURL == null) {
@@ -1656,7 +1679,7 @@ public class ProActive {
         if (xmlDescriptorUrl.indexOf(':') == -1) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
-        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveDescriptorInternal pad;
         try {
             if (!hierarchicalSearch) {
@@ -1720,7 +1743,7 @@ public class ProActive {
         if (xmlDescriptorUrl.indexOf(':') == -1) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
-        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveDescriptorInternal pad;
         try {
             if (!hierarchicalSearch) {
@@ -1786,8 +1809,7 @@ public class ProActive {
                 "Cannot register such virtualNode since it results from a lookup!");
         }
         if (registrationProtocol == null) {
-            registrationProtocol = ProActiveConfiguration.getInstance()
-                                                         .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+            registrationProtocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);

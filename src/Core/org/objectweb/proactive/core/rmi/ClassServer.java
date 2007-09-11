@@ -34,7 +34,9 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -45,22 +47,17 @@ public class ClassServer implements Runnable {
     public static final int DEFAULT_SERVER_BASE_PORT = 2010;
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 2;
     protected static int MAX_RETRY = 500;
-    private static java.util.Random random = new java.util.Random();
     protected static int port;
     private boolean active = true;
 
     static {
         String newport;
 
-        if (ProActiveConfiguration.getInstance()
-                                      .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
-            newport = ProActiveConfiguration.getInstance()
-                                            .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
+        if (PAProperties.PA_XMLHTTP_PORT.getValue() != null) {
+            newport = PAProperties.PA_XMLHTTP_PORT.getValue();
         } else {
             newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-            ProActiveConfiguration.getInstance()
-                                  .setProperty(Constants.PROPERTY_PA_XMLHTTP_PORT,
-                newport);
+            PAProperties.PA_XMLHTTP_PORT.setValue(newport);
         }
     }
 
@@ -81,17 +78,14 @@ public class ClassServer implements Runnable {
     protected ClassServer(int port_) throws java.io.IOException {
         if (port_ == 0) {
             port = boundServerSocket(Integer.parseInt(
-                        ProActiveConfiguration.getInstance()
-                                              .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT)),
-                    MAX_RETRY);
+                        PAProperties.PA_XMLHTTP_PORT.getValue()), MAX_RETRY);
             //            Thread.dumpStack();
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);
         }
 
-        ProActiveConfiguration.getInstance()
-                              .setProperty("proactive.http.port", port + "");
+        PAProperties.PA_HTTP_PORT.setValue(port + "");
 
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
         //        System.out.println("URL du classServer : " + hostname + ":" + port);
@@ -168,7 +162,7 @@ public class ClassServer implements Runnable {
     }
 
     public static int getServerSocketPort() {
-        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
+        if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
             return ClassServerServlet.getPort();
         }
         return port;
@@ -180,7 +174,7 @@ public class ClassServer implements Runnable {
 
     public static String getUrl() {
         try {
-            if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
+            if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
                 return ClassServerServlet.getUrl();
             } else {
                 return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
@@ -236,7 +230,7 @@ public class ClassServer implements Runnable {
                 server = new java.net.ServerSocket(basePortNumber);
                 return basePortNumber;
             } catch (java.io.IOException e) {
-                basePortNumber += random.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
+                basePortNumber += ProActiveRandom.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
             }
         }
 
