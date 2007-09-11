@@ -74,8 +74,10 @@ public class JobEvent implements Serializable{
 	private JobPriority priority = JobPriority.NORMAL;
 	/** state of the job */
 	private JobState state = JobState.PENDING;
-	/** If this status is not null, it means the task have to change their status */
+	/** If this status is not null, it means the tasks have to change their status */
 	private HashMap<TaskId,Status> taskStatusModify = null;
+	/** If this finished time is not null, it means the tasks have to change their finished time */
+	private HashMap<TaskId,Long> taskFinishedTimeModify = null;
 	
 	
 	/**
@@ -181,6 +183,22 @@ public class JobEvent implements Serializable{
 	 */
 	public HashMap<TaskId,Status> getTaskStatusModify() {
 		return taskStatusModify;
+	}
+	/**
+	 * To set the taskFinishedTimeModify
+	 * 
+	 * @param taskFinishedTimeModify the taskStatusModify to set
+	 */
+	public void setTaskFinishedTimeModify(HashMap<TaskId,Long> taskFinishedTimeModify) {
+		this.taskFinishedTimeModify = taskFinishedTimeModify;
+	}
+	/**
+	 * To get the taskFinishedTimeModify
+	 * 
+	 * @return the taskFinishedTimeModify
+	 */
+	public HashMap<TaskId,Long> getTaskFinishedTimeModify() {
+		return taskFinishedTimeModify;
 	}
 	/**
 	 * To get the numberOfFinishedTasks

@@ -371,6 +371,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 					if (td.getRerunnableLeft() > 0){
 						td.setRerunnableLeft(td.getRerunnableLeft()-1);
 						job.reStartTask(td);
+						//TODO if the job is paused, send an event to the schedulerto notify that this task is now paused.
 						//free execution node even if it is dead
 						resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
 					} else {
@@ -430,6 +431,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		frontend.runningToFinishedJobEvent(job.getJobInfo());
 		//don't forget to set the task status modify to null after a job.failed(...) method.
 		job.setTaskStatusModify(null);
+		job.setTaskFinishedTimeModify(null);
 		logger.info("<<<<<<<<<<<<<<<<<<< Terminated job (failed/Cancelled) "+job.getId());
 	}
 

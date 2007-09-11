@@ -129,6 +129,11 @@ public abstract class Job implements Serializable, Comparable<Job> {
 				tasks.get(id).setStatus(jobInfo.getTaskStatusModify().get(id));
 			}
 		}
+		if (jobInfo.getTaskFinishedTimeModify() != null){
+			for (TaskId id : tasks.keySet()){
+				tasks.get(id).setFinishedTime(jobInfo.getTaskFinishedTimeModify().get(id));
+			}
+		}
 	}
 	
 
@@ -298,17 +303,21 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		lightJob.failed();
 		//creating list of status
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
+		HashMap<TaskId,Long> htl = new HashMap<TaskId, Long>();
 		for (TaskDescriptor td : tasks.values()){
 			if (!td.getId().equals(taskId)){
 				if (td.getStatus() == Status.RUNNNING){
 					td.setStatus(Status.ABORTED);
 					td.setFinishedTime(System.currentTimeMillis());
-				} else if (td.getStatus() != Status.FINISHED)
+					htl.put(td.getId(), td.getFinishedTime());
+				} else if (td.getStatus() != Status.FINISHED){
 					td.setStatus(Status.NOT_STARTED);
+				}
 			}
 			hts.put(td.getId(), td.getStatus());
 		}
 		setTaskStatusModify(hts);
+		setTaskFinishedTimeModify(htl);
 	}
 	
 
@@ -499,6 +508,14 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		jobInfo.setTaskStatusModify(taskStatusModify);
 	}
 	
+	/**
+	 * To set the taskFinishedTimeModify
+	 * 
+	 * @param taskFinishedTimeModify the taskFinishedTimeModify to set
+	 */
+	public void setTaskFinishedTimeModify(HashMap<TaskId,Long> taskFinishedTimeModify) {
+		jobInfo.setTaskFinishedTimeModify(taskFinishedTimeModify);
+	}
 	
 	/**
 	 * To get the type
