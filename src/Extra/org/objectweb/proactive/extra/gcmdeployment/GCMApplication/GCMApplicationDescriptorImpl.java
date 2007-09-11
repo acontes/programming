@@ -20,7 +20,6 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
 
 
@@ -58,11 +57,9 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         // 1. Load all GCM Deployment Descriptor
         Map<String, GCMDeploymentDescriptor> gdds;
         gdds = gadParser.getResourceProviders();
-        System.out.println("XXX gdds.size" + gdds.size());
 
         // 2. Get Virtual Node and Command Builder
         virtualNodes = gadParser.getVirtualNodes();
-        System.out.println("XXX virtualNodes.size" + virtualNodes.size());
 
         CommandBuilder commandBuilder = gadParser.getCommandBuilder();
 

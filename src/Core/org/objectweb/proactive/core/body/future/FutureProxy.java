@@ -31,10 +31,7 @@
 package org.objectweb.proactive.core.body.future;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -42,10 +39,10 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
@@ -278,8 +275,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
             /* First time, hopefully the configuration file has been read */
             try {
-                futureMaxDelay = Long.parseLong(ProActiveConfiguration.getInstance()
-                                                                      .getProperty("proactive.future.maxdelay"));
+                futureMaxDelay = Long.parseLong(PAProperties.PA_FUTURE_MAXDELAY.getValue());
             } catch (IllegalArgumentException iea) {
                 /* The property is not set, that's not a problem */
                 futureMaxDelay = 0;

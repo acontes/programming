@@ -24,9 +24,9 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
@@ -509,9 +509,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node protocol = node.getAttributes().getNamedItem("protocol");
             String p = getNodeExpandedValue(protocol);
             String protocolValue = (p != null) ? p
-                                               : ProActiveConfiguration.getInstance()
-                                                                       .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
-
+                                               : PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
             VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(getNodeExpandedValue(
                         virtualNodeName), false);
 
@@ -568,8 +566,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node protocolAttr = node.getAttributes().getNamedItem("protocol");
             String protocol = getNodeExpandedValue(protocolAttr);
             if (protocol == null) {
-                protocol = ProActiveConfiguration.getInstance()
-                                                 .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+                protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
             }
 
             vn.createNodeOnCurrentJvm(protocol);
@@ -2006,7 +2003,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         NodeList childNodes = node.getChildNodes();
 
         StringBuffer sb = new StringBuffer();
-        String pathSeparator = System.getProperty("path.separator");
+        String pathSeparator = File.pathSeparator;
 
         boolean firstPathComponent = true;
         for (int i = 0; i < childNodes.getLength(); ++i) {
@@ -2035,8 +2032,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     // private static final String PROACTIVE_ORIGIN = "proactive.home";
     private static final String DEFAULT_ORIGIN = USER_HOME_ORIGIN;
     private static final String VALUE_ATTRIBUTE = "value";
-    private static final String proActiveDir = ProActiveConfiguration.getInstance()
-                                                                     .getProperty("proactive.home");
+    private static final String proActiveDir = PAProperties.PA_HOME.getValue();
     private static final String userDir = System.getProperty("user.dir");
     private static final String userHome = System.getProperty("user.home");
     private static final String javaHome = System.getProperty("java.home");

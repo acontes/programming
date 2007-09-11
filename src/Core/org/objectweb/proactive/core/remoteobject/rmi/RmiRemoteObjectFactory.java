@@ -38,6 +38,7 @@ import java.rmi.registry.Registry;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
@@ -57,8 +58,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
 
     static {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(ProActiveConfiguration.getInstance()
-                                                           .getProperty("proactive.securitymanager")))) {
+                PAProperties.PA_SECURITYMANAGER.isTrue()) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 
@@ -112,7 +112,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         try {
             rro = new RmiRemoteObjectImpl(target);
         } catch (RemoteException e1) {
-            // TODO Auto-generated catch block
+            // Cannot be thrown by the constructor
             e1.printStackTrace();
         }
 
@@ -144,22 +144,20 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .debug(" successfully bound in registry at " + url);
         } catch (java.rmi.AlreadyBoundException e) {
-            e.printStackTrace();
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn(url + " already bound in registry", e);
             throw new ProActiveException(e);
         } catch (java.net.MalformedURLException e) {
-            e.printStackTrace();
             throw new ProActiveException("cannot bind in registry at " + url, e);
         } catch (RemoteException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .debug(" cannot bind object at " + url);
-            e.printStackTrace();
+            throw new ProActiveException(e);
         } catch (IOException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn(" cannot bind object at " + url +
                 " \n reason is : " + e.getMessage());
-            e.printStackTrace();
+            throw new ProActiveException(e);
         }
         return rro;
     }
@@ -211,7 +209,6 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
     }
 
     public int getPort() {
-        return Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                      .getProperty(Constants.PROPERTY_PA_RMI_PORT));
+        return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
     }
 }

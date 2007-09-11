@@ -42,8 +42,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -101,11 +101,10 @@ public class StartRuntime {
     static private boolean initLog4j() {
         boolean ret = true;
 
-        if ("true".equals(System.getProperty("log4j.defaultInitOverride"))) {
+        if (PAProperties.LOG4J_DEFAULT_INIT_OVERRIDE.isTrue()) {
             // configure log4j here to avoid classloading problems with
             // log4j classes
-            String log4jConfiguration = System.getProperty(
-                    "log4j.configuration");
+            String log4jConfiguration = PAProperties.LOG4J.getValue();
             if (log4jConfiguration != null) {
                 try {
                     File f = new File(log4jConfiguration);
@@ -113,7 +112,7 @@ public class StartRuntime {
                 } catch (IOException e) {
                     System.err.println(
                         "Error : incorrect path for log4j configuration : " +
-                        System.getProperty("log4j.configuration"));
+                        PAProperties.LOG4J.getValue());
                     ret &= false;
                 }
             } else {
@@ -191,8 +190,7 @@ public class StartRuntime {
         ProActiveRuntimeImpl localRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveRuntime localRuntime;
         try {
-            localRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
-                                                                                           .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+            localRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
         } catch (ProActiveException e1) {
             logger.warn("Cannot get the local ProActive Runtime", e1);
             abort();
@@ -216,7 +214,7 @@ public class StartRuntime {
             }
         }
 
-        if (System.getProperty("proactive.runtime.stayalive") != null) {
+        if (PAProperties.PA_RUNTIME_STAYALIVE.isTrue()) {
             waitUntilInterupted();
         }
     }
@@ -231,7 +229,7 @@ public class StartRuntime {
             }
         }
     }
-    private enum Params {parent("p", "URL of the parent ProActive Runtime"),
+    public enum Params {parent("p", "URL of the parent ProActive Runtime"),
         deploymentID("i", "An uniq ID for the deployment framework"),
         capacity("c", "Number of Node to be created");
         protected String sOpt;
@@ -240,6 +238,14 @@ public class StartRuntime {
         private Params(String sOpt, String desc) {
             this.sOpt = sOpt;
             this.desc = desc;
+        }
+
+        public String shortOpt() {
+            return sOpt;
+        }
+
+        public String longOpt() {
+            return toString();
         }
     }
 }

@@ -76,14 +76,18 @@
 	</simpleType>
 
 	<complexType name="pathElementType">
-		<attribute name="base" type="ct:pathElementBaseType" use="required"></attribute>
-		<attribute name="relpath" type="ct:pathElementGeneralType" use="required"></attribute>
+		<attribute name="base" type="ct:pathElementBaseType"
+			use="required">
+		</attribute>
+		<attribute name="relpath" type="ct:pathElementGeneralType"
+			use="required">
+		</attribute>
 	</complexType>
 
 	<complexType name="pathType">
 		<sequence>
 			<element name="pathElement" type="ct:pathElementType"
-				maxOccurs="unbounded">
+				maxOccurs="unbounded" minOccurs="1">
 			</element>
 		</sequence>
 	</complexType>
@@ -91,7 +95,7 @@
 	<complexType name="classpathType">
 		<complexContent>
 			<extension base="ct:pathType">
-				<attribute name="type">
+				<attribute name="type" use="required">
 					<simpleType>
 						<restriction base="string">
 							<enumeration value="append"></enumeration>
@@ -172,10 +176,11 @@
 		substitutionGroup="ct:abstractVariable" type="ct:variableType">
 	</element>
 
+	<complexType name="dummyType"></complexType>
+
 	<complexType name="environmentType">
 		<sequence>
-			<element ref="ct:abstractVariable" maxOccurs="unbounded">
-			</element>
+			<element ref="ct:abstractVariable" maxOccurs="unbounded" />
 		</sequence>
 	</complexType>
 
