@@ -242,7 +242,14 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		setNumberOfPendingTasks(getNumberOfPendingTask()+1);
 		setNumberOfRunningTasks(getNumberOfRunningTask()-1);
 		lightJob.reStart(task.getId());
-		task.setStatus(Status.PENDING);
+		if (getState() == JobState.PAUSED){
+			task.setStatus(Status.PAUSED);
+			HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
+			hts.put(task.getId(), task.getStatus());
+			lightJob.update(hts);
+		} else {
+			task.setStatus(Status.PENDING);
+		}
 	}
 	
 	
@@ -286,7 +293,6 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		setNumberOfPendingTasks(0);
 		setNumberOfRunningTasks(0);
 		descriptor.setStatus((jobState == JobState.FAILED)?Status.FAILED:Status.CANCELLED);
-		setNumberOfRunningTasks(0);
 		setState(jobState);
 		//terminate this lightjob
 		lightJob.failed();
@@ -294,9 +300,10 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		for (TaskDescriptor td : tasks.values()){
 			if (!td.getId().equals(taskId)){
-				if (td.getStatus() == Status.RUNNNING)
+				if (td.getStatus() == Status.RUNNNING){
 					td.setStatus(Status.ABORTED);
-				else if (td.getStatus() != Status.FINISHED)
+					td.setFinishedTime(System.currentTimeMillis());
+				} else if (td.getStatus() != Status.FINISHED)
 					td.setStatus(Status.NOT_STARTED);
 			}
 			hts.put(td.getId(), td.getStatus());
