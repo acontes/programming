@@ -157,9 +157,10 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
 	/**
 	 * Terminate the SchedulerAuthentication active object.
 	 */
-	public void terminate() {
+	public boolean terminate() {
 		ProActive.terminateActiveObject(false);
 		logger.info("Scheduler authentication is now shutdown !");
+		return true;
 	}
 
 }

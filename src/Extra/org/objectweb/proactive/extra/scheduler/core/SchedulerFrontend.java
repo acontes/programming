@@ -465,11 +465,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/**
 	 * Terminate the schedulerConnexion active object and then this object.
 	 */
-	public void terminate() {
+	public boolean terminate() {
 		if (authenticationInterface != null)
 			authenticationInterface.terminate();
 		ProActive.terminateActiveObject(false);
 		logger.info("Scheduler frontend is now shutdown !");
+		return true;
 	}
 	
 	
