@@ -131,7 +131,9 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		}
 		if (jobInfo.getTaskFinishedTimeModify() != null){
 			for (TaskId id : tasks.keySet()){
-				tasks.get(id).setFinishedTime(jobInfo.getTaskFinishedTimeModify().get(id));
+				if (jobInfo.getTaskFinishedTimeModify().containsKey(id)){
+					tasks.get(id).setFinishedTime(jobInfo.getTaskFinishedTimeModify().get(id));
+				}
 			}
 		}
 	}
