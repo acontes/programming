@@ -97,7 +97,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 			if (scheduler != null)
 				scheduler.disconnect();
 		} catch (SchedulerException e) {
-			e.printStackTrace();
+			// Nothing to do
+			// e.printStackTrace();
 		}
 	}
 

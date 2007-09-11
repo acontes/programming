@@ -1,31 +1,28 @@
 /*
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
- *
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
+ * 
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ * Initial developer(s): The ProActive Team
+ * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
+ * 
  * ################################################################
  */
 package org.objectweb.proactive.extra.scheduler.gui.composite;
@@ -36,6 +33,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -91,8 +89,10 @@ public abstract class AbstractJobComposite extends Composite {
 	public static final String COLUMN_OWNER_TITLE = "User";
 	/** the unique id and the title for the column "State" */
 	public static final String COLUMN_STATE_TITLE = "State";
-	/** the background color of failed jobs */
+	/** the jobs failed background color */
 	public static final Color JOB_FAILED_BACKGROUND_COLOR = Colors.RED;
+	/** the jobs canceled background color */
+	public static final Color JOB_CANCELED_BACKGROUND_COLOR = Colors.DARK_ORANGE;
 
 	private Label label = null;
 	private Table table = null;
@@ -144,21 +144,23 @@ public abstract class AbstractJobComposite extends Composite {
 			table.removeAll();
 
 			Vector<JobId> jobsId = getJobs();
+			int i = 0;
 			for (JobId jobId : jobsId)
-				addJobInTable(jobId);
+				addJobInTable(jobId, i++);
 
 			// Turn drawing back on
 			table.setRedraw(true);
 		}
 	}
 
-	private void addJobInTable(JobId jobId) {
+	private void addJobInTable(JobId jobId, int anItemIndex) {
 		if (!isDisposed()) {
 			final Job job = JobsController.getLocalView().getJobById(jobId);
+			final int itemIndex = anItemIndex;
 			getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					createItem(job);
+					createItem(job, itemIndex);
 				}
 			});
 		}
@@ -177,6 +179,30 @@ public abstract class AbstractJobComposite extends Composite {
 		refreshTable();
 		table.setSortColumn((TableColumn) event.widget);
 		table.setSortDirection((order == Job.DESC_ORDER) ? SWT.DOWN : SWT.UP);
+	}
+
+	private void fillBackgroundColor(TableItem item, JobState state, Color col) {
+		boolean setFont = false;
+		switch (state) {
+		case CANCELLED:
+			setFont = true;
+			item.setForeground(JOB_CANCELED_BACKGROUND_COLOR);
+			break;
+		case FAILED:
+			setFont = true;
+			item.setForeground(JOB_FAILED_BACKGROUND_COLOR);
+			break;
+		case FINISHED:
+		case PAUSED:
+		case PENDING:
+		case RUNNING:
+		case STALLED:
+		}
+		if (setFont) {
+			Font font = item.getFont();
+			item.setFont(new Font(font.getDevice(), font.getFontData()[0].getName(), font.getFontData()[0]
+					.getHeight(), font.getFontData()[0].getStyle() | SWT.BOLD));
+		}
 	}
 
 	// -------------------------------------------------------------------- //
@@ -304,13 +330,15 @@ public abstract class AbstractJobComposite extends Composite {
 	 * @param job the job which represent the item
 	 * @return the new item
 	 */
-	protected TableItem createItem(Job job) {
+	protected TableItem createItem(Job job, int itemIndex) {
 		TableColumn[] cols = table.getColumns();
 		TableItem item = new TableItem(table, SWT.NONE);
 		item.setData(job.getId());
-		//TODO 
-		if(job.getState().equals(JobState.FAILED))
-			item.setBackground(JOB_FAILED_BACKGROUND_COLOR);
+		if (itemIndex == 0)
+			fillBackgroundColor(item, job.getState(), null);
+		else
+			fillBackgroundColor(item, job.getState(), table.getItem(itemIndex - 1).getBackground());
+
 		for (int i = 0; i < cols.length; i++) {
 			String title = cols[i].getText();
 			if (title.equals(COLUMN_STATE_TITLE))
@@ -326,7 +354,7 @@ public abstract class AbstractJobComposite extends Composite {
 		}
 		return item;
 	}
-	
+
 	protected void stateUpdate(JobId aJobId) {
 		if (!this.isDisposed()) {
 			final JobId jobId = aJobId;
@@ -337,23 +365,28 @@ public abstract class AbstractJobComposite extends Composite {
 					Table table = getTable();
 					TableItem[] items = table.getItems();
 					TableItem item = null;
-					for (TableItem it : items)
+					int itemIndex = 0;
+					for (TableItem it : items) {
 						if (((JobId) (it.getData())).equals(jobId)) {
 							item = it;
 							break;
 						}
+						itemIndex++;
+					}
 
 					if (item == null)
-						throw new IllegalArgumentException("the item which represent the job : "
-								+ jobId + " is unknown !");
+						throw new IllegalArgumentException("the item which represent the job : " + jobId
+								+ " is unknown !");
 
 					TableColumn[] cols = table.getColumns();
 					Job job = JobsController.getLocalView().getJobById(jobId);
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
 						if ((title != null) && (title.equals(COLUMN_STATE_TITLE))) {
-							if(job.getState().equals(JobState.FAILED))
-								item.setBackground(JOB_FAILED_BACKGROUND_COLOR);
+							if (itemIndex == 0)
+								fillBackgroundColor(item, job.getState(), null);
+							else
+								fillBackgroundColor(item, job.getState(), items[itemIndex].getBackground());
 							item.setText(i, job.getState().toString());
 							break;
 						}
@@ -362,11 +395,11 @@ public abstract class AbstractJobComposite extends Composite {
 			});
 		}
 	}
-	
+
 	protected void priorityUpdate(JobId aJobId) {
 		if (!this.isDisposed()) {
 			final JobId jobId = aJobId;
-			
+
 			getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -378,11 +411,11 @@ public abstract class AbstractJobComposite extends Composite {
 							item = it;
 							break;
 						}
-					
+
 					if (item == null)
-						throw new IllegalArgumentException("the item which represent the job : "
-								+ jobId + " is unknown !");
-					
+						throw new IllegalArgumentException("the item which represent the job : " + jobId
+								+ " is unknown !");
+
 					TableColumn[] cols = table.getColumns();
 					Job job = JobsController.getLocalView().getJobById(jobId);
 					for (int i = 0; i < cols.length; i++) {
@@ -438,7 +471,7 @@ public abstract class AbstractJobComposite extends Composite {
 	 */
 	public void addJob(JobId jobId) {
 		increaseCount();
-		addJobInTable(jobId);
+		addJobInTable(jobId, count - 1);
 	}
 
 	/**
@@ -471,7 +504,7 @@ public abstract class AbstractJobComposite extends Composite {
 						TaskView taskView = TaskView.getInstance();
 						if (taskView != null)
 							taskView.clear();
-						
+
 						// enabling/disabling button permitted with this job
 						ObtainJobOutputAction.getInstance().setEnabled(false);
 						PriorityIdleJobAction.getInstance().setEnabled(false);
@@ -516,7 +549,7 @@ public abstract class AbstractJobComposite extends Composite {
 	 * To sort jobs
 	 */
 	public abstract void sortJobs();
-	
+
 	/**
 	 * Call when a job is selected in a table
 	 * 

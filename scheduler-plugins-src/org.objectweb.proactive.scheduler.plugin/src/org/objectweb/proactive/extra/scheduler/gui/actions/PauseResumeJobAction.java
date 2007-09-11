@@ -59,7 +59,7 @@ public class PauseResumeJobAction extends Action {
 			if (jobState.equals(JobState.PAUSED)) {
 				SchedulerProxy.getInstance().resume(jobId);
 				setPauseMode();
-			} else if(jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING) || jobState.equals(JobState.RERUNNING) || jobState.equals(JobState.STALLED)) {
+			} else if(jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING) || jobState.equals(JobState.STALLED)) {
 				SchedulerProxy.getInstance().pause(jobId);
 				setResumeMode();
 			} else {

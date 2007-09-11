@@ -126,8 +126,7 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
 			JobState jobState = job.getState();
 			if (jobState.equals(JobState.PAUSED)) {
 				pauseResumeJobAction.setResumeMode();
-			} else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)
-					|| jobState.equals(JobState.RERUNNING)) {
+			} else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)) {
 				pauseResumeJobAction.setPauseMode();
 			} else {
 				pauseResumeJobAction.setPauseResumeMode();

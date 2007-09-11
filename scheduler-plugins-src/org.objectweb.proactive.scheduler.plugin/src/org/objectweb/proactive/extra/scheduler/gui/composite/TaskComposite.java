@@ -35,6 +35,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -46,7 +47,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extra.scheduler.core.Tools;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
 import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
@@ -70,15 +70,24 @@ public class TaskComposite extends Composite {
 	/** the unique id and the title for the column "Run time limit" */
 	public static final String COLUMN_RUN_TIME_LIMIT_TITLE = "Run time limit";
 	/** the unique id and the title for the column "Re-runnable" */
-	public static final String COLUMN_RERUNNABLE_TITLE = "Re-runnable";
+	public static final String COLUMN_RERUN_TITLE = "Re-run";
 	/** the unique id and the title for the column "Start time" */
 	public static final String COLUMN_START_TIME_TITLE = "Start time";
 	/** the unique id and the title for the column "Finished time" */
 	public static final String COLUMN_FINISHED_TIME_TITLE = "Finished time";
 	/** the unique id and the title for the column "host name" */
 	public static final String COLUMN_HOST_NAME_TITLE = "Host name";
-	/** the background color of failed tasks */
+	/** the canceled tasks background color */
+	public static final Color TASKS_CANCELED_BACKGROUND_COLOR = Colors.ORANGE;
+	/** the failed tasks background color */
 	public static final Color TASKS_FAILED_BACKGROUND_COLOR = Colors.RED;
+	/** the aborted tasks background color */
+	public static final Color TASKS_ABORTED_BACKGROUND_COLOR = Colors.BROWN;
+	/**
+	 * the background color of tasks that couldn't be started due to
+	 * dependencies failure
+	 */
+	public static final Color TASKS_NOT_STARTED_BACKGROUND_COLOR = Colors.DEEP_SKY_BLUE;
 
 	private List<TaskDescriptor> tasks = null;
 	private Label label = null;
@@ -162,13 +171,13 @@ public class TaskComposite extends Composite {
 		tc7.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_RUN_TIME_LIMIT);
+				sort(event, TaskDescriptor.SORT_BY_RERUNNABLE);
 			}
 		});
 		tc8.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_RERUNNABLE);
+				sort(event, TaskDescriptor.SORT_BY_RUN_TIME_LIMIT);
 			}
 		});
 		tc9.addSelectionListener(new SelectionAdapter() {
@@ -184,8 +193,8 @@ public class TaskComposite extends Composite {
 		tc4.setText(COLUMN_HOST_NAME_TITLE);
 		tc5.setText(COLUMN_START_TIME_TITLE);
 		tc6.setText(COLUMN_FINISHED_TIME_TITLE);
-		tc7.setText(COLUMN_RUN_TIME_LIMIT_TITLE);
-		tc8.setText(COLUMN_RERUNNABLE_TITLE);
+		tc7.setText(COLUMN_RERUN_TITLE);
+		tc8.setText(COLUMN_RUN_TIME_LIMIT_TITLE);
 		tc9.setText(COLUMN_DESCRIPTION_TITLE);
 		// setWidth
 		tc1.setWidth(50);
@@ -194,8 +203,8 @@ public class TaskComposite extends Composite {
 		tc4.setWidth(130);
 		tc5.setWidth(130);
 		tc6.setWidth(130);
-		tc7.setWidth(130);
-		tc8.setWidth(100);
+		tc7.setWidth(50);
+		tc8.setWidth(130);
 		tc9.setWidth(200);
 		// setMoveable
 		tc1.setMoveable(true);
@@ -239,33 +248,66 @@ public class TaskComposite extends Composite {
 			// We remove all the table entries
 			table.removeAll();
 
+			int i = 0;
 			// then add the entries
 			for (TaskDescriptor td : tasks)
-				createItem(td);
+				createItem(td, i++);
 
 			// Turn drawing back on
 			table.setRedraw(true);
 		}
 	}
 
-	private void createItem(TaskDescriptor taskDescriptor) {
+	private void createItem(TaskDescriptor taskDescriptor, int itemIndex) {
 		if (!table.isDisposed()) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			// To have a unique identifier for this TableItem
 			item.setData(taskDescriptor.getId());
-			fillItem(item, taskDescriptor);
+			if (itemIndex == 0)
+				fillItem(item, taskDescriptor, null);
+			else
+				fillItem(item, taskDescriptor, table.getItem(itemIndex - 1).getBackground());
 		}
 	}
 
-	private void fillItem(TableItem item, TaskDescriptor taskDescriptor) {
+	private void fillItem(TableItem item, TaskDescriptor taskDescriptor, Color col) {
 		if (!table.isDisposed()) {
+			boolean setFont = false;
+			switch (taskDescriptor.getStatus()) {
+			case ABORTED:
+				setFont = true;
+				item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
+				break;
+			case CANCELLED:
+				setFont = true;
+				item.setForeground(TASKS_CANCELED_BACKGROUND_COLOR);
+				break;
+			case FAILED:
+				setFont = true;
+				item.setForeground(TASKS_FAILED_BACKGROUND_COLOR);
+				break;
+			case NOT_STARTED:
+				setFont = true;
+				item.setForeground(TASKS_NOT_STARTED_BACKGROUND_COLOR);
+				break;
+			case FINISHED:
+			case PAUSED:
+			case PENDING:
+			case RUNNNING:
+			case SUBMITTED:
+			}
+
+			if (setFont) {
+				Font font = item.getFont();
+				item.setFont(new Font(font.getDevice(), font.getFontData()[0].getName(),
+						font.getFontData()[0].getHeight(), font.getFontData()[0].getStyle() | SWT.BOLD));
+			}
+
 			TableColumn[] cols = table.getColumns();
 			// I'm must fill item by this way, because all columns are
 			// moveable !
 			// So i don't know if the column "Id" is at the first or the "nth"
 			// position
-			if (taskDescriptor.getStatus().equals(Status.FAILED))
-				item.setBackground(TASKS_FAILED_BACKGROUND_COLOR);
 			for (int i = 0; i < cols.length; i++) {
 				String title = cols[i].getText();
 				if (title.equals(COLUMN_ID_TITLE))
@@ -280,8 +322,9 @@ public class TaskComposite extends Composite {
 					item.setText(i, Tools.getFormattedDate(taskDescriptor.getStartTime()));
 				else if (title.equals(COLUMN_FINISHED_TIME_TITLE))
 					item.setText(i, Tools.getFormattedDate(taskDescriptor.getFinishedTime()));
-				else if (title.equals(COLUMN_RERUNNABLE_TITLE))
-					item.setText(i, taskDescriptor.getRerunnable() + "");
+				else if (title.equals(COLUMN_RERUN_TITLE))
+					item.setText(i, (taskDescriptor.getRerunnable() - taskDescriptor.getRerunnableLeft())
+							+ "/" + taskDescriptor.getRerunnable());
 				else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE))
 					item.setText(i, Tools.getFormattedDate(taskDescriptor.getRunTimeLimit()));
 				else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
@@ -334,11 +377,17 @@ public class TaskComposite extends Composite {
 	public void changeLine(TaskId taskId, TaskDescriptor taskDescriptor) {
 		if (!table.isDisposed()) {
 			TableItem[] items = table.getItems();
-			for (TableItem item : items)
+			int itemIndex = 0;
+			for (TableItem item : items) {
 				if (((TaskId) item.getData()).equals(taskId)) {
-					fillItem(item, taskDescriptor);
+					if (itemIndex == 0)
+						fillItem(item, taskDescriptor, null);
+					else
+						fillItem(item, taskDescriptor, items[itemIndex - 1].getBackground());
 					break;
 				}
+				itemIndex++;
+			}
 		}
 	}
 

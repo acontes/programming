@@ -466,8 +466,7 @@ public class JobsController implements SchedulerEventListener {
 			JobState jobState = job.getState();
 			if (jobState.equals(JobState.PAUSED)) {
 				PauseResumeJobAction.getInstance().setResumeMode();
-			} else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)
-					|| jobState.equals(JobState.RERUNNING)) {
+			} else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)) {
 				PauseResumeJobAction.getInstance().setPauseMode();
 			} else {
 				PauseResumeJobAction.getInstance().setPauseResumeMode();
