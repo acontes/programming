@@ -132,6 +132,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		if (jobInfo.getTaskFinishedTimeModify() != null){
 			for (TaskId id : tasks.keySet()){
 				if (jobInfo.getTaskFinishedTimeModify().containsKey(id)){
+					//a null send to a long setter throws a NullPointerException so, here is the fix
 					tasks.get(id).setFinishedTime(jobInfo.getTaskFinishedTimeModify().get(id));
 				}
 			}
@@ -311,11 +312,11 @@ public abstract class Job implements Serializable, Comparable<Job> {
 				if (td.getStatus() == Status.RUNNNING){
 					td.setStatus(Status.ABORTED);
 					td.setFinishedTime(System.currentTimeMillis());
-					htl.put(td.getId(), td.getFinishedTime());
 				} else if (td.getStatus() != Status.FINISHED){
 					td.setStatus(Status.NOT_STARTED);
 				}
 			}
+			htl.put(td.getId(), td.getFinishedTime());
 			hts.put(td.getId(), td.getStatus());
 		}
 		setTaskStatusModify(hts);
