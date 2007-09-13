@@ -83,6 +83,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
@@ -1087,9 +1088,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 ProActiveSecurityManager siblingPSM = null;
 
                 if (this.proactiveSecurityManager != null) {
-                    siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_NODE,
-                            this.name);
-                }
+					siblingPSM = this.proactiveSecurityManager
+							.generateSiblingCertificate(EntityType.NODE, this.name);
+				}
 
                 int registerAttempts = this.REGISTRATION_ATTEMPTS;
 
@@ -1225,8 +1226,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             ProActiveSecurityManager siblingPSM = null;
 
             if (this.proactiveSecurityManager != null) {
-                siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_NODE, this.name);
-            }
+				siblingPSM = this.proactiveSecurityManager
+						.generateSiblingCertificate(EntityType.NODE, this.name);
+			}
 
             int registrationAttempts = this.REGISTRATION_ATTEMPTS;
 

@@ -39,7 +39,7 @@ public class EntityTableComposite extends Composite {
 		toolkit.adapt(this);
 		this.rules = data;
 		this.isFrom = isFrom;
-		setLayout(new GridLayout());
+		super.setLayout(new GridLayout());
 
 		this.entities = toolkit.createTable(this, SWT.NULL);
 		this.entities.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));

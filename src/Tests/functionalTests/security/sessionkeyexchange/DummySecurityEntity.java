@@ -30,7 +30,6 @@
  */
 package functionalTests.security.sessionkeyexchange;
 
-import java.io.IOException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -57,49 +56,73 @@ public class DummySecurityEntity implements SecurityEntity {
 	private ProActiveSecurityManager securityManager;
 
     public DummySecurityEntity(ProActiveSecurityManager securityManager) {
-        this.securityManager = securityManager;
+    	this.securityManager = securityManager;
     }
 
     public void initiateSession(int type, SecurityEntity body)
-        throws IOException, CommunicationForbiddenException,
+        throws CommunicationForbiddenException,
             AuthenticationException, RenegotiateSessionException,
             SecurityNotAvailableException {
-        securityManager.initiateSession(type, body);
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		this.securityManager.initiateSession(body);
     }
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException {
-        securityManager.terminateSession(sessionID);
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		this.securityManager.terminateSession(sessionID);
     }
 
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException {
-        return securityManager.getCertificate();
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getCertificate();
     }
 
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
-		return securityManager.getProActiveSecurityManager(user);
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getProActiveSecurityManager(user);
 	}
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws SecurityNotAvailableException, RenegotiateSessionException {
-        return securityManager.startNewSession(policy);
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.startNewSession(policy);
     }
 
     public PublicKey getPublicKey() throws SecurityNotAvailableException {
-        return securityManager.getPublicKey();
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getPublicKey();
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException {
-        return securityManager.randomValue(sessionID, clientRandomValue);
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.randomValue(sessionID, clientRandomValue);
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException {
-        return securityManager.publicKeyExchange(sessionID, myPublicKey,
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
     }
 
@@ -107,29 +130,47 @@ public class DummySecurityEntity implements SecurityEntity {
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
         throws SecurityNotAvailableException, RenegotiateSessionException {
-        return securityManager.secretKeyExchange(sessionID, encodedAESKey,
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.secretKeyExchange(sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,
             parametersSignature);
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException {
-        return securityManager.getPolicy(securityContext);
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getPolicy(from, to);
     }
 
     public String getVNName() throws SecurityNotAvailableException {
-        return securityManager.getVNName();
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getVNName();
     }
 
     public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
-        return securityManager.getCertificateEncoded();
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getCertificateEncoded();
     }
 
     public Entities getEntities() throws SecurityNotAvailableException {
-        return securityManager.getEntities();
+    	if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getEntities();
     }
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
-		securityManager.setProActiveSecurityManager(user, policyServer);
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		this.securityManager.setProActiveSecurityManager(user, policyServer);
 	}
 }

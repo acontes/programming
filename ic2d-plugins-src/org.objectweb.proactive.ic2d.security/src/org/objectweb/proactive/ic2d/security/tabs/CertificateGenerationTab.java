@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.objectweb.proactive.core.security.SecurityConstants;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.ic2d.security.core.CertificateTree;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeList;
 import org.objectweb.proactive.ic2d.security.widgets.CertificateTreeListSection;
@@ -91,9 +91,9 @@ public class CertificateGenerationTab extends UpdatableTab {
 
 		this.toolkit.createLabel(client, "Type : ");
 		this.typeCombo = new Combo(client, SWT.DROP_DOWN | SWT.READ_ONLY);
-		this.typeCombo.add(SecurityConstants.ENTITY_STRING_DOMAIN);
-		this.typeCombo.add(SecurityConstants.ENTITY_STRING_USER);
-		this.typeCombo.add(SecurityConstants.ENTITY_STRING_APPLICATION);
+		this.typeCombo.add(EntityType.DOMAIN.toString());
+		this.typeCombo.add(EntityType.USER.toString());
+		this.typeCombo.add(EntityType.APPLICATION.toString());
 		this.typeCombo.select(0);
 
 		createButtonNewChain(client);
@@ -136,8 +136,8 @@ public class CertificateGenerationTab extends UpdatableTab {
 					return;
 				}
 				System.out.println("Generate self signed certificate");
-				int type = SecurityConstants
-						.typeToInt(CertificateGenerationTab.this.typeCombo
+				EntityType type = EntityType
+						.fromString(CertificateGenerationTab.this.typeCombo
 								.getItem(CertificateGenerationTab.this.typeCombo
 										.getSelectionIndex()));
 				CertificateGenerationTab.this.certTreeList
@@ -190,8 +190,8 @@ public class CertificateGenerationTab extends UpdatableTab {
 					return;
 				}
 				System.out.println("Generating child certificate");
-				int type = SecurityConstants
-						.typeToInt(CertificateGenerationTab.this.typeCombo
+				EntityType type = EntityType
+						.fromString(CertificateGenerationTab.this.typeCombo
 								.getItem(CertificateGenerationTab.this.typeCombo
 										.getSelectionIndex()));
 				tree.add(name, keySize, validity, type);

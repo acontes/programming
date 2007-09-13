@@ -219,7 +219,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.getCertificate();
     }
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws java.io.IOException, RenegotiateSessionException,
             SecurityNotAvailableException {
         return this.wrappedBody.startNewSession(policy);
@@ -263,9 +263,9 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
      */
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException, IOException {
-        return this.wrappedBody.getPolicy(securityContext);
+        return this.wrappedBody.getPolicy(from, to);
     }
 
     public Entities getEntities()
@@ -299,11 +299,15 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.wrappedBody.register(url);
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+			throws SecurityNotAvailableException, AccessControlException,
+			IOException {
 		return this.wrappedBody.getProActiveSecurityManager(user);
 	}
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public void setProActiveSecurityManager(Entity user,
+			PolicyServer policyServer) throws SecurityNotAvailableException,
+			AccessControlException, IOException {
 		this.wrappedBody.setProActiveSecurityManager(user, policyServer);
 	}
 }

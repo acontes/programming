@@ -47,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -60,14 +61,14 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
 	private static final long serialVersionUID = -6885646803779608858L;
 	private transient Logger logger;
 
-    public DefaultProActiveSecurityManager(int type) {
+    public DefaultProActiveSecurityManager(EntityType type) {
         super(type);
         //	Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         //      Security.addProvider(myProvider);
         //		  Security.insertProviderAt(myProvider, 0);
     }
 
-    public DefaultProActiveSecurityManager(int type, String vide)
+    public DefaultProActiveSecurityManager(EntityType type, String vide)
         throws Exception {
         super(type, vide);
         this.sessions = new Hashtable<Long, Session>();

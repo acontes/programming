@@ -61,36 +61,36 @@ public class InternalBodySecurity implements SecurityEntity {
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
-        distantBody.terminateSession(sessionID);
+        this.distantBody.terminateSession(sessionID);
     }
 
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        return distantBody.getCertificate();
+        return this.distantBody.getCertificate();
     }
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return distantBody.startNewSession(policy);
+        return this.distantBody.startNewSession(policy);
     }
 
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
-        return distantBody.getPublicKey();
+        return this.distantBody.getPublicKey();
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return distantBody.randomValue(sessionID, clientRandomValue);
+        return this.distantBody.randomValue(sessionID, clientRandomValue);
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        return distantBody.publicKeyExchange(sessionID, myPublicKey,
+        return this.distantBody.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
     }
 
@@ -99,7 +99,7 @@ public class InternalBodySecurity implements SecurityEntity {
         byte[] encodedLockData, byte[] parametersSignature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return distantBody.secretKeyExchange(sessionID, encodedAESKey,
+        return this.distantBody.secretKeyExchange(sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,
             parametersSignature);
     }
@@ -109,14 +109,14 @@ public class InternalBodySecurity implements SecurityEntity {
     }
 
     public boolean isLocalBody() {
-        return distantBody == null;
+        return this.distantBody == null;
     }
 
     /**
      * @return distant Body Adapter
      */
     public UniversalBody getDistantBody() {
-        return ((UniversalBody) distantBody).getRemoteAdapter();
+        return ((UniversalBody) this.distantBody).getRemoteAdapter();
     }
 
     /**
@@ -124,33 +124,37 @@ public class InternalBodySecurity implements SecurityEntity {
      */
     public byte[] getCertificatEncoded()
         throws SecurityNotAvailableException, IOException {
-        return distantBody.getCertificateEncoded();
+        return this.distantBody.getCertificateEncoded();
     }
 
     /**
      * @param securityContext
      * @return securityContext with distant object context
      */
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException, IOException {
-        return distantBody.getPolicy(securityContext);
+        return this.distantBody.getPolicy(from, to);
     }
 
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
-        return distantBody.getEntities();
+        return this.distantBody.getEntities();
     }
 
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
-        return distantBody.getCertificateEncoded();
+        return this.distantBody.getCertificateEncoded();
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
-		return distantBody.getProActiveSecurityManager(user);
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+			throws SecurityNotAvailableException, AccessControlException,
+			IOException {
+		return this.distantBody.getProActiveSecurityManager(user);
 	}
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
-		distantBody.setProActiveSecurityManager(user, policyServer);
+	public void setProActiveSecurityManager(Entity user,
+			PolicyServer policyServer) throws SecurityNotAvailableException,
+			AccessControlException, IOException {
+		this.distantBody.setProActiveSecurityManager(user, policyServer);
 	}
 }

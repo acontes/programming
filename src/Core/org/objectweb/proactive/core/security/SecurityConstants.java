@@ -43,76 +43,101 @@ public abstract class SecurityConstants {
     public static final String XML_CERTIFICATION_AUTHORITY_CERTIFICATE = "Certificate";
     
     public static final int MAX_SESSION_VALIDATION_WAIT = 30;
+    
+    public enum EntityType {
+    	UNKNOWN,
+        ENTITY,
+        OBJECT,
+        NODE,
+        RUNTIME,
+        APPLICATION,
+        USER,
+        DOMAIN;
+		
+		public static EntityType fromString(String string) {
+			for (EntityType value : EntityType.values()) {
+				if (value.toString().equalsIgnoreCase(string)) {
+					return value;
+				}
+			}
+			return EntityType.UNKNOWN;
+		}
+		
+		public EntityType getParentType() {
+			switch (this) {
+			case ENTITY:
+			case OBJECT:
+			case NODE:
+			case RUNTIME:
+				return APPLICATION;
+			case APPLICATION:
+				return USER;
+			case USER:
+			case DOMAIN:
+				return DOMAIN;
+			default:
+				return UNKNOWN;
+			}
+		}
+    }
 
-    public static final int ENTITY_TYPE_UNKNOWN = -1;
-    public static final int ENTITY_TYPE_OBJECT = 0;
-    public static final int ENTITY_TYPE_NODE = 1;
-    public static final int ENTITY_TYPE_RUNTIME = 2;
-    public static final int ENTITY_TYPE_APPLICATION = 3;
-    public static final int ENTITY_TYPE_USER = 4;
-    public static final int ENTITY_TYPE_DOMAIN = 5;
-
-    public static final String ENTITY_STRING_UNKNOWN = "Unknown";
-    public static final String ENTITY_STRING_OBJECT = "Object";
-    public static final String ENTITY_STRING_NODE = "Node";
-    public static final String ENTITY_STRING_RUNTIME = "Runtime";
-    public static final String ENTITY_STRING_APPLICATION = "Application";
-    public static final String ENTITY_STRING_USER = "User";
-    public static final String ENTITY_STRING_DOMAIN = "Domain";
+//    public static final int ENTITY_TYPE_UNKNOWN = -1;
+//    public static final int ENTITY_TYPE_ENTITY = 0;
+//    public static final int ENTITY_TYPE_APPLICATION = 1;
+//    public static final int ENTITY_TYPE_USER = 2;
+//    public static final int ENTITY_TYPE_DOMAIN = 3;
+//
+//    public static final String ENTITY_STRING_UNKNOWN = "Unknown";
+//    public static final String ENTITY_STRING_ENTITY = "Entity";
+//    public static final String ENTITY_STRING_APPLICATION = "Application";
+//    public static final String ENTITY_STRING_USER = "User";
+//    public static final String ENTITY_STRING_DOMAIN = "Domain";
     
-    public static String typeToString(int type) {
-    	switch (type) {
-    	case ENTITY_TYPE_OBJECT:
-    		return ENTITY_STRING_OBJECT;
-    	case ENTITY_TYPE_NODE:
-    		return ENTITY_STRING_NODE;
-    	case ENTITY_TYPE_RUNTIME:
-    		return ENTITY_STRING_RUNTIME;
-    	case ENTITY_TYPE_APPLICATION:
-    		return ENTITY_STRING_APPLICATION;
-    	case ENTITY_TYPE_USER:
-    		return ENTITY_STRING_USER;
-    	case ENTITY_TYPE_DOMAIN:
-    		return ENTITY_STRING_DOMAIN;
-    	default:
-    		System.out.println("Unknown type");
-    		return ENTITY_STRING_UNKNOWN;
-    	}
-    }
+//    public static String typeToString(int type) {
+//    	switch (type) {
+//    	case ENTITY_TYPE_ENTITY:
+//    		return ENTITY_STRING_ENTITY;
+//    	case ENTITY_TYPE_APPLICATION:
+//    		return ENTITY_STRING_APPLICATION;
+//    	case ENTITY_TYPE_USER:
+//    		return ENTITY_STRING_USER;
+//    	case ENTITY_TYPE_DOMAIN:
+//    		return ENTITY_STRING_DOMAIN;
+//    	default:
+////    		System.out.println("Unknown type");
+//    		return ENTITY_STRING_UNKNOWN;
+//    	}
+//    }
+//    
+//    public static int typeToInt(String type) {
+//    	if (ENTITY_STRING_ENTITY.equalsIgnoreCase(type)) {
+//    		return ENTITY_TYPE_ENTITY;
+//    	}
+//    	if (ENTITY_STRING_APPLICATION.equalsIgnoreCase(type)) {
+//    		return ENTITY_TYPE_APPLICATION;
+//    	}
+//    	if (ENTITY_STRING_USER.equalsIgnoreCase(type)) {
+//    		return ENTITY_TYPE_USER;
+//    	}
+//    	if (ENTITY_STRING_DOMAIN.equalsIgnoreCase(type)) {
+//    		return ENTITY_TYPE_DOMAIN;
+//    	}
+//    	
+//    	System.out.println("Unknown type");
+//    	return ENTITY_TYPE_UNKNOWN;
+//    }
     
-    public static int typeToInt(String type) {
-    	if (ENTITY_STRING_OBJECT.equalsIgnoreCase(type)) {
-    		return ENTITY_TYPE_OBJECT;
-    	} else if (ENTITY_STRING_NODE.equalsIgnoreCase(type)) {
-    		return ENTITY_TYPE_NODE;
-    	} else if (ENTITY_STRING_RUNTIME.equalsIgnoreCase(type)) {
-    		return ENTITY_TYPE_RUNTIME;
-    	} else if (ENTITY_STRING_APPLICATION.equalsIgnoreCase(type)) {
-    		return ENTITY_TYPE_APPLICATION;
-    	} else if (ENTITY_STRING_USER.equalsIgnoreCase(type)) {
-    		return ENTITY_TYPE_USER;
-    	} else if (ENTITY_STRING_DOMAIN.equalsIgnoreCase(type)) {
-    		return ENTITY_TYPE_DOMAIN;
-    	} else {
-    		System.out.println("Unknown type");
-    		return ENTITY_TYPE_UNKNOWN;
-    	}
-    }
-    
-    public static int getParentType(int type) {
-    	switch (type) {
-    	case ENTITY_TYPE_OBJECT:
-    	case ENTITY_TYPE_NODE:
-		case ENTITY_TYPE_RUNTIME:
-			return ENTITY_TYPE_APPLICATION;
-		case ENTITY_TYPE_APPLICATION:
-			return ENTITY_TYPE_USER;
-		case ENTITY_TYPE_USER:
-			return ENTITY_TYPE_DOMAIN;
-		case ENTITY_TYPE_DOMAIN:
-			return ENTITY_TYPE_DOMAIN;
-		default:
-			return ENTITY_TYPE_UNKNOWN;
-    	}
-    }
+//    public static int getParentType(int type) {
+//    	switch (type) {
+//    	case ENTITY_TYPE_ENTITY:
+//			return ENTITY_TYPE_APPLICATION;
+//		case ENTITY_TYPE_APPLICATION:
+//			return ENTITY_TYPE_USER;
+//		case ENTITY_TYPE_USER:
+//		case ENTITY_TYPE_DOMAIN:
+//			return ENTITY_TYPE_DOMAIN;
+//		default:
+//			return ENTITY_TYPE_UNKNOWN;
+//    	}
+//    }
 }

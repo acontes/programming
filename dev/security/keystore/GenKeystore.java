@@ -22,8 +22,8 @@ import java.util.List;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.objectweb.proactive.core.security.CertTools;
 import org.objectweb.proactive.core.security.KeyStoreTools;
-import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 public class GenKeystore {
 	
@@ -45,14 +45,14 @@ public class GenKeystore {
 		keygen.initialize(512);
 
 		List<X509Certificate> certs = new ArrayList<X509Certificate>();
-		List<Integer> types = new ArrayList<Integer>();
+		List<EntityType> types = new ArrayList<EntityType>();
 		List<String> names = new ArrayList<String>();
 		List<KeyPair> pairs = new ArrayList<KeyPair>();
 		int i = 0;
 		try {
 			// domain fr
 			names.add("CN=fr");
-			types.add(SecurityConstants.ENTITY_TYPE_DOMAIN);
+			types.add(EntityType.DOMAIN);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genSelfCert(names.get(i), 360, null, pairs.get(
 					i).getPrivate(), pairs.get(i).getPublic(), true));
@@ -60,7 +60,7 @@ public class GenKeystore {
 
 			// domain inria
 			names.add("CN=inria");
-			types.add(SecurityConstants.ENTITY_TYPE_DOMAIN);
+			types.add(EntityType.DOMAIN);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genCert(names.get(i), 360, null, pairs.get(i)
 					.getPrivate(), pairs.get(i).getPublic(), true, names
@@ -70,7 +70,7 @@ public class GenKeystore {
 
 			// domain ProActive
 			names.add("CN=proActive");
-			types.add(SecurityConstants.ENTITY_TYPE_DOMAIN);
+			types.add(EntityType.DOMAIN);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genCert(names.get(i), 360, null, pairs.get(i)
 					.getPrivate(), pairs.get(i).getPublic(), true, names
@@ -80,7 +80,7 @@ public class GenKeystore {
 
 			// user nhouillo
 			names.add("CN=nhouillo");
-			types.add(SecurityConstants.ENTITY_TYPE_USER);
+			types.add(EntityType.USER);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genCert(names.get(i), 360, null, pairs.get(i)
 					.getPrivate(), pairs.get(i).getPublic(), true, names
@@ -90,7 +90,7 @@ public class GenKeystore {
 
 			// user acontes
 			names.add("CN=acontes");
-			types.add(SecurityConstants.ENTITY_TYPE_USER);
+			types.add(EntityType.USER);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genCert(names.get(i), 360, null, pairs.get(i)
 					.getPrivate(), pairs.get(i).getPublic(), true, names
@@ -100,7 +100,7 @@ public class GenKeystore {
 
 			// app garden1 from nhouillo
 			names.add("CN=Garden1");
-			types.add(SecurityConstants.ENTITY_TYPE_APPLICATION);
+			types.add(EntityType.APPLICATION);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genCert(names.get(i), 360, null, pairs.get(i)
 					.getPrivate(), pairs.get(i).getPublic(), true, names
@@ -110,7 +110,7 @@ public class GenKeystore {
 
 			// app garden2 from acontes
 			names.add("CN=Garden2");
-			types.add(SecurityConstants.ENTITY_TYPE_APPLICATION);
+			types.add(EntityType.APPLICATION);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genCert(names.get(i), 360, null, pairs.get(i)
 					.getPrivate(), pairs.get(i).getPublic(), true, names
@@ -120,7 +120,7 @@ public class GenKeystore {
 
 			// app garden3 from nhouillo
 			names.add("CN=Garden3");
-			types.add(SecurityConstants.ENTITY_TYPE_APPLICATION);
+			types.add(EntityType.APPLICATION);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genCert(names.get(i), 360, null, pairs.get(i)
 					.getPrivate(), pairs.get(i).getPublic(), true, names
@@ -130,7 +130,7 @@ public class GenKeystore {
 
 			// app garden4 from acontes
 			names.add("CN=Garden4");
-			types.add(SecurityConstants.ENTITY_TYPE_APPLICATION);
+			types.add(EntityType.APPLICATION);
 			pairs.add(keygen.genKeyPair());
 			certs.add(CertTools.genCert(names.get(i), 360, null, pairs.get(i)
 					.getPrivate(), pairs.get(i).getPublic(), true, names

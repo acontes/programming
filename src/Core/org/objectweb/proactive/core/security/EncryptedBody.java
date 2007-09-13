@@ -285,9 +285,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
-    public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, IOException,
-            RenegotiateSessionException {
+    public long startNewSession(SecurityContext policy) {
         return 0;
     }
 
@@ -346,8 +344,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
      */
-    public SecurityContext getPolicy(SecurityContext securityContext)
-        throws SecurityNotAvailableException, IOException {
+    public SecurityContext getPolicy(Entities from, Entities to) {
         return null;
     }
 
@@ -478,7 +475,7 @@ public class EncryptedBody implements Body, Serializable {
 		return null;
 	}
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
 		// TODO Auto-generated method stub
 		
 	}

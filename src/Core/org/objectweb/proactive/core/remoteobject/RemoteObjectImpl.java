@@ -128,12 +128,12 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
-        throws SecurityNotAvailableException, IOException {
-        if (this.psm != null) {
-            return this.psm.getPolicy(securityContext);
+    public SecurityContext getPolicy(Entities from, Entities to)
+        throws SecurityNotAvailableException {
+        if (this.psm == null) {
+        	throw new SecurityNotAvailableException();
         }
-        throw new SecurityNotAvailableException();
+        return this.psm.getPolicy(from, to);
     }
 
     public PublicKey getPublicKey()
@@ -177,7 +177,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         if (this.psm != null) {
@@ -302,10 +302,16 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
     }
 
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
-		return psm.getProActiveSecurityManager(user);
+		if (this.psm == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.psm.getProActiveSecurityManager(user);
 	}
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
-		psm.setProActiveSecurityManager(user, policyServer);
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
+		if (this.psm == null) {
+			throw new SecurityNotAvailableException();
+		}
+		this.psm.setProActiveSecurityManager(user, policyServer);
 	}
 }

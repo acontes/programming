@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.objectweb.proactive.core.security.KeyStoreTools;
-import org.objectweb.proactive.core.security.SecurityConstants;
 
 public abstract class KeystoreUtils {
 
@@ -73,12 +72,27 @@ public abstract class KeystoreUtils {
 		KeyStore store = KeyStore.getInstance("PKCS12",
 				BouncyCastleProvider.PROVIDER_NAME);
 		store.load(null, null);
-
+		
+		int entityNumber = 0;
 		int appNumber = 0;
 		for (CertificateTree tree : keepPrivateKeyMap.keySet()) {
-			if (tree.getCertificate().getType() == SecurityConstants.ENTITY_TYPE_APPLICATION) {
+			switch (tree.getCertificate().getType()) {
+			case APPLICATION:
 				appNumber++;
+				break;
+			case ENTITY:
+			case NODE:
+			case OBJECT:
+			case RUNTIME:
+				entityNumber++;
+				break;
+			default:
+				// nothing
 			}
+		}
+		
+		if (entityNumber != 1) {
+			throw new KeyStoreException("Only one entity can have a private key in a keystore");
 		}
 
 		for (CertificateTree tree : ctl) {
@@ -93,11 +107,22 @@ public abstract class KeystoreUtils {
 			throws KeyStoreException, UnrecoverableKeyException,
 			NoSuchAlgorithmException {
 		if (keepPrivateKeyMap.containsKey(tree)) {
-			if (oneApp
-					&& tree.getCertificate().getType() == SecurityConstants.ENTITY_TYPE_APPLICATION) {
-				KeyStoreTools.newApplicationPrivateKey(store, tree
-						.getCertificate());
-			} else {
+			switch (tree.getCertificate().getType()) {
+			case APPLICATION:
+				if (oneApp) {
+					KeyStoreTools.newApplicationPrivateKey(store, tree
+							.getCertificate());
+				} else {
+					KeyStoreTools.newPrivateKey(store, tree.getCertificate());
+				}
+				break;
+			case ENTITY:
+			case NODE:
+			case OBJECT:
+			case RUNTIME:
+				KeyStoreTools.newEntity(store, tree.getCertificate());
+				break;
+			default:
 				KeyStoreTools.newPrivateKey(store, tree.getCertificate());
 			}
 		} else {

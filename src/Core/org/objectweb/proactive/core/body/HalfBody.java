@@ -54,6 +54,8 @@ import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
 import org.objectweb.proactive.core.security.SecurityConstants;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -94,9 +96,9 @@ public class HalfBody extends AbstractBody {
             this.securityManager = factory.getProActiveSecurityManager();
         }
 
-        if (securityManager != null) {
-            securityManager = this.securityManager.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_OBJECT,
-                    "HalfBody");
+        if (this.securityManager != null) {
+            this.securityManager = this.securityManager
+					.generateSiblingCertificate(EntityType.OBJECT, "HalfBody");
             this.securityManager.setBody(this);
             this.isSecurityOn = this.securityManager.getCertificate() != null;
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
@@ -268,7 +270,7 @@ public class HalfBody extends AbstractBody {
 
         public void sendRequest(MethodCall methodCall, Future future,
             UniversalBody destinationBody)
-            throws java.io.IOException, RenegotiateSessionException {
+            throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             Request request = this.internalRequestFactory.newRequest(methodCall,
                     HalfBody.this, future == null, sequenceID);
@@ -284,11 +286,16 @@ public class HalfBody extends AbstractBody {
 
             // FAULT TOLERANCE
             // System.out.println("a half body send a request: " + request.getMethodName());
-            if (HalfBody.this.ftmanager != null) {
-                HalfBody.this.ftmanager.sendRequest(request, destinationBody);
-            } else {
-                request.send(destinationBody);
-            }
+//            try {
+            	if (HalfBody.this.ftmanager != null) {
+            		HalfBody.this.ftmanager.sendRequest(request, destinationBody);
+            	} else {
+            		request.send(destinationBody);
+            	}
+//            } catch (CommunicationForbiddenException cfe) {
+//            	System.out.println("wtf is happening ?");
+//            	cfe.printStackTrace();
+//            }
         }
 
         //

@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.crypto.Session;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
@@ -164,7 +165,7 @@ public class RequestImpl extends MessageImpl implements Request,
     // -- Implements Request -----------------------------------------------
     //
     public int send(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException {
+        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
         //System.out.println("RequestSender: sendRequest  " + methodName + " to destination");
         this.sendCounter++;
         return sendRequest(destinationBody);
@@ -313,10 +314,20 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     protected int sendRequest(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException {
+        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
         ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
         if (psm != null) {
-            this.crypt(psm, destinationBody);
+        	long sessionID;
+        	try {
+        		sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
+        		if (!psm.getSession(sessionID).getSecurityContext().getSendRequest().getCommunication()) {
+        			throw new CommunicationForbiddenException();
+        		}
+        	} catch (SecurityNotAvailableException e) {
+        		// TODO Auto-generated catch block
+        		e.printStackTrace();
+        	}
+        	this.crypt(psm, destinationBody);
         }
 
         return destinationBody.receiveRequest(this);

@@ -36,6 +36,7 @@ import java.security.cert.X509Certificate;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.TypedCertificateList;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -55,14 +56,14 @@ public class Entity implements Serializable {
     protected TypedCertificateList certChain;
     
     public Entity() {
-    	//
+    	// needed for serializable ?
 	}
 
     public Entity(TypedCertificateList certChain) {
         this.certChain = certChain;
     }
 
-    public int getType() {
+    public EntityType getType() {
         return this.certChain.get(0).getType();
     }
 

@@ -7,6 +7,7 @@ import java.security.UnrecoverableKeyException;
 
 import org.objectweb.proactive.core.security.KeyStoreTools;
 import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 public class CertificatedRuleEntity extends RuleEntity {
 	/**
@@ -16,7 +17,7 @@ public class CertificatedRuleEntity extends RuleEntity {
 
 	protected TypedCertificate certificate;
 
-	public CertificatedRuleEntity(int type, KeyStore keystore, String name)
+	public CertificatedRuleEntity(EntityType type, KeyStore keystore, String name)
 			throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException {
 		super(type);
 		this.certificate = KeyStoreTools.getCertificate(keystore, type, name);
@@ -24,13 +25,13 @@ public class CertificatedRuleEntity extends RuleEntity {
 	}
 
 	@Override
-	protected int match(Entity e) {
+	protected Match match(Entity e) {
 		for (TypedCertificate cert : e.getCertificateChain()) {
 			if (this.certificate.equals(cert)) {
-				return RuleEntity.MATCH_OK;
+				return Match.OK;
 			}
 		}
-		return RuleEntity.MATCH_FAILED;
+		return Match.FAILED;
 	}
 
 	@Override

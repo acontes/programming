@@ -37,6 +37,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
@@ -58,6 +59,7 @@ import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -102,6 +104,7 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.domain.SecurityDomain;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
@@ -129,7 +132,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     implements ProActiveRuntime, LocalProActiveRuntime,
         ProActiveRuntimeImplMBean {
-    //
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	//
     // -- STATIC MEMBERS
     // -----------------------------------------------------------
     //
@@ -209,13 +217,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
                 if ((file != null) && new File(file).exists()) {
                     // loading security from a file
-                    ProActiveRuntimeImpl.runtimeSecurityManager = new ProActiveSecurityManager(SecurityConstants.ENTITY_TYPE_RUNTIME,
-                            file);
+                    ProActiveRuntimeImpl.runtimeSecurityManager = new ProActiveSecurityManager(EntityType.RUNTIME,
+							file);
                     ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
                                    .info("ProActive Security Policy (proactive.runtime.security) using " +
                         file);
                     
-                    runtimeSecurityManager = runtimeSecurityManager.generateSiblingCertificate(SecurityConstants.ENTITY_TYPE_RUNTIME, this.getVMInformation().getName());
+                    runtimeSecurityManager = runtimeSecurityManager
+							.generateSiblingCertificate(EntityType.RUNTIME,
+									this
+											.getVMInformation().getName());
 
                     // Is the runtime included within a Domain ?
                     String domainURL = PAProperties.PA_RUNTIME_DOMAIN_URL.getValue();
@@ -235,9 +246,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 e.printStackTrace();
             }
 
-            // System.out.println(vmInformation.getVMID().toString());
-        } catch (java.net.UnknownHostException e) {
-            // System.out.println();
+            //System.out.println(vmInformation.getVMID().toString());
+        } catch (UnknownHostException e) {
+            //System.out.println();
             logger.fatal(" !!! Cannot do a reverse lookup on that host");
 
             // System.out.println();
@@ -1103,15 +1114,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * @param sc
      */
-    public SecurityContext getPolicy(SecurityContext sc)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException {
         if (runtimeSecurityManager == null) {
-            return sc;
+            throw new SecurityNotAvailableException();
         }
 
         PolicyServer policyServer = runtimeSecurityManager.getPolicyServer();
 
-        return policyServer.getPolicy(sc);
+        return policyServer.getPolicy(from, to);
     }
 
     public byte[] getClassDataFromParentRuntime(String className)
@@ -1288,7 +1299,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws SecurityNotAvailableException, RenegotiateSessionException {
     	if (runtimeSecurityManager == null) {
     		throw new SecurityNotAvailableException();
@@ -1550,7 +1561,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 		return runtimeSecurityManager.getProActiveSecurityManager(user);
 	}
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
     	if (runtimeSecurityManager == null) {
     		throw new SecurityNotAvailableException();
     	}

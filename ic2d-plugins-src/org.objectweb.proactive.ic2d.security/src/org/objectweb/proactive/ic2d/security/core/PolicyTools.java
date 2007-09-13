@@ -17,7 +17,7 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.Communication.Authorization;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -172,7 +172,7 @@ public abstract class PolicyTools {
 	}
 
 	private static void authorizationTag(String tag, TransformerHandler th,
-			boolean permission, int auth, int conf, int integ)
+			boolean permission, Authorization auth, Authorization conf, Authorization integ)
 			throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		atts.addAttribute("", "", "value", "CDATA", permission ? "authorized"
@@ -185,15 +185,12 @@ public abstract class PolicyTools {
 		th.endElement("", "", tag);
 	}
 
-	private static void attributesTag(TransformerHandler th, int auth,
-			int conf, int integ) throws SAXException {
+	private static void attributesTag(TransformerHandler th, Authorization auth,
+			Authorization conf, Authorization integ) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
-		atts.addAttribute("", "", "authentication", "CDATA", Communication
-				.valToString(auth));
-		atts.addAttribute("", "", "confidentiality", "CDATA", Communication
-				.valToString(conf));
-		atts.addAttribute("", "", "integrity", "CDATA", Communication
-				.valToString(integ));
+		atts.addAttribute("", "", "authentication", "CDATA", auth.toString());
+		atts.addAttribute("", "", "confidentiality", "CDATA", conf.toString());
+		atts.addAttribute("", "", "integrity", "CDATA", integ.toString());
 
 		th.startElement("", "", "Attributes", atts);
 		th.endElement("", "", "Attributes");
@@ -334,15 +331,15 @@ public abstract class PolicyTools {
 		for (Node node : getChildrenNamed(reqNode, "Attributes")) {
 			String auth = node.getAttributes().getNamedItem("authentication")
 					.getNodeValue();
-			rule.setReqAuth(Communication.valToInt(auth));
+			rule.setReqAuth(Authorization.fromString(auth));
 
 			String conf = node.getAttributes().getNamedItem("confidentiality")
 					.getNodeValue();
-			rule.setReqConf(Communication.valToInt(conf));
+			rule.setReqConf(Authorization.fromString(conf));
 
 			String integ = node.getAttributes().getNamedItem("integrity")
 					.getNodeValue();
-			rule.setReqInt(Communication.valToInt(integ));
+			rule.setReqInt(Authorization.fromString(integ));
 		}
 	}
 
@@ -353,15 +350,15 @@ public abstract class PolicyTools {
 		for (Node node : getChildrenNamed(repNode, "Attributes")) {
 			String auth = node.getAttributes().getNamedItem("authentication")
 					.getNodeValue();
-			rule.setRepAuth(Communication.valToInt(auth));
+			rule.setRepAuth(Authorization.fromString(auth));
 
 			String conf = node.getAttributes().getNamedItem("confidentiality")
 					.getNodeValue();
-			rule.setRepConf(Communication.valToInt(conf));
+			rule.setRepConf(Authorization.fromString(conf));
 
 			String integ = node.getAttributes().getNamedItem("integrity")
 					.getNodeValue();
-			rule.setRepInt(Communication.valToInt(integ));
+			rule.setRepInt(Authorization.fromString(integ));
 		}
 	}
 

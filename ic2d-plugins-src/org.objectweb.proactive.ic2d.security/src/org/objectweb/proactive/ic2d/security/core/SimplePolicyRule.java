@@ -3,7 +3,7 @@ package org.objectweb.proactive.ic2d.security.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.Communication.Authorization;
 
 public class SimplePolicyRule {
 
@@ -17,19 +17,19 @@ public class SimplePolicyRule {
 
 	private boolean request;
 
-	private int reqAuth;
+	private Authorization reqAuth;
 
-	private int reqConf;
+	private Authorization reqConf;
 
-	private int reqInt;
+	private Authorization reqInt;
 
 	private boolean reply;
 
-	private int repAuth;
+	private Authorization repAuth;
 
-	private int repConf;
+	private Authorization repConf;
 
-	private int repInt;
+	private Authorization repInt;
 
 	private boolean aoCreation;
 
@@ -48,14 +48,14 @@ public class SimplePolicyRule {
 		this.to = new ArrayList<String>();
 
 		this.request = true;
-		this.reqAuth = Communication.OPTIONAL;
-		this.reqConf = Communication.OPTIONAL;
-		this.reqInt = Communication.OPTIONAL;
+		this.reqAuth = Authorization.OPTIONAL;
+		this.reqConf = Authorization.OPTIONAL;
+		this.reqInt = Authorization.OPTIONAL;
 
 		this.reply = true;
-		this.repAuth = Communication.OPTIONAL;
-		this.repConf = Communication.OPTIONAL;
-		this.repInt = Communication.OPTIONAL;
+		this.repAuth = Authorization.OPTIONAL;
+		this.repConf = Authorization.OPTIONAL;
+		this.repInt = Authorization.OPTIONAL;
 
 		this.aoCreation = true;
 		this.migration = true;
@@ -86,27 +86,27 @@ public class SimplePolicyRule {
 		return this.name;
 	}
 
-	public int getRepAuth() {
+	public Authorization getRepAuth() {
 		return this.repAuth;
 	}
 
-	public void setRepAuth(int repAuth) {
+	public void setRepAuth(Authorization repAuth) {
 		this.repAuth = repAuth;
 	}
 
-	public int getRepConf() {
+	public Authorization getRepConf() {
 		return this.repConf;
 	}
 
-	public void setRepConf(int repConf) {
+	public void setRepConf(Authorization repConf) {
 		this.repConf = repConf;
 	}
 
-	public int getRepInt() {
+	public Authorization getRepInt() {
 		return this.repInt;
 	}
 
-	public void setRepInt(int repInt) {
+	public void setRepInt(Authorization repInt) {
 		this.repInt = repInt;
 	}
 
@@ -118,27 +118,27 @@ public class SimplePolicyRule {
 		this.reply = reply;
 	}
 
-	public int getReqAuth() {
+	public Authorization getReqAuth() {
 		return this.reqAuth;
 	}
 
-	public void setReqAuth(int reqAuth) {
+	public void setReqAuth(Authorization reqAuth) {
 		this.reqAuth = reqAuth;
 	}
 
-	public int getReqConf() {
+	public Authorization getReqConf() {
 		return this.reqConf;
 	}
 
-	public void setReqConf(int reqConf) {
+	public void setReqConf(Authorization reqConf) {
 		this.reqConf = reqConf;
 	}
 
-	public int getReqInt() {
+	public Authorization getReqInt() {
 		return this.reqInt;
 	}
 
-	public void setReqInt(int reqInt) {
+	public void setReqInt(Authorization reqInt) {
 		this.reqInt = reqInt;
 	}
 

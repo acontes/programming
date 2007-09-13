@@ -7,13 +7,13 @@
 	</security>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="rvn" property="multiple" />
+			<virtualNode name="vn1" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
-		<register virtualNode="rvn" protocol="rmi" />
+		<register virtualNode="vn1" protocol="rmi" />
 		<mapping>
-			<map virtualNode="rvn">
+			<map virtualNode="vn1">
 				<jvmSet>
 					<vmName value="Jvm1" />
 				</jvmSet>
@@ -22,14 +22,14 @@
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="localJVM" />
+					<processReference refid="localJVM1" />
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<processDefinition id="localJVM">
+			<processDefinition id="localJVM1">
 				<jvmProcess
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>

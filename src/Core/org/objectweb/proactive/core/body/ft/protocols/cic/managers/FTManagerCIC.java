@@ -70,6 +70,7 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.Utils;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.core.util.MutableLong;
@@ -435,7 +436,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
     @Override
     public synchronized int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination) throws RenegotiateSessionException {
+        UniversalBody destination) throws RenegotiateSessionException, CommunicationForbiddenException {
         //	if return value is RESEDN, receiver have to recover --> resend the message
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
@@ -853,7 +854,9 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                 this.sendRequest(r, destination);
             } catch (RenegotiateSessionException e) {
                 e.printStackTrace();
-            }
+            } catch (CommunicationForbiddenException e) {
+				e.printStackTrace();
+			}
         }
     }
 

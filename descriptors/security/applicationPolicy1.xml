@@ -11,17 +11,17 @@
 	<Rules>
 		<Rule>
 			<From>
-				<Entity type="domain" name="CN=inria" />
+				<Entity type="node" name="CN=vn1" />
 			</From>
 			<To>
-				<Entity type="domain" name="CN=inria" />
+				<Entity type="node" name="CN=vn2" />
 			</To>
 			<Communication>
 				<Request value="authorized">
 					<Attributes authentication="optional"
 						integrity="optional" confidentiality="optional" />
 				</Request>
-				<Reply value="authorized">
+				<Reply value="denied">
 					<Attributes authentication="optional"
 						integrity="optional" confidentiality="optional" />
 				</Reply>

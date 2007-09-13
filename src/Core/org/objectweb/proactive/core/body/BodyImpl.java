@@ -75,6 +75,7 @@ import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
@@ -266,7 +267,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         // request queue length = number of requests in queue
         //							+ the one to add now
-        return this.requestReceiver.receiveRequest(request, this);
+        try {
+			return this.requestReceiver.receiveRequest(request, this);
+		} catch (CommunicationForbiddenException e) {
+			System.out.println("Weird shit is happening.");
+			e.printStackTrace();
+		}
+		return 0;
     }
 
     /**
@@ -718,10 +725,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // END JMX Notification
 
             // FAULT TOLERANCE
+            try {
             if (BodyImpl.this.ftmanager != null) {
                 BodyImpl.this.ftmanager.sendRequest(request, destinationBody);
             } else {
                 request.send(destinationBody);
+            }
+            } catch (CommunicationForbiddenException cfe) {
+            	System.out.println("Communication forbidden.");
+            	cfe.printStackTrace();
             }
         }
 

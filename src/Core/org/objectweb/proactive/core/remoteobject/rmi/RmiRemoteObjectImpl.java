@@ -80,9 +80,9 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         return this.remoteObject.getEntities();
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getPolicy(securityContext);
+        return this.remoteObject.getPolicy(from, to);
     }
 
     public PublicKey getPublicKey()
@@ -114,7 +114,7 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
             parametersSignature);
     }
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return this.remoteObject.startNewSession(policy);
@@ -172,11 +172,15 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         return this.remoteObject.getAdapterClass();
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+			throws SecurityNotAvailableException, AccessControlException,
+			IOException {
 		return this.remoteObject.getProActiveSecurityManager(user);
 	}
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public void setProActiveSecurityManager(Entity user,
+			PolicyServer policyServer) throws SecurityNotAvailableException,
+			AccessControlException, IOException {
 		this.remoteObject.setProActiveSecurityManager(user, policyServer);
 	}
 }

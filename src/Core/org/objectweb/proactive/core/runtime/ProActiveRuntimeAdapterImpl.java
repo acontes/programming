@@ -535,7 +535,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
         }
     }
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws SecurityNotAvailableException, RenegotiateSessionException {
         try {
             return proActiveRuntime.startNewSession(policy);
@@ -596,10 +596,10 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
         }
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException {
         try {
-            return proActiveRuntime.getPolicy(securityContext);
+            return this.proActiveRuntime.getPolicy(from, to);
         } catch (IOException e) {
             e.printStackTrace();
 

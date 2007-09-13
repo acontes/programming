@@ -46,6 +46,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.crypto.AuthenticationException;
+import org.objectweb.proactive.core.security.crypto.Session;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -202,49 +206,50 @@ public class MigratableBody extends BodyImpl implements Migratable,
         String saveNodeURL = nodeURL;
         nodeURL = node.getNodeInformation().getURL();
 
+//      security checks
+    	try {
+    		ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
+
+    		if (this.securityManager != null) {
+    			Session session = this.securityManager.initiateSession(runtimeDestination);
+
+    			if (!session.getSecurityContext().isMigration()) {
+    				ProActiveLogger.getLogger(Loggers.SECURITY)
+    				.info("NOTE : Security manager forbids the migration");
+    				return this;
+    			}
+    		} else {
+//  			no local security but need to check if distant runtime accepts migration
+    			SecurityContext scDistant = runtimeDestination.getPolicy(this.getEntities(), runtimeDestination.getEntities());
+    			if (!scDistant.isMigration()) {
+    				ProActiveLogger.getLogger(Loggers.SECURITY)
+    				.info("NOTE : Security manager forbids the migration");
+    				return this;
+    			}
+    		}
+    	} catch (SecurityNotAvailableException e1) {
+    		bodyLogger.debug("Security not available");
+    		e1.printStackTrace();
+    	} catch (CommunicationForbiddenException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AuthenticationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RenegotiateSessionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
         try {
-            if (this.isSecurityOn) {
-                // security checks
-                try {
-                    ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
+        	
+        	nodeURL = node.getNodeInformation().getURL();
 
-                    Entities entitiesFrom = this.getEntities();
-                    Entities entitiesTo = runtimeDestination.getEntities();
-
-                    SecurityContext sc = new SecurityContext(SecurityContext.MIGRATION_TO,
-                            entitiesFrom, entitiesTo);
-
-                    SecurityContext result = null;
-
-                    if (isSecurityOn) {
-                        result = securityManager.getPolicy(sc);
-
-                        if (!result.isMigration()) {
-                            ProActiveLogger.getLogger(Loggers.SECURITY)
-                                           .info("NOTE : Security manager forbids the migration");
-                            return this;
-                        }
-                    } else {
-                        // no local security but need to check if distant runtime accepts migration
-                        result = runtimeDestination.getPolicy(sc);
-
-                        if (!result.isMigration()) {
-                            ProActiveLogger.getLogger(Loggers.SECURITY)
-                                           .info("NOTE : Security manager forbids the migration");
-                            return this;
-                        }
-                    }
-                } catch (SecurityNotAvailableException e1) {
-                    bodyLogger.debug("Security not available");
-                    e1.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            nodeURL = node.getNodeInformation().getURL();
-
-            // stop accepting communication
-            blockCommunication();
+        	// stop accepting communication
+        	blockCommunication();
 
             // save the id
             savedID = bodyID;

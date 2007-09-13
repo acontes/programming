@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.Securizable;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
@@ -105,7 +106,7 @@ public interface Request extends Message, Securizable {
      * @return value for fault-tolerance protocol
      */
     public int send(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException;
+        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException;
 
     /**
      * Serves this request by executing the embedded method call using the given

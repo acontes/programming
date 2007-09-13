@@ -2,11 +2,15 @@ package org.objectweb.proactive.core.security.securityentity;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+
 
 public abstract class RuleEntity implements Serializable {
-    public static final int MATCH_OK = 1;
-    public static final int MATCH_DEFAULT = 0;
-    public static final int MATCH_FAILED = -1;
+	public enum Match {
+		OK,
+		DEFAULT,
+		FAILED;
+	}
     
     public static final int UNDEFINED_LEVEL = 0;
     
@@ -14,9 +18,9 @@ public abstract class RuleEntity implements Serializable {
      * Level of the entity, equals the depth of its certificate in the certificate tree (UNDEFINED_LEVEL is the root, above the self signed certificates)
      */
     protected int level;
-    protected int type;
+    protected EntityType type;
 
-    protected RuleEntity(int type) {
+    protected RuleEntity(EntityType type) {
         this.type = type;
         this.level = UNDEFINED_LEVEL;
     }
@@ -25,25 +29,25 @@ public abstract class RuleEntity implements Serializable {
     	return this.level;
     }
     
-    public int getType() {
+    public EntityType getType() {
     	return this.type;
     }
 
-    protected int match(Entities e) {
+    protected Match match(Entities e) {
         for (Entity entity : e) {
-            if (match(entity) == RuleEntity.MATCH_FAILED) {
-                return RuleEntity.MATCH_FAILED;
+            if (match(entity) == Match.FAILED) {
+                return Match.FAILED;
             }
         }
-        return RuleEntity.MATCH_OK;
+        return Match.OK;
     }
 
-    abstract protected int match(Entity e);
+    abstract protected Match match(Entity e);
     
     abstract public String getName();
     
     @Override
 	public String toString() {
-    	return "RuleEnty :\n\tLevel : " + this.level;
+    	return "RuleEntity :\n\tLevel : " + this.level;
     }
 }

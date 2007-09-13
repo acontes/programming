@@ -44,12 +44,12 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
  */
 public interface SecurityDomain extends SecurityEntity {
 
-    /**
-     * @param securityContext
-     * @return returns the policy matching the corresponding securityContext
-     *
-     */
-    public SecurityContext getPolicy(SecurityContext securityContext);
+//    /**
+//     * @param securityContext
+//     * @return returns the policy matching the corresponding securityContext
+//     *
+//     */
+//    public SecurityContext getPolicy(SecurityContext securityContext);
 
     /**
      * @return returns the certificate of the entity corresponding to this domain

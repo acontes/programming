@@ -18,8 +18,8 @@ import java.util.List;
 import javassist.NotFoundException;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 public class CertificateTree implements Serializable {
 
@@ -61,7 +61,7 @@ public class CertificateTree implements Serializable {
 		this.certificate = certificate;
 	}
 
-	public CertificateTree(String name, int keySize, int validity, int type) {
+	public CertificateTree(String name, int keySize, int validity, EntityType type) {
 		this();
 
 		keygen.initialize(keySize);
@@ -147,7 +147,7 @@ public class CertificateTree implements Serializable {
 		return true;
 	}
 
-	public void add(String name, int keySize, int validity, int type) {
+	public void add(String name, int keySize, int validity, EntityType type) {
 		keygen.initialize(keySize);
 		KeyPair childKP = keygen.genKeyPair();
 
@@ -177,7 +177,7 @@ public class CertificateTree implements Serializable {
 		}
 	}
 
-	public TypedCertificate search(String name, int type)
+	public TypedCertificate search(String name, EntityType type)
 			throws NotFoundException {
 		if (type == this.certificate.getType()
 				&& this.certificate.getCert().getSubjectX500Principal().getName()
@@ -210,7 +210,7 @@ public class CertificateTree implements Serializable {
 	}
 
 	public String getName() {
-		String result = SecurityConstants.typeToString(this.certificate.getType());
+		String result = this.certificate.getType().toString();
 		result += ":";
 		result += this.certificate.getCert().getSubjectX500Principal().getName();
 		return result;

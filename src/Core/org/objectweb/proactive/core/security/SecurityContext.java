@@ -34,249 +34,122 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.security.securityentity.Entities;
 
-
 /**
- * This classe represents a security context associated with a particular session
- *
+ * This classe represents a security context associated with a particular
+ * session
+ * 
  */
 public class SecurityContext implements Serializable {
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3210156951283073478L;
-	public static int COMMUNICATION_SEND_REQUEST_TO = 0;
-    public static int COMMUNICATION_RECEIVE_REQUEST_FROM = 1;
-    public static int COMMUNICATION_SEND_REPLY_TO = 2;
-    public static int COMMUNICATION_RECEIVE_REPLY_FROM = 3;
-    public static int MIGRATION_TO = 4;
-    public static int MIGRATION_FROM = 5;
-    public static int Validate_POLICY = 5;
-    protected Entities entitiesFrom;
-    protected Entities entitiesTo;
-    protected Communication sendRequest;
-    protected Communication receiveRequest;
-    protected Communication sendReply;
-    protected Communication receiveReply;
-    protected Communication proposedPolicy;
-    protected int proposedPolicyValidated;
-    protected boolean migration;
-    protected boolean migrationTo;
-    protected boolean creationActiveObjectFrom;
-    protected boolean creationActiveObjectTo;
-    protected int type;
-    protected long sessionID;
 
-    public SecurityContext() {
-    }
+	private Entities entitiesFrom;
 
-    public SecurityContext(int type, Entities entitiesFrom, Entities entitiesTo) {
-        this.type = type;
-        this.entitiesFrom = entitiesFrom;
-        this.entitiesTo = entitiesTo;
-    }
+	private Entities entitiesTo;
 
-    //    public void addEntityFrom(Entity entity) {
-    //        entitiesFrom = entity;
-    //    }
-    //
-    //    public void addEntityTo(Entity entity) {
-    //        entitiesTo = entity;
-    //    }
+	private Communication sendRequest;
 
-    /**
-     * @return type of the interaction (migration, request, reply)
-     */
-    public int getType() {
-        return type;
-    }
+	private Communication sendReply;
 
-    /**
-     * set the type of the interaction (migration, request, reply)
-     * @param i
-     */
-    public void setType(int i) {
-        type = i;
-    }
+	private boolean migration;
 
-    /**
-     * @return true if creation of an active object is authorized by the from entities
-     */
-    public boolean isCreationActiveObjectFrom() {
-        return creationActiveObjectFrom;
-    }
+	private boolean aoCreation;
 
-    /**
-     * @return true if creation of an active object is authorized to the 'to' entities
-     */
-    public boolean isCreationActiveObjectTo() {
-        return creationActiveObjectTo;
-    }
+	public SecurityContext() {
+		// serializable
+	}
 
-    /**
-     * @return entities of the 'from' objects
-     */
-    public Entities getEntitiesFrom() {
-        return entitiesFrom;
-    }
+	public SecurityContext(Entities entitiesFrom, Entities entitiesTo,
+			Communication sendRequest, Communication sendReply,
+			boolean aoCreation, boolean migration) {
+		this.entitiesFrom = entitiesFrom;
+		this.entitiesTo = entitiesTo;
+		this.sendReply = sendReply;
+		this.sendRequest = sendRequest;
+		this.aoCreation = aoCreation;
+		this.migration = migration;
+	}
+	
+	/**
+	 * @return entities of the 'from' objects
+	 */
+	public Entities getEntitiesFrom() {
+		return this.entitiesFrom;
+	}
 
-    /**
-     * @return entities of the 'to' objects
-     */
-    public Entities getEntitiesTo() {
-        return entitiesTo;
-    }
+	/**
+	 * @return entities of the 'to' objects
+	 */
+	public Entities getEntitiesTo() {
+		return this.entitiesTo;
+	}
 
-    /**
-     * @return true if migration is granted
-     */
-    public boolean isMigration() {
-        return migration;
-    }
+	/**
+	 * @return true if migration is granted
+	 */
+	public boolean isMigration() {
+		return this.migration;
+	}
 
-    /**
-     * @return true if object can receive replies
-     */
-    public Communication getReceiveReply() {
-        return receiveReply;
-    }
+	/**
+	 * @return true if object can send replies
+	 */
+	public Communication getSendReply() {
+		return this.sendReply;
+	}
 
-    /**
-     * @return true if object can receive requests
-     */
-    public Communication getReceiveRequest() {
-        return receiveRequest;
-    }
+	/**
+	 * @return true if object can send requests
+	 */
+	public Communication getSendRequest() {
+		return this.sendRequest;
+	}
+	
+	public Communication getReceiveRequest() {
+		return this.sendReply;
+	}
+	
+	public Communication getReceiveReply() {
+		return this.sendRequest;
+	}
 
-    /**
-     * @return true if object can send replies
-     */
-    public Communication getSendReply() {
-        return sendReply;
-    }
+	public boolean isAoCreation() {
+		return this.aoCreation;
+	}
 
-    /**
-     * @return true if object can send requests
-     */
-    public Communication getSendRequest() {
-        return sendRequest;
-    }
-
-    /**
-     * @param b true if object on 'from' can create object
-     */
-    public void setCreationActiveObjectFrom(boolean b) {
-        creationActiveObjectFrom = b;
-    }
-
-    /**
-     * @param b true if object is authorized to create onject on 'to'
-     */
-    public void setCreationActiveObjectTo(boolean b) {
-        creationActiveObjectTo = b;
-    }
-
-    /**
-     * @param list all entities from 'from'
-     */
-    public void setEntitiesFrom(Entities entities) {
-        entitiesFrom = entities;
-    }
-
-    /**
-     * @param list all entities from 'to'
-     */
-    public void setEntitiesTo(Entities entities) {
-        entitiesTo = entities;
-    }
-
-    /**
-     * @param b true if migration is granted
-     */
-    public void setMigration(boolean b) {
-        migration = b;
-    }
-
-    /**
-     * @param b true if migration is granted to
-     */
-    public void setMigrationTo(boolean b) {
-        migrationTo = b;
-    }
-
-    /**
-     * @param communication attributes for receiving a reply
-     */
-    public void setReceiveReply(Communication communication) {
-        receiveReply = communication;
-    }
-
-    /**
-     * @param communication attributes for receiving a request
-     */
-    public void setReceiveRequest(Communication communication) {
-        receiveRequest = communication;
-    }
-
-    /**
-     * @param communication attributes for send a reply
-     */
-    public void setSendReply(Communication communication) {
-        sendReply = communication;
-    }
-
-    /**
-     * @param communication attributes for send a request
-     */
-    public void setSendRequest(Communication communication) {
-        sendRequest = communication;
-    }
-
-    /**
-     * @return Returns the sessionID.
-     */
-    public long getSessionID() {
-        return sessionID;
-    }
-
-    /**
-     * @param sessionID The sessionID to set.
-     */
-    public void setSessionID(long sessionID) {
-        this.sessionID = sessionID;
-    }
-
-    /**
-     * @return Returns the migrationTo.
-     */
-    public boolean isMigrationTo() {
-        return migrationTo;
-    }
-
-    /**
-     * @return Returns the proposedPolicy.
-     */
-    public Communication getProposedPolicy() {
-        return proposedPolicy;
-    }
-
-    /**
-     * @param proposedPolicy The proposedPolicy to set.
-     */
-    public void setProposedPolicy(Communication proposedPolicy) {
-        this.proposedPolicy = proposedPolicy;
-    }
-
-    /**
-     * @return Returns the proposedPolicyValidated.
-     */
-    public int getProposedPolicyValidated() {
-        return proposedPolicyValidated;
-    }
-
-    /**
-     * @param proposedPolicyValidated The proposedPolicyValidated to set.
-     */
-    public void setProposedPolicyValidated(int proposedPolicyValidated) {
-        this.proposedPolicyValidated = proposedPolicyValidated;
-    }
+	public boolean isEverythingForbidden() {
+		return !this.sendReply.getCommunication()
+				&& !this.sendRequest.getCommunication() && !this.aoCreation
+				&& !this.migration;
+	}
+	
+	public SecurityContext otherSideContext() {
+		return new SecurityContext(this.getEntitiesTo(), this.getEntitiesTo(),
+				this.getSendReply(), this.getSendRequest(),
+				this.isAoCreation(), this.isMigration());
+	}
+	
+	public static SecurityContext computeContext(SecurityContext from,
+			SecurityContext to) {
+		return new SecurityContext(from.getEntitiesFrom(),
+				from.getEntitiesTo(), Communication.computeCommunication(from
+						.getSendRequest(), to.getReceiveRequest()),
+				Communication.computeCommunication(from.getSendReply(), to
+						.getReceiveReply()), from.isAoCreation()
+						&& to.isAoCreation(), from.isMigration()
+						&& to.isMigration());
+	}
+	
+	public static SecurityContext mergeContexts(SecurityContext thees,
+			SecurityContext that) {
+		return new SecurityContext(thees.getEntitiesFrom(),
+				thees.getEntitiesTo(), Communication.computeCommunication(thees
+						.getSendRequest(), that.getSendRequest()),
+				Communication.computeCommunication(thees.getSendReply(), that
+						.getSendReply()), thees.isAoCreation()
+						&& that.isAoCreation(), thees.isMigration()
+						&& that.isMigration());
+	}
 }

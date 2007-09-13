@@ -42,12 +42,12 @@ public class PolicyRule implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -8290604572288562113L;
-	protected RuleEntities from;
-    protected RuleEntities to;
-    protected Communication communicationReply;
-    protected Communication communicationRequest;
-    protected boolean migration = false;
-    protected boolean aocreation = false;
+	private RuleEntities from;
+	private RuleEntities to;
+	private Communication communicationReply;
+	private Communication communicationRequest;
+	private boolean migration;
+	private boolean aocreation;
 
     /**
      * Default constructor, initialize a policy with communication attribute
@@ -109,19 +109,19 @@ public class PolicyRule implements Serializable {
         String vnTo;
         vnFrom = vnTo = null;
         if (this.from == null) {
-            vnFrom = "all";
+        	vnFrom = "all";
         } else {
-            vnFrom = this.from.toString();
+        	vnFrom = this.from.toString();
         }
         if (this.to == null) {
-            vnTo = "all";
+        	vnTo = "all";
         } else {
-            vnTo = this.from.toString();
+        	vnTo = this.to.toString();
         }
 
-        return vnFrom + "-->" + vnTo + "||  Request:" + this.communicationRequest +
-        " :: Reply : " + this.communicationReply + " || Migration :" + this.migration +
-        "|| AOCreation:" + this.aocreation;
+        return vnFrom + "-->\n" + vnTo + "\nRequest : " + this.communicationRequest +
+        "\nReply : " + this.communicationReply + "\nMigration :" + this.migration +
+        "\nAOCreation:" + this.aocreation;
     }
 
     /**

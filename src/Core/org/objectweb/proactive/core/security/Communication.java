@@ -44,22 +44,69 @@ public class Communication implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -4624752375050653382L;
-	public static final int REQUIRED = 1;
-    public static final int DENIED = -1;
-    public static final int OPTIONAL = 0;
+	
+	public enum Authorization {		
+		DENIED (-1),
+		OPTIONAL (0),
+		REQUIRED (1);
+		
+		private final int value;
+		
+		private Authorization(int value) {
+			this.value = value;
+		}
+		
+		public static Authorization compute(Authorization from, Authorization to) throws IncompatiblePolicyException {
+			return from.compute(to);
+		}
+		
+		public Authorization compute(Authorization that) throws IncompatiblePolicyException {
+			if (this.value * that.value == -1) {
+				throw new IncompatiblePolicyException("incompatible policies");
+			}
+			return realValue(this.value + that.value);
+		}
+		
+		private Authorization realValue(int value) {
+	        if (value > 0) {
+	            return REQUIRED;
+	        }
+	        if (value < 0) {
+	            return DENIED;
+	        }
+	        return OPTIONAL;
+	    }
+		
+		public static Authorization fromString(String string) {
+			for (Authorization value : Authorization.values()) {
+				if (value.toString().equalsIgnoreCase(string)) {
+					return value;
+				}
+			}
+			return Authorization.DENIED;
+		}
+	}
+	
+	private Authorization authentication;
+	private Authorization confidentiality;
+	private Authorization integrity;
+	
+//	public static final int REQUIRED = 1;
+//    public static final int DENIED = -1;
+//    public static final int OPTIONAL = 0;
     
-    public static final String STRING_REQUIRED = "required";
-	public static final String STRING_OPTIONAL = "optional";
-	public static final String STRING_DENIED = "denied";
+//    public static final String STRING_REQUIRED = "required";
+//	public static final String STRING_OPTIONAL = "optional";
+//	public static final String STRING_DENIED = "denied";
 
-    /* indicates if authentication is required,optional or denied */
-    private int authentication;
-
-    /* indicates if confidentiality is required,optional or denied */
-    private int confidentiality;
-
-    /* indicates if integrity is required,optional or denied */
-    private int integrity;
+//    /* indicates if authentication is required,optional or denied */
+//    private int authentication;
+//
+//    /* indicates if confidentiality is required,optional or denied */
+//    private int confidentiality;
+//
+//    /* indicates if integrity is required,optional or denied */
+//    private int integrity;
 
     /* indicates if communication between active objects is allowed or not */
     private boolean communication;
@@ -69,9 +116,9 @@ public class Communication implements Serializable {
      * authentication,confidentiality and integrity set to optional
      */
     public Communication() {
-    	this.authentication = DENIED;
-    	this.confidentiality = DENIED;
-    	this.integrity = DENIED;
+    	this.authentication = Authorization.DENIED;
+    	this.confidentiality = Authorization.DENIED;
+    	this.integrity = Authorization.DENIED;
     	this.communication = false;
     }
 
@@ -91,8 +138,8 @@ public class Communication implements Serializable {
      * @param confidentiality specifies if confidentiality is required, optional, or denied
      * @param integrity specifies if integrity is required, optional, or denied
      */
-    public Communication(boolean allowed, int authentication,
-        int confidentiality, int integrity) {
+    public Communication(boolean allowed, Authorization authentication,
+    		Authorization confidentiality, Authorization integrity) {
         this.communication = allowed;
         this.authentication = authentication;
         this.confidentiality = confidentiality;
@@ -104,7 +151,7 @@ public class Communication implements Serializable {
      * @return boolean true if authentication is required
      */
     public boolean isAuthenticationEnabled() {
-        return this.authentication == REQUIRED;
+        return this.authentication == Authorization.REQUIRED;
     }
 
     /**
@@ -112,7 +159,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is required
      */
     public boolean isConfidentialityEnabled() {
-        return this.confidentiality == REQUIRED;
+        return this.confidentiality == Authorization.REQUIRED;
     }
 
     /**
@@ -120,7 +167,7 @@ public class Communication implements Serializable {
      * @return boolean true if integrity is required
      */
     public boolean isIntegrityEnabled() {
-        return this.integrity == REQUIRED;
+        return this.integrity == Authorization.REQUIRED;
     }
 
     /**
@@ -128,7 +175,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is forbidden
      */
     public boolean isAuthenticationForbidden() {
-        return this.authentication == DENIED;
+        return this.authentication == Authorization.DENIED;
     }
 
     /**
@@ -136,7 +183,7 @@ public class Communication implements Serializable {
      * @return boolean true if confidentiality is forbidden
      */
     public boolean isConfidentialityForbidden() {
-        return this.confidentiality == DENIED;
+        return this.confidentiality == Authorization.DENIED;
     }
 
     /**
@@ -144,7 +191,7 @@ public class Communication implements Serializable {
      * @return boolean true if integrity is forbidden
      */
     public boolean isIntegrityForbidden() {
-        return this.integrity == DENIED;
+        return this.integrity == Authorization.DENIED;
     }
 
     /**
@@ -157,8 +204,8 @@ public class Communication implements Serializable {
 
     @Override
     public String toString() {
-        return "Com : " + this.communication + " Auth : " + this.authentication +
-        " Conf : " + this.confidentiality + " Integrity : " + this.integrity + "\n";
+        return "\n\tCom : " + this.communication + "\n\tAuth : " + this.authentication +
+        "\n\tConf : " + this.confidentiality + "\n\tIntegrity : " + this.integrity + "\n";
     }
 
     /**
@@ -170,35 +217,10 @@ public class Communication implements Serializable {
      */
     public static Communication computeCommunication(Communication from,
         Communication to) throws IncompatiblePolicyException {
-        if (from.isCommunicationAllowed() && to.isCommunicationAllowed()) {
-            if (((from.authentication == REQUIRED) &&
-                    (to.authentication == DENIED)) ||
-                    ((from.confidentiality == REQUIRED) &&
-                    (to.confidentiality == DENIED)) ||
-                    ((from.integrity == REQUIRED) && (to.integrity == DENIED)) ||
-                    ((from.authentication == DENIED) &&
-                    (to.authentication == REQUIRED)) ||
-                    ((from.confidentiality == DENIED) &&
-                    (to.confidentiality == REQUIRED)) ||
-                    ((from.integrity == DENIED) && (to.integrity == REQUIRED))) {
-                throw new IncompatiblePolicyException("incompatible policies");
-            }
-            return new Communication(true,
-                realValue(from.authentication + to.authentication),
-                realValue(from.confidentiality + to.confidentiality),
-                realValue(from.integrity + to.integrity));
-        }
-        return null;
-    }
-
-    private static int realValue(int value) {
-        if (value > 0) {
-            return REQUIRED;
-        }
-        if (value < 0) {
-            return DENIED;
-        }
-        return OPTIONAL;
+        return new Communication(from.communication && to.communication,
+        		Authorization.compute(from.authentication, to.authentication),
+        		Authorization.compute(from.confidentiality, to.confidentiality),
+        		Authorization.compute(from.integrity, to.integrity));
     }
 
     /**
@@ -215,39 +237,15 @@ public class Communication implements Serializable {
     	this.communication = i;
     }
 
-	public int getAuthentication() {
+	public Authorization getAuthentication() {
 		return this.authentication;
 	}
 
-	public int getConfidentiality() {
+	public Authorization getConfidentiality() {
 		return this.confidentiality;
 	}
 
-	public int getIntegrity() {
+	public Authorization getIntegrity() {
 		return this.integrity;
-	}
-    
-    public static int valToInt(String val) {
-		if (val.equalsIgnoreCase(STRING_REQUIRED)) {
-			return REQUIRED;
-		} else if (val.equalsIgnoreCase(STRING_OPTIONAL)) {
-			return OPTIONAL;
-		} else if (val.equalsIgnoreCase(STRING_DENIED)) {
-			return DENIED;
-		}
-		return -1;
-	}
-
-	public static String valToString(int val) {
-		switch (val) {
-		case REQUIRED:
-			return STRING_REQUIRED;
-		case OPTIONAL:
-			return STRING_OPTIONAL;
-		case DENIED:
-			return STRING_DENIED;
-		default:
-			return null;
-		}
 	}
 }

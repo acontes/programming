@@ -24,11 +24,12 @@ import org.eclipse.ui.WorkbenchException;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyRule;
 import org.objectweb.proactive.core.security.PolicyServer;
-import org.objectweb.proactive.core.security.SecurityConstants;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.securityentity.CertificatedRuleEntity;
 import org.objectweb.proactive.core.security.securityentity.RuleEntities;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.perspective.MonitoringPerspective;
@@ -111,7 +112,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 			for (String name : policy.getFrom()) {
 				try {
 					entitiesFrom.add(new CertificatedRuleEntity(
-							SecurityConstants.typeToInt(name.substring(0, name
+							EntityType.fromString(name.substring(0, name
 									.indexOf(':'))), keystore, name
 									.substring(name.indexOf(':') + 1)));
 				} catch (UnrecoverableKeyException e) {
@@ -129,8 +130,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 			RuleEntities entitiesTo = new RuleEntities();
 			for (String name : policy.getTo()) {
 				try {
-					entitiesTo.add(new CertificatedRuleEntity(SecurityConstants
-							.typeToInt(name.substring(0, name.indexOf(':'))),
+					entitiesTo.add(new CertificatedRuleEntity(EntityType.fromString(name.substring(0, name.indexOf(':'))),
 							keystore, name.substring(name.indexOf(':') + 1)));
 				} catch (UnrecoverableKeyException e) {
 					// TODO Auto-generated catch block
@@ -159,8 +159,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 		RuleEntities users = new RuleEntities();
 		for (String user : pev.getRt().getAuthorizedUsers()) {
 			try {
-				users.add(new CertificatedRuleEntity(SecurityConstants
-						.typeToInt(user.substring(0, user.indexOf(':'))),
+				users.add(new CertificatedRuleEntity(EntityType.fromString(user.substring(0, user.indexOf(':'))),
 						keystore, user.substring(user.indexOf(':') + 1)));
 			} catch (UnrecoverableKeyException e) {
 				// TODO Auto-generated catch block
@@ -206,7 +205,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 
 		this.object = ref;
 		super.setEnabled((this.object instanceof ActiveObject)
-				|| (this.object instanceof RuntimeObject));
+				|| (this.object instanceof RuntimeObject)|| (this.object instanceof NodeObject));
 	}
 
 	public void setActiveSelect(AbstractData ref) {

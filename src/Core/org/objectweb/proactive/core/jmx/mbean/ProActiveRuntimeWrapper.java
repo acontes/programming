@@ -114,7 +114,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
 
 	public ProActiveSecurityManager getSecurityManager(Entity user) {
 		try {
-			return runtime.getProActiveSecurityManager(user);
+			return this.runtime.getProActiveSecurityManager(user);
 		} catch (AccessControlException e) {
 			e.printStackTrace();
 		} catch (SecurityNotAvailableException e) {
@@ -128,7 +128,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
 
 	public void setSecurityManager(Entity user, PolicyServer policyServer) {
 		try {
-			runtime.setProActiveSecurityManager(user, policyServer);
+			this.runtime.setProActiveSecurityManager(user, policyServer);
 		} catch (AccessControlException e) {
 			e.printStackTrace();
 		} catch (SecurityNotAvailableException e) {

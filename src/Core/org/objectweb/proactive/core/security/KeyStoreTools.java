@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.security;
 
 import java.security.KeyStore;
@@ -11,13 +41,13 @@ import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStore.TrustedCertificateEntry;
 import java.security.cert.X509Certificate;
 
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+
 public abstract class KeyStoreTools {
 
 	private static final String KEYSTORE_ENTITY_KEY_PATH = "entityCertificate";
 
-	private static final String KEYSTORE_NODE_PATH = "nodeEntry_";
-
-	private static final String KEYSTORE_RUNTIME_PATH = "runtimeEntry_";
+	private static final String KEYSTORE_ENTITY_PATH = "entityEntry_";
 
 	private static final String KEYSTORE_APPLICATION_KEY_PATH = "applicationKey";
 
@@ -27,20 +57,23 @@ public abstract class KeyStoreTools {
 
 	private static final String KEYSTORE_DOMAIN_PATH = "domainCertificate_";
 
-	private static final String PRIVATE_KEY_PASSWORD = "weapologisefortheinconvenience";
+	private static final String PRIVATE_KEY_PASSWORD = "wafti";
 
-	public static TypedCertificate getSelfCertificate(KeyStore keystore,
-			int type) throws KeyStoreException, UnrecoverableKeyException,
+	public static TypedCertificate getSelfCertificate(KeyStore keystore)
+			throws KeyStoreException, UnrecoverableKeyException,
 			NoSuchAlgorithmException {
-		TypedCertificate cert = getCertificate(keystore, KEYSTORE_ENTITY_KEY_PATH);
-		cert.setType(type);
+		TypedCertificate cert = getCertificate(keystore,
+				KEYSTORE_ENTITY_KEY_PATH);
+		cert.setType(EntityType.ENTITY);
 		return cert;
 	}
 
-	public static TypedCertificateList getSelfCertificateChain(
-			KeyStore keystore, int type) throws KeyStoreException,
-			UnrecoverableKeyException, NoSuchAlgorithmException {
-		return getCertificateChain(keystore, getSelfCertificate(keystore, type));
+	public static TypedCertificateList getSelfCertificateChain(KeyStore keystore, EntityType type)
+			throws KeyStoreException, UnrecoverableKeyException,
+			NoSuchAlgorithmException {
+		TypedCertificateList tcl =  getCertificateChain(keystore, getSelfCertificate(keystore));
+		tcl.get(0).setType(type);
+		return tcl;
 	}
 
 	public static PrivateKey getSelfPrivateKey(KeyStore keystore)
@@ -88,7 +121,7 @@ public abstract class KeyStoreTools {
 				.getCertificate(alias), pathToType(alias), pk);
 	}
 
-	public static TypedCertificate getCertificate(KeyStore keystore, int type,
+	public static TypedCertificate getCertificate(KeyStore keystore, EntityType type,
 			String name) throws KeyStoreException, UnrecoverableKeyException,
 			NoSuchAlgorithmException {
 
@@ -111,8 +144,7 @@ public abstract class KeyStoreTools {
 	private static TypedCertificate getParentCertificate(KeyStore keystore,
 			TypedCertificate certificate) throws KeyStoreException,
 			UnrecoverableKeyException, NoSuchAlgorithmException {
-		return getCertificate(keystore, SecurityConstants
-				.getParentType(certificate.getType()), certificate.getCert()
+		return getCertificate(keystore, certificate.getType().getParentType(), certificate.getCert()
 				.getIssuerX500Principal().getName());
 	}
 
@@ -161,9 +193,9 @@ public abstract class KeyStoreTools {
 		keystore.setEntry(alias, certificateEntry, null);
 	}
 
-	public static void newPrivateKey(KeyStore keystore, TypedCertificate certificate)
-			throws UnrecoverableKeyException, KeyStoreException,
-			NoSuchAlgorithmException {
+	public static void newPrivateKey(KeyStore keystore,
+			TypedCertificate certificate) throws UnrecoverableKeyException,
+			KeyStoreException, NoSuchAlgorithmException {
 		String path = typeToPath(certificate.getType())
 				+ certificate.getCert().getSubjectX500Principal().getName();
 		PrivateKeyEntry keyEntry = new PrivateKeyEntry(certificate
@@ -206,41 +238,36 @@ public abstract class KeyStoreTools {
 		keystore.setEntry(KEYSTORE_APPLICATION_KEY_PATH, keyEntry, pp);
 	}
 
-	public static String typeToPath(int type) {
+	public static String typeToPath(EntityType type) {
 		switch (type) {
-		case SecurityConstants.ENTITY_TYPE_NODE:
-			return KEYSTORE_NODE_PATH;
-		case SecurityConstants.ENTITY_TYPE_RUNTIME:
-			return KEYSTORE_RUNTIME_PATH;
-		case SecurityConstants.ENTITY_TYPE_APPLICATION:
+		case ENTITY:
+			return KEYSTORE_ENTITY_PATH;
+		case APPLICATION:
 			return KEYSTORE_APPLICATION_PATH;
-		case SecurityConstants.ENTITY_TYPE_USER:
+		case USER:
 			return KEYSTORE_USER_PATH;
-		case SecurityConstants.ENTITY_TYPE_DOMAIN:
+		case DOMAIN:
 			return KEYSTORE_DOMAIN_PATH;
 		default:
-			System.out.println("Unknown type");
 			return null;
 		}
 	}
 
-	public static int pathToType(String path) {
-		if (path.contains(KEYSTORE_NODE_PATH)) {
-			return SecurityConstants.ENTITY_TYPE_NODE;
-		}
-		if (path.contains(KEYSTORE_RUNTIME_PATH)) {
-			return SecurityConstants.ENTITY_TYPE_RUNTIME;
+	public static EntityType pathToType(String path) {
+		if (path.contains(KEYSTORE_ENTITY_PATH)
+				|| path.equals(KEYSTORE_ENTITY_KEY_PATH)) {
+			return EntityType.ENTITY;
 		}
 		if (path.contains(KEYSTORE_APPLICATION_PATH)
 				|| path.equals(KEYSTORE_APPLICATION_KEY_PATH)) {
-			return SecurityConstants.ENTITY_TYPE_APPLICATION;
+			return EntityType.APPLICATION;
 		}
 		if (path.contains(KEYSTORE_USER_PATH)) {
-			return SecurityConstants.ENTITY_TYPE_USER;
+			return EntityType.USER;
 		}
 		if (path.contains(KEYSTORE_DOMAIN_PATH)) {
-			return SecurityConstants.ENTITY_TYPE_DOMAIN;
+			return EntityType.DOMAIN;
 		}
-		return SecurityConstants.ENTITY_TYPE_UNKNOWN;
+		return EntityType.UNKNOWN;
 	}
 }

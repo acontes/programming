@@ -2,6 +2,8 @@ package org.objectweb.proactive.core.security.securityentity;
 
 import java.util.ArrayList;
 
+import org.objectweb.proactive.core.security.securityentity.RuleEntity.Match;
+
 
 public class RuleEntities extends ArrayList<RuleEntity> {
     /**
@@ -17,17 +19,17 @@ public class RuleEntities extends ArrayList<RuleEntity> {
 		super(entities);
 	}
 
-	public int match(Entities entities) {
+	public Match match(Entities entities) {
         if (isEmpty()) {
-            return RuleEntity.MATCH_DEFAULT;
+            return Match.DEFAULT;
         }
 
         for (RuleEntity entity : this) {
-            if (entity.match(entities) == RuleEntity.MATCH_FAILED) {
-                return RuleEntity.MATCH_FAILED;
+            if (entity.match(entities) == Match.FAILED) {
+                return Match.FAILED;
             }
         }
-        return RuleEntity.MATCH_OK;
+        return Match.OK;
     }
 
     /**
@@ -46,7 +48,7 @@ public class RuleEntities extends ArrayList<RuleEntity> {
     
     public boolean contains(Entity entity) {
     	for (RuleEntity rule : this) {
-    		if (rule.match(entity) == RuleEntity.MATCH_OK) {
+    		if (rule.match(entity) == Match.OK) {
     			return true;
     		}
     	}

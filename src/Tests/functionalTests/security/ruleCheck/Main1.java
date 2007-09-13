@@ -1,6 +1,5 @@
 package functionalTests.security.ruleCheck;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Policy;
@@ -37,23 +36,29 @@ public class Main1 {
         System.setSecurityManager(new SecurityManager());
 
         try {
-            ProActiveDescriptor descriptor1 = ProActive.getProactiveDescriptor(
-                    "descriptors/security/simple1.xml");
-            descriptor1.activateMappings(); // Acquire the resources
-            VirtualNode virtualNode = descriptor1.getVirtualNode("rvn");
-            Node node1 = virtualNode.getNodes()[0];
-            A a = (A) ProActive.newActive(A.class.getName(), new Object[] {  }, node1);
+			ProActiveDescriptor descriptor1 = ProActive
+					.getProactiveDescriptor("descriptors/security/simple1.xml");
+			descriptor1.activateMappings();
+			VirtualNode virtualNode1 = descriptor1.getVirtualNode("vn1");
+			Node node1 = virtualNode1.getNodes()[0];
+			SampleObject a = (SampleObject) ProActive.newActive(
+					SampleObject.class.getName(), new Object[] { "A" }, node1);
 
-            ProActive.register(a, "//localhost/objectA");
+			ProActiveDescriptor descriptor2 = ProActive
+					.getProactiveDescriptor("descriptors/security/simple2.xml");
+			descriptor2.activateMappings();
+			VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
+			Node node2 = virtualNode2.getNodes()[0];
+			SampleObject b = (SampleObject) ProActive.newActive(
+					SampleObject.class.getName(), new Object[] { "B" }, node2);
+
+            a.makeTargetDoSomething(b);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        System.out.println("\n=======oki=======");
     }
 }

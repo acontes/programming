@@ -186,9 +186,9 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         return target.getEntities();
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException, IOException {
-        return target.getPolicy(securityContext);
+        return target.getPolicy(from, to);
     }
 
     public PublicKey getPublicKey()
@@ -220,7 +220,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
             parametersSignature);
     }
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return target.startNewSession(policy);
@@ -231,11 +231,15 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         target.terminateSession(sessionID);
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+			throws SecurityNotAvailableException, AccessControlException,
+			IOException {
 		return this.target.getProActiveSecurityManager(user);
 	}
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public void setProActiveSecurityManager(Entity user,
+			PolicyServer policyServer) throws SecurityNotAvailableException,
+			AccessControlException, IOException {
 		this.target.setProActiveSecurityManager(user, policyServer);
 	}
 }

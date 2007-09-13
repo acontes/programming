@@ -12,15 +12,15 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.objectweb.proactive.core.security.Communication;
-import org.objectweb.proactive.core.security.SecurityConstants;
+import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.ic2d.security.widgets.CertificateDetailsSection;
+import org.objectweb.proactive.ic2d.security.widgets.CommunicationDetailsComposite;
 
 public class SessionTab extends UpdatableTab {
 
@@ -33,14 +33,9 @@ public class SessionTab extends UpdatableTab {
 	private TableViewer sessionTableViewer;
 
 	private CertificateDetailsSection certDetailsSection;
-
-	private Text communicationText;
-
-	private Text authenticationText;
-
-	private Text confidentialityText;
-
-	private Text integrityText;
+	
+	private CommunicationDetailsComposite requestComposite;
+	private CommunicationDetailsComposite replyComposite;
 
 	public SessionTab(CTabFolder folder, FormToolkit tk) {
 		super(folder, SWT.NULL);
@@ -59,7 +54,7 @@ public class SessionTab extends UpdatableTab {
 		createSectionDistantCertificate(body).setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		createSectionCommunication(body).setLayoutData(
+		createSectionContext(body).setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		setControl(body);
@@ -105,7 +100,7 @@ public class SessionTab extends UpdatableTab {
 		return this.certDetailsSection.get();
 	}
 
-	private Section createSectionCommunication(Composite parent) {
+	private Section createSectionContext(Composite parent) {
 		Section section = this.toolkit.createSection(parent,
 				ExpandableComposite.TITLE_BAR);
 		section.setText("Communication");
@@ -113,29 +108,13 @@ public class SessionTab extends UpdatableTab {
 		Composite client = this.toolkit.createComposite(section);
 		client.setLayout(new GridLayout());
 
-		this.toolkit.createLabel(client, "Communication :");
-		this.communicationText = this.toolkit.createText(client, "");
-		this.communicationText.setEditable(false);
-		this.communicationText.setLayoutData(new GridData(SWT.FILL, SWT.TOP,
-				true, false));
-
-		this.toolkit.createLabel(client, "Authentication :");
-		this.authenticationText = this.toolkit.createText(client, "");
-		this.authenticationText.setEditable(false);
-		this.authenticationText.setLayoutData(new GridData(SWT.FILL, SWT.TOP,
-				true, false));
-
-		this.toolkit.createLabel(client, "Confidentiality :");
-		this.confidentialityText = this.toolkit.createText(client, "");
-		this.confidentialityText.setEditable(false);
-		this.confidentialityText.setLayoutData(new GridData(SWT.FILL, SWT.TOP,
-				true, false));
-
-		this.toolkit.createLabel(client, "Integrity :");
-		this.integrityText = this.toolkit.createText(client, "");
-		this.integrityText.setEditable(false);
-		this.integrityText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				false));
+		this.requestComposite = new CommunicationDetailsComposite(client, this.toolkit, "Request");
+		this.requestComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+				true));
+		
+		this.replyComposite = new CommunicationDetailsComposite(client, this.toolkit, "Reply");
+		this.replyComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+				true));
 
 		section.setClient(client);
 
@@ -155,17 +134,14 @@ public class SessionTab extends UpdatableTab {
 		this.certDetailsSection.update(new TypedCertificate(this.sessionList
 				.get(this.sessionTable.getSelectionIndex())
 				.getDistantOACertificate(),
-				SecurityConstants.ENTITY_TYPE_UNKNOWN, null));
+				EntityType.UNKNOWN, null));
 
-		Communication c = this.sessionList.get(
-				this.sessionTable.getSelectionIndex()).getCommunication();
-		this.communicationText.setText(c.getCommunication() ? "Authorized"
-				: "Forbidden");
-		this.authenticationText.setText(Communication.valToString(c
-				.getAuthentication()));
-		this.confidentialityText.setText(Communication.valToString(c
-				.getConfidentiality()));
-		this.integrityText.setText(Communication.valToString(c.getIntegrity()));
+		SecurityContext sc = this.sessionList.get(
+				this.sessionTable.getSelectionIndex()).getSecurityContext();
+		
+		this.requestComposite.updateCommunication(sc.getSendRequest());
+		
+		this.replyComposite.updateCommunication(sc.getSendReply());
 	}
 	
 	public void setSessions(List<Session> sessions) {

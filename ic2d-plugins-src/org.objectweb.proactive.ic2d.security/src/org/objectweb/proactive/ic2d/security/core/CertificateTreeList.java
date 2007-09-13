@@ -6,6 +6,7 @@ import java.util.Collection;
 import javassist.NotFoundException;
 
 import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 public class CertificateTreeList extends ArrayList<CertificateTree> {
 
@@ -23,7 +24,7 @@ public class CertificateTreeList extends ArrayList<CertificateTree> {
 		addAll(list);
 	}
 
-	public TypedCertificate search(String name, int type)
+	public TypedCertificate search(String name, EntityType type)
 			throws NotFoundException {
 		for (CertificateTree ct : this) {
 			try {

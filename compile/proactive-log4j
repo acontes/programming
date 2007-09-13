@@ -53,7 +53,7 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.p2p.skeletons.manager = DEBUG, CONSOLE
 #log4j.logger.proactive.p2p.daemon = DEBUG, CONSOLE
 
-log4j.logger.proactive.security = DEBUG, CONSOLE
+#log4j.logger.proactive.security = DEBUG, CONSOLE
 #log4j.logger.proactive.security.node = DEBUG, CONSOLE
 #log4j.logger.proactive.security.session = DEBUG, CONSOLE
 #log4j.logger.proactive.security.body = DEBUG, CONSOLE

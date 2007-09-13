@@ -68,9 +68,9 @@ public class DomainImpl implements SecurityDomain {
         }
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext) {
+    public SecurityContext getPolicy(Entities from, Entities to) {
         try {
-            return policyServer.getPolicy(securityContext);
+            return this.policyServer.getPolicy(from, to);
         } catch (SecurityNotAvailableException e) {
             e.printStackTrace();
         }
@@ -113,8 +113,7 @@ public class DomainImpl implements SecurityDomain {
         return null;
     }
 
-    public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public long startNewSession(SecurityContext policy) {
         return 0;
     }
 
@@ -148,7 +147,7 @@ public class DomainImpl implements SecurityDomain {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
 		// TODO Auto-generated method stub
 		
 	}

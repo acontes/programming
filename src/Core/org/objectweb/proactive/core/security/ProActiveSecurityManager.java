@@ -74,6 +74,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.AuthenticationException;
 import org.objectweb.proactive.core.security.crypto.AuthenticationTicket;
 import org.objectweb.proactive.core.security.crypto.AuthenticationTicketProperty;
@@ -125,20 +126,19 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     /* pointer to the wrapping SecurityEntity if exists */
     protected transient SecurityEntity parent;
     protected byte[] encodedKeyStore;
-
-    // indicates the type of the secured object (object, node, runtime)
-    protected int type;
+    
+    private EntityType type;
 
     /**
      * This a the default constructor to use with the ProActiveSecurityManager
      */
-    public ProActiveSecurityManager(int type) {
+    public ProActiveSecurityManager(EntityType type) {
         this.sessions = new Hashtable<Long, Session>();
         this.policyServer = null;
         this.type = type;
     }
 
-    public ProActiveSecurityManager(int type, String file)
+    public ProActiveSecurityManager(EntityType type, String file)
         throws InvalidPolicyFile {
         this(type);
         Provider myProvider = new BouncyCastleProvider();
@@ -154,7 +154,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     /**
      * @param server
      */
-    public ProActiveSecurityManager(int type, PolicyServer server) {
+    public ProActiveSecurityManager(EntityType type, PolicyServer server) {
         this(type);
 
         this.policyServer = server;
@@ -180,21 +180,22 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * @param securityContext the object certificate we want to get the policy from
      * @return Policy policy attributes
      */
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException {
+
+        // getting our policies 
+    	SecurityContext securityContext = this.policyServer.getPolicy(from, to);
+        
         // asking for our wrapping entity policies
         if (this.parent != null) {
             try {
-                securityContext = this.parent.getPolicy(securityContext);
+                securityContext = SecurityContext.mergeContexts(securityContext, this.parent.getPolicy(from, to));
             } catch (SecurityNotAvailableException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-        // adding our policies 
-        securityContext = this.policyServer.getPolicy(securityContext);
 
         return securityContext;
     }
@@ -219,7 +220,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * @throws CommunicationForbiddenException
      * @throws AuthenticationException
      */
-    public void initiateSession(int type, SecurityEntity distantSecurityEntity)
+    public Session initiateSession(SecurityEntity distantSecurityEntity)
         throws CommunicationForbiddenException,
             org.objectweb.proactive.core.security.crypto.AuthenticationException,
             RenegotiateSessionException, SecurityNotAvailableException {
@@ -245,40 +246,39 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         }
 
         // retrieves communication policy for local object
-        SecurityContext sc = new SecurityContext(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
-                from, to);
+//        SecurityContext scLocal = new SecurityContext(from, to);
 
-        sc = this.policyServer.getPolicy(sc);
+        SecurityContext scLocal = this.policyServer.getPolicy(from, to);
 
-        Communication localPolicy = sc.getSendRequest();
-
-        if (!localPolicy.isCommunicationAllowed()) {
-            throw new CommunicationForbiddenException(
-                "Sending request is denied");
-        }
+//        Communication localPolicy = scLocal.getSendRequest();
+//
+        if (scLocal.isEverythingForbidden()) {
+			throw new CommunicationForbiddenException(
+					"No communication is allowed with the target.");
+		}
 
         // retrieves communication policy for distant object
-        SecurityContext scDistant = new SecurityContext(SecurityContext.COMMUNICATION_RECEIVE_REQUEST_FROM,
-                from, to);
+        SecurityContext scDistant = null;
 
         try {
-            scDistant = distantSecurityEntity.getPolicy(scDistant);
+            scDistant = distantSecurityEntity.getPolicy(from, to);
         } catch (SecurityNotAvailableException e1) {
             e1.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Communication distantPolicy = scDistant.getReceiveRequest();
-
-        if (!distantPolicy.isCommunicationAllowed()) {
+//        Communication distantPolicy = scDistant.getReceiveRequest();
+//
+        if (scDistant.isEverythingForbidden()) {
             throw new CommunicationForbiddenException(
-                "Receiving request denied ");
+                "The target doesn't allow any communication.");
         }
 
         // compute policy
-        Communication resultPolicy = Communication.computeCommunication(localPolicy,
-                distantPolicy);
+        SecurityContext resultContext = SecurityContext.computeContext(scLocal, scDistant);
+//        Communication resultPolicy = Communication.computeCommunication(localPolicy,
+//                distantPolicy);
 
         long sessionID = 0;
         Session session = null;
@@ -287,11 +287,11 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         try {
             while (!sessionAccepted) {
                 // getting sessionID from target entity
-                sessionID = distantSecurityEntity.startNewSession(resultPolicy);
+                sessionID = distantSecurityEntity.startNewSession(resultContext.otherSideContext());
                 Long longId = new Long(sessionID);
 
                 if ((session = this.sessions.get(longId)) == null) {
-                    session = new Session(sessionID, resultPolicy);
+                    session = new Session(sessionID, resultContext);
                     session.setDistantOACertificate(distantBodyCertificate);
                     this.sessions.put(new Long(sessionID), session);
                     sessionAccepted = true;
@@ -338,6 +338,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         } catch (Exception e) {
             e.printStackTrace();
 		}
+        
+        return session;
 	}
 
 	public X509Certificate getCertificate() {
@@ -347,7 +349,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 		}
 		try {
 			return KeyStoreTools.getSelfCertificate(this.policyServer
-					.getKeyStore(), this.type).getCert();
+					.getKeyStore()).getCert();
 		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		} catch (UnrecoverableKeyException e) {
@@ -374,7 +376,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 	 * @param communicationPolicy
 	 * @return an identifier for the session
 	 */
-    public synchronized long startNewSession(Communication communicationPolicy) {
+    public synchronized long startNewSession(SecurityContext communicationPolicy) {
         long id = 0;
 
         //        PolicyRule defaultPolicy = new PolicyRule();
@@ -1542,9 +1544,9 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      */
     public Entities getEntities() {
         Entities entities = null;
-        if (parent != null) {
+        if (this.parent != null) {
             try {
-                entities = parent.getEntities();
+                entities = this.parent.getEntities();
             } catch (SecurityNotAvailableException e) {
                 // forget it
             } catch (IOException e) {
@@ -1566,7 +1568,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
     public TypedCertificateList getMyCertificateChain() {
         try {
-            return KeyStoreTools.getSelfCertificateChain(policyServer.getKeyStore(), this.type);
+            return KeyStoreTools.getSelfCertificateChain(this.policyServer.getKeyStore(), this.type);
         } catch (KeyStoreException e) {
 			e.printStackTrace();
         } catch (UnrecoverableKeyException e) {
@@ -1583,7 +1585,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         this.parent = parent;
     }
 
-    public ProActiveSecurityManager generateSiblingCertificate(int type,
+    public ProActiveSecurityManager generateSiblingCertificate(EntityType type,
         String siblingName) {
         ProActiveSecurityManager siblingPSM = new ProActiveSecurityManager(type);
 
@@ -1603,7 +1605,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                 siblingName);
             
             KeyStore keystore = this.policyServer.getKeyStore();
-            X509Certificate applicationCertificate = policyServer.getApplicationCertificate().getCert();
+            X509Certificate applicationCertificate = this.policyServer.getApplicationCertificate().getCert();
 
             X509Certificate cert = CertTools.genCert(siblingName, 65 * 24 * 360L, null,
                     siblingKeyPair.getPrivate(), siblingKeyPair.getPublic(),
@@ -1628,19 +1630,19 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
     
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-			throws SecurityNotAvailableException, AccessControlException {
+			throws AccessControlException {
 		accessControl(user);
 		return this;
 	}
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
+	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws AccessControlException {
 		accessControl(user);
-		sessions.clear();
+		this.sessions.clear();
 		this.policyServer = policyServer; 
 	}
 	
 	private boolean accessControl(Entity user) {
-		if (false && !this.policyServer.hasAccessRights(user)) { // TODO active protection
+		if (false && !this.policyServer.hasAccessRights(user)) { // TODO activate protection
 			throw new AccessControlException(
 					"User denied from accessing this security manager.");
 		}
@@ -1648,6 +1650,10 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 	}
 
 	public Hashtable<Long, Session> getSessions() {
-		return sessions;
+		return this.sessions;
+	}
+	
+	public EntityType getType() {
+		return this.type;
 	}
 }

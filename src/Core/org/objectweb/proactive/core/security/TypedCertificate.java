@@ -8,17 +8,19 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+
 public class TypedCertificate implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3389269734930919276L;
 	private transient X509Certificate cert;
-	private int type;
+	private EntityType type;
 	private PrivateKey privateKey;
 	private byte[] encodedCert;
 	
-	public TypedCertificate(X509Certificate cert, int type, PrivateKey privateKey) {
+	public TypedCertificate(X509Certificate cert, EntityType type, PrivateKey privateKey) {
 		this.cert = cert;
 		this.type = type;
 		this.privateKey = privateKey;
@@ -33,21 +35,17 @@ public class TypedCertificate implements Serializable {
 		return this.privateKey;
 	}
 
-	public int getType() {
+	public EntityType getType() {
 		return this.type;
 	}
 
-	public void setType(int type) {
+	public void setType(EntityType type) {
 		this.type = type;
 	}
 	
 	@Override
 	public String toString() {
-		String typeString = new String();
-		if (SecurityConstants.typeToString(getType()) != null) {
-			typeString = SecurityConstants.typeToString(getType()) + ":";
-		}
-		return typeString + getCert().getSubjectX500Principal().getName();
+		return getType() + ":" + getCert().getSubjectX500Principal().getName();
 	}
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {

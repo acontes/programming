@@ -104,7 +104,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="Entity" maxOccurs="unbounded"
-					minOccurs="1" />
+					minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -113,7 +113,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="Entity" maxOccurs="unbounded"
-					minOccurs="1" />
+					minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

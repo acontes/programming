@@ -113,12 +113,14 @@ public class ReplyImpl extends MessageImpl implements Reply,
                 sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
 
                 if (sessionID == 0) {
-                    psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REPLY_TO,
-                        destinationBody);
+                    psm.initiateSession(destinationBody);
                     sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
                 }
 
                 if (sessionID != 0) {
+                	if (!this.psm.getSession(sessionID).getSecurityContext().getSendReply().getCommunication()) {
+                		throw new CommunicationForbiddenException();
+                	}
                     encryptedResult = psm.encrypt(sessionID, result,
                             Session.ACT_AS_SERVER);
                     ciphered = true;

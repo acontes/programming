@@ -15,15 +15,10 @@
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
 	<classpathentry kind="lib" path="compile/lib/AntelopeTasks_3.2.19.jar"/>
 	<classpathentry kind="lib" path="compile/lib/jdepend.jar"/>
-	<classpathentry kind="lib" path="lib/bouncycastle.jar"/>
-	<classpathentry kind="lib" path="lib/javassist.jar" sourcepath="/user/nhouillo/home/javassist-3.4/src/main/"/>
-	<classpathentry kind="lib" path="lib/log4j.jar"/>
-	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="dev/trywithcatch/java-cup-v11a.jar"/>
 	<classpathentry kind="lib" path="dev/trywithcatch/JFlex.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
-	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ajo.jar"/>
 	<classpathentry kind="lib" path="lib/asm-2.2.1.jar"/>
@@ -98,6 +93,11 @@
 	<classpathentry kind="lib" path="lib/tablelayout.jar"/>
 	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
-	<classpathentry kind="lib" path="lib/sunxacml/sunxacml.jar"/>
+	<classpathentry kind="lib" path="lib/sunxacml.jar"/>
+	<classpathentry kind="lib" path="lib/bouncycastle.jar"/>
+	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
+	<classpathentry kind="lib" path="lib/javassist.jar"/>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -186,7 +186,7 @@ public interface RemoteProActiveRuntime extends Serializable {
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, java.io.IOException;
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             java.io.IOException;
 
@@ -208,7 +208,7 @@ public interface RemoteProActiveRuntime extends Serializable {
         throws SecurityNotAvailableException, RenegotiateSessionException,
             java.io.IOException;
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException, java.io.IOException;
 
     public byte[] getCertificateEncoded()

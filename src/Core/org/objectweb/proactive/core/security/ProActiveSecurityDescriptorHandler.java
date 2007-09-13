@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.security.Communication.Authorization;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.security.securityentity.CertificatedRuleEntity;
 import org.objectweb.proactive.core.security.securityentity.NamedRuleEntity;
@@ -352,22 +354,22 @@ public class ProActiveSecurityDescriptorHandler
         @Override
 		public void startContextElement(String name, Attributes attributes)
 				throws SAXException {
-			int type = SecurityConstants.typeToInt(attributes.getValue("type"));
+        	EntityType type = EntityType.fromString(attributes.getValue("type"));
 			String value = attributes.getValue("name");
 			KeyStore keystore = ProActiveSecurityDescriptorHandler.this.policyServer.getKeyStore();
 			
 			switch (type) {
-			case SecurityConstants.ENTITY_TYPE_NODE:
+			case NODE:
 				try {
 					this.entity = new NamedRuleEntity(type, keystore, value);
 					} catch (KeyStoreException e1) {
 						e1.printStackTrace();
 					}
 				break;
-			case SecurityConstants.ENTITY_TYPE_RUNTIME:
-			case SecurityConstants.ENTITY_TYPE_APPLICATION:
-			case SecurityConstants.ENTITY_TYPE_USER:
-			case SecurityConstants.ENTITY_TYPE_DOMAIN:
+			case RUNTIME:
+			case APPLICATION:
+			case USER:
+			case DOMAIN:
 				try {
 					this.entity = new CertificatedRuleEntity(type, keystore, value);
 					} catch (KeyStoreException e) {
@@ -378,6 +380,8 @@ public class ProActiveSecurityDescriptorHandler
 						e.printStackTrace();
 					}
 				break;
+			default:
+				// nothing (!)
 			}
 		}
         
@@ -464,7 +468,7 @@ public class ProActiveSecurityDescriptorHandler
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(RULE_COMMUNICATION_ATTRIBUTES_TAG)) {
-                int[] attr = (int[]) activeHandler.getResultObject();
+            	Authorization[] attr = (Authorization[]) activeHandler.getResultObject();
                 this.comm = new Communication(this.allowed, attr[0], attr[1], attr[2]);
             }
         }
@@ -482,19 +486,19 @@ public class ProActiveSecurityDescriptorHandler
      * This class receives Security events
      */
     private class CommunicationAttributesHandler extends BasicUnmarshaller {
-        private int[] attributes;
+        private Authorization[] attributes;
 
         public CommunicationAttributesHandler() {
             super();
-            this.attributes = new int[3];
+            this.attributes = new Authorization[3];
         }
 
         @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
-            this.attributes[0] = Communication.valToInt(attributes.getValue("authentication"));
-            this.attributes[1] = Communication.valToInt(attributes.getValue("confidentiality"));
-            this.attributes[2] = Communication.valToInt(attributes.getValue("integrity"));
+            this.attributes[0] = Authorization.fromString(attributes.getValue("authentication"));
+            this.attributes[1] = Authorization.fromString(attributes.getValue("confidentiality"));
+            this.attributes[2] = Authorization.fromString(attributes.getValue("integrity"));
         }
 
         /* (non-Javadoc)
@@ -532,7 +536,7 @@ public class ProActiveSecurityDescriptorHandler
             // ruleHandler = new RuleHandler();
             if (name.equals(ENTITY_TAG)) {
             	RuleEntity entity = (RuleEntity) activeHandler.getResultObject();
-            	if (entity != null && entity.getType() == SecurityConstants.ENTITY_TYPE_USER) {
+            	if (entity != null && entity.getType() == EntityType.USER) {
             		this.entities.add(entity);
             	}
                 //	  ruleHandler = new RuleHandler();

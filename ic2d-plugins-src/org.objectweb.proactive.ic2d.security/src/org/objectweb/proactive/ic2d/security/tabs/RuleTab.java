@@ -31,8 +31,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.objectweb.proactive.core.security.Communication;
-import org.objectweb.proactive.core.security.SecurityConstants;
+import org.objectweb.proactive.core.security.Communication.Authorization;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.ic2d.security.core.CertificateTree;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeList;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeMap;
@@ -194,8 +194,8 @@ public class RuleTab extends UpdatableTab {
 				RuleTab.this.rules
 						.get(RuleTab.this.rulesTable.getSelectionIndex())
 						.setReqAuth(
-								Communication
-										.valToInt(RuleTab.this.reqAuthCombo
+								Authorization
+										.fromString(RuleTab.this.reqAuthCombo
 												.getItem(RuleTab.this.reqAuthCombo
 														.getSelectionIndex())));
 
@@ -209,8 +209,8 @@ public class RuleTab extends UpdatableTab {
 				RuleTab.this.rules
 						.get(RuleTab.this.rulesTable.getSelectionIndex())
 						.setReqConf(
-								Communication
-										.valToInt(RuleTab.this.reqConfCombo
+								Authorization
+										.fromString(RuleTab.this.reqConfCombo
 												.getItem(RuleTab.this.reqConfCombo
 														.getSelectionIndex())));
 
@@ -223,7 +223,7 @@ public class RuleTab extends UpdatableTab {
 			public void widgetSelected(SelectionEvent e) {
 				RuleTab.this.rules.get(
 						RuleTab.this.rulesTable.getSelectionIndex()).setReqInt(
-						Communication.valToInt(RuleTab.this.reqIntCombo
+								Authorization.fromString(RuleTab.this.reqIntCombo
 								.getItem(RuleTab.this.reqIntCombo
 										.getSelectionIndex())));
 
@@ -267,8 +267,8 @@ public class RuleTab extends UpdatableTab {
 				RuleTab.this.rules
 						.get(RuleTab.this.rulesTable.getSelectionIndex())
 						.setRepAuth(
-								Communication
-										.valToInt(RuleTab.this.repAuthCombo
+								Authorization
+										.fromString(RuleTab.this.repAuthCombo
 												.getItem(RuleTab.this.repAuthCombo
 														.getSelectionIndex())));
 
@@ -282,8 +282,8 @@ public class RuleTab extends UpdatableTab {
 				RuleTab.this.rules
 						.get(RuleTab.this.rulesTable.getSelectionIndex())
 						.setRepConf(
-								Communication
-										.valToInt(RuleTab.this.repConfCombo
+								Authorization
+										.fromString(RuleTab.this.repConfCombo
 												.getItem(RuleTab.this.repConfCombo
 														.getSelectionIndex())));
 
@@ -296,7 +296,7 @@ public class RuleTab extends UpdatableTab {
 			public void widgetSelected(SelectionEvent e) {
 				RuleTab.this.rules.get(
 						RuleTab.this.rulesTable.getSelectionIndex()).setRepInt(
-						Communication.valToInt(RuleTab.this.repIntCombo
+								Authorization.fromString(RuleTab.this.repIntCombo
 								.getItem(RuleTab.this.repIntCombo
 										.getSelectionIndex())));
 
@@ -307,15 +307,29 @@ public class RuleTab extends UpdatableTab {
 		return client;
 	}
 
-	public static Combo createRODCombo(Composite parent) {
+	private static Combo createRODCombo(Composite parent) {
 		Combo combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 		combo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		combo.add(Communication.STRING_REQUIRED);
-		combo.add(Communication.STRING_OPTIONAL);
-		combo.add(Communication.STRING_DENIED);
+		combo.add(Authorization.REQUIRED.toString());
+		combo.add(Authorization.OPTIONAL.toString());
+		combo.add(Authorization.DENIED.toString());
 		combo.select(1);
 
 		return combo;
+	}
+	
+	private static void selectRODCombo(Authorization authorization, Combo combo) {
+		switch (authorization) {
+		case REQUIRED:
+			combo.select(0);
+			break;
+		case OPTIONAL:
+			combo.select(1);
+			break;
+		case DENIED:
+			combo.select(2);
+			break;
+		}
 	}
 
 	private Button createCheckAoCreation(Composite parent) {
@@ -606,7 +620,7 @@ public class RuleTab extends UpdatableTab {
 					CertificateTreeMap map = ((CertificateTreeMap) event.data);
 
 					for (CertificateTree tree : map.keySet()) {
-						if (tree.getCertificate().getType() == SecurityConstants.ENTITY_TYPE_USER) {
+						if (tree.getCertificate().getType() == EntityType.USER) {
 							RuleTab.this.authorizedUsers.add(tree
 									.getCertificate().toString());
 						}
@@ -699,17 +713,17 @@ public class RuleTab extends UpdatableTab {
 
 			enableRequestEditor(selectedRule.isRequest());
 
-			this.reqAuthCombo.select(-selectedRule.getReqAuth() + 1);
-			this.reqIntCombo.select(-selectedRule.getReqInt() + 1);
-			this.reqConfCombo.select(-selectedRule.getReqConf() + 1);
+			selectRODCombo(selectedRule.getReqAuth(), this.reqAuthCombo);
+			selectRODCombo(selectedRule.getReqInt(), this.reqIntCombo);
+			selectRODCombo(selectedRule.getReqConf(), this.reqConfCombo);
 
 			this.replyCheck.setSelection(selectedRule.isReply());
 
 			enableReplyEditor(selectedRule.isReply());
 
-			this.repAuthCombo.select(-selectedRule.getRepAuth() + 1);
-			this.repIntCombo.select(-selectedRule.getRepInt() + 1);
-			this.repConfCombo.select(-selectedRule.getRepConf() + 1);
+			selectRODCombo(selectedRule.getRepAuth(), this.repAuthCombo);
+			selectRODCombo(selectedRule.getRepInt(), this.repIntCombo);
+			selectRODCombo(selectedRule.getRepConf(), this.repConfCombo);
 
 			this.aoCreationCheck.setSelection(selectedRule.isAoCreation());
 			this.migrationCheck.setSelection(selectedRule.isMigration());

@@ -24,6 +24,7 @@ import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.securityentity.RuleEntity;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.security.core.KeystoreUtils;
@@ -139,7 +140,7 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 		System.out.println("GetSecurityManager.setAbstractDataObject()");
 		this.object = ref;
 		super.setEnabled((this.object instanceof ActiveObject)
-				|| (this.object instanceof RuntimeObject));
+				|| (this.object instanceof RuntimeObject)|| (this.object instanceof NodeObject));
 	}
 
 	public void setActiveSelect(AbstractData ref) {

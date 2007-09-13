@@ -50,11 +50,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.security.Communication.Authorization;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.security.securityentity.RuleEntities;
 import org.objectweb.proactive.core.security.securityentity.RuleEntity;
+import org.objectweb.proactive.core.security.securityentity.RuleEntity.Match;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -118,10 +121,10 @@ public class PolicyServer implements Serializable, Cloneable {
 //        }
 //    }
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities entitiesFrom, Entities entitiesTo)
         throws SecurityNotAvailableException {
-        Entities entitiesFrom = securityContext.getEntitiesFrom();
-        Entities entitiesTo = securityContext.getEntitiesTo();
+//        Entities entitiesFrom = securityContext.getEntitiesFrom();
+//        Entities entitiesTo = securityContext.getEntitiesTo();
 
         if (this.policyRules == null) {
             ProActiveLogger.getLogger(Loggers.SECURITY_POLICY)
@@ -145,16 +148,17 @@ public class PolicyServer implements Serializable, Cloneable {
             // testing if <From> tag matches <From> entities
             RuleEntities policyEntitiesFrom = policy.getEntitiesFrom();
 
-            int matchingFrom = policyEntitiesFrom.match(entitiesFrom);
-
+            Match matchingFrom = policyEntitiesFrom.match(entitiesFrom);
+            System.out.println("=\n" + matchingFrom + "\n=");
+            
             // testing if <To> tag matches <To> entities
             RuleEntities policyEntitiesTo = policy.getEntitiesTo();
 
-            int matchingTo = policyEntitiesTo.match(entitiesTo);
+            Match matchingTo = policyEntitiesTo.match(entitiesTo);
 
             //
-            if ((matchingFrom != RuleEntity.MATCH_FAILED) &&
-                    (matchingTo != RuleEntity.MATCH_FAILED)) {
+            if ((matchingFrom != Match.FAILED) &&
+                    (matchingTo != Match.FAILED)) {
                 matchingRules.add(policy);
             }
         }
@@ -208,29 +212,13 @@ public class PolicyServer implements Serializable, Cloneable {
         ProActiveLogger.getLogger(Loggers.SECURITY_POLICY)
                        .debug("Found Policy : " + matchingPolicy);
 
-        Communication communication;
+        
+        SecurityContext sc = new SecurityContext(entitiesFrom, entitiesTo,
+				matchingPolicy.getCommunicationRequest(), matchingPolicy
+						.getCommunicationReply(),
+				matchingPolicy.isAocreation(), matchingPolicy.isMigration());
 
-        // TODOSECURITY split receive of a request or a reply
-        if ((securityContext.getType() == SecurityContext.COMMUNICATION_RECEIVE_REQUEST_FROM) ||
-                (securityContext.getType() == SecurityContext.COMMUNICATION_RECEIVE_REPLY_FROM)) {
-            communication = matchingPolicy.getCommunicationReply();
-            //			communication.setCommunication(1);
-            securityContext.setReceiveReply(communication);
-            securityContext.setReceiveRequest(communication);
-        } else {
-            communication = matchingPolicy.getCommunicationRequest();
-            ProActiveLogger.getLogger(Loggers.SECURITY_POLICY)
-                           .debug("communication is " + communication);
-            //			communication.setCommunication(1);
-            securityContext.setSendReply(communication);
-            securityContext.setSendRequest(communication);
-        }
-
-        if (securityContext.getType() == SecurityContext.MIGRATION_TO) {
-            securityContext.setMigration(matchingPolicy.isMigration());
-        }
-
-        return securityContext;
+        return sc;
     }
 
 //    @Deprecated
@@ -447,7 +435,7 @@ public class PolicyServer implements Serializable, Cloneable {
     public TypedCertificate getApplicationCertificate(String appName) {
         if ((this.keyStore != null) && (appName != null)) {
             try {
-                return KeyStoreTools.getCertificate(this.keyStore.getKeyStore(), SecurityConstants.ENTITY_TYPE_APPLICATION, appName);
+                return KeyStoreTools.getCertificate(this.keyStore.getKeyStore(), EntityType.APPLICATION, appName);
             } catch (KeyStoreException e) {
                 e.printStackTrace();
                 PolicyServer.log.error("Application : " + appName +

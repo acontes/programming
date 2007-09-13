@@ -325,8 +325,6 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 			e.printStackTrace();
 		} catch (SecurityNotAvailableException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

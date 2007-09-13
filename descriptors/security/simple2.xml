@@ -7,13 +7,13 @@
 	</security>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="rvn2" property="multiple" />
+			<virtualNode name="vn2" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
-		<register virtualNode="rvn2" protocol="rmi" />
+		<register virtualNode="vn2" protocol="rmi" />
 		<mapping>
-			<map virtualNode="rvn2">
+			<map virtualNode="vn2">
 				<jvmSet>
 					<vmName value="Jvm2" />
 				</jvmSet>

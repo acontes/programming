@@ -10,14 +10,30 @@
 	<TrustedCertificationAuthority />
 	<Rules>
 		<Rule>
-			<From>
-				<Entity type="domain" name="CN=inria" />
-			</From>
-			<To>
-				<Entity type="domain" name="CN=inria" />
-			</To>
+			<From />
+			<To />
 			<Communication>
 				<Request value="authorized">
+					<Attributes authentication="optional"
+						integrity="optional" confidentiality="optional" />
+				</Request>
+				<Reply value="authorized">
+					<Attributes authentication="optional"
+						integrity="optional" confidentiality="optional" />
+				</Reply>
+			</Communication>
+			<Migration>authorized</Migration>
+			<OACreation>authorized</OACreation>
+		</Rule>
+		<Rule>
+			<From>
+				<Entity type="node" name="CN=vn1" />
+			</From>
+			<To>
+				<Entity type="node" name="CN=vn2" />
+			</To>
+			<Communication>
+				<Request value="denied">
 					<Attributes authentication="optional"
 						integrity="optional" confidentiality="optional" />
 				</Request>

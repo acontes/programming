@@ -82,6 +82,7 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.Secure;
 import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.AuthenticationException;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
@@ -519,7 +520,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.spmdManager;
     }
 
-    public long startNewSession(Communication policy)
+    public long startNewSession(SecurityContext policy)
         throws RenegotiateSessionException, SecurityNotAvailableException,
             IOException {
         try {
@@ -665,7 +666,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities from, Entities to)
         throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
@@ -674,9 +675,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
 
             if (this.internalBodySecurity.isLocalBody()) {
-                return this.securityManager.getPolicy(securityContext);
+                return this.securityManager.getPolicy(from, to);
             } else {
-                return this.internalBodySecurity.getPolicy(securityContext);
+                return this.internalBodySecurity.getPolicy(from, to);
             }
         } finally {
             exitFromThreadStore();
@@ -712,8 +713,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         try {
             //     logger.info("starting a new psm ");
             // TODO SECURITY check type (app/object/...)
-            this.securityManager = new DefaultProActiveSecurityManager(SecurityConstants.ENTITY_TYPE_APPLICATION,
-                    "vide");
+            this.securityManager = new DefaultProActiveSecurityManager(EntityType.UNKNOWN, "vide");
             this.isSecurityOn = true;
             this.securityManager.setBody(this);
             this.internalBodySecurity = new InternalBodySecurity(null);
@@ -849,8 +849,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         if (server != null) {
             if ((this.securityManager != null) &&
                     (this.securityManager.getPolicyServer() == null)) {
-                this.securityManager = new ProActiveSecurityManager(SecurityConstants.ENTITY_TYPE_OBJECT,
-                        server);
+                this.securityManager = new ProActiveSecurityManager(EntityType.UNKNOWN, server);
                 this.isSecurityOn = true;
                 logger.debug("Security is on " + this.isSecurityOn);
                 this.securityManager.setBody(this);
@@ -917,8 +916,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                             cert.getPublicKey());
                         sessionID = this.securityManager.getSessionIDTo(cert);
                         if (sessionID == 0) {
-                            this.securityManager.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
-                                destinationBody);
+                            this.securityManager.initiateSession(destinationBody);
                             sessionID = this.securityManager.getSessionIDTo(cert);
                         }
                     }
@@ -1118,10 +1116,16 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
     throws SecurityNotAvailableException, AccessControlException {
-    	return securityManager.getProActiveSecurityManager(user);
+    	if (this.securityManager == null) {
+    		throw new SecurityNotAvailableException();
+    	}
+    	return this.securityManager.getProActiveSecurityManager(user);
     }
     
-    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException {
-    	securityManager.setProActiveSecurityManager(user, policyServer);
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
+    	if (this.securityManager == null) {
+    		throw new SecurityNotAvailableException();
+    	}
+    	this.securityManager.setProActiveSecurityManager(user, policyServer);
     }
 }

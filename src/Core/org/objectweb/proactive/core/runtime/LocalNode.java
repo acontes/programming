@@ -30,8 +30,12 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
+import java.security.AccessControlException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -58,7 +62,16 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.SecurityEntity;
+import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
+import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -68,7 +81,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is a runtime representation of a node
  * and should not be used outside a runtime
  */
-public class LocalNode {
+public class LocalNode implements SecurityEntity {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
     private String name;
     private ArrayList<UniqueID> activeObjectsId;
@@ -353,4 +366,107 @@ public class LocalNode {
     public String getProperty(String key) {
         return this.localProperties.getProperty(key);
     }
+    
+    // Implements Security Entity
+
+	public X509Certificate getCertificate()
+			throws SecurityNotAvailableException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getCertificate();
+	}
+
+	public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getCertificateEncoded();
+	}
+
+	public Entities getEntities() throws SecurityNotAvailableException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getEntities();
+	}
+
+	public SecurityContext getPolicy(Entities from, Entities to)
+			throws SecurityNotAvailableException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getPolicy(from, to);
+	}
+
+	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+			throws SecurityNotAvailableException, AccessControlException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getProActiveSecurityManager(user);
+	}
+
+	public PublicKey getPublicKey() throws SecurityNotAvailableException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.getPublicKey();
+	}
+
+	public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+			byte[] myCertificate, byte[] signature)
+			throws SecurityNotAvailableException, RenegotiateSessionException,
+			KeyExchangeException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.publicKeyExchange(sessionID, myPublicKey,
+				myCertificate, signature);
+	}
+
+	public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+			throws SecurityNotAvailableException, RenegotiateSessionException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.randomValue(sessionID, clientRandomValue);
+	}
+
+	public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+			byte[] encodedIVParameters, byte[] encodedClientMacKey,
+			byte[] encodedLockData, byte[] parametersSignature)
+			throws SecurityNotAvailableException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.secretKeyExchange(sessionID, encodedAESKey,
+				encodedIVParameters, encodedClientMacKey, encodedLockData,
+				parametersSignature);
+	}
+
+	public void setProActiveSecurityManager(Entity user,
+			PolicyServer policyServer) throws SecurityNotAvailableException,
+			AccessControlException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		this.securityManager.setProActiveSecurityManager(user, policyServer);
+	}
+
+	public long startNewSession(SecurityContext policy)
+			throws SecurityNotAvailableException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		return this.securityManager.startNewSession(policy);
+	}
+
+	public void terminateSession(long sessionID)
+			throws SecurityNotAvailableException {
+		if (this.securityManager == null) {
+			throw new SecurityNotAvailableException();
+		}
+		this.securityManager.terminateSession(sessionID);
+	}
 }

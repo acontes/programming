@@ -68,8 +68,8 @@ public class Session implements Serializable {
     // Server Cipher.
     public transient Cipher se_cipher;
 
-    //	the communication policy
-    private Communication communication;
+//    //	the communication policy
+//    private SecurityContext communication;
 
     // RSA Cipher.
     public transient Cipher rsa_eng;
@@ -121,9 +121,9 @@ public class Session implements Serializable {
     public Session() {
     }
 
-    public Session(long sessionID, Communication policy)
+    public Session(long sessionID, SecurityContext securityContext)
         throws Exception {
-        this.communication = policy;
+        this.securityContext = securityContext;
         isSessionValidated = false;
         //        synchronized (synchronizationObject) {
         se_rand = new byte[32]; // Server Random
@@ -183,10 +183,10 @@ public class Session implements Serializable {
         switch (type) {
         case 1:
             // act as client
-            if (communication.isIntegrityEnabled()) {
+            if (this.securityContext.getSendRequest().isIntegrityEnabled()) {
                 cl_mac.update(in); // Update plain text into MAC
             }
-            if (communication.isConfidentialityEnabled()) {
+            if (this.securityContext.getSendRequest().isConfidentialityEnabled()) {
                 try {
                     cl_cipher.init(Cipher.ENCRYPT_MODE, cl_aes_key, cl_iv,
                         sec_rand);
@@ -201,7 +201,7 @@ public class Session implements Serializable {
                 }
             }
 
-            if (communication.isIntegrityEnabled()) {
+            if (this.securityContext.getSendRequest().isIntegrityEnabled()) {
                 ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
                                .debug("writePDU as client cl_mac :" +
                     displayByte(cl_hmac_key.getEncoded()));
@@ -210,10 +210,10 @@ public class Session implements Serializable {
             break;
         case 2:
             // act as server
-            if (communication.isIntegrityEnabled()) {
+            if (this.securityContext.getSendReply().isIntegrityEnabled()) {
                 se_mac.update(in); // Update plain text into MAC
             }
-            if (communication.isConfidentialityEnabled()) {
+            if (this.securityContext.getSendReply().isConfidentialityEnabled()) {
                 try {
                     in = se_cipher.doFinal(in); // Encrypt data for recipient.
                 } catch (Exception bex) {
@@ -223,7 +223,7 @@ public class Session implements Serializable {
                 }
             }
 
-            if (communication.isIntegrityEnabled()) {
+            if (this.securityContext.getSendReply().isIntegrityEnabled()) {
                 mac = se_mac.doFinal();
             }
             break;
@@ -266,7 +266,7 @@ public class Session implements Serializable {
         switch (type) {
         case 1:
             // act as client 
-            if (communication.isConfidentialityEnabled()) {
+            if (this.securityContext.getReceiveReply().isConfidentialityEnabled()) {
                 try {
                     in = se_cipher.doFinal(in);
                 } catch (Exception ex) {
@@ -277,7 +277,7 @@ public class Session implements Serializable {
                         ex.getMessage());
                 }
             }
-            if (communication.isIntegrityEnabled()) {
+            if (this.securityContext.getReceiveReply().isIntegrityEnabled()) {
                 se_mac.update(in); // MAC is taken on plain text.
 
                 byte[] m = null;
@@ -293,7 +293,7 @@ public class Session implements Serializable {
             break;
         case 2:
             // act as server
-            if (communication.isConfidentialityEnabled()) {
+            if (this.securityContext.getReceiveRequest().isConfidentialityEnabled()) {
                 try {
                     in = cl_cipher.doFinal(in);
                 } catch (Exception ex) {
@@ -304,7 +304,7 @@ public class Session implements Serializable {
                         ex.getMessage());
                 }
             }
-            if (communication.isIntegrityEnabled()) {
+            if (this.securityContext.getReceiveRequest().isIntegrityEnabled()) {
                 cl_mac.update(in); // MAC is taken on plain text.
 
                 byte[] m = null;
@@ -464,23 +464,23 @@ public class Session implements Serializable {
     public void setPolicy(PolicyRule resultPolicy) {
     }
 
-    public Communication getCommunication() {
-        return communication;
-    }
+//    public Communication getCommunication() {
+//        return communication;
+//    }
 
     /**
      *
      */
     public SecurityContext getSecurityContext() {
-        return securityContext;
+        return this.securityContext;
     }
 
-    /**
-     * @param securityContext The securityContext to set.
-     */
-    public void setSecurityContext(SecurityContext securityContext) {
-        this.securityContext = securityContext;
-    }
+//    /**
+//     * @param securityContext The securityContext to set.
+//     */
+//    public void setSecurityContext(SecurityContext securityContext) {
+//        this.securityContext = securityContext;
+//    }
 
     public boolean isSessionValidated() {
         return isSessionValidated;

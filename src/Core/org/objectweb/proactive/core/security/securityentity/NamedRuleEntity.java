@@ -4,6 +4,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 
 import org.objectweb.proactive.core.security.KeyStoreTools;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 public class NamedRuleEntity extends RuleEntity {
 	/**
@@ -13,7 +14,7 @@ public class NamedRuleEntity extends RuleEntity {
 
 	private String name;
 
-	public NamedRuleEntity(int type, KeyStore keystore, String name)
+	public NamedRuleEntity(EntityType type, KeyStore keystore, String name)
 			throws KeyStoreException {
 		super(type);
 		this.name = name;
@@ -21,22 +22,26 @@ public class NamedRuleEntity extends RuleEntity {
 	}
 
 	@Override
-	protected int match(Entities e) {
+	protected Match match(Entities e) {
 		for (Entity entity : e) {
-			if (match(entity) == RuleEntity.MATCH_OK) {
-				return RuleEntity.MATCH_OK;
+			if (match(entity) == Match.OK) {
+				return Match.OK;
 			}
 		}
-		return RuleEntity.MATCH_FAILED;
+		return Match.FAILED;
 	}
 
 	@Override
-	protected int match(Entity e) {
+	protected Match match(Entity e) {
+		System.out.println(e.getType());
+		System.out.println(this.getType());
+		System.out.println(e.getName());
+		System.out.println(this.name);
 		if (e.getType() == this.getType() && e.getName().equals(this.name)) {
-			return RuleEntity.MATCH_OK;
+			return Match.OK;
 		}
 
-		return RuleEntity.MATCH_FAILED;
+		return Match.FAILED;
 	}
 
 	@Override

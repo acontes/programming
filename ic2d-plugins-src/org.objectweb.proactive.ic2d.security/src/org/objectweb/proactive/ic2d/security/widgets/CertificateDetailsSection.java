@@ -8,7 +8,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.TypedCertificate;
 
 public class CertificateDetailsSection {
@@ -69,8 +68,7 @@ public class CertificateDetailsSection {
 	
 	public void update(TypedCertificate cert) {
 		if (cert != null) {
-			setType(SecurityConstants
-					.typeToString(cert.getType()));
+			setType(cert.getType().toString());
 			setSubject(cert.getCert().getSubjectX500Principal()
 					.getName());
 			setIssuer(cert.getCert().getIssuerX500Principal()

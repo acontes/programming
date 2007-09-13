@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.core.security.TypedCertificate;
@@ -37,28 +38,28 @@ public class CertificateTreeListSection {
 
 	private Tree tree;
 
-	private CertificateTreeList certTreeList;
+	protected CertificateTreeList certTreeList;
 
 	public CertificateTreeListSection(Composite parent, FormToolkit toolkit,
 			String title, CertificateTreeList data, boolean allowDeletion,
 			boolean allowDrag, boolean allowDrop, boolean withChecks) {
-		section = toolkit.createSection(parent, Section.TITLE_BAR);
-		section.setText(title);
-		certTreeList = data;
+		this.section = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
+		this.section.setText(title);
+		this.certTreeList = data;
 
-		Composite client = toolkit.createComposite(section);
+		Composite client = toolkit.createComposite(this.section);
 		client.setLayout(new GridLayout());
 
 		int style = withChecks ? SWT.SINGLE | SWT.CHECK : SWT.SINGLE;
-		tree = toolkit.createTree(client, style);
-		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		this.tree = toolkit.createTree(client, style);
+		this.tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		if (allowDeletion) {
-			tree.addKeyListener(new KeyAdapter() {
+			this.tree.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyPressed(KeyEvent e) {
 					if (e.character == SWT.DEL || e.character == SWT.BS) {
-						certTreeList.remove(getSelectionData());
+						CertificateTreeListSection.this.certTreeList.remove(getSelectionData());
 
 						updateSection();
 					}
@@ -69,7 +70,7 @@ public class CertificateTreeListSection {
 		}
 
 		if (allowDrag) {
-			DragSource source = new DragSource(tree, DND.DROP_COPY);
+			DragSource source = new DragSource(this.tree, DND.DROP_COPY);
 
 			source.setTransfer(new Transfer[] { CertificateTreeMapTransfer
 					.getInstance() });
@@ -87,7 +88,7 @@ public class CertificateTreeListSection {
 		}
 
 		if (allowDrop) {
-			DropTarget target = new DropTarget(tree, DND.DROP_DEFAULT
+			DropTarget target = new DropTarget(this.tree, DND.DROP_DEFAULT
 					| DND.DROP_COPY);
 
 			target.setTransfer(new Transfer[] { CertificateTreeMapTransfer
@@ -119,7 +120,7 @@ public class CertificateTreeListSection {
 							CertificateTree newTree = CertificateTree
 									.newTree(entry.getValue());
 							newTree.merge(entry.getKey());
-							certTreeList.add(newTree.getRoot());
+							CertificateTreeListSection.this.certTreeList.add(newTree.getRoot());
 						}
 
 						updateSection();
@@ -128,32 +129,32 @@ public class CertificateTreeListSection {
 			});
 		}
 
-		section.setClient(client);
+		this.section.setClient(client);
 	}
 
 	public void updateSection() {
 		// Get expansion state
 		Map<TypedCertificate, Boolean> expanded = new HashMap<TypedCertificate, Boolean>();
-		for (TreeItem item : tree.getItems()) {
+		for (TreeItem item : this.tree.getItems()) {
 			expanded.putAll(getExpanded(item));
 		}
 		
 		//Get check state
 		Map<TypedCertificate, Boolean> checked = new HashMap<TypedCertificate, Boolean>();
-		for (TreeItem item : tree.getItems()) {
+		for (TreeItem item : this.tree.getItems()) {
 			checked.putAll(getChecked(item));
 		}
 
-		tree.removeAll();
-		for (CertificateTree subTree : certTreeList) {
-			newTreeItem(tree, subTree);
+		this.tree.removeAll();
+		for (CertificateTree subTree : this.certTreeList) {
+			newTreeItem(this.tree, subTree);
 		}
 		
-		for (TreeItem item : tree.getItems()) {
+		for (TreeItem item : this.tree.getItems()) {
 			setChecked(item, checked);
 		}
 
-		for (TreeItem item : tree.getItems()) {
+		for (TreeItem item : this.tree.getItems()) {
 			setExpanded(item, expanded);
 		}
 	}
@@ -161,8 +162,8 @@ public class CertificateTreeListSection {
 	private Map<TypedCertificate, Boolean> getExpanded(TreeItem item) {
 		Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
 
-		state.put(((CertificateTree) item.getData()).getCertificate(), item
-				.getExpanded());
+		state.put(((CertificateTree) item.getData()).getCertificate(), new Boolean(item
+				.getExpanded()));
 		for (TreeItem child : item.getItems()) {
 			state.putAll(getExpanded(child));
 		}
@@ -174,8 +175,8 @@ public class CertificateTreeListSection {
 		Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
 
 		if (!item.getGrayed()) {
-			state.put(((CertificateTree) item.getData()).getCertificate(), item
-					.getChecked());
+			state.put(((CertificateTree) item.getData()).getCertificate(), new Boolean(item
+					.getChecked()));
 		}
 		for (TreeItem child : item.getItems()) {
 			state.putAll(getChecked(child));
@@ -188,7 +189,7 @@ public class CertificateTreeListSection {
 		TypedCertificate cert = ((CertificateTree) item.getData())
 				.getCertificate();
 		if (expanded.containsKey(cert)) {
-			item.setExpanded(expanded.get(cert));
+			item.setExpanded(expanded.get(cert).booleanValue());
 			for (TreeItem child : item.getItems()) {
 				setExpanded(child, expanded);
 			}
@@ -199,7 +200,7 @@ public class CertificateTreeListSection {
 		TypedCertificate cert = ((CertificateTree) item.getData())
 				.getCertificate();
 		if (checked.containsKey(cert)) {
-			item.setChecked(checked.get(cert));
+			item.setChecked(checked.get(cert).booleanValue());
 		} else if (!item.getGrayed()) {
 			item.setChecked(true);
 		}
@@ -236,15 +237,15 @@ public class CertificateTreeListSection {
 	}
 
 	public CertificateTree getSelectionData() {
-		return (CertificateTree) tree.getSelection()[0].getData();
+		return (CertificateTree) this.tree.getSelection()[0].getData();
 	}
 
 	public Section get() {
-		return section;
+		return this.section;
 	}
 
 	public Tree getTree() {
-		return tree;
+		return this.tree;
 	}
 
 }

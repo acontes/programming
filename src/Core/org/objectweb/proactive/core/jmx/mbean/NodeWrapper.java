@@ -1,6 +1,8 @@
 package org.objectweb.proactive.core.jmx.mbean;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,10 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.filter.ProActiveInternalObjectFilter;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.runtime.LocalNode;
+import org.objectweb.proactive.core.security.PolicyServer;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -123,4 +129,26 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         notification.setUserData(userData);
         sendNotification(notification);
     }
+
+	public ProActiveSecurityManager getSecurityManager(Entity user) {
+		try {
+			return this.localNode.getProActiveSecurityManager(user);
+		} catch (AccessControlException e) {
+			e.printStackTrace();
+			return null;
+		} catch (SecurityNotAvailableException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public void setSecurityManager(Entity user, PolicyServer policyServer) {
+		try {
+			this.localNode.setProActiveSecurityManager(user, policyServer);
+		} catch (AccessControlException e) {
+			e.printStackTrace();
+		} catch (SecurityNotAvailableException e) {
+			e.printStackTrace();
+		}
+	}
 }
