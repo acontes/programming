@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_application" priority="highest" type="APPLI">
+<job name="job_application" priority="low" type="APPLI">
 	<description>A job application that will find out the Nth first prime number where N is given as argument.</description>
 	<tasks>
 		<task name="Controller" neededNodes="5">
