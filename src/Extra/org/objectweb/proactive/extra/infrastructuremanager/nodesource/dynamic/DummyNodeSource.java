@@ -13,6 +13,13 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSour
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
 
 
+/**
+ * Simple implementation of what can be a {@link DynamicNodeSource}.
+ * This Dummy class, create a {@link PADNodeSource}, deployes nodes,
+ * and acts as if it was a dynamic source...
+ * @author proactive team
+ *
+ */
 public class DummyNodeSource extends DynamicNodeSource {
 
     /**
@@ -35,10 +42,9 @@ public class DummyNodeSource extends DynamicNodeSource {
             stubOnThis = (IMNodeSource) ProActive.getStubOnThis();
             manager = (PADNodeSource) ProActive.newActive(PADNodeSource.class.getCanonicalName(),
                     new Object[] { "DummyPADNS" });
-            manager.deployAllVirtualNodes(new File(
-                    "/user/jmartin/home/test2.xml"), null);
-            manager.deployAllVirtualNodes(new File(
-                    "/user/jmartin/home/test3.xml"), null);
+            manager.deployAllVirtualNodes(new File(getClass()
+                                                       .getResource("/org/objectweb/proactive/examples/scheduler/test.xml")
+                                                       .getPath()), null);
         } catch (ActiveObjectCreationException e) {
             logger.error("Error while creating Dummy PADNodeSource", e);
             e.printStackTrace();

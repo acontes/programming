@@ -52,6 +52,12 @@ import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
+/**
+ * Implementation of the {@link IMDataResource} interface,
+ * using a {@link IMNodeSource} that provides the nodes to handle.
+ * @author proactive team
+ *
+ */
 public class IMDataResourceImpl implements IMDataResource, Serializable {
 
     /**  */
@@ -74,6 +80,10 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     public void init() {
     }
 
+    /**
+     * find which {@link IMNode} correspond to the {@link Node} given in parameter
+     * and change its state to 'free'.
+     */
     public void freeNode(Node node) {
         ListIterator<IMNode> iterator = nodeManager.getBusyNodes().listIterator();
 
@@ -81,6 +91,9 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
         try {
             nodeName = node.getNodeInformation().getName();
         } catch (RuntimeException e) {
+            logger.debug("A Runtime exception occured " +
+                "while obtaining information on the node," +
+                "the node must be down (it will be detected later)", e);
             // node is down,
             // will be detected later
             return;
@@ -113,6 +126,15 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
         }
     }
 
+    /**
+     * The {@link #getAtMostNodes(IntWrapper, VerifyingScript)} method has three way to handle the request :
+     * if there is no script, it returns at most the first nb free nodes.
+     * If the script is a dynamic script, the method will test the resources,
+     * until nb nodes verifies the script or if there is no node left.
+     * In the case of a static script,
+     * it will return in priority the nodes on which the given script
+     * has already been verified.
+     */
     public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
         ArrayList<IMNode> nodes = nodeManager.getNodesByScript(verifyingScript,
                 true);
@@ -174,7 +196,8 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
                     if (res.errorOccured()) {
                         // nothing to do, just let the node in the free list
-                        logger.info("Error occured executing verifying script", res.getException());
+                        logger.info("Error occured executing verifying script",
+                            res.getException());
                     } else if (res.getResult()) {
                         // Result OK
                         nodeManager.setVerifyingScript(imnode, verifyingScript);
@@ -218,6 +241,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                 scriptResults.add(nodes.get(0).executeScript(verifyingScript));
                 nodes.remove(0);
             }
+
             // Recupere les resultats
             while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
                     (found < nb.intValue())) {
@@ -228,7 +252,8 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
                     if (res.errorOccured()) {
                         // nothing to do, just let the node in the free list
-                        logger.info("Error occured executing verifying script", res.getException());
+                        logger.info("Error occured executing verifying script",
+                            res.getException());
                     } else if (res.getResult()) {
                         // Result OK
                         nodeManager.setVerifyingScript(imnode, verifyingScript);
@@ -271,6 +296,9 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
         return null;
     }
 
+    /**
+     * Notifies the {@link IMNodeSource} that the given node is down.
+     */
     public void nodeIsDown(IMNode imNode) {
         nodeManager.setDown(imNode);
     }

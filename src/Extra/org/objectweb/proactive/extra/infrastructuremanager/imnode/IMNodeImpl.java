@@ -74,8 +74,10 @@ public class IMNodeImpl implements IMNode, Serializable {
         this.vnodeName = vnodeName;
         this.padName = padName;
         this.nodeName = node.getNodeInformation().getName();
-        this.hostName = node.getNodeInformation().getVMInformation().getHostName();
-        this.vmName = node.getNodeInformation().getVMInformation().getDescriptorVMName();
+        this.hostName = node.getNodeInformation().getVMInformation()
+                            .getHostName();
+        this.vmName = node.getNodeInformation().getVMInformation()
+                          .getDescriptorVMName();
         this.scriptStatus = new HashMap<VerifyingScript, Integer>();
     }
 
@@ -170,7 +172,8 @@ public class IMNodeImpl implements IMNode, Serializable {
             mes += ("| VNode 		  	: " + vnodeName + "\n");
             mes += ("| Host  		  	: " + getHostName() + "\n");
             mes += ("| Name of the VM 	: " +
-            getNodeInformation().getVMInformation().getDescriptorVMName() + "\n");
+            getNodeInformation().getVMInformation().getDescriptorVMName() +
+            "\n");
             mes += "+-----------------------------------------------+\n";
         } catch (NodeException e) {
             mes += "Node is down \n";
@@ -178,6 +181,9 @@ public class IMNodeImpl implements IMNode, Serializable {
         return mes;
     }
 
+    /**
+     * If no script handler is define, create one, and execute the script.
+     */
     @SuppressWarnings("unchecked")
     public ScriptResult<Boolean> executeScript(VerifyingScript script) {
         if (handler == null) {
@@ -191,7 +197,10 @@ public class IMNodeImpl implements IMNode, Serializable {
         return handler.handle(script);
     }
 
-    public void clean() {
+    /**
+     * kill all active objects on the node.
+     */
+    public synchronized void clean() {
         handler = null;
         try {
             node.killAllActiveObjects();

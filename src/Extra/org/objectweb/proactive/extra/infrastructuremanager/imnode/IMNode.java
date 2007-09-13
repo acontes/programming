@@ -45,14 +45,48 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
  */
 public interface IMNode {
     // STATES
+
+    /**
+     * The script has been executed on this node, and the result was negative.
+     */
     public static final int NOT_VERIFIED_SCRIPT = 0;
+
+    /**
+     * The script has allready responded by the negative,
+     * but something has been executed on the node since.
+     */
     public static final int NO_LONGER_VERIFIED_SCRIPT = 1;
+
+    /**
+     * The script has never been tested on this {@link IMNode}.
+     */
     public static final int NEVER_TESTED = 2;
+
+    /**
+     * The script is verifyied on this node,
+     * but something has been executed since the time it has been tested.
+     */
     public static final int ALREADY_VERIFIED_SCRIPT = 3;
+
+    /**
+     * The script is verifyied, and nothing
+     * has been executed since the verification.
+     */
     public static final int VERIFIED_SCRIPT = 4;
 
     // SCRIPTING
+    /**
+     * Execute a {@link VerifyingScript} on this {@link IMNode}
+     * @return the {@link ScriptResult} corresponding to the script execution.
+     */
     public ScriptResult<Boolean> executeScript(VerifyingScript script);
+
+    /**
+     * Get a map of all Verifying script allready tested on this node,
+     * and the responses given.
+     * @return the map of Script and status
+     */
+    public HashMap<VerifyingScript, Integer> getScriptStatus();
 
     // ----------------------------------------------------------------------//
     // GET
@@ -98,7 +132,7 @@ public interface IMNode {
     public String getDescriptorVMName();
 
     // ----------------------------------------------------------------------//
-    // STATE ?
+    // STATE
     public boolean isFree() throws NodeException;
 
     public boolean isDown();
@@ -128,14 +162,15 @@ public interface IMNode {
      */
     public void clean();
 
+    // NODE SOURCES
     /**
-     * Get a map of all Verifying script allready tested on this node,
-     * and the responses given.
-     * @return the map of Script and status
+     * The {@link IMNodeSource} from where the IMNode is issued.
      */
-    public HashMap<VerifyingScript, Integer> getScriptStatus();
-
     public IMNodeSource getNodeSource();
 
+    /**
+     * Change the {@link IMNodeSource} from where the node is.
+     * @param nodeSource
+     */
     public void setNodeSource(IMNodeSource nodeSource);
 }

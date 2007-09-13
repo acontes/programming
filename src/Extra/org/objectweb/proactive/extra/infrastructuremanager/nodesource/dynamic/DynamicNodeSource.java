@@ -57,15 +57,31 @@ import org.objectweb.proactive.extra.infrastructuremanager.utils.Heap;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 
+/**
+ * Abstract class that provide a way to simply create {@link DynamicNodeSource}
+ * You just have to write the {@link #getNode()} and {@link #releaseNode(IMNode)}
+ * methods to create a dynamic node source.
+ *
+ * WARNING : The {@link DynamicNodeSource} you will write must be an Active Object !
+ * @author proactive team
+ *
+ */
 public abstract class DynamicNodeSource extends IMNodeSource
     implements DynamicNSInterface, Serializable, InitActive, RunActive,
         EndActive {
+    // nodes and when they must be released
     private Map<IMNode, Long> nodes;
+
+    // Heap of the times to get a node.
     private Heap<Long> niceTimes;
     private ArrayList<IMNode> freeNodes;
     private ArrayList<IMNode> busyNodes;
     private ArrayList<IMNode> downNodes;
+
+    // Id of the DNS
     private String stringId;
+
+    // 3 parameters, used by the DynamicNSInterface 
     private int nbMax;
     private int nice;
     private int ttr;
@@ -91,6 +107,8 @@ public abstract class DynamicNodeSource extends IMNodeSource
         nodes = new HashMap<IMNode, Long>();
         running = true;
         long currentTime = System.currentTimeMillis();
+
+        // delaying the node adding.
         for (int i = 0; i < nbMax; i++) {
             niceTimes.add((long) currentTime + ((i * delay) / nbMax));
         }
@@ -256,6 +274,11 @@ public abstract class DynamicNodeSource extends IMNodeSource
         return free || busy || down;
     }
 
+    /**
+     * True if the node the ttr is reached for this node.
+     * @param node
+     * @return
+     */
     protected boolean isNodeToRelease(IMNode node) {
         Long stamp = nodes.get(node);
         if (stamp == null) {
@@ -265,6 +288,11 @@ public abstract class DynamicNodeSource extends IMNodeSource
         }
     }
 
+    /**
+     * release the nodes which have reached their TTR ;
+     * Get back nodes if Nice Time is elapsed.
+     *
+     */
     private void cleanAndGet() {
         long currentTime = System.currentTimeMillis();
 

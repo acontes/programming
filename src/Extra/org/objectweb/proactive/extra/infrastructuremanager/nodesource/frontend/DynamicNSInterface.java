@@ -30,17 +30,36 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend;
 
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
 
+
+/**
+ * Interface used by the {@link IMAdmin} frontend to manage
+ * the {@link DynamicNodeSource} behaviour, threw three parameters :
+ * <ul>
+ * <li><b>NbMaxNodes</b> : the maximum number of nodes that we can have by
+ *         this Node Source.</li>
+ * <li><b>Time To Release (TTR)</b> : The time we want to keep the node before
+ *         releasing it.</li>
+ * <li><b>Nice Time</b> : The time before trying to get back a node after having released one.
+ * </li>
+ * </ul>
+ * @author proactive team
+ *
+ */
 public interface DynamicNSInterface extends NodeSourceInterface {
+    // GETTERS
     public int getNbMaxNodes();
-
-    public void setNbMaxNodes(int nb);
 
     public int getTimeToRelease();
 
-    public void setTimeToRelease(int ttr);
-
     public int getNiceTime();
+
+    // SETTERS
+    public void setNbMaxNodes(int nb);
+
+    public void setTimeToRelease(int ttr);
 
     public void setNiceTime(int nice);
 }
