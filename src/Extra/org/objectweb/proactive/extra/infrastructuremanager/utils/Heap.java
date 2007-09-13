@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 
+
 /**
  * Heap simple implementation
  * @author proactive team

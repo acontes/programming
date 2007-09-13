@@ -75,7 +75,7 @@ public class IMActivityNode implements Runnable {
                             busy++;
                         }
                     } catch (Exception e) {
-                    	System.out.println("IMActivityNode.run()");
+                        System.out.println("IMActivityNode.run()");
                         this.imCore.nodeIsDown(imNode);
                     }
                 }

@@ -47,12 +47,12 @@ public class SimpleTestIMUser {
             NodeInformation nodeInfo = node.getNodeInformation();
             String mes = "#[SimpleTestIMUser] NodeInformation : \n";
             mes += "+--------------------------------------------------------------------\n";
-            mes += ("+--> getCreationProtocolID : " +
-            nodeInfo.getProtocol() + "\n");
+            mes += ("+--> getCreationProtocolID : " + nodeInfo.getProtocol() +
+            "\n");
             mes += ("+--> getDescriptorVMName   : " +
             nodeInfo.getVMInformation().getDescriptorVMName() + "\n");
-            mes += ("+--> getHostName           : " + nodeInfo.getVMInformation().getHostName() +
-            "\n");
+            mes += ("+--> getHostName           : " +
+            nodeInfo.getVMInformation().getHostName() + "\n");
             mes += ("+--> getJobID              : " + nodeInfo.getJobID() +
             "\n");
             mes += ("+--> getName               : " + nodeInfo.getName() +
@@ -80,13 +80,15 @@ public class SimpleTestIMUser {
             System.out.println(
                 "#[SimpleTestIMUser] User ask to the IM One Node");
             NodeSet node = user.getAtMostNodes(new IntWrapper(1), null);
-            if(!node.isEmpty())
-            afficheNodeInfo(node.get(0));
+            if (!node.isEmpty()) {
+                afficheNodeInfo(node.get(0));
+            }
 
             int nbAskedNodes = 2;
             System.out.println("#[SimpleTestIMUser] User ask to the IM " +
                 nbAskedNodes + " Nodes");
-            NodeSet nodes = user.getAtMostNodes(new IntWrapper(nbAskedNodes), null);
+            NodeSet nodes = user.getAtMostNodes(new IntWrapper(nbAskedNodes),
+                    null);
             for (Node aNode : nodes) {
                 afficheNodeInfo(aNode);
             }

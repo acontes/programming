@@ -34,6 +34,7 @@ import java.util.Comparator;
 
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
+
 /**
  * <p>This comparator allow to sort IMNode by :
  * </p>
@@ -43,7 +44,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
  * <li>Host machine</li>
  * <li>Virtual Machine</li>
  * </ul>
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jun 25, 2007
  * @since ProActive 3.2

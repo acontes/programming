@@ -45,11 +45,12 @@ public class IMLauncher {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-        System.out.println("STARTING INFRASTRUCTURE MANAGER: Press <ENTER> to Shutdown.");
-    	IMFactory.startLocal();
+        System.out.println(
+            "STARTING INFRASTRUCTURE MANAGER: Press <ENTER> to Shutdown.");
+        IMFactory.startLocal();
         IMAdmin admin = IMFactory.getAdmin();
-//        IMUser user = IMFactory.getUser();
-//        IMMonitoring monitor = IMFactory.getMonitoring();
+        //        IMUser user = IMFactory.getUser();
+        //        IMMonitoring monitor = IMFactory.getMonitoring();
         admin.deployAllVirtualNodes(new File("/user/jmartin/home/test.xml"),
             null);
         //        admin.deployAllVirtualNodes(new File(

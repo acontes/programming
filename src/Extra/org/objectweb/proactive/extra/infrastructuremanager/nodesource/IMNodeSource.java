@@ -72,7 +72,7 @@ public abstract class IMNodeSource implements NodeSourceInterface {
         }
         return false;
     }
-    
+
     /**
      * Set the {@link IMNode} in a busy state.
      * There is nothing to do more than that, like expressly setting
@@ -94,7 +94,7 @@ public abstract class IMNodeSource implements NodeSourceInterface {
      * @param imnode
      */
     public abstract void setDown(IMNode imnode);
-    
+
     /**
      * The way to to get free nodes in the structure, ordered (or not) with the script.
      * The more a Node has chances to verify the script, the less it's far in the list.

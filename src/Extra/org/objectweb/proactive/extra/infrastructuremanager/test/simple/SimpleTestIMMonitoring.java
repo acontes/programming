@@ -132,7 +132,7 @@ public class SimpleTestIMMonitoring {
      *                 Collections.sort(List, Comparator)
      */
     @SuppressWarnings("unchecked")
-	public void printIMNodesByVNodeByPad() {
+    public void printIMNodesByVNodeByPad() {
         ArrayList<IMNode> imNodes = imMonitoring.getListAllIMNodes();
         Object[] tableOfIMNodes = imNodes.toArray();
         Arrays.sort(tableOfIMNodes, new ComparatorIMNode());
