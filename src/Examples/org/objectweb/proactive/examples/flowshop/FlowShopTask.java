@@ -237,7 +237,7 @@ public class FlowShopTask extends Task {
      * Explore all permutation between currentPerm and lastPerm. May decide
      * also to split in sub Task.
      *
-     * @see org.objectweb.proactive.branchnbound.core.Task#execute()
+     * @see org.objectweb.proactive.branchnbound.core.ExecutableTask#execute()
      */
     @Override
     public Result execute() {
@@ -341,7 +341,7 @@ public class FlowShopTask extends Task {
      * Split the root Task in subtask. Can be called by the method execute() if
      * we want to split again.
      *
-     * @see org.objectweb.proactive.branchnbound.core.Task#split()
+     * @see org.objectweb.proactive.branchnbound.core.ExecutableTask#split()
      */
     @Override
     public Vector split() {
@@ -383,7 +383,7 @@ public class FlowShopTask extends Task {
     /**
      *
      * @throws NoResultsException
-     * @see org.objectweb.proactive.branchnbound.core.Task#gather(org.objectweb.proactive.branchnbound.core.Result[])
+     * @see org.objectweb.proactive.branchnbound.core.ExecutableTask#gather(org.objectweb.proactive.branchnbound.core.Result[])
      */
     @Override
     public Result gather(Result[] results) {

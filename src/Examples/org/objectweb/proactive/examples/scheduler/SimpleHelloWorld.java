@@ -11,11 +11,11 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.TaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.JavaTaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extra.scheduler.job.InternalTaskFlowJob;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalJavaTask;
 
 
 /**
@@ -49,12 +49,12 @@ public class SimpleHelloWorld {
             //******************** CREATE A NEW JOB ***********************
             //params are respectively : name, priority, runtimeLimit (not yet implemented), 
             //							reUntilCancel  (not yet implemented), description.
-            Job job = new TaskFlowJob("job name", JobPriority.NORMAL, -1,
+            InternalJob job = new InternalTaskFlowJob("job name", JobPriority.NORMAL, -1,
                     false, "A simple hello world example !");
 
             //******************** CREATE A NEW TASK ***********************
             //creating a new task
-            JavaTask task = new JavaTask() {
+            ExecutableJavaTask task = new ExecutableJavaTask() {
                     private static final long serialVersionUID = 1938122426482626365L;
 
                     public Object execute(TaskResult... results) {
@@ -69,7 +69,7 @@ public class SimpleHelloWorld {
                 };
 
             //adding the task to the job
-            JavaTaskDescriptor desc = new JavaTaskDescriptor(task);
+            InternalJavaTask desc = new InternalJavaTask(task);
             //this task is final, it means that the job result will contain this task result.
             desc.setFinalTask(true);
             job.addTask(desc);

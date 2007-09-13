@@ -44,8 +44,8 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
@@ -93,7 +93,7 @@ public class AppliTaskLauncher extends TaskLauncher {
 	 * This method should have NEVER been called in an application task launcher.
 	 */
 	@Override
-	public TaskResult doTask(SchedulerCore core, Task task, TaskResult... results) {
+	public TaskResult doTask(SchedulerCore core, ExecutableTask executableTask, TaskResult... results) {
 		throw new RuntimeException("This method should have NEVER been called in this context !!");
 	}
 	
@@ -108,7 +108,7 @@ public class AppliTaskLauncher extends TaskLauncher {
 	 * @return a task result representing the result of this task execution.
 	 */
 	@SuppressWarnings("unchecked")
-	public TaskResult doTask(SchedulerCore core, ApplicationTask task, NodeSet nodes) {
+	public TaskResult doTask(SchedulerCore core, ExecutableApplicationTask task, NodeSet nodes) {
 		nodesList = nodes;
 		try { nodesList.add(super.getNodes().get(0)); } catch (NodeException e) { }
 		//handle loggers

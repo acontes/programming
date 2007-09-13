@@ -30,28 +30,36 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.task;
 
-import java.io.Serializable;
-
+import java.util.Map;
 
 /**
- * This is the main entry point of a task execution.
- * Each executable java and native task may have to implements this method.
- * Only the application job will implement its own execute.
- * In this last case, the execute(TaskResult...) method will be shunted.
+ * A java task is a task representing a java .class file.
+ * Extends this abstract class if you want to create your own java task.
  * 
  * @author ProActive Team
- * @version 1.0, Aug 24, 2007
+ * @version 1.0, Jun 4, 2007
  * @since ProActive 3.2
  */
-public interface Task extends Serializable {
-
-	/**
-	 * The content of this method will be executed once or more if asked.
-	 * This may generate an Object result. It can be whatever you want.
-	 * 
-	 * @param results the results (as a taskResult) from parent tasks.
-	 * @return any object from the user.
-	 */
-	public Object execute(TaskResult... results);
+public abstract class ExecutableJavaTask implements ExecutableTask {
 	
+	/**
+	 * Initialization default method for a task.
+	 * By default it puts the parameters set in the task descriptor
+	 * in the class variables if their names are correctly mapped.
+	 * You can override this method to make your own initialisation.
+	 * 
+	 * @param args a map containing the differents variables names and values.
+	 */
+	public void init(Map<String, Object> args){
+		try{
+			//for (String key : args.keySet()){
+				//TODO make the mapping automatically (seems not to be possible)
+				//Field f = this.getClass().getDeclaredField(key);
+				//f.set(this, f.getClass().cast(args.get(key)));
+				//f.set(this, args.get(key));
+			//}
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 }

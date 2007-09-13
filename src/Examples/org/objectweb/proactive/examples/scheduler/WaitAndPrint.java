@@ -31,11 +31,11 @@
 package org.objectweb.proactive.examples.scheduler;
 
 import java.util.Map;
-import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
-public class WaitAndPrint extends JavaTask { 
+public class WaitAndPrint extends ExecutableJavaTask { 
     /**  */
 	private static final long serialVersionUID = 2518295052900092724L;
 	public int sleepTime;

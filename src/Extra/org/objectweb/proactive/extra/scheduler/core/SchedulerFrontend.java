@@ -55,15 +55,15 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
 import org.objectweb.proactive.extra.scheduler.job.IdentifyJob;
-import org.objectweb.proactive.extra.scheduler.job.Job;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobIdImpl;
-import org.objectweb.proactive.extra.scheduler.job.LightJob;
+import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskIdImpl;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
 
 /**
  * Scheduler Frontend. This is the API to talk to when you want to managed a scheduler core.
@@ -210,7 +210,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @return the job id of the given job.
 	 * @throws UserException an exception containing explicit error message.
 	 */
-	public JobId submit(Job job) throws SchedulerException {
+	public JobId submit(InternalJob job) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id))
 			throw new SchedulerException(ACCESS_DENIED);
@@ -227,13 +227,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 		job.setOwner(identifications.get(id).getUsername());
 		//setting the unique task IDs and jobId for each task
 		int taskId = 1;
-		for (TaskDescriptor td : job.getTasks()){
+		for (InternalTask td : job.getTasks()){
 			job.setTaskId(td,new TaskIdImpl(job.getId().value()*JOB_FACTOR+(taskId++)));
 			td.setJobInfo(job.getJobInfo());
 		}
 		jobs.put(job.getId(), new IdentifyJob(job.getId(),identifications.get(id)));
 		//make the light job
-		job.setLightJob(new LightJob(job));
+		job.setLightJob(new JobDescriptor(job));
 		scheduler.submit(job);
 		//stats
 		stats.increaseSubmittedJobCount(job.getType());
@@ -607,8 +607,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.JobU)
 	 */
-	public void newPendingJobEvent(Job job) {
-		dispatch("newPendingJobEvent", new Class<?>[]{Job.class},job);
+	public void newPendingJobEvent(InternalJob job) {
+		dispatch("newPendingJobEvent", new Class<?>[]{InternalJob.class},job);
 	}
 
 

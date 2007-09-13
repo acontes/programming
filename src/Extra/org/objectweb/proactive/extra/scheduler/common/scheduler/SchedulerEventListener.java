@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.Job;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 
@@ -128,7 +128,7 @@ public interface SchedulerEventListener extends Serializable {
 	 * 
 	 * @param job the new scheduled job.
 	 */
-	public void newPendingJobEvent(Job job);
+	public void newPendingJobEvent(InternalJob job);
 	
 	/**
 	 * Invoked when the scheduling of a job has just started.

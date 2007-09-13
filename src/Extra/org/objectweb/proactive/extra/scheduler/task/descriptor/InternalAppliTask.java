@@ -34,8 +34,8 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
@@ -47,18 +47,18 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
-public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
+public class InternalAppliTask extends InternalAbstractJavaTask {
 
 	/** Serial Version UID */
 	private static final long serialVersionUID = -6946803819032140410L;
 	/** the java task to launch */
-	private ApplicationTask task;
+	private ExecutableApplicationTask task;
 	
 	
 	/**
 	 * ProActive empty constructor
 	 */
-	public AppliTaskDescriptor() {}
+	public InternalAppliTask() {}
 	
 	
 	/**
@@ -66,7 +66,7 @@ public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
 	 * 
 	 * @param task the already instanciated java task.
 	 */
-	public AppliTaskDescriptor(ApplicationTask task) {
+	public InternalAppliTask(ExecutableApplicationTask task) {
 		this.task = task;
 	}
 
@@ -76,20 +76,20 @@ public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
 	 * 
 	 * @param taskClass the class instance of the class to instanciate.
 	 */
-	public AppliTaskDescriptor(Class<ApplicationTask> taskClass) {
+	public InternalAppliTask(Class<ExecutableApplicationTask> taskClass) {
 		super(taskClass);
 	}
 
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#getTask()
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask#getTask()
 	 */
 	@Override
-	public Task getTask() {
+	public ExecutableTask getTask() {
 		if (task != null)
 			return task;
 		try {
-			task = (ApplicationTask)taskClass.newInstance();
+			task = (ExecutableApplicationTask)taskClass.newInstance();
 			try{
 				task.init(args);
 			} catch (Exception e){
@@ -105,7 +105,7 @@ public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
 	 */
 	@Override
 	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException, NodeException {
@@ -125,7 +125,7 @@ public class AppliTaskDescriptor extends AbstractJavaTaskDescriptor {
 	 * 
 	 * @param task the instanciated java application task.
 	 */
-	public void setTask(ApplicationTask task){
+	public void setTask(ExecutableApplicationTask task){
 		this.task = task;
 	}
 

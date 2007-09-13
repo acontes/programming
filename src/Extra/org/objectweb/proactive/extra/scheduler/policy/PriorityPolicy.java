@@ -33,8 +33,8 @@ package org.objectweb.proactive.extra.scheduler.policy;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
-import org.objectweb.proactive.extra.scheduler.job.LightJob;
-import org.objectweb.proactive.extra.scheduler.task.EligibleLightTask;
+import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.EligibleTaskDescriptor;
 
 /**
  * Implementation of the policy using FIFO prio ordering.
@@ -54,11 +54,11 @@ public class PriorityPolicy implements PolicyInterface {
 	 * 
 	 * @see org.objectweb.proactive.extra.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
 	 */
-	public Vector<EligibleLightTask> getOrderedTasks(List<LightJob> jobs) {
-		Vector<EligibleLightTask> toReturn = new Vector<EligibleLightTask>();
+	public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
+		Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
 		//sort jobs by priority
 		Collections.sort(jobs);
-		for (LightJob lj : jobs){
+		for (JobDescriptor lj : jobs){
 			toReturn.addAll(lj.getEligibleTasks());
 		}
 		return toReturn;

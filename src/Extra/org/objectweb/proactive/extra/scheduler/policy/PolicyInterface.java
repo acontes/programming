@@ -33,8 +33,8 @@ package org.objectweb.proactive.extra.scheduler.policy;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
-import org.objectweb.proactive.extra.scheduler.job.LightJob;
-import org.objectweb.proactive.extra.scheduler.task.EligibleLightTask;
+import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.EligibleTaskDescriptor;
 
 /**
  * Policy interface for the scheduler.
@@ -55,6 +55,6 @@ public interface PolicyInterface extends Serializable {
 	 * @param jobs the list of light pending or running jobs. 
 	 * @return a vector of every tasks that are ready to be schedule.
 	 */
-	Vector<EligibleLightTask> getOrderedTasks(List<LightJob> jobs);
+	Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
 	
 }

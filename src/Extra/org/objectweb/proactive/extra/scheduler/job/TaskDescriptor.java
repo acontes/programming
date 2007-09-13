@@ -35,7 +35,7 @@ import java.util.Vector;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
 
 /**
  * This class represents a task for the policy.
@@ -46,7 +46,7 @@ import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
  * @version 1.0, Jul 9, 2007
  * @since ProActive 3.2
  */
-public class LightTask implements Serializable {
+public class TaskDescriptor implements Serializable {
 
 	/** Serial version UID */
 	private static final long serialVersionUID = -3597161883966090934L;
@@ -57,9 +57,9 @@ public class LightTask implements Serializable {
 	/** number of parents remaining (initial value must be 0) */
 	private int count = 0;
 	/** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
-	private Vector<LightTask> parents;
+	private Vector<TaskDescriptor> parents;
 	/** list of ordered children tasks for this task (null if jobType!=TASK_FLOW) */
-	private Vector<LightTask> children;
+	private Vector<TaskDescriptor> children;
 	
 	
 	/**
@@ -67,7 +67,7 @@ public class LightTask implements Serializable {
 	 * 
 	 * @param td the taskDescriptor to shrink.
 	 */
-	public LightTask(TaskDescriptor td) {
+	public TaskDescriptor(InternalTask td) {
 		this.id = td.getId();
 		this.jobId = td.getJobId();
 	}
@@ -78,8 +78,8 @@ public class LightTask implements Serializable {
 	 * 
 	 * @return the children
 	 */
-	public Vector<LightTask> getChildren() {
-		if (children == null) return new Vector<LightTask>();
+	public Vector<TaskDescriptor> getChildren() {
+		if (children == null) return new Vector<TaskDescriptor>();
 		return children;
 	}
 
@@ -99,8 +99,8 @@ public class LightTask implements Serializable {
 	 * 
 	 * @return the parents
 	 */
-	public Vector<LightTask> getParents() {
-		if (parents == null) return new Vector<LightTask>();
+	public Vector<TaskDescriptor> getParents() {
+		if (parents == null) return new Vector<TaskDescriptor>();
 		return parents;
 	}
 
@@ -140,9 +140,9 @@ public class LightTask implements Serializable {
 	 * 
 	 * @param task the parent task to add.
 	 */
-	public void addParent(LightTask task){
+	public void addParent(TaskDescriptor task){
 		if (parents == null)
-			parents = new Vector<LightTask>();
+			parents = new Vector<TaskDescriptor>();
 		parents.add(task);
 	}
 	
@@ -152,9 +152,9 @@ public class LightTask implements Serializable {
 	 * 
 	 * @param task the child task to add.
 	 */
-	public void addChild(LightTask task){
+	public void addChild(TaskDescriptor task){
 		if (children == null)
-			children = new Vector<LightTask>();
+			children = new Vector<TaskDescriptor>();
 		children.add(task);
 	}
 	
@@ -164,8 +164,8 @@ public class LightTask implements Serializable {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof LightTask)
-			return ((LightTask)obj).id.equals(id);
+		if (obj instanceof TaskDescriptor)
+			return ((TaskDescriptor)obj).id.equals(id);
 		return false;
 	}
 

@@ -34,7 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.objectweb.proactive.extra.scheduler.job.Job;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.JobFactory;
 
 public class JobFactoryTest {
@@ -44,7 +44,7 @@ public class JobFactoryTest {
 		if(f.exists()) {
 			System.out.println("OK");
 			InputStream is = new FileInputStream(f);
-			Job j = JobFactory.getFactory().createJob(is);
+			InternalJob j = JobFactory.getFactory().createJob(is);
 			System.out.println(j.getTasks().size());
 		}
 	}

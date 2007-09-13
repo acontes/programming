@@ -30,33 +30,33 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
+import java.util.ArrayList;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
 
 /**
- * Class ParameterSweepingJob.
- * This is the definition of a Parameter Swipping Job.
+ * Class TaskFlowJob.
+ * This is the definition of a tasks flow job.
  * 
  * @author ProActive Team
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
-public class ParameterSweepingJob extends Job {
-
+public class InternalTaskFlowJob extends InternalJob {
 
 	/** Serial version UID */
-	private static final long serialVersionUID = -5767666965335854263L;
-	
+	private static final long serialVersionUID = 5553430029462060936L;
+
 	
 	/**
 	 * ProActive empty constructor.
 	 */
-	public ParameterSweepingJob(){}
+	public InternalTaskFlowJob(){}
 	
 	
 	/**
-	 * Create a new Parameter Swipping Job with the given parameters. It provides methods to add or
+	 * Create a new Tasks Flow Job with the given parameters. It provides methods to add or
 	 * remove tasks.
 	 * 
 	 * @param name the current job name.
@@ -65,22 +65,24 @@ public class ParameterSweepingJob extends Job {
 	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 */
-	public ParameterSweepingJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
+	public InternalTaskFlowJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
 		super(name,priority,runtimeLimit,runUntilCancel,description);
 	}
 	
-	
+
 	/**
-	 * Append a task to this job, only if no task has been added before.
+	 * Append a list of tasks to this job.
 	 * 
-	 * @param task the task to add.
-	 * @return true if the task has been correctly added to the job, false if not.
+	 * @param tasks the list of tasks to add.
+	 * @return true if the list of tasks have been correctly added to the job,
+	 *         false if not.
 	 */
-	@Override
-	public boolean addTask(TaskDescriptor task) {
-		if (getTasks().size() > 0)
-			return false;
-		return super.addTask(task);
+	public boolean addTasks(ArrayList<InternalTask> tasks) {
+		for (InternalTask td : tasks) {
+			if (!addTask(td))
+				return false;
+		}
+		return true;
 	}
 	
 	
@@ -89,7 +91,7 @@ public class ParameterSweepingJob extends Job {
 	 */
 	@Override
 	public JobType getType() {
-		return JobType.PARAMETER_SWEEPING;
+		return JobType.TASKSFLOW;
 	}
 
 }

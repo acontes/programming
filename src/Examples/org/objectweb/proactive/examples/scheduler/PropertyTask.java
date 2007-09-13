@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.examples.scheduler;
 
-import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
-public class PropertyTask extends JavaTask {
+public class PropertyTask extends ExecutableJavaTask {
 
 	/**  */
 	private static final long serialVersionUID = -2536751215944833218L;

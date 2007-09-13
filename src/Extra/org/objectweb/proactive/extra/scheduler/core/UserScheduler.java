@@ -42,7 +42,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventLi
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.job.Job;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 /**
  * Scheduler user interface.
@@ -73,7 +73,7 @@ public class UserScheduler implements UserSchedulerInterface {
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.JobU)
 	 */
-	public JobId submit(Job job) throws SchedulerException {
+	public JobId submit(InternalJob job) throws SchedulerException {
 		return schedulerFrontend.submit(job);
 	}
 	

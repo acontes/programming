@@ -30,25 +30,33 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.job.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
 
 /**
- * This is the execution entry point for the native task.
- * The execute(TaskResult...) method will be override by the scheduler to launch the native process.
- * This class provide a getProcess method that will return the current running native process.
+ * This class represents an elligible task for the policy.
+ * It is a sort of tag class that will avoid user from giving non-eligible task to the scheduler.
+ * In fact policy will handle LightTask and EligibleLightTask but
+ * will only be allowed to send EligibleLightTask to the scheduler
+ * @see org.objectweb.proactive.extra.scheduler.job.TaskDescriptor
  * 
  * @author ProActive Team
- * @version 1.0, Aug 21, 2007
+ * @version 1.0, Jul 9, 2007
  * @since ProActive 3.2
  */
-public abstract class NativeTask implements Task {
+public class EligibleTaskDescriptor extends TaskDescriptor {
+
+	/** Serial version UID */
+	private static final long serialVersionUID = 8461969956605719440L;
 	
 	/**
-	 * Return the current nativ running process.
-	 * It is used by the scheduler to allow it to kill the process.
+	 * Get a new eligible light task using a taskDescriptor.
+	 * Same constructor as LightTask
 	 * 
-	 * @return the current nativ running process.
+	 * @param td the taskDescriptor to shrink.
 	 */
-	public abstract Process getProcess();
-	
+	public EligibleTaskDescriptor(InternalTask td) {
+		super(td);
+	}
+
 }

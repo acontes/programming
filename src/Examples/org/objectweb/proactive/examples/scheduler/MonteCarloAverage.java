@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.examples.scheduler;
 
-import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
-public class MonteCarloAverage extends JavaTask {
+public class MonteCarloAverage extends ExecutableJavaTask {
 
 	/** Serial version UID */
 	private static final long serialVersionUID = -2762210298670871929L;

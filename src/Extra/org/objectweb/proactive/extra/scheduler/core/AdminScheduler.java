@@ -44,7 +44,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthent
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
 import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
-import org.objectweb.proactive.extra.scheduler.job.Job;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 
 
@@ -173,7 +173,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#submit(org.objectweb.proactive.extra.scheduler.job.JobU)
 	 */
-	public JobId submit(Job job) throws SchedulerException {
+	public JobId submit(InternalJob job) throws SchedulerException {
 		return schedulerFrontend.submit(job);
 	}
 	

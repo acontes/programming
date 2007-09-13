@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.node.Node;
  * @version 1.0, Aug 21, 2007
  * @since ProActive 3.2
  */
-public abstract class ApplicationTask extends JavaTask {
+public abstract class ExecutableApplicationTask extends ExecutableJavaTask {
 
 	/**
 	 * <font color="red">Not used anymore in this context</font>

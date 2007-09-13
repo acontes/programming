@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.scheduler.task.descriptor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 
 /**
  * Abstract definition of a java task.
@@ -43,12 +43,12 @@ import org.objectweb.proactive.extra.scheduler.common.task.Task;
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
-public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
+public abstract class InternalAbstractJavaTask extends InternalTask {
 
 	/** Serial Version UID  */
 	private static final long serialVersionUID = 1340022492862249182L;
 	/** Class instance of the class to instanciate. */
-	protected Class<? extends Task> taskClass;
+	protected Class<? extends ExecutableTask> taskClass;
 	/** Arguments of the task as a map */
 	protected Map<String, Object> args = new HashMap<String, Object>();
 	
@@ -56,7 +56,7 @@ public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 	/**
 	 * ProActive empty constructor
 	 */
-	public AbstractJavaTaskDescriptor() {}
+	public InternalAbstractJavaTask() {}
 	
 
 	/**
@@ -64,7 +64,7 @@ public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 	 * 
 	 * @param taskClass the Class instance of the class to instanciate.
 	 */
-	public AbstractJavaTaskDescriptor(Class<? extends Task> taskClass) {
+	public InternalAbstractJavaTask(Class<? extends ExecutableTask> taskClass) {
 		this.taskClass = taskClass;
 	}
 
@@ -74,7 +74,7 @@ public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 	 * 
 	 * @return the task Class instance.
 	 */
-	public Class<? extends Task> getTaskClass() {
+	public Class<? extends ExecutableTask> getTaskClass() {
 		return taskClass;
 	}
 	
@@ -84,7 +84,7 @@ public abstract class AbstractJavaTaskDescriptor extends TaskDescriptor {
 	 * 
 	 * @param taskClass the task Class instance.
 	 */
-	public void setTaskClass(Class<? extends Task> taskClass) {
+	public void setTaskClass(Class<? extends ExecutableTask> taskClass) {
 		this.taskClass = taskClass;
 	}
 

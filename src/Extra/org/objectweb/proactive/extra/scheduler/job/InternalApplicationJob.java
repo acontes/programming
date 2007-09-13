@@ -32,9 +32,9 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
-import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.AppliTaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalAppliTask;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
 
 /**
  * Class ApplicationJob.
@@ -45,7 +45,7 @@ import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
-public class ApplicationJob extends Job {
+public class InternalApplicationJob extends InternalJob {
 
 	/** Serial version UID */
 	private static final long serialVersionUID = 5793055959400444968L;
@@ -54,7 +54,7 @@ public class ApplicationJob extends Job {
 	/**
 	 * ProActive empty constructor.
 	 */
-	public ApplicationJob(){}
+	public InternalApplicationJob(){}
 	
 
 	/**
@@ -66,9 +66,9 @@ public class ApplicationJob extends Job {
 	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 */
-	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
+	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
 		super(name,priority,runtimeLimit,runUntilCancel,description);
-		AppliTaskDescriptor descriptor = new AppliTaskDescriptor();
+		InternalAppliTask descriptor = new InternalAppliTask();
 		descriptor.setFinalTask(true);
 		super.addTask(descriptor);
 	}
@@ -85,7 +85,7 @@ public class ApplicationJob extends Job {
 	 * @param description a short description of the job and what it will do.
 	 * @param numberOfNodesNeeded the number of node needed by the user.
 	 */
-	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded) {
+	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded) {
 		this(name,priority,runtimeLimit,runUntilCancel,description);
 		getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
 	}
@@ -103,7 +103,7 @@ public class ApplicationJob extends Job {
 	 * @param numberOfNodesNeeded the number of node needed by the user.
 	 * @param taskClass the Class instance of the class to instanciate.
 	 */
-	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded, Class<ApplicationTask> taskClass) {
+	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded, Class<ExecutableApplicationTask> taskClass) {
 		this(name,priority,runtimeLimit,runUntilCancel,description,numberOfNodesNeeded);
 		getTask().setTaskClass(taskClass);
 	}
@@ -121,7 +121,7 @@ public class ApplicationJob extends Job {
 	 * @param numberOfNodesNeeded the number of node needed by the user.
 	 * @param taskClass the instanciated class task object.
 	 */
-	public ApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded, ApplicationTask task) {
+	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded, ExecutableApplicationTask task) {
 		this(name,priority,runtimeLimit,runUntilCancel,description,numberOfNodesNeeded);
 		getTask().setTask(task);
 	}
@@ -131,7 +131,7 @@ public class ApplicationJob extends Job {
 	 * Should never be called !
 	 */
 	@Override
-	public boolean addTask(TaskDescriptor task) {
+	public boolean addTask(InternalTask task) {
 		throw new RuntimeException("This method should have NEVER been called in ApplicationJob.");
 	}
 	
@@ -141,8 +141,8 @@ public class ApplicationJob extends Job {
 	 * 
 	 * @return the application task created while application job creation.
 	 */
-	public AppliTaskDescriptor getTask(){
-		return (AppliTaskDescriptor)getTasks().get(0);
+	public InternalAppliTask getTask(){
+		return (InternalAppliTask)getTasks().get(0);
 	}
 	
 	

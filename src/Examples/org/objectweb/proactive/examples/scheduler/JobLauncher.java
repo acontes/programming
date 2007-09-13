@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.job.Job;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.JobFactory;
 
 public class JobLauncher {
@@ -67,7 +67,7 @@ public class JobLauncher {
 			UserSchedulerInterface scheduler = auth.logAsUser("chri", "chri");
 
 			//CREATE JOB
-			Job j = JobFactory.getFactory().createJob(jobUrl);
+			InternalJob j = JobFactory.getFactory().createJob(jobUrl);
 			for (int i = 0; i < nbJob; i++) {
 				// SUBMIT JOB
 				j.setId(scheduler.submit(j));

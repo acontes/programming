@@ -48,7 +48,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
@@ -126,12 +126,12 @@ public class TaskLauncher implements InitActive, Serializable {
 	 * Execute the user task as an active object.
 	 * 
 	 * @param core The scheduler core to be notify
-	 * @param task the task to execute
+	 * @param executableTask the task to execute
 	 * @param results the possible results from parent tasks.(if task flow)
 	 * @return a task result representing the result of this task execution.
 	 */
 	@SuppressWarnings("unchecked")
-	public TaskResult doTask(SchedulerCore core, Task task, TaskResult... results) {
+	public TaskResult doTask(SchedulerCore core, ExecutableTask executableTask, TaskResult... results) {
 		//handle loggers
        	Appender out = new SocketAppender(host,port);
        	// store stdout and err
@@ -156,7 +156,7 @@ public class TaskLauncher implements InitActive, Serializable {
 	        	}
         	}
 			//launch task
-            TaskResult result = new TaskResultImpl(taskId, task.execute(results));
+            TaskResult result = new TaskResultImpl(taskId, executableTask.execute(results));
             //return result
             return result;
 		} catch (Exception ex) {

@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
 
 /**
  * Abstract class job.
@@ -53,7 +53,7 @@ import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
-public abstract class Job implements Serializable, Comparable<Job> {
+public abstract class InternalJob implements Serializable, Comparable<InternalJob> {
 
 	public static final int SORT_BY_ID = 1;
 	public static final int SORT_BY_NAME = 2;
@@ -76,18 +76,18 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	// TODO envParameters
 	// TODO un moyen pour le user de mettre n'importe quelles données dans le job et la retrouver dans la police.
 	// cela lui permettrai de moduler sa police en fonction de ces données
-	protected HashMap<TaskId,TaskDescriptor> tasks = new HashMap<TaskId,TaskDescriptor>();
+	protected HashMap<TaskId,InternalTask> tasks = new HashMap<TaskId,InternalTask>();
 	/** Instances of the final task, important to know which results will be sent to user */
-	protected Vector<TaskDescriptor> finalTasks = new Vector<TaskDescriptor>();
+	protected Vector<InternalTask> finalTasks = new Vector<InternalTask>();
 	/** informations about job execution */
 	protected JobEvent jobInfo = new JobEvent();
 	/** Light job for dependences management */
-	private LightJob lightJob;
+	private JobDescriptor lightJob;
 
 	/**
 	 * ProActive empty constructor.
 	 */
-	public Job() {}
+	public InternalJob() {}
 
 	/**
 	 * Create a new Job with the given parameters. It provides methods to add or
@@ -99,7 +99,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 */
-	public Job(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description) {
+	public InternalJob(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description) {
 		super();
 		this.name = name;
 		this.jobInfo.setPriority(priority);
@@ -179,7 +179,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(Job job) {
+	public int compareTo(InternalJob job) {
 		switch (currentSort) {
 		case SORT_BY_DESCRIPTION:
 			return (currentOrder == ASC_ORDER) ? (description
@@ -215,7 +215,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * @return true if the task has been correctly added to the job, false if
 	 *         not.
 	 */
-	public boolean addTask(TaskDescriptor task) {
+	public boolean addTask(InternalTask task) {
 		task.setJobId(getId());
 		if (task.isFinalTask())
 			finalTasks.add(task);
@@ -232,7 +232,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * @param td the task which has just been started.
 	 * @param hostname the computer host name on which the task has been started.
 	 */
-	public void startTask(TaskDescriptor td, String hostName) {
+	public void startTask(InternalTask td, String hostName) {
 		setNumberOfPendingTasks(getNumberOfPendingTask()-1);
 		setNumberOfRunningTasks(getNumberOfRunningTask()+1);
 		if (getState() == JobState.STALLED)
@@ -249,7 +249,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @param task the task which has to be restarted.
 	 */
-	public void reStartTask(TaskDescriptor task) {
+	public void reStartTask(InternalTask task) {
 		setNumberOfPendingTasks(getNumberOfPendingTask()+1);
 		setNumberOfRunningTasks(getNumberOfRunningTask()-1);
 		lightJob.reStart(task.getId());
@@ -270,8 +270,8 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * @param taskId the task to terminate.
 	 * @return the taskDescriptor that has just been terminated.
 	 */
-	public TaskDescriptor terminateTask(TaskId taskId) {
-		TaskDescriptor descriptor = tasks.get(taskId);
+	public InternalTask terminateTask(TaskId taskId) {
+		InternalTask descriptor = tasks.get(taskId);
 		descriptor.setFinishedTime(System.currentTimeMillis());
 		descriptor.setStatus(Status.FINISHED);
 		setNumberOfRunningTasks(getNumberOfRunningTask()-1);
@@ -282,7 +282,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		lightJob.terminate(taskId);
 		//creating list of status
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
-		for (TaskDescriptor td : tasks.values()){
+		for (InternalTask td : tasks.values()){
 			hts.put(td.getId(), td.getStatus());
 		}
 		//updating light job for eligible task
@@ -298,7 +298,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * @param jobState type of the failure on this job. (failed/cancelled)
 	 */
 	public void failed(TaskId taskId, JobState jobState){
-		TaskDescriptor descriptor = tasks.get(taskId);
+		InternalTask descriptor = tasks.get(taskId);
 		descriptor.setFinishedTime(System.currentTimeMillis());
 		setFinishedTime(System.currentTimeMillis());
 		setNumberOfPendingTasks(0);
@@ -310,7 +310,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		//creating list of status
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
 		HashMap<TaskId,Long> htl = new HashMap<TaskId, Long>();
-		for (TaskDescriptor td : tasks.values()){
+		for (InternalTask td : tasks.values()){
 			if (!td.getId().equals(taskId)){
 				if (td.getStatus() == Status.RUNNNING){
 					td.setStatus(Status.ABORTED);
@@ -347,7 +347,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		setNumberOfRunningTasks(0);
 		setState(JobState.RUNNING);
 		HashMap<TaskId,Status> status = new HashMap<TaskId,Status>();
-		for (TaskDescriptor td : getTasks()){
+		for (InternalTask td : getTasks()){
 			td.setStatus(Status.PENDING);
 			status.put(td.getId(), Status.PENDING);
 		}
@@ -374,7 +374,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 			return false;
 		jobInfo.setState(JobState.PAUSED);
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
-		for (TaskDescriptor td : tasks.values()){
+		for (InternalTask td : tasks.values()){
 			if (td.getStatus() != Status.FINISHED && td.getStatus() != Status.RUNNNING)
 				td.setStatus(Status.PAUSED);
 			hts.put(td.getId(), td.getStatus());
@@ -399,7 +399,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 		else
 			jobInfo.setState(JobState.RUNNING);
 		HashMap<TaskId,Status> hts = new HashMap<TaskId, Status>();
-		for (TaskDescriptor td : tasks.values()){
+		for (InternalTask td : tasks.values()){
 			if (jobInfo.getState() == JobState.PENDING){
 				td.setStatus(Status.SUBMITTED);
 			} else if (jobInfo.getState() == JobState.RUNNING || jobInfo.getState() == JobState.STALLED){
@@ -491,8 +491,8 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @return the tasks
 	 */
-	public ArrayList<TaskDescriptor> getTasks() {
-		return new ArrayList<TaskDescriptor>(tasks.values());
+	public ArrayList<InternalTask> getTasks() {
+		return new ArrayList<InternalTask>(tasks.values());
 	}
 	
 	
@@ -501,7 +501,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @return the tasks
 	 */
-	public HashMap<TaskId,TaskDescriptor> getHMTasks() {
+	public HashMap<TaskId,InternalTask> getHMTasks() {
 		return tasks;
 	}
 
@@ -535,7 +535,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @return the finalTask
 	 */
-	public Vector<TaskDescriptor> getFinalTasks() {
+	public Vector<InternalTask> getFinalTasks() {
 		return finalTasks;
 	}
 
@@ -632,7 +632,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * @param td the task descriptor from where to change the id.
 	 * @param id the new id.
 	 */
-	public void setTaskId(TaskDescriptor td, TaskId id) {
+	public void setTaskId(InternalTask td, TaskId id) {
 		tasks.remove(td.getId());
 		td.setId(id);
 		tasks.put(id,td);
@@ -720,7 +720,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @return the lightJob
 	 */
-	public LightJob getLightJob() {
+	public JobDescriptor getLightJob() {
 		return lightJob;
 	}
 
@@ -730,7 +730,7 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 * 
 	 * @param lightJob the lightJob to set
 	 */
-	public void setLightJob(LightJob lightJob) {
+	public void setLightJob(JobDescriptor lightJob) {
 		this.lightJob = lightJob;
 	}
 	
@@ -780,8 +780,8 @@ public abstract class Job implements Serializable, Comparable<Job> {
 	 */
 	@Override
 	public boolean equals(Object o){
-		if (o instanceof Job)
-			return getId().equals(((Job)o).getId());
+		if (o instanceof InternalJob)
+			return getId().equals(((InternalJob)o).getId());
 		return false;
 	}
 	

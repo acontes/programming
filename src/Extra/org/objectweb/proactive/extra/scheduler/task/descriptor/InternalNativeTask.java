@@ -36,22 +36,22 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.task.NativeTask;
+import org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask;
 import org.objectweb.proactive.extra.scheduler.task.NativeTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
 /**
  * Description of a native task.
  * This task include the process
- * see also {@link TaskDescriptor}
+ * see also {@link InternalTask}
  * 
  * @author ProActive Team
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
-public class NativeTaskDescriptor extends TaskDescriptor {
+public class InternalNativeTask extends InternalTask {
 
 	/** Serial Version UID */
 	private static final long serialVersionUID = 2587936204570926300L;
@@ -62,7 +62,7 @@ public class NativeTaskDescriptor extends TaskDescriptor {
 	/**
 	 * ProActive empty constructor.
 	 */
-	public NativeTaskDescriptor(){}
+	public InternalNativeTask(){}
 	
 	
 	/**
@@ -70,23 +70,23 @@ public class NativeTaskDescriptor extends TaskDescriptor {
 	 * 
 	 * @param cmd the command line to execute
 	 */
-	public NativeTaskDescriptor(String cmd) {
+	public InternalNativeTask(String cmd) {
 		this.cmd = cmd;
 	}
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#getTask()
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask#getTask()
 	 */
 	@Override
-	public Task getTask() {
+	public ExecutableTask getTask() {
 		//create the new task that will launch the command on execute.
-		NativeTask nativeTask = new NativeTask() {
+		ExecutableNativeTask executableNativeTask = new ExecutableNativeTask() {
 			private static final long serialVersionUID = 0L;
 			private Process process;
 
 			/**
-			 * @see org.objectweb.proactive.extra.scheduler.common.task.Task#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
+			 * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
 			 */
 			public Object execute(TaskResult... results) {
 				try {
@@ -106,18 +106,18 @@ public class NativeTaskDescriptor extends TaskDescriptor {
 			}
 			
 			/**
-			 * @see org.objectweb.proactive.extra.scheduler.task.NativeTask#getProcess()
+			 * @see org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask#getProcess()
 			 */
 			public Process getProcess(){
 				return process;
 			}
 		};
-		return nativeTask;
+		return executableNativeTask;
 	}
 	
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
 	 */
 	@Override
 	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException, NodeException {

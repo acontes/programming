@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.task.descriptor;
 
-import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 
 
 /**
@@ -42,18 +42,18 @@ import org.objectweb.proactive.extra.scheduler.common.task.Task;
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
-public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
+public class InternalJavaTask extends InternalAbstractJavaTask {
 
 	/** Serial Version UID */
 	private static final long serialVersionUID = -6946803819032140410L;
 	/** the java task to launch */
-	private JavaTask task;
+	private ExecutableJavaTask task;
 	
 	
 	/**
 	 * ProActive empty constructor
 	 */
-	public JavaTaskDescriptor() {}
+	public InternalJavaTask() {}
 	
 	
 	/**
@@ -61,7 +61,7 @@ public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
 	 * 
 	 * @param task the already instanciated java task.
 	 */
-	public JavaTaskDescriptor(JavaTask task) {
+	public InternalJavaTask(ExecutableJavaTask task) {
 		this.task = task;
 	}
 
@@ -71,20 +71,20 @@ public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
 	 * 
 	 * @param taskClass the class instance of the class to instanciate.
 	 */
-	public JavaTaskDescriptor(Class<JavaTask> taskClass) {
+	public InternalJavaTask(Class<ExecutableJavaTask> taskClass) {
 		super(taskClass);
 	}
 
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor#getTask()
+	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask#getTask()
 	 */
 	@Override
-	public Task getTask() {
+	public ExecutableTask getTask() {
 		if (task != null)
 			return task;
 		try {
-			task = (JavaTask)taskClass.newInstance();
+			task = (ExecutableJavaTask)taskClass.newInstance();
 			try{
 				task.init(args);
 			} catch (Exception e){
@@ -104,7 +104,7 @@ public class JavaTaskDescriptor extends AbstractJavaTaskDescriptor {
 	 * 
 	 * @param task the instanciated java task.
 	 */
-	public void setTask(JavaTask task){
+	public void setTask(ExecutableJavaTask task){
 		this.task = task;
 	}
 }

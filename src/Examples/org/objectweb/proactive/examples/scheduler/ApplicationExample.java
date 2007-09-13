@@ -38,12 +38,12 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 
 /**
  * @author jlscheef
  */
-public class ApplicationExample extends ApplicationTask {
+public class ApplicationExample extends ExecutableApplicationTask {
 
 	/** Serial Version UID */
 	private static final long serialVersionUID = -8328166769211310963L;
@@ -51,7 +51,7 @@ public class ApplicationExample extends ApplicationTask {
 	
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.task.JavaTask#init(java.util.Map)
+	 * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask#init(java.util.Map)
 	 */
 	@Override
 	public void init(Map<String, Object> args) {

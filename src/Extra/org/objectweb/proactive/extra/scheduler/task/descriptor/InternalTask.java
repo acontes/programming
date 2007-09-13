@@ -37,7 +37,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
@@ -56,7 +56,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
  * @version 1.0, Jul 9, 2007
  * @since ProActive 3.2
  */
-public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Serializable {
+public abstract class InternalTask implements Comparable<InternalTask>, Serializable {
 
 	
 	/** Sorting constant, this will allow the user to sort the descriptor. */
@@ -83,7 +83,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	/** Description of the task. */
 	private String description;
 	/** Parents list : null if no dependences */
-	private ArrayList<TaskDescriptor> dependences = null;
+	private ArrayList<InternalTask> dependences = null;
 	/** Verifying script : can be launched before getting a node in order to verify some computer specificity. */
 	private VerifyingScript verifyingScript;
 	/** Pre-task script : can be used to launch script just before the task execution. */
@@ -105,7 +105,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	/**
 	 * ProActive Empty constructor
 	 */
-	public TaskDescriptor(){}
+	public InternalTask(){}
 	
 	
 	/**
@@ -113,7 +113,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	 * 
 	 * @return the user task represented by this task descriptor.
 	 */
-	public abstract Task getTask();
+	public abstract ExecutableTask getTask();
 	
 	
 	/**
@@ -163,7 +163,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(TaskDescriptor task) {
+	public int compareTo(InternalTask task) {
 		switch (currentSort) {
 		case SORT_BY_DESCRIPTION:
 			return (currentOrder == ASC_ORDER)
@@ -223,9 +223,9 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	 * 
 	 * @param task a supertask of this task.
 	 */
-	public void addDependence(TaskDescriptor task){
+	public void addDependence(InternalTask task){
 		if (dependences == null)
-			dependences = new ArrayList<TaskDescriptor>();
+			dependences = new ArrayList<InternalTask>();
 		dependences.add(task);
 	}
 	
@@ -525,8 +525,8 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (TaskDescriptor.class.isAssignableFrom(obj.getClass())){
-			return ((TaskDescriptor)obj).getId().equals(getId());
+		if (InternalTask.class.isAssignableFrom(obj.getClass())){
+			return ((InternalTask)obj).getId().equals(getId());
 		}
 		return false;
 	}
@@ -537,7 +537,7 @@ public abstract class TaskDescriptor implements Comparable<TaskDescriptor>, Seri
 	 * 
 	 * @return the dependences
 	 */
-	public ArrayList<TaskDescriptor> getDependences() {
+	public ArrayList<InternalTask> getDependences() {
 		return dependences;
 	}
 	

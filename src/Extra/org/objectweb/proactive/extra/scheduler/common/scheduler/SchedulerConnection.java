@@ -38,7 +38,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.core.SchedulerAuthentication;
 
 /**
  * Scheduler connection class provide method to join an existing scheduler.
@@ -75,12 +74,12 @@ public class SchedulerConnection implements Serializable{
 			schedulerURL = "//localhost/"+SCHEDULER_DEFAULT_NAME;
 		}
     	try {
-    		schedulerAuth = (SchedulerAuthenticationInterface)(ProActive.lookupActive(SchedulerAuthentication.class.getName(), schedulerURL));
+    		schedulerAuth = (SchedulerAuthenticationInterface)(ProActive.lookupActive(SchedulerAuthenticationInterface.class.getName(), schedulerURL));
     		return schedulerAuth;
     	} catch (ActiveObjectCreationException e) {
-			throw new SchedulerException("Error while looking up this active object : "+SchedulerAuthentication.class.getName(),e);
+			throw new SchedulerException("Error while getting scheduler interface !",e);
 		} catch (IOException e) {
-			throw new SchedulerException("IO Error while looking up this active object : "+SchedulerAuthentication.class.getName(),e);
+			throw new SchedulerException("Error while connecting the scheduler !",e);
 		}
 	}
 

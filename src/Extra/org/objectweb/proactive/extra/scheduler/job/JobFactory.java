@@ -51,16 +51,16 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
-import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.scripting.SimpleScript;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.AbstractJavaTaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.JavaTaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.NativeTaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalAbstractJavaTask;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalJavaTask;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalNativeTask;
+import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -85,7 +85,7 @@ public class JobFactory {
 
 	private JobFactory() {}
 
-	public Job createJob(String fileUrl)
+	public InternalJob createJob(String fileUrl)
 	throws ParserConfigurationException, SAXException, IOException,
 	XPathExpressionException, InvalidScriptException,
 	ClassNotFoundException {
@@ -98,7 +98,7 @@ public class JobFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Job createJob(InputStream input)
+	public InternalJob createJob(InputStream input)
 	throws ParserConfigurationException, SAXException, IOException,
 	XPathExpressionException, InvalidScriptException,
 	ClassNotFoundException {
@@ -114,7 +114,7 @@ public class JobFactory {
 		String description = null;
 		boolean cancelOnException = false;
 		JobType jt = null;
-		Map<TaskDescriptor, String> tasks = new HashMap<TaskDescriptor, String>();
+		Map<InternalTask, String> tasks = new HashMap<InternalTask, String>();
 		int jobAppliNeededNodes = 0;
 
 		// JOB
@@ -169,7 +169,7 @@ public class JobFactory {
 				Node taskNode = list.item(i);
 
 				// TASK PROCESS
-				TaskDescriptor desc = null;
+				InternalTask desc = null;
 				Node process = (Node) xpath.evaluate("process/javaProcess",
 						taskNode, XPathConstants.NODE);
 				if (process != null) { // JAVA TASK
@@ -257,13 +257,13 @@ public class JobFactory {
 		}
 
 		// Job creation
-		Job job = null;
+		InternalJob job = null;
 		if (jt == JobType.APPLI) {
 			if(!tasks.keySet().isEmpty()) {
-				TaskDescriptor td = tasks.keySet().iterator().next();
+				InternalTask td = tasks.keySet().iterator().next();
 				
-				job = new ApplicationJob(name, getPriority(priority), -1, true, description, jobAppliNeededNodes, (Class<ApplicationTask>) td.getTask().getClass());
-				AbstractJavaTaskDescriptor td2 = ((ApplicationJob)job).getTask();
+				job = new InternalApplicationJob(name, getPriority(priority), -1, true, description, jobAppliNeededNodes, (Class<ExecutableApplicationTask>) td.getTask().getClass());
+				InternalAbstractJavaTask td2 = ((InternalApplicationJob)job).getTask();
 				td2.setDescription(td.getDescription());
 //				td2.setFinalTask(td.isFinalTask()); DONT DO THIS SETTING
 				td2.setName(td.getName());
@@ -272,22 +272,22 @@ public class JobFactory {
 				td2.setRerunnable(td.getRerunnable());
 				td2.setRunTimeLimit(td.getRunTimeLimit());
 				td2.setVerifyingScript(td.getVerifyingScript());
-				td2.setArgs(((JavaTaskDescriptor)td).getArgs());
+				td2.setArgs(((InternalJavaTask)td).getArgs());
 				
 			}
 		} else if (jt == JobType.PARAMETER_SWEEPING){
-			job = new ParameterSweepingJob(name, getPriority(priority), -1, cancelOnException, description);
+			job = new InternalParameterSweepingJob(name, getPriority(priority), -1, cancelOnException, description);
 		} else {
-			job = new TaskFlowJob(name, getPriority(priority), -1, cancelOnException, description);
+			job = new InternalTaskFlowJob(name, getPriority(priority), -1, cancelOnException, description);
 		}
 		// Dependencies
-		HashMap<String, TaskDescriptor> depends = 
-			new HashMap<String, TaskDescriptor>();
+		HashMap<String, InternalTask> depends = 
+			new HashMap<String, InternalTask>();
 
-		for(TaskDescriptor td : tasks.keySet())
+		for(InternalTask td : tasks.keySet())
 			depends.put(td.getName(), td);
 		if(job.getType() != JobType.APPLI){
-			for (Entry<TaskDescriptor, String> task : tasks.entrySet()) {
+			for (Entry<InternalTask, String> task : tasks.entrySet()) {
 				task.getKey().setJobId(job.getId());
 				String depstr = task.getValue();
 				if (!depstr.matches("[ ]*")){
@@ -315,7 +315,7 @@ public class JobFactory {
 		else return JobPriority.NORMAL;
 	}
 
-	private TaskDescriptor createNativeTask(Node process, XPath xpath) 
+	private InternalTask createNativeTask(Node process, XPath xpath) 
 	throws XPathExpressionException, ClassNotFoundException, IOException {
 		String cmd = (String) xpath.evaluate("@command", process, XPathConstants.STRING);
 		NodeList args = (NodeList) xpath
@@ -333,16 +333,16 @@ public class JobFactory {
 				}
 			}
 		}
-		NativeTaskDescriptor desc = new NativeTaskDescriptor(cmd);
+		InternalNativeTask desc = new InternalNativeTask(cmd);
 		return desc;
 	}
 
 
 	@SuppressWarnings("unchecked")
-	private JavaTaskDescriptor createJavaTask(Node process, XPath xpath)
+	private InternalJavaTask createJavaTask(Node process, XPath xpath)
 	throws XPathExpressionException, ClassNotFoundException, IOException {
-		JavaTaskDescriptor desc = new JavaTaskDescriptor();
-		desc.setTaskClass((Class<Task>) Class.forName(
+		InternalJavaTask desc = new InternalJavaTask();
+		desc.setTaskClass((Class<ExecutableTask>) Class.forName(
 				(String) xpath.compile("@class")
 				.evaluate(process, XPathConstants.STRING)));
 		// TODO Verify that class extends Task

@@ -39,7 +39,7 @@ import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
@@ -84,13 +84,13 @@ public class NativeTaskLauncher extends TaskLauncher {
 	 * Execute the user task as an active object.
 	 * 
 	 * @param core The scheduler core to be notify
-	 * @param task the task to execute
+	 * @param executableTask the task to execute
 	 * @param results the possible results from parent tasks.(if task flow)
 	 * @return a task result representing the result of this task execution.
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public TaskResult doTask(SchedulerCore core, Task task, TaskResult... results) {
+	public TaskResult doTask(SchedulerCore core, ExecutableTask executableTask, TaskResult... results) {
 		//handle loggers
        	Appender out = new SocketAppender(host,port);
        	// store stdout and err
@@ -115,9 +115,9 @@ public class NativeTaskLauncher extends TaskLauncher {
 	        	}
         	}
 			//get process
-			process = ((NativeTask)task).getProcess();
+			process = ((ExecutableNativeTask)executableTask).getProcess();
 			//launch task
-            TaskResult result = new TaskResultImpl(taskId, task.execute(results));
+            TaskResult result = new TaskResultImpl(taskId, executableTask.execute(results));
             //return result
             return result;
 		} catch (Exception ex) {

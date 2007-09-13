@@ -35,11 +35,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Random;
-import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
-public class MonteCarlo extends JavaTask {
+public class MonteCarlo extends ExecutableJavaTask {
 
     /**  */
     private static final long serialVersionUID = 6803732909189957274L;
