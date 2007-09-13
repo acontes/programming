@@ -37,9 +37,12 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
+import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
-import org.objectweb.proactive.extra.scheduler.exception.UserException;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
@@ -114,11 +117,11 @@ public class NativeTaskLauncher extends TaskLauncher {
 			//get process
 			process = ((NativeTask)task).getProcess();
 			//launch task
-            TaskResult result = new TaskResult(taskId, task.execute(results));
+            TaskResult result = new TaskResultImpl(taskId, task.execute(results));
             //return result
             return result;
 		} catch (Exception ex) {
-			return new TaskResult(taskId, ex);
+			return new TaskResultImpl(taskId, ex);
 		} finally {
 			//Unhandle loggers
             LogManager.shutdown();

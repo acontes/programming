@@ -37,8 +37,8 @@ import java.io.ObjectOutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 
 
 /**

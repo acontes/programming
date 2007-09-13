@@ -30,45 +30,89 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+
 /**
- * Class representing the type of the job.
- * Type are best describe below.
+ * Implementation of a job identification.
+ * For the moment, it is represented by an integer.
  * 
  * @author ProActive Team
- * @version 1.0, Jun 11, 2007
+ * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
-public enum JobType implements java.io.Serializable {
+public final class JobIdImpl implements JobId {
 	
-	/** 
-	 * Every tasks can communicate with each others.
-	 * So they all have to be executed in same time.
-	 */
-	APPLI ("Job Application"),
+	/** Serial version UID */
+	private static final long serialVersionUID = -7367447876595953374L;
+	private int id = 0;
+
+	
 	/**
-	 * Tasks can be executed one by one or all in same time but
-	 * every task represents the same native or java task.
-	 * Only the parameters given to the task will change. 
+	 * ProActive empty constructor
 	 */
-	PARAMETER_SWEEPING ("Parameter Sweeping"),
-	/** 
-	 * Tasks flow with dependences.
-	 * Only the task that have their dependences finished
-	 * can be executed.
+	public JobIdImpl(){}
+	
+	
+	/**
+	 * Default Job id constructor
+	 * 
+	 * @param id the id to put in the jobId
 	 */
-	TASKSFLOW ("Tasks Flow");
+	public JobIdImpl(int id){
+		this.id = id;
+	}
 	
-	private String name;
-	
-	
-	JobType (String name) {
-		this.name = name;
+
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.common.job.JobId#value()
+	 */
+	public int value() {
+		return id;
 	}
 	
 	
+	/**
+	 * @see org.objectweb.proactive.extra.scheduler.common.job.JobId#setValue(int)
+	 */
+	public void setValue(int id) {
+		this.id = id;
+	}
+
+
+	/**
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(JobId o) {
+		return new Integer(id).compareTo(new Integer(o.value()));
+	}
+	
+	
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
-    public String toString(){
-    	return name;
-    }
+	public boolean equals(Object o){
+		if (o instanceof JobId)
+			return ((JobId)o).value() == id;
+		return false;
+	}
+	
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return this.id;
+	}
+
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return ""+id;
+	}
 	
 }

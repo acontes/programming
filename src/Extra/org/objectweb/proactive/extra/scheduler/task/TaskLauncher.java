@@ -34,7 +34,6 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -47,9 +46,12 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
+import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
-import org.objectweb.proactive.extra.scheduler.exception.UserException;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptLoader;
@@ -154,11 +156,11 @@ public class TaskLauncher implements InitActive, Serializable {
 	        	}
         	}
 			//launch task
-            TaskResult result = new TaskResult(taskId, task.execute(results));
+            TaskResult result = new TaskResultImpl(taskId, task.execute(results));
             //return result
             return result;
 		} catch (Exception ex) {
-			return new TaskResult(taskId, ex);
+			return new TaskResultImpl(taskId, ex);
 		} finally {
 			//Unhandle loggers
             LogManager.shutdown();

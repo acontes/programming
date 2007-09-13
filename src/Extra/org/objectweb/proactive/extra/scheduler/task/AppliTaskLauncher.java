@@ -42,9 +42,13 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
+import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
-import org.objectweb.proactive.extra.scheduler.exception.UserException;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
@@ -131,12 +135,12 @@ public class AppliTaskLauncher extends TaskLauncher {
 				}
         	}
 			//launch task
-            TaskResult result = new TaskResult(taskId, task.execute(nodes));
+            TaskResult result = new TaskResultImpl(taskId, task.execute(nodes));
             //return result
             return result;
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			return new TaskResult(taskId, ex);
+			return new TaskResultImpl(taskId, ex);
 		} finally {
 			//Unhandle loggers
             LogManager.shutdown();

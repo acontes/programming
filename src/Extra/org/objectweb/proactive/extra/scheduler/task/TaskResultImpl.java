@@ -30,7 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-import java.io.Serializable;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 /**
  * Class representing the task result.
@@ -42,7 +43,7 @@ import java.io.Serializable;
  * @version 1.0, Aug 3, 2007
  * @since ProActive 3.2
  */
-public class TaskResult implements Serializable {
+public class TaskResultImpl implements TaskResult {
 
 	/** Serial Version UID */
 	private static final long serialVersionUID = 2976276079143998102L;
@@ -54,7 +55,7 @@ public class TaskResult implements Serializable {
 	private Throwable exception = null;
 
 	/** ProActive empty constructor. */
-	public TaskResult(){}
+	public TaskResultImpl(){}
 	
 	
 	/**
@@ -63,7 +64,7 @@ public class TaskResult implements Serializable {
 	 * @param id the identification of the task that send this result.
 	 * @param value the result of the task.
 	 */
-	public TaskResult(TaskId id, Object value) {
+	public TaskResultImpl(TaskId id, Object value) {
 		this.id = id;
 		this.value = value;
 	}
@@ -75,16 +76,14 @@ public class TaskResult implements Serializable {
 	 * @param id the identification of the task that send this result.
 	 * @param exception the exception that occured in the task.
 	 */
-	public TaskResult(TaskId id, Throwable exception) {
+	public TaskResultImpl(TaskId id, Throwable exception) {
 		this.id = id;
 		this.exception = exception;
 	}
 
 	
 	/**
-	 * To know if an exception has occured on this task.
-	 * 
-	 * @return true if an exception occured, false if not.
+	 * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#hadException()
 	 */
 	public boolean hadException(){
 		return exception != null;
@@ -92,9 +91,7 @@ public class TaskResult implements Serializable {
 	
 
 	/**
-	 * To get the id
-	 * 
-	 * @return the id
+	 * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getTaskId()
 	 */
 	public TaskId getTaskId() {
 		return id;
@@ -102,9 +99,7 @@ public class TaskResult implements Serializable {
 	
 
 	/**
-	 * To get the value
-	 * 
-	 * @return the value
+	 * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#value()
 	 */
 	public Object value() {
 		return value;
@@ -112,9 +107,7 @@ public class TaskResult implements Serializable {
 	
 	
 	/**
-	 * To get the exception
-	 * 
-	 * @return the exception
+	 * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getException()
 	 */
 	public Throwable getException() {
 		return exception;

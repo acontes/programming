@@ -28,38 +28,25 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
-import java.util.Map;
+import java.io.Serializable;
+import java.util.HashMap;
 
 /**
- * A java task is a task representing a java .class file.
- * Extends this abstract class if you want to create your own java task.
+ * Stats interface class will be used to view some tips on the scheduler.
  * 
  * @author ProActive Team
- * @version 1.0, Jun 4, 2007
+ * @version 1.0, Jul 25, 2007
  * @since ProActive 3.2
  */
-public abstract class JavaTask implements Task {
-	
+public interface Stats extends Serializable {
+
 	/**
-	 * Initialization default method for a task.
-	 * By default it puts the parameters set in the task descriptor
-	 * in the class variables if their names are correctly mapped.
-	 * You can override this method to make your own initialisation.
+	 * To get the properties saved in the stats class as an hashMap
 	 * 
-	 * @param args a map containing the differents variables names and values.
+	 * @return the properties as an hashMap.
 	 */
-	public void init(Map<String, Object> args){
-		try{
-			//for (String key : args.keySet()){
-				//TODO make the mapping automatically (seems not to be possible)
-				//Field f = this.getClass().getDeclaredField(key);
-				//f.set(this, f.getClass().cast(args.get(key)));
-				//f.set(this, args.get(key));
-			//}
-		} catch(Exception e){
-			e.printStackTrace();
-		}
-	}
+	public HashMap<String, Object> getProperties();
+	
 }

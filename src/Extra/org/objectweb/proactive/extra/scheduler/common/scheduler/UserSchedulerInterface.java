@@ -28,17 +28,15 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.userAPI;
+package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
-
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.scheduler.core.Stats;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.job.JobResult;
 
 /**
  * Scheduler user interface.
@@ -49,7 +47,7 @@ import org.objectweb.proactive.extra.scheduler.job.JobResult;
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
-public interface UserSchedulerInterface extends Serializable{
+public interface UserSchedulerInterface extends Serializable {
 	
 
 	/**
@@ -62,7 +60,7 @@ public interface UserSchedulerInterface extends Serializable{
 	 * 
 	 * @param job the new job to submit.
 	 * @return the generated new job ID.
-	 * @throws SchedulerException
+	 * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
 	 */
 	public JobId submit(Job job) throws SchedulerException;
 	
@@ -73,7 +71,7 @@ public interface UserSchedulerInterface extends Serializable{
 	 * 
 	 * @param jobId the job on which the result will be send
 	 * @return a job Result containing information about the result.
-	 * @throws SchedulerException
+	 * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
 	 */
 	public JobResult getResult(JobId jobId) throws SchedulerException;
 	
@@ -85,7 +83,7 @@ public interface UserSchedulerInterface extends Serializable{
 	 * @param jobId the id of the job to listen to.
 	 * @param hostname the hostname where to send the log.
 	 * @param port the port number on which the log will be sent.
-	 * @throws SchedulerException.
+	 * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
 	 */
 	public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException;
 	
@@ -96,16 +94,17 @@ public interface UserSchedulerInterface extends Serializable{
 	 * 
 	 * @param sel a SchedulerEventListener on which the scheduler will talk.
 	 * @return the scheduler current state containing the different lists of jobs.
-	 * @throws SchedulerException
+	 * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
 	 */
 	public SchedulerInitialState addSchedulerEventListener (SchedulerEventListener sel) throws SchedulerException;
 	
 	
 	/**
-	 * Return the scheduler statistics as an hashMap.
+	 * Return the scheduler statistics.
+	 * It will be possible to get an HashMap of all properties set in the stats class.
 	 * 
-	 * @return the scheduler statistics as an hashMap.
-	 * @throws SchedulerException
+	 * @return the scheduler statistics.
+	 * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
 	 */
 	public Stats getStats() throws SchedulerException;
 	
@@ -113,7 +112,7 @@ public interface UserSchedulerInterface extends Serializable{
 	/**
 	 * Disconnect properly the user from the scheduler.
 	 * 
-	 * @throws SchedulerException.
+	 * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
 	 */
 	public void disconnect() throws SchedulerException;
 	

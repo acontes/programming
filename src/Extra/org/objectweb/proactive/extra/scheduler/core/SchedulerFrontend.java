@@ -43,25 +43,27 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.job.IdentifyJob;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.job.JobIdImpl;
 import org.objectweb.proactive.extra.scheduler.job.LightJob;
 import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.task.TaskIdImpl;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
-import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 /**
  * Scheduler Frontend. This is the API to talk to when you want to managed a scheduler core.
@@ -100,7 +102,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/** scheduler listeners */
 	private HashMap<UniqueID,SchedulerEventListener> schedulerListeners = new HashMap<UniqueID,SchedulerEventListener>();
 	/** Scheduler's statistics */
-	private Stats stats = new Stats();
+	private StatsImpl stats = new StatsImpl();
 	
 	
 	/* ########################################################################################### */
@@ -221,12 +223,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 				throw new SchedulerException("Only the administrator can submit a job with such priority : "+ job.getPriority());
 		}
 		//setting the job properties
-		job.setId(new JobId(jobGlobalCount++));
+		job.setId(new JobIdImpl(jobGlobalCount++));
 		job.setOwner(identifications.get(id).getUsername());
 		//setting the unique task IDs and jobId for each task
 		int taskId = 1;
 		for (TaskDescriptor td : job.getTasks()){
-			job.setTaskId(td,new TaskId(job.getId().value()*JOB_FACTOR+(taskId++)));
+			job.setTaskId(td,new TaskIdImpl(job.getId().value()*JOB_FACTOR+(taskId++)));
 			td.setJobInfo(job.getJobInfo());
 		}
 		jobs.put(job.getId(), new IdentifyJob(job.getId(),identifications.get(id)));
@@ -256,7 +258,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener)
 	 */
 	public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener sel) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
@@ -268,7 +270,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#getStats()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getStats()
 	 */
 	public Stats getStats() throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
@@ -385,7 +387,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#disconnect()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#disconnect()
 	 */
 	public void disconnect() throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
@@ -418,7 +420,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public BooleanWrapper pause(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to pause this job !");
@@ -427,7 +429,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public BooleanWrapper resume(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to resume this job !");
@@ -436,7 +438,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public BooleanWrapper kill(JobId jobId) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to kill this job !");
@@ -445,7 +447,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#changePriority(org.objectweb.proactive.extra.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.objectweb.proactive.extra.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
 	 */
 	public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
 		prkcp(jobId,"You do not have permission to change the priority of this job !");
@@ -514,7 +516,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#SchedulerImmediatePausedEvent()
 	 */
 	public void schedulerImmediatePausedEvent() {
 		dispatch("schedulerImmediatePausedEvent", null);
@@ -522,7 +524,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#SchedulerPausedEvent()
 	 */
 	public void schedulerPausedEvent() {
 		dispatch("schedulerPausedEvent", null);
@@ -530,7 +532,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#SchedulerResumedEvent()
 	 */
 	public void schedulerResumedEvent() {
 		dispatch("schedulerResumedEvent", null);
@@ -538,7 +540,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerShutDownEvent()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#SchedulerShutDownEvent()
 	 */
 	public void schedulerShutDownEvent() {
 		dispatch("schedulerShutDownEvent", null);
@@ -546,7 +548,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerShuttingDownEvent()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#SchedulerShuttingDownEvent()
 	 */
 	public void schedulerShuttingDownEvent() {
 		dispatch("schedulerShuttingDownEvent", null);
@@ -554,7 +556,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#SchedulerStartedEvent()
 	 */
 	public void schedulerStartedEvent() {
 		dispatch("schedulerStartedEvent", null);
@@ -562,7 +564,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#SchedulerStoppedEvent()
 	 */
 	public void schedulerStoppedEvent() {
 		dispatch("schedulerStoppedEvent", null);
@@ -570,7 +572,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent()
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#SchedulerkilledEvent()
 	 */
 	public void schedulerKilledEvent() {
 		dispatch("schedulerKilledEvent", null);
@@ -578,7 +580,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobKilledEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#jobKilledEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
 	public void jobKilledEvent(JobId jobId) {
 		dispatch("jobKilledEvent", new Class<?>[]{JobId.class},jobId);
@@ -587,7 +589,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobPausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#jobPausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void jobPausedEvent(JobEvent event) {
 		dispatch("jobPausedEvent", new Class<?>[]{JobEvent.class},event);
@@ -595,7 +597,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobResumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#jobResumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void jobResumedEvent(JobEvent event) {
 		dispatch("jobResumedEvent", new Class<?>[]{JobEvent.class},event);
@@ -603,7 +605,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.JobU)
 	 */
 	public void newPendingJobEvent(Job job) {
 		dispatch("newPendingJobEvent", new Class<?>[]{Job.class},job);
@@ -611,7 +613,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void pendingToRunningJobEvent(JobEvent event) {
 		dispatch("pendingToRunningJobEvent", new Class<?>[]{JobEvent.class},event);
@@ -619,7 +621,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void runningToFinishedJobEvent(JobEvent event) {
 		dispatch("runningToFinishedJobEvent", new Class<?>[]{JobEvent.class},event);
@@ -630,7 +632,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void removeFinishedJobEvent(JobEvent event) {
 		dispatch("removeFinishedJobEvent", new Class<?>[]{JobEvent.class},event);
@@ -638,7 +640,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
 	 */
 	public void pendingToRunningTaskEvent(TaskEvent event) {
 		dispatch("pendingToRunningTaskEvent", new Class<?>[]{TaskEvent.class},event);
@@ -646,7 +648,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
 	 */
 	public void runningToFinishedTaskEvent(TaskEvent event) {
 		dispatch("runningToFinishedTaskEvent", new Class<?>[]{TaskEvent.class},event);
@@ -654,7 +656,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
 	 */
 	public void changeJobPriorityEvent(JobEvent event) {
 		dispatch("changeJobPriorityEvent", new Class<?>[]{JobEvent.class},event);

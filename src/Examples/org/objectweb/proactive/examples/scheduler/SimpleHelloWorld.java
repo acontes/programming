@@ -2,22 +2,20 @@ package org.objectweb.proactive.examples.scheduler;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-
 import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.job.TaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.task.JavaTask;
-import org.objectweb.proactive.extra.scheduler.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.JavaTaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
-import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
 
 
 /**

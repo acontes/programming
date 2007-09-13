@@ -28,10 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.common;
+package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 import java.util.Vector;
+
 import org.objectweb.proactive.extra.scheduler.job.Job;
 
 /**

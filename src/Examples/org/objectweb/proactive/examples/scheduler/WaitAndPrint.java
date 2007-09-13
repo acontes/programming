@@ -31,8 +31,8 @@
 package org.objectweb.proactive.examples.scheduler;
 
 import java.util.Map;
-import org.objectweb.proactive.extra.scheduler.task.JavaTask;
-import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 public class WaitAndPrint extends JavaTask { 
@@ -53,12 +53,12 @@ public class WaitAndPrint extends JavaTask {
 						System.out.println("\t "+tRes.getTaskId()+" : "+tRes.value());
 	        	}
 	            message = java.net.InetAddress.getLocalHost().toString();
-	            if (sleepTime == 5){
-	            	Thread.sleep(sleepTime * 100);
-	            	System.exit(1);
-	            } else {
+//	            if (sleepTime == 5){
+//	            	Thread.sleep(sleepTime * 100);
+//	            	System.exit(1);
+//	            } else {
 	            	Thread.sleep(sleepTime * 1000);
-	            }
+//	            }
 	        } catch (Exception e) {
 	            message = "crashed";
 	            e.printStackTrace();

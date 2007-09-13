@@ -30,9 +30,10 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
-import java.io.Serializable;
 import java.util.HashMap;
-import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**
@@ -45,7 +46,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskResult;
  * @version 1.0, Jul 5, 2007
  * @since ProActive 3.2
  */
-public class JobResult implements Serializable {
+public class JobResultImpl implements JobResult {
 
 	/** Serial version UID */
 	private static final long serialVersionUID = 6287355063616273677L;
@@ -57,7 +58,7 @@ public class JobResult implements Serializable {
     /**
      * ProActive empty constructor
      */
-    public JobResult() {}
+    public JobResultImpl() {}
 
     
     /**
@@ -67,7 +68,7 @@ public class JobResult implements Serializable {
      * @param result the result associated with this result
      * @param name the name of the job that has generate this result.
      */
-    public JobResult(JobId id, String name){
+    public JobResultImpl(JobId id, String name){
     	this.id = id;
     	this.name = name;
     }

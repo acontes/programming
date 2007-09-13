@@ -33,9 +33,11 @@ package org.objectweb.proactive.extra.scheduler.job;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobState;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.Status;
-import org.objectweb.proactive.extra.scheduler.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**
  * JobEvent provides some informations about a job.
@@ -53,7 +55,7 @@ public class JobEvent implements Serializable{
 	/** Serial version UID */
 	private static final long serialVersionUID = -7426315610231893158L;
 	/** job id */
-	private JobId jobId = new JobId(0);
+	private JobId jobId = new JobIdImpl(0);
 	/** job submitted time */
 	private long submittedTime = -1;
 	/** job started time */

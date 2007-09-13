@@ -30,10 +30,11 @@
  */
 package org.objectweb.proactive.extra.scheduler.core;
 
-import java.io.Serializable;
-import java.util.HashMap;
 
-import org.objectweb.proactive.extra.scheduler.job.JobType;
+import java.util.HashMap;
+import org.objectweb.proactive.extra.scheduler.common.job.JobType;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
 
 /**
  * Stats class will be used to view some tips on the scheduler.
@@ -42,7 +43,7 @@ import org.objectweb.proactive.extra.scheduler.job.JobType;
  * @version 1.0, Jul 25, 2007
  * @since ProActive 3.2
  */
-public class Stats implements Serializable {
+public class StatsImpl implements Stats {
 
 	/** Serial version UID */
 	private static final long serialVersionUID = 1986632393105294431L;
@@ -53,7 +54,7 @@ public class Stats implements Serializable {
 	/**
 	 * ProActive Empty constructor
 	 */
-	public Stats(){}
+	public StatsImpl(){}
 	
 	
 	/**
@@ -150,9 +151,7 @@ public class Stats implements Serializable {
 	}
 
 	/**
-	 * To get the properties.
-	 * 
-	 * @return the properties
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.Stats#getProperties()
 	 */
 	public HashMap<String, Object> getProperties() {
 		return properties;

@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.scheduler.task.descriptor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.extra.scheduler.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
 
 /**
  * Abstract definition of a java task.

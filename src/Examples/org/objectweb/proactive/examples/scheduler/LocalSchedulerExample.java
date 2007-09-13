@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
+import org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.SimpleResourceManager;
 
@@ -76,7 +77,7 @@ public class LocalSchedulerExample {
                 logger.info("ResourceManager created on " + ProActive.getActiveObjectNodeUrl(imp));
             }
 
-            AdminScheduler adminAPI = AdminScheduler.createScheduler(
+            AdminSchedulerInterface adminAPI = AdminScheduler.createScheduler(
             		LocalSchedulerExample.class.getResource("login.cfg").getFile(),
             		LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
             		"admin",

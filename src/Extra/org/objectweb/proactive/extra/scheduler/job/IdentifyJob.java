@@ -32,6 +32,8 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+
 /**
  * This class represented an authentificate job.
  * It is what the scheduler should be able to managed.

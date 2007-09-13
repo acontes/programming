@@ -30,25 +30,75 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+
 
 /**
- * This is the execution entry point for the native task.
- * The execute(TaskResult...) method will be override by the scheduler to launch the native process.
- * This class provide a getProcess method that will return the current running native process.
+ * Definition of a task identification.
+ * For the moment, it is represented by an integer.
  * 
  * @author ProActive Team
- * @version 1.0, Aug 21, 2007
+ * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
-public abstract class NativeTask implements Task {
+public final class TaskIdImpl implements TaskId {
+	
+	/** Serial version UID */
+	private static final long serialVersionUID = -7367447876595953374L;
+	/** task id */
+	private int id = 0;
+
 	
 	/**
-	 * Return the current nativ running process.
-	 * It is used by the scheduler to allow it to kill the process.
+	 * Default constructor. Just set the id of the task.
 	 * 
-	 * @return the current nativ running process.
+	 * @param id the task id to set.
 	 */
-	public abstract Process getProcess();
+	public TaskIdImpl(int id){
+		this.id = id;
+	}
+	
+	/**
+	 * To get the id
+	 * 
+	 * @return the id
+	 */
+	public int value() {
+		return id;
+	}
+	
+	
+	/**
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(TaskId o) {
+		return new Integer(id).compareTo(new Integer(o.value()));
+	}
+	
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object o){
+		if (o instanceof TaskIdImpl)
+			return ((TaskIdImpl)o).id == id;
+		return false;
+	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return id;
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return ""+id;
+	}
 	
 }

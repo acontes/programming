@@ -28,13 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.userAPI;
+package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 import javax.security.auth.login.LoginException;
-import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
-import org.objectweb.proactive.extra.scheduler.core.UserScheduler;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
+
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface;
 
 /**
  * Scheduler Authentification Interface provides method to connect to the scheduler.
@@ -57,7 +57,7 @@ public interface SchedulerAuthenticationInterface extends Serializable {
 	 * @throws LoginException thrown if this user/password does not match any entries.
 	 * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
 	 */
-	public UserScheduler logAsUser(String user, String password) throws LoginException, SchedulerException;
+	public UserSchedulerInterface logAsUser(String user, String password) throws LoginException, SchedulerException;
 	
 	/**
 	 * Connect the admin interface to a scheduler with the given scheduler URL.
@@ -72,5 +72,5 @@ public interface SchedulerAuthenticationInterface extends Serializable {
 	 * @throws LoginException thrown if this user/password does not match any entries.
 	 * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
 	 */
-	public AdminScheduler logAsAdmin(String user, String password) throws LoginException, SchedulerException;
+	public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException, SchedulerException;
 }

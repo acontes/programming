@@ -28,95 +28,60 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.job;
-
-import java.io.Serializable;
+package org.objectweb.proactive.extra.scheduler.common.job;
 
 /**
- * Definition of a job identification.
- * For the moment, it is represented by an integer.
+ * This is the different job priorities.
  * 
  * @author ProActive Team
- * @version 1.0, Jun 29, 2007
+ * @version 1.0, Jun 11, 2007
  * @since ProActive 3.2
  */
-public final class JobId implements Comparable<JobId>, Serializable, Cloneable {
+public enum JobPriority implements java.io.Serializable {
 	
-	/** Serial version UID */
-	private static final long serialVersionUID = -7367447876595953374L;
-	private int id = 0;
-
+	/** Lowest priority : administrator only */
+	IDLE ("Idle",0),
+	/** Lowest priority */
+	LOWEST ("Lowest",1),
+	/** Low priority */
+	LOW ("Low",2),
+	/** Normal Prority */
+	NORMAL ("Normal",3),
+	/** High priority : administrator only */
+	HIGH ("High",4),
+	/** Highest priority : administrator only */
+	HIGHEST ("Highest",5);
+	
+	
+	/** Name of the priority */
+	private String name;
+	/** Priority representing by an integer */
+	private int priority;
+	
 	
 	/**
-	 * ProActive empty constructor
-	 */
-	public JobId(){}
-	
-	
-	/**
-	 * Default Job id constructor
+	 * Implicit constructor of job priority.
 	 * 
-	 * @param id the id to put in the jobId
+	 * @param name the name of the prority.
+	 * @param priority the integer representing the priority.
 	 */
-	public JobId(int id){
-		this.id = id;
+	JobPriority (String name, int priority){
+		this.name = name;
+		this.priority = priority;
 	}
 	
-	
 	/**
-	 * To get the id
-	 * 
-	 * @return the id
+	 * @see java.lang.Enum#toString()
 	 */
-	public int value() {
-		return id;
+	public String toString(){
+		return name;
 	}
 	
-
 	/**
-	 * To set the id
-	 * 
-	 * @param id the id to set
+	 * @return the integer representing the priority.
 	 */
-	public void setValue(int id) {
-		this.id = id;
-	}
-
-
-	/**
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(JobId o) {
-		return new Integer(id).compareTo(new Integer(o.id));
-	}
-	
-	
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object o){
-		if (o instanceof JobId)
-			return ((JobId)o).id == id;
-		return false;
-	}
-	
-	
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return this.id;
-	}
-
-
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return ""+id;
+	public int getPriority(){
+		return priority;
 	}
 	
 }

@@ -28,68 +28,60 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.common;
+package org.objectweb.proactive.extra.scheduler.common.job;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+
 
 /**
- * State of a job.
- * The differents job states are best described below.
+ * Interface representing a job result.
+ * A job result is a map of task result.
+ * The key of the map is the name of the task on which to get the result.
+ * To identify the job result, it provides the id of the job in the scheduler and the job name.
  * 
  * @author ProActive Team
- * @version 1.0, Aug 10, 2007
+ * @version 1.0, Jul 5, 2007
  * @since ProActive 3.2
  */
-public enum JobState implements java.io.Serializable {
+public interface JobResult extends Serializable {
+
+    
+	/**
+	 * To get the id
+	 * 
+	 * @return the id
+	 */
+	public JobId getId();
 	
+
 	/**
-	 * The job is waiting to be scheduled.
+	 * To get the name of the job that has generate this result.
+	 * 
+	 * @return the name
 	 */
-	PENDING ("Pending"),
-	/**
-	 * The job is running. Actually at least one of its task has been scheduled.
-	 */
-	RUNNING ("Running"),
-	/**
-	 * The job has been launched but no task are currently running.
-	 */
-	STALLED ("Stalled"),
-	/**
-	 * The job is finished. Every tasks are finished.
-	 */
-	FINISHED ("Finished"),
-	/**
-	 * The job is paused waiting for user to resume it.
-	 */
-	PAUSED ("Paused"),
-	/**
-	 * The job has been cancelled due to user exception and order.
-	 * This state runs when a user exception occurs in a task
-	 * and when the user has asked to cancel on exception.
-	 */
-	CANCELLED ("Cancelled"),
-	/**
-	 * The job has failed. One or more tasks have failed.
-	 * There is no more rerun left for a task.
-	 */
-	FAILED ("Failed");
+	public String getName();
 	
 	
-	/** The textual definition of the state */
-	private String definition;
+	/**
+	 * Add a new task result to this job result.
+	 * 
+	 * @param taskName user define name (in XML) of the task.
+	 * @param taskResult the corresponding result of the task.
+	 */
+	public void addTaskResult(String taskName, TaskResult taskResult);
+	
 	
 	/**
-	 * Default constructor.
-	 * @param def the textual definition of the state.
+	 * Return the task results of this job as a mapping between
+	 * user task name (in XML jo description) and its task result.
+	 * User that wants to get a specific result may get this map and ask for a specific mapping.
+	 * 
+	 * @return the task result as a map.
 	 */
-	JobState (String def){
-		definition = def;
-	}
-	
-	/**
-	 * @see java.lang.Enum#toString()
-	 */
-	@Override
-	public String toString(){
-		return definition;
-	}
+	public HashMap<String,TaskResult> getTaskResults();
+
 	
 }

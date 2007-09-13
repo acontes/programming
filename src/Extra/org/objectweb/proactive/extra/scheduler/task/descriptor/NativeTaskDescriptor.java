@@ -32,16 +32,15 @@ package org.objectweb.proactive.extra.scheduler.task.descriptor;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.task.NativeTask;
 import org.objectweb.proactive.extra.scheduler.task.NativeTaskLauncher;
-import org.objectweb.proactive.extra.scheduler.task.Task;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
-import org.objectweb.proactive.extra.scheduler.task.TaskResult;
 
 /**
  * Description of a native task.
@@ -87,7 +86,7 @@ public class NativeTaskDescriptor extends TaskDescriptor {
 			private Process process;
 
 			/**
-			 * @see org.objectweb.proactive.extra.scheduler.task.Task#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
+			 * @see org.objectweb.proactive.extra.scheduler.common.task.Task#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
 			 */
 			public Object execute(TaskResult... results) {
 				try {

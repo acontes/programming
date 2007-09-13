@@ -28,60 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.job;
+package org.objectweb.proactive.extra.scheduler.common.job;
+
+import java.io.Serializable;
 
 /**
- * This is the different job priorities.
+ * Definition of a job identification.
  * 
  * @author ProActive Team
- * @version 1.0, Jun 11, 2007
+ * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
-public enum JobPriority implements java.io.Serializable {
-	
-	/** Lowest priority : administrator only */
-	IDLE ("Idle",0),
-	/** Lowest priority */
-	LOWEST ("Lowest",1),
-	/** Low priority */
-	LOW ("Low",2),
-	/** Normal Prority */
-	NORMAL ("Normal",3),
-	/** High priority : administrator only */
-	HIGH ("High",4),
-	/** Highest priority : administrator only */
-	HIGHEST ("Highest",5);
-	
-	
-	/** Name of the priority */
-	private String name;
-	/** Priority representing by an integer */
-	private int priority;
-	
+public interface JobId extends Comparable<JobId>, Serializable {
 	
 	/**
-	 * Implicit constructor of job priority.
+	 * To get the id real object.
 	 * 
-	 * @param name the name of the prority.
-	 * @param priority the integer representing the priority.
+	 * @return the id as the real object.
 	 */
-	JobPriority (String name, int priority){
-		this.name = name;
-		this.priority = priority;
-	}
+	public int value();
 	
 	/**
-	 * @see java.lang.Enum#toString()
+	 * To set the id
+	 * 
+	 * @param id the id to set
 	 */
-	public String toString(){
-		return name;
-	}
-	
-	/**
-	 * @return the integer representing the priority.
-	 */
-	public int getPriority(){
-		return priority;
-	}
+	public void setValue(int id);
 	
 }

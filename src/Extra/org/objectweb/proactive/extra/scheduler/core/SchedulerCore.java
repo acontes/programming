@@ -50,27 +50,29 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.job.JobState;
+import org.objectweb.proactive.extra.scheduler.common.job.JobType;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extra.scheduler.job.Job;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.job.JobResult;
-import org.objectweb.proactive.extra.scheduler.job.JobType;
+import org.objectweb.proactive.extra.scheduler.job.JobResultImpl;
 import org.objectweb.proactive.extra.scheduler.job.LightJob;
 import org.objectweb.proactive.extra.scheduler.job.LightTask;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
-import org.objectweb.proactive.extra.scheduler.task.ApplicationTask;
 import org.objectweb.proactive.extra.scheduler.task.Status;
-import org.objectweb.proactive.extra.scheduler.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
-import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.task.TaskResultImpl;
+import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerState;
 
 /**
  * <i><font size="-1" color="#FF0000">** Scheduler core ** </font></i>
@@ -421,7 +423,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		job.failed(task.getId(),jobState);
 		//store the exception into jobResult
 		if (jobState == JobState.FAILED)
-			results.get(job.getId()).addTaskResult(task.getName(),new TaskResult(task.getId(),new Throwable(errorMsg)));
+			results.get(job.getId()).addTaskResult(task.getName(),new TaskResultImpl(task.getId(),new Throwable(errorMsg)));
 		else
 			results.get(job.getId()).addTaskResult(task.getName(),taskResult);
 		//move the job
@@ -524,7 +526,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 		jobs.put(job.getId(), job);
 		pendingJobs.add(job);
 		//creating job result storage
-		JobResult jobResult = new JobResult(job.getId(),job.getName());
+		JobResult jobResult = new JobResultImpl(job.getId(),job.getName());
 		//store the job result until user get it
 		results.put(job.getId(),jobResult);
 		//sending event to client

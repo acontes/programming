@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.core;
+package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 import java.util.Calendar;

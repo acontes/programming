@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.userAPI;
+package org.objectweb.proactive.extra.scheduler.common.job;
 
 /**
  * State of a job.

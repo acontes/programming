@@ -35,9 +35,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Random;
-
-import org.objectweb.proactive.extra.scheduler.task.JavaTask;
-import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 public class MonteCarlo extends JavaTask {
@@ -104,7 +103,6 @@ public class MonteCarlo extends JavaTask {
                 }
             }
         }
-        n = 3/0;
         return result;
     }
 }

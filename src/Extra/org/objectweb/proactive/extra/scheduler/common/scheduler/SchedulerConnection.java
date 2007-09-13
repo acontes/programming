@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.userAPI;
+package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -37,8 +37,8 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerAuthentication;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 
 /**
  * Scheduler connection class provide method to join an existing scheduler.

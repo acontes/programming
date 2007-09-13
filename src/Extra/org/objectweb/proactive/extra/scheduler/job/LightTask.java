@@ -33,7 +33,8 @@ package org.objectweb.proactive.extra.scheduler.job;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.extra.scheduler.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
 /**

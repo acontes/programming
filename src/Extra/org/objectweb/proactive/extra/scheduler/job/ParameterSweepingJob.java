@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
 
 /**
@@ -76,14 +78,14 @@ public class ParameterSweepingJob extends Job {
 	 */
 	@Override
 	public boolean addTask(TaskDescriptor task) {
-		if (tasks.size() > 0)
+		if (getTasks().size() > 0)
 			return false;
 		return super.addTask(task);
 	}
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.job.Job#getType()
+	 * @see org.objectweb.proactive.extra.scheduler.job.JobU#getType()
 	 */
 	@Override
 	public JobType getType() {

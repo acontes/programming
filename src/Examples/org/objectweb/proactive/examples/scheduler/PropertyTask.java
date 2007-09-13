@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.examples.scheduler;
 
-import org.objectweb.proactive.extra.scheduler.task.JavaTask;
-import org.objectweb.proactive.extra.scheduler.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 public class PropertyTask extends JavaTask {
 

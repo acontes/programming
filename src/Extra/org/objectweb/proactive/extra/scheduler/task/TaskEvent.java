@@ -32,8 +32,9 @@ package org.objectweb.proactive.extra.scheduler.task;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
 
 /**
  * Informations about the task that is able to change.
@@ -51,7 +52,7 @@ public class TaskEvent implements Serializable{
 	/** global task id count */
 	private static int globalCount = 0;
 	/** id of the task */
-	private TaskId taskID = new TaskId(globalCount++);
+	private TaskId taskID = new TaskIdImpl(globalCount++);
 	/** informations about the job */
 	private JobEvent jobEvent = null;
 	/** task submitted time */

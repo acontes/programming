@@ -37,15 +37,15 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
 import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
 
 
 /**
@@ -147,7 +147,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	 * @throws AdminSchedulerException if an admin connection exception occurs.
 	 * @throws LoginException if a user login/password exception occurs.
 	 */
-	public static AdminScheduler createScheduler(String loginFile, String groupFile, String login, String password, InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException, SchedulerException, LoginException {
+	public static AdminSchedulerInterface createScheduler(String loginFile, String groupFile, String login, String password, InfrastructureManagerProxy imp, String policyFullClassName) throws AdminSchedulerException, SchedulerException, LoginException {
 		createScheduler(loginFile, groupFile, imp, policyFullClassName);
 		SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
 		return auth.logAsAdmin(login, password);
@@ -171,7 +171,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#submit(org.objectweb.proactive.extra.scheduler.job.Job)
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#submit(org.objectweb.proactive.extra.scheduler.job.JobU)
 	 */
 	public JobId submit(Job job) throws SchedulerException {
 		return schedulerFrontend.submit(job);
@@ -181,7 +181,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#start()
 	 */
-	public BooleanWrapper start(){
+	public BooleanWrapper start() throws SchedulerException {
 		return schedulerFrontend.coreStart();
 	}
 	
@@ -189,7 +189,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#stop()
 	 */
-	public BooleanWrapper stop(){
+	public BooleanWrapper stop() throws SchedulerException {
 		return schedulerFrontend.coreStop();
 	}
 	
@@ -197,7 +197,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pause()
 	 */
-	public BooleanWrapper pause(){
+	public BooleanWrapper pause() throws SchedulerException {
 		return schedulerFrontend.corePause();
 	}
 	
@@ -205,7 +205,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pauseImmediate()
 	 */
-	public BooleanWrapper pauseImmediate(){
+	public BooleanWrapper pauseImmediate() throws SchedulerException {
 		return schedulerFrontend.coreImmediatePause();
 	}
 	
@@ -213,7 +213,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
 	 */
-	public BooleanWrapper resume(){
+	public BooleanWrapper resume() throws SchedulerException {
 		return schedulerFrontend.coreResume();
 	}
 	
@@ -221,12 +221,12 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#shutdown()
 	 */
-	public BooleanWrapper shutdown(){
+	public BooleanWrapper shutdown() throws SchedulerException {
 		return schedulerFrontend.coreShutdown();
 	}
 	
 	
-	public BooleanWrapper kill(){
+	public BooleanWrapper kill() throws SchedulerException {
 		return schedulerFrontend.coreKill();
 	}
 	

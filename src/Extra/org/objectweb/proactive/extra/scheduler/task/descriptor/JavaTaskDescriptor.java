@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.task.descriptor;
 
-import org.objectweb.proactive.extra.scheduler.task.JavaTask;
-import org.objectweb.proactive.extra.scheduler.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
 
 
 /**

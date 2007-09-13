@@ -38,9 +38,10 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.security.FileLogin;
 import org.objectweb.proactive.extra.security.Login;
 
@@ -98,9 +99,9 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
 	 */
-	public UserScheduler logAsUser(String user, String password) throws LoginException, SchedulerException {
+	public UserSchedulerInterface logAsUser(String user, String password) throws LoginException, SchedulerException {
 		// Verify that this user//password can connect to this existing scheduler
 		logger.info(user+" is trying to connect...");
 		logger.info("Verifying user name and password...");
@@ -127,9 +128,9 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
 	 */
-	public AdminScheduler logAsAdmin(String user, String password) throws LoginException, SchedulerException {
+	public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException, SchedulerException {
 		// Verify that this user//password can connect (as admin) to this existing scheduler.
 		logger.info("Verifying admin name and password...");
 		Map<String, Object> params = new HashMap<String, Object>(6);
