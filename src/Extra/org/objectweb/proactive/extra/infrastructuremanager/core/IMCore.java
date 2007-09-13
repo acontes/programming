@@ -49,11 +49,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMDataResource;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMState;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.database.IMDataResourceImpl;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdminImpl;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoringImpl;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
@@ -323,11 +321,6 @@ public class IMCore implements InitActive, IMConstants, Serializable {
         return nodeManager.getAllNodes();
     }
 
-    public IMState addIMEventListener(IMEventListener listener) {
-        // FIXME return dataresource.addIMEventListener(listener);
-        return null;
-    }
-
     // ----------------------------------------------------------------------//
     // USER
 
@@ -381,7 +374,6 @@ public class IMCore implements InitActive, IMConstants, Serializable {
     public void shutdown() throws ProActiveException {
         BooleanWrapper bool = nodeManager.shutdown();
         try {
-            ProActive.waitFor(bool);
             if (bool.booleanValue()) {
                 logger.info("Infrastructure Manager successfully shut down.");
             } else {

@@ -297,6 +297,8 @@ public class TaskComposite extends Composite {
 			case SUBMITTED:
 			}
 
+			if (!setFont && ((taskDescriptor.getRerunnable() - taskDescriptor.getRerunnableLeft()) > 0))
+				setFont = true;
 			if (setFont) {
 				Font font = item.getFont();
 				item.setFont(new Font(font.getDevice(), font.getFontData()[0].getName(),
@@ -304,8 +306,8 @@ public class TaskComposite extends Composite {
 			}
 
 			TableColumn[] cols = table.getColumns();
-			// I'm must fill item by this way, because all columns are
-			// moveable !
+			// I'm must fill item by this way, because all columns are moveable
+			// !
 			// So i don't know if the column "Id" is at the first or the "nth"
 			// position
 			for (int i = 0; i < cols.length; i++) {

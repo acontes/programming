@@ -109,8 +109,6 @@ public class SeparatedJobView extends ViewPart {
 	private static Action shutdownSchedulerAction = null;
 	private static Action killSchedulerAction = null;
 
-	private static SeparatedJobView instance = null;
-
 	private static Composite parent = null;
 
 	// -------------------------------------------------------------------- //
@@ -314,52 +312,6 @@ public class SeparatedJobView extends ViewPart {
 		StartStopSchedulerAction.getInstance().setEnabled(false);
 	}
 
-	public static void adminToolBarMode() {
-		System.out.println("ADMIN()");
-		userToolBarMode();
-// IToolBarManager toolBarManager =
-// instance.getViewSite().getActionBars().getToolBarManager();
-// toolBarManager.add(new Separator());
-// toolBarManager.add(startStopSchedulerAction);
-// toolBarManager.add(freezeSchedulerAction);
-// toolBarManager.add(pauseSchedulerAction);
-// toolBarManager.add(resumeSchedulerAction);
-// toolBarManager.add(shutdownSchedulerAction);
-// toolBarManager.add(killSchedulerAction);
-// Display.getDefault().asyncExec(new Runnable() {
-// @Override
-// public void run() {
-// parent.redraw();
-// parent.update();
-// parent.getShell().redraw();
-// parent.getShell().update();
-// }
-// });
-	}
-
-	public static void userToolBarMode() {
-		System.out.println("USER()");
-		IToolBarManager toolBarManager = instance.getViewSite().getActionBars().getToolBarManager();
-		toolBarManager.removeAll();
-// toolBarManager.add(connectSchedulerAction);
-// toolBarManager.add(changeViewModeAction);
-// toolBarManager.add(new Separator());
-// toolBarManager.add(submitJob);
-// toolBarManager.add(pauseResumeJobAction);
-// toolBarManager.add(obtainJobOutputAction);
-// toolBarManager.add(killJobAction);
-// Display.getDefault().asyncExec(new Runnable() {
-// @Override
-// public void run() {
-// parent.redraw();
-// parent.update();
-// parent.getShell().redraw();
-// parent.getShell().update();
-// System.out.println(".run()");
-// }
-// });
-	}
-
 	// -------------------------------------------------------------------- //
 	// ------------------------- extends viewPart ------------------------- //
 	// -------------------------------------------------------------------- //
@@ -369,7 +321,6 @@ public class SeparatedJobView extends ViewPart {
 	@Override
 	public void createPartControl(Composite theParent) {
 		parent = theParent;
-		instance = this;
 
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 1;

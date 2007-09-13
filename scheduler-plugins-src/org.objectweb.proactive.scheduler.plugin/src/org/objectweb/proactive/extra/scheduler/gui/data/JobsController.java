@@ -898,11 +898,6 @@ public class JobsController implements SchedulerEventListener {
 		if (state == null) // addSchedulerEventListener failed
 			return false;
 
-		if (SchedulerProxy.getInstance().isAnAdmin())
-			SeparatedJobView.adminToolBarMode();
-		else
-			SeparatedJobView.userToolBarMode();
-
 		schedulerState = state.getState();
 		switch (schedulerState) {
 		case KILLED:

@@ -71,7 +71,7 @@ public class SelectSchedulerDialog extends Dialog {
 
 	/** Name of the file which store the good url */
 	public static final String URL_FILE = ".ProActive_Scheduler_urls";
-	/** Name of the file which store the good login */
+	/** Name of the file which store the good login */ // proactive/scheduler/
 	public static final String LOGIN_FILE = ".ProActive_Scheduler_logins";
 
 	private static List<String> urls = null;
@@ -307,7 +307,8 @@ public class SelectSchedulerDialog extends Dialog {
 			/* Do-Nothing */
 		} finally {
 			try {
-				bw.close();
+				if(bw != null)
+					bw.close();
 			} catch (IOException e) {
 				/* Do-Nothing */
 			}
@@ -374,7 +375,8 @@ public class SelectSchedulerDialog extends Dialog {
 			/* Do-Nothing */
 		} finally {
 			try {
-				bw.close();
+				if(bw != null)
+					bw.close();
 			} catch (IOException e) {
 				/* Do-Nothing */
 			}
