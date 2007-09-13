@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 
@@ -165,12 +166,22 @@ public class IMDialogKill  extends Dialog {
 				}
 				else {
 					if (checkedItemsNumber == 1) {
-						admin.killPAD(combo.getText(), listOfCheckedItem.get(0));
+						try {
+							admin.killPAD(combo.getText(), listOfCheckedItem.get(0));
+						} catch (ProActiveException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 					}
 					else {
 						String[] tab = new String[checkedItemsNumber];
 						listOfCheckedItem.toArray(tab);
-						admin.killPAD(combo.getText(), tab);
+						try {
+							admin.killPAD(combo.getText(), tab);
+						} catch (ProActiveException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 					}
 					shell.close();
 				}
