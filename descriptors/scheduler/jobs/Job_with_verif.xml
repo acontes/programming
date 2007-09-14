@@ -5,7 +5,7 @@
 		<task name="task1">
 			<description>Parallel Tasks - Task 1</description>
 			<verifyingTask>
-				<script file="/user/jmartin/home/scripts/parallel_tasks.js"/>
+				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
 			</verifyingTask>
 			<process>
 				<javaProcess
@@ -20,7 +20,7 @@
 		<task name="task2">
 			<description>Parallel Tasks - Task 2</description>
 			<verifyingTask>
-				<script file="/user/jmartin/home/scripts/parallel_tasks.js"/>
+				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
 			</verifyingTask>
 			<process>
 				<javaProcess
@@ -35,7 +35,7 @@
 		<task name="task3">
 			<description>Parallel Tasks - Task 3</description>
 			<verifyingTask>
-				<script file="/user/jmartin/home/scripts/parallel_tasks.js"/>
+				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
 			</verifyingTask>
 			<process>
 				<javaProcess
@@ -51,7 +51,7 @@
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 4</description>
 			<verifyingTask>
-				<script file="/user/jmartin/home/scripts/parallel_tasks.js"/>
+				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
 			</verifyingTask>
 			<process>
 				<javaProcess
@@ -67,7 +67,7 @@
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 5</description>
 			<verifyingTask>
-				<script file="/user/jmartin/home/scripts/parallel_tasks.js"/>
+				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
 			</verifyingTask>
 			<process>
 				<javaProcess
@@ -83,7 +83,7 @@
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 6</description>
 			<verifyingTask>
-				<script file="/user/jmartin/home/scripts/parallel_tasks.js"/>
+				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
 			</verifyingTask>
 			<process>
 				<javaProcess
@@ -99,7 +99,7 @@
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 7</description>
 			<verifyingTask>
-				<script file="/user/jmartin/home/scripts/parallel_tasks.js"/>
+				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
 			</verifyingTask>
 			<process>
 				<javaProcess
@@ -114,7 +114,7 @@
 		<task name="task8" finalTask="true">
 			<description>Parallel Tasks - Task 8</description>
 			<verifyingTask>
-				<script file="/user/jmartin/home/scripts/parallel_tasks.js"/>
+				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
 			</verifyingTask>
 			<process>
 				<javaProcess
