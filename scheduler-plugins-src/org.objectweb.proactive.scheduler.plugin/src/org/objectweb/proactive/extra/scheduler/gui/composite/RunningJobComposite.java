@@ -36,6 +36,8 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobState;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
@@ -52,11 +54,9 @@ import org.objectweb.proactive.extra.scheduler.gui.data.RunningJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
-import org.objectweb.proactive.extra.scheduler.job.Job;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
 
 /**
  * This class represents the running jobs
@@ -112,7 +112,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	@Override
-	public void jobSelected(Job job) {
+	public void jobSelected(InternalJob job) {
 		// enabling/disabling button permitted with this job
 		boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
 		PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
@@ -185,7 +185,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 	 * @see org.objectweb.proactive.extra.scheduler.gui.composites.AbstractJobComposite#createItem(org.objectweb.proactive.extra.scheduler.job.Job)
 	 */
 	@Override
-	protected TableItem createItem(Job job, int itemIndex) {
+	protected TableItem createItem(InternalJob job, int itemIndex) {
 		Table table = getTable();
 		TableItem item = super.createItem(job, itemIndex);
 		TableColumn[] cols = table.getColumns();
@@ -318,7 +318,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 								+ taskEvent.getJobId() + " is unknown !");
 
 					TableColumn[] cols = table.getColumns();
-					Job job = JobsController.getLocalView().getJobById(taskEvent.getJobId());
+					InternalJob job = JobsController.getLocalView().getJobById(taskEvent.getJobId());
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
 						if ((title != null) && (title.equals(COLUMN_PROGRESS_BAR_TITLE)))

@@ -33,9 +33,9 @@ package org.objectweb.proactive.extra.scheduler.gui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
 
 public class ObtainJobOutputAction extends Action {
 

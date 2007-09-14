@@ -93,7 +93,7 @@ public class JobOutputAppender extends AppenderSkeleton {
 		else if (event.getLevel().equals(Level.WARN))
 			jobOutput.warn(event.getRenderedMessage());
 		else
-			jobOutput.defaul(event.getRenderedMessage());
+			jobOutput.log(event.getRenderedMessage());
 	}
 
 	/**

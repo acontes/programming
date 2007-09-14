@@ -31,10 +31,10 @@
 package org.objectweb.proactive.extra.scheduler.gui.actions;
 
 import org.eclipse.jface.action.Action;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobPriority;
 
 public class PriorityIdleJobAction extends Action {
 

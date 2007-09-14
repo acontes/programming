@@ -44,11 +44,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.objectweb.proactive.extra.scheduler.core.Tools;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
  * 
@@ -89,11 +89,11 @@ public class TaskComposite extends Composite {
 	 */
 	public static final Color TASKS_NOT_STARTED_BACKGROUND_COLOR = Colors.DEEP_SKY_BLUE;
 
-	private List<TaskDescriptor> tasks = null;
+	private List<InternalTask> tasks = null;
 	private Label label = null;
 	private Table table = null;
-	private int order = TaskDescriptor.ASC_ORDER;
-	private int lastSorting = TaskDescriptor.SORT_BY_ID;
+	private int order = InternalTask.ASC_ORDER;
+	private int lastSorting = InternalTask.SORT_BY_ID;
 
 	/**
 	 * This is the default constructor.
@@ -135,55 +135,55 @@ public class TaskComposite extends Composite {
 		tc1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_ID);
+				sort(event, InternalTask.SORT_BY_ID);
 			}
 		});
 		tc2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_STATUS);
+				sort(event, InternalTask.SORT_BY_STATUS);
 			}
 		});
 		tc3.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_NAME);
+				sort(event, InternalTask.SORT_BY_NAME);
 			}
 		});
 		tc4.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_HOST_NAME);
+				sort(event, InternalTask.SORT_BY_HOST_NAME);
 			}
 		});
 		tc5.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_STARTED_TIME);
+				sort(event, InternalTask.SORT_BY_STARTED_TIME);
 			}
 		});
 		tc6.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_FINISHED_TIME);
+				sort(event, InternalTask.SORT_BY_FINISHED_TIME);
 			}
 		});
 		tc7.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_RERUNNABLE);
+				sort(event, InternalTask.SORT_BY_RERUNNABLE);
 			}
 		});
 		tc8.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_RUN_TIME_LIMIT);
+				sort(event, InternalTask.SORT_BY_RUN_TIME_LIMIT);
 			}
 		});
 		tc9.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, TaskDescriptor.SORT_BY_DESCRIPTION);
+				sort(event, InternalTask.SORT_BY_DESCRIPTION);
 			}
 		});
 		// setText
@@ -222,17 +222,17 @@ public class TaskComposite extends Composite {
 	private void sort(SelectionEvent event, int field) {
 		if (lastSorting == field) {
 			// if the new sort is the same as the last sort, invert order.
-			order = (order == TaskDescriptor.DESC_ORDER) ? TaskDescriptor.ASC_ORDER
-					: TaskDescriptor.DESC_ORDER;
-			TaskDescriptor.setSortingOrder(order);
+			order = (order == InternalTask.DESC_ORDER) ? InternalTask.ASC_ORDER
+					: InternalTask.DESC_ORDER;
+			InternalTask.setSortingOrder(order);
 		}
-		TaskDescriptor.setSortingBy(field);
+		InternalTask.setSortingBy(field);
 		lastSorting = field;
 
 		sort();
 
 		table.setSortColumn((TableColumn) event.widget);
-		table.setSortDirection((order == TaskDescriptor.DESC_ORDER) ? SWT.DOWN : SWT.UP);
+		table.setSortDirection((order == InternalTask.DESC_ORDER) ? SWT.DOWN : SWT.UP);
 	}
 
 	private void sort() {
@@ -250,7 +250,7 @@ public class TaskComposite extends Composite {
 
 			int i = 0;
 			// then add the entries
-			for (TaskDescriptor td : tasks)
+			for (InternalTask td : tasks)
 				createItem(td, i++);
 
 			// Turn drawing back on
@@ -258,22 +258,22 @@ public class TaskComposite extends Composite {
 		}
 	}
 
-	private void createItem(TaskDescriptor taskDescriptor, int itemIndex) {
+	private void createItem(InternalTask internalTask, int itemIndex) {
 		if (!table.isDisposed()) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			// To have a unique identifier for this TableItem
-			item.setData(taskDescriptor.getId());
+			item.setData(internalTask.getId());
 			if (itemIndex == 0)
-				fillItem(item, taskDescriptor, null);
+				fillItem(item, internalTask, null);
 			else
-				fillItem(item, taskDescriptor, table.getItem(itemIndex - 1).getBackground());
+				fillItem(item, internalTask, table.getItem(itemIndex - 1).getBackground());
 		}
 	}
 
-	private void fillItem(TableItem item, TaskDescriptor taskDescriptor, Color col) {
+	private void fillItem(TableItem item, InternalTask internalTask, Color col) {
 		if (!table.isDisposed()) {
 			boolean setFont = false;
-			switch (taskDescriptor.getStatus()) {
+			switch (internalTask.getStatus()) {
 			case ABORTED:
 				setFont = true;
 				item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
@@ -297,7 +297,7 @@ public class TaskComposite extends Composite {
 			case SUBMITTED:
 			}
 
-			if (!setFont && ((taskDescriptor.getRerunnable() - taskDescriptor.getRerunnableLeft()) > 0))
+			if (!setFont && ((internalTask.getRerunnable() - internalTask.getRerunnableLeft()) > 0))
 				setFont = true;
 			if (setFont) {
 				Font font = item.getFont();
@@ -313,24 +313,24 @@ public class TaskComposite extends Composite {
 			for (int i = 0; i < cols.length; i++) {
 				String title = cols[i].getText();
 				if (title.equals(COLUMN_ID_TITLE))
-					item.setText(i, taskDescriptor.getId().toString());
+					item.setText(i, internalTask.getId().toString());
 				else if (title.equals(COLUMN_STATUS_TITLE))
-					item.setText(i, taskDescriptor.getStatus().toString());
+					item.setText(i, internalTask.getStatus().toString());
 				else if (title.equals(COLUMN_NAME_TITLE))
-					item.setText(i, taskDescriptor.getName());
+					item.setText(i, internalTask.getName());
 				else if (title.equals(COLUMN_DESCRIPTION_TITLE))
-					item.setText(i, taskDescriptor.getDescription());
+					item.setText(i, internalTask.getDescription());
 				else if (title.equals(COLUMN_START_TIME_TITLE))
-					item.setText(i, Tools.getFormattedDate(taskDescriptor.getStartTime()));
+					item.setText(i, Tools.getFormattedDate(internalTask.getStartTime()));
 				else if (title.equals(COLUMN_FINISHED_TIME_TITLE))
-					item.setText(i, Tools.getFormattedDate(taskDescriptor.getFinishedTime()));
+					item.setText(i, Tools.getFormattedDate(internalTask.getFinishedTime()));
 				else if (title.equals(COLUMN_RERUN_TITLE))
-					item.setText(i, (taskDescriptor.getRerunnable() - taskDescriptor.getRerunnableLeft())
-							+ "/" + taskDescriptor.getRerunnable());
+					item.setText(i, (internalTask.getRerunnable() - internalTask.getRerunnableLeft())
+							+ "/" + internalTask.getRerunnable());
 				else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE))
-					item.setText(i, Tools.getFormattedDate(taskDescriptor.getRunTimeLimit()));
+					item.setText(i, Tools.getFormattedDate(internalTask.getRunTimeLimit()));
 				else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
-					String hostName = taskDescriptor.getExecutionHostName();
+					String hostName = internalTask.getExecutionHostName();
 					if (hostName == null)
 						item.setText(i, "n/a");
 					else
@@ -359,7 +359,7 @@ public class TaskComposite extends Composite {
 	 * @param jobId the jobId, just for the label.
 	 * @param tasks
 	 */
-	public void setTasks(JobId jobId, ArrayList<TaskDescriptor> tasks) {
+	public void setTasks(JobId jobId, ArrayList<InternalTask> tasks) {
 		this.tasks = tasks;
 		int tmp = tasks.size();
 
@@ -370,22 +370,22 @@ public class TaskComposite extends Composite {
 
 	/**
 	 * This method allow to replace only one line on the task table. This method
-	 * identify the "good" item with the taskId. The taskDescriptor is use to
+	 * identify the "good" item with the taskId. The internalTask is use to
 	 * fill item.
 	 * 
 	 * @param taskId the taskId which must be updated
-	 * @param taskDescriptor all informations for fill item
+	 * @param internalTask all informations for fill item
 	 */
-	public void changeLine(TaskId taskId, TaskDescriptor taskDescriptor) {
+	public void changeLine(TaskId taskId, InternalTask internalTask) {
 		if (!table.isDisposed()) {
 			TableItem[] items = table.getItems();
 			int itemIndex = 0;
 			for (TableItem item : items) {
 				if (((TaskId) item.getData()).equals(taskId)) {
 					if (itemIndex == 0)
-						fillItem(item, taskDescriptor, null);
+						fillItem(item, internalTask, null);
 					else
-						fillItem(item, taskDescriptor, items[itemIndex - 1].getBackground());
+						fillItem(item, internalTask, items[itemIndex - 1].getBackground());
 					break;
 				}
 				itemIndex++;

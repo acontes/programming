@@ -37,11 +37,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.Activator;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobOutput;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
 
 /**
  * Create, show and remove jobs output

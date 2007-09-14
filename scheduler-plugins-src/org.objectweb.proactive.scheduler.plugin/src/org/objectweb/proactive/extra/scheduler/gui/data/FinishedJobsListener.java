@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.gui.data;
 
-import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 
 /**
  * Class providing events for finished jobs.

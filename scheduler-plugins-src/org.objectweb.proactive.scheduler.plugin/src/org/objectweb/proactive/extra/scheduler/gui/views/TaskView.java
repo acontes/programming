@@ -33,13 +33,13 @@ package org.objectweb.proactive.extra.scheduler.gui.views;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.gui.composite.TaskComposite;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
-import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.TaskDescriptor;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
  * This view display many informations about tasks contains in a job.
@@ -77,9 +77,9 @@ public class TaskView extends ViewPart {
 	 * 
 	 * @param job a job
 	 */
-	public void fullUpdate(Job job) {
+	public void fullUpdate(InternalJob job) {
 		if (!taskComposite.isDisposed()) {
-			final Job aJob = job;
+			final InternalJob aJob = job;
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -96,9 +96,9 @@ public class TaskView extends ViewPart {
 	 * @param taskEvent
 	 * @param taskDescriptor
 	 */
-	public void lineUpdate(TaskEvent taskEvent, TaskDescriptor taskDescriptor) {
+	public void lineUpdate(TaskEvent taskEvent, InternalTask taskDescriptor) {
 		final TaskEvent aTaskEvent = taskEvent;
-		final TaskDescriptor aTaskDescriptor = taskDescriptor;
+		final InternalTask aTaskDescriptor = taskDescriptor;
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {

@@ -33,19 +33,20 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.core.Stats;
-import org.objectweb.proactive.extra.scheduler.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
-import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.job.JobResult;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerInitialState;
-import org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 /**
  * 
@@ -78,10 +79,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener listener) {
+	public SchedulerInitialState<InternalJob> addSchedulerEventListener(SchedulerEventListener listener) {
 		try {
-			return scheduler.addSchedulerEventListener(listener);
+			return (SchedulerInitialState<InternalJob>) scheduler.addSchedulerEventListener(listener);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}

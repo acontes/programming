@@ -44,6 +44,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobState;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
@@ -59,9 +61,7 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
-import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
-import org.objectweb.proactive.extra.scheduler.userAPI.JobState;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 /**
  * This class represents a composite which will be able to display many
@@ -98,8 +98,8 @@ public abstract class AbstractJobComposite extends Composite {
 	private Table table = null;
 	private int count = 0;
 	private String title = null;
-	private int order = Job.ASC_ORDER;
-	private int lastSorting = Job.SORT_BY_ID;
+	private int order = InternalJob.ASC_ORDER;
+	private int lastSorting = InternalJob.SORT_BY_ID;
 
 	// -------------------------------------------------------------------- //
 	// --------------------------- constructor ---------------------------- //
@@ -155,7 +155,7 @@ public abstract class AbstractJobComposite extends Composite {
 
 	private void addJobInTable(JobId jobId, int anItemIndex) {
 		if (!isDisposed()) {
-			final Job job = JobsController.getLocalView().getJobById(jobId);
+			final InternalJob job = JobsController.getLocalView().getJobById(jobId);
 			final int itemIndex = anItemIndex;
 			getDisplay().asyncExec(new Runnable() {
 				@Override
@@ -168,17 +168,17 @@ public abstract class AbstractJobComposite extends Composite {
 
 	private void sort(SelectionEvent event, int field) {
 		if (lastSorting == field) {
-			order = (order == Job.DESC_ORDER) ? Job.ASC_ORDER : Job.DESC_ORDER;
-			Job.setSortingOrder(order);
+			order = (order == InternalJob.DESC_ORDER) ? InternalJob.ASC_ORDER : InternalJob.DESC_ORDER;
+			InternalJob.setSortingOrder(order);
 		}
-		Job.setSortingBy(field);
+		InternalJob.setSortingBy(field);
 		lastSorting = field;
 
 		sortJobs();
 
 		refreshTable();
 		table.setSortColumn((TableColumn) event.widget);
-		table.setSortDirection((order == Job.DESC_ORDER) ? SWT.DOWN : SWT.UP);
+		table.setSortDirection((order == InternalJob.DESC_ORDER) ? SWT.DOWN : SWT.UP);
 	}
 
 	private void fillBackgroundColor(TableItem item, JobState state, Color col) {
@@ -247,31 +247,31 @@ public abstract class AbstractJobComposite extends Composite {
 		tc1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, Job.SORT_BY_ID);
+				sort(event, InternalJob.SORT_BY_ID);
 			}
 		});
 		tc2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, Job.SORT_BY_PRIORITY);
+				sort(event, InternalJob.SORT_BY_PRIORITY);
 			}
 		});
 		tc3.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, Job.SORT_BY_NAME);
+				sort(event, InternalJob.SORT_BY_NAME);
 			}
 		});
 		tc4.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, Job.SORT_BY_STATE);
+				sort(event, InternalJob.SORT_BY_STATE);
 			}
 		});
 		tc5.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				sort(event, Job.SORT_BY_OWNER);
+				sort(event, InternalJob.SORT_BY_OWNER);
 			}
 		});
 		// setText
@@ -298,7 +298,7 @@ public abstract class AbstractJobComposite extends Composite {
 				// get the jobId
 				JobId jobId = (JobId) event.item.getData();
 				// get the job by jobId
-				Job job = JobsController.getLocalView().getJobById(jobId);
+				InternalJob job = JobsController.getLocalView().getJobById(jobId);
 
 				// show its output
 				// TODO est-ce que je laisse ou pas ???
@@ -330,7 +330,7 @@ public abstract class AbstractJobComposite extends Composite {
 	 * @param job the job which represent the item
 	 * @return the new item
 	 */
-	protected TableItem createItem(Job job, int itemIndex) {
+	protected TableItem createItem(InternalJob job, int itemIndex) {
 		TableColumn[] cols = table.getColumns();
 		TableItem item = new TableItem(table, SWT.NONE);
 		item.setData(job.getId());
@@ -379,7 +379,7 @@ public abstract class AbstractJobComposite extends Composite {
 								+ " is unknown !");
 
 					TableColumn[] cols = table.getColumns();
-					Job job = JobsController.getLocalView().getJobById(jobId);
+					InternalJob job = JobsController.getLocalView().getJobById(jobId);
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
 						if ((title != null) && (title.equals(COLUMN_STATE_TITLE))) {
@@ -417,7 +417,7 @@ public abstract class AbstractJobComposite extends Composite {
 								+ " is unknown !");
 
 					TableColumn[] cols = table.getColumns();
-					Job job = JobsController.getLocalView().getJobById(jobId);
+					InternalJob job = JobsController.getLocalView().getJobById(jobId);
 					for (int i = 0; i < cols.length; i++) {
 						String title = cols[i].getText();
 						if ((title != null) && (title.equals(COLUMN_PRIORITY_TITLE))) {
@@ -555,7 +555,7 @@ public abstract class AbstractJobComposite extends Composite {
 	 * 
 	 * @param job the job selected
 	 */
-	public abstract void jobSelected(Job job);
+	public abstract void jobSelected(InternalJob job);
 
 	// -------------------------------------------------------------------- //
 	// ------------------------ extends composite ------------------------- //

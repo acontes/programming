@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.extra.scheduler.userAPI.SchedulerConnection;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 
 /**
  * This class allow to pop up a dialogue to connect a scheduler.

@@ -38,10 +38,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
-import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 /**
  * This class allow to assert that are only one item selected in all table managed.
@@ -136,7 +136,7 @@ public class TableManager {
 						table.select(i);
 
 						// get the job by jobId
-						Job job = JobsController.getLocalView().getJobById(jId);
+						InternalJob job = JobsController.getLocalView().getJobById(jId);
 
 						// update its informations
 						JobInfo jobInfo = JobInfo.getInstance();

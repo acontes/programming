@@ -140,7 +140,7 @@ public class JobOutput extends MessageConsole {
 	 * @param message the message
 	 * @see #DEFAULT_COLOR
 	 */
-	public synchronized void defaul(String message) {
+	public synchronized void log(String message) {
 		log(message, DEFAULT_COLOR);
 	}
 

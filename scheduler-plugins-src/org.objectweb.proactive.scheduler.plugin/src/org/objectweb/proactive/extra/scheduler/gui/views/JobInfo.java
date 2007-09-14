@@ -39,11 +39,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.extra.scheduler.core.Tools;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
-import org.objectweb.proactive.extra.scheduler.job.Job;
-import org.objectweb.proactive.extra.scheduler.job.JobId;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 /**
  * This view display many informations about a job.
@@ -81,7 +81,7 @@ public class JobInfo extends ViewPart {
 	 * 
 	 * @param job a job
 	 */
-	public void updateInfos(Job job) {
+	public void updateInfos(InternalJob job) {
 		setVisible(true);
 		Vector<String> propertiesName = new Vector<String>();
 		Vector<Object> propertiesValue = new Vector<Object>();
