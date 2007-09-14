@@ -39,39 +39,44 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 
 public class IMLauncher {
 
-    /**
-     *
-     *
-     * @param args
-     */
-    public static void main(String[] args) throws Exception {
-        System.out.println(
-            "STARTING INFRASTRUCTURE MANAGER: Press <ENTER> to Shutdown.");
-        IMFactory.startLocal();
-        IMAdmin admin = IMFactory.getAdmin();
-        //        IMUser user = IMFactory.getUser();
-        //        IMMonitoring monitor = IMFactory.getMonitoring();
-        admin.deployAllVirtualNodes(new File("/user/jmartin/home/test.xml"),
-            null);
-        //        admin.deployAllVirtualNodes(new File(
-        //        "/user/jmartin/home/test.xml"),
-        //    null);
-        //        PADNSInterface padInterface = admin.getPADNodeSource();
-        //        padInterface.
-        Thread.sleep(10000);
-        //        System.out.println("Number of nodes : "+ monitor.getNumberOfAllResources().intValue());
-        //        
-        //        System.out.println("Asking for 2 nodes :");
-        //        NodeSet ns = user.getAtMostNodes(new IntWrapper(3), null);
-        //        System.out.println("Nodes obtained : "+ ns.size());
-        //        System.out.println("Free nodes : "+ monitor.getNumberOfFreeResource().intValue());
-        //        System.out.println("Free nodes : "+ monitor.getNumberOfFreeResource().intValue());
-        System.in.read();
-        try {
-            IMFactory.getAdmin().shutdown();
-        } catch (Exception e) {
-            e.printStackTrace();
-            ProActive.exitFailure();
-        }
-    }
+	/**
+	 *
+	 *
+	 * @param args
+	 */
+	public static void main(String[] args) throws Exception {
+		System.out.println(
+		"STARTING INFRASTRUCTURE MANAGER: Press <ENTER> to Shutdown.");
+		IMFactory.startLocal();
+		IMAdmin admin = IMFactory.getAdmin();
+
+//		DynamicNodeSource d = (DynamicNodeSource) ProActive.newActive(DummyNodeSource.class.getCanonicalName(),
+//				new Object[] { "PAD - Dummy", 10, 3000, 30000 });
+//		admin.addDynamicNodeSources(d);
+		
+		//        IMUser user = IMFactory.getUser();
+		//        IMMonitoring monitor = IMFactory.getMonitoring();
+		admin.deployAllVirtualNodes(new File("/user/jmartin/home/test.xml"),
+				null);
+		//        admin.deployAllVirtualNodes(new File(
+		//        "/user/jmartin/home/test.xml"),
+		//    null);
+		//        PADNSInterface padInterface = admin.getPADNodeSource();
+		//        padInterface.
+		Thread.sleep(10000);
+		//        System.out.println("Number of nodes : "+ monitor.getNumberOfAllResources().intValue());
+		//        
+		//        System.out.println("Asking for 2 nodes :");
+		//        NodeSet ns = user.getAtMostNodes(new IntWrapper(3), null);
+		//        System.out.println("Nodes obtained : "+ ns.size());
+		//        System.out.println("Free nodes : "+ monitor.getNumberOfFreeResource().intValue());
+		//        System.out.println("Free nodes : "+ monitor.getNumberOfFreeResource().intValue());
+		System.in.read();
+		try {
+			IMFactory.getAdmin().shutdown();
+		} catch (Exception e) {
+			e.printStackTrace();
+			ProActive.exitFailure();
+		}
+	}
 }

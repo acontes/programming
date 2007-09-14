@@ -114,15 +114,23 @@ public abstract class DynamicNodeSource extends IMNodeSource
         }
     }
 
+    /**
+     * Periodically update the internal state of the dynamic
+     * node source.
+     * TODO The Time To Update (here 3000) should be parametrable.
+     */
     public void runActivity(Body body) {
         Service service = new Service(body);
 
         while (running) {
-            service.blockingServeOldest(3000 /* TODO TTR */);
+            service.blockingServeOldest(3000);
             cleanAndGet();
         }
     }
 
+    /**
+     * If not shutdown, do it.
+     */
     public void endActivity(Body body) {
         if (running) {
             shutdown();

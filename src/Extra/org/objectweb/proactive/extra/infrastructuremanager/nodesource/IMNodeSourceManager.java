@@ -70,9 +70,6 @@ public class IMNodeSourceManager extends IMNodeSource {
                 new Object[] {  }, nodeIM);
 
         dynNS = new ArrayList<DynamicNodeSource>();
-        //        DynamicNodeSource d = (DynamicNodeSource) ProActive.newActive(DummyNodeSource.class.getCanonicalName(),
-        //                new Object[] { "PAD - Dummy", 10, 3000, 30000 });
-        //        dynNS.add(d);
         this.id = sourceId;
     }
 
