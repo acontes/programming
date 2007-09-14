@@ -35,9 +35,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobFactory;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 public class SubmitJobAction extends Action {
 
@@ -63,9 +63,9 @@ public class SubmitJobAction extends Action {
 		if (fileName != null) {
 			try {
 				// CREATE JOB
-				InternalJob job = JobFactory.getFactory().createJob(fileName);
+				Job job = JobFactory.getFactory().createJob(fileName);
 				// SUBMIT JOB
-				job.setId(SchedulerProxy.getInstance().submit(job));
+				SchedulerProxy.getInstance().submit(job);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
