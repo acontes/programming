@@ -93,7 +93,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
 	 * @param name the current job name.
 	 * @param priority the priority of this job between 1 and 5.
 	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
-	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
+	 * @param CancelOnException true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 */
 	public InternalJob(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description) {

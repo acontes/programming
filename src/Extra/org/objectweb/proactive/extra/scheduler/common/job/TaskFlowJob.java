@@ -31,8 +31,10 @@
 package org.objectweb.proactive.extra.scheduler.common.job;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 
 /**
@@ -52,10 +54,12 @@ public class TaskFlowJob extends Job {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 1623955669459590983L;
 	/** List of task for the task flow job */
-	private ArrayList<Task> tasks = new ArrayList<Task>();
+	private HashMap<String,Task> tasks = new HashMap<String,Task>();
+	
 	
 	/** Proactive Empty Constructor */
 	public TaskFlowJob() {}
+	
 	
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getType()
@@ -71,8 +75,12 @@ public class TaskFlowJob extends Job {
 	 * 
 	 * @param task the task to add.
 	 */
-	public void addTask(Task task){
-		tasks.add(task);
+	public void addTask(Task task) throws UserException {
+		if (task.getName() == null)
+			throw new UserException("The name of the task must not be null !");
+		if (tasks.containsKey(task.getName()))
+			throw new UserException("The name of the task is already used !");
+		tasks.put(task.getName(),task);
 	}
 	
 	
@@ -81,7 +89,19 @@ public class TaskFlowJob extends Job {
 	 * 
 	 * @param tasks the list of tasks to add.
 	 */
-	public void addTasks(List<Task> tasks){
-		tasks.addAll(tasks);
+	public void addTasks(List<Task> tasks) throws UserException {
+		for (Task task : tasks){
+			addTask(task);
+		}
+	}
+
+
+	/**
+	 * To get the list of tasks.
+	 * 
+	 * @return the list of tasks.
+	 */
+	public ArrayList<Task> getTasks() {
+		return new ArrayList<Task>(tasks.values());
 	}
 }

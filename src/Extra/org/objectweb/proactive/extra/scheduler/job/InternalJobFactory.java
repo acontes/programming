@@ -31,15 +31,25 @@
 package org.objectweb.proactive.extra.scheduler.job;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.ApplicationJob;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.NativeTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalAbstractJavaTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalJavaTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalNativeTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
  * This is the factory to build Internal job with a job (user).
+ * For the moment it performs a simple copy from userJob to InternalJob
+ * and recreate the dependences if needed.
  * 
  * @author ProActive Team
  * @version 1.0, Sept 14, 2007
@@ -68,18 +78,6 @@ public class InternalJobFactory implements Serializable {
 	}
 	
 	
-	private static InternalJob createJob(TaskFlowJob userJob) throws SchedulerException {
-		InternalJob job = new InternalTaskFlowJob(
-				userJob.getName(),
-				userJob.getPriority(),
-				userJob.getRuntimeLimit(),
-				true,
-				userJob.getDescription());
-		
-		return job;
-	}
-	
-	
 	/**
 	 * Create an internalApplication job with the given Application job (user)
 	 * 
@@ -97,7 +95,7 @@ public class InternalJobFactory implements Serializable {
 					userJob.getName(),
 					userJob.getPriority(),
 					userJob.getRuntimeLimit(),
-					true, /* not yet */
+					userJob.isCancelOnException(),
 					userJob.getDescription(),
 					userTask.getNumberOfNodesNeeded(),
 					userTask.getTaskClass());
@@ -106,7 +104,7 @@ public class InternalJobFactory implements Serializable {
 					userJob.getName(),
 					userJob.getPriority(),
 					userJob.getRuntimeLimit(),
-					true,/* not yet */
+					userJob.isCancelOnException(),
 					userJob.getDescription(),
 					userTask.getNumberOfNodesNeeded(),
 					userTask.getTaskInstance());
@@ -114,15 +112,111 @@ public class InternalJobFactory implements Serializable {
 			throw new SchedulerException("You must specify your own executable application task to be launched (in the application task) !");
 		}
 		InternalAbstractJavaTask iajt = job.getTask();
-		iajt.setDescription(userTask.getDescription());
-		iajt.setName(userTask.getName());
-		iajt.setPostTask(userTask.getPostTask());
-		iajt.setPreTask(userTask.getPreTask());
-		iajt.setRerunnable(userTask.getRerunnable());
-		iajt.setRunTimeLimit(userTask.getRunTimeLimit());
-		iajt.setVerifyingScript(userTask.getVerifyingScript());
+		userTask.setFinalTask(true);
 		iajt.setArgs(userTask.getArguments());
+		setProperties(userTask, iajt);
 		return job;
 	}
+	
+	
+	/**
+	 * Create an internalTaskFlow job with the given task flow job (user)
+	 * 
+	 * @param job the user job that will be used to create the internal job.
+	 * @return the created internal job.
+	 * @throws SchedulerException an exception if the factory cannot create the given job.
+	 */
+	private static InternalJob createJob(TaskFlowJob userJob) throws SchedulerException {
+		if (userJob.getTasks().size() == 0)
+			throw new SchedulerException("This job must contains tasks !");
+		InternalJob job = new InternalTaskFlowJob(
+				userJob.getName(),
+				userJob.getPriority(),
+				userJob.getRuntimeLimit(),
+				userJob.isCancelOnException(),
+				userJob.getDescription());
+		HashMap<Task,InternalTask> tasksList = new HashMap<Task,InternalTask>();
+		boolean hasFinalTask = false;
+		for (Task t : userJob.getTasks()){
+			tasksList.put(t, createTask(t));
+			if (hasFinalTask == false) hasFinalTask = t.isFinalTask();
+		}
+		if (!hasFinalTask)
+			throw new SchedulerException("You must specify at least one final task in your job !");
+		for (Entry<Task,InternalTask> entry : tasksList.entrySet()){
+			for (Task t : entry.getKey().getDependencesList()){
+				entry.getValue().addDependence(tasksList.get(t));
+			}
+		}
+		return job;
+	}
+	
+	
+	private static InternalTask createTask(Task task) throws SchedulerException {
+		//TODO jlscheef : change this instanceof by better solutions, no time left for the moment
+		if (task instanceof NativeTask) {
+			return createTask((NativeTask)task);
+		} else if (task instanceof JavaTask) {
+			return createTask((JavaTask)task);
+		} else {
+			throw new SchedulerException("The task you intend to add is unknown !");
+		}
+	}
+
+
+	/**
+	 * Create an internal java Task with the given java task (user)
+	 * 
+	 * @param task the user java task that will be used to create the internal java task.
+	 * @return the created internal task.
+	 * @throws SchedulerException an exception if the factory cannot create the given task.
+	 */
+	private static InternalTask createTask(JavaTask task) throws SchedulerException {
+		InternalJavaTask javaTask;
+		if (task.getTaskClass() != null){
+			javaTask = new InternalJavaTask(task.getTaskClass());
+		} else if(task.getTaskInstance() != null){
+			javaTask = new InternalJavaTask(task.getTaskInstance());
+		} else {
+			throw new SchedulerException("You must specify your own executable task to be launched in every task !");
+		}
+		setProperties(task,javaTask);
+		return javaTask;
+	}
+
+
+	/**
+	 * Create an internal native Task with the given native task (user)
+	 * 
+	 * @param task the user native task that will be used to create the internal native task.
+	 * @return the created internal task.
+	 * @throws SchedulerException an exception if the factory cannot create the given task.
+	 */
+	private static InternalTask createTask(NativeTask task) throws SchedulerException {
+		if (task.getCommandLine() == null || task.getCommandLine() == "")
+			throw new SchedulerException("The command line is null or empty !!");
+		InternalNativeTask nativeTask = new InternalNativeTask(task.getCommandLine());
+		setProperties(task,nativeTask);
+		return nativeTask;
+	}
+	
+	
+	/**
+	 * Set some properties between the user task and internal task.
+	 * 
+	 * @param task the user task.
+	 * @param taskToSet the internal task to set.
+	 */
+	private static void setProperties(Task task, InternalTask taskToSet) {
+		taskToSet.setDescription(task.getDescription());
+		taskToSet.setFinalTask(task.isFinalTask());
+		taskToSet.setName(task.getName());
+		taskToSet.setPostTask(task.getPostTask());
+		taskToSet.setPreTask(task.getPreTask());
+		taskToSet.setRerunnable(task.getRerunnable());
+		taskToSet.setRunTimeLimit(task.getRunTimeLimit());
+		taskToSet.setVerifyingScript(task.getVerifyingScript());
+	}
+	
 	
 }

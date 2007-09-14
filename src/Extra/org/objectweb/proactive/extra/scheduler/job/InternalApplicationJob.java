@@ -63,11 +63,11 @@ public class InternalApplicationJob extends InternalJob {
 	 * @param name the current job name.
 	 * @param priority the priority of this job between 1 and 5.
 	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
-	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
+	 * @param cancelOnException true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 */
-	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description) {
-		super(name,priority,runtimeLimit,runUntilCancel,description);
+	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description) {
+		super(name,priority,runtimeLimit,cancelOnException,description);
 		InternalAppliTask descriptor = new InternalAppliTask();
 		descriptor.setFinalTask(true);
 		super.addTask(descriptor);
@@ -81,12 +81,12 @@ public class InternalApplicationJob extends InternalJob {
 	 * @param name the current job name.
 	 * @param priority the priority of this job between 1 and 5.
 	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
-	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
+	 * @param cancelOnException true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 * @param numberOfNodesNeeded the number of node needed by the user.
 	 */
-	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded) {
-		this(name,priority,runtimeLimit,runUntilCancel,description);
+	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description, int numberOfNodesNeeded) {
+		this(name,priority,runtimeLimit,cancelOnException,description);
 		getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
 	}
 	
@@ -98,13 +98,13 @@ public class InternalApplicationJob extends InternalJob {
 	 * @param name the current job name.
 	 * @param priority the priority of this job between 1 and 5.
 	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
-	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
+	 * @param cancelOnException true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 * @param numberOfNodesNeeded the number of node needed by the user.
 	 * @param taskClass the Class instance of the class to instanciate.
 	 */
-	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded, Class<ExecutableApplicationTask> taskClass) {
-		this(name,priority,runtimeLimit,runUntilCancel,description,numberOfNodesNeeded);
+	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description, int numberOfNodesNeeded, Class<ExecutableApplicationTask> taskClass) {
+		this(name,priority,runtimeLimit,cancelOnException,description,numberOfNodesNeeded);
 		getTask().setTaskClass(taskClass);
 	}
 	
@@ -116,13 +116,13 @@ public class InternalApplicationJob extends InternalJob {
 	 * @param name the current job name.
 	 * @param priority the priority of this job between 1 and 5.
 	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
-	 * @param runUntilCancel true if the job has to run until its end or an user intervention.
+	 * @param cancelOnException true if the job has to run until its end or an user intervention.
 	 * @param description a short description of the job and what it will do.
 	 * @param numberOfNodesNeeded the number of node needed by the user.
 	 * @param taskClass the instanciated class task object.
 	 */
-	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean runUntilCancel, String description, int numberOfNodesNeeded, ExecutableApplicationTask task) {
-		this(name,priority,runtimeLimit,runUntilCancel,description,numberOfNodesNeeded);
+	public InternalApplicationJob(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description, int numberOfNodesNeeded, ExecutableApplicationTask task) {
+		this(name,priority,runtimeLimit,cancelOnException,description,numberOfNodesNeeded);
 		getTask().setTask(task);
 	}
 	

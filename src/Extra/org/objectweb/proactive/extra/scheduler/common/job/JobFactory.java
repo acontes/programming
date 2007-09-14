@@ -50,6 +50,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.scripting.InvalidScriptException;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SimpleScript;
@@ -315,7 +316,11 @@ public class JobFactory {
 				}
 				switch(job.getType()) {
 				case TASKSFLOW:
-					((TaskFlowJob) job).addTask(task.getKey());
+					try {
+							((TaskFlowJob) job).addTask(task.getKey());
+						} catch (UserException e) {
+							e.printStackTrace();
+						}
 					break;
 				case PARAMETER_SWEEPING:
 					//TODO ((TaskFlowJob) job).addTask(task.getKey());

@@ -81,7 +81,8 @@ public abstract class Script<E> implements Serializable {
 
     protected abstract ScriptResult<E> getResult(Bindings bindings);
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
 	public boolean equals(Object o) {
     	if (o instanceof Script) {
 			Script<E> new_name = (Script<E>) o;

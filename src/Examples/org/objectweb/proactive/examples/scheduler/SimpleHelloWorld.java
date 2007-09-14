@@ -5,17 +5,17 @@ import java.net.UnknownHostException;
 import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.job.InternalTaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalJavaTask;
 
 
 /**
@@ -49,8 +49,11 @@ public class SimpleHelloWorld {
             //******************** CREATE A NEW JOB ***********************
             //params are respectively : name, priority, runtimeLimit (not yet implemented), 
             //							reUntilCancel  (not yet implemented), description.
-            InternalJob job = new InternalTaskFlowJob("job name", JobPriority.NORMAL, -1,
-                    false, "A simple hello world example !");
+            TaskFlowJob job = new TaskFlowJob();
+            job.setName("job name");
+            job.setPriority(JobPriority.NORMAL);
+            job.setCancelOnException(false);
+            job.setDescription("A simple hello world example !");
 
             //******************** CREATE A NEW TASK ***********************
             //creating a new task
@@ -67,12 +70,17 @@ public class SimpleHelloWorld {
                         }
                     }
                 };
-
+                
+            //Create the javatask
+            JavaTask desc = new JavaTask();
             //adding the task to the job
-            InternalJavaTask desc = new InternalJavaTask(task);
+            desc.setTaskInstance(task);
             //this task is final, it means that the job result will contain this task result.
             desc.setFinalTask(true);
-            job.addTask(desc);
+            //add the task to the job
+            try {
+				job.addTask(desc);
+			} catch (UserException e2) { e2.printStackTrace(); }
 
             //******************** SUBMIT THE JOB ***********************
             //submitting a job to the scheduler returns the attributed jobId
