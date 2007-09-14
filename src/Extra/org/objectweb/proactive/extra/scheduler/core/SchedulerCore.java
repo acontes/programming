@@ -72,7 +72,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskResultImpl;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
  * <i><font size="-1" color="#FF0000">** Scheduler core ** </font></i>
@@ -541,7 +541,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * @return the scheduler current state with the pending, running, finished jobs list.
 	 */
 	public SchedulerInitialState getSchedulerInitialState() {
-		SchedulerInitialState sState = new SchedulerInitialState();
+		SchedulerInitialState<InternalJob> sState = new SchedulerInitialState<InternalJob>();
 		sState.setPendingJobs(pendingJobs);
 		sState.setRunningJobs(runningJobs);
 		sState.setFinishedJobs(finishedJobs);

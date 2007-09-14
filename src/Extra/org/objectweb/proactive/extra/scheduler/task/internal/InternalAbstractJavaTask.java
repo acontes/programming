@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task.descriptor;
+package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import java.util.HashMap;
 import java.util.Map;

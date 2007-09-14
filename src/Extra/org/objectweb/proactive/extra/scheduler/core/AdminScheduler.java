@@ -38,13 +38,10 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
 import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 
 
@@ -157,25 +154,26 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
 	 */
-	public JobResult getResult(JobId jobId) throws SchedulerException {
-		return schedulerFrontend.getResult(jobId);
-	}
+//	public JobResult getResult(JobId jobId) throws SchedulerException {
+//		return schedulerFrontend.getResult(jobId);
+//	}
 	
 	
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
 	 */
-	public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
-		schedulerFrontend.listenLog(jobId, hostname, port);
-	}
+//	public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
+//		schedulerFrontend.listenLog(jobId, hostname, port);
+//	}
 	
 	
+
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#submit(org.objectweb.proactive.extra.scheduler.job.JobU)
+	 * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#submit(org.objectweb.proactive.extra.scheduler.common.job.Job)
 	 */
-	public JobId submit(InternalJob job) throws SchedulerException {
-		return schedulerFrontend.submit(job);
-	}
+//	public JobId submit(Job job) throws SchedulerException {
+//		return schedulerFrontend.submit(job);
+//	}
 	
 	
 	/**

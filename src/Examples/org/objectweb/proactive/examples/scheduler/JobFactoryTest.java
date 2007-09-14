@@ -34,8 +34,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobFactory;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.job.JobFactory;
 
 public class JobFactoryTest {
 	@SuppressWarnings("unchecked")

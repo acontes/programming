@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
@@ -42,7 +43,6 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventLi
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 /**
  * Scheduler user interface.
@@ -71,9 +71,9 @@ public class UserScheduler implements UserSchedulerInterface {
 
 
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.JobU)
+	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.common.job.Job)
 	 */
-	public JobId submit(InternalJob job) throws SchedulerException {
+	public JobId submit(Job job) throws SchedulerException {
 		return schedulerFrontend.submit(job);
 	}
 	

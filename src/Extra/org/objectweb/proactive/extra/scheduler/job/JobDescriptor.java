@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.EligibleTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.Status;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
 /**

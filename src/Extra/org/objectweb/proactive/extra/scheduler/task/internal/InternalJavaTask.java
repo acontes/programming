@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task.descriptor;
+package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
@@ -77,7 +77,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
 
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask#getTask()
+	 * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
 	 */
 	@Override
 	public ExecutableTask getTask() {

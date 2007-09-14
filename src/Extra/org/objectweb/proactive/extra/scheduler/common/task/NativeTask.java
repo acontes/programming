@@ -28,35 +28,44 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.common.task;
 
-import org.objectweb.proactive.extra.scheduler.job.TaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
- * This class represents an elligible task for the policy.
- * It is a sort of tag class that will avoid user from giving non-eligible task to the scheduler.
- * In fact policy will handle LightTask and EligibleLightTask but
- * will only be allowed to send EligibleLightTask to the scheduler
- * @see org.objectweb.proactive.extra.scheduler.job.TaskDescriptor
+ * Definition of a native task for the user.
+ * A native task includes a command line that can be set.
  * 
  * @author ProActive Team
- * @version 1.0, Jul 9, 2007
+ * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
-public class EligibleTaskDescriptor extends TaskDescriptor {
+public class NativeTask extends Task {
 
 	/** Serial version UID */
-	private static final long serialVersionUID = 8461969956605719440L;
+	private static final long serialVersionUID = -2327189450547547292L;
+	/** Command line for this native task */
+	private String commandLine = null;
+	
 	
 	/**
-	 * Get a new eligible light task using a taskDescriptor.
-	 * Same constructor as LightTask
-	 * 
-	 * @param td the taskDescriptor to shrink.
+	 * Empty constructor.
 	 */
-	public EligibleTaskDescriptor(InternalTask td) {
-		super(td);
+	public NativeTask () {}
+
+
+	/**
+	 * @return the commandLine
+	 */
+	public String getCommandLine() {
+		return commandLine;
 	}
 
+
+	/**
+	 * @param commandLine the commandLine to set
+	 */
+	public void setCommandLine(String commandLine) {
+		this.commandLine = commandLine;
+	}
+	
 }

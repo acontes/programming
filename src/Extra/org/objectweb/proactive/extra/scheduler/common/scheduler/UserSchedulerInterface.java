@@ -33,10 +33,10 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 import java.io.Serializable;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 /**
  * Scheduler user interface.
@@ -62,7 +62,7 @@ public interface UserSchedulerInterface extends Serializable {
 	 * @return the generated new job ID.
 	 * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
 	 */
-	public JobId submit(InternalJob job) throws SchedulerException;
+	public JobId submit(Job job) throws SchedulerException;
 	
 
 	/**

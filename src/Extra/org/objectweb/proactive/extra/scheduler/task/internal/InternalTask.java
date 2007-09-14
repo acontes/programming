@@ -28,9 +28,8 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task.descriptor;
+package org.objectweb.proactive.extra.scheduler.task.internal;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -38,10 +37,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.scripting.Script;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
@@ -56,7 +54,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
  * @version 1.0, Jul 9, 2007
  * @since ProActive 3.2
  */
-public abstract class InternalTask implements Comparable<InternalTask>, Serializable {
+public abstract class InternalTask extends Task implements Comparable<InternalTask> {
 
 	
 	/** Sorting constant, this will allow the user to sort the descriptor. */
@@ -75,27 +73,8 @@ public abstract class InternalTask implements Comparable<InternalTask>, Serializ
 	private static int currentSort = SORT_BY_ID;
 	private static int currentOrder = ASC_ORDER;
 	
-	/** Number of nodes asked by the user. */
-	protected int numberOfNodesNeeded = 1;
-	
-	/**  Name of the task. */
-	private String name;
-	/** Description of the task. */
-	private String description;
 	/** Parents list : null if no dependences */
 	private ArrayList<InternalTask> dependences = null;
-	/** Verifying script : can be launched before getting a node in order to verify some computer specificity. */
-	private VerifyingScript verifyingScript;
-	/** Pre-task script : can be used to launch script just before the task execution. */
-	private Script<?> preTask;
-	/** Pre-task script : can be used to launch script just after the task execution even if a problem occurs. */
-	private Script<?> postTask;
-	/** Maximum amount of time during which a job can be running. */
-	private long runTimeLimit;
-	/** Is this task rerunnable and how many times ? (0 if not) */
-	private int rerunnable = 1;
-	/** Is this task a final task. */
-	private boolean finalTask;
 	/** Informations about the launcher and node */
 	private ExecuterInformations executerInformations;
 	/** Task information : this is the informations that can change during process. */
@@ -208,14 +187,6 @@ public abstract class InternalTask implements Comparable<InternalTask>, Serializ
 		}
 	}
 	
-
-	/**
-	 * @return the numberOfNodesNeeded
-	 */
-	public int getNumberOfNodesNeeded() {
-		return numberOfNodesNeeded;
-	}
-	
 	
 	/**
 	 * Add a dependence to the list of dependences for this taskDescriptor.
@@ -259,125 +230,15 @@ public abstract class InternalTask implements Comparable<InternalTask>, Serializ
 		this.taskInfo = taskInfo;
 	}
 
-
-	/**
-	 * To get the description of this task.
-	 * 
-	 * @return the description of this task.
-	 */
-	public String getDescription() {
-		return description;
-	}
-	
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	/**
-	 * To know if this task is the final one or not.
-	 * 
-	 * @return true if this task is the final task, false if not.
-	 */
-	public boolean isFinalTask() {
-		return finalTask;
-	}
-	
-	public void setFinalTask(boolean finalTask) {
-		this.finalTask = finalTask;
-	}
-
-	/**
-	 * To get the name of this task.
-	 * 
-	 * @return the name of this task.
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * Get the number of possible rerun for this task.
-	 * 
-	 * @return the number of possible rerun for this task.
-	 */
-	public int getRerunnable() {
-		return rerunnable;
-	}
-	
 	/**
 	 * Set the number of possible rerun for this task.
 	 * 
 	 * @param rerunnable the number of rerun possible for this task.
 	 */
+	@Override
 	public void setRerunnable(int rerunnable) {
 		this.rerunnable = rerunnable;
 		this.taskInfo.setRerunnableLeft(rerunnable);
-	}
-
-	/**
-	 * To get the runTime limit of this task.
-	 * It means the maximum amount of time (in millis) it is authorized to use.
-	 * 
-	 * @return the runTime limit of the task.
-	 */
-	public long getRunTimeLimit() {
-		return runTimeLimit;
-	}
-	
-	public void setRunTimeLimit(long runTimeLimit) {
-		this.runTimeLimit = runTimeLimit;
-	}
-
-	public VerifyingScript getVerifyingScript() {
-		return verifyingScript;
-	}
-
-	public void setVerifyingScript(VerifyingScript verifyingScript) {
-		this.verifyingScript = verifyingScript;
-	}
-
-	
-	/**
-	 * To get the postTask
-	 * 
-	 * @return the postTask
-	 */
-	public Script<?> getPostTask() {
-		return postTask;
-	}
-
-	
-	/**
-	 * To set the postTask
-	 * 
-	 * @param postTask the postTask to set
-	 */
-	public void setPostTask(Script<?> postTask) {
-		this.postTask = postTask;
-	}
-
-	
-	/**
-	 * To get the preTask
-	 * 
-	 * @return the preTask
-	 */
-	public Script<?> getPreTask() {
-		return preTask;
-	}
-
-	
-	/**
-	 * To set the preTask
-	 * 
-	 * @param preTask the preTask to set
-	 */
-	public void setPreTask(Script<?> preTask) {
-		this.preTask = preTask;
 	}
 
 	

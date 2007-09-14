@@ -32,8 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 import java.util.Vector;
-
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
 
 /**
  * This class is a representation of the entire scheduler state.
@@ -43,16 +42,16 @@ import org.objectweb.proactive.extra.scheduler.job.InternalJob;
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
  */
-public final class SchedulerInitialState implements Serializable {
+public final class SchedulerInitialState<E extends Job> implements Serializable {
 
 	/** serial version UID */
 	private static final long serialVersionUID = -7448663006621330188L;
 	/** pending jobs */
-	private Vector<InternalJob> pendingJobs = new Vector<InternalJob>();
+	private Vector<E> pendingJobs = new Vector<E>();
 	/** running jobs */
-	private Vector<InternalJob> runningJobs = new Vector<InternalJob>();
+	private Vector<E> runningJobs = new Vector<E>();
 	/** finished jobs */
-	private Vector<InternalJob> finishedJobs = new Vector<InternalJob>();
+	private Vector<E> finishedJobs = new Vector<E>();
 	/** scheduler state */
 	private SchedulerState state = SchedulerState.STOPPED;
 	
@@ -68,7 +67,7 @@ public final class SchedulerInitialState implements Serializable {
 	 * 
 	 * @return the finishedJobs
 	 */
-	public Vector<InternalJob> getFinishedJobs() {
+	public Vector<E> getFinishedJobs() {
 		return finishedJobs;
 	}
 
@@ -78,7 +77,7 @@ public final class SchedulerInitialState implements Serializable {
 	 * 
 	 * @param finishedJobs the finishedJobs to set
 	 */
-	public void setFinishedJobs(Vector<InternalJob> finishedJobs) {
+	public void setFinishedJobs(Vector<E> finishedJobs) {
 		this.finishedJobs = finishedJobs;
 	}
 	
@@ -88,7 +87,7 @@ public final class SchedulerInitialState implements Serializable {
 	 * 
 	 * @return the pendingJobs
 	 */
-	public Vector<InternalJob> getPendingJobs() {
+	public Vector<E> getPendingJobs() {
 		return pendingJobs;
 	}
 
@@ -98,7 +97,7 @@ public final class SchedulerInitialState implements Serializable {
 	 * 
 	 * @param pendingJobs the pendingJobs to set
 	 */
-	public void setPendingJobs(Vector<InternalJob> pendingJobs) {
+	public void setPendingJobs(Vector<E> pendingJobs) {
 		this.pendingJobs = pendingJobs;
 	}
 	
@@ -108,7 +107,7 @@ public final class SchedulerInitialState implements Serializable {
 	 * 
 	 * @return the runningJobs
 	 */
-	public Vector<InternalJob> getRunningJobs() {
+	public Vector<E> getRunningJobs() {
 		return runningJobs;
 	}
 
@@ -118,7 +117,7 @@ public final class SchedulerInitialState implements Serializable {
 	 * 
 	 * @param runningJobs the runningJobs to set
 	 */
-	public void setRunningJobs(Vector<InternalJob> runningJobs) {
+	public void setRunningJobs(Vector<E> runningJobs) {
 		this.runningJobs = runningJobs;
 	}
 

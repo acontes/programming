@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
  * Abstract class job.
@@ -53,7 +53,7 @@ import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
-public abstract class InternalJob implements Serializable, Comparable<InternalJob> {
+public abstract class InternalJob extends Job implements Comparable<InternalJob> {
 
 	public static final int SORT_BY_ID = 1;
 	public static final int SORT_BY_NAME = 2;
@@ -68,11 +68,8 @@ public abstract class InternalJob implements Serializable, Comparable<InternalJo
 	private static int currentOrder = ASC_ORDER;
 	/** Serial version UID */
 	private static final long serialVersionUID = 1565033147327965656L;
+	/** Owner of the job */
 	private String owner = "";
-	private String name = "";
-	private long runtimeLimit = -1;
-	private boolean cancelOnException = false;
-	private String description = "";
 	// TODO envParameters
 	// TODO un moyen pour le user de mettre n'importe quelles données dans le job et la retrouver dans la police.
 	// cela lui permettrai de moduler sa police en fonction de ces données
@@ -100,7 +97,6 @@ public abstract class InternalJob implements Serializable, Comparable<InternalJo
 	 * @param description a short description of the job and what it will do.
 	 */
 	public InternalJob(String name, JobPriority priority, long runtimeLimit, boolean cancelOnException, String description) {
-		super();
 		this.name = name;
 		this.jobInfo.setPriority(priority);
 		this.runtimeLimit = runtimeLimit;
@@ -412,26 +408,7 @@ public abstract class InternalJob implements Serializable, Comparable<InternalJo
 		setTaskStatusModify(hts);
 		return true;
 	}
-	
-	
-	/**
-	 * To get the description
-	 * 
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
 
-	/**
-	 * To set the description
-	 * 
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
 
 	/**
 	 * To get the id
@@ -442,49 +419,25 @@ public abstract class InternalJob implements Serializable, Comparable<InternalJo
 		return jobInfo.getJobId();
 	}
 
-	/**
-	 * To get the name
-	 * 
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
 
 	/**
-	 * To get the priority
-	 * 
-	 * @return the priority
+	 * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getPriority()
 	 */
+	@Override
 	public JobPriority getPriority() {
 		return jobInfo.getPriority();
 	}
 	
+
 	/**
-	 * To set the priority.
+	 * @see org.objectweb.proactive.extra.scheduler.common.job.Job#setPriority(org.objectweb.proactive.extra.scheduler.common.job.JobPriority)
 	 */
+	@Override
 	public void setPriority(JobPriority priority) {
 		jobInfo.setPriority(priority);
 		lightJob.setPriority(priority);
 	}
 
-	/**
-	 * To get the runtimeLimit
-	 * 
-	 * @return the runtimeLimit
-	 */
-	public long getRuntimeLimit() {
-		return runtimeLimit;
-	}
-
-	/**
-	 * To get the cancelOnException
-	 * 
-	 * @return the cancelOnException
-	 */
-	public boolean isCancelOnException() {
-		return cancelOnException;
-	}
 
 	/**
 	 * To get the tasks as an arraylist.
@@ -648,14 +601,6 @@ public abstract class InternalJob implements Serializable, Comparable<InternalJo
 		return jobInfo.getRemovedTime();
 	}
 
-	/**
-	 * To get the cancelOnException
-	 * 
-	 * @return the cancelOnException
-	 */
-	public boolean getCancelOnException() {
-		return cancelOnException;
-	}
 
 	/**
 	 * To get the submittedTime
@@ -733,21 +678,7 @@ public abstract class InternalJob implements Serializable, Comparable<InternalJo
 	public void setLightJob(JobDescriptor lightJob) {
 		this.lightJob = lightJob;
 	}
-	
-	
-	/**
-	 * @return the owner
-	 */
-	public String getOwner() {
-		return owner;
-	}
 
-	/**
-	 * @param owner the owner to set
-	 */
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
 	
 	/**
 	 * To get the state of the job.
@@ -763,6 +694,25 @@ public abstract class InternalJob implements Serializable, Comparable<InternalJo
 	 */
 	public void setState(JobState state) {
 		jobInfo.setState(state);
+	}
+	
+	/**
+	 * To get the owner of the job.
+	 * 
+	 * @return the owner of the job.
+	 */
+	public String getOwner() {
+		return owner;
+	}
+
+
+	/**
+	 * To set the owner of this job.
+	 * 
+	 * @param owner the owner to set.
+	 */
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 	
 	

@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
  * Class ParameterSweepingJob.

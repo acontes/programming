@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.job;
+package org.objectweb.proactive.extra.scheduler.common.job;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,18 +49,20 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.job.InternalApplicationJob;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extra.scheduler.job.InternalParameterSweepingJob;
+import org.objectweb.proactive.extra.scheduler.job.InternalTaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
 import org.objectweb.proactive.extra.scheduler.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.scripting.SimpleScript;
 import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalAbstractJavaTask;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalJavaTask;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalNativeTask;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalAbstractJavaTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalJavaTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalNativeTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

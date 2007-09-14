@@ -15,7 +15,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalTaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalJavaTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalJavaTask;
 
 
 /**

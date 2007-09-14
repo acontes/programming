@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task.descriptor;
+package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -82,7 +82,7 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
 
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask#getTask()
+	 * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
 	 */
 	@Override
 	public ExecutableTask getTask() {
@@ -105,7 +105,7 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
 	
 	
 	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+	 * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
 	 */
 	@Override
 	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException, NodeException {

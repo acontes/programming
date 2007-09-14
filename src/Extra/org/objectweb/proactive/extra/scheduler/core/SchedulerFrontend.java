@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
@@ -56,6 +57,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
 import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
 import org.objectweb.proactive.extra.scheduler.job.IdentifyJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extra.scheduler.job.InternalJobFactory;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.job.JobIdImpl;
 import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
@@ -63,7 +65,7 @@ import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.TaskIdImpl;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
  * Scheduler Frontend. This is the API to talk to when you want to managed a scheduler core.
@@ -210,10 +212,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	 * @return the job id of the given job.
 	 * @throws UserException an exception containing explicit error message.
 	 */
-	public JobId submit(InternalJob job) throws SchedulerException {
+	public JobId submit(Job userJob) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id))
 			throw new SchedulerException(ACCESS_DENIED);
+		//get the internal job.
+		InternalJob job = InternalJobFactory.createJob(userJob);
 		//setting job informations
 		if (job.getTasks().size() == 0)
 			throw new SchedulerException("This job does not contain Tasks !! Insert tasks before submitting job.");

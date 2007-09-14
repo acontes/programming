@@ -33,8 +33,8 @@ package org.objectweb.proactive.extra.scheduler.job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalAppliTask;
-import org.objectweb.proactive.extra.scheduler.task.descriptor.InternalTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalAppliTask;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 /**
  * Class ApplicationJob.

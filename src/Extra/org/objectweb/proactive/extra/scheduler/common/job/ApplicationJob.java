@@ -28,35 +28,59 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.common.job;
 
-import org.objectweb.proactive.extra.scheduler.job.TaskDescriptor;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
+
+import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
 
 /**
- * This class represents an elligible task for the policy.
- * It is a sort of tag class that will avoid user from giving non-eligible task to the scheduler.
- * In fact policy will handle LightTask and EligibleLightTask but
- * will only be allowed to send EligibleLightTask to the scheduler
- * @see org.objectweb.proactive.extra.scheduler.job.TaskDescriptor
+ * Definition of an application job for the user.
+ * An application job is a job that contains a task that have a list of node in its parameters list.
+ * To make this type of job, just use the default no params constructor,
+ * and set the properties you want to set.
+ * Then add your application task with the given method in order to fill the job with your own tasks.
+ * You must set the number of nodes you want in the task,
+ * and also the task as a .class or instance.
  * 
  * @author ProActive Team
- * @version 1.0, Jul 9, 2007
+ * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
-public class EligibleTaskDescriptor extends TaskDescriptor {
-
-	/** Serial version UID */
-	private static final long serialVersionUID = 8461969956605719440L;
+public class ApplicationJob extends Job {
+	
+	/** Serial Version UID */
+	private static final long serialVersionUID = 1623955669459590983L;
+	private ApplicationTask task = null;
+	
+	
+	/** Proactive Empty Constructor */
+	public ApplicationJob() {}
 	
 	/**
-	 * Get a new eligible light task using a taskDescriptor.
-	 * Same constructor as LightTask
-	 * 
-	 * @param td the taskDescriptor to shrink.
+	 * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getType()
 	 */
-	public EligibleTaskDescriptor(InternalTask td) {
-		super(td);
+	@Override
+	public JobType getType() {
+		return JobType.APPLI;
 	}
+
+	/**
+	 * To get the unique task of this job.
+	 * 
+	 * @return the unique task of this job.
+	 */
+	public ApplicationTask getTask() {
+		return task;
+	}
+
+	/**
+	 * To set the unique task of this job.
+	 * 
+	 * @param task the task to set
+	 */
+	public void setTask(ApplicationTask task) {
+		this.task = task;
+	}
+	
 
 }
