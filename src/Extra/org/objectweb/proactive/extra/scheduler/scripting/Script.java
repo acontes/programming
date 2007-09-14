@@ -82,9 +82,9 @@ public abstract class Script<E> implements Serializable {
     protected abstract ScriptResult<E> getResult(Bindings bindings);
     
     @Override
-    public boolean equals(Object o) {
+	public boolean equals(Object o) {
     	if (o instanceof Script) {
-			Script new_name = (Script) o;
+			Script<E> new_name = (Script<E>) o;
 			return this.getId().equals(new_name.getId());
 		}
     	return false;

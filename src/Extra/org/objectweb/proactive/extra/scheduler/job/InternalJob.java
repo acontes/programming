@@ -481,6 +481,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
 	 * 
 	 * @return the type
 	 */
+	@Override
 	public abstract JobType getType();
 
 	/**

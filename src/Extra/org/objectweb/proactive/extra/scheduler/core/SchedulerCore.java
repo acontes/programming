@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
@@ -540,7 +541,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 	 * 
 	 * @return the scheduler current state with the pending, running, finished jobs list.
 	 */
-	public SchedulerInitialState getSchedulerInitialState() {
+	public SchedulerInitialState<? extends Job> getSchedulerInitialState() {
 		SchedulerInitialState<InternalJob> sState = new SchedulerInitialState<InternalJob>();
 		sState.setPendingJobs(pendingJobs);
 		sState.setRunningJobs(runningJobs);

@@ -73,6 +73,7 @@ public enum JobPriority implements java.io.Serializable {
 	/**
 	 * @see java.lang.Enum#toString()
 	 */
+	@Override
 	public String toString(){
 		return name;
 	}

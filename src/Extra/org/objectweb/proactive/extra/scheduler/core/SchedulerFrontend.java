@@ -264,7 +264,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Us
 	/**
 	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener)
 	 */
-	public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener sel) throws SchedulerException {
+	public SchedulerInitialState<? extends Job> addSchedulerEventListener(SchedulerEventListener sel) throws SchedulerException {
 		UniqueID id = ProActive.getContext().getCurrentRequest().getSourceBodyID();
 		if (!identifications.containsKey(id))
 			throw new SchedulerException(ACCESS_DENIED);

@@ -135,7 +135,7 @@ public class SimpleTestIMMonitoring {
     public void printIMNodesByVNodeByPad() {
         ArrayList<IMNode> imNodes = imMonitoring.getListAllIMNodes();
         Object[] tableOfIMNodes = imNodes.toArray();
-        Arrays.sort(tableOfIMNodes, new ComparatorIMNode());
+        Arrays.sort(tableOfIMNodes);
         /*
         for(int i = 0 ; i < tableOfIMNodes.length ; i ++ ) {
                 System.out.println(i + ". " + descriptionIMNode((IMNode)tableOfIMNodes[i]));

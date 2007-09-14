@@ -43,7 +43,7 @@ import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 /**
  * The <I>IMNode</I> is a object containing a node and its description.<BR/>
  */
-public interface IMNode {
+public interface IMNode extends Comparable<IMNode> {
     // STATES
 
     /**

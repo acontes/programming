@@ -96,7 +96,7 @@ public interface UserSchedulerInterface extends Serializable {
 	 * @return the scheduler current state containing the different lists of jobs.
 	 * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
 	 */
-	public SchedulerInitialState addSchedulerEventListener (SchedulerEventListener sel) throws SchedulerException;
+	public SchedulerInitialState<? extends Job> addSchedulerEventListener (SchedulerEventListener sel) throws SchedulerException;
 	
 	
 	/**

@@ -45,7 +45,7 @@ public class SchedulerException extends Exception {
 
 	/**
      * Attaches a message to the Exception
-     * @param arg0-message ataached
+     * @param arg0 message attached
      */
     public SchedulerException(String arg0) {
         super(arg0);

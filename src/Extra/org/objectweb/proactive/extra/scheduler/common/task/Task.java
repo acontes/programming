@@ -132,7 +132,7 @@ public abstract class Task implements Serializable {
 	/**
 	 * Set if the task is final or not.
 	 * 
-	 * @param final true if the task is final, false if not.
+	 * @param finalTask true if the task is final, false if not.
 	 */
 	public void setFinalTask(boolean finalTask) {
 		this.finalTask = finalTask;
