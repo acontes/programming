@@ -139,6 +139,15 @@ public class ApplicationTask extends Task {
 	}
 	
 	/**
+	 * Set the task arguments list to this task.
+	 * 
+	 * @param the arguments list to set
+	 */
+	public void setArguments(Map<String, Object> args) {
+		this.args = args;
+	}
+	
+	/**
 	 * Add an argument to the list of arguments.
 	 * 
 	 * @param name the name of the argument to add.
