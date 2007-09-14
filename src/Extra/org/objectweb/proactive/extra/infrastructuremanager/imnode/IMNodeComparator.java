@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.imnode;
 
 import java.util.Comparator;
 
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 
 /**

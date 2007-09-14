@@ -54,11 +54,11 @@ import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
-import org.objectweb.proactive.extra.scheduler.scripting.Script;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptHandler;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptLoader;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 
 /**

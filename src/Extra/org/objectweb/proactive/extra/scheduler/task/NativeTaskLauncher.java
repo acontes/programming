@@ -39,13 +39,13 @@ import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptHandler;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptLoader;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
 
 /**
  * Native Task Launcher.

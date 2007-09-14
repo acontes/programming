@@ -37,8 +37,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
 
 public class TestIMProxy {
 	

@@ -63,7 +63,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.Dy
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PADNSInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 
 public class IMCore implements InitActive, IMConstants, Serializable {

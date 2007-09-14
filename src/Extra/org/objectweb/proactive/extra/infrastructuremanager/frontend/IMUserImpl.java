@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 
 public class IMUserImpl implements IMUser {

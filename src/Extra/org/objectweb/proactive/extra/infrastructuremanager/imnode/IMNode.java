@@ -36,8 +36,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 
 /**

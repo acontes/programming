@@ -33,8 +33,9 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.objectweb.proactive.extra.scheduler.scripting.Script;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+
+import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 /**
  * Definition of a task for the user.

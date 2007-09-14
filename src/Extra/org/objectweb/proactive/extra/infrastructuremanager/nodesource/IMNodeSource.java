@@ -38,7 +38,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSourceInterface;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 
 /**

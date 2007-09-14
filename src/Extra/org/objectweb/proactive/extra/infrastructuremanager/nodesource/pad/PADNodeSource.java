@@ -57,7 +57,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeComparat
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeImpl;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PADNSInterface;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 
@@ -103,7 +103,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
      *                 -> Next, the nodes that haven't been tested ;
      *                 -> Next, the nodes that have allready verified the script, but no longer ;
      *                 -> To finish, the nodes that don't verify the script.
-     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNodesByScript(org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript)
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNodesByScript(org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript)
      */
     public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
         boolean ordered) {

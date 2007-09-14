@@ -28,27 +28,47 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.scripting;
+package org.objectweb.proactive.extra.scheduler.common.scripting;
 
-public class InvalidScriptException extends Exception {
+import java.io.Serializable;
 
-	public InvalidScriptException() {
-		super();
-	}
-
-	public InvalidScriptException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public InvalidScriptException(String message) {
-		super(message);
-	}
-
-	public InvalidScriptException(Throwable cause) {
-		super(cause);
-	}
+public class ScriptResult<E> implements Serializable {
 
 	/**  */
-	private static final long serialVersionUID = 9017447962578395084L;
+	private static final long serialVersionUID = 2665277848502662458L;
+	private E result = null;
+	private Throwable exception = null;
+	
+	public ScriptResult() {}
+	
+	public ScriptResult(E result, Throwable exception) {
+		this.result = result;
+		this.exception = exception;
+	}
+	
+	public ScriptResult(E result) {
+		this(result, null);
+	}
+	
+	public ScriptResult(Throwable exception) {
+		this(null, exception);
+	}
+	
+	public boolean errorOccured() {
+		return exception != null;
+	}
+	
+	public Throwable getException() {
+		return exception;
+	}
+	public void setException(Throwable exception) {
+		this.exception = exception;
+	}
+	public E getResult() {
+		return result;
+	}
+	public void setResult(E result) {
+		this.result = result;
+	}
 
 }

@@ -6,12 +6,12 @@
 			<!-- Task human description -->
 			<description>Will control the workers in order to find the prime number</description>
 			<process>
-				<javaProcess
+				<applicationProcess
 					class="org.objectweb.proactive.examples.scheduler.ApplicationExample">
 					<initParameters>
 						<parameter name="numberToFind" value="200" />
 					</initParameters>
-				</javaProcess>
+				</applicationProcess>
 			</process>
 		</task>
 	</tasks>

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.scripting;
+package org.objectweb.proactive.extra.scheduler.common.scripting;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -143,7 +143,7 @@ public class SimpleScript extends Script {
     /**
      * VerifyingScript must give its result in the 'result_script' variable.
      *
-     * @see org.objectweb.proactive.extra.scheduler.scripting.Script#getResult(javax.script.Bindings)
+     * @see org.objectweb.proactive.extra.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
     protected ScriptResult<Object> getResult(Bindings bindings) {

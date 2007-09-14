@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.scripting;
+package org.objectweb.proactive.extra.scheduler.common.scripting;
 
 import java.io.*;
 import java.net.URL;
@@ -165,7 +165,7 @@ public class VerifyingScript extends Script<Boolean> {
     /**
      * VerifyingScript must give its result in the 'result_script' variable.
      *
-     * @see org.objectweb.proactive.extra.scheduler.scripting.Script#getResult(javax.script.Bindings)
+     * @see org.objectweb.proactive.extra.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
     protected ScriptResult<Boolean> getResult(Bindings bindings) {

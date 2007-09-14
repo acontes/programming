@@ -49,20 +49,17 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import org.objectweb.proactive.extra.scheduler.common.scripting.InvalidScriptException;
+import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SimpleScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
-import org.objectweb.proactive.extra.scheduler.job.InternalApplicationJob;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.job.InternalParameterSweepingJob;
-import org.objectweb.proactive.extra.scheduler.job.InternalTaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.scripting.InvalidScriptException;
-import org.objectweb.proactive.extra.scheduler.scripting.Script;
-import org.objectweb.proactive.extra.scheduler.scripting.SimpleScript;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalAbstractJavaTask;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalJavaTask;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalNativeTask;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.NativeTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -87,7 +84,7 @@ public class JobFactory {
 
 	private JobFactory() {}
 
-	public InternalJob createJob(String fileUrl)
+	public Job createJob(String fileUrl)
 	throws ParserConfigurationException, SAXException, IOException,
 	XPathExpressionException, InvalidScriptException,
 	ClassNotFoundException {
@@ -100,7 +97,7 @@ public class JobFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	public InternalJob createJob(InputStream input)
+	public Job createJob(InputStream input)
 	throws ParserConfigurationException, SAXException, IOException,
 	XPathExpressionException, InvalidScriptException,
 	ClassNotFoundException {
@@ -116,7 +113,7 @@ public class JobFactory {
 		String description = null;
 		boolean cancelOnException = false;
 		JobType jt = null;
-		Map<InternalTask, String> tasks = new HashMap<InternalTask, String>();
+		Map<Task, String> tasks = new HashMap<Task, String>();
 		int jobAppliNeededNodes = 0;
 
 		// JOB
@@ -171,19 +168,19 @@ public class JobFactory {
 				Node taskNode = list.item(i);
 
 				// TASK PROCESS
-				InternalTask desc = null;
+				Task desc = null;
 				Node process = (Node) xpath.evaluate("process/javaProcess",
 						taskNode, XPathConstants.NODE);
 				if (process != null) { // JAVA TASK
 					desc = createJavaTask(process, xpath);
+				} else if((process = (Node) xpath.evaluate("process/nativeProcess",
+						taskNode, XPathConstants.NODE)) != null){ // NATIVE TASK
+					desc = createNativeTask(process, xpath);
+				} else if((process = (Node) xpath.evaluate("process/applicationProcess",
+						taskNode, XPathConstants.NODE)) != null){ // APPLICATION TASK
+					desc = createApplicationTask(process, xpath);
 				} else {
-					process = (Node) xpath.evaluate("process/nativeProcess",
-							taskNode, XPathConstants.NODE);
-					if (process != null) { // NATIVE TASK
-						desc = createNativeTask(process, xpath);
-					} else {
-						throw new RuntimeException("Unknow process !!");
-					}
+					throw new RuntimeException("Unknow process !!");
 				}
 
 				// TASK NAME
@@ -259,38 +256,53 @@ public class JobFactory {
 		}
 
 		// Job creation
-		InternalJob job = null;
+		Job job = null;
 		if (jt == JobType.APPLI) {
 			if(!tasks.keySet().isEmpty()) {
-				InternalTask td = tasks.keySet().iterator().next();
-				
-				job = new InternalApplicationJob(name, getPriority(priority), -1, true, description, jobAppliNeededNodes, (Class<ExecutableApplicationTask>) td.getTask().getClass());
-				InternalAbstractJavaTask td2 = ((InternalApplicationJob)job).getTask();
+				Task td = tasks.keySet().iterator().next();
+				job = new ApplicationJob();
+				ApplicationJob jobA = (ApplicationJob) job;
+				jobA.setName(name);
+				jobA.setPriority(getPriority(priority));
+				jobA.setDescription(description);
+
+				ApplicationTask td2 = jobA.getTask();
 				td2.setDescription(td.getDescription());
-//				td2.setFinalTask(td.isFinalTask()); DONT DO THIS SETTING
 				td2.setName(td.getName());
 				td2.setPostTask(td.getPostTask());
 				td2.setPreTask(td.getPreTask());
 				td2.setRerunnable(td.getRerunnable());
 				td2.setRunTimeLimit(td.getRunTimeLimit());
 				td2.setVerifyingScript(td.getVerifyingScript());
-				td2.setArgs(((InternalJavaTask)td).getArgs());
-				
+				td2.setArguments(((JavaTask)td).getArguments());
+				td2.setNumberOfNodesNeeded(jobAppliNeededNodes);
+				td2.setTaskClass(((ApplicationTask)td).getTaskClass());
+
 			}
 		} else if (jt == JobType.PARAMETER_SWEEPING){
-			job = new InternalParameterSweepingJob(name, getPriority(priority), -1, cancelOnException, description);
+//	TODO	job = new ParameterSweepingJob();
+//			ParameterSweepingJob jobPS = (ParameterSweepingJob) job;
+//			jobPS.setName(name);
+//			jobPS.setPriority(getPriority(priority));
+//			jobPS.setCancelOnException(cancelOnException);
+//			jobPS.setDescription(description);
 		} else {
-			job = new InternalTaskFlowJob(name, getPriority(priority), -1, cancelOnException, description);
+			job = new TaskFlowJob();
+			TaskFlowJob jobTF = (TaskFlowJob) job;
+			jobTF.setName(name);
+			jobTF.setPriority(getPriority(priority));
+			job.setCancelOnException(cancelOnException);
+			job.setDescription(description);
 		}
 		// Dependencies
-		HashMap<String, InternalTask> depends = 
-			new HashMap<String, InternalTask>();
+		HashMap<String, Task> depends = 
+			new HashMap<String, Task>();
 
-		for(InternalTask td : tasks.keySet())
+		for(Task td : tasks.keySet())
 			depends.put(td.getName(), td);
 		if(job.getType() != JobType.APPLI){
-			for (Entry<InternalTask, String> task : tasks.entrySet()) {
-				task.getKey().setJobId(job.getId());
+			for (Entry<Task, String> task : tasks.entrySet()) {
+				//task.getKey().setJobId(job.getId());
 				String depstr = task.getValue();
 				if (!depstr.matches("[ ]*")){
 					String[] deps = depstr.split(" ");
@@ -301,7 +313,13 @@ public class JobFactory {
 							System.err.println("Can't resolve dependence : "+deps[i]);
 					}
 				}
-				job.addTask(task.getKey());
+				switch(job.getType()) {
+				case TASKSFLOW:
+					((TaskFlowJob) job).addTask(task.getKey());
+					break;
+				case PARAMETER_SWEEPING:
+					//TODO ((TaskFlowJob) job).addTask(task.getKey());
+				}
 			}
 		}
 
@@ -317,7 +335,7 @@ public class JobFactory {
 		else return JobPriority.NORMAL;
 	}
 
-	private InternalTask createNativeTask(Node process, XPath xpath) 
+	private Task createNativeTask(Node process, XPath xpath) 
 	throws XPathExpressionException, ClassNotFoundException, IOException {
 		String cmd = (String) xpath.evaluate("@command", process, XPathConstants.STRING);
 		NodeList args = (NodeList) xpath
@@ -329,22 +347,23 @@ public class JobFactory {
 				String value = (String) xpath.evaluate("@value", arg,
 						XPathConstants.STRING);
 //				String serializedFile = (String) xpath.evaluate("@serializedFile",
-//						arg, XPathConstants.STRING);
+//				arg, XPathConstants.STRING);
 				if (value != null) {
 					cmd += " "+value;
 				}
 			}
 		}
-		InternalNativeTask desc = new InternalNativeTask(cmd);
+		NativeTask desc = new NativeTask();
+		desc.setCommandLine(cmd);
 		return desc;
 	}
 
 
 	@SuppressWarnings("unchecked")
-	private InternalJavaTask createJavaTask(Node process, XPath xpath)
+	private JavaTask createJavaTask(Node process, XPath xpath)
 	throws XPathExpressionException, ClassNotFoundException, IOException {
-		InternalJavaTask desc = new InternalJavaTask();
-		desc.setTaskClass((Class<ExecutableTask>) Class.forName(
+		JavaTask desc = new JavaTask();
+		desc.setTaskClass((Class<ExecutableJavaTask>) Class.forName(
 				(String) xpath.compile("@class")
 				.evaluate(process, XPathConstants.STRING)));
 		// TODO Verify that class extends Task
@@ -362,15 +381,51 @@ public class JobFactory {
 				String serializedFile = (String) xpath.evaluate("@serializedFile",
 						arg, XPathConstants.STRING);
 				if ((name != null) && (value != null)) {
-					desc.getArgs().put(name, value);
+					desc.getArguments().put(name, value);
 				} else if ((name != null) && (serializedFile != null)) {
 					FileInputStream fis = new FileInputStream(serializedFile);
 					ObjectInputStream ois = new ObjectInputStream(fis);
-					desc.getArgs().put(name, ois.readObject());
+					desc.getArguments().put(name, ois.readObject());
 				}
 			}
 		}
-		for (Entry<String, Object> entry : desc.getArgs().entrySet())
+		for (Entry<String, Object> entry : desc.getArguments().entrySet())
+			System.out.println("arg: " + entry.getKey() + " = " +
+					entry.getValue());
+		return desc;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ApplicationTask createApplicationTask(Node process, XPath xpath)
+	throws XPathExpressionException, ClassNotFoundException, IOException {
+		ApplicationTask desc = new ApplicationTask();
+		desc.setTaskClass((Class<ExecutableApplicationTask>) Class.forName(
+				(String) xpath.compile("@class")
+				.evaluate(process, XPathConstants.STRING)));
+		// TODO Verify that class extends Task
+		System.out.println("task = " + desc.getTaskClass().getCanonicalName());
+		NodeList args = (NodeList) xpath
+		.evaluate("initParameters/parameter",process,
+				XPathConstants.NODESET);
+		if (args != null) {
+			for (int i = 0; i < args.getLength(); i++) {
+				Node arg = args.item(i);
+				String name = (String) xpath.evaluate("@name", arg,
+						XPathConstants.STRING);
+				String value = (String) xpath.evaluate("@value", arg,
+						XPathConstants.STRING);
+				String serializedFile = (String) xpath.evaluate("@serializedFile",
+						arg, XPathConstants.STRING);
+				if ((name != null) && (value != null)) {
+					desc.getArguments().put(name, value);
+				} else if ((name != null) && (serializedFile != null)) {
+					FileInputStream fis = new FileInputStream(serializedFile);
+					ObjectInputStream ois = new ObjectInputStream(fis);
+					desc.getArguments().put(name, ois.readObject());
+				}
+			}
+		}
+		for (Entry<String, Object> entry : desc.getArguments().entrySet())
 			System.out.println("arg: " + entry.getKey() + " = " +
 					entry.getValue());
 		return desc;

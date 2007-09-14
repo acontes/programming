@@ -37,10 +37,10 @@ import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptHandler;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptLoader;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 public class IMNodeImpl implements IMNode, Serializable {
 

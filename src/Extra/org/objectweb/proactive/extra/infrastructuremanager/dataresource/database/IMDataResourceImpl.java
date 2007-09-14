@@ -48,8 +48,8 @@ import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMDataRe
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
-import org.objectweb.proactive.extra.scheduler.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
+import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 
 /**

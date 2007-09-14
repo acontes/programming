@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.scripting;
+package org.objectweb.proactive.extra.scheduler.common.scripting;
 
 import java.io.Reader;
 import java.io.Serializable;
