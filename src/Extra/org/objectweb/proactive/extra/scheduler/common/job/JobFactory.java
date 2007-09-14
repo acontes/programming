@@ -267,7 +267,8 @@ public class JobFactory {
 				jobA.setPriority(getPriority(priority));
 				jobA.setDescription(description);
 
-				ApplicationTask td2 = jobA.getTask();
+				ApplicationTask td2 = new ApplicationTask();
+				jobA.setTask(td2);
 				td2.setDescription(td.getDescription());
 				td2.setName(td.getName());
 				td2.setPostTask(td.getPostTask());

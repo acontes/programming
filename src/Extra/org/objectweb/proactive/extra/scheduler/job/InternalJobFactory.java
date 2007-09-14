@@ -144,9 +144,12 @@ public class InternalJobFactory implements Serializable {
 		if (!hasFinalTask)
 			throw new SchedulerException("You must specify at least one final task in your job !");
 		for (Entry<Task,InternalTask> entry : tasksList.entrySet()){
-			for (Task t : entry.getKey().getDependencesList()){
-				entry.getValue().addDependence(tasksList.get(t));
+			if (entry.getKey().getDependencesList() != null){
+				for (Task t : entry.getKey().getDependencesList()){
+					entry.getValue().addDependence(tasksList.get(t));
+				}
 			}
+			job.addTask(entry.getValue());
 		}
 		return job;
 	}
@@ -180,6 +183,7 @@ public class InternalJobFactory implements Serializable {
 		} else {
 			throw new SchedulerException("You must specify your own executable task to be launched in every task !");
 		}
+		javaTask.setArgs(task.getArguments());
 		setProperties(task,javaTask);
 		return javaTask;
 	}
