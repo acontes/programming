@@ -210,6 +210,7 @@
 				<include name="org/**/*.properties" />
 				<include name="org/**/*.xsd" />
 				<include name="org/**/*.png" />
+				<include name="org/**/*.config" />
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
 			</fileset>
 		</copy>
