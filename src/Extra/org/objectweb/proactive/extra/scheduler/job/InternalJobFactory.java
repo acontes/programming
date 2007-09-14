@@ -88,7 +88,7 @@ public class InternalJobFactory implements Serializable {
 	private static InternalJob createJob(ApplicationJob userJob) throws SchedulerException {
 		InternalApplicationJob job;
 		ApplicationTask userTask = userJob.getTask();
-		if (userTask != null)
+		if (userTask == null)
 			throw new SchedulerException("You must specify an application task !");
 		if (userTask.getTaskClass() != null){
 			job = new InternalApplicationJob(

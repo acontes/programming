@@ -276,7 +276,7 @@ public class JobFactory {
 				td2.setRerunnable(td.getRerunnable());
 				td2.setRunTimeLimit(td.getRunTimeLimit());
 				td2.setVerifyingScript(td.getVerifyingScript());
-				td2.setArguments(((JavaTask)td).getArguments());
+				td2.setArguments(((ApplicationTask)td).getArguments());
 				td2.setNumberOfNodesNeeded(jobAppliNeededNodes);
 				td2.setTaskClass(((ApplicationTask)td).getTaskClass());
 
