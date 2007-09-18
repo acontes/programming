@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -66,7 +66,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
                 classServerHelper = new ClassServerHelper();
                 String codebase = classServerHelper.initializeClassServer();
 
-                PAProperties.PA_XMLHTTP_PORT.setValue(UrlBuilder.getPortNumber(
+                PAProperties.PA_XMLHTTP_PORT.setValue(URIBuilder.getPortNumber(
                         codebase) + "");
 
                 addCodebase(codebase);
@@ -81,6 +81,9 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb.proactive.core.remoteobject.RemoteObject)
+     */
     public RemoteRemoteObject newRemoteObject(RemoteObject target)
         throws ProActiveException {
         try {
@@ -94,6 +97,10 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
      * Registers an remote object into the http registry
      * @param urn The urn of the body (in fact his url + his name)
      * @exception java.io.IOException if the remote body cannot be registered
+     */
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive.core.remoteobject.RemoteObject, java.net.URI, boolean)
      */
     public RemoteRemoteObject register(RemoteObject ro, URI url,
         boolean replacePrevious) throws ProActiveException {
@@ -212,6 +219,9 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#getPort()
+     */
     public int getPort() {
         return Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
     }

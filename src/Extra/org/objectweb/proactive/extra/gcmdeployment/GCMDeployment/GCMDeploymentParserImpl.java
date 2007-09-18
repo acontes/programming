@@ -20,10 +20,10 @@ import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeSSHParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupBSubParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGLiteParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGlobusParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGridEngineParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupLSFParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupMPIParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARGridParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARParser;
@@ -113,7 +113,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerGroupParser(new GroupOARParser());
         registerGroupParser(new GroupOARGridParser());
         registerGroupParser(new GroupPBSParser());
-        registerGroupParser(new GroupBSubParser());
+        registerGroupParser(new GroupLSFParser());
         registerGroupParser(new GroupGLiteParser());
         registerGroupParser(new GroupGlobusParser());
         registerGroupParser(new GroupGridEngineParser());
@@ -156,8 +156,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                                        .toString();
 
         schemas.add(0, deploymentSchema);
-        schemas.add(0, commonTypesSchema);
-
+        //        schemas.add(0, commonTypesSchema);
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
@@ -167,7 +166,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
             xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                    DEPLOYMENT_DESCRIPTOR_NAMESPACE));
+                    GCM_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         }
@@ -256,6 +255,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 XPathConstants.NODE);
 
         String refid = GCMParserHelper.getAttributeValue(hostNode, "refid");
+
+        // FIXME glaurent XSD does not enforce keyref integrity so a check is needed to see if refid exist or not
         HostInfo hostInfo = getHostInfo(refid);
         group.setHostInfo(hostInfo);
     }

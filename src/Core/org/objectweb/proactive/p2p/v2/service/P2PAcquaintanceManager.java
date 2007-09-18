@@ -49,6 +49,7 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -56,8 +57,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 import org.objectweb.proactive.p2p.v2.service.messages.AcquaintanceRequest;
-import org.objectweb.proactive.p2p.v2.service.messages.Message;
-import org.objectweb.proactive.p2p.v2.service.util.NOAPowerLawGenerator;
 import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
 
 
@@ -76,10 +75,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      */
     private static long MAX_WAIT_TIME = 10000;
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
+    static public int NOA = Integer.parseInt(PAProperties.PA_P2P_NOA.getValue());
 
-    //    static public  int NOA = Integer.parseInt(System.getProperty(
-    //                P2PConstants.PROPERTY_NOA));
-    static public int NOA = new NOAPowerLawGenerator(1, 9, -3).nextInt();
+    //	static public int NOA = new NOAPowerLawGenerator(1, 9, -3).nextInt();
 
     // protected Random rand = new Random();
     private Random randomizer = new Random();
@@ -138,13 +136,13 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             if (this.getEstimatedNumberOfAcquaintances() < NOA) {
                 //   this.dumpTables();
                 lookForNewPeers();
+            } else if (this.acquaintances.size() > NOA) {
+                //we should drop some here
+                //do we go for all at once or just one at a time?
+                logger.info("I have too many neighbors!");
+                this.dropRandomPeer();
             } else {
-                if (this.acquaintances.size() > NOA) {
-                    //we should drop some here
-                    //do we go for all at once or just one at a time?
-                    logger.info("I have too many neighbors!");
-                    this.dropRandomPeer();
-                }
+                logger.info("I have reached the maximum of acquaintance ");
             }
             waitTTU(service);
             //     this.dumpTables();
@@ -201,10 +199,10 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     public void connectToPreferedAcquaintances() {
         int size = this.preferedAcquaintancesURLs.size();
 
-        //     int index = 0;
-        //        System.out.println(
-        //            "P2PAcquaintanceManager.connectToPreferedAcquaintances() number of URLs  " +
-        //            preferedAcquaintancesURLs.size());
+        // int index = 0;
+        //		System.out.println(
+        //		"P2PAcquaintanceManager.connectToPreferedAcquaintances() number of URLs  " +
+        //		preferedAcquaintancesURLs.size());
         //while(!this.peers.isEmpty()) {
         //     for (int i = 0; i < size; i++) {
         HashSet<String> newSet = new HashSet<String>();
@@ -225,19 +223,20 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             try {
                 Node distNode = NodeFactory.getNode(peerUrl);
                 P2PService peer = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
-                if (!peer.equals(this.localService) &&
-                        !this.contains(peer).booleanValue()) {
+                if ( //!peer.equals(this.localService) &&
+                    !this.contains(peer).booleanValue()) {
                     // Send a message to the remote peer to register myself
-                    logger.info("P2PAcquaintanceManager requesting peer " +
-                        peerUrl);
+                    System.out.println(
+                        "P2PAcquaintanceManager requesting peer " + peerUrl);
                     //peer.registerRequest(this.localService);
                     startAcquaintanceHandShake(peerUrl, peer);
                 } else {
                     newSet.add(peerUrl);
                 }
             } catch (Exception e) {
-                logger.info("The peer at " + peerUrl +
-                    " couldn't be contacted", e);
+                System.out.println("The peer at " + peerUrl +
+                    " couldn't be contacted");
+                e.printStackTrace();
                 //put it back for later use
                 newSet.add(peerUrl);
                 //remove it from the awaited
@@ -297,8 +296,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     public void startAcquaintanceHandShake(String peerUrl, P2PService peer) {
         this.localService.transmit(new AcquaintanceRequest(1), peer);
 
-        //    	peer.message(new AcquaintanceRequest(1,
-        //        this.localService.generateUuid(), this.localService));
+        //		peer.message(new AcquaintanceRequest(1,
+        //		this.localService.generateUuid(), this.localService));
         System.out.println("XXXXXX putting in awaited List " + peerUrl);
         awaitedReplies.put(buildCorrectUrl(peerUrl),
             new DatedRequest(peer, System.currentTimeMillis()));
@@ -350,13 +349,14 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     public void acqAccepted(String url, P2PService peer) {
         logger.info("P2PAcquaintanceManager.acqAccepted() got a reply from " +
             url);
+        System.out.println("URL:" + url + " PEER:" + peer);
         //we remove it from the awaited answers
         //if we don't do so, it might be refused because of the NOA limit
         this.removeFromAwaited(url);
         this.add(url, peer);
         System.out.println("P2PAcquaintanceManager.acqAccepted() adding " +
-            "--rmi:" + url + "--");
-        this.preferedAcquaintancesURLs.add("rmi:" + url);
+            "--" + url + "--");
+        this.preferedAcquaintancesURLs.add(url);
         Iterator it = this.preferedAcquaintancesURLs.iterator();
         while (it.hasNext()) {
             System.out.println("            " + it.next());
@@ -377,8 +377,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         for (int i = 0; i < tmp.length; i++) {
             System.out.println("--" + tmp[i] + "--");
         }
-        logger.info("Removing --rmi:" + url + "-- from awaited peers " +
-            awaitedReplies.remove("rmi:" + url));
+        logger.info("Removing --" + url + "-- from awaited peers " +
+            awaitedReplies.remove(url));
     }
 
     /**
@@ -461,19 +461,17 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     }
 
     public P2PService getAcquaintances() {
-        System.out.println(
-            "P2PAcquaintanceManager.getAcquaintances() ---------------");
         return this.acquaintances.getAcquaintances();
     }
 
-    /**
-     * Calls the transmit() method of the message m
-     * @param m
-     */
-    public void transmit(Message m) {
-        m.transmit(this.acquaintances.getAcquaintances());
-    }
-
+    //	/**
+    //	* Calls the transmit() method of the message m
+    //	* @param m
+    //	*/
+    //	public void transmit(Message m) {
+    ////	m.transmit(this.acquaintances.getAcquaintances());
+    //	m.transmit(localService);
+    //	}
     public int getMaxNOA() {
         return NOA;
     }
@@ -526,8 +524,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         this.preferedAcquaintancesURLs = new HashSet<String>();
         Iterator it = v.iterator();
         while (it.hasNext()) {
-            this.preferedAcquaintancesURLs.add(buildCorrectUrl(
-                    (String) it.next()));
+            String p = buildCorrectUrl((String) it.next());
+            System.out.println(p);
+            this.preferedAcquaintancesURLs.add(p);
         }
     }
 
@@ -545,10 +544,10 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     }
 
     /**
-      * Add the default name of the P2P Node to a specified <code>url</code>.
-      * @param url  the url.
-      * @return the <code>url</code> with the name of the P2P Node.
-      */
+     * Add the default name of the P2P Node to a specified <code>url</code>.
+     * @param url  the url.
+     * @return the <code>url</code> with the name of the P2P Node.
+     */
     private static String urlAdderP2PNodeName(String url) {
         if (url.indexOf(P2P_NODE_NAME) <= 0) {
             url += ("/" + P2P_NODE_NAME);

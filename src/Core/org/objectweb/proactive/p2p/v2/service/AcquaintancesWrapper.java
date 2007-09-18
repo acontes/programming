@@ -21,16 +21,16 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class AcquaintancesWrapper implements Serializable {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
-    private P2PService acquaintances = null;
+    private P2PService acquaintances_active = null;
     private Group groupOfAcquaintances = null;
     private ArrayList<String> urlList = new ArrayList<String>();
 
     public AcquaintancesWrapper() {
         try {
-            acquaintances = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
-            ProActive.addNFEListenerOnGroup(this.acquaintances,
+            acquaintances_active = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
+            ProActive.addNFEListenerOnGroup(this.acquaintances_active,
                 new AutomaticPurgeGroup());
-            this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances);
+            this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances_active);
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -73,7 +73,7 @@ public class AcquaintancesWrapper implements Serializable {
     }
 
     public P2PService getAcquaintances() {
-        return this.acquaintances;
+        return this.acquaintances_active;
     }
 
     public Group getAcquaintancesAsGroup() {

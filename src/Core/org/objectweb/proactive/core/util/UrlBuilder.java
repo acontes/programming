@@ -30,10 +30,16 @@
  */
 package org.objectweb.proactive.core.util;
 
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
@@ -48,6 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class is a utility class to perform modifications and operations on urls.
  */
+@Deprecated
 public class UrlBuilder {
     private static String[] LOCAL_URLS = {
             "", "localhost.localdomain", "localhost", "127.0.0.1"
@@ -270,9 +277,9 @@ public class UrlBuilder {
     //        return url;
     //    }
     public static String removeProtocol(String url) {
-        String tmp = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
-                UrlBuilder.getNameFromUrl(url), null,
-                UrlBuilder.getPortFromUrl(url));
+        String tmp = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(url),
+                URIBuilder.getNameFromURI(url), null,
+                URIBuilder.getPortNumber(url)).toString();
         return tmp;
     }
 
@@ -315,6 +322,7 @@ public class UrlBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
+        //        address = getNetworkInterfaces();
         if (PAProperties.PA_RUNTIME_IPADDRESS.getValue() != null) {
             return PAProperties.PA_RUNTIME_IPADDRESS.getValue();
         }
@@ -322,11 +330,16 @@ public class UrlBuilder {
         if (PAProperties.PA_HOSTNAME.getValue() != null) {
             return PAProperties.PA_HOSTNAME.getValue();
         }
+
+        String temp = "";
+
         if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
-            return address.getHostAddress();
+            temp = (address).getHostAddress();
         } else {
-            return address.getCanonicalHostName();
+            temp = address.getCanonicalHostName();
         }
+
+        return URIBuilder.ipv6withoutscope(temp);
     }
 
     public static String removeUsername(String url) {
@@ -361,7 +374,7 @@ public class UrlBuilder {
 
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {
-                return UrlBuilder.getHostNameorIP(hostInetAddress);
+                return URIBuilder.getHostNameorIP(hostInetAddress);
             }
         }
 
@@ -403,5 +416,41 @@ public class UrlBuilder {
         }
 
         return url;
+    }
+
+    public static InetAddress getNetworkInterfaces() {
+        List<InetAddress> ips = new ArrayList<InetAddress>();
+
+        Enumeration<NetworkInterface> interfaces;
+        try {
+            interfaces = NetworkInterface.getNetworkInterfaces();
+
+            int i = 0;
+
+            while (interfaces.hasMoreElements()) { // carte reseau trouvee
+                System.out.println("interface " + i++);
+                NetworkInterface interfaceN = interfaces.nextElement();
+                Enumeration<InetAddress> ienum = interfaceN.getInetAddresses();
+                int j = 0;
+                while (ienum.hasMoreElements()) { // retourne l adresse IPv4 et IPv6
+                    System.out.println("adresses " + j++);
+
+                    InetAddress ia = ienum.nextElement();
+                    String adress = ia.getHostAddress().toString();
+
+                    System.out.println(ia.getClass());
+
+                    System.out.println(ia.getHostAddress());
+
+                    if (ia instanceof Inet6Address) {
+                        return ia;
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 }
