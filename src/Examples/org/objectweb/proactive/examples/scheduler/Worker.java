@@ -1,10 +1,12 @@
 /**
- * 
+ *
  */
 package org.objectweb.proactive.examples.scheduler;
 
 import java.util.ArrayList;
+
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+
 
 /**
  * @author jlscheef
@@ -17,7 +19,8 @@ public class Worker implements java.io.Serializable {
     private ArrayList<Integer> primeNumbers = new ArrayList<Integer>();
 
     /** ProActive empty constructor */
-    public Worker() { }
+    public Worker() {
+    }
 
     public BooleanWrapper isPrime(int num) {
         for (Integer n : primeNumbers) {

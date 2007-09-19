@@ -34,24 +34,25 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
-public class AppenderTest extends AppenderSkeleton {
 
+public class AppenderTest extends AppenderSkeleton {
     @Override
     protected void append(LoggingEvent arg0) {
-    
-        if (arg0.getLevel().equals(Level.INFO)){
-            System.out.println("======INFO======> " + arg0.getLoggerName() + " : " + arg0.getRenderedMessage());
-        } else if (arg0.getLevel().equals(Level.ERROR)){
-            System.out.println("======ERROR=====> " + arg0.getLoggerName() + " : " + arg0.getRenderedMessage());
+        if (arg0.getLevel().equals(Level.INFO)) {
+            System.out.println("======INFO======> " + arg0.getLoggerName() +
+                " : " + arg0.getRenderedMessage());
+        } else if (arg0.getLevel().equals(Level.ERROR)) {
+            System.out.println("======ERROR=====> " + arg0.getLoggerName() +
+                " : " + arg0.getRenderedMessage());
         } else {
-            System.out.println("======OTHER=====> " + arg0.getLoggerName() + " : " + arg0.getRenderedMessage());
+            System.out.println("======OTHER=====> " + arg0.getLoggerName() +
+                " : " + arg0.getRenderedMessage());
         }
     }
 
     @Override
     public void close() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -59,5 +60,4 @@ public class AppenderTest extends AppenderSkeleton {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

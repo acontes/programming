@@ -35,60 +35,60 @@ import java.io.Serializable;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
+
 /**
  * Internal and global description of a task.
  * This class contains all informations about the task to launch.
  * It also provides a method to create its own launcher.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Sept 10, 2007
  * @since ProActive 3.2
  */
-public class ExecuterInformations implements Serializable{
-	
-	/** Serial Version UID */
-	private static final long serialVersionUID = 7710839621630737064L;
-	/** Reference to the launcher of this task. */
-	private TaskLauncher launcher;
-	/** Reference to the node */
-	private Node node;
-	/** Reference to the node name of this task. */
-	private String nodeName;
-	
-	
-	/**
-	 * Create a new excuter informations with the given infos.
-	 * 
-	 * @param launcher the active object on which the task has been launched
-	 * @param node the node on which the active object has been launched.
-	 */
-	public ExecuterInformations(TaskLauncher launcher, Node node) {
-		this.launcher = launcher;
-		this.node = node;
-		this.nodeName = node.getNodeInformation().getName();
-	}
+public class ExecuterInformations implements Serializable {
 
+    /** Serial Version UID */
+    private static final long serialVersionUID = 7710839621630737064L;
 
-	/**
-	 * @return the launcher
-	 */
-	public TaskLauncher getLauncher() {
-		return launcher;
-	}
+    /** Reference to the launcher of this task. */
+    private TaskLauncher launcher;
 
-	/**
-	 * @return the node
-	 */
-	public Node getNode() {
-		return node;
-	}
+    /** Reference to the node */
+    private Node node;
 
-	/**
-	 * @return the nodeName
-	 */
-	public String getNodeName() {
-		return nodeName;
-	}
+    /** Reference to the node name of this task. */
+    private String nodeName;
 
-	
+    /**
+     * Create a new excuter informations with the given infos.
+     *
+     * @param launcher the active object on which the task has been launched
+     * @param node the node on which the active object has been launched.
+     */
+    public ExecuterInformations(TaskLauncher launcher, Node node) {
+        this.launcher = launcher;
+        this.node = node;
+        this.nodeName = node.getNodeInformation().getName();
+    }
+
+    /**
+     * @return the launcher
+     */
+    public TaskLauncher getLauncher() {
+        return launcher;
+    }
+
+    /**
+     * @return the node
+     */
+    public Node getNode() {
+        return node;
+    }
+
+    /**
+     * @return the nodeName
+     */
+    public String getNodeName() {
+        return nodeName;
+    }
 }

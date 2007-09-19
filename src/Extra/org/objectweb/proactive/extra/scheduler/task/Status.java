@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.scheduler.task;
 
 /**
  * The status of each task submitted by the user
- * 
+ *
  * @author ProActive Team
  * @version 1.1, Jun 28, 2007
  * @since ProActive 3.2
@@ -43,62 +43,58 @@ public enum Status implements java.io.Serializable {
      *
      * The task has just been submitted by the user
      */
-    SUBMITTED ("Submitted"),
+    SUBMITTED("Submitted"),
     /**
      * The task is in the scheduler pending queue
      */
-    PENDING ("Pending"),
+    PENDING("Pending"),
     /**
      * The task is paused.
      */
-    PAUSED ("Paused"),
+    PAUSED("Paused"),
     /**
      * The task is executing
      */
-    RUNNNING ("Runnning"),
+    RUNNNING("Runnning"),
     /**
      * The task is failed
      */
-    FAILED ("Failed"),
+    FAILED("Failed"),
     /**
      * The task could not be started.
      * Warning, it means that the task could not be started due to
      * dependences failure.
      */
-    NOT_STARTED ("Could not start"),
+    NOT_STARTED("Could not start"),
     /**
      * The task has finished execution
      */
-    CANCELLED ("Cancelled"),
+    CANCELLED("Cancelled"),
     /**
      * The task has been aborted by an exception on an other task
      */
-    ABORTED ("Aborted"),
+    ABORTED("Aborted"),
     /**
      * The task has finished execution
      */
-    FINISHED ("Finished");
-    
-    
+    FINISHED("Finished");
     /** The name of the current status. */
     private String name;
-    
-    
+
     /**
      * Implicit constructor of a status.
-     * 
+     *
      * @param name the name of the status.
      */
-    Status (String name) {
-    	this.name = name;
+    Status(String name) {
+        this.name = name;
     }
-    
-    
+
     /**
      * @see java.lang.Enum#toString()
      */
     @Override
-    public String toString(){
-    	return name;
+    public String toString() {
+        return name;
     }
 }

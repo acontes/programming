@@ -35,21 +35,20 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import static org.objectweb.proactive.extra.scheduler.core.SchedulerCore.logger;
 
-
 /**
 *
 * Stack catcher for Non Fonctionnal Exception.
-* 
+*
 * @author ProActive Team
 * @version 1.0, Jun 28, 2007
 * @since ProActive 3.2
 *
 */
 public class NFEHandler implements NFEListener, java.io.Serializable {
-	
+
     /** Serial version UID */
-	private static final long serialVersionUID = 6341082431127272393L;
-	private String source;
+    private static final long serialVersionUID = 6341082431127272393L;
+    private String source;
 
     public NFEHandler() {
     }
@@ -59,7 +58,7 @@ public class NFEHandler implements NFEListener, java.io.Serializable {
     }
 
     public boolean handleNFE(NonFunctionalException e) {
-        logger.info("##" + source + "had an  NFE",e);
+        logger.info("##" + source + "had an  NFE", e);
         if (logger.isDebugEnabled()) {
             logger.debug(
                 "follows is a print out of the stack trace, warning, the exception is caught , this is just a printout" +

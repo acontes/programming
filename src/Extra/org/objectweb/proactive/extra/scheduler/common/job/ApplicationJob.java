@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.job;
 
-
 import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
+
 
 /**
  * Definition of an application job for the user.
@@ -41,46 +41,44 @@ import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
  * Then add your application task with the given method in order to fill the job with your own tasks.
  * You must set the number of nodes you want in the task,
  * and also the task as a .class or instance.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
 public class ApplicationJob extends Job {
-	
-	/** Serial Version UID */
-	private static final long serialVersionUID = 1623955669459590983L;
-	private ApplicationTask task = null;
-	
-	
-	/** Proactive Empty Constructor */
-	public ApplicationJob() {}
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getType()
-	 */
-	@Override
-	public JobType getType() {
-		return JobType.APPLI;
-	}
 
-	/**
-	 * To get the unique task of this job.
-	 * 
-	 * @return the unique task of this job.
-	 */
-	public ApplicationTask getTask() {
-		return task;
-	}
+    /** Serial Version UID */
+    private static final long serialVersionUID = 1623955669459590983L;
+    private ApplicationTask task = null;
 
-	/**
-	 * To set the unique task of this job.
-	 * 
-	 * @param task the task to set
-	 */
-	public void setTask(ApplicationTask task) {
-		this.task = task;
-	}
-	
+    /** Proactive Empty Constructor */
+    public ApplicationJob() {
+    }
 
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getType()
+     */
+    @Override
+    public JobType getType() {
+        return JobType.APPLI;
+    }
+
+    /**
+     * To get the unique task of this job.
+     *
+     * @return the unique task of this job.
+     */
+    public ApplicationTask getTask() {
+        return task;
+    }
+
+    /**
+     * To set the unique task of this job.
+     *
+     * @param task the task to set
+     */
+    public void setTask(ApplicationTask task) {
+        this.task = task;
+    }
 }

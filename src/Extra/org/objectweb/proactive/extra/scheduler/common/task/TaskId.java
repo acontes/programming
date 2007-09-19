@@ -36,18 +36,17 @@ import java.io.Serializable;
 /**
  * Definition of a task identification.
  * For the moment, it is represented by an integer.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
 public interface TaskId extends Comparable<TaskId>, Serializable {
-	
-	/**
-	 * To get the id
-	 * 
-	 * @return the id
-	 */
-	public int value();
-	
+
+    /**
+     * To get the id
+     *
+     * @return the id
+     */
+    public int value();
 }

@@ -2,7 +2,9 @@ package org.objectweb.proactive.examples.scheduler;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+
 import javax.security.auth.login.LoginException;
+
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
@@ -70,7 +72,7 @@ public class SimpleHelloWorld {
                         }
                     }
                 };
-                
+
             //Create the javatask
             JavaTask desc = new JavaTask();
             //adding the task to the job
@@ -79,8 +81,10 @@ public class SimpleHelloWorld {
             desc.setFinalTask(true);
             //add the task to the job
             try {
-				job.addTask(desc);
-			} catch (UserException e2) { e2.printStackTrace(); }
+                job.addTask(desc);
+            } catch (UserException e2) {
+                e2.printStackTrace();
+            }
 
             //******************** SUBMIT THE JOB ***********************
             //submitting a job to the scheduler returns the attributed jobId

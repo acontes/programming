@@ -33,20 +33,20 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 import java.io.Serializable;
 import java.util.HashMap;
 
+
 /**
  * Stats interface class will be used to view some tips on the scheduler.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jul 25, 2007
  * @since ProActive 3.2
  */
 public interface Stats extends Serializable {
 
-	/**
-	 * To get the properties saved in the stats class as an hashMap
-	 * 
-	 * @return the properties as an hashMap.
-	 */
-	public HashMap<String, Object> getProperties();
-	
+    /**
+     * To get the properties saved in the stats class as an hashMap
+     *
+     * @return the properties as an hashMap.
+     */
+    public HashMap<String, Object> getProperties();
 }

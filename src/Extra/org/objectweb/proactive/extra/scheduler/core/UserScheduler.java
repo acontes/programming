@@ -44,105 +44,99 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitial
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 
+
 /**
  * Scheduler user interface.
  * This class provides method to managed jobs for a user.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
  */
 public class UserScheduler implements UserSchedulerInterface {
-	
-	/** serial version UID */
-	private static final long serialVersionUID = 3319322779771815630L;
-	/** Scheduler logger */
-	public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
-	/** scheduler proxy as an active object */
-	protected SchedulerFrontend schedulerFrontend;
-	
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
-	 */
-	public JobResult getResult(JobId jobId) throws SchedulerException {
-		return schedulerFrontend.getResult(jobId);
-	}
 
+    /** serial version UID */
+    private static final long serialVersionUID = 3319322779771815630L;
 
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.common.job.Job)
-	 */
-	public JobId submit(Job job) throws SchedulerException {
-		return schedulerFrontend.submit(job);
-	}
-	
+    /** Scheduler logger */
+    public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
-	 */
-	public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
-		schedulerFrontend.listenLog(jobId,hostname,port);
-	}
-	
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener)
-	 */
-	public SchedulerInitialState<? extends Job> addSchedulerEventListener (SchedulerEventListener sel) throws SchedulerException {
-		return schedulerFrontend.addSchedulerEventListener(sel);
-	}
+    /** scheduler proxy as an active object */
+    protected SchedulerFrontend schedulerFrontend;
 
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
+     */
+    public JobResult getResult(JobId jobId) throws SchedulerException {
+        return schedulerFrontend.getResult(jobId);
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#disconnect()
-	 */
-	public void disconnect() throws SchedulerException {
-		schedulerFrontend.disconnect();
-	}
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.common.job.Job)
+     */
+    public JobId submit(Job job) throws SchedulerException {
+        return schedulerFrontend.submit(job);
+    }
 
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
+     */
+    public void listenLog(JobId jobId, String hostname, int port)
+        throws SchedulerException {
+        schedulerFrontend.listenLog(jobId, hostname, port);
+    }
 
-	/**
-	 * @throws SchedulerException 
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
-	 */
-	public BooleanWrapper pause(JobId jobId) throws SchedulerException {
-		return schedulerFrontend.pause(jobId);
-	}
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener)
+     */
+    public SchedulerInitialState<?extends Job> addSchedulerEventListener(
+        SchedulerEventListener sel) throws SchedulerException {
+        return schedulerFrontend.addSchedulerEventListener(sel);
+    }
 
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#disconnect()
+     */
+    public void disconnect() throws SchedulerException {
+        schedulerFrontend.disconnect();
+    }
 
-	/**
-	 * @throws SchedulerException 
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
-	 */
-	public BooleanWrapper resume(JobId jobId) throws SchedulerException {
-		return schedulerFrontend.resume(jobId);
-	}
+    /**
+     * @throws SchedulerException
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
+     */
+    public BooleanWrapper pause(JobId jobId) throws SchedulerException {
+        return schedulerFrontend.pause(jobId);
+    }
 
+    /**
+     * @throws SchedulerException
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
+     */
+    public BooleanWrapper resume(JobId jobId) throws SchedulerException {
+        return schedulerFrontend.resume(jobId);
+    }
 
-	/**
-	 * @throws SchedulerException 
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
-	 */
-	public BooleanWrapper kill(JobId jobId) throws SchedulerException {
-		return schedulerFrontend.kill(jobId);
-	}
-	
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.objectweb.proactive.extra.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
-	 */
-	public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
-		schedulerFrontend.changePriority(jobId, priority);
-	}
-	
+    /**
+     * @throws SchedulerException
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
+     */
+    public BooleanWrapper kill(JobId jobId) throws SchedulerException {
+        return schedulerFrontend.kill(jobId);
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getStats()
-	 */
-	public Stats getStats() throws SchedulerException {
-		return schedulerFrontend.getStats();
-	}
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.objectweb.proactive.extra.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
+     */
+    public void changePriority(JobId jobId, JobPriority priority)
+        throws SchedulerException {
+        schedulerFrontend.changePriority(jobId, priority);
+    }
 
-	
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getStats()
+     */
+    public Stats getStats() throws SchedulerException {
+        return schedulerFrontend.getStats();
+    }
 }

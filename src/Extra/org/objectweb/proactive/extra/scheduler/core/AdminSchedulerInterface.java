@@ -38,74 +38,66 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
 /**
  * Scheduler interface.
  * This interface represents what the AdminScheduler and the SchedulerFrontend should do.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
 public interface AdminSchedulerInterface extends UserSchedulerInterface {
-	
 
-	
-	/**
-	 * Start the scheduler.
-	 * 
-	 * @return true if success, false if not.
-	 * @throws SchedulerException (can be due to insufficient permission)
-	 */
-	public BooleanWrapper start() throws SchedulerException;
-	
-	
-	/**
-	 * Stop the scheduler.
-	 * 
-	 * @return true if success, false if not.
-	 * @throws SchedulerException (can be due to insufficient permission)
-	 */
-	public BooleanWrapper stop() throws SchedulerException;
-	
-	
-	/**
-	 * Pause the scheduler by terminating running jobs.
-	 * 
-	 * @return true if success, false if not.
-	 * @throws SchedulerException (can be due to insufficient permission)
-	 */
-	public BooleanWrapper pause() throws SchedulerException;
-	
-	
-	/**
-	 * Pause the scheduler by terminating running tasks.
-	 * 
-	 * @return true if success, false if not.
-	 * @throws SchedulerException (can be due to insufficient permission)
-	 */
-	public BooleanWrapper pauseImmediate() throws SchedulerException;
-	
-	
-	/**
-	 * Resume the scheduler.
-	 * 
-	 * @return true if success, false if not.
-	 * @throws SchedulerException (can be due to insufficient permission)
-	 */
-	public BooleanWrapper resume() throws SchedulerException;
-	
-	
-	/**
-	 * Shutdown the scheduler.
-	 * 
-	 * @return true if success, false if not.
-	 * @throws SchedulerException (can be due to insufficient permission)
-	 */
-	public BooleanWrapper shutdown() throws SchedulerException;
-	
-	
-	/**
-	 * kill the scheduler.
-	 * 
-	 * @return true if success, false if not.
-	 * @throws SchedulerException (can be due to insufficient permission)
-	 */
-	public BooleanWrapper kill() throws SchedulerException;
+    /**
+     * Start the scheduler.
+     *
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper start() throws SchedulerException;
+
+    /**
+     * Stop the scheduler.
+     *
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper stop() throws SchedulerException;
+
+    /**
+     * Pause the scheduler by terminating running jobs.
+     *
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper pause() throws SchedulerException;
+
+    /**
+     * Pause the scheduler by terminating running tasks.
+     *
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper pauseImmediate() throws SchedulerException;
+
+    /**
+     * Resume the scheduler.
+     *
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper resume() throws SchedulerException;
+
+    /**
+     * Shutdown the scheduler.
+     *
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper shutdown() throws SchedulerException;
+
+    /**
+     * kill the scheduler.
+     *
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper kill() throws SchedulerException;
 }

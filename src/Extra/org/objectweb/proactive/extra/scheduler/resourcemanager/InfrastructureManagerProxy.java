@@ -138,30 +138,30 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
      * @param postScript
      */
     public void freeNode(Node node, Script<?> postScript) {
-    	if (node != null){
-	        if (postScript == null) {
-	            freeNode(node);
-	        } else {
-	            try {
-	                ScriptHandler handler = ScriptLoader.createHandler(node);
-	                nodes.put(node, handler.handle(postScript));
-	                if (logger.isInfoEnabled()) {
-	                    logger.info("Post Script handled on node" +
-	                        node.getNodeInformation().getURL());
-	                }
-	            } catch (ActiveObjectCreationException e) {
-	                // TODO Que faire si noeud mort ?
-	                // CHOIX 1 : on retourne le noeud sans rien faire
-	                e.printStackTrace();
-	                freeNode(node);
-	            } catch (NodeException e) {
-	                // TODO Que faire si noeud mort ?
-	                // CHOIX 1 : on retourne le noeud sans rien faire
-	                e.printStackTrace();
-	                freeNode(node);
-	            }
-	        }
-    	}
+        if (node != null) {
+            if (postScript == null) {
+                freeNode(node);
+            } else {
+                try {
+                    ScriptHandler handler = ScriptLoader.createHandler(node);
+                    nodes.put(node, handler.handle(postScript));
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Post Script handled on node" +
+                            node.getNodeInformation().getURL());
+                    }
+                } catch (ActiveObjectCreationException e) {
+                    // TODO Que faire si noeud mort ?
+                    // CHOIX 1 : on retourne le noeud sans rien faire
+                    e.printStackTrace();
+                    freeNode(node);
+                } catch (NodeException e) {
+                    // TODO Que faire si noeud mort ?
+                    // CHOIX 1 : on retourne le noeud sans rien faire
+                    e.printStackTrace();
+                    freeNode(node);
+                }
+            }
+        }
     }
 
     /**
@@ -188,7 +188,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
         if (postScript == null) {
             freeNodes(nodes);
         } else {
-        	System.err.println("POOOOOOOOOST");
+            System.err.println("POOOOOOOOOST");
             for (Node node : nodes) {
                 try {
                     ScriptHandler handler = ScriptLoader.createHandler(node);
@@ -214,13 +214,11 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
     }
 
     // GET NODES *********************************************
-    public NodeSet getAtMostNodes(int nbNodes,
-        VerifyingScript verifyingScript) {
+    public NodeSet getAtMostNodes(int nbNodes, VerifyingScript verifyingScript) {
         return user.getAtMostNodes(new IntWrapper(nbNodes), verifyingScript);
     }
 
-    public NodeSet getExactlyNodes(int nbNodes,
-        VerifyingScript verifyingScript) {
+    public NodeSet getExactlyNodes(int nbNodes, VerifyingScript verifyingScript) {
         return user.getExactlyNodes(new IntWrapper(nbNodes), verifyingScript);
     }
 
@@ -232,11 +230,10 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
     public IntWrapper getNumberOfFreeResource() {
         return monitoring.getNumberOfFreeResource();
     }
-    
-    public BooleanWrapper hasFreeResources(){
-    	return new BooleanWrapper(getNumberOfFreeResource().intValue() != 0);
+
+    public BooleanWrapper hasFreeResources() {
+        return new BooleanWrapper(getNumberOfFreeResource().intValue() != 0);
     }
-    
 
     // PROXY SPECIFIC METHODS ********************************
     public void shutdownProxy() {
@@ -287,8 +284,8 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
             user.freeNodes(ns);
         }
     }
-    
+
     public void freeDownNode(String nodeName) {
-    	//imcore.freeDownNode(nodeName);
+        //imcore.freeDownNode(nodeName);
     }
 }

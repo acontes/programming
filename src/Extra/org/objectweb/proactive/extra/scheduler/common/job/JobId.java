@@ -32,27 +32,27 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 
 import java.io.Serializable;
 
+
 /**
  * Definition of a job identification.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
 public interface JobId extends Comparable<JobId>, Serializable {
-	
-	/**
-	 * To get the id real object.
-	 * 
-	 * @return the id as the real object.
-	 */
-	public int value();
-	
-	/**
-	 * To set the id
-	 * 
-	 * @param id the id to set
-	 */
-	public void setValue(int id);
-	
+
+    /**
+     * To get the id real object.
+     *
+     * @return the id as the real object.
+     */
+    public int value();
+
+    /**
+     * To set the id
+     *
+     * @param id the id to set
+     */
+    public void setValue(int id);
 }

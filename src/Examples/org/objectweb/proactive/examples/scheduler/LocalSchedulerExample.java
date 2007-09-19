@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.scheduler;
 
 import java.io.File;
 import java.net.URI;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -53,42 +54,42 @@ public class LocalSchedulerExample {
         InfrastructureManagerProxy imp = null;
 
         try {
-        	
-
             if (args.length > 0) {
                 try {
-                	
-                	imp = InfrastructureManagerProxy.getProxy(new URI(args[0]));
-           
+                    imp = InfrastructureManagerProxy.getProxy(new URI(args[0]));
+
                     logger.info("Connect to ResourceManager on " + args[0]);
                 } catch (Exception e) {
-                    throw new Exception("ResourceManager doesn't exist on " + args[0]);
+                    throw new Exception("ResourceManager doesn't exist on " +
+                        args[0]);
                 }
             } else {
-            	IMFactory.startLocal();
-            	IMAdmin admin = IMFactory.getAdmin();
-            	
-            	String xmlURL = SimpleResourceManager.class.getResource("/org/objectweb/proactive/examples/scheduler/test.xml").getPath();
-            	admin.deployAllVirtualNodes(new File(xmlURL), null);
-            	
-            	imp = InfrastructureManagerProxy.getProxy(new URI("rmi://localhost:"+System.getProperty("proactive.rmi.port")+"/"));
-            	
-            	
-                logger.info("ResourceManager created on " + ProActive.getActiveObjectNodeUrl(imp));
+                IMFactory.startLocal();
+                IMAdmin admin = IMFactory.getAdmin();
+
+                String xmlURL = SimpleResourceManager.class.getResource(
+                        "/org/objectweb/proactive/examples/scheduler/test.xml")
+                                                           .getPath();
+                admin.deployAllVirtualNodes(new File(xmlURL), null);
+
+                imp = InfrastructureManagerProxy.getProxy(new URI(
+                            "rmi://localhost:" +
+                            System.getProperty("proactive.rmi.port") + "/"));
+
+                logger.info("ResourceManager created on " +
+                    ProActive.getActiveObjectNodeUrl(imp));
             }
 
-            AdminSchedulerInterface adminAPI = AdminScheduler.createScheduler(
-            		LocalSchedulerExample.class.getResource("login.cfg").getFile(),
-            		LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
-            		"admin",
-            		"admin",
-            		imp,
-            		"org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
-            
+            AdminSchedulerInterface adminAPI = AdminScheduler.createScheduler(LocalSchedulerExample.class.getResource(
+                        "login.cfg").getFile(),
+                    LocalSchedulerExample.class.getResource("groups.cfg")
+                                               .getFile(), "admin", "admin",
+                    imp,
+                    "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
+
             adminAPI.start();
-            
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             logger.error("Error creating Scheduler " + e.toString());
             System.exit(1);
         }

@@ -67,7 +67,7 @@ public abstract class Script<E> implements Serializable {
                     "An exception occured while executing the script ", e));
         }
     }
-    
+
     /** String identifying the script **/
     public abstract String getId();
 
@@ -80,14 +80,14 @@ public abstract class Script<E> implements Serializable {
     protected abstract void prepareBindings(Bindings bindings);
 
     protected abstract ScriptResult<E> getResult(Bindings bindings);
-    
+
     @SuppressWarnings("unchecked")
-	@Override
-	public boolean equals(Object o) {
-    	if (o instanceof Script) {
-			Script<E> new_name = (Script<E>) o;
-			return this.getId().equals(new_name.getId());
-		}
-    	return false;
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Script) {
+            Script<E> new_name = (Script<E>) o;
+            return this.getId().equals(new_name.getId());
+        }
+        return false;
     }
 }

@@ -33,25 +33,25 @@ package org.objectweb.proactive.examples.scheduler;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
+
 public class MonteCarloAverage extends ExecutableJavaTask {
 
-	/** Serial version UID */
-	private static final long serialVersionUID = -2762210298670871929L;
+    /** Serial version UID */
+    private static final long serialVersionUID = -2762210298670871929L;
 
-	public Object execute(TaskResult... results) {
-		double avrg = 0;
-		int count = 0;
-		System.out.print("Parameters are : ");
-		for (TaskResult res : results){
-			if (!res.hadException()){
-				System.out.print(res.value()+" ");
-				avrg += ((Double)(res.value())).doubleValue();
-				count++;
-			}
-		}
-		Double result = new Double(avrg/count);
-		System.out.println("Average is : "+result);
-		return result;
-	}
-
+    public Object execute(TaskResult... results) {
+        double avrg = 0;
+        int count = 0;
+        System.out.print("Parameters are : ");
+        for (TaskResult res : results) {
+            if (!res.hadException()) {
+                System.out.print(res.value() + " ");
+                avrg += ((Double) (res.value())).doubleValue();
+                count++;
+            }
+        }
+        Double result = new Double(avrg / count);
+        System.out.println("Average is : " + result);
+        return result;
+    }
 }

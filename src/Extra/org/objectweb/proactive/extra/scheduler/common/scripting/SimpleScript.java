@@ -44,64 +44,66 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
+
 public class SimpleScript extends Script {
 
-	/**  */
-	private static final long serialVersionUID = -263217514047549052L;
-	/**  */
+    /**  */
+    private static final long serialVersionUID = -263217514047549052L;
+
+    /**  */
     private String scriptEngine = null;
     private String script = null;
-	private String id = null;
+    private String id = null;
 
     /** Directly create a script with a string. */
     public SimpleScript(String script, String engineName)
         throws InvalidScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName(engineName);
-        if(engine == null) {
-        	throw new InvalidScriptException("The engine '"+engineName+"' is not valid");
+        if (engine == null) {
+            throw new InvalidScriptException("The engine '" + engineName +
+                "' is not valid");
         } else {
-        	scriptEngine = engine.getFactory().getNames().get(0);
+            scriptEngine = engine.getFactory().getNames().get(0);
         }
         this.script = script;
-		this.id = script;
+        this.id = script;
     }
 
     /** Create a script from a file. */
-    public SimpleScript(File file)
-        throws InvalidScriptException {
+    public SimpleScript(File file) throws InvalidScriptException {
         getEngineName(file.getPath());
         try {
-			storeScript(file);
-		} catch (IOException e) {
-			throw new InvalidScriptException("Unable to read script : ", e);
-		}
-		this.id = file.getPath();
+            storeScript(file);
+        } catch (IOException e) {
+            throw new InvalidScriptException("Unable to read script : ", e);
+        }
+        this.id = file.getPath();
     }
 
     /** Create a script from an URL. */
-    public SimpleScript(URL url)
-        throws InvalidScriptException {
+    public SimpleScript(URL url) throws InvalidScriptException {
         getEngineName(url.getFile());
         try {
-			storeScript(url);
-		} catch (IOException e) {
-			throw new InvalidScriptException("Unable to read script : ", e);
-		}
-		this.id = url.toExternalForm();
+            storeScript(url);
+        } catch (IOException e) {
+            throw new InvalidScriptException("Unable to read script : ", e);
+        }
+        this.id = url.toExternalForm();
     }
 
     private void storeScript(URL url) throws IOException {
-		BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()));
-		StringBuilder builder = new StringBuilder();
+        BufferedReader buf = new BufferedReader(new InputStreamReader(
+                    url.openStream()));
+        StringBuilder builder = new StringBuilder();
         String tmp = null;
         while ((tmp = buf.readLine()) != null) {
             builder.append(tmp + "\n");
         }
         script = builder.toString();
-	}
+    }
 
-	private void storeScript(File file) throws IOException {
+    private void storeScript(File file) throws IOException {
         BufferedReader buf = new BufferedReader(new InputStreamReader(
                     new FileInputStream(file)));
         StringBuilder builder = new StringBuilder();
@@ -125,10 +127,10 @@ public class SimpleScript extends Script {
         }
     }
 
-	@Override
-	public String getId() {
-		return this.id;
-	}
+    @Override
+    public String getId() {
+        return this.id;
+    }
 
     @Override
     protected ScriptEngine getEngine() {
@@ -160,5 +162,4 @@ public class SimpleScript extends Script {
     @Override
     protected void prepareBindings(Bindings bindings) {
     }
-
 }

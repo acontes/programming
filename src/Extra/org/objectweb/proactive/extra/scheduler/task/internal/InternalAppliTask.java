@@ -39,101 +39,103 @@ import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
+
 /**
  * Description of an application java task.
  * See also @see AbstractJavaTaskDescriptor
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
 public class InternalAppliTask extends InternalAbstractJavaTask {
 
-	/** Serial Version UID */
-	private static final long serialVersionUID = -6946803819032140410L;
-	/** the java task to launch */
-	private ExecutableApplicationTask task;
-	
-	
-	/**
-	 * ProActive empty constructor
-	 */
-	public InternalAppliTask() {}
-	
-	
-	/**
-	 * Create a new Java application task descriptor using instantiated java task.
-	 * 
-	 * @param task the already instanciated java task.
-	 */
-	public InternalAppliTask(ExecutableApplicationTask task) {
-		this.task = task;
-	}
+    /** Serial Version UID */
+    private static final long serialVersionUID = -6946803819032140410L;
 
-	
-	/**
-	 * Create a new Java application task descriptor using a specific Class.
-	 * 
-	 * @param taskClass the class instance of the class to instanciate.
-	 */
-	public InternalAppliTask(Class<ExecutableApplicationTask> taskClass) {
-		super(taskClass);
-	}
+    /** the java task to launch */
+    private ExecutableApplicationTask task;
 
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
-	 */
-	@Override
-	public ExecutableTask getTask() {
-		if (task != null)
-			return task;
-		try {
-			task = (ExecutableApplicationTask)taskClass.newInstance();
-			try{
-				task.init(args);
-			} catch (Exception e){
-				System.err.println("WARING : INIT has failed for task "+task.getClass().getSimpleName());
-				e.printStackTrace();
-			}
-			return task;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
-	 */
-	@Override
-	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException, NodeException {
-		AppliTaskLauncher launcher;
-		if (getPreTask() == null){
-			launcher = (AppliTaskLauncher)ProActive.newActive(AppliTaskLauncher.class.getName(), new Object[]{getId(),getJobId(), host, port}, node);
-		} else {
-			launcher = (AppliTaskLauncher)ProActive.newActive(AppliTaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
-		}
-		setExecuterInformations(new ExecuterInformations(launcher,node));
-		return launcher;
-	}
-	
-	
-	/**
-	 * Set the instanciated java application task.
-	 * 
-	 * @param task the instanciated java application task.
-	 */
-	public void setTask(ExecutableApplicationTask task){
-		this.task = task;
-	}
+    /**
+     * ProActive empty constructor
+     */
+    public InternalAppliTask() {
+    }
 
+    /**
+     * Create a new Java application task descriptor using instantiated java task.
+     *
+     * @param task the already instanciated java task.
+     */
+    public InternalAppliTask(ExecutableApplicationTask task) {
+        this.task = task;
+    }
 
-	/**
-	 * @param numberOfNodesNeeded the numberOfNodesNeeded to set
-	 */
-	public void setNumberOfNodesNeeded(int numberOfNodesNeeded) {
-		this.numberOfNodesNeeded = numberOfNodesNeeded;
-	}
+    /**
+     * Create a new Java application task descriptor using a specific Class.
+     *
+     * @param taskClass the class instance of the class to instanciate.
+     */
+    public InternalAppliTask(Class<ExecutableApplicationTask> taskClass) {
+        super(taskClass);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
+     */
+    @Override
+    public ExecutableTask getTask() {
+        if (task != null) {
+            return task;
+        }
+        try {
+            task = (ExecutableApplicationTask) taskClass.newInstance();
+            try {
+                task.init(args);
+            } catch (Exception e) {
+                System.err.println("WARING : INIT has failed for task " +
+                    task.getClass().getSimpleName());
+                e.printStackTrace();
+            }
+            return task;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+     */
+    @Override
+    public TaskLauncher createLauncher(String host, int port, Node node)
+        throws ActiveObjectCreationException, NodeException {
+        AppliTaskLauncher launcher;
+        if (getPreTask() == null) {
+            launcher = (AppliTaskLauncher) ProActive.newActive(AppliTaskLauncher.class.getName(),
+                    new Object[] { getId(), getJobId(), host, port }, node);
+        } else {
+            launcher = (AppliTaskLauncher) ProActive.newActive(AppliTaskLauncher.class.getName(),
+                    new Object[] { getId(), getJobId(), getPreTask(), host, port },
+                    node);
+        }
+        setExecuterInformations(new ExecuterInformations(launcher, node));
+        return launcher;
+    }
+
+    /**
+     * Set the instanciated java application task.
+     *
+     * @param task the instanciated java application task.
+     */
+    public void setTask(ExecutableApplicationTask task) {
+        this.task = task;
+    }
+
+    /**
+     * @param numberOfNodesNeeded the numberOfNodesNeeded to set
+     */
+    public void setNumberOfNodesNeeded(int numberOfNodesNeeded) {
+        this.numberOfNodesNeeded = numberOfNodesNeeded;
+    }
 }

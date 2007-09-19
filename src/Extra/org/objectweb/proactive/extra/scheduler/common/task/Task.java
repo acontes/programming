@@ -37,6 +37,7 @@ import java.util.List;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
+
 /**
  * Definition of a task for the user.
  * A task contains some properties that can be set but also :
@@ -46,224 +47,234 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
  * unset vars you set in the preTask).
  * You will be also able to add dependences (if necessary) to this task. The dependences mechanism are
  * best describe below. @see #addDependence(Task)
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
 public abstract class Task implements Serializable {
-	
-	/** Number of nodes asked by the user. */
-	protected int numberOfNodesNeeded = 1;
-	/**  Name of the task. */
-	protected String name;
-	/** Description of the task. */
-	protected String description;
-	/** Verifying script : can be launched before getting a node in order to verify some computer specificity. */
-	protected VerifyingScript verifyingScript;
-	/** Pre-task script : can be used to launch script just before the task execution. */
-	protected Script<?> preTask;
-	/** Pre-task script : can be used to launch script just after the task execution even if a problem occurs. */
-	protected Script<?> postTask;
-	/** Maximum amount of time during which a task can be running. */
-	protected long runTimeLimit;
-	/** Is this task rerunnable and how many times ? (0 if not) */
-	protected int rerunnable = 1;
-	/** Is this task a final task. */
-	protected boolean finalTask;
-	/** List of dependences if necessary */
-	protected ArrayList<Task> dependences = null; 
-	
-	
-	/**
-	 * Add a dependence to the task.
-	 * Warning : the dependence order is very important.
-	 * In fact, it is in this order that you will get back the result in the child task.
-	 * For example : if you add to the task t3, the dependences t1 then t2
-	 * The parents of t3 will be t1 and t2 in this order and the parameters of t3 will be
-	 * the results of t1 and t2 in this order.
-	 * 
-	 * @param task the parent task to add to this task.
-	 */
-	public void addDependence(Task task){
-		if (dependences == null)
-			dependences = new ArrayList<Task>();
-		dependences.add(task);
-	}
-	
-	/**
-	 * Same as the {@link #addDependence(Task) AddDependence} method in the same class,
-	 * but for a list of dependences.
-	 * 
-	 * @param tasks the parent list of tasks to add to this task.
-	 */
-	public void addDependences (List<Task> tasks){
-		if (dependences == null)
-			dependences = new ArrayList<Task>();
-		dependences.addAll(tasks);
-	}
 
-	/**
-	 * To get the decsription of this task.
-	 * 
-	 * @return the description of this task.
-	 */
-	public String getDescription() {
-		return description;
-	}
+    /** Number of nodes asked by the user. */
+    protected int numberOfNodesNeeded = 1;
 
-	/**
-	 * To set the description of this task.
-	 * 
-	 * @param description the description to set.
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    /**  Name of the task. */
+    protected String name;
 
-	/**
-	 * To know if this task is a final one.
-	 * 
-	 * @return true if the task is final, false if not.
-	 */
-	public boolean isFinalTask() {
-		return finalTask;
-	}
+    /** Description of the task. */
+    protected String description;
 
-	/**
-	 * Set if the task is final or not.
-	 * 
-	 * @param finalTask true if the task is final, false if not.
-	 */
-	public void setFinalTask(boolean finalTask) {
-		this.finalTask = finalTask;
-	}
+    /** Verifying script : can be launched before getting a node in order to verify some computer specificity. */
+    protected VerifyingScript verifyingScript;
 
-	/**
-	 * To get the name of this task.
-	 * 
-	 * @return the name of this task.
-	 */
-	public String getName() {
-		return name;
-	}
+    /** Pre-task script : can be used to launch script just before the task execution. */
+    protected Script<?> preTask;
 
-	/**
-	 * To set the name of this task.
-	 * 
-	 * @param name the name to set.
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+    /** Pre-task script : can be used to launch script just after the task execution even if a problem occurs. */
+    protected Script<?> postTask;
 
-	/**
-	 * To get the post task of this task.
-	 * 
-	 * @return the postTask of this task.
-	 */
-	public Script<?> getPostTask() {
-		return postTask;
-	}
+    /** Maximum amount of time during which a task can be running. */
+    protected long runTimeLimit;
 
-	/**
-	 * To set the post task of this task.
-	 * 
-	 * @param postTask the postTask to set.
-	 */
-	public void setPostTask(Script<?> postTask) {
-		this.postTask = postTask;
-	}
+    /** Is this task rerunnable and how many times ? (0 if not) */
+    protected int rerunnable = 1;
 
-	/**
-	 * To get the pre task of this task.
-	 * 
-	 * @return the preTask of this task.
-	 */
-	public Script<?> getPreTask() {
-		return preTask;
-	}
+    /** Is this task a final task. */
+    protected boolean finalTask;
 
-	/**
-	 * To set the pre task of this task.
-	 * 
-	 * @param preTask the preTask to set.
-	 */
-	public void setPreTask(Script<?> preTask) {
-		this.preTask = preTask;
-	}
+    /** List of dependences if necessary */
+    protected ArrayList<Task> dependences = null;
 
-	/**
-	 * To get number of times this task can be restart if an error occurs.
-	 * 
-	 * @return the number of times this task can be restart.
-	 */
-	public int getRerunnable() {
-		return rerunnable;
-	}
+    /**
+     * Add a dependence to the task.
+     * Warning : the dependence order is very important.
+     * In fact, it is in this order that you will get back the result in the child task.
+     * For example : if you add to the task t3, the dependences t1 then t2
+     * The parents of t3 will be t1 and t2 in this order and the parameters of t3 will be
+     * the results of t1 and t2 in this order.
+     *
+     * @param task the parent task to add to this task.
+     */
+    public void addDependence(Task task) {
+        if (dependences == null) {
+            dependences = new ArrayList<Task>();
+        }
+        dependences.add(task);
+    }
 
-	/**
-	 * To set number of times this task can be restart if an error occurs.
-	 * 
-	 * @param rerunnable the number of times this task can be restart.
-	 */
-	public void setRerunnable(int rerunnable) {
-		this.rerunnable = rerunnable;
-	}
+    /**
+     * Same as the {@link #addDependence(Task) AddDependence} method in the same class,
+     * but for a list of dependences.
+     *
+     * @param tasks the parent list of tasks to add to this task.
+     */
+    public void addDependences(List<Task> tasks) {
+        if (dependences == null) {
+            dependences = new ArrayList<Task>();
+        }
+        dependences.addAll(tasks);
+    }
 
-	/**
-	 * To get the maximum amount of time during witch the task will be running.
-	 * 
-	 * @return the the maximum amount of time during witch the task will be running.
-	 */
-	public long getRunTimeLimit() {
-		return runTimeLimit;
-	}
+    /**
+     * To get the decsription of this task.
+     *
+     * @return the description of this task.
+     */
+    public String getDescription() {
+        return description;
+    }
 
-	/**
-	 * To set the maximum amount of time during witch the task will be running.
-	 * 
-	 * @param runTimeLimit the runTimeLimit to set.
-	 */
-	public void setRunTimeLimit(long runTimeLimit) {
-		this.runTimeLimit = runTimeLimit;
-	}
+    /**
+     * To set the description of this task.
+     *
+     * @param description the description to set.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	/**
-	 * To get the verifying script.
-	 * This is the script that will select a node.
-	 * 
-	 * @return the verifying Script.
-	 */
-	public VerifyingScript getVerifyingScript() {
-		return verifyingScript;
-	}
+    /**
+     * To know if this task is a final one.
+     *
+     * @return true if the task is final, false if not.
+     */
+    public boolean isFinalTask() {
+        return finalTask;
+    }
 
-	/**
-	 * To set the verifying script.
-	 * 
-	 * @param verifyingScript the verifyingScript to set.
-	 */
-	public void setVerifyingScript(VerifyingScript verifyingScript) {
-		this.verifyingScript = verifyingScript;
-	}
+    /**
+     * Set if the task is final or not.
+     *
+     * @param finalTask true if the task is final, false if not.
+     */
+    public void setFinalTask(boolean finalTask) {
+        this.finalTask = finalTask;
+    }
 
-	/**
-	 * To get the list of dependences of the task.
-	 * 
-	 * @return the the list of dependences of the task.
-	 */
-	public ArrayList<Task> getDependencesList() {
-		return dependences;
-	}
+    /**
+     * To get the name of this task.
+     *
+     * @return the name of this task.
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * Get the number of nodes needed for this task.
-	 * (by default : 1)
-	 * 
-	 * @return the number Of Nodes Needed
-	 */
-	public int getNumberOfNodesNeeded() {
-		return numberOfNodesNeeded;
-	}
+    /**
+     * To set the name of this task.
+     *
+     * @param name the name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * To get the post task of this task.
+     *
+     * @return the postTask of this task.
+     */
+    public Script<?> getPostTask() {
+        return postTask;
+    }
+
+    /**
+     * To set the post task of this task.
+     *
+     * @param postTask the postTask to set.
+     */
+    public void setPostTask(Script<?> postTask) {
+        this.postTask = postTask;
+    }
+
+    /**
+     * To get the pre task of this task.
+     *
+     * @return the preTask of this task.
+     */
+    public Script<?> getPreTask() {
+        return preTask;
+    }
+
+    /**
+     * To set the pre task of this task.
+     *
+     * @param preTask the preTask to set.
+     */
+    public void setPreTask(Script<?> preTask) {
+        this.preTask = preTask;
+    }
+
+    /**
+     * To get number of times this task can be restart if an error occurs.
+     *
+     * @return the number of times this task can be restart.
+     */
+    public int getRerunnable() {
+        return rerunnable;
+    }
+
+    /**
+     * To set number of times this task can be restart if an error occurs.
+     *
+     * @param rerunnable the number of times this task can be restart.
+     */
+    public void setRerunnable(int rerunnable) {
+        this.rerunnable = rerunnable;
+    }
+
+    /**
+     * To get the maximum amount of time during witch the task will be running.
+     *
+     * @return the the maximum amount of time during witch the task will be running.
+     */
+    public long getRunTimeLimit() {
+        return runTimeLimit;
+    }
+
+    /**
+     * To set the maximum amount of time during witch the task will be running.
+     *
+     * @param runTimeLimit the runTimeLimit to set.
+     */
+    public void setRunTimeLimit(long runTimeLimit) {
+        this.runTimeLimit = runTimeLimit;
+    }
+
+    /**
+     * To get the verifying script.
+     * This is the script that will select a node.
+     *
+     * @return the verifying Script.
+     */
+    public VerifyingScript getVerifyingScript() {
+        return verifyingScript;
+    }
+
+    /**
+     * To set the verifying script.
+     *
+     * @param verifyingScript the verifyingScript to set.
+     */
+    public void setVerifyingScript(VerifyingScript verifyingScript) {
+        this.verifyingScript = verifyingScript;
+    }
+
+    /**
+     * To get the list of dependences of the task.
+     *
+     * @return the the list of dependences of the task.
+     */
+    public ArrayList<Task> getDependencesList() {
+        return dependences;
+    }
+
+    /**
+     * Get the number of nodes needed for this task.
+     * (by default : 1)
+     *
+     * @return the number Of Nodes Needed
+     */
+    public int getNumberOfNodesNeeded() {
+        return numberOfNodesNeeded;
+    }
 }

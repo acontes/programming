@@ -36,13 +36,13 @@ import java.io.OutputStream;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+
 // COPYRIGHT ???
 /**
  * An OutputStream that flushes out to a Category.
  * @author Jim Moore
  * @see Category
  */
-
 public class LoggingOutputStream extends OutputStream {
 
     /**
@@ -73,7 +73,6 @@ public class LoggingOutputStream extends OutputStream {
      */
     public static final int DEFAULT_BUFFER_LENGTH = 2048;
 
-
     /**
      * The category to write to.
      */
@@ -84,11 +83,9 @@ public class LoggingOutputStream extends OutputStream {
      */
     protected Level level;
 
-
     private LoggingOutputStream() {
         // illegal
     }
-
 
     /**
      * Creates the LoggingOutputStream to flush to the given Category.
@@ -97,7 +94,7 @@ public class LoggingOutputStream extends OutputStream {
      * @throws IllegalArgumentException if cat == null or priority == null
      */
     public LoggingOutputStream(Logger log, Level level)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         if (log == null) {
             throw new IllegalArgumentException("cat == null");
         }
@@ -112,12 +109,9 @@ public class LoggingOutputStream extends OutputStream {
         count = 0;
     }
 
-    
-    public LoggingOutputStream(Logger log) throws IllegalArgumentException  {
-        this(log,Level.ALL);
+    public LoggingOutputStream(Logger log) throws IllegalArgumentException {
+        this(log, Level.ALL);
     }
-    
-    
 
     /**
      * Closes this output stream and releases any system resources
@@ -130,7 +124,6 @@ public class LoggingOutputStream extends OutputStream {
         flush();
         hasBeenClosed = true;
     }
-
 
     /**
      * Writes the specified byte to this output stream. The general
@@ -165,7 +158,6 @@ public class LoggingOutputStream extends OutputStream {
         count++;
     }
 
-
     /**
      * Flushes this output stream and forces any buffered output bytes
      * to be written out. The general contract of <code>flush</code> is
@@ -180,7 +172,7 @@ public class LoggingOutputStream extends OutputStream {
         }
 
         // don't print out blank lines; flushing from PrintStream puts out these
-        if (count == 1 && ((char) buf[0]) == '\n') {
+        if ((count == 1) && (((char) buf[0]) == '\n')) {
             reset();
             return;
         }
@@ -190,15 +182,13 @@ public class LoggingOutputStream extends OutputStream {
         System.arraycopy(buf, 0, theBytes, 0, count);
 
         logger.log(level, new String(theBytes));
-        
+
         reset();
     }
-
 
     private void reset() {
         // not resetting the buffer -- assuming that if it grew then it
         //   will likely grow similarly again
         count = 0;
     }
-
 }

@@ -39,44 +39,42 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthent
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 
-public class JobLauncher {
 
-	public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+public class JobLauncher {
+    public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     public static void main(String[] args) {
-		try {
-			//GET SCHEDULER
-			String jobUrl = null;
-			int nbJob = 1;
-			SchedulerAuthenticationInterface auth = null;
-			if (args.length > 2) {
-				jobUrl = args[0];
-				nbJob = Integer.parseInt(args[1]);
-				auth = SchedulerConnection.join(args[2]);
-			} else if (args.length > 1) {
-				jobUrl = args[0];
-				nbJob = Integer.parseInt(args[1]);
-				auth = SchedulerConnection.join(null);
-			} else if (args.length > 0) {
-				jobUrl = args[0];
-				auth = SchedulerConnection.join(null);
-			} else {
-				System.err.println("You must enter a job descriptor");
-				System.exit(0);
-			}
-			UserSchedulerInterface scheduler = auth.logAsUser("chri", "chri");
+        try {
+            //GET SCHEDULER
+            String jobUrl = null;
+            int nbJob = 1;
+            SchedulerAuthenticationInterface auth = null;
+            if (args.length > 2) {
+                jobUrl = args[0];
+                nbJob = Integer.parseInt(args[1]);
+                auth = SchedulerConnection.join(args[2]);
+            } else if (args.length > 1) {
+                jobUrl = args[0];
+                nbJob = Integer.parseInt(args[1]);
+                auth = SchedulerConnection.join(null);
+            } else if (args.length > 0) {
+                jobUrl = args[0];
+                auth = SchedulerConnection.join(null);
+            } else {
+                System.err.println("You must enter a job descriptor");
+                System.exit(0);
+            }
+            UserSchedulerInterface scheduler = auth.logAsUser("chri", "chri");
 
-			//CREATE JOB
-			Job j = JobFactory.getFactory().createJob(jobUrl);
-			for (int i = 0; i < nbJob; i++) {
-				// SUBMIT JOB
-				scheduler.submit(j);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-	}
+            //CREATE JOB
+            Job j = JobFactory.getFactory().createJob(jobUrl);
+            for (int i = 0; i < nbJob; i++) {
+                // SUBMIT JOB
+                scheduler.submit(j);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 }

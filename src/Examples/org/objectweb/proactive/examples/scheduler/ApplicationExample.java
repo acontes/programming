@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.scheduler;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
@@ -40,95 +41,92 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 
+
 /**
  * @author jlscheef
  */
 public class ApplicationExample extends ExecutableApplicationTask {
 
-	/** Serial Version UID */
-	private static final long serialVersionUID = -8328166769211310963L;
-	private int numberToFind = 5003;
-	
+    /** Serial Version UID */
+    private static final long serialVersionUID = -8328166769211310963L;
+    private int numberToFind = 5003;
 
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask#init(java.util.Map)
-	 */
-	@Override
-	public void init(Map<String, Object> args) {
-		try {
-			numberToFind = Integer.parseInt(args.get("numberToFind").toString());
-		} catch (NumberFormatException e) { /* will stay to 5003 */ }
-	}
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask#init(java.util.Map)
+     */
+    @Override
+    public void init(Map<String, Object> args) {
+        try {
+            numberToFind = Integer.parseInt(args.get("numberToFind").toString());
+        } catch (NumberFormatException e) { /* will stay to 5003 */
+        }
+    }
 
-
-	@Override
-	public Object execute(ArrayList<Node> nodes) {
-		
-		System.out.println("Application started !!");
+    @Override
+    public Object execute(ArrayList<Node> nodes) {
+        System.out.println("Application started !!");
 
         // create workers (on local node)
         Vector<Worker> workers = new Vector<Worker>();
         for (Node node : nodes) {
-			try {
-				Worker w = (Worker) ProActive.newActive(Worker.class.getName(), new Object[] {},node);
-				workers.add(w);
-			} catch (ActiveObjectCreationException e) {
-				e.printStackTrace();
-			} catch (NodeException e) {
-				e.printStackTrace();
-			}
+            try {
+                Worker w = (Worker) ProActive.newActive(Worker.class.getName(),
+                        new Object[] {  }, node);
+                workers.add(w);
+            } catch (ActiveObjectCreationException e) {
+                e.printStackTrace();
+            } catch (NodeException e) {
+                e.printStackTrace();
+            }
         }
 
         // create controller
         Controller controller = new Controller(workers);
         int result = controller.findNthPrimeNumber(numberToFind);
-		
-        System.out.println("last prime : "+result);
-        
+
+        System.out.println("last prime : " + result);
+
         return result;
-	}
+    }
 
+    private class Controller {
+        // Managed workers 
+        private Vector<Worker> workers;
 
-	
-	private class Controller {
-	    // Managed workers 
-	    private Vector<Worker> workers;
-	
-	    public Controller(Vector<Worker> workers) {
-	        this.workers = workers;
-	    }
-	
-	    // start computation
-	    public int findNthPrimeNumber(int nth) {
-	        long startTime = System.currentTimeMillis();
-	        BooleanWrapper flase = new BooleanWrapper(false);
-	        int found = 0;
-	        int n = 2;
-	        while (found < nth) {
-	            Vector<BooleanWrapper> answers = new Vector<BooleanWrapper>();
-	
-	            // send requests
-	            for (Worker worker : workers) {
-	                BooleanWrapper resp = worker.isPrime(n);
-	                answers.add(resp);
-	            }
-	
-	            ProActive.waitForAll(answers);
-	
-	            if (!answers.contains(flase)) {
-	                workers.get(found % workers.size()).addPrimeNumber(n);
-	                System.out.println("--->" + n);
-	                found++;
-	            }
-	
-	            n++;
-	        }
-	
-	        long stopTime = System.currentTimeMillis();
-	        System.out.println("Total time (ms) " + (stopTime - startTime));
-	        
-	        return n-1;
-	    }
-	}
-	
+        public Controller(Vector<Worker> workers) {
+            this.workers = workers;
+        }
+
+        // start computation
+        public int findNthPrimeNumber(int nth) {
+            long startTime = System.currentTimeMillis();
+            BooleanWrapper flase = new BooleanWrapper(false);
+            int found = 0;
+            int n = 2;
+            while (found < nth) {
+                Vector<BooleanWrapper> answers = new Vector<BooleanWrapper>();
+
+                // send requests
+                for (Worker worker : workers) {
+                    BooleanWrapper resp = worker.isPrime(n);
+                    answers.add(resp);
+                }
+
+                ProActive.waitForAll(answers);
+
+                if (!answers.contains(flase)) {
+                    workers.get(found % workers.size()).addPrimeNumber(n);
+                    System.out.println("--->" + n);
+                    found++;
+                }
+
+                n++;
+            }
+
+            long stopTime = System.currentTimeMillis();
+            System.out.println("Total time (ms) " + (stopTime - startTime));
+
+            return n - 1;
+        }
+    }
 }

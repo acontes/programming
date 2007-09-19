@@ -32,12 +32,14 @@ package org.objectweb.proactive.extra.scheduler.common.scripting;
 
 import java.io.*;
 import java.net.URL;
+
 import javax.script.*;
+
 
 /**
  * A Verifying Script : return true if the resource tested is correct.
- * 
- * 
+ *
+ *
  * @author ProActive Team
  * @version 1.0, Jun 8, 2007
  * @since ProActive 3.2
@@ -49,81 +51,81 @@ public class VerifyingScript extends Script<Boolean> {
     private boolean dynamic;
     private String scriptEngine = null;
     private String script = null;
-	private String id = null;
+    private String id = null;
 
     /** ProActive needed constructor */
     public VerifyingScript() {
     }
 
-    public VerifyingScript(String script, String engineName) 
-    throws InvalidScriptException {
-    	this(script,engineName,true);
+    public VerifyingScript(String script, String engineName)
+        throws InvalidScriptException {
+        this(script, engineName, true);
     }
-    
+
     /** Directly create a script with a string. */
     public VerifyingScript(String script, String engineName, boolean dynamic)
         throws InvalidScriptException {
-    	this.dynamic = dynamic;
+        this.dynamic = dynamic;
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName(engineName);
-        if(engine == null) {
-        	throw new InvalidScriptException("The engine '"+engineName+"' is not valid");
+        if (engine == null) {
+            throw new InvalidScriptException("The engine '" + engineName +
+                "' is not valid");
         } else {
-        	scriptEngine = engine.getFactory().getNames().get(0);
+            scriptEngine = engine.getFactory().getNames().get(0);
         }
         this.script = script;
-		this.id = script;
+        this.id = script;
     }
 
     /** Create a script from a file. */
-    public VerifyingScript(File file)
-    	throws InvalidScriptException {
-    	this(file,true);
+    public VerifyingScript(File file) throws InvalidScriptException {
+        this(file, true);
     }
 
     /** Create a script from a file. */
     public VerifyingScript(File file, boolean dynamic)
         throws InvalidScriptException {
-    	this.dynamic = dynamic;
+        this.dynamic = dynamic;
         getEngineName(file.getPath());
         try {
-			storeScript(file);
-		} catch (IOException e) {
-			throw new InvalidScriptException("Unable to read script : ", e);
-		}
-		this.id = file.getPath();
+            storeScript(file);
+        } catch (IOException e) {
+            throw new InvalidScriptException("Unable to read script : ", e);
+        }
+        this.id = file.getPath();
     }
-    
+
     /** Create a script from an URL. */
-    public VerifyingScript(URL url) 
-    	throws InvalidScriptException {
-    	this(url,true);
+    public VerifyingScript(URL url) throws InvalidScriptException {
+        this(url, true);
     }
 
     /** Create a script from an URL. */
     public VerifyingScript(URL url, boolean dynamic)
         throws InvalidScriptException {
-    	this.dynamic = dynamic;
+        this.dynamic = dynamic;
         getEngineName(url.getFile());
         try {
-			storeScript(url);
-		} catch (IOException e) {
-			throw new InvalidScriptException("Unable to read script : ", e);
-		}
-		this.id = url.toExternalForm();
+            storeScript(url);
+        } catch (IOException e) {
+            throw new InvalidScriptException("Unable to read script : ", e);
+        }
+        this.id = url.toExternalForm();
     }
 
     private void storeScript(URL url) throws IOException {
-		BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()));
-		StringBuilder builder = new StringBuilder();
+        BufferedReader buf = new BufferedReader(new InputStreamReader(
+                    url.openStream()));
+        StringBuilder builder = new StringBuilder();
         String tmp = null;
         while ((tmp = buf.readLine()) != null) {
             builder.append(tmp + "\n");
         }
         script = builder.toString();
-	}
+    }
 
-	private void storeScript(File file) throws IOException {
+    private void storeScript(File file) throws IOException {
         BufferedReader buf = new BufferedReader(new InputStreamReader(
                     new FileInputStream(file)));
         StringBuilder builder = new StringBuilder();
@@ -147,10 +149,10 @@ public class VerifyingScript extends Script<Boolean> {
         }
     }
 
-	@Override
-	public String getId() {
-		return this.id;
-	}
+    @Override
+    public String getId() {
+        return this.id;
+    }
 
     @Override
     protected ScriptEngine getEngine() {
@@ -176,7 +178,8 @@ public class VerifyingScript extends Script<Boolean> {
             } else if (result instanceof Integer) {
                 return new ScriptResult<Boolean>((Integer) result != 0);
             } else if (result instanceof String) {
-                return new ScriptResult<Boolean>(!(((String) result).equals("false") || ((String) result).equals("False")));
+                return new ScriptResult<Boolean>(!(((String) result).equals(
+                        "false") || ((String) result).equals("False")));
             } else {
                 return new ScriptResult<Boolean>(new Exception(
                         "Bad result format : awaited Boolean (or Integer when not existing), found " +
@@ -187,10 +190,10 @@ public class VerifyingScript extends Script<Boolean> {
                     "No binding for key 'script_result'"));
         }
     }
-    
+
     /** Say if the script is static or dynamic **/
     public boolean isDynamic() {
-    	return dynamic;
+        return dynamic;
     }
 
     /**
@@ -200,18 +203,20 @@ public class VerifyingScript extends Script<Boolean> {
     protected void prepareBindings(Bindings bindings) {
         bindings.put("script_result", new Boolean(true));
     }
-    
+
     @Override
     public boolean equals(Object o) {
-    	if(o == this) return true;
-    	if(o instanceof VerifyingScript) {
-    		return ((VerifyingScript)o).getId().equals(getId());
-    	}
-    	return false;
+        if (o == this) {
+            return true;
+        }
+        if (o instanceof VerifyingScript) {
+            return ((VerifyingScript) o).getId().equals(getId());
+        }
+        return false;
     }
-    
+
     @Override
     public int hashCode() {
-    	return getId().hashCode();
+        return getId().hashCode();
     }
 }

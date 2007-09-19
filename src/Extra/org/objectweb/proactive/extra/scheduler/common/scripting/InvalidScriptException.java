@@ -31,24 +31,22 @@
 package org.objectweb.proactive.extra.scheduler.common.scripting;
 
 public class InvalidScriptException extends Exception {
+    public InvalidScriptException() {
+        super();
+    }
 
-	public InvalidScriptException() {
-		super();
-	}
+    public InvalidScriptException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public InvalidScriptException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public InvalidScriptException(String message) {
+        super(message);
+    }
 
-	public InvalidScriptException(String message) {
-		super(message);
-	}
+    public InvalidScriptException(Throwable cause) {
+        super(cause);
+    }
 
-	public InvalidScriptException(Throwable cause) {
-		super(cause);
-	}
-
-	/**  */
-	private static final long serialVersionUID = 9017447962578395084L;
-
+    /**  */
+    private static final long serialVersionUID = 9017447962578395084L;
 }

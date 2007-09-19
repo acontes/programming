@@ -32,136 +32,127 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 
 import java.io.Serializable;
 
+
 /**
  * Definition of a job for the user.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Sept 13, 2007
  * @since ProActive 3.2
  */
 public abstract class Job implements Serializable {
-	
-	
-	/** Name of the job */
-	protected String name = "Default name";
-	/** Maximum amount of running time that the job can not exceed */
-	protected long runtimeLimit = -1;
-	/** Is this job has to cancel when an exception occurs in a task */
-	protected boolean cancelOnException = false;
-	/** Short description of this job */
-	protected String description = "Default description";
-	/** Job priority */
-	protected JobPriority priority = JobPriority.NORMAL;
-	
-	
-	/** ProActive Empty Constructor */
-	public Job () {}
 
-	
-	/**
-	 * To get the type
-	 * 
-	 * @return the type
-	 */
-	public abstract JobType getType();
+    /** Name of the job */
+    protected String name = "Default name";
 
-	
+    /** Maximum amount of running time that the job can not exceed */
+    protected long runtimeLimit = -1;
 
-	/**
-	 * To get the cancelOnException
-	 * 
-	 * @return the cancelOnException
-	 */
-	public boolean isCancelOnException() {
-		return cancelOnException;
-	}
+    /** Is this job has to cancel when an exception occurs in a task */
+    protected boolean cancelOnException = false;
 
+    /** Short description of this job */
+    protected String description = "Default description";
 
-	/**
-	 * Set to true if you want to cancel the job when an exception occurs in a task.
-	 * 
-	 * @param cancelOnException the cancelOnException to set
-	 */
-	public void setCancelOnException(boolean cancelOnException) {
-		this.cancelOnException = cancelOnException;
-	}
+    /** Job priority */
+    protected JobPriority priority = JobPriority.NORMAL;
 
+    /** ProActive Empty Constructor */
+    public Job() {
+    }
 
-	/**
-	 * To get the description
-	 * 
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
+    /**
+     * To get the type
+     *
+     * @return the type
+     */
+    public abstract JobType getType();
 
+    /**
+     * To get the cancelOnException
+     *
+     * @return the cancelOnException
+     */
+    public boolean isCancelOnException() {
+        return cancelOnException;
+    }
 
-	/**
-	 * To set a short description for the job.
-	 * 
-	 * @param description the description to set.
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    /**
+     * Set to true if you want to cancel the job when an exception occurs in a task.
+     *
+     * @param cancelOnException the cancelOnException to set
+     */
+    public void setCancelOnException(boolean cancelOnException) {
+        this.cancelOnException = cancelOnException;
+    }
 
+    /**
+     * To get the description
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
 
-	/**
-	 * To get the name of the job.
-	 * 
-	 * @return the name of the job.
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * To set a short description for the job.
+     *
+     * @param description the description to set.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
+    /**
+     * To get the name of the job.
+     *
+     * @return the name of the job.
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * To set the name of the job.
-	 * 
-	 * @param name the name to set.
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     * To set the name of the job.
+     *
+     * @param name the name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    /**
+     * To get the runtimeLimit
+     *
+     * @return the runtimeLimit
+     */
+    public long getRuntimeLimit() {
+        return runtimeLimit;
+    }
 
-	/**
-	 * To get the runtimeLimit
-	 * 
-	 * @return the runtimeLimit
-	 */
-	public long getRuntimeLimit() {
-		return runtimeLimit;
-	}
+    /**
+     * @param runtimeLimit the runtimeLimit to set
+     */
+    public void setRuntimeLimit(long runtimeLimit) {
+        this.runtimeLimit = runtimeLimit;
+    }
 
+    /**
+     * To get the priority of the job.
+     *
+     * @return the priority of the job.
+     */
+    public JobPriority getPriority() {
+        return priority;
+    }
 
-	/**
-	 * @param runtimeLimit the runtimeLimit to set
-	 */
-	public void setRuntimeLimit(long runtimeLimit) {
-		this.runtimeLimit = runtimeLimit;
-	}
-
-
-	/**
-	 * To get the priority of the job.
-	 * 
-	 * @return the priority of the job.
-	 */
-	public JobPriority getPriority() {
-		return priority;
-	}
-
-
-	/**
-	 * To set the priority of the job.
-	 * 
-	 * @param priority the priority to set.
-	 */
-	public void setPriority(JobPriority priority) {
-		this.priority = priority;
-	}
-	
+    /**
+     * To set the priority of the job.
+     *
+     * @param priority the priority to set.
+     */
+    public void setPriority(JobPriority priority) {
+        this.priority = priority;
+    }
 }

@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Random;
+
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
@@ -54,12 +55,14 @@ public class MonteCarlo extends ExecutableJavaTask {
         if (args.containsKey("steps")) {
             try {
                 steps = Long.parseLong(args.get("steps").toString());
-            } catch (NumberFormatException e) { }
+            } catch (NumberFormatException e) {
+            }
         }
         if (args.containsKey("iterations")) {
             try {
-            	iterations = Long.parseLong(args.get("iterations").toString());
-            } catch (NumberFormatException e) { }
+                iterations = Long.parseLong(args.get("iterations").toString());
+            } catch (NumberFormatException e) {
+            }
         }
         if (args.containsKey("file")) {
             file = args.get("file").toString();
@@ -74,7 +77,8 @@ public class MonteCarlo extends ExecutableJavaTask {
         double res = 0;
         while (n > 0) {
             if (print < 0) {
-                System.out.println("Calcul intermediaire ("+(100-((n*100)/iterations))+"%) : Pi = " +
+                System.out.println("Calcul intermediaire (" +
+                    (100 - ((n * 100) / iterations)) + "%) : Pi = " +
                     (((double) 4 * res) / (((++nbPrint) * iterations) / steps)));
                 print = iterations / steps;
             }

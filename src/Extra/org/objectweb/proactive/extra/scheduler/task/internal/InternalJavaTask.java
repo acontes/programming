@@ -37,74 +37,73 @@ import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 /**
  * Description of a java task.
  * See also @see AbstractJavaTaskDescriptor
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
 public class InternalJavaTask extends InternalAbstractJavaTask {
 
-	/** Serial Version UID */
-	private static final long serialVersionUID = -6946803819032140410L;
-	/** the java task to launch */
-	private ExecutableJavaTask task;
-	
-	
-	/**
-	 * ProActive empty constructor
-	 */
-	public InternalJavaTask() {}
-	
-	
-	/**
-	 * Create a new Java task descriptor using instantiated java task.
-	 * 
-	 * @param task the already instanciated java task.
-	 */
-	public InternalJavaTask(ExecutableJavaTask task) {
-		this.task = task;
-	}
+    /** Serial Version UID */
+    private static final long serialVersionUID = -6946803819032140410L;
 
-	
-	/**
-	 * Create a new Java task descriptor using a specific Class.
-	 * 
-	 * @param taskClass the class instance of the class to instanciate.
-	 */
-	public InternalJavaTask(Class<ExecutableJavaTask> taskClass) {
-		super(taskClass);
-	}
+    /** the java task to launch */
+    private ExecutableJavaTask task;
 
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
-	 */
-	@Override
-	public ExecutableTask getTask() {
-		if (task != null)
-			return task;
-		try {
-			task = (ExecutableJavaTask)taskClass.newInstance();
-			try{
-				task.init(args);
-			} catch (Exception e){
-				System.err.println("WARING : INIT has failed for task "+task.getClass().getSimpleName());
-				e.printStackTrace();
-			}
-			return task;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+    /**
+     * ProActive empty constructor
+     */
+    public InternalJavaTask() {
+    }
 
+    /**
+     * Create a new Java task descriptor using instantiated java task.
+     *
+     * @param task the already instanciated java task.
+     */
+    public InternalJavaTask(ExecutableJavaTask task) {
+        this.task = task;
+    }
 
-	/**
-	 * Set the instanciated java task.
-	 * 
-	 * @param task the instanciated java task.
-	 */
-	public void setTask(ExecutableJavaTask task){
-		this.task = task;
-	}
+    /**
+     * Create a new Java task descriptor using a specific Class.
+     *
+     * @param taskClass the class instance of the class to instanciate.
+     */
+    public InternalJavaTask(Class<ExecutableJavaTask> taskClass) {
+        super(taskClass);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
+     */
+    @Override
+    public ExecutableTask getTask() {
+        if (task != null) {
+            return task;
+        }
+        try {
+            task = (ExecutableJavaTask) taskClass.newInstance();
+            try {
+                task.init(args);
+            } catch (Exception e) {
+                System.err.println("WARING : INIT has failed for task " +
+                    task.getClass().getSimpleName());
+                e.printStackTrace();
+            }
+            return task;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Set the instanciated java task.
+     *
+     * @param task the instanciated java task.
+     */
+    public void setTask(ExecutableJavaTask task) {
+        this.task = task;
+    }
 }

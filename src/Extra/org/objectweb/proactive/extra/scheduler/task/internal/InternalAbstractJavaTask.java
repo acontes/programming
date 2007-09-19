@@ -35,76 +35,74 @@ import java.util.Map;
 
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 
+
 /**
  * Abstract definition of a java task.
  * See also @see TaskDescriptor
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
 public abstract class InternalAbstractJavaTask extends InternalTask {
 
-	/** Serial Version UID  */
-	private static final long serialVersionUID = 1340022492862249182L;
-	/** Class instance of the class to instanciate. */
-	protected Class<? extends ExecutableTask> taskClass;
-	/** Arguments of the task as a map */
-	protected Map<String, Object> args = new HashMap<String, Object>();
-	
-	
-	/**
-	 * ProActive empty constructor
-	 */
-	public InternalAbstractJavaTask() {}
-	
+    /** Serial Version UID  */
+    private static final long serialVersionUID = 1340022492862249182L;
 
-	/**
-	 * Create a new java task descriptor using the Class instance of the class to instanciate.
-	 * 
-	 * @param taskClass the Class instance of the class to instanciate.
-	 */
-	public InternalAbstractJavaTask(Class<? extends ExecutableTask> taskClass) {
-		this.taskClass = taskClass;
-	}
+    /** Class instance of the class to instanciate. */
+    protected Class<?extends ExecutableTask> taskClass;
 
+    /** Arguments of the task as a map */
+    protected Map<String, Object> args = new HashMap<String, Object>();
 
-	/**
-	 * Get the task Class instance.
-	 * 
-	 * @return the task Class instance.
-	 */
-	public Class<? extends ExecutableTask> getTaskClass() {
-		return taskClass;
-	}
-	
+    /**
+     * ProActive empty constructor
+     */
+    public InternalAbstractJavaTask() {
+    }
 
-	/**
-	 * Set the task Class instance.
-	 * 
-	 * @param taskClass the task Class instance.
-	 */
-	public void setTaskClass(Class<? extends ExecutableTask> taskClass) {
-		this.taskClass = taskClass;
-	}
+    /**
+     * Create a new java task descriptor using the Class instance of the class to instanciate.
+     *
+     * @param taskClass the Class instance of the class to instanciate.
+     */
+    public InternalAbstractJavaTask(Class<?extends ExecutableTask> taskClass) {
+        this.taskClass = taskClass;
+    }
 
-	
-	/**
-	 * Get the task arguments as a map.
-	 * 
-	 * @return the task arguments.
-	 */
-	public Map<String, Object> getArgs() {
-		return args;
-	}
+    /**
+     * Get the task Class instance.
+     *
+     * @return the task Class instance.
+     */
+    public Class<?extends ExecutableTask> getTaskClass() {
+        return taskClass;
+    }
 
-	
-	/**
-	 * Set the task arguments as a map.
-	 * 
-	 * @param args the task arguments.
-	 */
-	public void setArgs(Map<String, Object> args) {
-		this.args = args;
-	}
+    /**
+     * Set the task Class instance.
+     *
+     * @param taskClass the task Class instance.
+     */
+    public void setTaskClass(Class<?extends ExecutableTask> taskClass) {
+        this.taskClass = taskClass;
+    }
+
+    /**
+     * Get the task arguments as a map.
+     *
+     * @return the task arguments.
+     */
+    public Map<String, Object> getArgs() {
+        return args;
+    }
+
+    /**
+     * Set the task arguments as a map.
+     *
+     * @param args the task arguments.
+     */
+    public void setArgs(Map<String, Object> args) {
+        this.args = args;
+    }
 }

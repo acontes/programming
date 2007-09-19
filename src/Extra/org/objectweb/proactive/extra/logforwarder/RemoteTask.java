@@ -39,29 +39,28 @@ import org.apache.log4j.net.SocketAppender;
 
 
 public class RemoteTask {
-    
     SocketAppender out;
     Logger logger;
-    
-    public RemoteTask(){}
-    
-    
-    public void initLogger(String loggerName, String host, int port){
-        out = new SocketAppender(host,port);
+
+    public RemoteTask() {
+    }
+
+    public void initLogger(String loggerName, String host, int port) {
+        out = new SocketAppender(host, port);
         logger = Logger.getLogger(loggerName);
         logger.removeAllAppenders();
         logger.addAppender(out);
-        
+
         //test
         //logger.removeAllAppenders();
-        
+
         // redirect stdout
-        System.setOut(new PrintStream(new LoggingOutputStream(logger, Level.INFO), true));
-//        System.setErr(new PrintStream(new LoggingOutputStream(logger, Level.ERROR), true));
-    
+        System.setOut(new PrintStream(
+                new LoggingOutputStream(logger, Level.INFO), true));
+        //        System.setErr(new PrintStream(new LoggingOutputStream(logger, Level.ERROR), true));
     }
-    
-    public void doTask(){
+
+    public void doTask() {
         System.out.println(" Message info 1 from " + this);
         try {
             Thread.sleep(2000);
@@ -70,19 +69,12 @@ public class RemoteTask {
             e.printStackTrace();
         }
         System.err.println(" Message error 2 from " + this);
-        
-        
-        
     }
-    
-    
-    public int terminateTask(){
+
+    public int terminateTask() {
         System.out.println(" Terminating logger on " + this);
         //logger.removeAllAppenders();
         LogManager.shutdown();
         return 0;
     }
-    
-    
-
 }

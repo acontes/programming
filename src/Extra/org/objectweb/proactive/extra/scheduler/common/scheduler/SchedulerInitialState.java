@@ -32,109 +32,106 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 import java.util.Vector;
+
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
+
 
 /**
  * This class is a representation of the entire scheduler state.
  * It is represented by 3 lists of jobs.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
  */
 public final class SchedulerInitialState<E extends Job> implements Serializable {
 
-	/** serial version UID */
-	private static final long serialVersionUID = -7448663006621330188L;
-	/** pending jobs */
-	private Vector<E> pendingJobs = new Vector<E>();
-	/** running jobs */
-	private Vector<E> runningJobs = new Vector<E>();
-	/** finished jobs */
-	private Vector<E> finishedJobs = new Vector<E>();
-	/** scheduler state */
-	private SchedulerState state = SchedulerState.STOPPED;
-	
-	
-	/**
-	 * ProActive Empty constructor.
-	 */
-	public SchedulerInitialState(){}
-	
-	
-	/**
-	 * To get the finishedJobs
-	 * 
-	 * @return the finishedJobs
-	 */
-	public Vector<E> getFinishedJobs() {
-		return finishedJobs;
-	}
+    /** serial version UID */
+    private static final long serialVersionUID = -7448663006621330188L;
 
-	
-	/**
-	 * To set the finishedJobs
-	 * 
-	 * @param finishedJobs the finishedJobs to set
-	 */
-	public void setFinishedJobs(Vector<E> finishedJobs) {
-		this.finishedJobs = finishedJobs;
-	}
-	
+    /** pending jobs */
+    private Vector<E> pendingJobs = new Vector<E>();
 
-	/**
-	 * To get the pendingJobs
-	 * 
-	 * @return the pendingJobs
-	 */
-	public Vector<E> getPendingJobs() {
-		return pendingJobs;
-	}
+    /** running jobs */
+    private Vector<E> runningJobs = new Vector<E>();
 
-	
-	/**
-	 * To set the pendingJobs
-	 * 
-	 * @param pendingJobs the pendingJobs to set
-	 */
-	public void setPendingJobs(Vector<E> pendingJobs) {
-		this.pendingJobs = pendingJobs;
-	}
-	
+    /** finished jobs */
+    private Vector<E> finishedJobs = new Vector<E>();
 
-	/**
-	 * To get the runningJobs
-	 * 
-	 * @return the runningJobs
-	 */
-	public Vector<E> getRunningJobs() {
-		return runningJobs;
-	}
+    /** scheduler state */
+    private SchedulerState state = SchedulerState.STOPPED;
 
-	
-	/**
-	 * To set the runningJobs
-	 * 
-	 * @param runningJobs the runningJobs to set
-	 */
-	public void setRunningJobs(Vector<E> runningJobs) {
-		this.runningJobs = runningJobs;
-	}
+    /**
+     * ProActive Empty constructor.
+     */
+    public SchedulerInitialState() {
+    }
 
+    /**
+     * To get the finishedJobs
+     *
+     * @return the finishedJobs
+     */
+    public Vector<E> getFinishedJobs() {
+        return finishedJobs;
+    }
 
-	/**
-	 * @return the state
-	 */
-	public SchedulerState getState() {
-		return state;
-	}
+    /**
+     * To set the finishedJobs
+     *
+     * @param finishedJobs the finishedJobs to set
+     */
+    public void setFinishedJobs(Vector<E> finishedJobs) {
+        this.finishedJobs = finishedJobs;
+    }
 
+    /**
+     * To get the pendingJobs
+     *
+     * @return the pendingJobs
+     */
+    public Vector<E> getPendingJobs() {
+        return pendingJobs;
+    }
 
-	/**
-	 * @param state the state to set
-	 */
-	public void setState(SchedulerState state) {
-		this.state = state;
-	}
-	
+    /**
+     * To set the pendingJobs
+     *
+     * @param pendingJobs the pendingJobs to set
+     */
+    public void setPendingJobs(Vector<E> pendingJobs) {
+        this.pendingJobs = pendingJobs;
+    }
+
+    /**
+     * To get the runningJobs
+     *
+     * @return the runningJobs
+     */
+    public Vector<E> getRunningJobs() {
+        return runningJobs;
+    }
+
+    /**
+     * To set the runningJobs
+     *
+     * @param runningJobs the runningJobs to set
+     */
+    public void setRunningJobs(Vector<E> runningJobs) {
+        this.runningJobs = runningJobs;
+    }
+
+    /**
+     * @return the state
+     */
+    public SchedulerState getState() {
+        return state;
+    }
+
+    /**
+     * @param state the state to set
+     */
+    public void setState(SchedulerState state) {
+        this.state = state;
+    }
 }

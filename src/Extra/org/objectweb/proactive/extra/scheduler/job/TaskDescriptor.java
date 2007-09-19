@@ -37,153 +37,154 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
+
 /**
  * This class represents a task for the policy.
  * The internal scheduler tasks are not sent to the policy.
  * Only a restricted number of properties on each tasks is sent to the policy.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jul 9, 2007
  * @since ProActive 3.2
  */
 public class TaskDescriptor implements Serializable {
 
-	/** Serial version UID */
-	private static final long serialVersionUID = -3597161883966090934L;
-	/** Task id */
-	private TaskId id;
-	/** job id */
-	private JobId jobId;
-	/** number of parents remaining (initial value must be 0) */
-	private int count = 0;
-	/** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
-	private Vector<TaskDescriptor> parents;
-	/** list of ordered children tasks for this task (null if jobType!=TASK_FLOW) */
-	private Vector<TaskDescriptor> children;
-	
-	
-	/**
-	 * Get a new light task using a taskDescriptor.
-	 * 
-	 * @param td the taskDescriptor to shrink.
-	 */
-	public TaskDescriptor(InternalTask td) {
-		this.id = td.getId();
-		this.jobId = td.getJobId();
-	}
+    /** Serial version UID */
+    private static final long serialVersionUID = -3597161883966090934L;
 
+    /** Task id */
+    private TaskId id;
 
-	/**
-	 * To get the children
-	 * 
-	 * @return the children
-	 */
-	public Vector<TaskDescriptor> getChildren() {
-		if (children == null) return new Vector<TaskDescriptor>();
-		return children;
-	}
+    /** job id */
+    private JobId jobId;
 
+    /** number of parents remaining (initial value must be 0) */
+    private int count = 0;
 
-	/**
-	 * To get the id
-	 * 
-	 * @return the id
-	 */
-	public TaskId getId() {
-		return id;
-	}
+    /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
+    private Vector<TaskDescriptor> parents;
 
+    /** list of ordered children tasks for this task (null if jobType!=TASK_FLOW) */
+    private Vector<TaskDescriptor> children;
 
-	/**
-	 * To get the parents
-	 * 
-	 * @return the parents
-	 */
-	public Vector<TaskDescriptor> getParents() {
-		if (parents == null) return new Vector<TaskDescriptor>();
-		return parents;
-	}
+    /**
+     * Get a new light task using a taskDescriptor.
+     *
+     * @param td the taskDescriptor to shrink.
+     */
+    public TaskDescriptor(InternalTask td) {
+        this.id = td.getId();
+        this.jobId = td.getJobId();
+    }
 
+    /**
+     * To get the children
+     *
+     * @return the children
+     */
+    public Vector<TaskDescriptor> getChildren() {
+        if (children == null) {
+            return new Vector<TaskDescriptor>();
+        }
+        return children;
+    }
 
-	/**
-	 * To get the jobId
-	 * 
-	 * @return the jobId
-	 */
-	public JobId getJobId() {
-		return jobId;
-	}
-	
+    /**
+     * To get the id
+     *
+     * @return the id
+     */
+    public TaskId getId() {
+        return id;
+    }
 
-	/**
-	 * Return the number of parents remaining
-	 * 
-	 * @return the number of parents remaining.
-	 */
-	int getCount() {
-		return count;
-	}
+    /**
+     * To get the parents
+     *
+     * @return the parents
+     */
+    public Vector<TaskDescriptor> getParents() {
+        if (parents == null) {
+            return new Vector<TaskDescriptor>();
+        }
+        return parents;
+    }
 
+    /**
+     * To get the jobId
+     *
+     * @return the jobId
+     */
+    public JobId getJobId() {
+        return jobId;
+    }
 
-	/**
-	 * Set the number of parents remaining.
-	 * 
-	 * @param count the number of parents remaining.
-	 */
-	void setCount(int count) {
-		this.count = count;
-	}
-	
-	
-	/**
-	 * Add a parent to the list of parents dependence.
-	 * 
-	 * @param task the parent task to add.
-	 */
-	public void addParent(TaskDescriptor task){
-		if (parents == null)
-			parents = new Vector<TaskDescriptor>();
-		parents.add(task);
-	}
-	
-	
-	/**
-	 * Add a child to the list of children dependence.
-	 * 
-	 * @param task the child task to add.
-	 */
-	public void addChild(TaskDescriptor task){
-		if (children == null)
-			children = new Vector<TaskDescriptor>();
-		children.add(task);
-	}
-	
-	
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof TaskDescriptor)
-			return ((TaskDescriptor)obj).id.equals(id);
-		return false;
-	}
+    /**
+     * Return the number of parents remaining
+     *
+     * @return the number of parents remaining.
+     */
+    int getCount() {
+        return count;
+    }
 
-	
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
+    /**
+     * Set the number of parents remaining.
+     *
+     * @param count the number of parents remaining.
+     */
+    void setCount(int count) {
+        this.count = count;
+    }
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "LightTask("+getId()+")";
-	}
-	
+    /**
+     * Add a parent to the list of parents dependence.
+     *
+     * @param task the parent task to add.
+     */
+    public void addParent(TaskDescriptor task) {
+        if (parents == null) {
+            parents = new Vector<TaskDescriptor>();
+        }
+        parents.add(task);
+    }
+
+    /**
+     * Add a child to the list of children dependence.
+     *
+     * @param task the child task to add.
+     */
+    public void addChild(TaskDescriptor task) {
+        if (children == null) {
+            children = new Vector<TaskDescriptor>();
+        }
+        children.add(task);
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TaskDescriptor) {
+            return ((TaskDescriptor) obj).id.equals(id);
+        }
+        return false;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "LightTask(" + getId() + ")";
+    }
 }

@@ -43,7 +43,6 @@ import org.apache.log4j.spi.LoggingEvent;
 
 
 public class SimpleLoggerServer implements Runnable {
-
     // socket port
     private int port;
     private boolean terminate = false;
@@ -54,23 +53,20 @@ public class SimpleLoggerServer implements Runnable {
     // connection
     private ServerSocket serverSocket;
 
-    
-    
     /**
      * Create a new logger server on any free port. This port can be
      * retreived using getPort().
      * @return the created server.
      * @throws IOException
      */
-    public static SimpleLoggerServer createLoggerServer() throws IOException {
+    public static SimpleLoggerServer createLoggerServer()
+        throws IOException {
         SimpleLoggerServer simpleLoggerServer = new SimpleLoggerServer();
         Thread simpleLoggerServerThread = new Thread(simpleLoggerServer);
         simpleLoggerServerThread.start();
         return simpleLoggerServer;
     }
 
-    
-    
     /**
      * Create a logger server on a given port.
      * @param port the binding port of the created server.
@@ -98,7 +94,7 @@ public class SimpleLoggerServer implements Runnable {
     public int getPort() {
         return this.port;
     }
-    
+
     /**
      * Stop this logger server.
      */
@@ -109,7 +105,6 @@ public class SimpleLoggerServer implements Runnable {
         this.terminate = true;
     }
 
-    
     @Override
     public void run() {
         while (!terminate) {
@@ -130,9 +125,7 @@ public class SimpleLoggerServer implements Runnable {
             e.printStackTrace();
         }
     }
-    
-    
-    
+
     /**
      * Thread for handling incoming blocking connection.
      *

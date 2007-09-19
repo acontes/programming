@@ -37,6 +37,7 @@ import java.util.List;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 
+
 /**
  * Definition of a task flow job for the user.
  * A task flow job or data flow job, is a job that can contain
@@ -44,64 +45,63 @@ import org.objectweb.proactive.extra.scheduler.common.task.Task;
  * To make this type of job, just use the default no params constructor,
  * and set the properties you want to set.
  * Then add tasks with the given method in order to fill the job with your own tasks.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
 public class TaskFlowJob extends Job {
-	
-	/** Serial Version UID */
-	private static final long serialVersionUID = 1623955669459590983L;
-	/** List of task for the task flow job */
-	private HashMap<String,Task> tasks = new HashMap<String,Task>();
-	
-	
-	/** Proactive Empty Constructor */
-	public TaskFlowJob() {}
-	
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getType()
-	 */
-	@Override
-	public JobType getType() {
-		return JobType.TASKSFLOW;
-	}
-	
-	
-	/**
-	 * Add a task to this task flow job.
-	 * 
-	 * @param task the task to add.
-	 */
-	public void addTask(Task task) throws UserException {
-		if (task.getName() == null)
-			throw new UserException("The name of the task must not be null !");
-		if (tasks.containsKey(task.getName()))
-			throw new UserException("The name of the task is already used !");
-		tasks.put(task.getName(),task);
-	}
-	
-	
-	/**
-	 * Add a list of tasks to this task flow job.
-	 * 
-	 * @param tasks the list of tasks to add.
-	 */
-	public void addTasks(List<Task> tasks) throws UserException {
-		for (Task task : tasks){
-			addTask(task);
-		}
-	}
 
+    /** Serial Version UID */
+    private static final long serialVersionUID = 1623955669459590983L;
 
-	/**
-	 * To get the list of tasks.
-	 * 
-	 * @return the list of tasks.
-	 */
-	public ArrayList<Task> getTasks() {
-		return new ArrayList<Task>(tasks.values());
-	}
+    /** List of task for the task flow job */
+    private HashMap<String, Task> tasks = new HashMap<String, Task>();
+
+    /** Proactive Empty Constructor */
+    public TaskFlowJob() {
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getType()
+     */
+    @Override
+    public JobType getType() {
+        return JobType.TASKSFLOW;
+    }
+
+    /**
+     * Add a task to this task flow job.
+     *
+     * @param task the task to add.
+     */
+    public void addTask(Task task) throws UserException {
+        if (task.getName() == null) {
+            throw new UserException("The name of the task must not be null !");
+        }
+        if (tasks.containsKey(task.getName())) {
+            throw new UserException("The name of the task is already used !");
+        }
+        tasks.put(task.getName(), task);
+    }
+
+    /**
+     * Add a list of tasks to this task flow job.
+     *
+     * @param tasks the list of tasks to add.
+     */
+    public void addTasks(List<Task> tasks) throws UserException {
+        for (Task task : tasks) {
+            addTask(task);
+        }
+    }
+
+    /**
+     * To get the list of tasks.
+     *
+     * @return the list of tasks.
+     */
+    public ArrayList<Task> getTasks() {
+        return new ArrayList<Task>(tasks.values());
+    }
 }

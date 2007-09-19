@@ -34,62 +34,60 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
+
 /**
  * Class ParameterSweepingJob.
  * This is the definition of a Parameter Swipping Job.
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
 public class InternalParameterSweepingJob extends InternalJob {
 
+    /** Serial version UID */
+    private static final long serialVersionUID = -5767666965335854263L;
 
-	/** Serial version UID */
-	private static final long serialVersionUID = -5767666965335854263L;
-	
-	
-	/**
-	 * ProActive empty constructor.
-	 */
-	public InternalParameterSweepingJob(){}
-	
-	
-	/**
-	 * Create a new Parameter Swipping Job with the given parameters. It provides methods to add or
-	 * remove tasks.
-	 * 
-	 * @param name the current job name.
-	 * @param priority the priority of this job between 1 and 5.
-	 * @param runtimeLimit the maximum execution time for this job given in millisecond.
-	 * @param CancelOnException true if the job has to run until its end or an user intervention.
-	 * @param description a short description of the job and what it will do.
-	 */
-	public InternalParameterSweepingJob(String name, JobPriority priority, long runtimeLimit, boolean CancelOnException, String description) {
-		super(name,priority,runtimeLimit,CancelOnException,description);
-	}
-	
-	
-	/**
-	 * Append a task to this job, only if no task has been added before.
-	 * 
-	 * @param task the task to add.
-	 * @return true if the task has been correctly added to the job, false if not.
-	 */
-	@Override
-	public boolean addTask(InternalTask task) {
-		if (getTasks().size() > 0)
-			return false;
-		return super.addTask(task);
-	}
-	
-	
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.job.JobU#getType()
-	 */
-	@Override
-	public JobType getType() {
-		return JobType.PARAMETER_SWEEPING;
-	}
+    /**
+     * ProActive empty constructor.
+     */
+    public InternalParameterSweepingJob() {
+    }
 
+    /**
+     * Create a new Parameter Swipping Job with the given parameters. It provides methods to add or
+     * remove tasks.
+     *
+     * @param name the current job name.
+     * @param priority the priority of this job between 1 and 5.
+     * @param runtimeLimit the maximum execution time for this job given in millisecond.
+     * @param CancelOnException true if the job has to run until its end or an user intervention.
+     * @param description a short description of the job and what it will do.
+     */
+    public InternalParameterSweepingJob(String name, JobPriority priority,
+        long runtimeLimit, boolean CancelOnException, String description) {
+        super(name, priority, runtimeLimit, CancelOnException, description);
+    }
+
+    /**
+     * Append a task to this job, only if no task has been added before.
+     *
+     * @param task the task to add.
+     * @return true if the task has been correctly added to the job, false if not.
+     */
+    @Override
+    public boolean addTask(InternalTask task) {
+        if (getTasks().size() > 0) {
+            return false;
+        }
+        return super.addTask(task);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.job.JobU#getType()
+     */
+    @Override
+    public JobType getType() {
+        return JobType.PARAMETER_SWEEPING;
+    }
 }

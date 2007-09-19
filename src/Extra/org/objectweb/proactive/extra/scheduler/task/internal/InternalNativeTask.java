@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
@@ -42,93 +43,96 @@ import org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask;
 import org.objectweb.proactive.extra.scheduler.task.NativeTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
+
 /**
  * Description of a native task.
  * This task include the process
  * see also {@link InternalTask}
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
 public class InternalNativeTask extends InternalTask {
 
-	/** Serial Version UID */
-	private static final long serialVersionUID = 2587936204570926300L;
-	/** Command line to execute */
-	private String cmd;
-	
-	
-	/**
-	 * ProActive empty constructor.
-	 */
-	public InternalNativeTask(){}
-	
-	
-	/**
-	 * Create a new native task descriptor with the given command line.
-	 * 
-	 * @param cmd the command line to execute
-	 */
-	public InternalNativeTask(String cmd) {
-		this.cmd = cmd;
-	}
+    /** Serial Version UID */
+    private static final long serialVersionUID = 2587936204570926300L;
 
+    /** Command line to execute */
+    private String cmd;
 
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
-	 */
-	@Override
-	public ExecutableTask getTask() {
-		//create the new task that will launch the command on execute.
-		ExecutableNativeTask executableNativeTask = new ExecutableNativeTask() {
-			private static final long serialVersionUID = 0L;
-			private Process process;
+    /**
+     * ProActive empty constructor.
+     */
+    public InternalNativeTask() {
+    }
 
-			/**
-			 * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
-			 */
-			public Object execute(TaskResult... results) {
-				try {
-					process = Runtime.getRuntime().exec(cmd);
-					//TODO ask cdelbe for better solution.
-					BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-					String str = null;
-					while((str = reader.readLine()) != null){
-						System.out.println(str);
-					}
-					process.waitFor();
-					return process.exitValue();
-				} catch (Exception e) {
-					e.printStackTrace();
-					return 255;
-				}
-			}
-			
-			/**
-			 * @see org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask#getProcess()
-			 */
-			public Process getProcess(){
-				return process;
-			}
-		};
-		return executableNativeTask;
-	}
-	
+    /**
+     * Create a new native task descriptor with the given command line.
+     *
+     * @param cmd the command line to execute
+     */
+    public InternalNativeTask(String cmd) {
+        this.cmd = cmd;
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
-	 */
-	@Override
-	public TaskLauncher createLauncher(String host, int port, Node node) throws ActiveObjectCreationException, NodeException {
-		NativeTaskLauncher launcher;
-		if (getPreTask() == null){
-			launcher = (NativeTaskLauncher)ProActive.newActive(NativeTaskLauncher.class.getName(), new Object[]{getId(),getJobId(), host, port}, node);
-		} else {
-			launcher = (NativeTaskLauncher)ProActive.newActive(NativeTaskLauncher.class.getName(), new Object[]{getId(),getJobId(),getPreTask(), host, port}, node);
-		}
-		setExecuterInformations(new ExecuterInformations(launcher,node));
-		return launcher;
-	}
-	
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
+     */
+    @Override
+    public ExecutableTask getTask() {
+        //create the new task that will launch the command on execute.
+        ExecutableNativeTask executableNativeTask = new ExecutableNativeTask() {
+                private static final long serialVersionUID = 0L;
+                private Process process;
+
+                /**
+                 * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
+                 */
+                public Object execute(TaskResult... results) {
+                    try {
+                        process = Runtime.getRuntime().exec(cmd);
+                        //TODO ask cdelbe for better solution.
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                                    process.getInputStream()));
+                        String str = null;
+                        while ((str = reader.readLine()) != null) {
+                            System.out.println(str);
+                        }
+                        process.waitFor();
+                        return process.exitValue();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return 255;
+                    }
+                }
+
+                /**
+                 * @see org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask#getProcess()
+                 */
+                public Process getProcess() {
+                    return process;
+                }
+            };
+        return executableNativeTask;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+     */
+    @Override
+    public TaskLauncher createLauncher(String host, int port, Node node)
+        throws ActiveObjectCreationException, NodeException {
+        NativeTaskLauncher launcher;
+        if (getPreTask() == null) {
+            launcher = (NativeTaskLauncher) ProActive.newActive(NativeTaskLauncher.class.getName(),
+                    new Object[] { getId(), getJobId(), host, port }, node);
+        } else {
+            launcher = (NativeTaskLauncher) ProActive.newActive(NativeTaskLauncher.class.getName(),
+                    new Object[] { getId(), getJobId(), getPreTask(), host, port },
+                    node);
+        }
+        setExecuterInformations(new ExecuterInformations(launcher, node));
+        return launcher;
+    }
 }
