@@ -30,12 +30,10 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -62,12 +60,13 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
-import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
@@ -110,7 +109,7 @@ public class LocalNode implements SecurityEntity {
                 this.securityManager.getPolicyServer().getApplicationName());
 
             // setting virtual node name
-            this.securityManager.setVNName(this.virtualNodeName);
+//            this.securityManager.setVNName(this.virtualNodeName);
 
             ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
                            .debug("registering node certificate for VN " +
@@ -368,7 +367,7 @@ public class LocalNode implements SecurityEntity {
     
     // Implements Security Entity
 
-	public X509Certificate getCertificate()
+	public TypedCertificate getCertificate()
 			throws SecurityNotAvailableException {
 		if (this.securityManager == null) {
 			throw new SecurityNotAvailableException();
@@ -376,12 +375,12 @@ public class LocalNode implements SecurityEntity {
 		return this.securityManager.getCertificate();
 	}
 
-	public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
-		if (this.securityManager == null) {
-			throw new SecurityNotAvailableException();
-		}
-		return this.securityManager.getCertificateEncoded();
-	}
+//	public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
+//		if (this.securityManager == null) {
+//			throw new SecurityNotAvailableException();
+//		}
+//		return this.securityManager.getCertificateEncoded();
+//	}
 
 	public Entities getEntities() throws SecurityNotAvailableException {
 		if (this.securityManager == null) {
@@ -390,12 +389,12 @@ public class LocalNode implements SecurityEntity {
 		return this.securityManager.getEntities();
 	}
 
-	public SecurityContext getPolicy(Entities from, Entities to)
+	public SecurityContext getPolicy(Entities local, Entities distant)
 			throws SecurityNotAvailableException {
 		if (this.securityManager == null) {
 			throw new SecurityNotAvailableException();
 		}
-		return this.securityManager.getPolicy(from, to);
+		return this.securityManager.getPolicy(local, distant);
 	}
 
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
@@ -453,12 +452,12 @@ public class LocalNode implements SecurityEntity {
 		this.securityManager.setProActiveSecurityManager(user, policyServer);
 	}
 
-	public long startNewSession(SecurityContext policy)
-			throws SecurityNotAvailableException {
+	public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+			throws SecurityNotAvailableException, SessionException {
 		if (this.securityManager == null) {
 			throw new SecurityNotAvailableException();
 		}
-		return this.securityManager.startNewSession(policy);
+		return this.securityManager.startNewSession(distantSessionID, policy, distantCertificate);
 	}
 
 	public void terminateSession(long sessionID)

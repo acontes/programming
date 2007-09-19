@@ -233,12 +233,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
     	} catch (CommunicationForbiddenException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (AuthenticationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (RenegotiateSessionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -326,7 +320,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
         hasJustMigrated = true;
         if (this.isSecurityOn) {
             internalBodySecurity = new InternalBodySecurity(null);
-            securityManager.setBody(this);
+//            securityManager.setBody(this);
         }
     }
 

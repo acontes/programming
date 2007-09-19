@@ -16,8 +16,6 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.core.security.SecurityContext;
-import org.objectweb.proactive.core.security.TypedCertificate;
-import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.ic2d.security.widgets.CertificateDetailsSection;
 import org.objectweb.proactive.ic2d.security.widgets.CommunicationDetailsComposite;
@@ -124,17 +122,16 @@ public class SessionTab extends UpdatableTab {
 	private void updateSessionTable() {
 		this.sessionTable.removeAll();
 		for (Session session : this.sessionList) {
-			this.sessionTableViewer.add(new Long(session.getSessionID())
+			this.sessionTableViewer.add(new Long(session.getDistantSessionID())
 					.toString());
 		}
 		updateViewers();
 	}
 
 	protected void updateViewers() {
-		this.certDetailsSection.update(new TypedCertificate(this.sessionList
+		this.certDetailsSection.update(this.sessionList
 				.get(this.sessionTable.getSelectionIndex())
-				.getDistantOACertificate(),
-				EntityType.UNKNOWN, null));
+				.getDistantCertificate());
 
 		SecurityContext sc = this.sessionList.get(
 				this.sessionTable.getSelectionIndex()).getSecurityContext();

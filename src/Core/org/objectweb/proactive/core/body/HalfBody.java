@@ -99,7 +99,7 @@ public class HalfBody extends AbstractBody {
         if (this.securityManager != null) {
             this.securityManager = this.securityManager
 					.generateSiblingCertificate(EntityType.OBJECT, "HalfBody");
-            this.securityManager.setBody(this);
+//            this.securityManager.setBody(this);
             this.isSecurityOn = this.securityManager.getCertificate() != null;
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
             ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)

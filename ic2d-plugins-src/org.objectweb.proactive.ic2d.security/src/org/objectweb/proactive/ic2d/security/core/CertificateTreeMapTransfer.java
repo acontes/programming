@@ -69,8 +69,9 @@ public class CertificateTreeMapTransfer extends ByteArrayTransfer {
 	public Object nativeToJava(TransferData transferData) {
 		if (isSupportedType(transferData)) {
 			byte[] buffer = (byte[]) super.nativeToJava(transferData);
-			if (buffer == null)
+			if (buffer == null) {
 				return null;
+			}
 
 			Object chains = null;
 			try {

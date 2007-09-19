@@ -21,7 +21,7 @@ public class CertificatedRuleEntity extends RuleEntity {
 			throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException {
 		super(type);
 		this.certificate = KeyStoreTools.getCertificate(keystore, type, name);
-		this.level = KeyStoreTools.getLevel(keystore, this.certificate);
+		this.level = KeyStoreTools.getLevel(keystore, this.certificate) + levelIncrement();
 	}
 
 	@Override

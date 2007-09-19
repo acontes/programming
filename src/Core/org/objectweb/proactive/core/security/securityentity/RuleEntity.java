@@ -41,6 +41,20 @@ public abstract class RuleEntity implements Serializable {
         }
         return Match.OK;
     }
+    
+    // represents the number of levels of the entities above the application level
+    protected int levelIncrement() {
+		switch (this.type) {
+		case RUNTIME:
+			return 1;
+		case NODE:
+			return 2;
+		case OBJECT:
+			return 3;
+		default:
+			return 0;
+		}
+    }
 
     abstract protected Match match(Entity e);
     

@@ -124,13 +124,13 @@ public class PolicyRule implements Serializable {
         "\nAOCreation:" + this.aocreation;
     }
 
-    /**
-     * @param arrayLists
-     */
-    public void setCommunicationRules(Communication[] arrayLists) {
-        setCommunicationRulesReply(arrayLists[0]);
-        setCommunicationRulesRequest(arrayLists[1]);
-    }
+//    /**
+//     * @param arrayLists
+//     */
+//    public void setCommunicationRules(Communication[] arrayLists) {
+//        setCommunicationRulesReply(arrayLists[0]);
+//        setCommunicationRulesRequest(arrayLists[1]);
+//    }
 
     public Communication getCommunicationReply() {
         return this.communicationReply;

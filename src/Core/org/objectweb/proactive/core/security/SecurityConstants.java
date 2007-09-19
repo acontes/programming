@@ -37,10 +37,10 @@ package org.objectweb.proactive.core.security;
  *
  */
 public abstract class SecurityConstants {
-    public static final String XML_CERTIFICATE = "/Policy/Certificate";
-    public static final String XML_PRIVATE_KEY = "/Policy/PrivateKey";
-    public static final String XML_TRUSTED_CERTIFICATION_AUTHORITY = "/Policy/TrustedCertificationAuthority/CertificationAuthority";
-    public static final String XML_CERTIFICATION_AUTHORITY_CERTIFICATE = "Certificate";
+//    public static final String XML_CERTIFICATE = "/Policy/Certificate";
+//    public static final String XML_PRIVATE_KEY = "/Policy/PrivateKey";
+//    public static final String XML_TRUSTED_CERTIFICATION_AUTHORITY = "/Policy/TrustedCertificationAuthority/CertificationAuthority";
+//    public static final String XML_CERTIFICATION_AUTHORITY_CERTIFICATE = "Certificate";
     
     public static final int MAX_SESSION_VALIDATION_WAIT = 30;
     
@@ -80,64 +80,4 @@ public abstract class SecurityConstants {
 			}
 		}
     }
-
-//    public static final int ENTITY_TYPE_UNKNOWN = -1;
-//    public static final int ENTITY_TYPE_ENTITY = 0;
-//    public static final int ENTITY_TYPE_APPLICATION = 1;
-//    public static final int ENTITY_TYPE_USER = 2;
-//    public static final int ENTITY_TYPE_DOMAIN = 3;
-//
-//    public static final String ENTITY_STRING_UNKNOWN = "Unknown";
-//    public static final String ENTITY_STRING_ENTITY = "Entity";
-//    public static final String ENTITY_STRING_APPLICATION = "Application";
-//    public static final String ENTITY_STRING_USER = "User";
-//    public static final String ENTITY_STRING_DOMAIN = "Domain";
-    
-//    public static String typeToString(int type) {
-//    	switch (type) {
-//    	case ENTITY_TYPE_ENTITY:
-//    		return ENTITY_STRING_ENTITY;
-//    	case ENTITY_TYPE_APPLICATION:
-//    		return ENTITY_STRING_APPLICATION;
-//    	case ENTITY_TYPE_USER:
-//    		return ENTITY_STRING_USER;
-//    	case ENTITY_TYPE_DOMAIN:
-//    		return ENTITY_STRING_DOMAIN;
-//    	default:
-////    		System.out.println("Unknown type");
-//    		return ENTITY_STRING_UNKNOWN;
-//    	}
-//    }
-//    
-//    public static int typeToInt(String type) {
-//    	if (ENTITY_STRING_ENTITY.equalsIgnoreCase(type)) {
-//    		return ENTITY_TYPE_ENTITY;
-//    	}
-//    	if (ENTITY_STRING_APPLICATION.equalsIgnoreCase(type)) {
-//    		return ENTITY_TYPE_APPLICATION;
-//    	}
-//    	if (ENTITY_STRING_USER.equalsIgnoreCase(type)) {
-//    		return ENTITY_TYPE_USER;
-//    	}
-//    	if (ENTITY_STRING_DOMAIN.equalsIgnoreCase(type)) {
-//    		return ENTITY_TYPE_DOMAIN;
-//    	}
-//    	
-//    	System.out.println("Unknown type");
-//    	return ENTITY_TYPE_UNKNOWN;
-//    }
-    
-//    public static int getParentType(int type) {
-//    	switch (type) {
-//    	case ENTITY_TYPE_ENTITY:
-//			return ENTITY_TYPE_APPLICATION;
-//		case ENTITY_TYPE_APPLICATION:
-//			return ENTITY_TYPE_USER;
-//		case ENTITY_TYPE_USER:
-//		case ENTITY_TYPE_DOMAIN:
-//			return ENTITY_TYPE_DOMAIN;
-//		default:
-//			return ENTITY_TYPE_UNKNOWN;
-//    	}
-//    }
 }

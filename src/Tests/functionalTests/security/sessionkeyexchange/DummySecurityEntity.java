@@ -39,8 +39,10 @@ import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.crypto.AuthenticationException;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
@@ -77,7 +79,7 @@ public class DummySecurityEntity implements SecurityEntity {
 		this.securityManager.terminateSession(sessionID);
     }
 
-    public X509Certificate getCertificate()
+    public TypedCertificate getCertificate()
         throws SecurityNotAvailableException {
     	if (this.securityManager == null) {
 			throw new SecurityNotAvailableException();
@@ -92,12 +94,12 @@ public class DummySecurityEntity implements SecurityEntity {
 		return this.securityManager.getProActiveSecurityManager(user);
 	}
 
-    public long startNewSession(SecurityContext policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+        throws SecurityNotAvailableException, SessionException {
     	if (this.securityManager == null) {
 			throw new SecurityNotAvailableException();
 		}
-		return this.securityManager.startNewSession(policy);
+		return this.securityManager.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
     public PublicKey getPublicKey() throws SecurityNotAvailableException {
@@ -138,27 +140,27 @@ public class DummySecurityEntity implements SecurityEntity {
             parametersSignature);
     }
 
-    public SecurityContext getPolicy(Entities from, Entities to)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException {
     	if (this.securityManager == null) {
 			throw new SecurityNotAvailableException();
 		}
-		return this.securityManager.getPolicy(from, to);
+		return this.securityManager.getPolicy(local, distant);
     }
 
-    public String getVNName() throws SecurityNotAvailableException {
-    	if (this.securityManager == null) {
-			throw new SecurityNotAvailableException();
-		}
-		return this.securityManager.getVNName();
-    }
+//    public String getVNName() throws SecurityNotAvailableException {
+//    	if (this.securityManager == null) {
+//			throw new SecurityNotAvailableException();
+//		}
+//		return this.securityManager.getVNName();
+//    }
 
-    public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
-    	if (this.securityManager == null) {
-			throw new SecurityNotAvailableException();
-		}
-		return this.securityManager.getCertificateEncoded();
-    }
+//    public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
+//    	if (this.securityManager == null) {
+//			throw new SecurityNotAvailableException();
+//		}
+//		return this.securityManager.getCertificateEncoded();
+//    }
 
     public Entities getEntities() throws SecurityNotAvailableException {
     	if (this.securityManager == null) {

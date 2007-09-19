@@ -22,25 +22,25 @@
 		<jvms>
 			<jvm name="Jvm2">
 				<creation>
-					<processReference refid="localJVM2" />
+					<processReference refid="localJVM" />
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<processDefinition id="localJVM2">
+			<processDefinition id="localJVM">
 				<jvmProcess
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter
 							value='-Dproactive.runtime.security=descriptors/security/applicationPolicy2.xml' />
-						<!--
+						
 						<parameter
 							value='-Xdebug' />
 						<parameter
 							value='-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8002' />
-							-->
+							
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

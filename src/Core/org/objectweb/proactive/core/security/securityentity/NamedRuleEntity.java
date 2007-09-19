@@ -17,8 +17,8 @@ public class NamedRuleEntity extends RuleEntity {
 	public NamedRuleEntity(EntityType type, KeyStore keystore, String name)
 			throws KeyStoreException {
 		super(type);
-		this.name = name;
-		this.level = KeyStoreTools.getApplicationLevel(keystore) + 1;
+    	this.name = name;
+		this.level = KeyStoreTools.getApplicationLevel(keystore) + levelIncrement();
 	}
 
 	@Override
@@ -33,10 +33,6 @@ public class NamedRuleEntity extends RuleEntity {
 
 	@Override
 	protected Match match(Entity e) {
-		System.out.println(e.getType());
-		System.out.println(this.getType());
-		System.out.println(e.getName());
-		System.out.println(this.name);
 		if (e.getType() == this.getType() && e.getName().equals(this.name)) {
 			return Match.OK;
 		}

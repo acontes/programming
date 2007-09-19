@@ -33,10 +33,10 @@ package org.objectweb.proactive.core.security;
 import java.io.IOException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
@@ -64,16 +64,17 @@ public class InternalBodySecurity implements SecurityEntity {
         this.distantBody.terminateSession(sessionID);
     }
 
-    public X509Certificate getCertificate()
+    public TypedCertificate getCertificate()
         throws SecurityNotAvailableException, IOException {
         return this.distantBody.getCertificate();
     }
 
-    public long startNewSession(SecurityContext policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.distantBody.startNewSession(policy);
-    }
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+			TypedCertificate distantCertificate) throws IOException,
+			SessionException, SecurityNotAvailableException {
+		return this.distantBody.startNewSession(distantSessionID, policy,
+				distantCertificate);
+	}
 
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
@@ -119,21 +120,21 @@ public class InternalBodySecurity implements SecurityEntity {
         return ((UniversalBody) this.distantBody).getRemoteAdapter();
     }
 
-    /**
-     * @return distant object's certificate as byte array
-     */
-    public byte[] getCertificatEncoded()
-        throws SecurityNotAvailableException, IOException {
-        return this.distantBody.getCertificateEncoded();
-    }
+//    /**
+//     * @return distant object's certificate as byte array
+//     */
+//    public byte[] getCertificatEncoded()
+//        throws SecurityNotAvailableException, IOException {
+//        return this.distantBody.getCertificateEncoded();
+//    }
 
     /**
      * @param securityContext
      * @return securityContext with distant object context
      */
-    public SecurityContext getPolicy(Entities from, Entities to)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException, IOException {
-        return this.distantBody.getPolicy(from, to);
+        return this.distantBody.getPolicy(local, distant);
     }
 
     public Entities getEntities()
@@ -141,10 +142,10 @@ public class InternalBodySecurity implements SecurityEntity {
         return this.distantBody.getEntities();
     }
 
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, IOException {
-        return this.distantBody.getCertificateEncoded();
-    }
+//    public byte[] getCertificateEncoded()
+//        throws SecurityNotAvailableException, IOException {
+//        return this.distantBody.getCertificateEncoded();
+//    }
 
 	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
 			throws SecurityNotAvailableException, AccessControlException,

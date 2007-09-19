@@ -146,10 +146,7 @@ public abstract class CertTools {
 		Vector<String> values = new Vector<String>();
 		int index = -1;
 
-		for (int i = 0; i < dNObjects.length; i++) {
-			// log.debug("Looking for "+objects[i]);
-			String object = dNObjects[i];
-
+		for (String object : dNObjects) {
 			while ((index = oldordering.indexOf(object)) != -1) {
 				// log.debug("Found 1 "+object+" at index " + index);
 				DERObjectIdentifier oid = getOid(object);

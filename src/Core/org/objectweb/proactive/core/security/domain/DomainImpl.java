@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.TypedCertificateList;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
@@ -68,9 +69,9 @@ public class DomainImpl implements SecurityDomain {
         }
     }
 
-    public SecurityContext getPolicy(Entities from, Entities to) {
+    public SecurityContext getPolicy(Entities local, Entities distant) {
         try {
-            return this.policyServer.getPolicy(from, to);
+            return this.policyServer.getPolicy(local, distant);
         } catch (SecurityNotAvailableException e) {
             e.printStackTrace();
         }
@@ -104,8 +105,7 @@ public class DomainImpl implements SecurityDomain {
         throws IOException, SecurityNotAvailableException {
     }
 
-    public X509Certificate getCertificate()
-        throws SecurityNotAvailableException {
+    public TypedCertificate getCertificate() {
         return null;
     }
 
@@ -113,7 +113,7 @@ public class DomainImpl implements SecurityDomain {
         return null;
     }
 
-    public long startNewSession(SecurityContext policy) {
+    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate) {
         return 0;
     }
 

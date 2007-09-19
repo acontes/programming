@@ -104,8 +104,10 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.domain.SecurityDomain;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
@@ -855,9 +857,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody).getProActiveSecurityManager();
 
         if (objectSecurityManager != null) {
-            ProActiveSecurityManager nodeSecurityManager = this.nodeMap.get(nodeName)
-                                                                       .getSecurityManager();
-            objectSecurityManager.setParent(nodeSecurityManager);
+            objectSecurityManager.setParent(this.nodeMap.get(nodeName));
         }
 
         ProActiveLogger.getLogger(Loggers.RUNTIME).debug("nodeName " +
@@ -889,11 +889,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(String,
      *      Body)
      */
-    public UniversalBody receiveBody(String nodeName, Body body)
-        throws ProActiveException {
+    public UniversalBody receiveBody(String nodeName, Body body) {
         ProActiveSecurityManager psm = ((AbstractBody) body).getProActiveSecurityManager();
         if (psm != null) {
-            psm.setParent(this.nodeMap.get(nodeName).getSecurityManager());
+            psm.setParent(this.nodeMap.get(nodeName));
         }
 
         registerBody(nodeName, body);
@@ -1108,7 +1107,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * @param sc
      */
-    public SecurityContext getPolicy(Entities from, Entities to)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
@@ -1116,7 +1115,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         PolicyServer policyServer = runtimeSecurityManager.getPolicyServer();
 
-        return policyServer.getPolicy(from, to);
+        return policyServer.getPolicy(local, distant);
     }
 
     public byte[] getClassDataFromParentRuntime(String className)
@@ -1271,7 +1270,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCertificate()
      */
-    public X509Certificate getCertificate()
+    public TypedCertificate getCertificate()
         throws SecurityNotAvailableException {
     	if (runtimeSecurityManager == null) {
     		throw new SecurityNotAvailableException();
@@ -1293,12 +1292,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
-    public long startNewSession(SecurityContext policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+        throws SecurityNotAvailableException, SessionException {
     	if (runtimeSecurityManager == null) {
     		throw new SecurityNotAvailableException();
     	}
-        return runtimeSecurityManager.startNewSession(policy);
+        return runtimeSecurityManager.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
     /*
@@ -1376,17 +1375,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             encodedLockData, parametersSignature);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCertificateEncoded()
-     */
-    public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
-    	if (runtimeSecurityManager == null) {
-    		throw new SecurityNotAvailableException();
-    	}
-        return runtimeSecurityManager.getCertificateEncoded();
-    }
+//    /*
+//     * (non-Javadoc)
+//     *
+//     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCertificateEncoded()
+//     */
+//    public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
+//    	if (runtimeSecurityManager == null) {
+//    		throw new SecurityNotAvailableException();
+//    	}
+//        return runtimeSecurityManager.getCertificateEncoded();
+//    }
 
     public String getVNName(String nodename) throws ProActiveException {
         return this.nodeMap.get(nodename).getVirtualNodeName();

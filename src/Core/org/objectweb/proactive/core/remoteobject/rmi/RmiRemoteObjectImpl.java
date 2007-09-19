@@ -18,7 +18,9 @@ import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
@@ -65,24 +67,24 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         return this.remoteObject.receiveMessage(message);
     }
 
-    public X509Certificate getCertificate()
+    public TypedCertificate getCertificate()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getCertificate();
     }
 
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getCertificateEncoded();
-    }
+//    public byte[] getCertificateEncoded()
+//        throws SecurityNotAvailableException, IOException {
+//        return this.remoteObject.getCertificateEncoded();
+//    }
 
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
     }
 
-    public SecurityContext getPolicy(Entities from, Entities to)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getPolicy(from, to);
+        return this.remoteObject.getPolicy(local, distant);
     }
 
     public PublicKey getPublicKey()
@@ -114,11 +116,12 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
             parametersSignature);
     }
 
-    public long startNewSession(SecurityContext policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.remoteObject.startNewSession(policy);
-    }
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+			TypedCertificate distantCertificate) throws IOException,
+			SessionException, SecurityNotAvailableException {
+		return this.remoteObject.startNewSession(distantSessionID, policy,
+				distantCertificate);
+	}
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {

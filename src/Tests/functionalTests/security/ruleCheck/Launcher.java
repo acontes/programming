@@ -15,7 +15,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import sun.security.provider.PolicyFile;
 
 
-public class Main1 {
+public class Launcher {
     public static void main(String[] args) {
         Policy policy = null;
         String policyFile = System.getProperty("user.dir") + "/dev/security/jaas-cfg/allPerm.policy";
@@ -44,15 +44,43 @@ public class Main1 {
 			SampleObject a = (SampleObject) ProActive.newActive(
 					SampleObject.class.getName(), new Object[] { "A" }, node1);
 
-			ProActiveDescriptor descriptor2 = ProActive
-					.getProactiveDescriptor("descriptors/security/simple2.xml");
-			descriptor2.activateMappings();
-			VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
-			Node node2 = virtualNode2.getNodes()[0];
-			SampleObject b = (SampleObject) ProActive.newActive(
-					SampleObject.class.getName(), new Object[] { "B" }, node2);
+//			ProActiveDescriptor descriptor2 = ProActive
+//					.getProactiveDescriptor("descriptors/security/simple2.xml");
+//			descriptor2.activateMappings();
+//			VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
+//			Node node2 = virtualNode2.getNodes()[0];
+//			SampleObject b = (SampleObject) ProActive.newActive(
+//					SampleObject.class.getName(), new Object[] { "B" }, node2);
+//
+//			ProActiveDescriptor descriptor3 = ProActive
+//					.getProactiveDescriptor("descriptors/security/simple3.xml");
+//			descriptor3.activateMappings();
+//			VirtualNode virtualNode3 = descriptor3.getVirtualNode("vn3");
+//			Node node3 = virtualNode3.getNodes()[0];
+//			SampleObject c = (SampleObject) ProActive.newActive(
+//					SampleObject.class.getName(), new Object[] { "C" }, node3);
 
-            a.makeTargetDoSomething(b);
+			System.out.println(a.makeTargetDoSomething(a));
+//            System.out.println("==");
+//            System.out.println(a.makeTargetDoSomething(b));
+//            System.out.println("==");
+//            System.out.println(a.makeTargetDoSomething(c));
+            
+//            System.out.println("//////////////////");
+            
+//            System.out.println(b.makeTargetDoSomething(a));
+//            System.out.println("==");
+//            b.makeTargetDoSomething(b);
+//            System.out.println("==");
+//            System.out.println(b.makeTargetDoSomething(c));
+            
+//            System.out.println("//////////////////");
+            
+//            System.out.println(c.makeTargetDoSomething(a));
+//            System.out.println("==");
+//            System.out.println(c.makeTargetDoSomething(b));
+//            System.out.println("==");
+//            c.makeTargetDoSomething(c);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

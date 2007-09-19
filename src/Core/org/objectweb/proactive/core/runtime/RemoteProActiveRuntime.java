@@ -54,6 +54,8 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.SecurityEntity;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
@@ -72,7 +74,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-public interface RemoteProActiveRuntime extends Serializable {
+public interface RemoteProActiveRuntime extends Serializable, SecurityEntity {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     public String createLocalNode(String nodeName,
@@ -180,45 +182,45 @@ public interface RemoteProActiveRuntime extends Serializable {
     public ProActiveDescriptorInternal getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException;
 
-    //
-    // -- Security
-    //
-    public X509Certificate getCertificate()
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public long startNewSession(SecurityContext policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            java.io.IOException;
-
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            java.io.IOException;
-
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, java.io.IOException;
-
-    byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            java.io.IOException;
-
-    public SecurityContext getPolicy(Entities from, Entities to)
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public Entities getEntities()
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public void terminateSession(long sessionID)
-        throws java.io.IOException, SecurityNotAvailableException;
+//    //
+//    // -- Security
+//    //
+//    public TypedCertificate getCertificate()
+//        throws SecurityNotAvailableException, java.io.IOException;
+//
+//    public long startNewSession(SecurityContext policy, TypedCertificate distantCertificate)
+//        throws SecurityNotAvailableException, RenegotiateSessionException,
+//            java.io.IOException;
+//
+//    public PublicKey getPublicKey()
+//        throws SecurityNotAvailableException, java.io.IOException;
+//
+//    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+//        throws SecurityNotAvailableException, RenegotiateSessionException,
+//            java.io.IOException;
+//
+//    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+//        byte[] myCertificate, byte[] signature)
+//        throws SecurityNotAvailableException, RenegotiateSessionException,
+//            KeyExchangeException, java.io.IOException;
+//
+//    byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+//        byte[] encodedIVParameters, byte[] encodedClientMacKey,
+//        byte[] encodedLockData, byte[] parametersSignature)
+//        throws SecurityNotAvailableException, RenegotiateSessionException,
+//            java.io.IOException;
+//
+//    public SecurityContext getPolicy(Entities from, Entities to)
+//        throws SecurityNotAvailableException, java.io.IOException;
+//
+//    public byte[] getCertificateEncoded()
+//        throws SecurityNotAvailableException, java.io.IOException;
+//
+//    public Entities getEntities()
+//        throws SecurityNotAvailableException, java.io.IOException;
+//
+//    public void terminateSession(long sessionID)
+//        throws java.io.IOException, SecurityNotAvailableException;
 
     public Object setLocalNodeProperty(String nodeName, String key, String value)
         throws IOException, ProActiveException;

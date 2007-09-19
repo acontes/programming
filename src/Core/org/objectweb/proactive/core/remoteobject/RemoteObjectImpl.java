@@ -50,7 +50,9 @@ import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
@@ -104,7 +106,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
     }
 
     // implements SecurityEntity ----------------------------------------------
-    public X509Certificate getCertificate()
+    public TypedCertificate getCertificate()
         throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getCertificate();
@@ -112,13 +114,13 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, IOException {
-        if (this.psm != null) {
-            return this.psm.getCertificateEncoded();
-        }
-        throw new SecurityNotAvailableException();
-    }
+//    public byte[] getCertificateEncoded()
+//        throws SecurityNotAvailableException, IOException {
+//        if (this.psm != null) {
+//            return this.psm.getCertificateEncoded();
+//        }
+//        throw new SecurityNotAvailableException();
+//    }
 
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
@@ -128,12 +130,12 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public SecurityContext getPolicy(Entities from, Entities to)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException {
         if (this.psm == null) {
         	throw new SecurityNotAvailableException();
         }
-        return this.psm.getPolicy(from, to);
+        return this.psm.getPolicy(local, distant);
     }
 
     public PublicKey getPublicKey()
@@ -177,11 +179,10 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public long startNewSession(SecurityContext policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+        throws SecurityNotAvailableException, SessionException {
         if (this.psm != null) {
-            return this.psm.startNewSession(policy);
+            return this.psm.startNewSession(distantSessionID, policy, distantCertificate);
         }
         throw new SecurityNotAvailableException();
     }

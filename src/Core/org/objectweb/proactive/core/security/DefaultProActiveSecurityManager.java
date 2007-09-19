@@ -31,24 +31,26 @@
 package org.objectweb.proactive.core.security;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
-import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -61,20 +63,14 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
 	private static final long serialVersionUID = -6885646803779608858L;
 	private transient Logger logger;
 
-    public DefaultProActiveSecurityManager(EntityType type) {
-        super(type);
-        //	Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-        //      Security.addProvider(myProvider);
-        //		  Security.insertProviderAt(myProvider, 0);
-    }
-
-    public DefaultProActiveSecurityManager(EntityType type, String vide)
+    
+    public DefaultProActiveSecurityManager(EntityType type)
         throws Exception {
-        super(type, vide);
-        this.sessions = new Hashtable<Long, Session>();
+        super(type, new DefaultPolicyServer());
+        
         this.logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
-        Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+        Provider myProvider = new BouncyCastleProvider();
         Security.addProvider(myProvider);
 
         /* generation of a default certificate */
@@ -87,15 +83,15 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
 
         keyPair = keyPairGen.generateKeyPair();
 
-        // privateKey = keyPair.getPrivate();
-        //publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+        PublicKey publicKey = keyPair.getPublic();
         X509V3CertificateGenerator certifGenerator = new X509V3CertificateGenerator();
 
         X509Certificate certif = null;
 
         DateFormat convert = DateFormat.getDateInstance();
 
-        //certifGenerator.setPublicKey(publicKey);
+        certifGenerator.setPublicKey(publicKey);
         String subjectCN = "CN=Generic Certificate" + new Random().nextLong() +
             ", OU=Generic Certificate, EmailAddress=none";
 
@@ -115,30 +111,13 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
 
         certifGenerator.setNotAfter(stop);
         certifGenerator.setNotBefore(start);
-        //  certifGenerator.setPublicKey(publicKey);
+          certifGenerator.setPublicKey(publicKey);
         certifGenerator.setSerialNumber(new BigInteger("1"));
 
-        //certificate = certifGenerator.generateX509Certificate(privateKey, "BC");
-        // byte[] t = certificate.getEncoded();
-        // certificate = ProActiveSecurity.decodeCertificate(t);
-        // System.out.println("Generic certificate created " + certificate.getSubjectDN());
-        //  new RuntimeException().printStackTrace();
-        //   System.out.println("******************** instantiated DefaultPSM ao Thread " + Thread.currentThread().getName() + "******************");
-        // throw new SecurityException();
+        X509Certificate certificate = certifGenerator.generate(privateKey, "BC");
     }
 
-//    public PolicyRule getPolicyTo(X509Certificate certificate) {
-//        //   logger.info("asked for my policy TO, replied default policy");
-//        return new PolicyRule();
-//    }
-
-//    @Override
-//    public Communication getPolicyTo(String type, String from, String to) {
-//        //   logger.info("asked for my policy TO, replied default policy");
-//        return new Communication();
-//    }
-
-    private void readObject(java.io.ObjectInputStream in)
+    private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 

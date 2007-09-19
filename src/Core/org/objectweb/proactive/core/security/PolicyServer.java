@@ -44,19 +44,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.security.Communication.Authorization;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.security.securityentity.RuleEntities;
-import org.objectweb.proactive.core.security.securityentity.RuleEntity;
 import org.objectweb.proactive.core.security.securityentity.RuleEntity.Match;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -73,14 +70,11 @@ public class PolicyServer implements Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = 6881821067929081660L;
 	static Logger log = ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER);
-//    private static int REQUIRED = 1;
-//    private static int DENIED = -1;
-//    private static int OPTIONAL = 0;
-    protected List<PolicyRule> policyRules;
-    protected RuleEntities accessAuthorizations;
-    protected String policyRulesFileLocation;
-    protected String applicationName;
-    protected SerializableKeyStore keyStore;
+    private List<PolicyRule> policyRules;
+    private RuleEntities accessAuthorizations;
+    private String policyRulesFileLocation;
+    private String applicationName;
+    private SerializableKeyStore keyStore;
 
     public PolicyServer() {
         ProActiveSecurity.loadProvider();
@@ -94,8 +88,8 @@ public class PolicyServer implements Serializable, Cloneable {
     public PolicyServer(PolicyRule[] policyRules) {
     	this();
         this.policyRules = new ArrayList<PolicyRule>();
-        for (int i = 0; i < policyRules.length; i++) {
-            this.policyRules.add(policyRules[i]);
+        for (PolicyRule element : policyRules) {
+            this.policyRules.add(element);
         }
     }
 
@@ -110,21 +104,8 @@ public class PolicyServer implements Serializable, Cloneable {
         this.keyStore = new SerializableKeyStore(keyStore);
     }
 
-//    private int convert(String name) {
-//        if (name.equals("required") || name.equals("allowed") ||
-//                name.equals("authorized")) {
-//            return REQUIRED;
-//        } else if (name.equals("denied")) {
-//            return DENIED;
-//        } else {
-//            return OPTIONAL;
-//        }
-//    }
-
-    public SecurityContext getPolicy(Entities entitiesFrom, Entities entitiesTo)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException {
-//        Entities entitiesFrom = securityContext.getEntitiesFrom();
-//        Entities entitiesTo = securityContext.getEntitiesTo();
 
         if (this.policyRules == null) {
             ProActiveLogger.getLogger(Loggers.SECURITY_POLICY)
@@ -135,9 +116,9 @@ public class PolicyServer implements Serializable, Cloneable {
 
         if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
                                .isDebugEnabled()) {
-            String s = "================================\nFrom : " +
-                entitiesFrom.toString();
-            s += ("\nTo : " + entitiesTo.toString());
+            String s = "================================\nLocal : " +
+            local.toString();
+            s += ("\nDistant : " + distant.toString());
             ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
                            .debug(s + "\n=================================\n");
         }
@@ -148,21 +129,35 @@ public class PolicyServer implements Serializable, Cloneable {
             // testing if <From> tag matches <From> entities
             RuleEntities policyEntitiesFrom = policy.getEntitiesFrom();
 
-            Match matchingFrom = policyEntitiesFrom.match(entitiesFrom);
-            System.out.println("=\n" + matchingFrom + "\n=");
+            Match matchingFrom = policyEntitiesFrom.match(local);
             
             // testing if <To> tag matches <To> entities
             RuleEntities policyEntitiesTo = policy.getEntitiesTo();
 
-            Match matchingTo = policyEntitiesTo.match(entitiesTo);
+            Match matchingTo = policyEntitiesTo.match(distant);
 
             //
             if ((matchingFrom != Match.FAILED) &&
                     (matchingTo != Match.FAILED)) {
                 matchingRules.add(policy);
+            } else {
+            	// check if the rule apply by switching from/to
+            	matchingFrom = policyEntitiesFrom.match(distant);
+            	matchingTo = policyEntitiesTo.match(local);
+            	
+            	if ((matchingFrom != Match.FAILED) &&
+                        (matchingTo != Match.FAILED)) {
+            		PolicyRule newPolicy = new PolicyRule(policy);
+            		newPolicy.setCommunicationRulesRequest(policy.getCommunicationReply());
+            		newPolicy.setCommunicationRulesReply(policy.getCommunicationRequest());
+            		newPolicy.setEntitiesFrom(policy.getEntitiesTo());
+            		newPolicy.setEntitiesTo(policy.getEntitiesFrom());
+            		matchingRules.add(newPolicy);
+            	}
+
             }
         }
-
+        
         // getting the most specific rule(s)
         List<PolicyRule> applicableRules = new ArrayList<PolicyRule>();
         for (PolicyRule matchingPolicy : matchingRules) {
@@ -199,6 +194,8 @@ public class PolicyServer implements Serializable, Cloneable {
                 }
             }
         }
+        
+        
 
         // resolving the applicable rules
         PolicyRule matchingPolicy;
@@ -213,80 +210,15 @@ public class PolicyServer implements Serializable, Cloneable {
                        .debug("Found Policy : " + matchingPolicy);
 
         
-        SecurityContext sc = new SecurityContext(entitiesFrom, entitiesTo,
+        return new SecurityContext(local, distant,
 				matchingPolicy.getCommunicationRequest(), matchingPolicy
 						.getCommunicationReply(),
 				matchingPolicy.isAocreation(), matchingPolicy.isMigration());
-
-        return sc;
     }
-
-//    @Deprecated
-//    public Communication getPolicyTo(String type, String virtualNodeFrom,
-//        String virtualNodeTo) throws SecurityNotAvailableException {
-//        // if (p == null) {
-//        // logger.debug("SEcurityNamfndjdhuidss crac r cd boium");
-//        // throw new SecurityNotAvailableException();
-//        // }
-//        if (true) {
-//            throw new RuntimeException("DEPRECATED METHOD : UPDATE !!!");
-//        }
-//        return null;
-//    }
     
     public List<PolicyRule> getPolicies() {
     	return this.policyRules;
     }
-
-//    public int[] computePolicy(int[] from, int[] to)
-//        throws ComputePolicyException {
-//        // logger.info("calculating composed policy");
-//        if (((from[0] == REQUIRED) && (to[0] == DENIED)) ||
-//                ((from[1] == REQUIRED) && (to[1] == DENIED)) ||
-//                ((from[2] == REQUIRED) && (to[2] == DENIED)) ||
-//                ((from[0] == DENIED) && (to[0] == REQUIRED)) ||
-//                ((from[1] == DENIED) && (to[1] == REQUIRED)) ||
-//                ((from[2] == DENIED) && (to[2] == REQUIRED))) {
-//            throw new ComputePolicyException("incompatible policies");
-//        }
-//
-//        return new int[] { from[0] + to[0], from[1] + to[1], from[2] + to[2] };
-//    }
-
-    public boolean CanSendRequestTo(X509Certificate distantOA) {
-        return false;
-    }
-
-    public boolean CanReceiveRequestFrom(X509Certificate distantOA) {
-        return false;
-    }
-
-    public boolean CanSendReplyTo(X509Certificate distantOA) {
-        return false;
-    }
-
-    public boolean CanReceiveReplyFrom(X509Certificate distantOA) {
-        return false;
-    }
-
-    public boolean CanMigrateTo(X509Certificate distantOA) {
-        return false;
-    }
-
-//    public boolean canMigrateTo(String type, String from, String to) {
-//        try {
-//            System.out.println("Migration from " + from + "to" + to);
-//            ArrayList<Entity> arrayFrom = new ArrayList<Entity>();
-//            ArrayList<Entity> arrayTo = new ArrayList<Entity>();
-//
-//            SecurityContext sc = new SecurityContext(SecurityContext.MIGRATION_TO,
-//                    arrayFrom, arrayTo);
-//            return getPolicy(sc).isMigration();
-//        } catch (SecurityNotAvailableException e) {
-//            // no security all is permitted
-//            return true;
-//        }
-//    }
     
     public void setAccessAuthorization(RuleEntities entities) {
     	this.accessAuthorizations = entities;
@@ -315,58 +247,6 @@ public class PolicyServer implements Serializable, Cloneable {
 
         return s;
     }
-
-//    // implements Serializable
-//    private void writeObject(java.io.ObjectOutputStream out)
-//        throws IOException {
-//        if (this.keyStore != null) {
-//            try {
-//                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-//
-//                keyStore.store(bout, "ha".toCharArray());
-//                encodedKeyStore = bout.toByteArray();
-//                keyStore = null;
-//                bout.close();
-//            } catch (CertificateEncodingException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } catch (KeyStoreException e) {
-//                // TODO SECURITYSECURITY Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (NoSuchAlgorithmException e) {
-//                // TODO SECURITYSECURITY Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (CertificateException e) {
-//                // TODO SECURITYSECURITY Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//        }
-//        out.defaultWriteObject();
-//    }
-//
-//    private void readObject(java.io.ObjectInputStream in)
-//        throws IOException, ClassNotFoundException {
-//        in.defaultReadObject();
-//        if (this.encodedKeyStore != null) {
-//            try {
-//                this.keyStore = KeyStore.getInstance("PKCS12", "BC");
-//                this.keyStore.load(new ByteArrayInputStream(
-//                        this.encodedKeyStore), "ha".toCharArray());
-//                this.encodedKeyStore = null;
-//            } catch (KeyStoreException e) {
-//                e.printStackTrace();
-//            } catch (NoSuchProviderException e) {
-//                e.printStackTrace();
-//            } catch (NoSuchAlgorithmException e) {
-//                e.printStackTrace();
-//            } catch (CertificateException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     /**
      * @param policies
@@ -495,9 +375,6 @@ public class PolicyServer implements Serializable, Cloneable {
         return this.keyStore.getKeyStore();
     }
 
-    // public void setKeyStore(KeyStore keyStore) {
-    // this.keyStore = keyStore;
-    // }
     public void setPKCS12Keystore(String pkcs12Keystore) {
         try {
             KeyStore keyStore = KeyStore.getInstance("PKCS12", "BC");
@@ -517,5 +394,35 @@ public class PolicyServer implements Serializable, Cloneable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+	public TypedCertificate getCertificate() {
+		try {
+			return KeyStoreTools.getSelfCertificate(getKeyStore());
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		} catch (UnrecoverableKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+    public TypedCertificateList getMyCertificateChain(EntityType type) {
+        try {
+            return KeyStoreTools.getSelfCertificateChain(getKeyStore(), type);
+        } catch (KeyStoreException e) {
+			e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
     }
 }

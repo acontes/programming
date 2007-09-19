@@ -34,9 +34,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
@@ -56,7 +56,7 @@ public interface SecurityEntity extends Serializable {
      * @throws SecurityNotAvailableException if security is not available
      * @throws java.io.IOException if communication fails
      */
-    public X509Certificate getCertificate()
+    public TypedCertificate getCertificate()
         throws SecurityNotAvailableException, IOException;
 
     /**
@@ -65,10 +65,11 @@ public interface SecurityEntity extends Serializable {
      * @return session ID
      * @throws SecurityNotAvailableException if security is not available
      * @throws RenegotiateSessionException if the session immediatly expires
+     * @throws SessionException 
+     * @throws SecurityNotAvailableException 
      */
-    public long startNewSession(SecurityContext policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException;
+    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+        throws SessionException, SecurityNotAvailableException, IOException;
 
     /**
      * entity public key
@@ -140,15 +141,15 @@ public interface SecurityEntity extends Serializable {
      * @return securityContext filled with this entity's policy
      * @throws SecurityNotAvailableException thrown the entity doest not support the security
      */
-    public SecurityContext getPolicy(Entities from, Entities to)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException, IOException;
 
-    /**
-     * Entity's X509Certificate as byte array
-     * @return entity's X509Certificate as byte array
-     */
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, IOException;
+//    /**
+//     * Entity's X509Certificate as byte array
+//     * @return entity's X509Certificate as byte array
+//     */
+//    public byte[] getCertificateEncoded()
+//        throws SecurityNotAvailableException, IOException;
 
     /**
      * Retrieves all the entity's ID which contain this entity plus this entity ID.

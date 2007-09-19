@@ -685,7 +685,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         public void sendRequest(MethodCall methodCall, Future future,
             UniversalBody destinationBody)
-            throws java.io.IOException, RenegotiateSessionException {
+            throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             Request request = this.internalRequestFactory.newRequest(methodCall,
                     BodyImpl.this, future == null, sequenceID);
@@ -720,28 +720,27 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                                 destinationBody.getNodeURL(),
                                 methodCall.getName(), -1));
                     }
-                }
-            }
+				}
+			}
 
-            // END JMX Notification
+			// END JMX Notification
 
-            // FAULT TOLERANCE
-            try {
+			// FAULT TOLERANCE
             if (BodyImpl.this.ftmanager != null) {
-                BodyImpl.this.ftmanager.sendRequest(request, destinationBody);
+            	BodyImpl.this.ftmanager.sendRequest(request,
+            			destinationBody);
             } else {
-                request.send(destinationBody);
+            	request.send(destinationBody);
             }
-            } catch (CommunicationForbiddenException cfe) {
-            	System.out.println("Communication forbidden.");
-            	cfe.printStackTrace();
-            }
-        }
+		}
 
         /**
-         * Returns a unique identifier that can be used to tag a future, a request
-         * @return a unique identifier that can be used to tag a future, a request.
-         */
+		 * Returns a unique identifier that can be used to tag a future, a
+		 * request
+		 * 
+		 * @return a unique identifier that can be used to tag a future, a
+		 *         request.
+		 */
         public synchronized long getNextSequenceID() {
             return BodyImpl.this.bodyID.toString().hashCode() +
             ++this.absoluteSequenceID;

@@ -45,9 +45,9 @@ public class SecurityContext implements Serializable {
 	 */
 	private static final long serialVersionUID = -3210156951283073478L;
 
-	private Entities entitiesFrom;
+	private Entities entitiesLocal;
 
-	private Entities entitiesTo;
+	private Entities entitiesDistant;
 
 	private Communication sendRequest;
 
@@ -61,11 +61,11 @@ public class SecurityContext implements Serializable {
 		// serializable
 	}
 
-	public SecurityContext(Entities entitiesFrom, Entities entitiesTo,
+	public SecurityContext(Entities local, Entities distant,
 			Communication sendRequest, Communication sendReply,
 			boolean aoCreation, boolean migration) {
-		this.entitiesFrom = entitiesFrom;
-		this.entitiesTo = entitiesTo;
+		this.entitiesLocal = local;
+		this.entitiesDistant = distant;
 		this.sendReply = sendReply;
 		this.sendRequest = sendRequest;
 		this.aoCreation = aoCreation;
@@ -75,15 +75,15 @@ public class SecurityContext implements Serializable {
 	/**
 	 * @return entities of the 'from' objects
 	 */
-	public Entities getEntitiesFrom() {
-		return this.entitiesFrom;
+	public Entities getEntitiesLocal() {
+		return this.entitiesLocal;
 	}
 
 	/**
 	 * @return entities of the 'to' objects
 	 */
-	public Entities getEntitiesTo() {
-		return this.entitiesTo;
+	public Entities getEntitiesDistant() {
+		return this.entitiesDistant;
 	}
 
 	/**
@@ -126,15 +126,15 @@ public class SecurityContext implements Serializable {
 	}
 	
 	public SecurityContext otherSideContext() {
-		return new SecurityContext(this.getEntitiesTo(), this.getEntitiesTo(),
+		return new SecurityContext(this.getEntitiesDistant(), this.getEntitiesLocal(),
 				this.getSendReply(), this.getSendRequest(),
 				this.isAoCreation(), this.isMigration());
 	}
 	
 	public static SecurityContext computeContext(SecurityContext from,
 			SecurityContext to) {
-		return new SecurityContext(from.getEntitiesFrom(),
-				from.getEntitiesTo(), Communication.computeCommunication(from
+		return new SecurityContext(from.getEntitiesLocal(),
+				from.getEntitiesDistant(), Communication.computeCommunication(from
 						.getSendRequest(), to.getReceiveRequest()),
 				Communication.computeCommunication(from.getSendReply(), to
 						.getReceiveReply()), from.isAoCreation()
@@ -144,12 +144,26 @@ public class SecurityContext implements Serializable {
 	
 	public static SecurityContext mergeContexts(SecurityContext thees,
 			SecurityContext that) {
-		return new SecurityContext(thees.getEntitiesFrom(),
-				thees.getEntitiesTo(), Communication.computeCommunication(thees
+		return new SecurityContext(thees.getEntitiesLocal(),
+				thees.getEntitiesDistant(), Communication.computeCommunication(thees
 						.getSendRequest(), that.getSendRequest()),
 				Communication.computeCommunication(thees.getSendReply(), that
 						.getSendReply()), thees.isAoCreation()
 						&& that.isAoCreation(), thees.isMigration()
 						&& that.isMigration());
+	}
+	
+	@Override
+	public String toString() {
+		String s = new String();
+		s += "Context :";
+		s += "\n\tLocal : " + this.entitiesLocal.toString();
+		s += "\n\tDistant : " + this.entitiesDistant.toString();
+		s += "\n\tRequest : " + this.sendRequest.toString();
+		s += "\n\tReply : " + this.sendReply.toString();
+		s += "\n\tAOCreation : " + this.aoCreation;
+		s += "\n\tMigration : " + this.migration;
+		
+		return s;
 	}
 }

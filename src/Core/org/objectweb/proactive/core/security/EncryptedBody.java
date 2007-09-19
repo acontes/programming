@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
@@ -268,8 +267,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getCertificate()
      */
-    public X509Certificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
+    public TypedCertificate getCertificate() {
         return null;
     }
 
@@ -284,7 +282,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
-    public long startNewSession(SecurityContext policy) {
+    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate) {
         return 0;
     }
 
@@ -343,7 +341,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
      */
-    public SecurityContext getPolicy(Entities from, Entities to) {
+    public SecurityContext getPolicy(Entities local, Entities distant) {
         return null;
     }
 

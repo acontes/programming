@@ -22,7 +22,9 @@ import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
@@ -171,24 +173,24 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         target.removeNFEListener(listener);
     }
 
-    public X509Certificate getCertificate()
+    public TypedCertificate getCertificate()
         throws SecurityNotAvailableException, IOException {
         return target.getCertificate();
     }
 
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, IOException {
-        return target.getCertificateEncoded();
-    }
+//    public byte[] getCertificateEncoded()
+//        throws SecurityNotAvailableException, IOException {
+//        return target.getCertificateEncoded();
+//    }
 
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return target.getEntities();
     }
 
-    public SecurityContext getPolicy(Entities from, Entities to)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException, IOException {
-        return target.getPolicy(from, to);
+        return target.getPolicy(local, distant);
     }
 
     public PublicKey getPublicKey()
@@ -220,10 +222,10 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
             parametersSignature);
     }
 
-    public long startNewSession(SecurityContext policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return target.startNewSession(policy);
+    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+        throws SecurityNotAvailableException, IOException, SessionException
+             {
+        return target.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
     public void terminateSession(long sessionID)
