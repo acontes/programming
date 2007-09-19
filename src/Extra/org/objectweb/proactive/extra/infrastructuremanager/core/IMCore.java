@@ -93,8 +93,8 @@ public class IMCore implements InitActive, IMConstants, Serializable {
 
     public IMCore(Node nodeIM)
         throws ActiveObjectCreationException, NodeException {
-        if (logger.isInfoEnabled()) {
-            logger.info("IMCore constructor");
+        if (logger.isDebugEnabled()) {
+            logger.debug("IMCore constructor");
         }
         this.nodeIM = nodeIM;
     }
@@ -107,30 +107,30 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @param body
      */
     public void initActivity(Body body) {
-        if (logger.isInfoEnabled()) {
-            logger.info("IMCore start : initActivity");
+        if (logger.isDebugEnabled()) {
+            logger.debug("IMCore start : initActivity");
         }
         try {
-            if (logger.isInfoEnabled()) {
-                logger.info("active object IMAdmin");
+            if (logger.isDebugEnabled()) {
+                logger.debug("active object IMAdmin");
             }
             admin = (IMAdminImpl) ProActive.newActive(IMAdminImpl.class.getName(),
                     new Object[] { ProActive.getStubOnThis() }, nodeIM);
 
-            if (logger.isInfoEnabled()) {
-                logger.info("active object IMMonitoring");
+            if (logger.isDebugEnabled()) {
+                logger.debug("active object IMMonitoring");
             }
             monitoring = (IMMonitoringImpl) ProActive.newActive(IMMonitoringImpl.class.getName(),
                     new Object[] { ProActive.getStubOnThis() }, nodeIM);
 
-            if (logger.isInfoEnabled()) {
-                logger.info("active object IMUser");
+            if (logger.isDebugEnabled()) {
+                logger.debug("active object IMUser");
             }
             user = (IMUserImpl) ProActive.newActive(IMUserImpl.class.getName(),
                     new Object[] { ProActive.getStubOnThis() }, nodeIM);
 
-            if (logger.isInfoEnabled()) {
-                logger.info("instanciation IMDataResourceImpl");
+            if (logger.isDebugEnabled()) {
+                logger.debug("instanciation IMDataResourceImpl");
             }
             this.nodeManager = new IMNodeSourceManager("NSManager", nodeIM);
             this.dataresource = new IMDataResourceImpl(nodeManager);
@@ -144,8 +144,8 @@ public class IMCore implements InitActive, IMConstants, Serializable {
         } catch (NodeException e) {
             e.printStackTrace();
         }
-        if (logger.isInfoEnabled()) {
-            logger.info("IMCore end : initActivity");
+        if (logger.isDebugEnabled()) {
+            logger.debug("IMCore end : initActivity");
         }
     }
 
@@ -183,8 +183,8 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @param padName : the name of the proactive descriptor
      */
     public void addNode(Node node, String vnName, String padName) {
-        if (logger.isInfoEnabled()) {
-            logger.info("IMCore - addNode : node=" +
+        if (logger.isDebugEnabled()) {
+            logger.debug("IMCore - addNode : node=" +
                 node.getNodeInformation().getName() + "\t\t vnName=" + vnName +
                 "\t\t padName=" + padName);
         }

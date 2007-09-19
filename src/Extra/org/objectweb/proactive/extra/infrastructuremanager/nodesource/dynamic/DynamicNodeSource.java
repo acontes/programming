@@ -332,11 +332,18 @@ public abstract class DynamicNodeSource extends IMNodeSource
                 niceTimes.add(System.currentTimeMillis() + nice);
                 break;
             }
-            logger.info("new node from Dynamic source : " + node.getNodeName() +
-                " (total = " + (nodes.size() + 1) + ")");
             nodes.put(node, currentTime + ttr);
             freeNodes.add(node);
             niceTimes.extract();
+            // log
+            try {
+                logger.info("[DYNAMIC SOURCE] get new node : " +
+                    node.getNodeInformation().getURL() + " (total = " +
+                    nodes.size() + ") while MAX is " + nbMax);
+            } catch (NodeException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

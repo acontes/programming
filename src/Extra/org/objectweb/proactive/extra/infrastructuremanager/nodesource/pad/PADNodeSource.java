@@ -235,7 +235,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
                 if (imnode.getPADName().equals(padName) &&
                         imnode.getVNodeName().equals(vnode.getName())) {
                     if (logger.isInfoEnabled()) {
-                        logger.info("remove node : " + imnode.getNodeName());
+                        logger.info("remove node : " + imnode.getNodeURL());
                     }
                     toRemove.add(imnode);
                 }
@@ -383,7 +383,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
             IMNode imnode = iterator.next();
             if (imnode.getPADName().equals(padName)) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("remove node : " + imnode.getNodeName());
+                    logger.info("remove node : " + imnode.getNodeURL());
                 }
                 toRemove.add(imnode);
             }
@@ -399,7 +399,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
             if (imnode.getPADName().equals(padName) &&
                     imnode.getVNodeName().equals(vnName)) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("remove node : " + imnode.getNodeName());
+                    logger.info("remove node : " + imnode.getNodeURL());
                 }
                 toRemove.add(imnode);
             }

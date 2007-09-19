@@ -124,8 +124,8 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
      * @param node
      */
     public void freeNode(Node node) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Node freed : " + node.getNodeInformation().getURL());
+        if (logger.isInfoEnabled()) {
+            logger.info("Node freed : " + node.getNodeInformation().getURL());
         }
         user.freeNode(node);
     }

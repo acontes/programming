@@ -59,7 +59,7 @@ public class SimpleTestIMMonitoring {
         mes += (imnode.getVNodeName() + " - ");
         mes += (imnode.getHostName() + " - ");
         mes += (imnode.getDescriptorVMName() + " - ");
-        mes += (imnode.getNodeName() + ".\n");
+        mes += (imnode.getNodeURL() + ".\n");
         return mes;
     }
 
@@ -149,7 +149,7 @@ public class SimpleTestIMMonitoring {
         System.out.println("\t+-- " + imnode.getVNodeName());
         System.out.println("\t\t+-- " + imnode.getHostName());
         System.out.println("\t\t\t+-- " + imnode.getDescriptorVMName());
-        System.out.print("\t\t\t\t+-- " + imnode.getNodeName());
+        System.out.print("\t\t\t\t+-- " + imnode.getNodeURL());
         try {
             if (imnode.isFree()) {
                 System.out.println(" \tfree");
@@ -186,7 +186,7 @@ public class SimpleTestIMMonitoring {
                     imnode2.getDescriptorVMName());
                 change = true;
             }
-            System.out.print("\t\t\t\t+-- " + imnode2.getNodeName());
+            System.out.print("\t\t\t\t+-- " + imnode2.getNodeURL());
             try {
                 if (imnode2.isFree()) {
                     System.out.println(" \tfree");

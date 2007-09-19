@@ -59,8 +59,8 @@ public class IMMonitoringImpl implements IMMonitoring {
     }
 
     public IMMonitoringImpl(IMCore imcore) {
-        if (logger.isInfoEnabled()) {
-            logger.info("IMMonitoring constructor");
+        if (logger.isDebugEnabled()) {
+            logger.debug("IMMonitoring constructor");
         }
         this.imcore = imcore;
     }
@@ -72,50 +72,50 @@ public class IMMonitoringImpl implements IMMonitoring {
 
     // =======================================================//
     public HashMap<String, ProActiveDescriptor> getListDescriptor() {
-        if (logger.isInfoEnabled()) {
-            logger.info("getListDescriptor");
+        if (logger.isDebugEnabled()) {
+            logger.debug("getListDescriptor");
         }
         return imcore.getListPAD();
     }
 
     public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
-        if (logger.isInfoEnabled()) {
-            logger.info("getDeployedVirtualNodeByPad");
+        if (logger.isDebugEnabled()) {
+            logger.debug("getDeployedVirtualNodeByPad");
         }
         return imcore.getDeployedVirtualNodeByPad();
     }
 
     public ArrayList<IMNode> getListAllIMNodes() {
-        if (logger.isInfoEnabled()) {
-            logger.info("getListAllIMNodes");
+        if (logger.isDebugEnabled()) {
+            logger.debug("getListAllIMNodes");
         }
         return imcore.getListAllNodes();
     }
 
     public ArrayList<IMNode> getListFreeIMNode() {
-        if (logger.isInfoEnabled()) {
-            logger.info("getListFreeIMNode");
+        if (logger.isDebugEnabled()) {
+            logger.debug("getListFreeIMNode");
         }
         return imcore.getListFreeIMNode();
     }
 
     public ArrayList<IMNode> getListBusyIMNode() {
-        if (logger.isInfoEnabled()) {
-            logger.info("getListBusyIMNode");
+        if (logger.isDebugEnabled()) {
+            logger.debug("getListBusyIMNode");
         }
         return imcore.getListBusyIMNode();
     }
 
     public IntWrapper getNumberOfFreeResource() {
-        if (logger.isInfoEnabled()) {
-            logger.info("getNumberOfFreeResource");
+        if (logger.isDebugEnabled()) {
+            logger.debug("getNumberOfFreeResource");
         }
         return imcore.getSizeListFreeIMNode();
     }
 
     public IntWrapper getNumberOfBusyResource() {
-        if (logger.isInfoEnabled()) {
-            logger.info("getNumberOfBusyResource");
+        if (logger.isDebugEnabled()) {
+            logger.debug("getNumberOfBusyResource");
         }
         return imcore.getSizeListBusyIMNode();
     }

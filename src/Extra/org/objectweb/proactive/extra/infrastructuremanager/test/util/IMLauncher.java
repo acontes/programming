@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 
-import java.io.File;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
 
 
 public class IMLauncher {
@@ -50,20 +50,35 @@ public class IMLauncher {
         IMFactory.startLocal();
         IMAdmin admin = IMFactory.getAdmin();
 
-        //		DynamicNodeSource d = (DynamicNodeSource) ProActive.newActive(DummyNodeSource.class.getCanonicalName(),
-        //				new Object[] { "PAD - Dummy", 10, 3000, 30000 });
-        //		admin.addDynamicNodeSources(d);
+        DynamicNodeSource d = (DynamicNodeSource) ProActive.newActive(P2PNodeSource.class.getCanonicalName(),
+                new Object[] { "Nodes on P2P", 3, 3000, 30000 });
+        admin.addDynamicNodeSources(d);
 
-        //        IMUser user = IMFactory.getUser();
-        //        IMMonitoring monitor = IMFactory.getMonitoring();
-        admin.deployAllVirtualNodes(new File("/user/jmartin/home/test.xml"),
-            null);
+        //TEST
+        //		Vector<String> v = new Vector<String>();
+        //        v.add("//lo.inria.fr:6695/");
+        //        StartP2PService startServiceP2P = new StartP2PService(v);
+        //        startServiceP2P.start();
+        //        P2PService p2pService = startServiceP2P.getP2PService();
+        //		while (true){
+        //		    System.out.println("get a node : enter");
+        //		    System.in.read();
+        //		    Node n = p2pService.getANode("SchedulerNodes", "Scheduler"); // SET JOB-ID
+        //		    System.out.println("Returned node : " + n.getNodeInformation().getURL());
+        //		    
+        //        }
+        // END TEST
+
+        //		        IMUser user = IMFactory.getUser();
+        //		        IMMonitoring monitor = IMFactory.getMonitoring();
+        //		admin.deployAllVirtualNodes(new File("/user/cdelbe/home/ProActiveStd/ProActiveScheduler/descriptors/Workers.xml"),
+        //				null);
         //        admin.deployAllVirtualNodes(new File(
         //        "/user/jmartin/home/test.xml"),
         //    null);
         //        PADNSInterface padInterface = admin.getPADNodeSource();
         //        padInterface.
-        Thread.sleep(10000);
+        Thread.sleep(Integer.MAX_VALUE);
         //        System.out.println("Number of nodes : "+ monitor.getNumberOfAllResources().intValue());
         //        
         //        System.out.println("Asking for 2 nodes :");
@@ -71,7 +86,7 @@ public class IMLauncher {
         //        System.out.println("Nodes obtained : "+ ns.size());
         //        System.out.println("Free nodes : "+ monitor.getNumberOfFreeResource().intValue());
         //        System.out.println("Free nodes : "+ monitor.getNumberOfFreeResource().intValue());
-        System.in.read();
+        // System.in.read();
         try {
             IMFactory.getAdmin().shutdown();
         } catch (Exception e) {

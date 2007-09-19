@@ -102,7 +102,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             IMNode imnode = iterator.next();
 
             // Si le noeud correspond
-            if (imnode.getNodeName().equals(nodeName)) {
+            if (imnode.getNodeURL().equals(nodeName)) {
                 imnode.clean(); // Nettoyage du noeud
                 nodeManager.setFree(imnode);
                 break;

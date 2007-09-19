@@ -225,13 +225,13 @@ public enum PAProperties {
     PA_P2P_LOOKUP_FREQ("proactive.p2p.lookup_freq", false),
 
     /** If true deploying one shared nodes by CPU, else only one node is shared. */
-    PA_P2P_MULTI_PROC_NODES("proactive.p2p.multi_proc_nodes", false),
+    PA_P2P_MULTI_PROC_NODES("proactive.p2p.multi_proc_nodes", true),
 
     /** Path of the xml deployment descriptor, for deploying shared nodes. */
     PA_P2P_XML_PATH("proactive.p2p.xml_path", false),
 
     /** Boolean value for disable node sharing. */
-    PA_P2P_NO_SHARING("proactive.p2p.nosharing", false),
+    PA_P2P_NO_SHARING("proactive.p2p.nosharing", true),
 
     /** TODO Describe this property */
     PA_BYTECODEMANIPULATOR("byteCodeManipulator", false),

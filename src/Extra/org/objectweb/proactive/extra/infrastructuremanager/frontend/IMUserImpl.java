@@ -54,8 +54,8 @@ public class IMUserImpl implements IMUser {
     }
 
     public IMUserImpl(IMCore imcore) {
-        if (logger.isInfoEnabled()) {
-            logger.info("IMUser constructor");
+        if (logger.isDebugEnabled()) {
+            logger.debug("IMUser constructor");
         }
         this.imcore = imcore;
     }
@@ -87,7 +87,7 @@ public class IMUserImpl implements IMUser {
 
     public void freeNode(Node node) {
         if (logger.isInfoEnabled()) {
-            logger.info("freeNode : " + node.getNodeInformation().getName());
+            logger.info("freeNode : " + node.getNodeInformation().getURL());
         }
         imcore.freeNode(node);
     }

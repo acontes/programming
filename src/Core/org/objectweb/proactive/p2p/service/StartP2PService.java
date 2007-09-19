@@ -349,7 +349,7 @@ public class StartP2PService implements P2PConstants {
         }
 
         System.setProperty(PROPERTY_NO_SHARING,
-            (parsed.no_sharing == null) ? "flase" : parsed.no_sharing);
+            (parsed.no_sharing == null) ? "false" : parsed.no_sharing);
     }
 
     // -------------------------------------------------------------------------
@@ -540,7 +540,7 @@ public class StartP2PService implements P2PConstants {
         private String nodes_acq_to = PAProperties.PA_P2P_NODES_ACQUISITION_T0.getValue();
         private String lookup_freq = PAProperties.PA_P2P_LOOKUP_FREQ.getValue();
         private String multi_proc_nodes = PAProperties.PA_P2P_MULTI_PROC_NODES.getValue();
-        private String xml_path = PAProperties.PA_P2P_MULTI_PROC_NODES.getValue();
+        private String xml_path = PAProperties.PA_P2P_XML_PATH.getValue();
         private String peerListFile = null;
         private final Vector peers = new Vector();
         private String no_sharing = PAProperties.PA_P2P_NO_SHARING.getValue();

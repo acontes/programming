@@ -347,7 +347,7 @@ public class StartP2PService implements P2PConstants {
         }
 
         System.setProperty(PROPERTY_NO_SHARING,
-            (parsed.no_sharing == null) ? "flase" : parsed.no_sharing);
+            (parsed.no_sharing == null) ? "false" : parsed.no_sharing);
     }
 
     // -------------------------------------------------------------------------

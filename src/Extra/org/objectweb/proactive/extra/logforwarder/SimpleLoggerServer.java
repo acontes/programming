@@ -176,7 +176,7 @@ public class SimpleLoggerServer implements Runnable {
 
             // close stream
             try {
-                System.out.println(this + " is terminating...");
+                //                System.out.println(this + " is terminating...");
                 this.inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();

@@ -52,7 +52,7 @@ public class IMNodeImpl implements IMNode, Serializable {
 
     // Attributes
     private Node node;
-    private String nodeName;
+    private String nodeURL;
     private String vnodeName;
     private String padName;
     private String hostName;
@@ -62,6 +62,7 @@ public class IMNodeImpl implements IMNode, Serializable {
     private ScriptHandler handler = null;
     private IMNodeSource nodeSource;
 
+
     // ----------------------------------------------------------------------//
     // CONSTRUCTOR
     public IMNodeImpl(Node node, String vnodeName, String padName,
@@ -70,7 +71,8 @@ public class IMNodeImpl implements IMNode, Serializable {
         this.node = node;
         this.vnodeName = vnodeName;
         this.padName = padName;
-        this.nodeName = node.getNodeInformation().getName();
+        //  this.nodeName = node.getNodeInformation().getName();
+        this.nodeURL = node.getNodeInformation().getURL();
         this.hostName = node.getNodeInformation().getVMInformation()
                             .getHostName();
         this.vmName = node.getNodeInformation().getVMInformation()
@@ -80,9 +82,10 @@ public class IMNodeImpl implements IMNode, Serializable {
 
     // ----------------------------------------------------------------------//
     // GET
-    public String getNodeName() {
-        return this.nodeName;
+    public String getNodeURL() {
+        return this.nodeURL;
     }
+
 
     public Node getNode() throws NodeException {
         if (!isDown()) {
@@ -163,7 +166,7 @@ public class IMNodeImpl implements IMNode, Serializable {
     public String toString() {
         String mes = "\n";
         try {
-            mes += ("| Name of this Node  :  " + getNodeName() + "\n");
+            mes += ("| Name of this Node  :  " + getNodeURL() + "\n");
             mes += "+-----------------------------------------------+\n";
             mes += ("| Node is free ?  	: " + free + "\n");
             mes += ("| Name of PAD	  	: " + padName + "\n");
@@ -203,21 +206,22 @@ public class IMNodeImpl implements IMNode, Serializable {
         try {
             node.killAllActiveObjects();
         } catch (Exception e) {
-            logger.error("Error cleanning the Node", e);
+            logger.error("Error while cleaning the Node", e);
         }
     }
+
 
     @Override
     public boolean equals(Object imnode) {
         if (imnode instanceof IMNode) {
-            return nodeName.equals(((IMNode) imnode).getNodeName());
+            return this.nodeURL.equals(((IMNode) imnode).getNodeURL());
         }
         return false;
     }
     ;
     @Override
     public int hashCode() {
-        return nodeName.hashCode();
+        return nodeURL.hashCode();
     }
 
     @SuppressWarnings("unchecked")
@@ -239,7 +243,7 @@ public class IMNodeImpl implements IMNode, Serializable {
                 if (this.getHostName().equals(imnode.getHostName())) {
                     if (this.getDescriptorVMName()
                                 .equals(imnode.getDescriptorVMName())) {
-                        return this.getNodeName().compareTo(imnode.getNodeName());
+                        return this.getNodeURL().compareTo(imnode.getNodeURL());
                     } else {
                         return this.getDescriptorVMName()
                                    .compareTo(imnode.getDescriptorVMName());
