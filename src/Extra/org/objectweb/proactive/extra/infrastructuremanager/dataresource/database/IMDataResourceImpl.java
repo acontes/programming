@@ -87,9 +87,9 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     public void freeNode(Node node) {
         ListIterator<IMNode> iterator = nodeManager.getBusyNodes().listIterator();
 
-        String nodeName = null;
+        String nodeURL = null;
         try {
-            nodeName = node.getNodeInformation().getName();
+            nodeURL = node.getNodeInformation().getURL();
         } catch (RuntimeException e) {
             logger.debug("A Runtime exception occured " +
                 "while obtaining information on the node," +
@@ -102,7 +102,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             IMNode imnode = iterator.next();
 
             // Si le noeud correspond
-            if (imnode.getNodeURL().equals(nodeName)) {
+            if (imnode.getNodeURL().equals(nodeURL)) {
                 imnode.clean(); // Nettoyage du noeud
                 nodeManager.setFree(imnode);
                 break;
