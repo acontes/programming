@@ -60,6 +60,9 @@ public class ProActiveMPINodeImpl implements Serializable, InitActive, ProActive
 
     // native process wrapper
     private ProActiveMPIComm target;
+    
+    // cache of node references
+    private Hashtable<String, ProActiveMPINode> nodeCache;
 
     private int jobID;
 
@@ -68,6 +71,7 @@ public class ProActiveMPINodeImpl implements Serializable, InitActive, ProActive
 
     public ProActiveMPINodeImpl(String libName, Integer jobNum) throws ActiveObjectCreationException, NodeException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         this.jobID = jobNum.intValue();
+        this.nodeCache = new Hashtable<String, ProActiveMPINode>();
         this.target = new ProActiveMPIComm(libName, ProActive.getBodyOnThis().getID().hashCode(), this.jobID);
     }
 
@@ -151,15 +155,18 @@ public class ProActiveMPINodeImpl implements Serializable, InitActive, ProActive
             throws IOException {
         int destRank = m_r.getDest();
 
-        //MPI_IMPL_LOGGER.info("[MPI NODE] getting rank#" + destRank  + " JobID#" + jobID);
-        ProActiveMPINode dest = myCluster.getNode(jobID, destRank);
-        //MPI_IMPL_LOGGER.info("[MPI NODE] got rank#" + destRank  + " JobID#" + jobID);
+        ProActiveMPINode destNode = this.nodeCache.get(""+jobID+"_"+destRank);
+        if(destNode == null) {
+        	destNode = myCluster.getNode(jobID, destRank);
+        	this.nodeCache.put(""+jobID+"_"+destRank, destNode);
+        }
+        
 
-        if (dest != null) {
+        if (destNode != null) {
             //MPI_IMPL_LOGGER.info("[MPI NODE]"+destRank + "-" + jobID +   "was not null, so receive from");
-            dest.receiveFromMpi(m_r);
+            destNode.receiveFromMpi(m_r);
         } else {
-            throw new IndexOutOfBoundsException(" destination " + dest + " in the jobID " + jobID + " is unreachable!");
+            throw new IndexOutOfBoundsException(" destination " + destRank + " in the jobID " + jobID + " is unreachable!");
         }
     }
 
@@ -169,7 +176,7 @@ public class ProActiveMPINodeImpl implements Serializable, InitActive, ProActive
         return new Ack();
     }
 
-    public void MPISend(byte[] buf, int count, int datatype, int dest,
+    public void MPISend(byte[] buf, int count, int datatype, int destRank,
                         int tag, int jobID) {
         //create Message to send and use the native method
         ProActiveMPIData m_r = new ProActiveMPIData();
@@ -177,16 +184,21 @@ public class ProActiveMPINodeImpl implements Serializable, InitActive, ProActive
         m_r.setData(buf);
         m_r.setCount(count);
         m_r.setDatatype(datatype);
-        m_r.setDest(dest);
+        m_r.setDest(destRank);
         m_r.setTag(tag);
         m_r.setJobID(jobID);
 
-        ProActiveMPINode destNode = myCluster.getNode(jobID, dest);
+        ProActiveMPINode destNode = this.nodeCache.get(""+jobID+"_"+destRank);
+        if(destNode == null) {
+        	destNode = myCluster.getNode(jobID, destRank);
+        	this.nodeCache.put(""+jobID+"_"+destRank, destNode);
+        }
+        
 
         if (destNode != null) {
             destNode.receiveFromProActive(m_r);
         } else {
-            throw new IndexOutOfBoundsException(" destination " + dest + " in the jobID " + jobID + " is unreachable!");
+            throw new IndexOutOfBoundsException(" destination " + destRank + " in the jobID " + jobID + " is unreachable!");
         }
     }
 

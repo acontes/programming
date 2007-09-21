@@ -74,7 +74,6 @@ public interface ProActiveMPINode {
 
     int getRank();
 
-    @Override
-    String toString();
+
 
 }
