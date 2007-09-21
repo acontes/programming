@@ -1,0 +1,24 @@
+Poisson-3D cubic partitioning implementation
+
+Arguments: 
+size_x size_y size_z cluster_geom_x cluster_geom_y cluster_geom_z workers_geom_x workers_geom_y workers_geom_z maxit
+
+
+- size_(x|y|z) are the GLOBAL matrix size for each axis.
+- cluster_geom_(x|y|z) is the 'geometry' at cluster level partitioning.
+-- Geometry '1 2 1' means the application uses 2 clusters (x*y*z). The matrix being divided in 2 subdomainsalong its 'y' axis
+- workers_geom_(x|y|z) is the 'geometry' at worker level partitioning for EACH clusters.
+-- This means each clusters must have the same worker geometry and thus the same number of workers.
+   Geometry '2 2 1' means the cluster uses 4 workers and partitions the cluster sub-matrix along 'x' and 'y' axis.
+
+NOTE:
+	According to previous examples the total number of workers is the number of clusters given by
+	(cluster_geom_x * cluster_geom_y * cluster_geom_z) multiplied by (workers_geom_x * workers_geom_y * workers_geom_z)
+  
+* Timer can be setted by enabling the TIMED  macro
+* memory is dynamically allocated (i.e. no memory wasted by static array known at compile time)
+
+
+Notes:
+
+* It is important that each cluster have the same number of nodes !!
