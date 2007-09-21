@@ -42,43 +42,43 @@ public class Launcher {
 			VirtualNode virtualNode1 = descriptor1.getVirtualNode("vn1");
 			Node node1 = virtualNode1.getNodes()[0];
 			SampleObject a = (SampleObject) ProActive.newActive(
-					SampleObject.class.getName(), new Object[] { "A" }, node1);
+					SampleObject.class.getName(), new Object[] { "CN=Garden1" }, node1);
 
-//			ProActiveDescriptor descriptor2 = ProActive
-//					.getProactiveDescriptor("descriptors/security/simple2.xml");
-//			descriptor2.activateMappings();
-//			VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
-//			Node node2 = virtualNode2.getNodes()[0];
-//			SampleObject b = (SampleObject) ProActive.newActive(
-//					SampleObject.class.getName(), new Object[] { "B" }, node2);
-//
-//			ProActiveDescriptor descriptor3 = ProActive
-//					.getProactiveDescriptor("descriptors/security/simple3.xml");
-//			descriptor3.activateMappings();
-//			VirtualNode virtualNode3 = descriptor3.getVirtualNode("vn3");
-//			Node node3 = virtualNode3.getNodes()[0];
-//			SampleObject c = (SampleObject) ProActive.newActive(
-//					SampleObject.class.getName(), new Object[] { "C" }, node3);
+			ProActiveDescriptor descriptor2 = ProActive
+					.getProactiveDescriptor("descriptors/security/simple2.xml");
+			descriptor2.activateMappings();
+			VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
+			Node node2 = virtualNode2.getNodes()[0];
+			SampleObject b = (SampleObject) ProActive.newActive(
+					SampleObject.class.getName(), new Object[] { "CN=Garden2" }, node2);
 
-			System.out.println(a.makeTargetDoSomething(a));
+			ProActiveDescriptor descriptor3 = ProActive
+					.getProactiveDescriptor("descriptors/security/simple3.xml");
+			descriptor3.activateMappings();
+			VirtualNode virtualNode3 = descriptor3.getVirtualNode("vn3");
+			Node node3 = virtualNode3.getNodes()[0];
+			SampleObject c = (SampleObject) ProActive.newActive(
+					SampleObject.class.getName(), new Object[] { "CN=Garden3" }, node3);
+
+//			a.makeTargetDoSomething(a);
 //            System.out.println("==");
-//            System.out.println(a.makeTargetDoSomething(b));
+            a.makeTargetDoSomething(b);
 //            System.out.println("==");
-//            System.out.println(a.makeTargetDoSomething(c));
+//            a.makeTargetDoSomething(c);
             
 //            System.out.println("//////////////////");
             
-//            System.out.println(b.makeTargetDoSomething(a));
+//            b.makeTargetDoSomething(a);
 //            System.out.println("==");
 //            b.makeTargetDoSomething(b);
 //            System.out.println("==");
-//            System.out.println(b.makeTargetDoSomething(c));
+            b.makeTargetDoSomething(c);
             
 //            System.out.println("//////////////////");
             
-//            System.out.println(c.makeTargetDoSomething(a));
+            c.makeTargetDoSomething(a);
 //            System.out.println("==");
-//            System.out.println(c.makeTargetDoSomething(b));
+//            c.makeTargetDoSomething(b);
 //            System.out.println("==");
 //            c.makeTargetDoSomething(c);
         } catch (ActiveObjectCreationException e) {

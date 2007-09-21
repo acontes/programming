@@ -16,8 +16,8 @@ public class TypedCertificate implements Serializable {
 	 */
 	private static final long serialVersionUID = -3389269734930919276L;
 	private transient X509Certificate cert;
-	private EntityType type;
-	private PrivateKey privateKey;
+	private final EntityType type;
+	private final PrivateKey privateKey;
 	private byte[] encodedCert;
 	
 	public TypedCertificate(X509Certificate cert, EntityType type, PrivateKey privateKey) {
@@ -39,8 +39,12 @@ public class TypedCertificate implements Serializable {
 		return this.type;
 	}
 
-	public void setType(EntityType type) {
-		this.type = type;
+//	public void setType(EntityType type) {
+//		this.type = type;
+//	}
+	
+	public TypedCertificate noPrivateKey() {
+		return new TypedCertificate(this.cert, this.type, null);
 	}
 	
 	@Override
@@ -79,7 +83,7 @@ public class TypedCertificate implements Serializable {
     	}
 		TypedCertificate otherCert = (TypedCertificate) obj;
 			
-		if (otherCert.getType() != this.getType()) {
+		if (!otherCert.getType().match(this.getType())) {
 			return false;
 		}
 		if (!otherCert.getCert().equals(this.getCert())) {

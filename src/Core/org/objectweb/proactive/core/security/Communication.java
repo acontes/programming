@@ -56,8 +56,8 @@ public class Communication implements Serializable {
 			this.value = value;
 		}
 		
-		public static Authorization compute(Authorization from, Authorization to) throws IncompatiblePolicyException {
-			return from.compute(to);
+		public static Authorization compute(Authorization local, Authorization distant) throws IncompatiblePolicyException {
+			return local.compute(distant);
 		}
 		
 		public Authorization compute(Authorization that) throws IncompatiblePolicyException {
@@ -87,9 +87,9 @@ public class Communication implements Serializable {
 		}
 	}
 	
-	private Authorization authentication;
-	private Authorization confidentiality;
-	private Authorization integrity;
+	private final Authorization authentication;
+	private final Authorization confidentiality;
+	private final Authorization integrity;
 	
 //	public static final int REQUIRED = 1;
 //    public static final int DENIED = -1;
@@ -109,16 +109,16 @@ public class Communication implements Serializable {
 //    private int integrity;
 
     /* indicates if communication between active objects is allowed or not */
-    private boolean communication;
+    private final boolean communication;
 
     /**
      * Default constructor, initialize a policy with communication attribute sets to allowed and
      * authentication,confidentiality and integrity set to optional
      */
     public Communication() {
-    	this.authentication = Authorization.DENIED;
-    	this.confidentiality = Authorization.DENIED;
-    	this.integrity = Authorization.DENIED;
+    	this.authentication = Authorization.REQUIRED;
+    	this.confidentiality = Authorization.REQUIRED;
+    	this.integrity = Authorization.REQUIRED;
     	this.communication = false;
     }
 
@@ -170,29 +170,29 @@ public class Communication implements Serializable {
         return this.integrity == Authorization.REQUIRED;
     }
 
-    /**
-     * Method isAuthenticationForbidden.
-     * @return boolean true if confidentiality is forbidden
-     */
-    public boolean isAuthenticationForbidden() {
-        return this.authentication == Authorization.DENIED;
-    }
-
-    /**
-     * Method isConfidentialityForbidden.
-     * @return boolean true if confidentiality is forbidden
-     */
-    public boolean isConfidentialityForbidden() {
-        return this.confidentiality == Authorization.DENIED;
-    }
-
-    /**
-     * Method isIntegrityForbidden.
-     * @return boolean true if integrity is forbidden
-     */
-    public boolean isIntegrityForbidden() {
-        return this.integrity == Authorization.DENIED;
-    }
+//    /**
+//     * Method isAuthenticationForbidden.
+//     * @return boolean true if confidentiality is forbidden
+//     */
+//    public boolean isAuthenticationForbidden() {
+//        return this.authentication == Authorization.DENIED;
+//    }
+//
+//    /**
+//     * Method isConfidentialityForbidden.
+//     * @return boolean true if confidentiality is forbidden
+//     */
+//    public boolean isConfidentialityForbidden() {
+//        return this.confidentiality == Authorization.DENIED;
+//    }
+//
+//    /**
+//     * Method isIntegrityForbidden.
+//     * @return boolean true if integrity is forbidden
+//     */
+//    public boolean isIntegrityForbidden() {
+//        return this.integrity == Authorization.DENIED;
+//    }
 
     /**
      * Method isCommunicationAllowed.
@@ -230,12 +230,12 @@ public class Communication implements Serializable {
         return this.communication;
     }
 
-    /**
-     * @param i
-     */
-    public void setCommunication(boolean i) {
-    	this.communication = i;
-    }
+//    /**
+//     * @param i
+//     */
+//    public void setCommunication(boolean i) {
+//    	this.communication = i;
+//    }
 
 	public Authorization getAuthentication() {
 		return this.authentication;

@@ -41,6 +41,6 @@ public class Domain {
     }
 
     public PublicKey getPublicKey() {
-        return certificate.getPublicKey();
+        return this.certificate.getPublicKey();
     }
 }

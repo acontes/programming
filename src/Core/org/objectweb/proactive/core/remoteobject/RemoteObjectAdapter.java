@@ -123,12 +123,10 @@ public class RemoteObjectAdapter implements RemoteObject {
         return this.remoteObject.getPublicKey();
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        return this.remoteObject.publicKeyExchange(sessionID, myPublicKey,
-            myCertificate, signature);
+        return this.remoteObject.publicKeyExchange(sessionID, signature);
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
@@ -147,11 +145,12 @@ public class RemoteObjectAdapter implements RemoteObject {
             parametersSignature);
     }
 
-    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
-        throws SecurityNotAvailableException, IOException, SessionException
-             {
-        return this.remoteObject.startNewSession(distantSessionID, policy, distantCertificate);
-    }
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+			TypedCertificate distantCertificate)
+			throws SecurityNotAvailableException, IOException, SessionException {
+		return this.remoteObject.startNewSession(distantSessionID, policy,
+				distantCertificate);
+	}
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {

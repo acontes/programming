@@ -13,6 +13,7 @@ import org.objectweb.proactive.core.security.TypedCertificate;
 public class CertificateDetailsSection {
 
 	private Section section;
+
 	private Text typeText;
 
 	private Text subjectText;
@@ -22,7 +23,7 @@ public class CertificateDetailsSection {
 	private Text publicText;
 
 	private Text privateText;
-	
+
 	public CertificateDetailsSection(Composite parent, FormToolkit toolkit) {
 		this.section = toolkit.createSection(parent,
 				ExpandableComposite.TITLE_BAR);
@@ -50,29 +51,25 @@ public class CertificateDetailsSection {
 				false));
 
 		toolkit.createLabel(client, "Public Key :");
-		this.publicText = toolkit.createText(client, "", SWT.MULTI
-				| SWT.WRAP);
+		this.publicText = toolkit.createText(client, "", SWT.MULTI | SWT.WRAP);
 		this.publicText.setEditable(false);
 		this.publicText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 				true));
 
 		toolkit.createLabel(client, "Private Key :");
-		this.privateText = toolkit.createText(client, "", SWT.MULTI
-				| SWT.WRAP);
+		this.privateText = toolkit.createText(client, "", SWT.MULTI | SWT.WRAP);
 		this.privateText.setEditable(false);
 		this.privateText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 				true));
 
 		this.section.setClient(client);
 	}
-	
+
 	public void update(TypedCertificate cert) {
 		if (cert != null) {
 			setType(cert.getType().toString());
-			setSubject(cert.getCert().getSubjectX500Principal()
-					.getName());
-			setIssuer(cert.getCert().getIssuerX500Principal()
-					.getName());
+			setSubject(cert.getCert().getSubjectX500Principal().getName());
+			setIssuer(cert.getCert().getIssuerX500Principal().getName());
 			setPublic(cert.getCert().getPublicKey().toString());
 			if (cert.getPrivateKey() != null) {
 				setPrivate(cert.getPrivateKey().toString());
@@ -87,7 +84,7 @@ public class CertificateDetailsSection {
 			setPrivate("");
 		}
 	}
-	
+
 	public Section get() {
 		return this.section;
 	}

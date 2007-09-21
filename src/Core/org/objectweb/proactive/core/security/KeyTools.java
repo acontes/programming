@@ -144,7 +144,7 @@ public class KeyTools {
             chain = null;
         } else {
             chain = new Certificate[cacerts.size()];
-            chain = (Certificate[]) cacerts.toArray(chain);
+            chain = cacerts.toArray(chain);
         }
         return createP12(alias, privKey, cert, chain);
     } // createP12
@@ -178,7 +178,7 @@ public class KeyTools {
 
         // To not get a ClassCastException we need to genereate a real new certificate with BC
         CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
-        chain[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
+        chain[0] = cf.generateCertificate(new ByteArrayInputStream(
                     cert.getEncoded()));
 
         if (cachain != null) {
@@ -361,8 +361,8 @@ public class KeyTools {
         // If we came here, we have a cert which is not root cert in 'cert'
         ArrayList<Certificate> array = new ArrayList<Certificate>();
 
-        for (int i = 0; i < certchain.length; i++) {
-            array.add(certchain[i]);
+        for (Certificate element : certchain) {
+            array.add(element);
         }
 
         boolean stop = false;
@@ -385,11 +385,11 @@ public class KeyTools {
                     stop = true;
                 }
 
-                for (int j = 0; j < chain1.length; j++) {
-                    array.add(chain1[j]);
+                for (Certificate element : chain1) {
+                    array.add(element);
 
                     // If one cert is slefsigned, we have found a root certificate, we don't need to go on anymore
-                    if (CertTools.isSelfSigned((X509Certificate) chain1[j])) {
+                    if (CertTools.isSelfSigned((X509Certificate) element)) {
                         stop = true;
                     }
                 }
@@ -399,7 +399,7 @@ public class KeyTools {
         Certificate[] ret = new Certificate[array.size()];
 
         for (int i = 0; i < ret.length; i++) {
-            ret[i] = (X509Certificate) array.get(i);
+            ret[i] = array.get(i);
             System.out.println("Issuer='" +
                 CertTools.getIssuerDN((X509Certificate) ret[i]) + "'.");
             System.out.println("Subject='" +

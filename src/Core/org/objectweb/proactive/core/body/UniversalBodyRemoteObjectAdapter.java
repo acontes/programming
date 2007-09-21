@@ -198,12 +198,10 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         return target.getPublicKey();
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        return target.publicKeyExchange(sessionID, myPublicKey, myCertificate,
-            signature);
+        return target.publicKeyExchange(sessionID, signature);
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
@@ -222,11 +220,12 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
             parametersSignature);
     }
 
-    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
-        throws SecurityNotAvailableException, IOException, SessionException
-             {
-        return target.startNewSession(distantSessionID, policy, distantCertificate);
-    }
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+			TypedCertificate distantCertificate)
+			throws SecurityNotAvailableException, IOException, SessionException {
+		return target.startNewSession(distantSessionID, policy,
+				distantCertificate);
+	}
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {

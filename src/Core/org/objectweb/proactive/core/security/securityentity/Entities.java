@@ -2,7 +2,6 @@ package org.objectweb.proactive.core.security.securityentity;
 
 import java.util.ArrayList;
 
-
 public class Entities extends ArrayList<Entity> {
 
 	/**

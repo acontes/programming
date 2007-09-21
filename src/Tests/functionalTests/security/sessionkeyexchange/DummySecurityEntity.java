@@ -117,15 +117,13 @@ public class DummySecurityEntity implements SecurityEntity {
 		return this.securityManager.randomValue(sessionID, clientRandomValue);
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException {
     	if (this.securityManager == null) {
 			throw new SecurityNotAvailableException();
 		}
-		return this.securityManager.publicKeyExchange(sessionID, myPublicKey,
-            myCertificate, signature);
+		return this.securityManager.publicKeyExchange(sessionID, signature);
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,

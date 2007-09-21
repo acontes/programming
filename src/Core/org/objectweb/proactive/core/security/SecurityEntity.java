@@ -94,8 +94,6 @@ public interface SecurityEntity extends Serializable {
     /**
      * exchange entity certificate and/or public key if certificate are not available
      * @param sessionID the session ID
-     * @param myPublicKey encoded public key
-     * @param myCertificate encoded certificate
      * @param signature encoded signature of previous paramaters
      * @return an array containing :
      *           - server certificate and/or server public key
@@ -104,8 +102,7 @@ public interface SecurityEntity extends Serializable {
      * @throws RenegotiateSessionException if the session has expired
      * @throws KeyExchangeException if a key data/length/algorithm is not supported
      */
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException;
 

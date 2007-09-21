@@ -1,6 +1,7 @@
 package org.objectweb.proactive.ic2d.security.tabs;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TableViewer;
@@ -22,7 +23,7 @@ import org.objectweb.proactive.ic2d.security.widgets.CommunicationDetailsComposi
 
 public class SessionTab extends UpdatableTab {
 
-	private List<Session> sessionList;
+	private List<SessionWithID> sessionList;
 
 	private FormToolkit toolkit;
 
@@ -31,15 +32,16 @@ public class SessionTab extends UpdatableTab {
 	private TableViewer sessionTableViewer;
 
 	private CertificateDetailsSection certDetailsSection;
-	
+
 	private CommunicationDetailsComposite requestComposite;
+
 	private CommunicationDetailsComposite replyComposite;
 
 	public SessionTab(CTabFolder folder, FormToolkit tk) {
 		super(folder, SWT.NULL);
 		setText("Sessions browser");
 
-		this.sessionList = new ArrayList<Session>();
+		this.sessionList = new ArrayList<SessionWithID>();
 		this.toolkit = tk;
 
 		Composite body = this.toolkit.createComposite(folder);
@@ -83,7 +85,7 @@ public class SessionTab extends UpdatableTab {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateViewers();
-				
+
 				super.widgetSelected(e);
 			}
 		});
@@ -106,13 +108,15 @@ public class SessionTab extends UpdatableTab {
 		Composite client = this.toolkit.createComposite(section);
 		client.setLayout(new GridLayout());
 
-		this.requestComposite = new CommunicationDetailsComposite(client, this.toolkit, "Request");
-		this.requestComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				true));
-		
-		this.replyComposite = new CommunicationDetailsComposite(client, this.toolkit, "Reply");
-		this.replyComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				true));
+		this.requestComposite = new CommunicationDetailsComposite(client,
+				this.toolkit, "Request");
+		this.requestComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+				true, true));
+
+		this.replyComposite = new CommunicationDetailsComposite(client,
+				this.toolkit, "Reply");
+		this.replyComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+				true, true));
 
 		section.setClient(client);
 
@@ -121,34 +125,56 @@ public class SessionTab extends UpdatableTab {
 
 	private void updateSessionTable() {
 		this.sessionTable.removeAll();
-		for (Session session : this.sessionList) {
-			this.sessionTableViewer.add(new Long(session.getDistantSessionID())
-					.toString());
+		for (SessionWithID session : this.sessionList) {
+			this.sessionTableViewer.add(session.getThisID() + " -> "
+					+ session.getSession().getDistantSessionID());
 		}
 		updateViewers();
 	}
 
 	protected void updateViewers() {
-		this.certDetailsSection.update(this.sessionList
-				.get(this.sessionTable.getSelectionIndex())
-				.getDistantCertificate());
+		Session session = this.sessionList.get(
+				this.sessionTable.getSelectionIndex()).getSession();
 
-		SecurityContext sc = this.sessionList.get(
-				this.sessionTable.getSelectionIndex()).getSecurityContext();
-		
+		this.certDetailsSection.update(session.getDistantCertificate());
+
+		SecurityContext sc = session.getSecurityContext();
+
 		this.requestComposite.updateCommunication(sc.getSendRequest());
-		
+
 		this.replyComposite.updateCommunication(sc.getSendReply());
 	}
-	
-	public void setSessions(List<Session> sessions) {
+
+	public void setSessions(Hashtable<Long, Session> sessions) {
 		this.sessionList.clear();
-		this.sessionList.addAll(sessions);
+		for (Long id : sessions.keySet()) {
+			this.sessionList.add(new SessionWithID(sessions.get(id), id
+					.longValue()));
+		}
 	}
 
 	@Override
 	public void update() {
 		updateSessionTable();
+	}
+
+	private class SessionWithID {
+		private Session session;
+
+		private long id;
+
+		public SessionWithID(Session session, long id) {
+			this.session = session;
+			this.id = id;
+		}
+
+		public Session getSession() {
+			return this.session;
+		}
+
+		public long getThisID() {
+			return this.id;
+		}
 	}
 
 }

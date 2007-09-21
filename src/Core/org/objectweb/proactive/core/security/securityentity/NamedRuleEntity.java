@@ -12,13 +12,12 @@ public class NamedRuleEntity extends RuleEntity {
 	 */
 	private static final long serialVersionUID = -2724922813544854253L;
 
-	private String name;
+	private final String name;
 
 	public NamedRuleEntity(EntityType type, KeyStore keystore, String name)
 			throws KeyStoreException {
-		super(type);
-    	this.name = name;
-		this.level = KeyStoreTools.getApplicationLevel(keystore) + levelIncrement();
+		super(type, KeyStoreTools.getApplicationLevel(keystore));
+		this.name = name;
 	}
 
 	@Override

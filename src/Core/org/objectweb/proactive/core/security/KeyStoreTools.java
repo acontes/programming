@@ -59,20 +59,18 @@ public abstract class KeyStoreTools {
 
 	private static final String PRIVATE_KEY_PASSWORD = "wafti";
 
-	public static TypedCertificate getSelfCertificate(KeyStore keystore)
+	public static TypedCertificate getSelfCertificate(KeyStore keystore, EntityType type)
 			throws KeyStoreException, UnrecoverableKeyException,
 			NoSuchAlgorithmException {
 		TypedCertificate cert = getCertificate(keystore,
 				KEYSTORE_ENTITY_KEY_PATH);
-		cert.setType(EntityType.ENTITY);
-		return cert;
+		return new TypedCertificate(cert.getCert(), type, cert.getPrivateKey());
 	}
 
 	public static TypedCertificateList getSelfCertificateChain(KeyStore keystore, EntityType type)
 			throws KeyStoreException, UnrecoverableKeyException,
 			NoSuchAlgorithmException {
-		TypedCertificateList tcl =  getCertificateChain(keystore, getSelfCertificate(keystore));
-		tcl.get(0).setType(type);
+		TypedCertificateList tcl =  getCertificateChain(keystore, getSelfCertificate(keystore, type));
 		return tcl;
 	}
 

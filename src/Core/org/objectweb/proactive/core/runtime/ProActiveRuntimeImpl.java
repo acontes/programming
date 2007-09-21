@@ -1340,13 +1340,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *      org.objectweb.proactive.core.body.UniversalBody, byte[], byte[],
      *      byte[])
      */
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException {
         if (runtimeSecurityManager != null) {
             try {
-                return runtimeSecurityManager.publicKeyExchange(sessionID,
-                    myPublicKey, myCertificate, signature);
+                return runtimeSecurityManager.publicKeyExchange(sessionID, signature);
             } catch (KeyExchangeException e) {
                 e.printStackTrace();
             }

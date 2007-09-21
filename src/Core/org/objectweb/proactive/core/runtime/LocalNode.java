@@ -412,15 +412,13 @@ public class LocalNode implements SecurityEntity {
 		return this.securityManager.getPublicKey();
 	}
 
-	public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-			byte[] myCertificate, byte[] signature)
+	public byte[] publicKeyExchange(long sessionID, byte[] signature)
 			throws SecurityNotAvailableException, RenegotiateSessionException,
 			KeyExchangeException {
 		if (this.securityManager == null) {
 			throw new SecurityNotAvailableException();
 		}
-		return this.securityManager.publicKeyExchange(sessionID, myPublicKey,
-				myCertificate, signature);
+		return this.securityManager.publicKeyExchange(sessionID, signature);
 	}
 
 	public byte[] randomValue(long sessionID, byte[] clientRandomValue)

@@ -92,12 +92,10 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         return this.remoteObject.getPublicKey();
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        return this.remoteObject.publicKeyExchange(sessionID, myPublicKey,
-            myCertificate, signature);
+        return this.remoteObject.publicKeyExchange(sessionID, signature);
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)

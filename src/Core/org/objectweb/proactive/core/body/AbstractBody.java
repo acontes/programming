@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.security.AccessControlException;
 import java.security.PublicKey;
@@ -126,7 +127,7 @@ import org.objectweb.proactive.core.util.profiling.TimerProvidable;
  *
  */
 public abstract class AbstractBody extends AbstractUniversalBody implements Body,
-    java.io.Serializable {
+    Serializable {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
@@ -596,8 +597,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         try {
@@ -605,19 +605,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             if (this.isSecurityOn) {
                 renegociateSessionIfNeeded(sessionID);
 
-                byte[][] pke;
-
                 if (this.internalBodySecurity.isLocalBody()) {
-                    pke = this.securityManager.publicKeyExchange(sessionID,
-                            myPublicKey, myCertificate, signature);
-
-                    return pke;
-                } else {
-                    pke = this.internalBodySecurity.publicKeyExchange(sessionID,
-                            myPublicKey, myCertificate, signature);
-
-                    return pke;
+                	return this.securityManager.publicKeyExchange(sessionID, signature);
                 }
+                // else
+                return this.internalBodySecurity.publicKeyExchange(sessionID,
+                            signature);
+                
             }
             throw new SecurityNotAvailableException();
         } finally {

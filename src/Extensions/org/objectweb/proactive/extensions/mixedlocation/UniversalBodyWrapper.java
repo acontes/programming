@@ -237,12 +237,10 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.randomValue(sessionID, cl_rand);
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] my_pub,
-        byte[] my_cert, byte[] sig_code)
+    public byte[] publicKeyExchange(long sessionID, byte[] sig_code)
         throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException, KeyExchangeException {
-        return this.wrappedBody.publicKeyExchange(sessionID, my_pub, my_cert,
-            sig_code);
+        return this.wrappedBody.publicKeyExchange(sessionID, sig_code);
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,

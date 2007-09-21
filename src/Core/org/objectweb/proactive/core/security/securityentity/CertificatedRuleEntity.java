@@ -15,13 +15,14 @@ public class CertificatedRuleEntity extends RuleEntity {
 	 */
 	private static final long serialVersionUID = 6616484696945476576L;
 
-	protected TypedCertificate certificate;
+	protected final TypedCertificate certificate;
 
-	public CertificatedRuleEntity(EntityType type, KeyStore keystore, String name)
-			throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException {
-		super(type);
+	public CertificatedRuleEntity(EntityType type, KeyStore keystore,
+			String name) throws KeyStoreException, UnrecoverableKeyException,
+			NoSuchAlgorithmException {
+		super(type, KeyStoreTools.getLevel(keystore, KeyStoreTools
+				.getCertificate(keystore, type, name)));
 		this.certificate = KeyStoreTools.getCertificate(keystore, type, name);
-		this.level = KeyStoreTools.getLevel(keystore, this.certificate) + levelIncrement();
 	}
 
 	@Override
@@ -36,7 +37,8 @@ public class CertificatedRuleEntity extends RuleEntity {
 
 	@Override
 	public String toString() {
-		return super.toString() + "\n\tCertificate : " + this.certificate.toString();
+		return super.toString() + "\n\tCertificate : "
+				+ this.certificate.toString();
 	}
 
 	@Override

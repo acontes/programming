@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.security.views;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -34,10 +35,13 @@ public class PolicyEditorView extends ViewPart {
 	protected CTabFolder tabFolder;
 
 	private ScrolledForm form;
-	
+
 	private CertificateGenerationTab cgt;
+
 	private KeystoreTab kt;
+
 	private RuleTab rt;
+
 	private SessionTab st;
 
 	public PolicyEditorView() {
@@ -64,12 +68,14 @@ public class PolicyEditorView extends ViewPart {
 		this.tabFolder.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				((UpdatableTab) PolicyEditorView.this.tabFolder.getSelection()).update();
+				((UpdatableTab) PolicyEditorView.this.tabFolder.getSelection())
+						.update();
 			}
 		});
 
 		toolkit.paintBordersFor(this.tabFolder);
-		this.cgt = new CertificateGenerationTab(this.tabFolder, this.keystore, toolkit);
+		this.cgt = new CertificateGenerationTab(this.tabFolder, this.keystore,
+				toolkit);
 		this.kt = new KeystoreTab(this.tabFolder, this.keystore, toolkit);
 		this.rt = new RuleTab(this.tabFolder, this.keystore, toolkit);
 		this.st = new SessionTab(this.tabFolder, toolkit);
@@ -78,21 +84,22 @@ public class PolicyEditorView extends ViewPart {
 	}
 
 	public void update(CertificateTreeList list,
-			List<SimplePolicyRule> policies, String appName, List<String> authorizedUsers, List<Session> sessions) {
+			List<SimplePolicyRule> policies, String appName,
+			List<String> authorizedUsers, Hashtable<Long, Session> sessions) {
 		if (list != null) {
 			this.keystore.clear();
 			this.keystore.addAll(list);
 		}
 
 		this.cgt.update();
-		
+
 		this.kt.update();
-		
+
 		this.rt.update();
 		this.rt.setAppName(appName);
 		this.rt.setRules(policies);
 		this.rt.setAuthorizedUsers(authorizedUsers);
-		
+
 		this.st.setSessions(sessions);
 		this.st.update();
 	}

@@ -5,6 +5,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.management.InstanceNotFoundException;
@@ -81,7 +82,7 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 					SecurityPerspective.ID, iworkbench
 							.getActiveWorkbenchWindow());
 			IViewPart part = page.showView(PolicyEditorView.ID);
-			
+
 			PolicyEditorView pev = (PolicyEditorView) part;
 			PolicyServer ps = psm.getPolicyServer();
 
@@ -89,14 +90,15 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 			for (PolicyRule policy : ps.getPolicies()) {
 				sprl.add(prToSpr(policy));
 			}
-			
+
 			List<String> users = new ArrayList<String>();
 			for (RuleEntity entity : ps.getAccessAuthorizations()) {
 				users.add(entity.getName());
 			}
-			
-			List<Session> sessions = new ArrayList<Session>();
-			sessions.addAll(psm.getSessions().values());
+
+			Hashtable<Long, Session> sessions = new Hashtable<Long, Session>();
+			sessions.putAll(psm.getSessions());
+
 			pev.update(KeystoreUtils.listKeystore(ps.getKeyStore()), sprl, ps
 					.getApplicationName(), users, sessions);
 		} catch (WorkbenchException e2) {
@@ -139,8 +141,9 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 	public void setAbstractDataObject(AbstractData ref) {
 		System.out.println("GetSecurityManager.setAbstractDataObject()");
 		this.object = ref;
-		super.setEnabled((this.object instanceof ActiveObject)
-				|| (this.object instanceof RuntimeObject)|| (this.object instanceof NodeObject));
+		super.setEnabled(this.object instanceof ActiveObject
+				|| this.object instanceof RuntimeObject
+				|| this.object instanceof NodeObject);
 	}
 
 	public void setActiveSelect(AbstractData ref) {

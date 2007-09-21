@@ -201,10 +201,7 @@ public class CertTools {
         Vector<String> values = new Vector<String>();
         int index = -1;
 
-        for (int i = 0; i < dNObjects.length; i++) {
-            //log.debug("Looking for "+objects[i]);
-            String object = dNObjects[i];
-
+        for (String object : dNObjects) {
             while ((index = oldordering.indexOf(object)) != -1) {
                 //log.debug("Found 1 "+object+" at index " + index);
                 DERObjectIdentifier oid = getOid(object);
@@ -458,15 +455,17 @@ public class CertTools {
             PrintStream opstr = new PrintStream(ostr);
             String temp;
             while (((temp = bufRdr.readLine()) != null) &&
-                    !temp.equals(beginKey))
-                continue;
+                    !temp.equals(beginKey)) {
+				continue;
+			}
             if (temp == null) {
                 throw new IOException("Error in " + certstream.toString() +
                     ", missing " + beginKey + " boundary");
             }
             while (((temp = bufRdr.readLine()) != null) &&
-                    !temp.equals(endKey))
-                opstr.print(temp);
+                    !temp.equals(endKey)) {
+				opstr.print(temp);
+			}
             if (temp == null) {
                 throw new IOException("Error in " + certstream.toString() +
                     ", missing " + endKey + " boundary");

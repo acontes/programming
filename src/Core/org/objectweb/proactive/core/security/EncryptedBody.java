@@ -91,7 +91,7 @@ public class EncryptedBody implements Body, Serializable {
     public EncryptedBody(byte[] encryptedBody, long sessionID) {
         this.encryptedBody = encryptedBody;
         this.sessionID = sessionID;
-        isEncrypted = (encryptedBody != null);
+        this.isEncrypted = (encryptedBody != null);
     }
 
     /* (non-Javadoc)
@@ -313,8 +313,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#publicKeyExchange(long, org.objectweb.proactive.core.body.UniversalBody, byte[], byte[], byte[])
      */
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         return null;

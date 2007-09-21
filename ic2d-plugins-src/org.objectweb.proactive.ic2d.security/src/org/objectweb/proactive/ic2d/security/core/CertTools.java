@@ -188,13 +188,13 @@ public abstract class CertTools {
 
 		// Set back startdate ten minutes to avoid some problems with wrongly
 		// set clocks.
-		firstDate.setTime(firstDate.getTime() - (10 * 60 * 1000));
+		firstDate.setTime(firstDate.getTime() - 10 * 60 * 1000);
 
 		Date lastDate = new Date();
 
 		// validity in days = validity*24*60*60*1000 milliseconds
 		lastDate.setTime(lastDate.getTime()
-				+ (validity * (24 * 60 * 60 * 1000)));
+				+ validity * 24 * 60 * 60 * 1000);
 
 		X509V3CertificateGenerator certgen = new X509V3CertificateGenerator();
 
@@ -276,13 +276,13 @@ public abstract class CertTools {
 
 		// Set back startdate ten minutes to avoid some problems with wrongly
 		// set clocks.
-		firstDate.setTime(firstDate.getTime() - (10 * 60 * 1000));
+		firstDate.setTime(firstDate.getTime() - 10 * 60 * 1000);
 
 		Date lastDate = new Date();
 
 		// validity in days = validity*24*60*60*1000 milliseconds
 		lastDate.setTime(lastDate.getTime()
-				+ (validity * (24 * 60 * 60 * 1000)));
+				+ validity * 24 * 60 * 60 * 1000);
 
 		X509V3CertificateGenerator certgen = new X509V3CertificateGenerator();
 

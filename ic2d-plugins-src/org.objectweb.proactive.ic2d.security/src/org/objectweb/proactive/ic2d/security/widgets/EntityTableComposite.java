@@ -42,7 +42,8 @@ public class EntityTableComposite extends Composite {
 		super.setLayout(new GridLayout());
 
 		this.entities = toolkit.createTable(this, SWT.NULL);
-		this.entities.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		this.entities
+				.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		this.viewer = new TableViewer(this.entities);
 
 		this.entities.addKeyListener(new KeyAdapter() {
@@ -50,11 +51,17 @@ public class EntityTableComposite extends Composite {
 			public void keyPressed(KeyEvent e) {
 				if (e.character == SWT.DEL || e.character == SWT.BS) {
 					if (isFrom) {
-						EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex()).removeFrom(
-								EntityTableComposite.this.entities.getSelectionIndex());
+						EntityTableComposite.this.rules.get(
+								EntityTableComposite.this.rulesTable
+										.getSelectionIndex()).removeFrom(
+								EntityTableComposite.this.entities
+										.getSelectionIndex());
 					} else {
-						EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex()).removeTo(
-								EntityTableComposite.this.entities.getSelectionIndex());
+						EntityTableComposite.this.rules.get(
+								EntityTableComposite.this.rulesTable
+										.getSelectionIndex()).removeTo(
+								EntityTableComposite.this.entities
+										.getSelectionIndex());
 					}
 					updateTable();
 				}
@@ -89,14 +96,18 @@ public class EntityTableComposite extends Composite {
 			public void drop(DropTargetEvent event) {
 				if (CertificateTreeMapTransfer.getInstance().isSupportedType(
 						event.currentDataType)) {
-					CertificateTreeMap map = ((CertificateTreeMap) event.data);
+					CertificateTreeMap map = (CertificateTreeMap) event.data;
 
 					for (CertificateTree tree : map.keySet()) {
 						if (isFrom) {
-							EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex()).addFrom(
+							EntityTableComposite.this.rules.get(
+									EntityTableComposite.this.rulesTable
+											.getSelectionIndex()).addFrom(
 									tree.getCertificate().toString());
 						} else {
-							EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex()).addTo(
+							EntityTableComposite.this.rules.get(
+									EntityTableComposite.this.rulesTable
+											.getSelectionIndex()).addTo(
 									tree.getCertificate().toString());
 						}
 					}
@@ -118,11 +129,12 @@ public class EntityTableComposite extends Composite {
 		this.entities.removeAll();
 		if (this.rulesTable.getSelectionIndex() != -1) {
 			if (this.isFrom) {
-				this.viewer.add(this.rules.get(this.rulesTable.getSelectionIndex()).getFrom()
+				this.viewer.add(this.rules.get(
+						this.rulesTable.getSelectionIndex()).getFrom()
 						.toArray());
 			} else {
-				this.viewer.add(this.rules.get(this.rulesTable.getSelectionIndex()).getTo()
-						.toArray());
+				this.viewer.add(this.rules.get(
+						this.rulesTable.getSelectionIndex()).getTo().toArray());
 			}
 		}
 	}

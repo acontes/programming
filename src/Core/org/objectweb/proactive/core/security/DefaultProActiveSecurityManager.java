@@ -87,8 +87,6 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
         PublicKey publicKey = keyPair.getPublic();
         X509V3CertificateGenerator certifGenerator = new X509V3CertificateGenerator();
 
-        X509Certificate certif = null;
-
         DateFormat convert = DateFormat.getDateInstance();
 
         certifGenerator.setPublicKey(publicKey);

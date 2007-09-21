@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.security.crypto;
 
 public class KeyExchangeException extends Exception {
     String type;
-
+    
     public KeyExchangeException() {
     }
 
@@ -44,4 +44,6 @@ public class KeyExchangeException extends Exception {
     public String toString() {
         return type;
     }
+    
+    
 }

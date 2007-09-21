@@ -223,7 +223,7 @@ public class RuleTab extends UpdatableTab {
 			public void widgetSelected(SelectionEvent e) {
 				RuleTab.this.rules.get(
 						RuleTab.this.rulesTable.getSelectionIndex()).setReqInt(
-								Authorization.fromString(RuleTab.this.reqIntCombo
+						Authorization.fromString(RuleTab.this.reqIntCombo
 								.getItem(RuleTab.this.reqIntCombo
 										.getSelectionIndex())));
 
@@ -296,7 +296,7 @@ public class RuleTab extends UpdatableTab {
 			public void widgetSelected(SelectionEvent e) {
 				RuleTab.this.rules.get(
 						RuleTab.this.rulesTable.getSelectionIndex()).setRepInt(
-								Authorization.fromString(RuleTab.this.repIntCombo
+						Authorization.fromString(RuleTab.this.repIntCombo
 								.getItem(RuleTab.this.repIntCombo
 										.getSelectionIndex())));
 
@@ -317,7 +317,7 @@ public class RuleTab extends UpdatableTab {
 
 		return combo;
 	}
-	
+
 	private static void selectRODCombo(Authorization authorization, Combo combo) {
 		switch (authorization) {
 		case REQUIRED:
@@ -617,7 +617,7 @@ public class RuleTab extends UpdatableTab {
 			public void drop(DropTargetEvent event) {
 				if (CertificateTreeMapTransfer.getInstance().isSupportedType(
 						event.currentDataType)) {
-					CertificateTreeMap map = ((CertificateTreeMap) event.data);
+					CertificateTreeMap map = (CertificateTreeMap) event.data;
 
 					for (CertificateTree tree : map.keySet()) {
 						if (tree.getCertificate().getType() == EntityType.USER) {

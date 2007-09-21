@@ -79,5 +79,25 @@ public abstract class SecurityConstants {
 				return UNKNOWN;
 			}
 		}
+		
+		public boolean match(EntityType that) {
+			if (this == that) {
+				return true;
+			}
+			
+			if (this == UNKNOWN || that == UNKNOWN) {
+				return true;
+			}
+			
+			if (this == ENTITY && (that == RUNTIME || that == NODE || that == OBJECT)) {
+				return true;
+			}
+			
+			if (that == ENTITY && (this == RUNTIME || this == NODE || this == OBJECT)) {
+				return true;
+			}
+			
+			return false;
+		}
     }
 }

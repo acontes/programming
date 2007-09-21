@@ -172,8 +172,8 @@ public abstract class PolicyTools {
 	}
 
 	private static void authorizationTag(String tag, TransformerHandler th,
-			boolean permission, Authorization auth, Authorization conf, Authorization integ)
-			throws SAXException {
+			boolean permission, Authorization auth, Authorization conf,
+			Authorization integ) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		atts.addAttribute("", "", "value", "CDATA", permission ? "authorized"
 				: "denied");
@@ -185,8 +185,9 @@ public abstract class PolicyTools {
 		th.endElement("", "", tag);
 	}
 
-	private static void attributesTag(TransformerHandler th, Authorization auth,
-			Authorization conf, Authorization integ) throws SAXException {
+	private static void attributesTag(TransformerHandler th,
+			Authorization auth, Authorization conf, Authorization integ)
+			throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		atts.addAttribute("", "", "authentication", "CDATA", auth.toString());
 		atts.addAttribute("", "", "confidentiality", "CDATA", conf.toString());
@@ -223,14 +224,15 @@ public abstract class PolicyTools {
 	 * 
 	 * @param path
 	 * @return
-	 * @throws ParserConfigurationException 
+	 * @throws ParserConfigurationException
 	 */
-	public static PolicyFile readPolicyFile(String path) throws ParserConfigurationException {
+	public static PolicyFile readPolicyFile(String path)
+			throws ParserConfigurationException {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 		DocumentBuilder db = dbf.newDocumentBuilder();
-		
+
 		Document document = null;
 		try {
 			document = db.parse(path);

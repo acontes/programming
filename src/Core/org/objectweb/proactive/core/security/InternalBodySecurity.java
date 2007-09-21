@@ -87,12 +87,10 @@ public class InternalBodySecurity implements SecurityEntity {
         return this.distantBody.randomValue(sessionID, clientRandomValue);
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        return this.distantBody.publicKeyExchange(sessionID, myPublicKey,
-            myCertificate, signature);
+        return this.distantBody.publicKeyExchange(sessionID, signature);
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,

@@ -72,7 +72,7 @@ public abstract class KeystoreUtils {
 		KeyStore store = KeyStore.getInstance("PKCS12",
 				BouncyCastleProvider.PROVIDER_NAME);
 		store.load(null, null);
-		
+
 		int entityNumber = 0;
 		int appNumber = 0;
 		for (CertificateTree tree : keepPrivateKeyMap.keySet()) {
@@ -90,9 +90,10 @@ public abstract class KeystoreUtils {
 				// nothing
 			}
 		}
-		
+
 		if (entityNumber != 1) {
-			throw new KeyStoreException("Only one entity can have a private key in a keystore");
+			throw new KeyStoreException(
+					"Only one entity can have a private key in a keystore");
 		}
 
 		for (CertificateTree tree : ctl) {

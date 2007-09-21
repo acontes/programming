@@ -37,8 +37,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -46,7 +44,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyRule;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.SecurityContext;
@@ -69,7 +66,7 @@ public class Session implements Serializable {
     private TypedCertificate distantOACertificate;
 
 //    // The clients public key for encryption and decryption.
-    public PublicKey distantOAPublicKey;
+//    private PublicKey distantAOPublicKey;
 
     // Client Side Cipher.
     public transient Cipher cl_cipher;
@@ -162,7 +159,7 @@ public class Session implements Serializable {
 
         this.distantSessionID = distantId;
         this.distantOACertificate = certificate; // The clients public key for encryption and decryption.
-        this.distantOAPublicKey = null; // The clients authentication and signing certificate.
+//        this.distantAOPublicKey = null; // The clients authentication and signing certificate.
     }
 
 //    public boolean isID(long ID) {
@@ -194,6 +191,10 @@ public class Session implements Serializable {
 
     public TypedCertificate getDistantCertificate() {
         return this.distantOACertificate;
+    }
+    
+    public PublicKey getDistantPublicKey() {
+    	return this.distantOACertificate.getCert().getPublicKey();
     }
 
 //    public PublicKey getDistantOAPublicKey() {

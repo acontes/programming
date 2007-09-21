@@ -45,21 +45,21 @@ public class SecurityContext implements Serializable {
 	 */
 	private static final long serialVersionUID = -3210156951283073478L;
 
-	private Entities entitiesLocal;
+	private final Entities entitiesLocal;
 
-	private Entities entitiesDistant;
+	private final Entities entitiesDistant;
 
-	private Communication sendRequest;
+	private final Communication sendRequest;
 
-	private Communication sendReply;
+	private final Communication sendReply;
 
-	private boolean migration;
+	private final boolean migration;
 
-	private boolean aoCreation;
+	private final boolean aoCreation;
 
-	public SecurityContext() {
-		// serializable
-	}
+//	public SecurityContext() {
+//		// serializable
+//	}
 
 	public SecurityContext(Entities local, Entities distant,
 			Communication sendRequest, Communication sendReply,

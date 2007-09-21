@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.security;
 import java.io.Serializable;
 import java.util.List;
 
-import org.objectweb.proactive.core.security.exceptions.IncompatiblePolicyException;
 import org.objectweb.proactive.core.security.securityentity.RuleEntities;
 
 
@@ -42,17 +41,17 @@ public class PolicyRule implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -8290604572288562113L;
-	private RuleEntities from;
-	private RuleEntities to;
-	private Communication communicationReply;
-	private Communication communicationRequest;
-	private boolean migration;
-	private boolean aocreation;
+	private final RuleEntities from;
+	private final RuleEntities to;
+	private final Communication communicationReply;
+	private final Communication communicationRequest;
+	private final boolean migration;
+	private final boolean aocreation;
 
     /**
      * Default constructor, initialize a policy with communication attribute
-     * sets to allowed and authentication,confidentiality and integrity set to
-     * optional
+     * sets to forbidden and authentication,confidentiality and integrity set to
+     * required.
      */
     public PolicyRule() {
     	this.from = new RuleEntities();
@@ -63,45 +62,52 @@ public class PolicyRule implements Serializable {
     	this.aocreation = false;
     }
     
+    public PolicyRule(RuleEntities from, RuleEntities to, Communication request, Communication reply, boolean aoCreation, boolean migration) {
+    	if (from == null || to == null || request == null || reply == null) {
+    		throw new NullPointerException();
+    	}
+    	this.from = from;
+    	this.to = to;
+    	this.communicationRequest = request;
+    	this.communicationReply = reply;
+    	this.aocreation = aoCreation;
+    	this.migration = migration;
+    }
+    
     /**
      * Copy constructor.
      */
     public PolicyRule(PolicyRule policy) {
-    	this.from = new RuleEntities(policy.getEntitiesFrom());
-    	this.to = new RuleEntities(policy.getEntitiesTo());
-    	this.communicationReply = new Communication(policy.getCommunicationReply());
-    	this.communicationRequest = new Communication(policy.getCommunicationRequest());
-    	this.migration = policy.isMigration();
-    	this.aocreation = policy.isAocreation();
+    	this(policy.getEntitiesFrom(), policy.getEntitiesTo(), policy.getCommunicationRequest(), policy.getCommunicationReply(), policy.isAoCreation(), policy.isMigration());
     }
 
-    /**
-     * @param object
-     */
-    public void setEntitiesFrom(RuleEntities entities) {
-        this.from = entities;
-    }
-
-    /**
-     * @param object
-     */
-    public void setEntitiesTo(RuleEntities entities) {
-        this.to = entities;
-    }
-
-    /**
-     * @param object
-     */
-    public void setCommunicationRulesRequest(Communication object) {
-    	this.communicationRequest = object;
-    }
-
-    /**
-     * @param object
-     */
-    public void setCommunicationRulesReply(Communication object) {
-    	this. communicationReply = object;
-    }
+//    /**
+//     * @param object
+//     */
+//    public void setEntitiesFrom(RuleEntities entities) {
+//        this.from = entities;
+//    }
+//
+//    /**
+//     * @param object
+//     */
+//    public void setEntitiesTo(RuleEntities entities) {
+//        this.to = entities;
+//    }
+//
+//    /**
+//     * @param object
+//     */
+//    public void setCommunicationRulesRequest(Communication object) {
+//    	this.communicationRequest = object;
+//    }
+//
+//    /**
+//     * @param object
+//     */
+//    public void setCommunicationRulesReply(Communication object) {
+//    	this. communicationReply = object;
+//    }
 
     @Override
     public String toString() {
@@ -151,7 +157,7 @@ public class PolicyRule implements Serializable {
     /**
      * @return true if object creation is authorized
      */
-    public boolean isAocreation() {
+    public boolean isAoCreation() {
         return this.aocreation;
     }
 
@@ -162,19 +168,19 @@ public class PolicyRule implements Serializable {
         return this.migration;
     }
 
-    /**
-     * @param b
-     */
-    public void setAocreation(boolean b) {
-    	this.aocreation = b;
-    }
-
-    /**
-     * @param b
-     */
-    public void setMigration(boolean b) {
-    	this.migration = b;
-    }
+//    /**
+//     * @param b
+//     */
+//    public void setAocreation(boolean b) {
+//    	this.aocreation = b;
+//    }
+//
+//    /**
+//     * @param b
+//     */
+//    public void setMigration(boolean b) {
+//    	this.migration = b;
+//    }
 
     public static PolicyRule mergePolicies(List<PolicyRule> policies) {
         PolicyRule resultPolicy = null;
@@ -189,22 +195,31 @@ public class PolicyRule implements Serializable {
                 int resultFromLevel = resultPolicy.getEntitiesFrom().getLevel();
                 int resultToLevel = resultPolicy.getEntitiesTo().getLevel();
 
+                RuleEntities from;
                 if (fromLevel > resultFromLevel) {
-                    resultPolicy.setEntitiesFrom(policy.getEntitiesFrom());
+                    from = policy.getEntitiesFrom();
+                } else {
+                	from = resultPolicy.getEntitiesFrom();
                 }
+                
+                RuleEntities to;
                 if (toLevel > resultToLevel) {
-                    resultPolicy.setEntitiesTo(policy.getEntitiesTo());
+                    to = policy.getEntitiesTo();
+                } else {
+                	to = resultPolicy.getEntitiesTo();
                 }
-                if ((policy.isAocreation() != resultPolicy.isAocreation()) ||
-                        (policy.isMigration() != resultPolicy.isMigration())) {
-                    throw new IncompatiblePolicyException("Incompatible rules");
-                }
-                resultPolicy.setCommunicationRulesReply(Communication.computeCommunication(
-                        policy.getCommunicationReply(),
-                        resultPolicy.getCommunicationReply()));
-                resultPolicy.setCommunicationRulesRequest(Communication.computeCommunication(
+                
+                Communication request = Communication.computeCommunication(
                         policy.getCommunicationRequest(),
-                        resultPolicy.getCommunicationRequest()));
+                        resultPolicy.getCommunicationRequest());
+                Communication reply = Communication.computeCommunication(
+                        policy.getCommunicationReply(),
+                        resultPolicy.getCommunicationReply());
+                
+                boolean aoCreation = policy.isAoCreation() && resultPolicy.isAoCreation();
+                boolean migration = policy.isMigration() && resultPolicy.isMigration();
+                
+                resultPolicy = new PolicyRule(from, to, request, reply, aoCreation, migration);
             }
         }
         return resultPolicy;

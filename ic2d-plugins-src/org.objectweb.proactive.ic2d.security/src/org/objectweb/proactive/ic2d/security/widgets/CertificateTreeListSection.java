@@ -43,7 +43,8 @@ public class CertificateTreeListSection {
 	public CertificateTreeListSection(Composite parent, FormToolkit toolkit,
 			String title, CertificateTreeList data, boolean allowDeletion,
 			boolean allowDrag, boolean allowDrop, boolean withChecks) {
-		this.section = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
+		this.section = toolkit.createSection(parent,
+				ExpandableComposite.TITLE_BAR);
 		this.section.setText(title);
 		this.certTreeList = data;
 
@@ -59,7 +60,8 @@ public class CertificateTreeListSection {
 				@Override
 				public void keyPressed(KeyEvent e) {
 					if (e.character == SWT.DEL || e.character == SWT.BS) {
-						CertificateTreeListSection.this.certTreeList.remove(getSelectionData());
+						CertificateTreeListSection.this.certTreeList
+								.remove(getSelectionData());
 
 						updateSection();
 					}
@@ -120,7 +122,8 @@ public class CertificateTreeListSection {
 							CertificateTree newTree = CertificateTree
 									.newTree(entry.getValue());
 							newTree.merge(entry.getKey());
-							CertificateTreeListSection.this.certTreeList.add(newTree.getRoot());
+							CertificateTreeListSection.this.certTreeList
+									.add(newTree.getRoot());
 						}
 
 						updateSection();
@@ -138,8 +141,8 @@ public class CertificateTreeListSection {
 		for (TreeItem item : this.tree.getItems()) {
 			expanded.putAll(getExpanded(item));
 		}
-		
-		//Get check state
+
+		// Get check state
 		Map<TypedCertificate, Boolean> checked = new HashMap<TypedCertificate, Boolean>();
 		for (TreeItem item : this.tree.getItems()) {
 			checked.putAll(getChecked(item));
@@ -149,7 +152,7 @@ public class CertificateTreeListSection {
 		for (CertificateTree subTree : this.certTreeList) {
 			newTreeItem(this.tree, subTree);
 		}
-		
+
 		for (TreeItem item : this.tree.getItems()) {
 			setChecked(item, checked);
 		}
@@ -162,8 +165,8 @@ public class CertificateTreeListSection {
 	private Map<TypedCertificate, Boolean> getExpanded(TreeItem item) {
 		Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
 
-		state.put(((CertificateTree) item.getData()).getCertificate(), new Boolean(item
-				.getExpanded()));
+		state.put(((CertificateTree) item.getData()).getCertificate(),
+				new Boolean(item.getExpanded()));
 		for (TreeItem child : item.getItems()) {
 			state.putAll(getExpanded(child));
 		}
@@ -175,8 +178,8 @@ public class CertificateTreeListSection {
 		Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
 
 		if (!item.getGrayed()) {
-			state.put(((CertificateTree) item.getData()).getCertificate(), new Boolean(item
-					.getChecked()));
+			state.put(((CertificateTree) item.getData()).getCertificate(),
+					new Boolean(item.getChecked()));
 		}
 		for (TreeItem child : item.getItems()) {
 			state.putAll(getChecked(child));
@@ -185,7 +188,8 @@ public class CertificateTreeListSection {
 		return state;
 	}
 
-	private void setExpanded(TreeItem item, Map<TypedCertificate, Boolean> expanded) {
+	private void setExpanded(TreeItem item,
+			Map<TypedCertificate, Boolean> expanded) {
 		TypedCertificate cert = ((CertificateTree) item.getData())
 				.getCertificate();
 		if (expanded.containsKey(cert)) {
@@ -196,7 +200,8 @@ public class CertificateTreeListSection {
 		}
 	}
 
-	private void setChecked(TreeItem item, Map<TypedCertificate, Boolean> checked) {
+	private void setChecked(TreeItem item,
+			Map<TypedCertificate, Boolean> checked) {
 		TypedCertificate cert = ((CertificateTree) item.getData())
 				.getCertificate();
 		if (checked.containsKey(cert)) {

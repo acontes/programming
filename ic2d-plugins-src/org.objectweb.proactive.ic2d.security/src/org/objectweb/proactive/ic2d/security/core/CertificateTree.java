@@ -30,15 +30,15 @@ public class CertificateTree implements Serializable {
 
 	private static KeyPairGenerator keygen;
 
-	private List<CertificateTree> children;
+	private final List<CertificateTree> children;
 
 	private CertificateTree parent;
 
 	private TypedCertificate certificate;
 
-	private CertificateTree() {
+	protected CertificateTree(TypedCertificate certificate) {
 		this.children = new ArrayList<CertificateTree>();
-		this.certificate = null;
+		this.certificate = certificate;
 		this.parent = null;
 
 		if (keygen == null) {
@@ -54,16 +54,16 @@ public class CertificateTree implements Serializable {
 				e1.printStackTrace();
 			}
 		}
+
 	}
 
-	protected CertificateTree(TypedCertificate certificate) {
-		this();
-		this.certificate = certificate;
+	public CertificateTree(String name, int keySize, int validity,
+			EntityType type) {
+		this(genCert(name, keySize, validity, type));
 	}
-
-	public CertificateTree(String name, int keySize, int validity, EntityType type) {
-		this();
-
+	
+	private static TypedCertificate genCert(String name, int keySize, int validity,
+			EntityType type) {
 		keygen.initialize(keySize);
 
 		KeyPair kp = keygen.genKeyPair();
@@ -71,7 +71,7 @@ public class CertificateTree implements Serializable {
 		try {
 			X509Certificate cert = CertTools.genSelfCert(name, validity, null,
 					kp.getPrivate(), kp.getPublic(), true);
-			this.certificate = new TypedCertificate(cert, type, kp.getPrivate());
+			return  new TypedCertificate(cert, type, kp.getPrivate());
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (CertificateEncodingException e) {
@@ -83,6 +83,7 @@ public class CertificateTree implements Serializable {
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	public List<CertificateTree> getChildren() {
@@ -180,8 +181,8 @@ public class CertificateTree implements Serializable {
 	public TypedCertificate search(String name, EntityType type)
 			throws NotFoundException {
 		if (type == this.certificate.getType()
-				&& this.certificate.getCert().getSubjectX500Principal().getName()
-						.equals(name)) {
+				&& this.certificate.getCert().getSubjectX500Principal()
+						.getName().equals(name)) {
 			return this.certificate;
 		}
 
@@ -212,7 +213,8 @@ public class CertificateTree implements Serializable {
 	public String getName() {
 		String result = this.certificate.getType().toString();
 		result += ":";
-		result += this.certificate.getCert().getSubjectX500Principal().getName();
+		result += this.certificate.getCert().getSubjectX500Principal()
+				.getName();
 		return result;
 	}
 

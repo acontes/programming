@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +66,7 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
  *
  */
 public abstract class AbstractUniversalBody implements UniversalBody,
-    java.io.Serializable {
+    Serializable {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //

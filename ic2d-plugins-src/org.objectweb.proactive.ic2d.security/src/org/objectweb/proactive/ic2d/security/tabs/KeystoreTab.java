@@ -63,7 +63,7 @@ public class KeystoreTab extends UpdatableTab {
 	protected Tree keystoreTree;
 
 	protected CertificateTreeListSection activeKeystoreSection;
-	
+
 	protected CertificateDetailsSection certDetailsSection;
 
 	protected Text passwordText;
@@ -252,7 +252,8 @@ public class KeystoreTab extends UpdatableTab {
 				if (data instanceof CertificateTree) {
 					CertificateTree ct = (CertificateTree) data;
 
-					KeystoreTab.this.certDetailsSection.update(ct.getCertificate());
+					KeystoreTab.this.certDetailsSection.update(ct
+							.getCertificate());
 				} else {
 					KeystoreTab.this.certDetailsSection.update(null);
 				}
@@ -353,8 +354,9 @@ public class KeystoreTab extends UpdatableTab {
 				new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						KeystoreTab.this.certDetailsSection.update(KeystoreTab.this.activeKeystoreSection
-								.getSelectionData().getCertificate());
+						KeystoreTab.this.certDetailsSection
+								.update(KeystoreTab.this.activeKeystoreSection
+										.getSelectionData().getCertificate());
 
 						super.widgetSelected(e);
 					}
@@ -364,8 +366,9 @@ public class KeystoreTab extends UpdatableTab {
 	}
 
 	private Section createSectionCertDetails(Composite parent) {
-		this.certDetailsSection = new CertificateDetailsSection(parent, this.toolkit);
-		
+		this.certDetailsSection = new CertificateDetailsSection(parent,
+				this.toolkit);
+
 		return this.certDetailsSection.get();
 	}
 

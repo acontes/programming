@@ -1,6 +1,5 @@
 package org.objectweb.proactive.ic2d.security.widgets;
 
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -12,14 +11,18 @@ import org.objectweb.proactive.core.security.Communication;
 public class CommunicationDetailsComposite extends Composite {
 
 	private Text communicationText;
+
 	private Text authenticationText;
+
 	private Text confidentialityText;
+
 	private Text integrityText;
 
-	public CommunicationDetailsComposite(Composite parent, FormToolkit toolkit, String name) {
+	public CommunicationDetailsComposite(Composite parent, FormToolkit toolkit,
+			String name) {
 		super(parent, SWT.NULL);
 		toolkit.adapt(this);
-		
+
 		super.setLayout(new GridLayout());
 
 		toolkit.createLabel(this, name);
@@ -49,9 +52,9 @@ public class CommunicationDetailsComposite extends Composite {
 				false));
 	}
 
-
 	public void updateCommunication(Communication c) {
-		this.communicationText.setText(c.getCommunication() ? "Authorized" : "Forbidden");
+		this.communicationText.setText(c.getCommunication() ? "Authorized"
+				: "Forbidden");
 		this.authenticationText.setText(c.getAuthentication().toString());
 		this.confidentialityText.setText(c.getConfidentiality().toString());
 		this.integrityText.setText(c.getIntegrity().toString());

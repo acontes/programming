@@ -146,13 +146,11 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         if (this.psm != null) {
-            return this.psm.publicKeyExchange(sessionID, myPublicKey,
-                myCertificate, signature);
+            return this.psm.publicKeyExchange(sessionID, signature);
         }
         throw new SecurityNotAvailableException();
     }
