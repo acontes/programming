@@ -53,6 +53,7 @@ public class IMNodeImpl implements IMNode, Serializable {
     // Attributes
     private Node node;
     private String nodeURL;
+    private String nodeName;
     private String vnodeName;
     private String padName;
     private String hostName;
@@ -71,7 +72,7 @@ public class IMNodeImpl implements IMNode, Serializable {
         this.node = node;
         this.vnodeName = vnodeName;
         this.padName = padName;
-        //  this.nodeName = node.getNodeInformation().getName();
+        this.nodeName = node.getNodeInformation().getName();
         this.nodeURL = node.getNodeInformation().getURL();
         this.hostName = node.getNodeInformation().getVMInformation()
                             .getHostName();
@@ -86,6 +87,9 @@ public class IMNodeImpl implements IMNode, Serializable {
         return this.nodeURL;
     }
 
+    public String getNodeName(){
+        return this.nodeName;
+    }
 
     public Node getNode() throws NodeException {
         if (!isDown()) {

@@ -92,10 +92,15 @@ public interface IMNode extends Comparable<IMNode> {
     // GET
 
     /**
-     * @return the name of the node
+     * @return the URL of the node
      */
     public String getNodeURL();
 
+    /**
+     * @return the name of the node
+     */
+    public String getNodeName();
+    
     /**
      * @return Node
      */
