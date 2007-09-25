@@ -52,6 +52,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 
 import javax.crypto.BadPaddingException;
@@ -76,6 +77,7 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
+import org.objectweb.proactive.core.security.securityentity.RuleEntities;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -1500,5 +1502,17 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
 	
 	public String getApplicationName() {
 		return this.policyServer.getApplicationName();
+	}
+	
+	public List<PolicyRule> getPolicies() {
+		return this.policyServer.getPolicies();
+	}
+	
+	public RuleEntities getAccessAuthorizations() {
+		return this.policyServer.getAccessAuthorizations();
+	}
+	
+	public KeyStore getKeyStore() {
+		return this.policyServer.getKeyStore();
 	}
 }

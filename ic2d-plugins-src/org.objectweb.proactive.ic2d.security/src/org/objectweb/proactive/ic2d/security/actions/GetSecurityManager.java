@@ -19,7 +19,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.objectweb.proactive.core.security.PolicyRule;
-import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.securityentity.RuleEntity;
@@ -39,8 +38,6 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 	private AbstractData object;
 
 	public GetSecurityManager() {
-		System.out.println("GetSecurityManager.GetSecurityManager()");
-
 		setId(GET_SECURITY_MANAGER);
 		setToolTipText("Export SM to Policy view");
 		setText("Export SM to Policy view");
@@ -49,8 +46,6 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 
 	@Override
 	public final void run() {
-		System.out.println("GetSecurityManager.run()");
-
 		ProActiveSecurityManager psm = null;
 		try {
 			psm = (ProActiveSecurityManager) this.object
@@ -84,22 +79,21 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 			IViewPart part = page.showView(PolicyEditorView.ID);
 
 			PolicyEditorView pev = (PolicyEditorView) part;
-			PolicyServer ps = psm.getPolicyServer();
 
 			List<SimplePolicyRule> sprl = new ArrayList<SimplePolicyRule>();
-			for (PolicyRule policy : ps.getPolicies()) {
+			for (PolicyRule policy : psm.getPolicies()) {
 				sprl.add(prToSpr(policy));
 			}
 
 			List<String> users = new ArrayList<String>();
-			for (RuleEntity entity : ps.getAccessAuthorizations()) {
+			for (RuleEntity entity : psm.getAccessAuthorizations()) {
 				users.add(entity.getName());
 			}
 
 			Hashtable<Long, Session> sessions = new Hashtable<Long, Session>();
 			sessions.putAll(psm.getSessions());
 
-			pev.update(KeystoreUtils.listKeystore(ps.getKeyStore()), sprl, ps
+			pev.update(KeystoreUtils.listKeystore(psm.getKeyStore()), sprl, psm
 					.getApplicationName(), users, sessions);
 		} catch (WorkbenchException e2) {
 			e2.printStackTrace();
@@ -139,7 +133,6 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 	}
 
 	public void setAbstractDataObject(AbstractData ref) {
-		System.out.println("GetSecurityManager.setAbstractDataObject()");
 		this.object = ref;
 		super.setEnabled(this.object instanceof ActiveObject
 				|| this.object instanceof RuntimeObject
@@ -147,7 +140,6 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 	}
 
 	public void setActiveSelect(AbstractData ref) {
-		System.out.println("GetSecurityManager.setActiveSelect()");
 		// TODO Auto-generated method stub
 
 	}
