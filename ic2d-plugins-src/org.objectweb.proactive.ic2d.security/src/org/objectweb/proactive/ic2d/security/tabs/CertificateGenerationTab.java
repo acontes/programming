@@ -55,7 +55,7 @@ public class CertificateGenerationTab extends UpdatableTab {
 
 		body.setLayout(new GridLayout(3, true));
 
-		createSectionKeyPair(body).setLayoutData(
+		createSectionOptions(body).setLayoutData(
 				new GridData(SWT.FILL, SWT.TOP, true, true));
 
 		createSectionCertTreeList(body).setLayoutData(
@@ -67,7 +67,7 @@ public class CertificateGenerationTab extends UpdatableTab {
 		setControl(body);
 	}
 
-	private Section createSectionKeyPair(Composite parent) {
+	private Section createSectionOptions(Composite parent) {
 		Section section = this.toolkit.createSection(parent,
 				ExpandableComposite.TITLE_BAR);
 		section.setText("Stuff");

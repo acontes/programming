@@ -132,7 +132,7 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 		rule.setReqInt(policy.getCommunicationRequest().getIntegrity());
 		rule.setRequest(policy.getCommunicationRequest()
 				.isCommunicationAllowed());
-		rule.setAoCreation(policy.isAocreation());
+		rule.setAoCreation(policy.isAoCreation());
 		rule.setMigration(policy.isMigration());
 
 		return rule;

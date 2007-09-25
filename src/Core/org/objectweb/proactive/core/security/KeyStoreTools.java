@@ -70,18 +70,13 @@ public abstract class KeyStoreTools {
 	public static TypedCertificateList getSelfCertificateChain(KeyStore keystore, EntityType type)
 			throws KeyStoreException, UnrecoverableKeyException,
 			NoSuchAlgorithmException {
-		TypedCertificateList tcl =  getCertificateChain(keystore, getSelfCertificate(keystore, type));
-		return tcl;
+		return getCertificateChain(keystore, getSelfCertificate(keystore, type));
 	}
 
 	public static PrivateKey getSelfPrivateKey(KeyStore keystore)
 			throws UnrecoverableKeyException, KeyStoreException,
 			NoSuchAlgorithmException {
 		return getPrivateKey(keystore, KEYSTORE_ENTITY_KEY_PATH);
-	}
-
-	public static int getSelfLevel(KeyStore keystore) throws KeyStoreException {
-		return keystore.getCertificateChain(KEYSTORE_ENTITY_KEY_PATH).length;
 	}
 
 	public static TypedCertificate getApplicationCertificate(KeyStore keystore)

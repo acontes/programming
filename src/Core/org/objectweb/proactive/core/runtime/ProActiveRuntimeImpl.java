@@ -1113,9 +1113,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             throw new SecurityNotAvailableException();
         }
 
-        PolicyServer policyServer = runtimeSecurityManager.getPolicyServer();
+//        PolicyServer policyServer = runtimeSecurityManager.getPolicyServer();
 
-        return policyServer.getPolicy(local, distant);
+        return runtimeSecurityManager.getPolicy(local, distant);
     }
 
     public byte[] getClassDataFromParentRuntime(String className)

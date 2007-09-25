@@ -108,7 +108,6 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 
 		List<PolicyRule> policyRules = new ArrayList<PolicyRule>();
 		for (SimplePolicyRule policy : pev.getRt().getRules()) {
-			PolicyRule pr = new PolicyRule();
 			RuleEntities entitiesFrom = new RuleEntities();
 			for (String name : policy.getFrom()) {
 				try {
@@ -126,7 +125,6 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 					e.printStackTrace();
 				}
 			}
-			pr.setEntitiesFrom(entitiesFrom);
 			RuleEntities entitiesTo = new RuleEntities();
 			for (String name : policy.getTo()) {
 				try {
@@ -144,17 +142,14 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 					e.printStackTrace();
 				}
 			}
-			pr.setEntitiesTo(entitiesTo);
-			pr.setAocreation(policy.isAoCreation());
-			pr.setMigration(policy.isMigration());
-			pr.setCommunicationRulesReply(new Communication(policy.isReply(),
+			Communication reply = new Communication(policy.isReply(),
 					policy.getRepAuth(), policy.getRepConf(), policy
-							.getRepInt()));
-			pr.setCommunicationRulesRequest(new Communication(policy
+							.getRepInt());
+			Communication request = new Communication(policy
 					.isRequest(), policy.getReqAuth(), policy.getReqConf(),
-					policy.getReqInt()));
+					policy.getReqInt());
 
-			policyRules.add(pr);
+			policyRules.add(new PolicyRule(entitiesFrom, entitiesTo, request, reply, policy.isAoCreation(), policy.isMigration()));
 		}
 
 		RuleEntities users = new RuleEntities();
@@ -175,10 +170,8 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 			}
 		}
 
-		PolicyServer ps = new PolicyServer(keystore, policyRules);
-		ps.setApplicationName(pev.getAppName());
-		ps.setAccessAuthorization(users);
-
+		PolicyServer ps = new PolicyServer(keystore, policyRules, pev.getAppName(), "unknown", users);
+		
 		try {
 			this.object
 					.invoke(

@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.objectweb.proactive.core.security.Communication.Authorization;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
@@ -128,16 +129,21 @@ public class ProActiveSecurityDescriptorHandler extends
 	 */
 	public ProActiveSecurityDescriptorHandler(String descriptorUrl) {
 		super();
-		Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+		Provider myProvider = new BouncyCastleProvider();
 		Security.addProvider(myProvider);
 		this.descriptorUrl = descriptorUrl;
-		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String,
+	 *      org.objectweb.proactive.core.xml.io.Attributes)
+	 */
+	public void startContextElement(String name, Attributes attributes) {
 		addHandler(APPLICATION_NAME_TAG, new SingleValueUnmarshaller());
-
 		addHandler(PKCS12_KEYSTORE, new SingleValueUnmarshaller());
-
 		addHandler(RULES_TAG, new RulesHandler());
-
 		addHandler(ACCESS_TAG, new AccessHandler());
 	}
 
@@ -161,16 +167,14 @@ public class ProActiveSecurityDescriptorHandler extends
 			String pkcs12Keystore = (String) activeHandler.getResultObject();
 			try {
 				this.keystore = KeyStore.getInstance("PKCS12", "BC");
+				this.keystore.load(new FileInputStream(pkcs12Keystore),
+						  "ha".toCharArray());
 			} catch (KeyStoreException e) {
 				e.printStackTrace();
 				this.keystore = null;
 			} catch (NoSuchProviderException e) {
 				e.printStackTrace();
 				this.keystore = null;
-			}
-			try {
-				this.keystore.load(new FileInputStream(pkcs12Keystore),
-				  "ha".toCharArray());
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
 				this.keystore = null;
@@ -212,16 +216,6 @@ public class ProActiveSecurityDescriptorHandler extends
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String,
-	 *      org.objectweb.proactive.core.xml.io.Attributes)
-	 */
-	public void startContextElement(String name, Attributes attributes) {
-		// nothing
-	}
-
 	/**
 	 * This class receives Security events
 	 */
@@ -230,25 +224,25 @@ public class ProActiveSecurityDescriptorHandler extends
 
 		public RulesHandler() {
 			super();
-			this.policies = new ArrayList<PolicyRule>();
-			addHandler(RULE_TAG, new RuleHandler());
 		}
 
 		public void startContextElement(String name, Attributes attributes) {
-			// nothing
+			this.policies = new ArrayList<PolicyRule>();
+			addHandler(RULE_TAG, new RuleHandler());
 		}
 
 		@Override
 		protected void notifyEndActiveHandler(String name,
 				UnmarshallerHandler activeHandler)
-				throws org.xml.sax.SAXException {
+				throws SAXException {
 			if (name.equals(RULE_TAG)) {
 				Object resultObject = activeHandler.getResultObject();
 				if (resultObject != null) {
 					this.policies.add((PolicyRule) resultObject);
 				}
 			}
-			addHandler(RULE_TAG, new RuleHandler());
+			
+//			addHandler(RULE_TAG, new RuleHandler());
 		}
 
 		/*
@@ -306,6 +300,9 @@ public class ProActiveSecurityDescriptorHandler extends
 
 		public RuleHandler() {
 			super();
+		}
+
+		public void startContextElement(String name, Attributes attributes) {
 			addHandler(ENTITY_FROM_TAG, new EntityCollector());
 			addHandler(ENTITY_TO_TAG, new EntityCollector());
 			addHandler(RULE_COMMUNICATION_TAG,
@@ -314,10 +311,6 @@ public class ProActiveSecurityDescriptorHandler extends
 					new SingleValueUnmarshaller());
 			addHandler(RULE_COMMUNICATION_MIGRATION_TAG,
 					new SingleValueUnmarshaller());
-		}
-
-		public void startContextElement(String name, Attributes attributes) {
-			// nothing
 		}
 
 		/*
@@ -369,6 +362,16 @@ public class ProActiveSecurityDescriptorHandler extends
 		private RuleEntities entities;
 
 		public EntityCollector() {
+			super();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String,
+		 *      org.objectweb.proactive.core.xml.io.Attributes)
+		 */
+		public void startContextElement(String name, Attributes attributes) {
 			this.entities = new RuleEntities();
 			addHandler(ENTITY_TAG, new EntityHandler());
 		}
@@ -398,16 +401,6 @@ public class ProActiveSecurityDescriptorHandler extends
 		 */
 		public Object getResultObject() {
 			return this.entities;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String,
-		 *      org.objectweb.proactive.core.xml.io.Attributes)
-		 */
-		public void startContextElement(String name, Attributes attributes) {
-			// nothing
 		}
 	}
 
@@ -477,6 +470,15 @@ public class ProActiveSecurityDescriptorHandler extends
 
 		public CommunicationCollectionHandler() {
 			super();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String,
+		 *      org.objectweb.proactive.core.xml.io.Attributes)
+		 */
+		public void startContextElement(String name, Attributes attributes) {
 			addHandler(RULE_COMMUNICATION_REPLY_TAG, new CommunicationHandler());
 			addHandler(RULE_COMMUNICATION_REQUEST_TAG,
 					new CommunicationHandler());
@@ -507,16 +509,6 @@ public class ProActiveSecurityDescriptorHandler extends
 		public Object getResultObject() {
 			return new Communications(this.request, this.reply);
 		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String,
-		 *      org.objectweb.proactive.core.xml.io.Attributes)
-		 */
-		public void startContextElement(String name, Attributes attributes) {
-			// nothing
-		}
 	}
 
 	/**
@@ -529,13 +521,13 @@ public class ProActiveSecurityDescriptorHandler extends
 
 		public CommunicationHandler() {
 			super();
-
-			addHandler(RULE_COMMUNICATION_ATTRIBUTES_TAG,
-					new CommunicationAttributesHandler());
 		}
 
 		public void startContextElement(String name, Attributes attributes)
-				throws org.xml.sax.SAXException {
+				throws SAXException {
+			addHandler(RULE_COMMUNICATION_ATTRIBUTES_TAG,
+					new CommunicationAttributesHandler());
+			
 			this.allowed = attributes.getValue("value").equalsIgnoreCase("authorized");
 		}
 
@@ -581,11 +573,10 @@ public class ProActiveSecurityDescriptorHandler extends
 		@Override
 		public void startContextElement(String name, Attributes attributes)
 				throws SAXException {
-			this.attributes = new Authorizations(Authorization
-					.fromString(attributes.getValue("authentication")),
-					Authorization.fromString(attributes
-							.getValue("confidentiality")), Authorization
-							.fromString(attributes.getValue("integrity")));
+			this.attributes = new Authorizations(
+					Authorization.fromString(attributes.getValue("authentication")),
+					Authorization.fromString(attributes.getValue("confidentiality")),
+					Authorization.fromString(attributes.getValue("integrity")));
 		}
 
 		/*
@@ -606,18 +597,17 @@ public class ProActiveSecurityDescriptorHandler extends
 
 		public AccessHandler() {
 			super();
-			this.entities = new RuleEntities();
-			addHandler(ENTITY_TAG, new EntityHandler());
 		}
 
 		public void startContextElement(String name, Attributes attributes) {
-			// nothing
+			this.entities = new RuleEntities();
+			addHandler(ENTITY_TAG, new EntityHandler());
 		}
 
 		@Override
 		protected void notifyEndActiveHandler(String name,
 				UnmarshallerHandler activeHandler)
-				throws org.xml.sax.SAXException {
+				throws SAXException {
 			// new handler otherwise all policies reference the same object,
 			// maybe there is another thing to do
 			// addHandler(RULE_TAG, new RuleHandler());
@@ -672,7 +662,6 @@ public class ProActiveSecurityDescriptorHandler extends
 
 	private class Communications {
 		private Communication request;
-
 		private Communication reply;
 
 		public Communications(Communication request, Communication reply) {
@@ -693,8 +682,9 @@ public class ProActiveSecurityDescriptorHandler extends
 		private Authorization authentication;
 		private Authorization confidentiality;
 		private Authorization integrity;
-		
-		public Authorizations(Authorization authentication, Authorization confidentiality, Authorization integrity) {
+
+		public Authorizations(Authorization authentication,
+				Authorization confidentiality, Authorization integrity) {
 			this.authentication = authentication;
 			this.confidentiality = confidentiality;
 			this.integrity = integrity;
@@ -710,6 +700,15 @@ public class ProActiveSecurityDescriptorHandler extends
 
 		public Authorization getIntegrity() {
 			return this.integrity;
+		}
+		
+		@Override
+		public String toString() {
+			String s = "";
+			s += "\n\nAuth : " + this.authentication;
+			s += "\nConf : " + this.confidentiality;
+			s += "\nInt : " + this.integrity;
+			return s;
 		}
 	}
 }

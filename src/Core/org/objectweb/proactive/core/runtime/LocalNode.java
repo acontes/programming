@@ -106,7 +106,7 @@ public class LocalNode implements SecurityEntity {
             ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
                            .debug("Local Node : " + this.name + " VN name : " +
                 this.virtualNodeName + " policyserver for app :" +
-                this.securityManager.getPolicyServer().getApplicationName());
+                this.securityManager.getApplicationName());
 
             // setting virtual node name
 //            this.securityManager.setVNName(this.virtualNodeName);

@@ -222,7 +222,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             this.isSecurityOn = true;
             ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
                            .debug("Active Object security On application is " +
-                this.securityManager.getPolicyServer().getApplicationName());
+                this.securityManager.getApplicationName());
             ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
                            .debug("current thread is " +
                 Thread.currentThread().getName());
@@ -834,17 +834,17 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public void setPolicyServer(PolicyServer server) {
-        if (server != null) {
-            if ((this.securityManager != null) &&
-                    (this.securityManager.getPolicyServer() == null)) {
-                this.securityManager = new ProActiveSecurityManager(EntityType.UNKNOWN, server);
-                this.isSecurityOn = true;
-                logger.debug("Security is on " + this.isSecurityOn);
-//                this.securityManager.setBody(this);
-            }
-        }
-    }
+//    public void setPolicyServer(PolicyServer server) {
+//        if (server != null) {
+//            if ((this.securityManager != null) &&
+//                    (this.securityManager.getPolicyServer() == null)) {
+//                this.securityManager = new ProActiveSecurityManager(EntityType.UNKNOWN, server);
+//                this.isSecurityOn = true;
+//                logger.debug("Security is on " + this.isSecurityOn);
+////                this.securityManager.setBody(this);
+//            }
+//        }
+//    }
 
     //
     // -- implements LocalBody -----------------------------------------------

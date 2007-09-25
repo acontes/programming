@@ -64,7 +64,7 @@ public class Launcher {
 //            System.out.println("==");
             a.makeTargetDoSomething(b);
 //            System.out.println("==");
-//            a.makeTargetDoSomething(c);
+            a.makeTargetDoSomething(c);
             
 //            System.out.println("//////////////////");
             
@@ -76,7 +76,7 @@ public class Launcher {
             
 //            System.out.println("//////////////////");
             
-            c.makeTargetDoSomething(a);
+//            c.makeTargetDoSomething(a);
 //            System.out.println("==");
 //            c.makeTargetDoSomething(b);
 //            System.out.println("==");

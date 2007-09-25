@@ -260,26 +260,20 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
 
         // compute policy
         SecurityContext resultContext = SecurityContext.computeContext(scLocal, scDistant);
-
+        
         // create the session locally and on the distant entity
         long sessionID = 0;
         long distantSessionID = 0;
         Session session = null;
 		try {
-			sessionID = this.startNewSession(0, resultContext, distantBodyCertificate);
+		
+			sessionID = startNewSession(0, resultContext, distantBodyCertificate);
+			
 			distantSessionID = distantSecurityEntity.startNewSession(sessionID, resultContext.otherSideContext(), this.getCertificate().noPrivateKey());
-	        
+			
 			session = getSession(sessionID);
 			session.setDistantSessionID(distantSessionID);
-		} catch (SessionException e1) {
-			e1.printStackTrace();
-			throw new CommunicationForbiddenException();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new CommunicationForbiddenException();
-		}
-
-        try {
+        
 			ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug(
 					"adding new session "
 							+ sessionID
@@ -288,17 +282,23 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
 									.getSubjectDN() + "\n local object is "
 							+ this.getCertificate().getCert().getSubjectDN());
 
-			keyNegociationSenderSide(distantSecurityEntity, session);
+			if (!session.isSessionValidated()) {
+				keyNegociationSenderSide(distantSecurityEntity, session);
+			}
 
+			
 			// session is ready, we can validate it
-			session.setSessionValidated(true);
+//			session.validate();
+		} catch (SessionException se) {
+			se.printStackTrace();
+			throw new CommunicationForbiddenException("Cannot create a new session object.");
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+			throw new CommunicationForbiddenException("Distant entity unreachable for session creation.");
 		} catch (KeyExchangeException e) {
 			logger.warn("Key exchange exception ");
 			e.printStackTrace();
-			throw new CommunicationForbiddenException();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CommunicationForbiddenException("Key exchange exception.");
 		}
         
         return session;
@@ -309,7 +309,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
 				|| (this.policyServer.getKeyStore() == null)) {
 			return null;
 		}
-		return this.policyServer.getCertificate(this.getType());
+		return this.policyServer.getCertificate(this.getType()).noPrivateKey();
 	}
 
 //	public void terminateSession(UniversalBody body, long sessionID) {
@@ -318,7 +318,9 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
 
 	public void terminateSession(long sessionID) {
 		synchronized (this.sessions) {
+			Session session = getSession(sessionID);
 			this.sessions.remove(new Long(sessionID));
+			this.sessionIDs.remove(session.getDistantCertificate());
 		}
 	}
 
@@ -508,7 +510,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
      * @return boolean returns true if the negociation has succeed.
      * @throws KeyExchangeException
      */
-    public boolean keyNegociationSenderSide(
+    public synchronized boolean keyNegociationSenderSide(
         SecurityEntity distantSecurityEntity, Session session)
         throws KeyExchangeException {
 //        Session session = getSession(sessionID);
@@ -526,7 +528,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             // Read the HELLO back from the server and collect
             // the Server Random value.
             //
-            session.getSec_rand().nextBytes(session.cl_rand);
+            session.sec_rand.nextBytes(session.cl_rand);
             session.se_rand = distantSecurityEntity.randomValue(session.getDistantSessionID(),
                     session.cl_rand);
 
@@ -549,7 +551,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             //
             // Init signature with the private key used for signing.
             //
-            sig.initSign(this.getPrivateKey(), session.getSec_rand());
+            sig.initSign(this.getPrivateKey(), session.sec_rand);
 
             //
             // All signatures incorporate the client random and the server
@@ -665,10 +667,10 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             //
             KeyGenerator key_gen = KeyGenerator.getInstance("AES", "BC"); // Get instance for AES
 
-            key_gen.init(192, session.getSec_rand()); // Use a 192 bit key size.
+            key_gen.init(192, session.sec_rand); // Use a 192 bit key size.
             session.cl_aes_key = key_gen.generateKey(); // Generate the  SecretKey
 
-            key_gen.init(160, session.getSec_rand()); // Set up for a 160 bit key.
+            key_gen.init(160, session.sec_rand); // Set up for a 160 bit key.
             session.cl_hmac_key = key_gen.generateKey(); // Generate key for HMAC.
 
             //
@@ -698,7 +700,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             // up for Encryption.
             //
             session.cl_cipher.init(Cipher.ENCRYPT_MODE, session.cl_aes_key,
-                session.cl_iv, session.getSec_rand());
+                session.cl_iv, session.sec_rand);
 
             //
             // Set up Client side MAC with key.
@@ -708,20 +710,20 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             //
             // Load byte array with random data.
             //
-            session.getSec_rand().nextBytes(tmp_lock);
+            session.sec_rand.nextBytes(tmp_lock);
 
             //
             // Set up RSA for encryption.
             //
             session.rsa_eng.init(Cipher.ENCRYPT_MODE,
-                session.getDistantPublicKey(), session.getSec_rand());
+                session.getDistantPublicKey(), session.sec_rand);
 
             //
             // Set up and instace of AES for the Signature locking data.
             //
             aes_lock = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
             aes_lock.init(Cipher.ENCRYPT_MODE, session.cl_aes_key,
-                session.cl_iv, session.getSec_rand());
+                session.cl_iv, session.sec_rand);
 
             //
             //  Secret Keys Exchange. = confidentiality 
@@ -800,7 +802,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             byte[] tmp_loc;
 
             session.rsa_eng.init(Cipher.DECRYPT_MODE, this.getPrivateKey(),
-                session.getSec_rand());
+                session.sec_rand);
 
             //
             // Read in secret key.
@@ -875,6 +877,8 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             //
             // setup for sending and receiving are automaticly done if we succeed
             // the key echange
+            
+            session.validate();
         } catch (Exception e) {
             e.printStackTrace();
             throw new KeyExchangeException(
@@ -964,7 +968,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             //
             // Generate Server's Random;
             //
-            session.getSec_rand().nextBytes(session.se_rand); // Fill with random data.
+            session.sec_rand.nextBytes(session.se_rand); // Fill with random data.
 
             //   System.out.println("Server: Sending my HELLO to client");
         } catch (Exception e) {
@@ -1137,7 +1141,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             // But first we need to decrypt the lock data to incorperate into the exchange.
             //
             session.rsa_eng.init(Cipher.DECRYPT_MODE, this.getPrivateKey(),
-                session.getSec_rand());
+                session.sec_rand);
 
             SecretKey sk = new SecretKeySpec(session.rsa_eng.doFinal(
                         clientAESKeyEncoded), "AES");
@@ -1146,7 +1150,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
                         clientIVEncoded));
 
             session.se_cipher.init(Cipher.DECRYPT_MODE, sk, ivspec,
-                session.getSec_rand());
+                session.sec_rand);
 
             Signature sig = Signature.getInstance("MD5withRSA", "BC");
 
@@ -1192,24 +1196,24 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             // Generate my secrets.
             //
             KeyGenerator key_gen = KeyGenerator.getInstance("AES", "BC");
-            key_gen.init(192, session.getSec_rand());
+            key_gen.init(192, session.sec_rand);
             session.se_aes_key = key_gen.generateKey();
 
-            key_gen.init(160, session.getSec_rand());
+            key_gen.init(160, session.sec_rand);
             session.se_hmac_key = key_gen.generateKey();
 
             // initialization of IV 
             session.se_iv = new IvParameterSpec(new byte[16]);
 
             session.se_cipher.init(Cipher.ENCRYPT_MODE, session.se_aes_key,
-                session.se_iv, session.getSec_rand());
+                session.se_iv, session.sec_rand);
 
             byte[] my_iv = session.se_cipher.getIV();
             session.se_iv = new IvParameterSpec(my_iv);
 
             session.se_mac.init(session.se_hmac_key);
             clientLockData = new byte[24];
-            session.getSec_rand().nextBytes(clientLockData);
+            session.sec_rand.nextBytes(clientLockData);
 
             //
             // Set up RSA for encryption.
@@ -1218,7 +1222,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             sig.update(session.cl_rand);
             sig.update(session.se_rand);
             session.rsa_eng.init(Cipher.ENCRYPT_MODE,
-                session.getDistantPublicKey(), session.getSec_rand());
+                session.getDistantPublicKey(), session.sec_rand);
 
             //
             // Encrypt and send AES key.
@@ -1242,7 +1246,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             // Encrypt and send LOCK data..
             //
             session.se_cipher.init(Cipher.ENCRYPT_MODE, session.se_aes_key,
-                new IvParameterSpec(my_iv), session.getSec_rand());
+                new IvParameterSpec(my_iv), session.sec_rand);
             result[3] = session.se_cipher.doFinal(clientLockData);
             sig.update(clientLockData); // Incorporate plain text into signature.
 
@@ -1253,7 +1257,7 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
             // can set up our PDU generators to send encrypted
             // messages.
             //
-            session.setSessionValidated(true);
+            session.validate();
         } catch (BadPaddingException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
@@ -1346,12 +1350,12 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
 //        return this.VNName;
 //    }
 
-    /**
-     * @return policy server
-     */
-    public PolicyServer getPolicyServer() {
-        return this.policyServer;
-    }
+//    /**
+//     * @return policy server
+//     */
+//    protected PolicyServer getPolicyServer() {
+//        return this.policyServer;
+//    }
 
 //    /**
 //     * This method returns the entity certificate as byte array. It should be used
@@ -1436,14 +1440,14 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
                         		   name);
             
             KeyStore keystore = this.policyServer.getKeyStore();
-            X509Certificate applicationCertificate = this.policyServer.getApplicationCertificate().getCert();
+            TypedCertificate appCert = this.policyServer.getApplicationCertificate();
 
             X509Certificate cert = CertTools.genCert(name, 65 * 24 * 360L, null,
                     siblingKeyPair.getPrivate(), siblingKeyPair.getPublic(),
                     true,
-                    applicationCertificate.getSubjectX500Principal().getName(),
-                    KeyStoreTools.getApplicationPrivateKey(keystore),
-                        applicationCertificate.getPublicKey());
+                    appCert.getCert().getSubjectX500Principal().getName(),
+                    appCert.getPrivateKey(),
+                        appCert.getCert().getPublicKey());
 
             KeyStoreTools.newEntity(keystore, new TypedCertificate(cert, this.type, siblingKeyPair.getPrivate()));
         } catch (InvalidKeyException e) {
@@ -1492,5 +1496,9 @@ public class ProActiveSecurityManager implements Serializable/*, SecurityEntity*
 	
 	public EntityType getType() {
 		return this.type;
+	}
+	
+	public String getApplicationName() {
+		return this.policyServer.getApplicationName();
 	}
 }
