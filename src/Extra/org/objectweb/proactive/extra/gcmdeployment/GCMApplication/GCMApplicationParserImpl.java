@@ -122,8 +122,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                                        .toString();
 
         schemas.add(0, deploymentSchema);
-        schemas.add(0, commonTypesSchema);
-
+        //        schemas.add(0, commonTypesSchema);
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
@@ -133,13 +132,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
             xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                    GCMParserConstants.APPLICATION_DESCRIPTOR_NAMESPACE));
+                    GCM_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
         }
     }
 
-    synchronized public Map<String, GCMDeploymentDescriptor> getResourceProviders() {
+    synchronized public Map<String, GCMDeploymentDescriptor> getResourceProviders()
+        throws SAXException, IOException {
         if (resourceProvidersMap != null) {
             return resourceProvidersMap;
         }
@@ -197,42 +197,38 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                         resourceProviderParams));
             }
         } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         }
 
         return resourceProvidersMap;
     }
 
-    public CommandBuilder getCommandBuilder() {
+    public CommandBuilder getCommandBuilder()
+        throws XPathExpressionException, SAXException, IOException {
         if (commandBuilder != null) {
             return commandBuilder;
         }
 
-        try {
-            Node applicationNode = (Node) xpath.evaluate(XPATH_APPLICATION,
-                    document, XPathConstants.NODE);
+        Node applicationNode = (Node) xpath.evaluate(XPATH_APPLICATION,
+                document, XPathConstants.NODE);
 
-            NodeList appNodes = applicationNode.getChildNodes();
+        NodeList appNodes = applicationNode.getChildNodes();
 
-            for (int i = 0; i < appNodes.getLength(); ++i) {
-                Node commandNode = appNodes.item(i);
-                if (commandNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                ApplicationParser applicationParser = getApplicationParserForNode(commandNode);
-                if (applicationParser == null) {
-                    GCMDeploymentLoggers.GCMA_LOGGER.warn(
-                        "No application parser registered for node <" +
-                        commandNode.getNodeName() + ">");
-                } else {
-                    applicationParser.parseApplicationNode(commandNode, this,
-                        xpath);
-                    commandBuilder = applicationParser.getCommandBuilder();
-                }
+        for (int i = 0; i < appNodes.getLength(); ++i) {
+            Node commandNode = appNodes.item(i);
+            if (commandNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
             }
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
+
+            ApplicationParser applicationParser = getApplicationParserForNode(commandNode);
+            if (applicationParser == null) {
+                GCMDeploymentLoggers.GCMA_LOGGER.warn(
+                    "No application parser registered for node <" +
+                    commandNode.getNodeName() + ">");
+            } else {
+                applicationParser.parseApplicationNode(commandNode, this, xpath);
+                commandBuilder = applicationParser.getCommandBuilder();
+            }
         }
 
         return commandBuilder;
@@ -243,7 +239,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         return applicationParser;
     }
 
-    synchronized public Map<String, VirtualNodeInternal> getVirtualNodes() {
+    synchronized public Map<String, VirtualNodeInternal> getVirtualNodes()
+        throws SAXException, IOException {
         if (virtualNodes != null) {
             return virtualNodes;
         }

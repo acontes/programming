@@ -43,6 +43,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -70,7 +71,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private Vector bookedNodes = new Vector();
     private Vector usingNodes = new Vector();
     private int nodeCounter = 0;
-    private final String descriptorPath = System.getProperty(PROPERPY_XML_PATH);
+    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
     private ProActiveDescriptor pad = null;
 
     //--------------------------------------------------------------------------
@@ -275,15 +276,14 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         // security 
         ProActiveSecurityManager newNodeSecurityManager = null;
 
-        //    try {
-        newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
-                                  .generateSiblingCertificate(P2PConstants.VN_NAME);
-        //        } catch (IOException e) {
-        //            e.printStackTrace();
-        //        } catch (SecurityNotAvailableException e) {
-        //            // well nothing to do except maybe log it
-        //            ProActiveLogger.getLogger(Loggers.SECURITY_NODE).debug("Node created without security manager");
-        //        }
+        try {
+            newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
+                                      .generateSiblingCertificate(P2PConstants.VN_NAME);
+        } catch (NullPointerException e) {
+            // well nothing to do except maybe log it
+            ProActiveLogger.getLogger(Loggers.SECURITY_NODE)
+                           .debug("Node created without security manager");
+        }
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
                 "_" + this.nodeCounter++, true, newNodeSecurityManager,
                 P2PConstants.VN_NAME, null);
@@ -300,12 +300,12 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         assert PROC > 0 : "Processor count = 0";
         logger.debug("Number of available processors for this JVM: " + PROC);
         int nodes = PROC;
-        if (!new Boolean(System.getProperty(PROPERTY_MULTI_PROC_NODES)).booleanValue()) {
+        if (!PAProperties.PA_P2P_MULTI_PROC_NODES.isTrue()) {
             nodes = 1;
         }
 
         // No sharing enable
-        if (new Boolean(System.getProperty(PROPERTY_NO_SHARING)).booleanValue()) {
+        if (PAProperties.PA_P2P_NO_SHARING.isTrue()) {
             nodes = 0;
         }
 

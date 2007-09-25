@@ -33,7 +33,6 @@ package org.objectweb.proactive;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -109,7 +108,7 @@ import org.objectweb.proactive.core.util.NodeCreationListenerForAoCreation;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
 import org.objectweb.proactive.core.util.ProcessForAoCreation;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
@@ -718,15 +717,14 @@ public class ProActive {
         // in BodyImpl for the timing of a body.
         if (Profiling.TIMERS_COMPILED) {
             try {
-                if (TimItBasicManager.checkNodeProperties(node) &&
-                        // Because we don't want to time the TimItReductor
+                if (TimItBasicManager.checkNodeProperties(node)) {
+                    // Because we don't want to time the TimItReductor
                     // active object and avoid StackOverflow
                     // we need to check the current activated object
                     // classname
-                    !TimItBasicManager.getReductorClassName().equals(classname) &&
-                        !classname.contains("Spy")) {
-                    // The timit reductor will be passed to the factory
-                    // and used when a body is created
+
+                    //                    // The timit reductor will be passed to the factory
+                    //                    // and used when a body is created
                     clonedFactory.setTimItReductor(TimItBasicManager.getInstance()
                                                                     .createReductor());
                 }
@@ -1364,7 +1362,7 @@ public class ProActive {
      * @exception java.io.IOException if the remote object cannot be removed from the registry
      */
     public static void unregister(String url) throws java.io.IOException {
-        String protocol = UrlBuilder.getProtocol(url);
+        String protocol = URIBuilder.getProtocol(url);
 
         RemoteObject rmo;
         try {
@@ -1466,15 +1464,15 @@ public class ProActive {
 
     /**
      * Register a method in the calling active object to be called when the
-     * specified future is updated. The registered method takes a FutureResult
-     * as parameter.
+     * specified future is updated. The registered method takes a
+     * java.util.concurrent.Future as parameter.
      *
      * @param future the future to watch
      * @param methodName the name of the method to call on the current active object
-     * @throws NoSuchMethodException if the method could not be found
+     * @throws IllegalArgumentException if the first argument is not a future or if
+     * the method could not be found
      */
-    public static void addFutureCallback(Object future, String methodName)
-        throws NoSuchMethodException {
+    public static void addActionOnFuture(Object future, String methodName) {
         FutureProxy f;
         try {
             f = (FutureProxy) ((StubObject) future).getProxy();
@@ -1715,14 +1713,14 @@ public class ProActive {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
                 "A problem occured when getting the proActiveDescriptor at location \"" +
-                xmlDescriptorUrl + "\".");
+                xmlDescriptorUrl + "\"." + e.getMessage());
             throw new ProActiveException(
                 "A problem occured when getting the proActiveDescriptor at location \"" +
-                xmlDescriptorUrl + "\"." + e);
+                xmlDescriptorUrl + "\"." + e.getMessage(), e);
         } catch (java.io.IOException e) {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
-                "A problem occured when getting the proActiveDescriptor at location \"" +
+                "An IO problem occured when getting the proActiveDescriptor at location \"" +
                 xmlDescriptorUrl + "\".");
             throw new ProActiveException(e);
         }
@@ -1818,7 +1816,7 @@ public class ProActive {
             throw new ProActiveException("VirtualNode " + virtualnodeName +
                 " has not been yet activated or does not exist! Try to activate it first !");
         }
-        part.registerVirtualNode(UrlBuilder.appendVnSuffix(virtualnodeName),
+        part.registerVirtualNode(URIBuilder.appendVnSuffix(virtualnodeName),
             replacePreviousBinding);
     }
 
@@ -1834,13 +1832,9 @@ public class ProActive {
     public static VirtualNode lookupVirtualNode(String url)
         throws ProActiveException {
         ProActiveRuntime remoteProActiveRuntime = null;
-        try {
-            remoteProActiveRuntime = RuntimeFactory.getRuntime(UrlBuilder.buildVirtualNodeUrl(
-                        url), UrlBuilder.getProtocol(url));
-        } catch (UnknownHostException ex) {
-            throw new ProActiveException(ex);
-        }
-        return remoteProActiveRuntime.getVirtualNode(UrlBuilder.getNameFromUrl(
+        remoteProActiveRuntime = RuntimeFactory.getRuntime(URIBuilder.buildVirtualNodeUrl(
+                    url).toString());
+        return remoteProActiveRuntime.getVirtualNode(URIBuilder.getNameFromURI(
                 url));
     }
 
@@ -1859,7 +1853,7 @@ public class ProActive {
         }
         String virtualNodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(((VirtualNodeImpl) virtualNode).getRegistrationProtocol());
-        part.unregisterVirtualNode(UrlBuilder.appendVnSuffix(
+        part.unregisterVirtualNode(URIBuilder.appendVnSuffix(
                 virtualNode.getName()));
         if (logger.isInfoEnabled()) {
             logger.info("Success at unbinding " + virtualNodeName);

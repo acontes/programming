@@ -43,6 +43,8 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -57,6 +59,7 @@ import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -67,10 +70,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
@@ -80,9 +81,11 @@ import org.objectweb.proactive.core.jmx.mbean.JMXClassLoader;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapper;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
@@ -110,7 +113,7 @@ import org.objectweb.proactive.core.security.securityentity.EntityCertificate;
 import org.objectweb.proactive.core.security.securityentity.EntityVirtualNode;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -136,19 +139,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveRuntimeImpl proActiveRuntime;
 
     // JMX
-    private static boolean createMBean;
     private static Logger jmxLogger = ProActiveLogger.getLogger(Loggers.JMX);
 
     static {
         try {
             proActiveRuntime = new ProActiveRuntimeImpl();
-
-            // JMX
-            String mbeanProperty = PAProperties.PA_JMX_MBEAN.getValue();
-            createMBean = PAProperties.PA_JMX_MBEAN.isTrue();
-            if (createMBean) {
-                proActiveRuntime.createMBean();
-            }
+            proActiveRuntime.createMBean();
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         }
@@ -247,9 +243,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
                 this);
 
-        String url = UrlBuilder.buildUrlFromProperties(UrlBuilder.getHostNameFromUrl(
+        String url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(
                     getInternalURL()),
-                UrlBuilder.getNameFromUrl(getInternalURL()));
+                URIBuilder.getNameFromURI(getInternalURL())).toString();
 
         this.roe.activateProtocol(URI.create(url));
 
@@ -284,10 +280,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getMBean()
      */
-    public synchronized ProActiveRuntimeWrapperMBean getMBean() {
-        if (createMBean && (mbean == null)) {
-            createMBean();
-        }
+    public ProActiveRuntimeWrapperMBean getMBean() {
         return mbean;
     }
 
@@ -295,7 +288,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getMBeanServerName()
      */
     public String getMBeanServerName() {
-        return UrlBuilder.getNameFromUrl(proActiveRuntime.getURL());
+        return URIBuilder.getNameFromURI(proActiveRuntime.getURL());
     }
 
     /**
@@ -371,7 +364,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void createServerConnector() {
         // One the Serverconnector is launched any ProActive JMX Connector
         // client can connect to it remotely and manage the MBeans.
-        serverConnector = new ServerConnector(UrlBuilder.getNameFromUrl(
+        serverConnector = new ServerConnector(URIBuilder.getNameFromURI(
                     proActiveRuntime.getURL()));
         try {
             serverConnector.start();
@@ -384,7 +377,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * Creates the MBean associated to the ProActiveRuntime
      */
-    public void createMBean() {
+    protected void createMBean() {
         // JMX registration
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         JMXClassLoader jmxClassLoader = new JMXClassLoader(classLoader);
@@ -445,7 +438,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ProActiveSecurityManager nodeSecurityManager, String vnName,
         String jobId) throws NodeException, AlreadyBoundException {
         // check if nodeName is an URI or not
-        String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
+        String nodeName = URIBuilder.getNameFromURI(nodeURL);
 
         if (!replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
             throw new AlreadyBoundException("Node " + nodeName +
@@ -701,9 +694,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
      */
     protected String getInternalURL() {
-        return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
+        return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
                 this.vmInformation.getInetAddress()),
-            this.vmInformation.getName());
+            this.vmInformation.getName()).toString();
     }
 
     /**
@@ -766,15 +759,18 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) throws UnknownProtocolException {
         String url;
-        url = UrlBuilder.buildUrlFromProperties(UrlBuilder.getHostNameFromUrl(
-                    getInternalURL()), virtualNodeName);
+        url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(
+                    getInternalURL()), virtualNodeName).toString();
         this.roe.activateProtocol(URI.create(url));
     }
 
     public void unregisterVirtualNode(String virtualNodeName) {
-        removeRuntimeRegistrationEventListener((VirtualNodeImpl) this.virtualNodesMap.get(
-                virtualNodeName));
-        this.virtualNodesMap.remove(virtualNodeName);
+        VirtualNodeInternal vn = virtualNodesMap.get(virtualNodeName);
+        if (vn != null) {
+            JMXNotificationManager.getInstance()
+                                  .unsubscribe(getMBean().getObjectName(), vn);
+        }
+        virtualNodesMap.remove(virtualNodeName);
     }
 
     public void unregisterAllVirtualNodes() {
@@ -785,7 +781,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getJobID(java.lang.String)
      */
     public String getJobID(String nodeUrl) {
-        String name = UrlBuilder.getNameFromUrl(nodeUrl);
+        String name = URIBuilder.getNameFromURI(nodeUrl);
         LocalNode localNode = this.nodeMap.get(name);
         return localNode.getJobId();
     }
@@ -909,7 +905,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // update node url
         ret.updateNodeURL(nodeURL);
 
-        String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
+        String nodeName = URIBuilder.getNameFromURI(nodeURL);
 
         // push the initial context for the current thread.
         // need to register as thread of the corresponding active object: this
@@ -1391,12 +1387,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private String name;
         private long capacity;
         private final String hostName;
-        private final DeployerTag deployerTag;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
             this.hostInetAddress = java.net.InetAddress.getLocalHost();
-            this.hostName = UrlBuilder.getHostNameorIP(this.hostInetAddress);
+            this.hostName = URIBuilder.getHostNameorIP(this.hostInetAddress);
             String random = Integer.toString(ProActiveRandom.nextPosInt());
 
             if (PAProperties.PA_RUNTIME_NAME.isSet()) {
@@ -1408,10 +1403,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                         "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
                 }
             } else {
-                this.name = "PA_JVM" + random + "_" + this.hostName;
+                this.name = "PA_JVM" + random; //+ "_" + this.hostName;
             }
 
-            this.deployerTag = new DeployerTag(ProActiveConfiguration.getGroupInformation());
             this.capacity = -1;
         }
 
@@ -1446,13 +1440,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
          */
         public String getDescriptorVMName() {
             return this.name;
-        }
-
-        /**
-         * @see org.objectweb.proactive.core.runtime.VMInformation#getDeployerTag()
-         */
-        public DeployerTag getDeployerTag() {
-            return this.deployerTag;
         }
 
         public long getCapacity() {
@@ -1535,7 +1522,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return this.roe.getURLs();
     }
 
-    public void setCapacity(long capacity) {
+    public Set<String> setCapacity(long capacity) {
         if (vmInformation.getCapacity() > 0) {
             throw new IllegalStateException("setCapacity already set to " +
                 vmInformation.getCapacity());
@@ -1548,16 +1535,19 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         logger.debug("Capacity set to " + capacity + ". Creating the nodes...");
         vmInformation.setCapacity(capacity);
 
+        Set<String> nodeUrls = new HashSet<String>();
+
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         String hostname = vmInformation.getHostName();
         for (long i = 0; i < capacity; i++) {
-            String nodeName = "CapacityNode-" + i;
-            String url = UrlBuilder.buildUrl(hostname, nodeName, protocol);
+            String nodeName = Constants.GCM_NODE_NAME + i;
+            String url = URIBuilder.buildURI(hostname, nodeName, protocol)
+                                   .toString();
 
             try {
-                // FIXME acontes: PSM ?
-                createLocalNode(url, false, null, VirtualNode.DEFAULT_VN,
-                    "Undefined");
+                // FIXME acontes PSM ?
+                nodeUrls.add(createLocalNode(url, false, null,
+                        VirtualNode.DEFAULT_VN, "Undefined"));
             } catch (NodeException e) {
                 // Cannot do something here. This node will node be created
                 logger.warn("Failed to create a capacity node", e);
@@ -1566,8 +1556,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 // Should not happen, log it and delete the old node
                 logger.warn(url + "is already registered... replacing it !");
                 try {
-                    createLocalNode(url, true, null, VirtualNode.DEFAULT_VN,
-                        null);
+                    nodeUrls.add(createLocalNode(url, true, null,
+                            VirtualNode.DEFAULT_VN, null));
                 } catch (NodeException e1) {
                     logger.warn("Failed to create a capacity node", e1);
                 } catch (AlreadyBoundException e1) {
@@ -1576,5 +1566,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 }
             }
         }
+        return nodeUrls;
+    }
+
+    public void register(GCMRuntimeRegistrationNotificationData notification) {
+        getMBean()
+            .sendNotification(NotificationType.GCMRuntimeRegistered,
+            notification);
     }
 }

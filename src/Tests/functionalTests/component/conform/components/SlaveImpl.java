@@ -1,21 +1,15 @@
 package functionalTests.component.conform.components;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ClassDispatchMetadata;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
-//@ClassDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
-//)
 public class SlaveImpl implements Slave {
     public SlaveImpl() {
     }
 
-    public void compute(String arg, String other) {
+    public void computeOneWay(String arg, String other) {
         System.err.println(ProActive.getBodyOnThis().getNodeURL() + "Slave: " +
             this + " arg: " + arg + " other: " + other);
     }
@@ -24,8 +18,13 @@ public class SlaveImpl implements Slave {
         return new StringWrapper(computeSync(arg, other));
     }
 
+    public GenericTypeWrapper<String> computeAsyncGenerics(String arg,
+        String other) {
+        return new GenericTypeWrapper<String>(computeSync(arg, other));
+    }
+
     public String computeSync(String arg, String other) {
-        compute(arg, other);
+        computeOneWay(arg, other);
         return "arg: '" + arg + "',other: '" + other + "'";
     }
 }

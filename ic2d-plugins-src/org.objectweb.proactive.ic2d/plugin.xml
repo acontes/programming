@@ -48,5 +48,12 @@
      </product>
   </extension>
   
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+               class="org.objectweb.proactive.ic2d.DefaultPerspective"
+               id="org.objectweb.proactive.ic2d.DefaultPerspective"
+               name="Default"/>
+   </extension>
    
 </plugin>

@@ -44,7 +44,6 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -53,7 +52,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -74,7 +73,9 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private final Vector<Object> bookedNodes = new Vector<Object>();
     private final Vector usingNodes = new Vector();
     private int nodeCounter = 0;
-    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
+
+    //    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
+    private final String descriptorPath = System.getProperty(PAProperties.PA_P2P_XML_PATH.getKey());
     private ProActiveDescriptorInternal pad = null;
 
     //--------------------------------------------------------------------------
@@ -175,9 +176,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      * Leave the specified node. The node is killed and new one is created and
      * ready for sharing.
      * @param nodeToFree the node to kill.
-     * @param vnName Virtual node name to unregister or null.
      */
-    public void leaveNode(Node nodeToFree, String vnName) {
+    public void leaveNode(Node nodeToFree) {
         String nodeUrl = nodeToFree.getNodeInformation().getURL();
         logger.debug("LeaveNode message received for node @" + nodeUrl);
         this.usingNodes.remove(nodeToFree);
@@ -286,13 +286,15 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                            .debug("Node created without security manager");
         }
 
-        Node newNode = NodeFactory.createNode(UrlBuilder.buildUrl("localhost",
+        Node newNode = NodeFactory.createNode(URIBuilder.buildURI("localhost",
                     P2PConstants.SHARED_NODE_NAME + "_" + this.nodeCounter++,
-                    UrlBuilder.getProtocol(ProActiveRuntimeImpl.getProActiveRuntime()
-                                                               .getURL()),
-                    UrlBuilder.getPortFromUrl(ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                  .getURL())),
-                true, newNodeSecurityManager, P2PConstants.VN_NAME, null);
+                    URIBuilder.getProtocol(ProActiveRuntimeImpl.getProActiveRuntime()
+                                                               .getURL())
+                              .toString(),
+                    URIBuilder.getPortNumber(ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getURL()))
+                                                        .toString(), true,
+                newNodeSecurityManager, P2PConstants.VN_NAME, null);
         this.availbaleNodes.add(newNode);
         logger.info("New shared node created @" +
             newNode.getNodeInformation().getURL());

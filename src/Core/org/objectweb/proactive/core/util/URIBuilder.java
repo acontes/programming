@@ -86,10 +86,14 @@ public class URIBuilder {
      * @throws UnknownProtocolException
      * @returnan url under the form [protocol:][//host][[/]name]
      */
-    public static URI buildURI(String host, String name, String protocol)
-        throws UnknownProtocolException {
-        return buildURI(host, name, protocol,
-            RemoteObjectHelper.getDefaultPortForProtocol(protocol));
+    public static URI buildURI(String host, String name, String protocol) {
+        try {
+            return buildURI(host, name, protocol,
+                RemoteObjectHelper.getDefaultPortForProtocol(protocol));
+        } catch (UnknownProtocolException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -100,8 +104,7 @@ public class URIBuilder {
      * @throws UnknownProtocolException
      * @returnan url under the form [//host][[/]name]
      */
-    public static URI buildURI(String host, String name)
-        throws UnknownProtocolException {
+    public static URI buildURI(String host, String name) {
         return buildURI(host, name, null);
     }
 
@@ -187,13 +190,7 @@ public class URIBuilder {
             port = PAProperties.PA_XMLHTTP_PORT.getValue();
         }
         if (port == null) {
-            try {
-                return buildURI(host, name, protocol);
-            } catch (UnknownProtocolException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-            }
+            return buildURI(host, name, protocol);
         } else {
             return buildURI(host, name, protocol, new Integer(port).intValue());
         }
@@ -205,14 +202,23 @@ public class URIBuilder {
      * @return
      * @throws java.net.UnknownHostException if no network interface was found
      */
-    public static URI buildVirtualNodeUrl(URI uri)
-        throws java.net.UnknownHostException {
+    public static URI buildVirtualNodeUrl(URI uri) {
         String vnName = getNameFromURI(uri);
         vnName = vnName.concat("_VN");
         String host = getHostNameFromUrl(uri);
         String protocol = uri.getScheme();
         int port = uri.getPort();
         return buildURI(host, vnName, protocol, port);
+    }
+
+    /**
+     * build a virtual node url from a given url
+     * @param url
+     * @return
+     * @throws java.net.UnknownHostException if no network interface was found
+     */
+    public static URI buildVirtualNodeUrl(String url) {
+        return buildVirtualNodeUrl(URI.create(url));
     }
 
     public static String appendVnSuffix(String name) {
@@ -241,6 +247,11 @@ public class URIBuilder {
         return path;
     }
 
+    public static String getNameFromURI(String url) {
+        URI uri = URI.create(url);
+        return getNameFromURI(uri);
+    }
+
     /**
      * Return the protocol specified in the string
      * The same convention as in URL is used
@@ -253,6 +264,11 @@ public class URIBuilder {
         return protocol;
     }
 
+    public static String getProtocol(String url) {
+        URI uri = URI.create(url);
+        return getProtocol(uri);
+    }
+
     /**
      * Returns the url without protocol
      */
@@ -261,8 +277,18 @@ public class URIBuilder {
             uri.getPort(), false);
     }
 
+    public static URI removeProtocol(String url) {
+        URI uri = URI.create(url);
+        return removeProtocol(uri);
+    }
+
     public static String getHostNameFromUrl(URI uri) {
         return uri.getHost();
+    }
+
+    public static String getHostNameFromUrl(String url) {
+        URI uri = URI.create(url);
+        return getHostNameFromUrl(uri);
     }
 
     public static String removePortFromHost(String hostname) {
@@ -284,6 +310,7 @@ public class URIBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
+        //        address = UrlBuilder.getNetworkInterfaces();
         if (PAProperties.PA_RUNTIME_IPADDRESS.getValue() != null) {
             return PAProperties.PA_RUNTIME_IPADDRESS.getValue();
         }
@@ -291,11 +318,15 @@ public class URIBuilder {
         if (PAProperties.PA_HOSTNAME.getValue() != null) {
             return PAProperties.PA_HOSTNAME.getValue();
         }
+        String temp = "";
+
         if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
-            return address.getHostAddress();
+            temp = ((InetAddress) address).getHostAddress();
         } else {
-            return address.getCanonicalHostName();
+            temp = address.getCanonicalHostName();
         }
+
+        return URIBuilder.ipv6withoutscope(temp);
     }
 
     /**
@@ -314,7 +345,7 @@ public class URIBuilder {
         java.net.InetAddress hostInetAddress = java.net.InetAddress.getLocalHost();
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {
-                return UrlBuilder.getHostNameorIP(hostInetAddress);
+                return URIBuilder.getHostNameorIP(hostInetAddress);
             }
         }
 
@@ -327,15 +358,15 @@ public class URIBuilder {
      * @return port number or 0 if there is no  port
      */
     public static int getPortNumber(String url) {
-        try {
-            URI uri = new URI(url);
-            if (uri.getPort() != -1) {
-                return uri.getPort();
-            }
-            return 0;
-        } catch (URISyntaxException e) {
-            return 0;
+        URI uri = URI.create(url);
+        return getPortNumber(uri);
+    }
+
+    public static int getPortNumber(URI uri) {
+        if (uri.getPort() != -1) {
+            return uri.getPort();
         }
+        return 0;
     }
 
     /**
@@ -355,5 +386,41 @@ public class URIBuilder {
         }
 
         return u;
+    }
+
+    public static String ipv6withoutscope(String address) {
+        String name = address;
+        int indexPercent = name.indexOf('%');
+        if (indexPercent != -1) {
+            return "[" + name.substring(0, indexPercent) + "]";
+        } else {
+            return address;
+        }
+    }
+
+    public static String ipv6withoutscope(InetAddress address) {
+        String name = address.getHostAddress();
+        int indexPercent = name.indexOf('%');
+
+        if (indexPercent != -1) {
+            return "[" + name.substring(0, indexPercent) + "]";
+        } else {
+            return name;
+        }
+    }
+
+    public static String removeUsername(String url) {
+        //this method is used to extract the username, that might be necessary for the callback
+        //it updates the hostable.
+        int index = url.indexOf("@");
+
+        if (index >= 0) {
+            String username = url.substring(0, index);
+            url = url.substring(index + 1, url.length());
+
+            HostsInfos.setUserName(getHostNameFromUrl(url), username);
+        }
+
+        return url;
     }
 }

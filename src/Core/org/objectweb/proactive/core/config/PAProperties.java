@@ -3,9 +3,19 @@ package org.objectweb.proactive.core.config;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+/**
+ * A Java Properties factory for ProActive
+ *
+ * All Java properties supported by ProActive must be declared and documented in
+ * this enumeration. Provided methods provided must be used in place
+ * of System.(get|set)property() or the ProActiveConfiguration class.
+ *
+ * TODO Add integer properties
+ */
 public enum PAProperties {
 
-    // ---------- 
+    // ----------
 
     /** this property identifies proactive's configuration file */
     PA_CONFIGURATION_FILE("proactive.configuration", false),
@@ -67,7 +77,7 @@ public enum PAProperties {
     /** TODO cmathieu Describe this property */
     PA_SECONDARYNAMES("proactive.secondaryNames", false),
 
-    /** TODO acontes Describe this property */
+    /** this property should be used when one wants to start only a runtime without an additionnal main class */
     PA_RUNTIME_STAYALIVE("proactive.runtime.stayalive", true),
 
     // ---------- RMI
@@ -176,13 +186,13 @@ public enum PAProperties {
 
     // ---------- Security
 
-    /** TODO acontes Describe this property */
+    /** this property indicates if a RMISecurityManager has to be instanciated*/
     PA_SECURITYMANAGER("proactive.securitymanager", true),
 
-    /** TODO acontes Describe this property */
+    /** this property indicates the location of the runtime' security manager configuration file */
     PA_RUNTIME_SECURITY("proactive.runtime.security", false),
 
-    /** TODO acontes Describe this property */
+    /** this property indicates the url of the security domain the runtime depends on */
     PA_RUNTIME_DOMAIN_URL("proactive.runtime.domain.url", false),
 
     // ------------ Timit
@@ -233,9 +243,6 @@ public enum PAProperties {
     /** Boolean value for disable node sharing. */
     PA_P2P_NO_SHARING("proactive.p2p.nosharing", true),
 
-    /** TODO Describe this property */
-    PA_BYTECODEMANIPULATOR("byteCodeManipulator", false),
-
     // -------------- DGC
 
     /** TODO gchazara Describe this property */
@@ -256,10 +263,13 @@ public enum PAProperties {
 
     // -------------- Misc
 
+    /** TODO Describe this property */
+    PA_BYTECODEMANIPULATOR("byteCodeManipulator", false),
+
     /** TODO vlegrand Describe this property */
     CATALINA_BASE("catalina.base", false),
     PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", true);static final Logger logger =
-        ProActiveLogger.getLogger(Loggers.CORE);
+        ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     private String key;

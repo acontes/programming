@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -333,23 +333,26 @@ public class StartP2PService implements P2PConstants {
      * @param parsed Arguments from command line.
      */
     private static void initP2PProperties(Args parsed) {
-        System.setProperty(PROPERTY_ACQUISITION, parsed.acquisitionMethod);
-        System.setProperty(PROPERTY_PORT, parsed.portNumber);
-        System.setProperty(PROPERTY_NOA, parsed.noa);
-        System.setProperty(PROPERTY_TTU, parsed.ttu);
-        System.setProperty(PROPERTY_TTL, parsed.ttl);
-        System.setProperty(PROPERTY_MSG_MEMORY, parsed.msg_capacity);
-        System.setProperty(PROPERTY_EXPLORING_MSG, parsed.expl_msg);
-        System.setProperty(PROPERTY_NODES_ACQUISITION_T0, parsed.nodes_acq_to);
-        System.setProperty(PROPERTY_LOOKUP_FREQ, parsed.lookup_freq);
-        System.setProperty(PROPERTY_MULTI_PROC_NODES, parsed.multi_proc_nodes);
+        PAProperties.PA_P2P_ACQUISITION.setValue(parsed.acquisitionMethod);
+        PAProperties.PA_P2P_PORT.setValue(parsed.portNumber);
+        PAProperties.PA_P2P_NOA.setValue(parsed.noa);
+        PAProperties.PA_P2P_TTU.setValue(parsed.ttu);
+        PAProperties.PA_P2P_TTL.setValue(parsed.ttl);
+        PAProperties.PA_P2P_MSG_MEMORY.setValue(parsed.msg_capacity);
+        PAProperties.PA_P2P_EXPLORING_MSG.setValue(parsed.expl_msg);
+        PAProperties.PA_P2P_NODES_ACQUISITION_T0.setValue(parsed.nodes_acq_to);
+        PAProperties.PA_P2P_LOOKUP_FREQ.setValue(parsed.lookup_freq);
+        PAProperties.PA_P2P_MULTI_PROC_NODES.setValue(parsed.multi_proc_nodes);
 
         if (parsed.xml_path != null) {
-            System.setProperty(PROPERPY_XML_PATH, parsed.xml_path);
+            PAProperties.PA_P2P_XML_PATH.setValue(parsed.xml_path);
         }
 
-        System.setProperty(PROPERTY_NO_SHARING,
-            (parsed.no_sharing == null) ? "false" : parsed.no_sharing);
+        if (parsed.no_sharing == null) {
+            PAProperties.PA_P2P_NO_SHARING.setValue(PAProperties.FALSE);
+        } else {
+            PAProperties.PA_P2P_NO_SHARING.setValue(parsed.no_sharing);
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -365,7 +368,7 @@ public class StartP2PService implements P2PConstants {
         // For Debbugging
         try {
             logger.info("**** Starting jvm on " +
-                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
+                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
         } catch (UnknownHostException e) {
             logger.warn("Couldn't get local host name", e);
         }
@@ -492,9 +495,9 @@ public class StartP2PService implements P2PConstants {
         String url = null;
 
         try {
-            url = paRuntime.createLocalNode(UrlBuilder.buildUrl("localhost",
+            url = paRuntime.createLocalNode(URIBuilder.buildURI("localhost",
                         P2PConstants.P2P_NODE_NAME, acquisitionMethod,
-                        Integer.parseInt(portNumber)), false, null,
+                        Integer.parseInt(portNumber)).toString(), false, null,
                     paRuntime.getVMInformation().getName(), Job.DEFAULT_JOBID);
         } catch (AlreadyBoundException e) {
             logger.warn("This name " + P2PConstants.P2P_NODE_NAME +

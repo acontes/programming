@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -418,11 +419,6 @@ public interface ProActiveRuntime extends SecurityEntity {
     public void startJMXServerConnector();
 
     /**
-     * Create the MBean associated to the ProActive Runtime.
-     */
-    public void createMBean();
-
-    /**
      * Return the MBean associated to this ProActiveRuntime.
      * @return the MBean associated to this ProActiveRuntime.
      */
@@ -439,4 +435,6 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return the JMX Server connector
      */
     public ServerConnector getJMXServerConnector();
+
+    public void register(GCMRuntimeRegistrationNotificationData event);
 }

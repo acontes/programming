@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
@@ -127,6 +126,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * Can be set with the property proactive.future.maxdelay
      */
     protected static long futureMaxDelay = -1;
+
+    /**
+     * The methods to call when this future is updated
+     */
+    private transient LocalFutureUpdateCallbacks callbacks;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -559,10 +563,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         this.exceptionLevel = exceptionLevel;
     }
 
-    private transient LocalFutureUpdateCallbacks callbacks;
-
-    public synchronized void addCallback(String methodName)
-        throws NoSuchMethodException {
+    /**
+     * Add a method to call when the future is arrived, or call it now if the
+     * future is already arrived.
+     */
+    public synchronized void addCallback(String methodName) {
         if (this.callbacks == null) {
             this.callbacks = new LocalFutureUpdateCallbacks(this);
         }

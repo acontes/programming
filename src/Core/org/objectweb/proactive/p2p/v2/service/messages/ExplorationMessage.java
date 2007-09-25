@@ -40,7 +40,7 @@ public class ExplorationMessage extends BreadthFirstMessage
                 }
             } catch (Exception e) {
                 logger.info("Trouble with registering remote peer", e);
-                target.acquaintanceManager.remove(this.sender, null);
+                target.acquaintanceManager_active.remove(this.sender, null);
             }
         }
     }

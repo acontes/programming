@@ -84,6 +84,7 @@
 
 				<!-- Disable GCM Deployment related unit tests -->
 				<exclude name="unitTests/deployment/**/*.class"/>
+				<exclude name="functionalTests/gcmdeployment/**/*.class"/>
 			</fileset>
 		</else>
 	</if>
@@ -210,7 +211,6 @@
 				<include name="org/**/*.properties" />
 				<include name="org/**/*.xsd" />
 				<include name="org/**/*.png" />
-				<include name="org/**/*.config" />
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
 			</fileset>
 		</copy>

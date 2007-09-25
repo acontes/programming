@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.xpath.XPathExpressionException;
+
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
@@ -14,13 +16,14 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentRe
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
-import org.objectweb.proactive.extra.gcmdeployment.core.VMNodes;
+import org.objectweb.proactive.extra.gcmdeployment.core.VMNodeList;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
+import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.xml.sax.SAXException;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
@@ -38,12 +41,14 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
     private ArrayList<String> currentDeploymentPath;
 
     public GCMApplicationDescriptorImpl(String filename)
-        throws IllegalArgumentException {
+        throws IllegalArgumentException, SAXException, IOException,
+            XPathExpressionException {
         this(new File(filename));
     }
 
     public GCMApplicationDescriptorImpl(File file)
-        throws IllegalArgumentException {
+        throws IllegalArgumentException, SAXException, IOException,
+            XPathExpressionException {
         currentDeploymentPath = new ArrayList<String>();
 
         gadFile = Helpers.checkDescriptorFileExist(file);
@@ -68,6 +73,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
         // 4. Build the runtime tree
         buildDeploymentTree();
+
+        //		JMXNotificationManager.getInstance().subscribe(FactoryName.createRuntimeObjectName(.getURL()), this);
 
         // 5. Start the deployment
         for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
@@ -101,11 +108,11 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         currentDeploymentPath.clear();
 
         ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-        VMNodes vmNodes = new VMNodes(proActiveRuntime.getVMInformation());
+        VMNodeList vmNodeList = new VMNodeList(proActiveRuntime.getVMInformation());
         currentDeploymentPath.add(proActiveRuntime.getVMInformation().getName());
 
         //                    vmNodes.addNode(<something>); - TODO cmathieu
-        rootNode.addVMNodes(vmNodes);
+        rootNode.addVMNodes(vmNodeList);
         rootNode.setDeploymentPath(getCurrentdDeploymentPath());
 
         deploymentTree.setRootNode(rootNode);
@@ -114,6 +121,11 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
             GCMDeploymentDescriptorImpl gddi = (GCMDeploymentDescriptorImpl) gdd;
             GCMDeploymentResources resources = gddi.getResources();
+
+            HostInfo hostInfo = resources.getHostInfo();
+            if (hostInfo != null) {
+                buildHostInfoTreeNode(rootNode, hostInfo);
+            }
 
             for (Group group : resources.getGroups()) {
                 buildGroupTreeNode(rootNode, group);
@@ -133,12 +145,21 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         return new ArrayList<String>(currentDeploymentPath);
     }
 
+    private void buildHostInfoTreeNode(DeploymentNode rootNode,
+        HostInfo hostInfo) {
+        DeploymentNode deploymentNode = new DeploymentNode();
+        deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
+        pushDeploymentPath(hostInfo.getId());
+        hostInfo.setDeploymentId(deploymentNode.getId());
+        deploymentTree.addNode(deploymentNode, rootNode);
+    }
+
     private void buildGroupTreeNode(DeploymentNode rootNode, Group group) {
         DeploymentNode deploymentNode = new DeploymentNode();
         deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
-        HostInfoImpl hostInfo = (HostInfoImpl) group.getHostInfo();
+        HostInfo hostInfo = group.getHostInfo();
         pushDeploymentPath(hostInfo.getId());
-        hostInfo.setNodeId(deploymentNode.getId());
+        hostInfo.setDeploymentId(deploymentNode.getId());
         deploymentTree.addNode(deploymentNode, rootNode);
         popDeploymentPath();
     }
@@ -152,9 +173,9 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         // first look for a host info...
         //
         if (bridge.getHostInfo() != null) {
-            HostInfoImpl hostInfo = (HostInfoImpl) bridge.getHostInfo();
+            HostInfo hostInfo = bridge.getHostInfo();
             pushDeploymentPath(hostInfo.getId());
-            hostInfo.setNodeId(deploymentNode.getId());
+            hostInfo.setDeploymentId(deploymentNode.getId());
             deploymentTree.addNode(deploymentNode, baseNode);
             popDeploymentPath();
         }

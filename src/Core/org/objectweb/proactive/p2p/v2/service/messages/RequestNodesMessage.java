@@ -19,17 +19,18 @@ public class RequestNodesMessage extends BreadthFirstMessage {
     protected String jobId;
     protected boolean underloadedOnly;
     protected String nodeFamilyRegexp;
+    protected Boolean active;
 
     /**
-    * @param ttl Time to live of the message, in number of hops.
-    * @param uuid UUID of the message.
-    * @param remoteService The original sender.
-    * @param numberOfNodes Number of asked nodes.
-    * @param lookup The P2P nodes lookup.
-    * @param vnName Virtual node name.
-    * @param jobId
-    * @param underloadedOnly determines if it replies with normal "askingNode" method or discard the call
-    */
+     * @param ttl Time to live of the message, in number of hops.
+     * @param uuid UUID of the message.
+     * @param remoteService The original sender.
+     * @param numberOfNodes Number of asked nodes.
+     * @param lookup The P2P nodes lookup.
+     * @param vnName Virtual node name.
+     * @param jobId
+     * @param underloadedOnly determines if it replies with normal "askingNode" method or discard the call
+     */
     public RequestNodesMessage(int ttl, UniversalUniqueID uuid,
         P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
         String vnName, String jobId, boolean underloadedOnly,
@@ -74,6 +75,12 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                 }
                 if (nodes.size() > 0) {
                     lookup.giveNodeForMax(nodes, target.nodeManager);
+                    numberOfNodes -= nodes.size();
+                    if (numberOfNodes <= 0) {
+                        this.active = false;
+                    }
+                    target.acquaintanceManager_active.setMaxNOA(target.acquaintanceManager_active.getMaxNOA() -
+                        1);
                 }
             } else {
                 P2PNode askedNode = target.nodeManager.askingNode(nodeFamilyRegexp);
@@ -152,5 +159,15 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean shouldExecute() {
+        return active;
+    }
+
+    @Override
+    public boolean shouldTransmit() {
+        return active;
     }
 }

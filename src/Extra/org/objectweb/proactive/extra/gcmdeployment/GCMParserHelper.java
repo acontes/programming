@@ -46,29 +46,27 @@ public class GCMParserHelper implements GCMParserConstants {
     static public class MyDefaultHandler extends DefaultHandler {
         private String errMessage = "";
 
-        /*
-         * With a handler class, just override the methods you need to use
-         */
-
-        // Start Error Handler code here
         @Override
-        public void warning(SAXParseException e) {
-            System.err.println("Warning Line " + e.getLineNumber() + ": " +
-                e.getMessage() + "\n");
+        public void warning(SAXParseException e) throws SAXParseException {
+            //            System.err.println("Warning Line " + e.getLineNumber() + ": " +
+            //                e.getMessage() + "\n");
+            throw e;
         }
 
         @Override
-        public void error(SAXParseException e) {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
-                    e.getMessage() + "\n");
-            System.err.println(errMessage);
+        public void error(SAXParseException e) throws SAXParseException {
+            //            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
+            //                    e.getMessage() + "\n");
+            //            System.err.println(errMessage);
+            throw e;
         }
 
         @Override
-        public void fatalError(SAXParseException e) {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
-                    e.getMessage() + "\n");
-            System.err.println(errMessage);
+        public void fatalError(SAXParseException e) throws SAXParseException {
+            //            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
+            //                    e.getMessage() + "\n");
+            //            System.err.println(errMessage);
+            throw e;
         }
     }
 
@@ -84,8 +82,6 @@ public class GCMParserHelper implements GCMParserConstants {
                 throw new NullPointerException("Null prefix");
             } else if ("pa".equals(prefix)) {
                 return namespace;
-            } else if ("ct".equals(prefix)) {
-                return COMMON_TYPES_NAMESPACE;
             } else if ("xml".equals(prefix)) {
                 return XMLConstants.XML_NS_URI;
             }

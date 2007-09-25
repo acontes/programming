@@ -63,4 +63,12 @@ public abstract class Message implements Serializable {
      * @param acq
      */
     public abstract void transmit(P2PService acq);
+
+    public boolean shouldExecute() {
+        return true;
+    }
+
+    public boolean shouldTransmit() {
+        return true;
+    }
 }
