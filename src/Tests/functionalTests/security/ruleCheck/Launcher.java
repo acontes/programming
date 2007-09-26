@@ -1,6 +1,5 @@
 package functionalTests.security.ruleCheck;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Policy;
 
@@ -18,18 +17,14 @@ import sun.security.provider.PolicyFile;
 public class Launcher {
     public static void main(String[] args) {
         Policy policy = null;
-        String policyFile = System.getProperty("user.dir") + "/dev/security/jaas-cfg/allPerm.policy";
+        URL policyFile = Launcher.class.getResource("allPerm.policy");
 
         // sets the policy to be used by the new jvms
-        System.setProperty("java.security.policy", policyFile);
+        System.setProperty("java.security.policy", policyFile.toString());
 
         // sets the policy to be used for the current thread
-        try {
-            policy = new PolicyFile(new URL("file:" + policyFile));
-        } catch (MalformedURLException mue) {
-            mue.printStackTrace();
-            System.exit(-1);
-        }
+        policy = new PolicyFile(policyFile);
+        
         Policy.setPolicy(policy);
 
         // enables security for the current thread
