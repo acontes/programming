@@ -40,7 +40,15 @@ public class CertificateTree implements Serializable {
 		this.children = new ArrayList<CertificateTree>();
 		this.certificate = certificate;
 		this.parent = null;
+	}
 
+	public CertificateTree(String name, int keySize, int validity,
+			EntityType type) {
+		this(genCert(name, keySize, validity, type));
+	}
+	
+	private static TypedCertificate genCert(String name, int keySize, int validity,
+			EntityType type) {
 		if (keygen == null) {
 			if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
 				Security.addProvider(new BouncyCastleProvider());
@@ -54,16 +62,7 @@ public class CertificateTree implements Serializable {
 				e1.printStackTrace();
 			}
 		}
-
-	}
-
-	public CertificateTree(String name, int keySize, int validity,
-			EntityType type) {
-		this(genCert(name, keySize, validity, type));
-	}
-	
-	private static TypedCertificate genCert(String name, int keySize, int validity,
-			EntityType type) {
+		
 		keygen.initialize(keySize);
 
 		KeyPair kp = keygen.genKeyPair();
@@ -241,5 +240,10 @@ public class CertificateTree implements Serializable {
 		}
 
 		return thisNode;
+	}
+	
+	@Override
+	public String toString() {
+		return this.certificate.toString();
 	}
 }

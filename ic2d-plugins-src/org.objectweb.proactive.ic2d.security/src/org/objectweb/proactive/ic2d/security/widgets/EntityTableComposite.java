@@ -99,16 +99,15 @@ public class EntityTableComposite extends Composite {
 					CertificateTreeMap map = (CertificateTreeMap) event.data;
 
 					for (CertificateTree tree : map.keySet()) {
+						String display = tree.getCertificate().getType().toString() + ":" + tree.getCertificate().getCert().getSubjectDN().getName();
 						if (isFrom) {
 							EntityTableComposite.this.rules.get(
 									EntityTableComposite.this.rulesTable
-											.getSelectionIndex()).addFrom(
-									tree.getCertificate().toString());
+											.getSelectionIndex()).addFrom(display);
 						} else {
 							EntityTableComposite.this.rules.get(
 									EntityTableComposite.this.rulesTable
-											.getSelectionIndex()).addTo(
-									tree.getCertificate().toString());
+											.getSelectionIndex()).addTo(display);
 						}
 					}
 

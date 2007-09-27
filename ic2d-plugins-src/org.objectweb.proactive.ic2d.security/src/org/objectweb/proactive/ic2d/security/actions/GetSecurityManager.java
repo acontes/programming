@@ -112,10 +112,10 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 	private SimplePolicyRule prToSpr(PolicyRule policy) {
 		SimplePolicyRule rule = new SimplePolicyRule();
 		for (RuleEntity entity : policy.getEntitiesFrom()) {
-			rule.addFrom(entity.getName());
+			rule.addFrom(entity.getType() + ":" + entity.getName());
 		}
 		for (RuleEntity entity : policy.getEntitiesTo()) {
-			rule.addTo(entity.getName());
+			rule.addTo(entity.getType() + ":" + entity.getName());
 		}
 		rule.setRepAuth(policy.getCommunicationReply().getAuthentication());
 		rule.setRepConf(policy.getCommunicationReply().getConfidentiality());

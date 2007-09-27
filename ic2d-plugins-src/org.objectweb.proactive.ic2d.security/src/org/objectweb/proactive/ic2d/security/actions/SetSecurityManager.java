@@ -45,8 +45,6 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 	private AbstractData object;
 
 	public SetSecurityManager() {
-		System.out.println("SetSecurityManager.SetSecurityManager()");
-
 		setId(SET_SECURITY_MANAGER);
 		setToolTipText("Import SM from Policy view");
 		setText("Import SM from Policy view");
@@ -55,8 +53,6 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 
 	@Override
 	public void run() {
-		System.out.println("SetSecurityManager.run()");
-
 		IWorkbench iworkbench = PlatformUI.getWorkbench();
 		IWorkbenchPage page = null;
 		try {
@@ -196,8 +192,6 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 	}
 
 	public void setAbstractDataObject(AbstractData ref) {
-		System.out.println("SetSecurityManager.setAbstractDataObject()");
-
 		this.object = ref;
 		super.setEnabled(this.object instanceof ActiveObject
 				|| this.object instanceof RuntimeObject
@@ -205,7 +199,6 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 	}
 
 	public void setActiveSelect(AbstractData ref) {
-		System.out.println("SetSecurityManager.setActiveSelect()");
 		// TODO Auto-generated method stub
 	}
 

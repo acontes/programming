@@ -140,10 +140,13 @@ public class CertificateGenerationTab extends UpdatableTab {
 						.fromString(CertificateGenerationTab.this.typeCombo
 								.getItem(CertificateGenerationTab.this.typeCombo
 										.getSelectionIndex()));
+				
 				CertificateGenerationTab.this.certTreeList
 						.add(new CertificateTree(name, keySize, validity, type));
+				
 				CertificateGenerationTab.this.certTreeListSection
 						.updateSection();
+				
 
 				super.mouseUp(e);
 			}
