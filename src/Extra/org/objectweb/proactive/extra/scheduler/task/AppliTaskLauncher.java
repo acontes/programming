@@ -42,6 +42,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
@@ -128,6 +129,7 @@ public class AppliTaskLauncher extends TaskLauncher {
         // create logger
         Logger l = Logger.getLogger(SchedulerCore.LOGGER_PREFIX + jobId);
         l.removeAllAppenders();
+        l.addAppender(EmptyAppender.SINK);
         l.addAppender(out);
         // redirect stdout and err
         System.setOut(new PrintStream(new LoggingOutputStream(l, Level.INFO),

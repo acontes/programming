@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
@@ -648,8 +649,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @param port the port number on which the log will be sent.
      */
     public void listenLog(JobId jobId, String hostname, int port) {
-        Logger.getLogger(LOGGER_PREFIX + jobId)
-              .addAppender(new SocketAppender(hostname, port));
+        Logger l = Logger.getLogger(LOGGER_PREFIX + jobId);
+        l.addAppender(EmptyAppender.SINK);
+        l.addAppender(new SocketAppender(hostname, port));
     }
 
     /**

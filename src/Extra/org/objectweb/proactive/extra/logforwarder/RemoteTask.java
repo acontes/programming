@@ -48,7 +48,8 @@ public class RemoteTask {
     public void initLogger(String loggerName, String host, int port) {
         out = new SocketAppender(host, port);
         logger = Logger.getLogger(loggerName);
-        logger.removeAllAppenders();
+//        logger.removeAllAppenders();
+        logger.addAppender(EmptyAppender.SINK);
         logger.addAppender(out);
 
         //test

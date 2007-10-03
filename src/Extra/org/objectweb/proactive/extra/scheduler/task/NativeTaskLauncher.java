@@ -37,6 +37,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
+import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
@@ -104,6 +105,7 @@ public class NativeTaskLauncher extends TaskLauncher {
         // create logger
         Logger l = Logger.getLogger(SchedulerCore.LOGGER_PREFIX + jobId);
         l.removeAllAppenders();
+        l.addAppender(EmptyAppender.SINK);
         l.addAppender(out);
         // redirect stdout and err
         System.setOut(new PrintStream(new LoggingOutputStream(l, Level.INFO),
