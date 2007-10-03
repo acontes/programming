@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -138,9 +139,9 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
         ArrayList<IMNode> nodes = nodeManager.getNodesByScript(verifyingScript,
                 true);
-        String order = "";
+        StringBuffer order = new StringBuffer();
         for (IMNode n : nodes)
-            order += (n.getHostName() + " ");
+            order.append(n.getHostName() + " ");
         logger.info("Nodes = " + order);
         NodeSet result = new NodeSet();
         int found = 0;
@@ -182,7 +183,17 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             int launched = found;
             while (!nodes.isEmpty() && (launched++ < nb.intValue())) {
                 nodeResults.add(nodes.get(0));
-                scriptResults.add(nodes.get(0).executeScript(verifyingScript));
+                ScriptResult<Boolean> sr = nodes.get(0).executeScript(verifyingScript);
+                if (MOP.isReifiedObject(sr)){ // should check isAFuture...
+                    scriptResults.add(sr);
+                } else {
+                    // scriptResult is an exception ?
+                    if (sr.errorOccured()){
+                        logger.warn("======> A script result is ignored ...");
+                    } else {
+                        throw new RuntimeException("COMPRENDS PAS LA ...");
+                    }
+                }
                 nodes.remove(0);
             }
 
@@ -238,7 +249,8 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             int launched = 0;
             while (!nodes.isEmpty() && (launched++ < nb.intValue())) {
                 nodeResults.add(nodes.get(0));
-                scriptResults.add(nodes.get(0).executeScript(verifyingScript));
+                ScriptResult<Boolean> r = nodes.get(0).executeScript(verifyingScript);
+                scriptResults.add(r);
                 nodes.remove(0);
             }
 
