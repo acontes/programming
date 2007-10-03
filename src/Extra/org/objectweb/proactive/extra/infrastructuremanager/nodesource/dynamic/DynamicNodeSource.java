@@ -44,6 +44,7 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -217,6 +218,9 @@ public abstract class DynamicNodeSource extends IMNodeSource
 
     public void setBusy(IMNode imnode) {
         removeFromAllLists(imnode);
+        if (!nodes.containsKey(imnode)){
+            throw new RuntimeException("Setting busy a removed node : " + imnode.getNodeURL());
+        }
         busyNodes.add(imnode);
         try {
             imnode.setBusy();
@@ -241,6 +245,10 @@ public abstract class DynamicNodeSource extends IMNodeSource
             niceTimes.insert(System.currentTimeMillis() + nice);
             releaseNode(imnode);
         } else {
+            if (!nodes.containsKey(imnode)){
+                throw new RuntimeException("Freeing a removed node : " + imnode.getNodeURL());
+            }
+            assert(!nodes.containsKey(imnode));
             freeNodes.add(imnode);
             try {
                 imnode.setFree();
@@ -310,6 +318,7 @@ public abstract class DynamicNodeSource extends IMNodeSource
         while (iter.hasNext()) {
             Entry<IMNode, Long> entry = iter.next();
             try {
+                // release only free nodes !!
                 if ((time > entry.getValue()) &&
                         (entry.getKey().isDown() || entry.getKey().isFree())) {
                     iter.remove();
