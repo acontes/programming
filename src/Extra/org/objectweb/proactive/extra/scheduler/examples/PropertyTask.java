@@ -28,31 +28,25 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extra.scheduler.examples;
 
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
-/**
- * Class providing events for running jobs.
- *
- * @author ProActive Team
- * @version 1.0, Jul 12, 2007
- * @since ProActive 3.2
- */
-public interface RunningJobsListener {
+public class PropertyTask extends ExecutableJavaTask {
 
-    /**
-     * Invoke by jobs controller when a job has just started scheduling
-     *
-     * @param jobId the jobid
-     */
-    public void addRunningJob(JobId jobId);
+    /**  */
+    private static final long serialVersionUID = -2536751215944833218L;
 
-    /**
-     * Invoke by jobs controller when a job has just been terminated
-     *
-     * @param jobId the jobid
-     */
-    public void removeRunningJob(JobId jobId);
+    public Object execute(TaskResult... results) {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("------> The property user.property1 has value '" +
+            System.getProperty("user.property1") + "'");
+        return 0;
+    }
 }

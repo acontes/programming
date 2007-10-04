@@ -28,31 +28,30 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extra.scheduler.examples;
 
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
-/**
- * Class providing events for running jobs.
- *
- * @author ProActive Team
- * @version 1.0, Jul 12, 2007
- * @since ProActive 3.2
- */
-public interface RunningJobsListener {
+public class MonteCarloAverage extends ExecutableJavaTask {
 
-    /**
-     * Invoke by jobs controller when a job has just started scheduling
-     *
-     * @param jobId the jobid
-     */
-    public void addRunningJob(JobId jobId);
+    /** Serial version UID */
+    private static final long serialVersionUID = -2762210298670871929L;
 
-    /**
-     * Invoke by jobs controller when a job has just been terminated
-     *
-     * @param jobId the jobid
-     */
-    public void removeRunningJob(JobId jobId);
+    public Object execute(TaskResult... results) {
+        double avrg = 0;
+        int count = 0;
+        System.out.print("Parameters are : ");
+        for (TaskResult res : results) {
+            if (!res.hadException()) {
+                System.out.print(res.value() + " ");
+                avrg += ((Double) (res.value())).doubleValue();
+                count++;
+            }
+        }
+        Double result = new Double(avrg / count);
+        System.out.println("Average is : " + result);
+        return result;
+    }
 }

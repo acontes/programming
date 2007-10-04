@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -35,78 +35,80 @@ import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobOutput;
 
+
 /**
  * A job output appender
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class JobOutputAppender extends AppenderSkeleton {
+    private JobOutput jobOutput = null;
 
-	private JobOutput jobOutput = null;
+    // -------------------------------------------------------------------- //
+    // --------------------------- constructor ---------------------------- //
+    // -------------------------------------------------------------------- //
+    /**
+     * The default constructor
+     *
+     * @param jobOutput the job output
+     */
+    public JobOutputAppender(JobOutput jobOutput) {
+        this.jobOutput = jobOutput;
+    }
 
-	// -------------------------------------------------------------------- //
-	// --------------------------- constructor ---------------------------- //
-	// -------------------------------------------------------------------- //
-	/**
-	 * The default constructor
-	 * 
-	 * @param jobOutput the job output
-	 */
-	public JobOutputAppender(JobOutput jobOutput) {
-		this.jobOutput = jobOutput;
-	}
+    // -------------------------------------------------------------------- //
+    // ------------------------------ public ------------------------------ //
+    // -------------------------------------------------------------------- //
+    /**
+     * To obtains the job output
+     *
+     * @return the job output
+     */
+    public JobOutput getJobOutput() {
+        return jobOutput;
+    }
 
-	// -------------------------------------------------------------------- //
-	// ------------------------------ public ------------------------------ //
-	// -------------------------------------------------------------------- //
-	/**
-	 * To obtains the job output
-	 * 
-	 * @return the job output
-	 */
-	public JobOutput getJobOutput() {
-		return jobOutput;
-	}
+    // -------------------------------------------------------------------- //
+    // -------------------- extends AppenderSkeleton ---------------------- //
+    // -------------------------------------------------------------------- //
+    /**
+     * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
+     */
+    @Override
+    protected void append(LoggingEvent event) {
+        if (event.getLevel().equals(Level.DEBUG)) {
+            jobOutput.debug(event.getRenderedMessage());
+        } else if (event.getLevel().equals(Level.ERROR)) {
+            jobOutput.error(event.getRenderedMessage());
+        } else if (event.getLevel().equals(Level.FATAL)) {
+            jobOutput.fatal(event.getRenderedMessage());
+        } else if (event.getLevel().equals(Level.INFO)) {
+            jobOutput.info(event.getRenderedMessage());
+        } else if (event.getLevel().equals(Level.OFF)) {
+            jobOutput.off();
+        } else if (event.getLevel().equals(Level.TRACE)) {
+            jobOutput.trace(event.getRenderedMessage());
+        } else if (event.getLevel().equals(Level.WARN)) {
+            jobOutput.warn(event.getRenderedMessage());
+        } else {
+            jobOutput.log(event.getRenderedMessage());
+        }
+    }
 
-	// -------------------------------------------------------------------- //
-	// -------------------- extends AppenderSkeleton ---------------------- //
-	// -------------------------------------------------------------------- //
-	/**
-	 * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
-	 */
-	@Override
-	protected void append(LoggingEvent event) {
-		if (event.getLevel().equals(Level.DEBUG))
-			jobOutput.debug(event.getRenderedMessage());
-		else if (event.getLevel().equals(Level.ERROR))
-			jobOutput.error(event.getRenderedMessage());
-		else if (event.getLevel().equals(Level.FATAL))
-			jobOutput.fatal(event.getRenderedMessage());
-		else if (event.getLevel().equals(Level.INFO))
-			jobOutput.info(event.getRenderedMessage());
-		else if (event.getLevel().equals(Level.OFF))
-			jobOutput.off();
-		else if (event.getLevel().equals(Level.TRACE))
-			jobOutput.trace(event.getRenderedMessage());
-		else if (event.getLevel().equals(Level.WARN))
-			jobOutput.warn(event.getRenderedMessage());
-		else
-			jobOutput.log(event.getRenderedMessage());
-	}
+    /**
+     * @see org.apache.log4j.AppenderSkeleton#close()
+     */
+    @Override
+    public void close() {
+    }
 
-	/**
-	 * @see org.apache.log4j.AppenderSkeleton#close()
-	 */
-	@Override
-	public void close() {}
-
-	/**
-	 * @see org.apache.log4j.AppenderSkeleton#requiresLayout()
-	 */
-	@Override
-	public boolean requiresLayout() {
-		return false;
-	}
+    /**
+     * @see org.apache.log4j.AppenderSkeleton#requiresLayout()
+     */
+    @Override
+    public boolean requiresLayout() {
+        return false;
+    }
 }

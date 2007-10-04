@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.gui.data;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+
 
 /**
  * Class providing events for pending jobs.
@@ -41,17 +42,17 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  */
 public interface PendingJobsListener {
 
-	/**
-	 * Invoke by jobs controller when a job has just been submitted
-	 * 
-	 * @param jobId the jobid
-	 */
-	public void addPendingJob(JobId jobId);
-	
-	/**
-	 * Invoke by jobs controller when a job has just started scheduling
-	 * 
-	 * @param jobId the jobid
-	 */
-	public void removePendingJob(JobId jobId);
+    /**
+     * Invoke by jobs controller when a job has just been submitted
+     *
+     * @param jobId the jobid
+     */
+    public void addPendingJob(JobId jobId);
+
+    /**
+     * Invoke by jobs controller when a job has just started scheduling
+     *
+     * @param jobId the jobid
+     */
+    public void removePendingJob(JobId jobId);
 }

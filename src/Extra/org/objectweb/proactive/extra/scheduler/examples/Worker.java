@@ -28,31 +28,37 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extra.scheduler.examples;
 
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import java.util.ArrayList;
+
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
- * Class providing events for running jobs.
+ * @author jlscheef
  *
- * @author ProActive Team
- * @version 1.0, Jul 12, 2007
- * @since ProActive 3.2
  */
-public interface RunningJobsListener {
+public class Worker implements java.io.Serializable {
+    private static final long serialVersionUID = 6479587603886940747L;
 
-    /**
-     * Invoke by jobs controller when a job has just started scheduling
-     *
-     * @param jobId the jobid
-     */
-    public void addRunningJob(JobId jobId);
+    // primeNumbers already known by the worker
+    private ArrayList<Integer> primeNumbers = new ArrayList<Integer>();
 
-    /**
-     * Invoke by jobs controller when a job has just been terminated
-     *
-     * @param jobId the jobid
-     */
-    public void removeRunningJob(JobId jobId);
+    /** ProActive empty constructor */
+    public Worker() {
+    }
+
+    public BooleanWrapper isPrime(int num) {
+        for (Integer n : primeNumbers) {
+            if ((num % n) == 0) {
+                return new BooleanWrapper(false);
+            }
+        }
+        return new BooleanWrapper(true);
+    }
+
+    public void addPrimeNumber(int num) {
+        primeNumbers.add(num);
+    }
 }

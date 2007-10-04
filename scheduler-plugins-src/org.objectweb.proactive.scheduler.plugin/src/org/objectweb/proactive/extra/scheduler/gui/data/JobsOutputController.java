@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -43,108 +43,114 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 import org.objectweb.proactive.extra.scheduler.gui.Activator;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobOutput;
 
+
 /**
  * Create, show and remove jobs output
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class JobsOutputController {
 
-	/** title of the job output view */
-	public static final String PREFIX_JOB_OUTPUT_TITLE = "Job #";
+    /** title of the job output view */
+    public static final String PREFIX_JOB_OUTPUT_TITLE = "Job #";
 
-	// The shared instance
-	private static JobsOutputController instance = null;
-	private Map<JobId, JobOutputAppender> appenders = null;
+    // The shared instance
+    private static JobsOutputController instance = null;
+    private Map<JobId, JobOutputAppender> appenders = null;
 
-	// -------------------------------------------------------------------- //
-	// --------------------------- constructor ---------------------------- //
-	// -------------------------------------------------------------------- //
-	private JobsOutputController() {
-		appenders = new HashMap<JobId, JobOutputAppender>();
-	}
+    // -------------------------------------------------------------------- //
+    // --------------------------- constructor ---------------------------- //
+    // -------------------------------------------------------------------- //
+    private JobsOutputController() {
+        appenders = new HashMap<JobId, JobOutputAppender>();
+    }
 
-	// -------------------------------------------------------------------- //
-	// ------------------------------ public ------------------------------ //
-	// -------------------------------------------------------------------- //
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static JobsOutputController getInstance() {
-		if (instance == null)
-			instance = new JobsOutputController();
-		return instance;
-	}
+    // -------------------------------------------------------------------- //
+    // ------------------------------ public ------------------------------ //
+    // -------------------------------------------------------------------- //
+    /**
+     * Returns the shared instance
+     *
+     * @return the shared instance
+     */
+    public static JobsOutputController getInstance() {
+        if (instance == null) {
+            instance = new JobsOutputController();
+        }
+        return instance;
+    }
 
-	public static void clearInstance() {
-		if (instance != null) {
-			instance.removeAllJobOutput();
-			instance = null;
-		}
-	}
+    public static void clearInstance() {
+        if (instance != null) {
+            instance.removeAllJobOutput();
+            instance = null;
+        }
+    }
 
-	/**
-	 * This method tries to show the output of a job (identified by the given
-	 * jobId). This method can't show the output if it has never been created.
-	 * In order to create an output use
-	 * {@link JobsOutputController#createJobOutput(JobId) createJobOutput}.
-	 * 
-	 * @param jobId the jobId
-	 * @return true only if the output was created
-	 * @see JobsOutputController#createJobOutput(JobId)
-	 */
-	public boolean showJobOutput(JobId jobId) {
-		JobOutputAppender joa = appenders.get(jobId);
-		if (joa == null) {
-			return false;
-		}
-		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(joa.getJobOutput());
-		return true;
-	}
+    /**
+     * This method tries to show the output of a job (identified by the given
+     * jobId). This method can't show the output if it has never been created.
+     * In order to create an output use
+     * {@link JobsOutputController#createJobOutput(JobId) createJobOutput}.
+     *
+     * @param jobId the jobId
+     * @return true only if the output was created
+     * @see JobsOutputController#createJobOutput(JobId)
+     */
+    public boolean showJobOutput(JobId jobId) {
+        JobOutputAppender joa = appenders.get(jobId);
+        if (joa == null) {
+            return false;
+        }
+        ConsolePlugin.getDefault().getConsoleManager()
+                     .showConsoleView(joa.getJobOutput());
+        return true;
+    }
 
-	/**
-	 * Create an output for a job identified by the given jobId
-	 * 
-	 * @param jobId the jobId
-	 * @throws SchedulerException
-	 */
-	public void createJobOutput(JobId jobId) {
-		if (!showJobOutput(jobId)) {
-			SchedulerProxy.getInstance().listenLog(jobId, Activator.getHostname(), Activator.LISTEN_PORT);
-			JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId));
-			Logger log = Logger.getLogger(SchedulerCore.LOGGER_PREFIX + jobId);
-			log.setLevel(Level.ALL);
-			log.removeAllAppenders();
-			log.addAppender(joa);
-			appenders.put(jobId, joa);
-			showJobOutput(jobId);
-		}
-	}
+    /**
+     * Create an output for a job identified by the given jobId
+     *
+     * @param jobId the jobId
+     * @throws SchedulerException
+     */
+    public void createJobOutput(JobId jobId) {
+        if (!showJobOutput(jobId)) {
+            SchedulerProxy.getInstance()
+                          .listenLog(jobId, Activator.getHostname(),
+                Activator.LISTEN_PORT);
+            JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE +
+                        jobId));
+            Logger log = Logger.getLogger(SchedulerCore.LOGGER_PREFIX + jobId);
+            log.setLevel(Level.ALL);
+            log.removeAllAppenders();
+            log.addAppender(joa);
+            appenders.put(jobId, joa);
+            showJobOutput(jobId);
+        }
+    }
 
-	/**
-	 * To remove an output for a job identified by the given jobId
-	 * 
-	 * @param jobId the jobId
-	 */
-	public void removeJobOutput(JobId jobId) {
-		JobOutputAppender joa = appenders.get(jobId);
-		if (joa != null) {
-			ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
-					new IConsole[] { joa.getJobOutput() });
-		}
-		appenders.remove(jobId);
-	}
+    /**
+     * To remove an output for a job identified by the given jobId
+     *
+     * @param jobId the jobId
+     */
+    public void removeJobOutput(JobId jobId) {
+        JobOutputAppender joa = appenders.get(jobId);
+        if (joa != null) {
+            ConsolePlugin.getDefault().getConsoleManager()
+                         .removeConsoles(new IConsole[] { joa.getJobOutput() });
+        }
+        appenders.remove(jobId);
+    }
 
-	/**
-	 * Remove all output ! This method clear the console.
-	 */
-	public void removeAllJobOutput() {
-		for (JobOutputAppender joa : appenders.values())
-			ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
-					new IConsole[] { joa.getJobOutput() });
-	}
+    /**
+     * Remove all output ! This method clear the console.
+     */
+    public void removeAllJobOutput() {
+        for (JobOutputAppender joa : appenders.values())
+            ConsolePlugin.getDefault().getConsoleManager()
+                         .removeConsoles(new IConsole[] { joa.getJobOutput() });
+    }
 }
