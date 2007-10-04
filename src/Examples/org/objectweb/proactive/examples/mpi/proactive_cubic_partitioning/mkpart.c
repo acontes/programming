@@ -154,7 +154,7 @@ void mkpart(int cluster_rank, int worker_rank, int dims_c_x, int dims_c_y,
 			up_c = -1;
 			up_w = -1;
 		} else {
-			up_c = cluster_rank - dims_w_x;
+			up_c = cluster_rank - dims_c_x;
 			up_w = (dims_w_x * dims_w_y) - (dims_w_x - worker_rank);
 		}
 	} else {
@@ -218,6 +218,30 @@ void mkpart(int cluster_rank, int worker_rank, int dims_c_x, int dims_c_y,
 	worker_neigh[4] = front_w;
 	worker_neigh[5] = rear_w;
 }
+/*
+int main(int argc, char ** argv) {
+//	void mkpart(int cluster_rank, int worker_rank, int dims_c_x, int dims_c_y,
+//			int dims_c_z, int dims_w_x, int dims_w_y, int dims_w_z,
+//			int * cluster_neigh, int * worker_neigh) {
+	int cluster_neigh [] = { -2, -2, -2, -2, -2, -2 };
+	int worker_neigh [] = { -2, -2, -2, -2, -2, -2 };
+	
+	int a,b;
+	int cx = 1, cy = 2, cz = 1, wx = 2, wy = 2, wz = 1;
+	
+	for (a=0; a < cx*cy*cz; a++) {
+		for (b=0; b < wx*wy*wz; b++) {
+			mkpart(a, b, cx, cy, cz, wx, wy, wz, cluster_neigh, worker_neigh);
+			printf("-------------------------\n");
+			printf("(%d , %d) l (%d , %d)\n",a,b,cluster_neigh[0], worker_neigh[0]);
+			printf("(%d , %d) r (%d , %d)\n",a,b,cluster_neigh[1], worker_neigh[1]);
+			printf("(%d , %d) u (%d , %d)\n",a,b,cluster_neigh[2], worker_neigh[2]);
+			printf("(%d , %d) d (%d , %d)\n",a,b,cluster_neigh[3], worker_neigh[3]);
+			printf("(%d , %d) f (%d , %d)\n",a,b,cluster_neigh[4], worker_neigh[4]);
+			printf("(%d , %d) r (%d , %d)\n",a,b,cluster_neigh[5], worker_neigh[5]);
+		}
+	}
 
+}*/
 /**************************************************************************/
 
