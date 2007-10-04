@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -36,7 +36,7 @@ import java.util.ListIterator;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.MOP;
@@ -183,12 +183,13 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             int launched = found;
             while (!nodes.isEmpty() && (launched++ < nb.intValue())) {
                 nodeResults.add(nodes.get(0));
-                ScriptResult<Boolean> sr = nodes.get(0).executeScript(verifyingScript);
-                if (MOP.isReifiedObject(sr)){ // should check isAFuture...
+                ScriptResult<Boolean> sr = nodes.get(0)
+                                                .executeScript(verifyingScript);
+                if (MOP.isReifiedObject(sr)) { // should check isAFuture...
                     scriptResults.add(sr);
                 } else {
                     // scriptResult is an exception ?
-                    if (sr.errorOccured()){
+                    if (sr.errorOccured()) {
                         logger.warn("======> A script result is ignored ...");
                     } else {
                         throw new RuntimeException("COMPRENDS PAS LA ...");
@@ -201,7 +202,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
                     (found < nb.intValue())) {
                 try {
-                    int idx = ProActive.waitForAny(scriptResults,
+                    int idx = ProFuture.waitForAny(scriptResults,
                             MAX_VERIF_TIMEOUT);
                     IMNode imnode = nodeResults.remove(idx);
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
@@ -249,7 +250,8 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             int launched = 0;
             while (!nodes.isEmpty() && (launched++ < nb.intValue())) {
                 nodeResults.add(nodes.get(0));
-                ScriptResult<Boolean> r = nodes.get(0).executeScript(verifyingScript);
+                ScriptResult<Boolean> r = nodes.get(0)
+                                               .executeScript(verifyingScript);
                 scriptResults.add(r);
                 nodes.remove(0);
             }
@@ -259,7 +261,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     (found < nb.intValue())) {
                 try {
                     //					int idx = ProActive.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
-                    int idx = ProActive.waitForAny(scriptResults);
+                    int idx = ProFuture.waitForAny(scriptResults);
                     IMNode imnode = nodeResults.remove(idx);
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
                     if (res.errorOccured()) {

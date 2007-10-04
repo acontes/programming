@@ -10,7 +10,7 @@
 			</preTask>
 			<process>
 				<javaProcess
-					class="org.objectweb.proactive.examples.scheduler.PropertyTask">
+					class="org.objectweb.proactive.extra.scheduler.examples.PropertyTask">
 				</javaProcess>
 			</process>
 			<postTask>

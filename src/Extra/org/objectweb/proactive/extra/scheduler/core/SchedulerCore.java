@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -39,9 +39,10 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -220,7 +221,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */
     public void runActivity(Body body) {
-        ProActive.setImmediateService("listenLog");
+        ProActiveObject.setImmediateService("listenLog");
         Service service = new Service(body);
 
         //set the filter for serveAll method
@@ -293,7 +294,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         }
         //destroying scheduler active objects
         frontend.terminate();
-        ProActive.terminateActiveObject(false);
+        ProActiveObject.terminateActiveObject(false);
         logger.info("Scheduler is now shutdown !");
         //exit
         System.exit(0);
@@ -349,7 +350,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                         }
                         taskResults.put(internalTask.getId(),
                             ((AppliTaskLauncher) launcher).doTask(
-                                (SchedulerCore) ProActive.getStubOnThis(),
+                                (SchedulerCore) ProActiveObject.getStubOnThis(),
                                 (ExecutableApplicationTask) internalTask.getTask(),
                                 nodes));
                     } else if (currentJob.getType() != JobType.APPLI) {
@@ -367,12 +368,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                             }
                             taskResults.put(internalTask.getId(),
                                 launcher.doTask(
-                                    (SchedulerCore) ProActive.getStubOnThis(),
+                                    (SchedulerCore) ProActiveObject.getStubOnThis(),
                                     internalTask.getTask(), params));
                         } else {
                             taskResults.put(internalTask.getId(),
                                 launcher.doTask(
-                                    (SchedulerCore) ProActive.getStubOnThis(),
+                                    (SchedulerCore) ProActiveObject.getStubOnThis(),
                                     internalTask.getTask()));
                         }
                     }
@@ -430,8 +431,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             InternalJob job = runningJobs.get(i);
             for (InternalTask td : job.getTasks()) {
                 if ((td.getStatus() == Status.RUNNNING) &&
-                        !ProActive.pingActiveObject(td.getExecuterInformations()
-                                                          .getLauncher())) {
+                        !ProActiveObject.pingActiveObject(
+                            td.getExecuterInformations().getLauncher())) {
                     logger.info("<<<<<<<< Node failed on job " + job.getId() +
                         ", task [ " + td.getId() + " ]");
                     if (td.getRerunnableLeft() > 0) {
@@ -540,7 +541,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             TaskResult res = null;
             res = taskResults.get(taskId);
             if (res != null) {
-                if (ProActive.isException(res)) {
+                if (ProException.isException(res)) {
                     //in this case, it is a node error.
                     //this is not user exception or usage,
                     //so we restart independantly of rerunnable properties

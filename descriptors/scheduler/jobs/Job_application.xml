@@ -7,7 +7,7 @@
 			<description>Will control the workers in order to find the prime number</description>
 			<process>
 				<applicationProcess
-					class="org.objectweb.proactive.examples.scheduler.ApplicationExample">
+					class="org.objectweb.proactive.extra.scheduler.examples.ApplicationExample">
 					<initParameters>
 						<parameter name="numberToFind" value="200" />
 					</initParameters>

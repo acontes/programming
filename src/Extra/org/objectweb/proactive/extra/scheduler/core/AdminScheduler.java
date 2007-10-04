@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.scheduler.core;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -42,7 +42,6 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
-import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 
 
@@ -91,7 +90,7 @@ public class AdminScheduler extends UserScheduler
 
         //verifying that the scheduler is an active object
         try {
-            ProActive.getActiveObjectNodeUrl(imp);
+            ProActiveObject.getActiveObjectNodeUrl(imp);
         } catch (ProActiveRuntimeException e) {
             logger.warn(
                 "The infrastructure manager is not an active object, this will decrease the scheduler performance.");
@@ -110,24 +109,24 @@ public class AdminScheduler extends UserScheduler
             // creating the scheduler proxy.
             // if this fails then it will not continue.
             logger.info("Creating scheduler frontend...");
-            schedulerFrontend = (SchedulerFrontend) ProActive.newActive(SchedulerFrontend.class.getName(),
+            schedulerFrontend = (SchedulerFrontend) ProActiveObject.newActive(SchedulerFrontend.class.getName(),
                     new Object[] { imp, policyFullClassName });
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger.info("Creating scheduler authentication interface...");
-            schedulerAuth = (SchedulerAuthentication) ProActive.newActive(SchedulerAuthentication.class.getName(),
+            schedulerAuth = (SchedulerAuthentication) ProActiveObject.newActive(SchedulerAuthentication.class.getName(),
                     new Object[] { loginFile, groupFile, schedulerFrontend });
             // adding NFE listener to managed non fonctionnal exceptions
             // that occurs in Proactive Core
-            ProActive.addNFEListenerOnAO(schedulerFrontend,
-                new NFEHandler("Scheduler Frontend"));
-            ProActive.addNFEListenerOnAO(schedulerAuth,
-                new NFEHandler("Scheduler authentication"));
+            //ProActive.addNFEListenerOnAO(schedulerFrontend,
+            //    new NFEHandler("Scheduler Frontend"));
+            //ProActive.addNFEListenerOnAO(schedulerAuth,
+            //    new NFEHandler("Scheduler authentication"));
             // registering the scheduler proxy at the given URL
             logger.info("Registering scheduler...");
             String schedulerUrl = "//localhost/" +
                 SchedulerConnection.SCHEDULER_DEFAULT_NAME;
-            ProActive.register(schedulerAuth, schedulerUrl);
+            ProActiveObject.register(schedulerAuth, schedulerUrl);
             // setting the proxy to the admin scheduler API
             adminScheduler.schedulerFrontend = schedulerFrontend;
             // run forest run !!

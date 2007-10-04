@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -55,7 +55,6 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventLi
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
 import org.objectweb.proactive.extra.scheduler.job.IdentifyJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalJobFactory;
@@ -155,16 +154,16 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      */
     public void initActivity(Body body) {
         try {
-            scheduler = (SchedulerCore) ProActive.newActive(SchedulerCore.class.getName(),
+            scheduler = (SchedulerCore) ProActiveObject.newActive(SchedulerCore.class.getName(),
                     new Object[] {
-                        resourceManager, ProActive.getStubOnThis(),
+                        resourceManager, ProActiveObject.getStubOnThis(),
                         policyFullName
                     });
-            ProActive.addNFEListenerOnAO(scheduler,
-                new NFEHandler("Scheduler Core"));
+            //ProActive.addNFEListenerOnAO(scheduler,
+            //    new NFEHandler("Scheduler Core"));
             logger.info("Scheduler successfully created on " +
-                ProActive.getNode().getNodeInformation().getVMInformation()
-                         .getHostName());
+                ProActiveObject.getNode().getNodeInformation().getVMInformation()
+                               .getHostName());
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -188,8 +187,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
     public void connect(UniqueID sourceBodyID, UserIdentification identification)
         throws SchedulerException {
         if (authenticationInterface == null) {
-            authenticationInterface = (SchedulerAuthentication) ProActive.getContext()
-                                                                         .getStubOnCaller();
+            authenticationInterface = (SchedulerAuthentication) ProActiveObject.getContext()
+                                                                               .getStubOnCaller();
         }
         if (identifications.containsKey(sourceBodyID)) {
             logger.warn("Active object already connected !");
@@ -205,8 +204,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      */
     public JobResult getResult(JobId jobId) throws SchedulerException {
         //checking permissions
-        UniqueID id = ProActive.getContext().getCurrentRequest()
-                               .getSourceBodyID();
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
         }
@@ -242,8 +241,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      * @throws UserException an exception containing explicit error message.
      */
     public JobId submit(Job userJob) throws SchedulerException {
-        UniqueID id = ProActive.getContext().getCurrentRequest()
-                               .getSourceBodyID();
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
         }
@@ -291,8 +290,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      */
     public void listenLog(JobId jobId, String hostname, int port)
         throws SchedulerException {
-        UniqueID id = ProActive.getContext().getCurrentRequest()
-                               .getSourceBodyID();
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
         }
@@ -313,8 +312,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      */
     public SchedulerInitialState<?extends Job> addSchedulerEventListener(
         SchedulerEventListener sel) throws SchedulerException {
-        UniqueID id = ProActive.getContext().getCurrentRequest()
-                               .getSourceBodyID();
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
         }
@@ -326,8 +325,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getStats()
      */
     public Stats getStats() throws SchedulerException {
-        UniqueID id = ProActive.getContext().getCurrentRequest()
-                               .getSourceBodyID();
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
         }
@@ -347,8 +346,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      * @return true if order can continue, false if not.
      */
     private boolean ssprsc(String permissionMsg) {
-        UniqueID id = ProActive.getContext().getCurrentRequest()
-                               .getSourceBodyID();
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
         if (!identifications.containsKey(id)) {
             logger.warn(ACCESS_DENIED);
             return false;
@@ -442,8 +441,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#disconnect()
      */
     public void disconnect() throws SchedulerException {
-        UniqueID id = ProActive.getContext().getCurrentRequest()
-                               .getSourceBodyID();
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
         }
@@ -462,8 +461,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
      */
     private void prkcp(JobId jobId, String permissionMsg)
         throws SchedulerException {
-        UniqueID id = ProActive.getContext().getCurrentRequest()
-                               .getSourceBodyID();
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
         }
@@ -508,9 +507,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
         throws SchedulerException {
         prkcp(jobId,
             "You do not have permission to change the priority of this job !");
-        UserIdentification ui = identifications.get(ProActive.getContext()
-                                                             .getCurrentRequest()
-                                                             .getSourceBodyID());
+        UserIdentification ui = identifications.get(ProActiveObject.getContext()
+                                                                   .getCurrentRequest()
+                                                                   .getSourceBodyID());
         if (!ui.isAdmin()) {
             if (priority == JobPriority.HIGHEST) {
                 throw new SchedulerException(
@@ -533,7 +532,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
         if (authenticationInterface != null) {
             authenticationInterface.terminate();
         }
-        ProActive.terminateActiveObject(false);
+        ProActiveObject.terminateActiveObject(false);
         logger.info("Scheduler frontend is now shutdown !");
         return true;
     }

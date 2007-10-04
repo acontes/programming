@@ -1,28 +1,31 @@
 /*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
- * computing with Security and Mobility
- * 
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
- * proactive@objectweb.org
- * 
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or any later version.
- * 
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
- * Place, Suite 330, Boston, MA 02111-1307 USA
- * 
- * Initial developer(s): The ProActive Team
- * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
- * 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
  * ################################################################
  */
 package org.objectweb.proactive.extra.scheduler.gui.views;
@@ -40,7 +43,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ChangeViewModeAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
@@ -70,314 +73,325 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 
+
 /**
  * This class display the state of the scheduler in real time
- * 
+ *
  * @author ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class SeparatedJobView extends ViewPart {
-	/** the view part id */
-	public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView";
-	private static final long serialVersionUID = -6958852991395601640L;
 
-	private static JobComposite jobComposite = null;
+    /** the view part id */
+    public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView";
+    private static final long serialVersionUID = -6958852991395601640L;
+    private static JobComposite jobComposite = null;
+    private static AbstractJobComposite pendingJobComposite = null;
+    private static AbstractJobComposite runningJobComposite = null;
+    private static AbstractJobComposite finishedJobComposite = null;
+    private static Action connectSchedulerAction = null;
+    private static Action changeViewModeAction = null;
+    private static Action obtainJobOutputAction = null;
+    private static Action submitJob = null;
+    private static Action pauseResumeJobAction = null;
+    private static Action killJobAction = null;
+    private static Action priorityIdleJobAction = null;
+    private static Action priorityLowestJobAction = null;
+    private static Action priorityLowJobAction = null;
+    private static Action priorityNormalJobAction = null;
+    private static Action priorityHighJobAction = null;
+    private static Action priorityHighestJobAction = null;
+    private static Action startStopSchedulerAction = null;
+    private static Action freezeSchedulerAction = null;
+    private static Action pauseSchedulerAction = null;
+    private static Action resumeSchedulerAction = null;
+    private static Action shutdownSchedulerAction = null;
+    private static Action killSchedulerAction = null;
+    private static Composite parent = null;
 
-	private static AbstractJobComposite pendingJobComposite = null;
-	private static AbstractJobComposite runningJobComposite = null;
-	private static AbstractJobComposite finishedJobComposite = null;
+    // -------------------------------------------------------------------- //
+    // --------------------------- constructor ---------------------------- //
+    // -------------------------------------------------------------------- //
+    /**
+     * The constructor.
+     */
+    public SeparatedJobView() {
+    }
 
-	private static Action connectSchedulerAction = null;
-	private static Action changeViewModeAction = null;
-	private static Action obtainJobOutputAction = null;
-	private static Action submitJob = null;
-	private static Action pauseResumeJobAction = null;
-	private static Action killJobAction = null;
+    // -------------------------------------------------------------------- //
+    // ----------------------------- private ------------------------------ //
+    // -------------------------------------------------------------------- //
+    private void hookContextMenu(Composite parent) {
+        MenuManager menuMgr = new MenuManager("#PopupMenu");
+        menuMgr.setRemoveAllWhenShown(true);
+        menuMgr.addMenuListener(new IMenuListener() {
+                public void menuAboutToShow(IMenuManager manager) {
+                    fillContextMenu(manager);
+                }
+            });
 
-	private static Action priorityIdleJobAction = null;
-	private static Action priorityLowestJobAction = null;
-	private static Action priorityLowJobAction = null;
-	private static Action priorityNormalJobAction = null;
-	private static Action priorityHighJobAction = null;
-	private static Action priorityHighestJobAction = null;
+        Menu menu = menuMgr.createContextMenu(parent);
+        parent.setMenu(menu);
+        pendingJobComposite.setMenu(menu);
+        runningJobComposite.setMenu(menu);
+        finishedJobComposite.setMenu(menu);
+    }
 
-	private static Action startStopSchedulerAction = null;
-	private static Action freezeSchedulerAction = null;
-	private static Action pauseSchedulerAction = null;
-	private static Action resumeSchedulerAction = null;
-	private static Action shutdownSchedulerAction = null;
-	private static Action killSchedulerAction = null;
+    private void fillContextMenu(IMenuManager manager) {
+        manager.add(connectSchedulerAction);
+        manager.add(changeViewModeAction);
+        manager.add(new Separator());
+        manager.add(submitJob);
+        manager.add(pauseResumeJobAction);
+        IMenuManager subMenu = new MenuManager("Change job priority");
+        manager.add(subMenu);
+        if (SchedulerProxy.getInstance() != null) {
+            if (SchedulerProxy.getInstance().isAnAdmin()) {
+                subMenu.add(priorityIdleJobAction);
+            }
+        }
+        subMenu.add(priorityLowestJobAction);
+        subMenu.add(priorityLowJobAction);
+        subMenu.add(priorityNormalJobAction);
+        manager.add(obtainJobOutputAction);
+        manager.add(killJobAction);
+        if (SchedulerProxy.getInstance() != null) {
+            if (SchedulerProxy.getInstance().isAnAdmin()) {
+                subMenu.add(priorityHighJobAction);
+                subMenu.add(priorityHighestJobAction);
+                manager.add(new Separator());
+                manager.add(startStopSchedulerAction);
+                manager.add(freezeSchedulerAction);
+                manager.add(pauseSchedulerAction);
+                manager.add(resumeSchedulerAction);
+                manager.add(shutdownSchedulerAction);
+                manager.add(killSchedulerAction);
+            }
+        }
 
-	private static Composite parent = null;
+        // // Other plug-ins can contribute there actions here
+        // manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+    }
 
-	// -------------------------------------------------------------------- //
-	// --------------------------- constructor ---------------------------- //
-	// -------------------------------------------------------------------- //
-	/**
-	 * The constructor.
-	 */
-	public SeparatedJobView() {}
+    private void contributeToActionBars() {
+        IActionBars bars = getViewSite().getActionBars();
+        fillLocalToolBar(bars.getToolBarManager());
+    }
 
-	// -------------------------------------------------------------------- //
-	// ----------------------------- private ------------------------------ //
-	// -------------------------------------------------------------------- //
-	private void hookContextMenu(Composite parent) {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(parent);
-		parent.setMenu(menu);
-		pendingJobComposite.setMenu(menu);
-		runningJobComposite.setMenu(menu);
-		finishedJobComposite.setMenu(menu);
-	}
+    private void fillLocalToolBar(IToolBarManager manager) {
+        // toolBarManager = manager;
+        manager.add(connectSchedulerAction);
+        manager.add(changeViewModeAction);
+        manager.add(new Separator());
+        manager.add(submitJob);
+        manager.add(pauseResumeJobAction);
+        manager.add(obtainJobOutputAction);
+        manager.add(killJobAction);
 
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(connectSchedulerAction);
-		manager.add(changeViewModeAction);
-		manager.add(new Separator());
-		manager.add(submitJob);
-		manager.add(pauseResumeJobAction);
-		IMenuManager subMenu = new MenuManager("Change job priority");
-		manager.add(subMenu);
-		if (SchedulerProxy.getInstance() != null) {
-			if (SchedulerProxy.getInstance().isAnAdmin()) {
-				subMenu.add(priorityIdleJobAction);
-			}
-		}
-		subMenu.add(priorityLowestJobAction);
-		subMenu.add(priorityLowJobAction);
-		subMenu.add(priorityNormalJobAction);
-		manager.add(obtainJobOutputAction);
-		manager.add(killJobAction);
-		if (SchedulerProxy.getInstance() != null) {
-			if (SchedulerProxy.getInstance().isAnAdmin()) {
-				subMenu.add(priorityHighJobAction);
-				subMenu.add(priorityHighestJobAction);
-				manager.add(new Separator());
-				manager.add(startStopSchedulerAction);
-				manager.add(freezeSchedulerAction);
-				manager.add(pauseSchedulerAction);
-				manager.add(resumeSchedulerAction);
-				manager.add(shutdownSchedulerAction);
-				manager.add(killSchedulerAction);
-			}
-		}
+        manager.add(new Separator());
+        manager.add(startStopSchedulerAction);
+        manager.add(freezeSchedulerAction);
+        manager.add(pauseSchedulerAction);
+        manager.add(resumeSchedulerAction);
+        manager.add(shutdownSchedulerAction);
+        manager.add(killSchedulerAction);
+    }
 
-// // Other plug-ins can contribute there actions here
-// manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
+    private void makeActions() {
+        Shell shell = parent.getShell();
 
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalToolBar(bars.getToolBarManager());
-	}
+        connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(parent);
+        changeViewModeAction = ChangeViewModeAction.newInstance(jobComposite);
 
-	private void fillLocalToolBar(IToolBarManager manager) {
-		// toolBarManager = manager;
-		manager.add(connectSchedulerAction);
-		manager.add(changeViewModeAction);
-		manager.add(new Separator());
-		manager.add(submitJob);
-		manager.add(pauseResumeJobAction);
-		manager.add(obtainJobOutputAction);
-		manager.add(killJobAction);
+        obtainJobOutputAction = ObtainJobOutputAction.newInstance();
+        submitJob = SubmitJobAction.newInstance(parent);
+        pauseResumeJobAction = PauseResumeJobAction.newInstance();
+        killJobAction = KillJobAction.newInstance(shell);
 
-		manager.add(new Separator());
-		manager.add(startStopSchedulerAction);
-		manager.add(freezeSchedulerAction);
-		manager.add(pauseSchedulerAction);
-		manager.add(resumeSchedulerAction);
-		manager.add(shutdownSchedulerAction);
-		manager.add(killSchedulerAction);
-	}
+        priorityIdleJobAction = PriorityIdleJobAction.newInstance();
+        priorityLowestJobAction = PriorityLowestJobAction.newInstance();
+        priorityLowJobAction = PriorityLowJobAction.newInstance();
+        priorityNormalJobAction = PriorityNormalJobAction.newInstance();
+        priorityHighJobAction = PriorityHighJobAction.newInstance();
+        priorityHighestJobAction = PriorityHighestJobAction.newInstance();
 
-	private void makeActions() {
-		Shell shell = parent.getShell();
+        startStopSchedulerAction = StartStopSchedulerAction.newInstance();
+        freezeSchedulerAction = FreezeSchedulerAction.newInstance();
+        pauseSchedulerAction = PauseSchedulerAction.newInstance();
+        resumeSchedulerAction = ResumeSchedulerAction.newInstance();
+        shutdownSchedulerAction = ShutdownSchedulerAction.newInstance(shell);
+        killSchedulerAction = KillSchedulerAction.newInstance(shell);
+    }
 
-		connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(parent);
-		changeViewModeAction = ChangeViewModeAction.newInstance(jobComposite);
+    // -------------------------------------------------------------------- //
+    // ------------------------------ public ------------------------------ //
+    // -------------------------------------------------------------------- //
+    /**
+     * To display or not the view
+     *
+     * @param visible
+     */
+    public static void setVisible(boolean visible) {
+        pendingJobComposite.setVisible(visible);
+        runningJobComposite.setVisible(visible);
+        finishedJobComposite.setVisible(visible);
+        // JobInfo jobInfo = JobInfo.getInstance();
+        // if(jobInfo != null)
+        // jobInfo.setVisible(visible);
+        // TaskView taskView = TaskView.getInstance();
+        // if(taskView != null)
+        // taskView.setVisible(visible);
+    }
 
-		obtainJobOutputAction = ObtainJobOutputAction.newInstance();
-		submitJob = SubmitJobAction.newInstance(parent);
-		pauseResumeJobAction = PauseResumeJobAction.newInstance();
-		killJobAction = KillJobAction.newInstance(shell);
+    /**
+     * Returns the pending job composite
+     *
+     * @return the pending job composite
+     */
+    public static AbstractJobComposite getPendingJobComposite() {
+        return pendingJobComposite;
+    }
 
-		priorityIdleJobAction = PriorityIdleJobAction.newInstance();
-		priorityLowestJobAction = PriorityLowestJobAction.newInstance();
-		priorityLowJobAction = PriorityLowJobAction.newInstance();
-		priorityNormalJobAction = PriorityNormalJobAction.newInstance();
-		priorityHighJobAction = PriorityHighJobAction.newInstance();
-		priorityHighestJobAction = PriorityHighestJobAction.newInstance();
+    /**
+     * Returns the running job composite
+     *
+     * @return the running job composite
+     */
+    public static AbstractJobComposite getRunningJobComposite() {
+        return runningJobComposite;
+    }
 
-		startStopSchedulerAction = StartStopSchedulerAction.newInstance();
-		freezeSchedulerAction = FreezeSchedulerAction.newInstance();
-		pauseSchedulerAction = PauseSchedulerAction.newInstance();
-		resumeSchedulerAction = ResumeSchedulerAction.newInstance();
-		shutdownSchedulerAction = ShutdownSchedulerAction.newInstance(shell);
-		killSchedulerAction = KillSchedulerAction.newInstance(shell);
-	}
+    /**
+     * Returns the finished job composite
+     *
+     * @return the finished job composite
+     */
+    public static AbstractJobComposite getFinishedJobComposite() {
+        return finishedJobComposite;
+    }
 
-	// -------------------------------------------------------------------- //
-	// ------------------------------ public ------------------------------ //
-	// -------------------------------------------------------------------- //
-	/**
-	 * To display or not the view
-	 * 
-	 * @param visible
-	 */
-	public static void setVisible(boolean visible) {
-		pendingJobComposite.setVisible(visible);
-		runningJobComposite.setVisible(visible);
-		finishedJobComposite.setVisible(visible);
-		// JobInfo jobInfo = JobInfo.getInstance();
-		// if(jobInfo != null)
-		// jobInfo.setVisible(visible);
-		// TaskView taskView = TaskView.getInstance();
-		// if(taskView != null)
-		// taskView.setVisible(visible);
-	}
+    public static void clearOnDisconnection(Boolean sendDisconnectMessage) {
+        setVisible(false);
+        ConnectDeconnectSchedulerAction.getInstance().setDisconnectionMode();
 
-	/**
-	 * Returns the pending job composite
-	 * 
-	 * @return the pending job composite
-	 */
-	public static AbstractJobComposite getPendingJobComposite() {
-		return pendingJobComposite;
-	}
+        TaskView taskView = TaskView.getInstance();
+        if (taskView != null) {
+            taskView.clear();
+        }
 
-	/**
-	 * Returns the running job composite
-	 * 
-	 * @return the running job composite
-	 */
-	public static AbstractJobComposite getRunningJobComposite() {
-		return runningJobComposite;
-	}
+        JobInfo jobInfo = JobInfo.getInstance();
+        if (jobInfo != null) {
+            jobInfo.clear();
+        }
 
-	/**
-	 * Returns the finished job composite
-	 * 
-	 * @return the finished job composite
-	 */
-	public static AbstractJobComposite getFinishedJobComposite() {
-		return finishedJobComposite;
-	}
+        JobsOutputController jobsOutputController = JobsOutputController.getInstance();
+        if (jobsOutputController != null) {
+            jobsOutputController.removeAllJobOutput();
+        }
 
-	public static void clearOnDisconnection(Boolean sendDisconnectMessage) {
-		setVisible(false);
-		ConnectDeconnectSchedulerAction.getInstance().setDisconnectionMode();
+        if (sendDisconnectMessage) {
+            SchedulerProxy.getInstance().disconnect();
+        }
+        ProActiveObject.terminateActiveObject(SchedulerProxy.getInstance(),
+            false);
+        SchedulerProxy.clearInstance();
 
-		TaskView taskView = TaskView.getInstance();
-		if (taskView != null)
-			taskView.clear();
+        ChangeViewModeAction.getInstance().setEnabled(false);
+        KillJobAction.getInstance().setEnabled(false);
+        ObtainJobOutputAction.getInstance().setEnabled(false);
+        PauseResumeJobAction.getInstance().setEnabled(false);
+        SubmitJobAction.getInstance().setEnabled(false);
 
-		JobInfo jobInfo = JobInfo.getInstance();
-		if (jobInfo != null)
-			jobInfo.clear();
+        PriorityIdleJobAction.getInstance().setEnabled(false);
+        PriorityLowestJobAction.getInstance().setEnabled(false);
+        PriorityLowJobAction.getInstance().setEnabled(false);
+        PriorityNormalJobAction.getInstance().setEnabled(false);
+        PriorityHighJobAction.getInstance().setEnabled(false);
+        PriorityHighestJobAction.getInstance().setEnabled(false);
 
-		JobsOutputController jobsOutputController = JobsOutputController.getInstance();
-		if (jobsOutputController != null)
-			jobsOutputController.removeAllJobOutput();
+        FreezeSchedulerAction.getInstance().setEnabled(false);
+        KillSchedulerAction.getInstance().setEnabled(false);
+        PauseSchedulerAction.getInstance().setEnabled(false);
+        ResumeSchedulerAction.getInstance().setEnabled(false);
+        ShutdownSchedulerAction.getInstance().setEnabled(false);
+        StartStopSchedulerAction.getInstance().setEnabled(false);
+    }
 
-		if (sendDisconnectMessage)
-			SchedulerProxy.getInstance().disconnect();
-		ProActive.terminateActiveObject(SchedulerProxy.getInstance(), false);
-		SchedulerProxy.clearInstance();
+    // -------------------------------------------------------------------- //
+    // ------------------------- extends viewPart ------------------------- //
+    // -------------------------------------------------------------------- //
+    /**
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    @Override
+    public void createPartControl(Composite theParent) {
+        parent = theParent;
 
-		ChangeViewModeAction.getInstance().setEnabled(false);
-		KillJobAction.getInstance().setEnabled(false);
-		ObtainJobOutputAction.getInstance().setEnabled(false);
-		PauseResumeJobAction.getInstance().setEnabled(false);
-		SubmitJobAction.getInstance().setEnabled(false);
+        GridLayout gridLayout = new GridLayout();
+        gridLayout.numColumns = 1;
+        parent.setLayout(gridLayout);
 
-		PriorityIdleJobAction.getInstance().setEnabled(false);
-		PriorityLowestJobAction.getInstance().setEnabled(false);
-		PriorityLowJobAction.getInstance().setEnabled(false);
-		PriorityNormalJobAction.getInstance().setEnabled(false);
-		PriorityHighJobAction.getInstance().setEnabled(false);
-		PriorityHighestJobAction.getInstance().setEnabled(false);
+        jobComposite = new JobComposite(parent);
 
-		FreezeSchedulerAction.getInstance().setEnabled(false);
-		KillSchedulerAction.getInstance().setEnabled(false);
-		PauseSchedulerAction.getInstance().setEnabled(false);
-		ResumeSchedulerAction.getInstance().setEnabled(false);
-		ShutdownSchedulerAction.getInstance().setEnabled(false);
-		StartStopSchedulerAction.getInstance().setEnabled(false);
-	}
+        pendingJobComposite = new PendingJobComposite(jobComposite, "Pending",
+                JobsController.getLocalView());
+        runningJobComposite = new RunningJobComposite(jobComposite, "Running",
+                JobsController.getLocalView());
+        finishedJobComposite = new FinishedJobComposite(jobComposite,
+                "Finished", JobsController.getLocalView());
 
-	// -------------------------------------------------------------------- //
-	// ------------------------- extends viewPart ------------------------- //
-	// -------------------------------------------------------------------- //
-	/**
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	public void createPartControl(Composite theParent) {
-		parent = theParent;
+        GridData gridData = new GridData();
+        gridData = new GridData();
+        gridData.verticalAlignment = GridData.FILL;
+        gridData.grabExcessVerticalSpace = true;
+        gridData.horizontalAlignment = GridData.FILL;
+        gridData.grabExcessHorizontalSpace = true;
+        jobComposite.setLayoutData(gridData);
 
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 1;
-		parent.setLayout(gridLayout);
+        gridData = new GridData();
+        gridData.horizontalAlignment = GridData.FILL;
 
-		jobComposite = new JobComposite(parent);
+        StatusLabel.newInstance(theParent, gridData,
+            JobsController.getLocalView());
 
-		pendingJobComposite = new PendingJobComposite(jobComposite, "Pending", JobsController.getLocalView());
-		runningJobComposite = new RunningJobComposite(jobComposite, "Running", JobsController.getLocalView());
-		finishedJobComposite = new FinishedJobComposite(jobComposite, "Finished", JobsController
-				.getLocalView());
+        // I must turn active the jobsController after create
+        // pendingJobComposite, runningJobComposite, finishedJobComposite
+        // and before call newInstance on StatusLabel.
+        JobsController.turnActive();
 
-		GridData gridData = new GridData();
-		gridData = new GridData();
-		gridData.verticalAlignment = GridData.FILL;
-		gridData.grabExcessVerticalSpace = true;
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		jobComposite.setLayoutData(gridData);
+        makeActions();
+        hookContextMenu(parent);
+        contributeToActionBars();
+        setVisible(false);
+    }
 
-		gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
+    /**
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     */
+    @Override
+    public void setFocus() {
+    }
 
-		StatusLabel.newInstance(theParent, gridData, JobsController.getLocalView());
-
-		// I must turn active the jobsController after create
-		// pendingJobComposite, runningJobComposite, finishedJobComposite
-		// and before call newInstance on StatusLabel.
-		JobsController.turnActive();
-
-		makeActions();
-		hookContextMenu(parent);
-		contributeToActionBars();
-		setVisible(false);
-	}
-
-	/**
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {}
-
-	@Override
-	public void dispose() {
-		TableManager.clearInstance();
-		TaskView taskView = TaskView.getInstance();
-		if (taskView != null)
-			taskView.clear();
-		JobInfo jobInfo = JobInfo.getInstance();
-		if (jobInfo != null)
-			jobInfo.clear();
-		JobsOutputController.clearInstance();
-		ProActive.terminateActiveObject(JobsController.getActiveView(), false);
-		SchedulerProxy.getInstance().disconnect();
-		ProActive.terminateActiveObject(SchedulerProxy.getInstance(), false);
-		JobsController.clearInstances();
-		SchedulerProxy.clearInstance();
-		super.dispose();
-	}
+    @Override
+    public void dispose() {
+        TableManager.clearInstance();
+        TaskView taskView = TaskView.getInstance();
+        if (taskView != null) {
+            taskView.clear();
+        }
+        JobInfo jobInfo = JobInfo.getInstance();
+        if (jobInfo != null) {
+            jobInfo.clear();
+        }
+        JobsOutputController.clearInstance();
+        ProActiveObject.terminateActiveObject(JobsController.getActiveView(),
+            false);
+        SchedulerProxy.getInstance().disconnect();
+        ProActiveObject.terminateActiveObject(SchedulerProxy.getInstance(),
+            false);
+        JobsController.clearInstances();
+        SchedulerProxy.clearInstance();
+        super.dispose();
+    }
 }

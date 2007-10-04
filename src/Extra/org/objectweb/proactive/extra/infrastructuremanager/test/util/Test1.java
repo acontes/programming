@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 import java.io.File;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
@@ -102,12 +103,12 @@ public class Test1 extends TestCase {
 
             //			Get At Most 3 nodes not on fiacre (but there is only 2 nodes corresponding"
             nodes = user.getAtMostNodes(new IntWrapper(3), verif);
-            ProActive.waitFor((Object) nodes);
+            ProFuture.waitFor((Object) nodes);
             if (!nodes.isEmpty()) {
                 System.err.println("nodes obtained = " + nodes.size());
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
-                ProActive.waitFor(nodes);
+                ProFuture.waitFor(nodes);
                 assertEquals("getAtMostNodes(3, verif)", nodes.size(),
                     monitor.getNumberOfAllResources().intValue() -
                     monitor.getNumberOfFreeResource().intValue());

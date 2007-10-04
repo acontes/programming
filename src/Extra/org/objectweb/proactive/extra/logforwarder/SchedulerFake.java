@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -31,8 +31,6 @@
 package org.objectweb.proactive.extra.logforwarder;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Category;
@@ -40,10 +38,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
@@ -69,7 +66,7 @@ public class SchedulerFake {
             e2.printStackTrace();
         }
 
-        ProActive.setImmediateService("listenLog");
+        ProActiveObject.setImmediateService("listenLog");
 
         // resources
         //        SimpleResourceManager srm = null;
@@ -87,7 +84,7 @@ public class SchedulerFake {
         IMUser imu = null;
         NodeSet nodes = null;
         try {
-            IMCore imc = (IMCore) (ProActive.lookupActive(IMCore.class.getName(),
+            IMCore imc = (IMCore) (ProActiveObject.lookupActive(IMCore.class.getName(),
                     "//localhost/IMCORE"));
             imu = imc.getUser();
             //            imu = IMFactory.getUser(new URI("rmi://duff.inria.fr:1099/"));
@@ -117,10 +114,10 @@ public class SchedulerFake {
             System.out.println("**********" + nodes.size());
 
             // Creates an active instance of class Hello2 on the local node
-            t1 = (RemoteTask) ProActive.newActive(RemoteTask.class.getName(), // the class to deploy
+            t1 = (RemoteTask) ProActiveObject.newActive(RemoteTask.class.getName(), // the class to deploy
                     null, // the arguments to pass to the constructor, here none
                     nodes.get(0)); // which jvm should be used to hold the Active Object
-            t2 = (RemoteTask) ProActive.newActive(RemoteTask.class.getName(), // the class to deploy
+            t2 = (RemoteTask) ProActiveObject.newActive(RemoteTask.class.getName(), // the class to deploy
                     null, // the arguments to pass to the constructor, here none
                     nodes.get(1)); // which jvm should be used to hold the Active Object
         } catch (NodeException e) {
@@ -143,13 +140,13 @@ public class SchedulerFake {
         t1.terminateTask();
         t2.terminateTask();
 
-        ProActive.terminateActiveObject(t1, false);
-        ProActive.terminateActiveObject(t2, false);
+        ProActiveObject.terminateActiveObject(t1, false);
+        ProActiveObject.terminateActiveObject(t2, false);
 
         // release nodes
         imu.freeNodes(nodes);
 
-        Logger.getLogger(LOGGER_PREFIX + "1").shutdown();
+        Category.shutdown();
         //        System.out.println("CLOOOOOOOOOOOOOOSE");
         LogManager.shutdown();
     }
@@ -182,9 +179,9 @@ public class SchedulerFake {
 
     public static void main(String[] args) {
         try {
-            SchedulerFake sf = (SchedulerFake) (ProActive.newActive(SchedulerFake.class.getName(),
+            SchedulerFake sf = (SchedulerFake) (ProActiveObject.newActive(SchedulerFake.class.getName(),
                     null));
-            ProActive.register(sf, "rmi://duff/scheduler");
+            ProActiveObject.register(sf, "rmi://duff/scheduler");
             sf.scheduleTasks();
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();

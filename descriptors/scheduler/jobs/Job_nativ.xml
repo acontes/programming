@@ -28,7 +28,7 @@
 			<!-- Task human description -->
 			<description>This task will sleep 10s</description>
 			<process>
-				<javaProcess class="org.objectweb.proactive.examples.scheduler.WaitAndPrint">
+				<javaProcess class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
 					<initParameters>
 						<parameter name="sleepTime" value="15" />
 						<parameter name="number" value="3" />
