@@ -67,13 +67,13 @@ public class AOListener implements MouseListener, MouseMotionListener{
 			dnd.setSourceFigure(figure);
 			figure.setHighlight(ColorConstants.green);
 			
-			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
-				IAction act = action.next();
-				if (act instanceof IActionExtPoint) {
-					IActionExtPoint extensionAction = (IActionExtPoint) act;
-					extensionAction.setActiveSelect(this.ao);
-				}
-			}
+//			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
+//				IAction act = action.next();
+//				if (act instanceof IActionExtPoint) {
+//					IActionExtPoint extensionAction = (IActionExtPoint) act;
+//					extensionAction.setActiveSelect(this.ao);
+//				}
+//			}
 //			// Manual handling of an action for timer snapshot ... needs improvement
 //			IAction anAction = registry.getAction("Get timer snapshot");
 //			if ( anAction != null ){

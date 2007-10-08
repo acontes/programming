@@ -58,7 +58,6 @@ public class DomainImpl implements SecurityDomain {
     // empty constructor
     public DomainImpl() {
     }
-    ;
 
     // create policy Server
     public DomainImpl(String securityFile, String name) {

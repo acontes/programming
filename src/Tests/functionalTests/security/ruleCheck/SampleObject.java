@@ -6,6 +6,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.security.exceptions.RuntimeSecurityException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 
 
@@ -31,6 +32,10 @@ public class SampleObject implements Serializable {
         return new SerializableString(this.name + " did something and returned this.");
     }
     
+    public SerializableString sayhello(SampleObject target) {
+    	return target.doSomething();
+    }
+    
     public void makeTargetDoSomething(SampleObject target) {
     	String targetString = "the target";
     	try {
@@ -44,8 +49,13 @@ public class SampleObject implements Serializable {
     	System.out.println(this.name + " is asking " + targetString + " to do something.");
     	
     	ProActive.setImmediateService("doSomething");
-    	SerializableString result = target.doSomething();
-    	
+    	SerializableString result = null;
+    	try {
+    	   result = target.doSomething();
+    	} catch (RuntimeSecurityException e) {
+    		System.out.println("-- Security Exception " + e.getMessage());
+    		
+    	}
     	System.out.println(this.name + " got a result from " + targetString + " >> " + result);
     }
 }

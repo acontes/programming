@@ -1020,7 +1020,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         // ------- Runtime Registered
-        if (NotificationType.runtimeRegistered.equals(type)) {
+        if (NotificationType.runtimeRegistered.equals(type) ||
+                NotificationType.runtimeAcquired.equals(type)) {
 
             /*
              * Check if the runtime has been created by this VirtualNode/VirtualMachine
@@ -1624,13 +1625,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         if (this.isActivated) {
-            try {
-                waitForAllNodesCreation();
-            } catch (NodeException e) {
-                out.defaultWriteObject();
-
-                return;
-            }
+            //            try {
+            //                waitForAllNodesCreation();
+            //            } catch (NodeException e) {
+            //                out.defaultWriteObject();
+            //
+            //                return;
+            //            }
         }
 
         out.defaultWriteObject();
@@ -1650,7 +1651,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * Use for p2p infrastructure to get nodes.
      * @see org.objectweb.proactive.core.event.NodeCreationEventListener#nodeCreated(org.objectweb.proactive.core.event.NodeCreationEvent)
      */
-    public synchronized void nodeCreated(NodeNotificationData notification,
+    synchronized public void nodeCreated(NodeNotificationData notification,
         boolean isP2PNode) {
         Node node = notification.getNode();
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +

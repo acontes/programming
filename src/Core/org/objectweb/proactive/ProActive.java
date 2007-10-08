@@ -1469,15 +1469,15 @@ public class ProActive {
 
     /**
      * Register a method in the calling active object to be called when the
-     * specified future is updated. The registered method takes a FutureResult
-     * as parameter.
+     * specified future is updated. The registered method takes a
+     * java.util.concurrent.Future as parameter.
      *
      * @param future the future to watch
      * @param methodName the name of the method to call on the current active object
-     * @throws NoSuchMethodException if the method could not be found
+     * @throws IllegalArgumentException if the first argument is not a future or if
+     * the method could not be found
      */
-    public static void addFutureCallback(Object future, String methodName)
-        throws NoSuchMethodException {
+    public static void addActionOnFuture(Object future, String methodName) {
         FutureProxy f;
         try {
             f = (FutureProxy) ((StubObject) future).getProxy();
@@ -1718,14 +1718,14 @@ public class ProActive {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
                 "A problem occured when getting the proActiveDescriptor at location \"" +
-                xmlDescriptorUrl + "\".");
+                xmlDescriptorUrl + "\"." + e.getMessage());
             throw new ProActiveException(
                 "A problem occured when getting the proActiveDescriptor at location \"" +
-                xmlDescriptorUrl + "\"." + e);
+                xmlDescriptorUrl + "\"." + e.getMessage(), e);
         } catch (java.io.IOException e) {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
-                "A problem occured when getting the proActiveDescriptor at location \"" +
+                "An IO problem occured when getting the proActiveDescriptor at location \"" +
                 xmlDescriptorUrl + "\".");
             throw new ProActiveException(e);
         }

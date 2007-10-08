@@ -57,7 +57,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 	//
 
 	/**
-	 * @see org.objectweb.proactive.ic2d.monitoring.jmx.finder.RuntimeFinder#getRuntimeObjects(HostObject)
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder#getRuntimeObjects(HostObject)
 	 */
 	public Collection<RuntimeObject> getRuntimeObjects(HostObject host){
 
@@ -115,8 +115,6 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 							if(runtime==null){
 								// This runtime is not yet monitored
 								runtime = new RuntimeObject(host, runtimeUrl, oname, hostUrl, mbeanServerName);
-								proActiveRuntime.startJMXServerConnector();
-								//proActiveRuntime.getMBean();
 							}
 							runtimeObjects.put(runtimeUrl,runtime);
 	                    }

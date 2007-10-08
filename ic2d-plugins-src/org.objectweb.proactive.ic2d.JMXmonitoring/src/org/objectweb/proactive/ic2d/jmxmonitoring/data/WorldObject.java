@@ -48,8 +48,6 @@ public class WorldObject extends AbstractData{
 
 	private String name;
 
-	private ProActiveConnection connection;
-
 	/** Contains all virtual nodes. */
 	private Map<String, VNObject> vnChildren;
 
@@ -69,6 +67,8 @@ public class WorldObject extends AbstractData{
 	private MonitorThread monitorThread;
 	
 	private JMXNotificationManager notificationManager;
+	
+	private boolean hideP2P = HIDE_P2PNODE_MONITORING;
 	
 	// -------------------------------------------
 	// --- Constructor ---------------------------
@@ -95,11 +95,6 @@ public class WorldObject extends AbstractData{
 		notificationManager = JMXNotificationManager.getInstance();
 	}
 
-	public WorldObject(ProActiveConnection connection){
-		this();
-		this.connection = connection;
-	}
-
 	// -------------------------------------------
 	// --- Methods -------------------------------
 	// -------------------------------------------
@@ -122,7 +117,7 @@ public class WorldObject extends AbstractData{
 			e.printStackTrace();
 		}
 		setChanged();
-		if(getMonitoresChildrenSize() == 1)
+		if(getMonitoredChildrenSize() == 1)
 			notifyObservers(methodName.ADD_CHILD);
 		notifyObservers();
 	}
@@ -139,7 +134,7 @@ public class WorldObject extends AbstractData{
 	public void removeChild(AbstractData child){
 		super.removeChild(child);
 		setChanged();
-		if(getMonitoresChildrenSize() == 0)
+		if(getMonitoredChildrenSize() == 0)
 			notifyObservers(methodName.REMOVE_CHILD);
 		notifyObservers();
 	}
@@ -196,7 +191,7 @@ public class WorldObject extends AbstractData{
 		
 		ao.resetCommunications();
 		ao.getParent().removeChild(ao);
-		ao.unsubscribe(ao.getListener());
+		JMXNotificationManager.getInstance().unsubscribe(ao.getObjectName(), ao.getListener());
 	}
 		
 
@@ -214,12 +209,7 @@ public class WorldObject extends AbstractData{
 	public WorldObject getWorldObject(){
 		return this;
 	}
-
-	@Override
-	protected ProActiveConnection getConnection(){
-		return this.connection;
-	}
-
+	
 	@Override
 	public String getKey() {
 		return this.name;
@@ -332,5 +322,22 @@ public class WorldObject extends AbstractData{
 	
 	public List<VNObject>getVNChildren () {
 		return new ArrayList<VNObject>(this.vnChildren.values ());
+	}
+
+	/**
+	 * Use to hide or nor the p2p objects.
+	 * @param hide true for hide the p2p object, false otherwise
+	 */
+	public void hideP2P(boolean hide){
+		this.hideP2P = hide;
+		getMonitorThread().forceRefresh();
+	}
+
+	/**
+	 * Return true if the p2p objects ars hidden, false otherwise
+	 * @return true if the p2p objects ars hidden, false otherwise
+	 */
+	public boolean isP2PHidden(){
+		return this.hideP2P;
 	}
 }

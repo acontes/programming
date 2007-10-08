@@ -63,13 +63,13 @@ public class JVMListener implements MouseListener, MouseMotionListener {
 		if(me.button == 1){
 			dnd.reset();
 			
-			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
-				IAction act = action.next();
-				if (act instanceof IActionExtPoint) {
-					IActionExtPoint extensionAction = (IActionExtPoint) act;
-					extensionAction.setActiveSelect(this.jvm);
-				}
-			}
+//			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
+//				IAction act = action.next();
+//				if (act instanceof IActionExtPoint) {
+//					IActionExtPoint extensionAction = (IActionExtPoint) act;
+//					extensionAction.setActiveSelect(this.jvm);
+//				}
+//			}
 		}
 		else if(me.button == 3) {
 			

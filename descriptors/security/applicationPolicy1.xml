@@ -27,6 +27,7 @@
 				</Reply>
 			</Communication>
 			<Migration>authorized</Migration>
+			
 			<OACreation>authorized</OACreation>
 		</Rule>
 		<Rule>

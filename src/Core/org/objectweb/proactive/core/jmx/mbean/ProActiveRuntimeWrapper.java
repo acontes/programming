@@ -6,10 +6,6 @@ import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
@@ -77,10 +73,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
         runtime.killRT(true);
     }
 
-    public List<ObjectName> getNodes()
-        throws ProActiveException, MalformedObjectNameException,
-            NullPointerException, InstanceAlreadyExistsException,
-            MBeanRegistrationException, NotCompliantMBeanException {
+    public List<ObjectName> getNodes() throws ProActiveException {
         String[] nodeNames = null;
         nodeNames = this.runtime.getLocalNodeNames();
 

@@ -76,10 +76,12 @@ public class Launcher {
                     params, provideNodes(args[0]));
 
             String input = "";
+
+            //default number of iterations
             long numOfIterations = 1;
             double result;
             double error;
-            DoubleWrapper results;
+            DoubleWrapper wrappedResult;
 
             while (numOfIterations > 0) {
                 // Prompt the user
@@ -93,18 +95,24 @@ public class Launcher {
                     ex.printStackTrace();
                 }
 
-                numOfIterations = Long.parseLong(input);
+                try {
+                    numOfIterations = Long.parseLong(input);
+                } catch (NumberFormatException numberException) {
+                    System.err.println(numberException.getMessage());
+                    System.out.println(
+                        "No valid number entered using 1 iteration...");
+                }
 
                 if (numOfIterations <= 0) {
                     break;
                 }
 
-                // Workers starts their job and return a group of Futures
-                results = workers.start(numOfIterations);
-
-                result = ((DoubleWrapper) ProActiveGroup.getGroup(results).get(0)).doubleValue();
+                // Send the number of iterations to the first worker
+                Worker firstWorker = (Worker) ProActiveGroup.getGroup(workers)
+                                                            .get(0);
+                wrappedResult = firstWorker.start(numOfIterations);
+                result = wrappedResult.doubleValue();
                 error = result - Math.PI;
-
                 System.out.println("\nCalculated PI is " + result +
                     " error is " + error);
             }

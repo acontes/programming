@@ -66,8 +66,9 @@ public class WorldListener implements MouseListener, MouseMotionListener {
 		if(me.button == 1){
 			dnd.reset();
 		}
-		else if(me.button == 3) {
+		else if (me.button == 3) {
 			
+
 			for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions(); action
 					.hasNext();) {
 				IAction act = action.next();
@@ -82,54 +83,7 @@ public class WorldListener implements MouseListener, MouseMotionListener {
 				} else {
 					act.setEnabled(false);
 				}
-			}
-//			// Monitor a new host
-//			registry.getAction(NewHostAction.NEW_HOST).setEnabled(true);
-//			
-//			// Set depth control
-//			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(true);
-//				
-//			// Refresh
-//			registry.getAction(RefreshAction.REFRESH).setEnabled(true);
-//			
-//			// Set time to refresh
-//			registry.getAction(SetTTRAction.SET_TTR).setEnabled(true);
-//
-//			// Look for new JVM
-//			registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
-//			
-//			// Look for new Nodes
-//			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
-//			
-//			// Look for new Active Objects
-//			registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
-//			
-//			// Stop monitoring this ...
-//			registry.getAction(StopMonitoringAction.STOP_MONITORING).setEnabled(false);
-//			
-//			// Set update frequence...
-//			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
-//			
-//			// Kill VM
-//			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
-//
-//			// Vertical Layout
-//			registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT).setEnabled(false);
-//			
-//			// Horizontal Layout
-//			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
-//			
-//			// Manual handling of an action for timer snapshot ... needs
-//			// improvement
-//			if (this.world.getMonitoresChildrenSize() != 0) {
-//				IAction anAction = registry.getAction("Get timer snapshot");
-//				if (anAction != null) {
-//					((IActionExtPoint) anAction)
-//							.setAbstractDataObject(this.world);
-//					anAction.setText("Gather All Stats");
-//					anAction.setEnabled(true);
-//				}
-//			}
+				}
 		}
 	}
 

@@ -10,6 +10,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.security.exceptions.RuntimeSecurityException;
 
 import sun.security.provider.PolicyFile;
 
@@ -57,9 +58,9 @@ public class Launcher {
 
 //			a.makeTargetDoSomething(a);
 //            System.out.println("==");
-            a.makeTargetDoSomething(b);
+            //a.makeTargetDoSomething(b);
 //            System.out.println("==");
-            a.makeTargetDoSomething(c);
+            //a.makeTargetDoSomething(c);
             
 //            System.out.println("//////////////////");
             
@@ -70,6 +71,21 @@ public class Launcher {
             b.makeTargetDoSomething(c);
             
 //            System.out.println("//////////////////");
+            //a.makeTargetDoSomething(b);
+            
+          
+            try {
+            String s = b.sayhello(c).get();
+            System.out.println("s : "  + s);
+            } catch (RuntimeSecurityException ex) {
+            	System.out.println("wwwwwwwaaaouuuuu");
+            }
+            try {
+            	
+            b.makeTargetDoSomething(c);
+            } catch (RuntimeSecurityException ex) {
+            	System.out.println("void ");
+            }
             
 //            c.makeTargetDoSomething(a);
 //            System.out.println("==");

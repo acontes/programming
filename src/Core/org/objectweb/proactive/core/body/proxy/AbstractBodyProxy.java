@@ -147,7 +147,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                     methodCall.getReifiedMethod() +
                     System.getProperty("line.separator") +
                     "They are synchronous for the following reason: " + reason;
-                ;
                 if (loggedSyncCalls.add(msg)) {
                     syncCallLogger.debug(msg);
                 }

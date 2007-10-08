@@ -424,13 +424,13 @@ public class ProActiveSecurityDescriptorHandler extends
 
 			switch (type) {
 			case NODE:
+			case RUNTIME:
 				try {
 					this.entity = new NamedRuleEntity(type, keystore, value);
 				} catch (KeyStoreException e1) {
 					e1.printStackTrace();
 				}
 				break;
-			case RUNTIME:
 			case APPLICATION:
 			case USER:
 			case DOMAIN:

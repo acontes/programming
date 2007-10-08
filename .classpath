@@ -99,5 +99,6 @@
 	<classpathentry kind="lib" path="lib/javassist.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="lib/ptolemy.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

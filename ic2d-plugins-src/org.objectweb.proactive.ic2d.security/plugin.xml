@@ -43,7 +43,10 @@
    <extension
          point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
       <action_class class="org.objectweb.proactive.ic2d.security.actions.GetSecurityManager"/>
-      <action_class class="org.objectweb.proactive.ic2d.security.actions.SetSecurityManager"/>
+    
    </extension>
-
+    <extension
+         point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
+            <action_class class="org.objectweb.proactive.ic2d.security.actions.SetSecurityManager"/>
+  </extension>
 </plugin>

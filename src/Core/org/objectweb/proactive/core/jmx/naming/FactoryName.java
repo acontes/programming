@@ -8,6 +8,7 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -34,6 +35,11 @@ public class FactoryName {
     public static final String AO_TYPE = "AO";
     public static final String AO = "org.objectweb.proactive.core.body:type=" +
         AO_TYPE;
+    public static final String RUNTIME_URL_PROPERTY = "runtimeUrl";
+    public static final String VIRTUAL_NODE_JOBID_PROPERTY = "jobID";
+    public static final String VIRTUAL_NODE_NAME_PROPERTY = "vnName";
+    public static final String NODE_NAME_PROPERTY = "nodeName";
+    public static final String AO_ID_PROPERTY = "aoID";
 
     /**
      * Creates a ObjectName corresponding to an active object.
@@ -43,7 +49,7 @@ public class FactoryName {
     public static ObjectName createActiveObjectName(UniqueID id) {
         ObjectName oname = null;
         try {
-            oname = new ObjectName(FactoryName.AO + ", id=" +
+            oname = new ObjectName(FactoryName.AO + "," + AO_ID_PROPERTY + "=" +
                     id.toString().replace(':', '-'));
         } catch (MalformedObjectNameException e) {
             logger.error("Can't create the objectName of the active object", e);
@@ -65,8 +71,9 @@ public class FactoryName {
 
         ObjectName oname = null;
         try {
-            oname = new ObjectName(FactoryName.NODE + ",runtimeUrl=" +
-                    runtimeUrl.replace(':', '-') + ", nodeName=" +
+            oname = new ObjectName(FactoryName.NODE + "," +
+                    RUNTIME_URL_PROPERTY + "=" + runtimeUrl.replace(':', '-') +
+                    "," + NODE_NAME_PROPERTY + "=" +
                     nodeName.replace(':', '-'));
         } catch (MalformedObjectNameException e) {
             logger.error("Can't create the objectName of the node", e);
@@ -86,8 +93,8 @@ public class FactoryName {
 
         ObjectName oname = null;
         try {
-            oname = new ObjectName(FactoryName.RUNTIME + ",url=" +
-                    url.replace(':', '-'));
+            oname = new ObjectName(FactoryName.RUNTIME + "," +
+                    RUNTIME_URL_PROPERTY + "=" + url.replace(':', '-'));
         } catch (MalformedObjectNameException e) {
             logger.error("Can't create the objectName of the runtime", e);
         } catch (NullPointerException e) {
@@ -106,8 +113,9 @@ public class FactoryName {
         String jobID) {
         ObjectName oname = null;
         try {
-            oname = new ObjectName(FactoryName.VIRTUAL_NODE + ",name=" +
-                    name.replace(':', '-') + ", jobID=" +
+            oname = new ObjectName(FactoryName.VIRTUAL_NODE + "," +
+                    VIRTUAL_NODE_NAME_PROPERTY + "=" + name.replace(':', '-') +
+                    "," + VIRTUAL_NODE_JOBID_PROPERTY + "=" +
                     jobID.replace(':', '-'));
         } catch (MalformedObjectNameException e) {
             logger.error("Can't create the objectName of the virtual node", e);
@@ -118,19 +126,31 @@ public class FactoryName {
     }
 
     /**
+     * Return the JMX Server Name used for a given url of a runtime
+     * @param runtimeUrl
+     * @return The JMX Server Name
+     */
+    public static String getJMXServerName(String runtimeUrl) {
+        return URIBuilder.getNameFromURI(runtimeUrl);
+    }
+
+    /**
+     * Return the JMX Server Name used for a given uri of a runtime
+     * @param runtimeUrl
+     * @return The JMX Server Name
+     */
+    public static String getJMXServerName(URI runtimeURI) {
+        return URIBuilder.getNameFromURI(runtimeURI);
+    }
+
+    /**
      * Creates a complete url 'protocol://host:port/path'
      * @param url
      * @return A complete url
      */
     public static String getCompleteUrl(String url) {
-        //        String host = UrlBuilder.getHostNameFromUrl(url);
-        //        String name = UrlBuilder.getNameFromUrl(url);
-        //        String protocol = UrlBuilder.getProtocol(url);
-        //        int port = UrlBuilder.getPortFromUrl(url);
-        //
-        //        String newUrl = UrlBuilder.buildUrl(host, name, protocol, port);
-        //
-        //        return newUrl;
-        return RemoteObjectHelper.expandURI(URI.create(url)).toString();
+        URI uri = URI.create(url);
+        URI expandedURI = RemoteObjectHelper.expandURI(uri);
+        return expandedURI.toString();
     }
 }
