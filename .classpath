@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="classes/Core" path="src/Core"/>
-	<classpathentry kind="src" output="classes/dev" path="dev/security/keystore"/>
 	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" output="classes/Examples" path="src/Examples"/>
 	<classpathentry kind="src" output="classes/Extensions" path="src/Extensions"/>
 	<classpathentry kind="src" output="classes/Extra" path="src/Extra"/>
@@ -15,10 +14,15 @@
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
 	<classpathentry kind="lib" path="compile/lib/AntelopeTasks_3.2.19.jar"/>
 	<classpathentry kind="lib" path="compile/lib/jdepend.jar"/>
+	<classpathentry kind="lib" path="lib/bouncycastle.jar"/>
+	<classpathentry kind="lib" path="lib/javassist.jar"/>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="dev/trywithcatch/java-cup-v11a.jar"/>
 	<classpathentry kind="lib" path="dev/trywithcatch/JFlex.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
+	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ajo.jar"/>
 	<classpathentry kind="lib" path="lib/asm-2.2.1.jar"/>
@@ -77,6 +81,7 @@
 	<classpathentry kind="lib" path="lib/oscar.jar"/>
 	<classpathentry kind="lib" path="lib/osgi.jar"/>
 	<classpathentry kind="lib" path="lib/ow_deployment_scheduling.jar"/>
+	<classpathentry kind="lib" path="lib/ptolemy.jar"/>
 	<classpathentry kind="lib" path="lib/puretls.jar"/>
 	<classpathentry kind="lib" path="lib/saaj-api.jar"/>
 	<classpathentry kind="lib" path="lib/scriptPlugin.jar"/>
@@ -94,11 +99,5 @@
 	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/sunxacml.jar"/>
-	<classpathentry kind="lib" path="lib/bouncycastle.jar"/>
-	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
-	<classpathentry kind="lib" path="lib/javassist.jar"/>
-	<classpathentry kind="lib" path="lib/log4j.jar"/>
-	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="lib/ptolemy.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

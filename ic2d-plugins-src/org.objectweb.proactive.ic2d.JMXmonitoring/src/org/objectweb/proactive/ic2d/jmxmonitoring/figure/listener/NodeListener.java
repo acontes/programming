@@ -51,7 +51,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 public class NodeListener implements MouseListener, MouseMotionListener {
-
 	private ActionRegistry registry;
 	private NodeObject node;
 	private NodeFigure figure;
@@ -93,55 +92,7 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 					act.setEnabled(false);
 				}
 			}
-//			// Monitor a new host
-//			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
-//
-//			// Set depth control
-//			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(false);
-//
-//			// Refresh
-//			registry.getAction(RefreshAction.REFRESH).setEnabled(false);
-//
-//			// Set time to refresh
-//			registry.getAction(SetTTRAction.SET_TTR).setEnabled(false);
-//
-//			// Look for new JVM
-//			registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
-//
-//			// Look for new Nodes
-//			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
-//
-//			// Kill VM
-//			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
-//
-//			// Look for new Active Objects
-//			RefreshNodeAction refreshNodeAction = (RefreshNodeAction)registry.getAction(RefreshNodeAction.REFRESH_NODE);
-//			refreshNodeAction.setNode(node);
-//			refreshNodeAction.setEnabled(true);
-//
-//			// Stop monitoring this node
-//			StopMonitoringAction stopMonitoringAction = (StopMonitoringAction)registry.getAction(StopMonitoringAction.STOP_MONITORING);
-//			stopMonitoringAction.setObject(node);
-//			stopMonitoringAction.setEnabled(true);
-//
-//			// Set update frequence...
-//			SetUpdateFrequenceAction setUpdateFrequenceAction = (SetUpdateFrequenceAction)registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE);
-//			setUpdateFrequenceAction.setNode(node);
-//			setUpdateFrequenceAction.setEnabled(true);
-//
-//			// Vertical Layout
-//			registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT).setEnabled(false);
-//
-//			// Horizontal Layout
-//			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
-//			
-//			// Manual handling of an action for timer snapshot ... needs improvement
-//			IAction anAction = registry.getAction("Get timer snapshot");
-//			if ( anAction != null ){
-//				((IActionExtPoint)anAction).setAbstractDataObject(this.node);
-//				anAction.setText("Gather Stats from Node");
-//				anAction.setEnabled(true);
-//			}
+
 		}
 	}
 
@@ -192,4 +143,5 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 	public void mouseHover(MouseEvent me) { /* Do nothing */ }
 
 	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
+
 }

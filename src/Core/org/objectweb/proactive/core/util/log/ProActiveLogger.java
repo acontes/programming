@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.config.PAProperties;
  */
 public class ProActiveLogger extends Logger {
 
-  
     private static ProActiveLoggerFactory myFactory = new ProActiveLoggerFactory();
 
     /**

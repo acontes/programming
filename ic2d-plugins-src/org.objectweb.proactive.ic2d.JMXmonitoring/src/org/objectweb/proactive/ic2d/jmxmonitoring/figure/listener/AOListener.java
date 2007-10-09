@@ -45,6 +45,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
+
 public class AOListener implements MouseListener, MouseMotionListener{
 
 	private ActiveObject ao;
@@ -162,4 +163,5 @@ public class AOListener implements MouseListener, MouseMotionListener{
 	public void mouseHover(MouseEvent me) {	/* Do nothing */ }
 
 	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
+
 }

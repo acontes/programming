@@ -44,8 +44,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
-public class JVMListener implements MouseListener, MouseMotionListener {
 
+public class JVMListener implements MouseListener, MouseMotionListener {
 	private ActionRegistry registry;
 	private RuntimeObject jvm;
 	private DragAndDrop dnd;
@@ -90,55 +90,7 @@ public class JVMListener implements MouseListener, MouseMotionListener {
 					act.setEnabled(false);
 				}
 			}
-//			// Monitor a new host
-//			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
-//			
-//			// Set depth control
-//			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(false);
-//				
-//			// Refresh
-//			registry.getAction(RefreshAction.REFRESH).setEnabled(false);
-//			
-//			// Set time to refresh
-//			registry.getAction(SetTTRAction.SET_TTR).setEnabled(false);
-//			
-//			// Look for new JVM
-//			registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
-//			
-//			// Look for new Nodes
-//			RefreshJVMAction refreshJVMAction = (RefreshJVMAction)registry.getAction(RefreshJVMAction.REFRESH_JVM);
-//			refreshJVMAction.setJVM(jvm);
-//			refreshJVMAction.setEnabled(true);
-//			
-//			// Look for new Active Objects
-//			registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
-//			
-//			// Stop monitoring this JVM
-//			StopMonitoringAction stopMonitoringAction = (StopMonitoringAction)registry.getAction(StopMonitoringAction.STOP_MONITORING);
-//			stopMonitoringAction.setObject(jvm);
-//			stopMonitoringAction.setEnabled(true);
-//			
-//			// Kill this VM
-//			KillVMAction killVMAction = (KillVMAction)registry.getAction(KillVMAction.KILLVM);
-//			killVMAction.setVM(jvm);
-//			killVMAction.setEnabled(true);
-//			
-//			// Set update frequence...
-//			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
-//
-//			// Vertical Layout
-//			registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT).setEnabled(false);
-//			
-//			// Horizontal Layout
-//			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
-//			
-//			// Manual handling of an action for timer snapshot ... needs improvement
-//			IAction anAction = registry.getAction("Get timer snapshot");
-//			if ( anAction != null ){
-//				((IActionExtPoint)anAction).setAbstractDataObject(this.jvm);
-//				anAction.setText("Gather Stats from JVM");
-//				anAction.setEnabled(true);
-//			}
+
 		}
 	}
 
@@ -163,4 +115,5 @@ public class JVMListener implements MouseListener, MouseMotionListener {
 	public void mouseHover(MouseEvent me) { /* Do nothing */ }
 
 	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
+
 }

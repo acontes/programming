@@ -3,7 +3,7 @@ package org.objectweb.proactive.ic2d.security.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.security.Communication.Authorization;
+import org.objectweb.proactive.core.security.Authorization;
 
 public class SimplePolicyRule {
 

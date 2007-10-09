@@ -26,5 +26,4 @@ public interface IActionExtPoint extends IAction{
 	 * @param The reference on the active object 
 	 */
 	public void setActiveSelect(AbstractData ref);
-	
 }

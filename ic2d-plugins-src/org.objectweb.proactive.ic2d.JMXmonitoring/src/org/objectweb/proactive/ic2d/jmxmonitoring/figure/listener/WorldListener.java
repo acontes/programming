@@ -46,8 +46,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
-public class WorldListener implements MouseListener, MouseMotionListener {
 
+public class WorldListener implements MouseListener, MouseMotionListener {
 	private DragAndDrop dnd;
 	private DragHost dragHost;
 	private ActionRegistry registry;

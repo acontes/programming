@@ -10,7 +10,11 @@ STEP 1: Download Scilab 4.1.2 or above BINARY Version
 If you can't download version 4.1.2 please follow step 2.
 
 
+<<<<<<< HEAD:scripts/unix/scilab/README
 STEP 2: Download Scilab SOURCE version 4.1 or 4.1.1
+=======
+STEP 2 (source version only): Download Scilab SOURCE version 4.1 or 4.1.1
+>>>>>>> master:scripts/unix/scilab/README
 
 copy javasci_Scilab2.h and javasci_Scilab2.c from folder PROACTIVE/scripts/linux/scilab/c_sources to SCILAB/routines/Javasci/
 

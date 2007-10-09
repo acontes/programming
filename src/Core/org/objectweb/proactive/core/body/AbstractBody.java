@@ -1117,6 +1117,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     	}
     	this.securityManager.setProActiveSecurityManager(user, policyServer);
     }
+
     /**
      * @param obj
      * @return

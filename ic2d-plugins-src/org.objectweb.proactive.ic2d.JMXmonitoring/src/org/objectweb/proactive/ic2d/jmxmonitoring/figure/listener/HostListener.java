@@ -47,8 +47,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.HostFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
-public class HostListener implements MouseListener, MouseMotionListener {
 
+public class HostListener implements MouseListener, MouseMotionListener {
 	private ActionRegistry registry;
 
 	private HostObject host;
@@ -104,62 +104,7 @@ public class HostListener implements MouseListener, MouseMotionListener {
 					act.setEnabled(false);
 				}
 			}
-//			// Monitor a new host
-//			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
-//			
-//			// Set depth control
-//			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(false);
-//				
-//			// Refresh
-//			registry.getAction(RefreshAction.REFRESH).setEnabled(false);
-//			
-//			// Set time to refresh
-//			registry.getAction(SetTTRAction.SET_TTR).setEnabled(false);
-//			
-//			// Look for new JVM
-//			RefreshHostAction refreshHostAction = (RefreshHostAction)registry.getAction(RefreshHostAction.REFRESH_HOST);
-//			refreshHostAction.setHost(host);
-//			refreshHostAction.setEnabled(true);
-//			
-//			// Look for new Nodes
-//			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
-//			
-//			// Look for new Active Objects
-//			registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
-//			
-//			// Stop monitoring this host
-//			StopMonitoringAction stopMonitoringAction = (StopMonitoringAction)registry.getAction(StopMonitoringAction.STOP_MONITORING);
-//			stopMonitoringAction.setObject(host);
-//			stopMonitoringAction.setEnabled(true);
-//			
-//			// Kill VM
-//			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
-//			
-//			// Set update frequence...
-//			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
-//			
-//
-//			// Vertical Layout
-//			VerticalLayoutAction verticalLayoutAction = (VerticalLayoutAction)registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT);
-//			verticalLayoutAction.setHost(figure);
-//			if(figure.isVerticalLayout())
-//				verticalLayoutAction.setChecked(true);
-//			verticalLayoutAction.setEnabled(true);
-//			
-//			// Horizontal Layout
-//			HorizontalLayoutAction horizontalLayoutAction = (HorizontalLayoutAction)registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT);
-//			horizontalLayoutAction.setHost(figure);
-//			if(figure.isVerticalLayout())
-//				horizontalLayoutAction.setChecked(false);
-//			horizontalLayoutAction.setEnabled(true);
-//			
-//			// Manual handling of an action for timer snapshot ... needs improvement
-//			IAction anAction = registry.getAction("Get timer snapshot");
-//			if ( anAction != null ){
-//				((IActionExtPoint)anAction).setAbstractDataObject(this.host);
-//				anAction.setText("Gather Stats from Host");
-//				anAction.setEnabled(true);
-//			}
+
 		}
 	}
 

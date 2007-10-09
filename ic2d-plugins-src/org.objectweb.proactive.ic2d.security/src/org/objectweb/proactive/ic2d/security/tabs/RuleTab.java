@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.objectweb.proactive.core.security.Communication.Authorization;
+import org.objectweb.proactive.core.security.Authorization;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.ic2d.security.core.CertificateTree;
 import org.objectweb.proactive.ic2d.security.core.CertificateTreeList;

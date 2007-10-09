@@ -769,7 +769,6 @@ public class ProActiveObject {
 
             clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
                                                              .generateSiblingCertificate(EntityType.OBJECT,nameOfTargetType));
-
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");
         }

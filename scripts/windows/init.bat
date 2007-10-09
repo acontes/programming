@@ -25,6 +25,7 @@ SET CLASSPATH=.
 IF EXIST "%PROACTIVE%\classes" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes\Core;%PROACTIVE%\classes\Extensions;%PROACTIVE%\classes\Extra;%PROACTIVE%\classes\Examples;%PROACTIVE%\classes\IC2D-old
 IF EXIST "%PROACTIVE%\ProActive.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive.jar
 IF EXIST "%PROACTIVE%\ProActive_examples.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
+<<<<<<< HEAD:scripts/windows/init.bat
 IF EXIST "%PROACTIVE%\lib\log4j.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j.jar
 IF EXIST "%PROACTIVE%\lib\bouncycastle.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bouncycastle.jar
 IF EXIST "%PROACTIVE%\lib\xercesImpl.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xercesImpl.jar
@@ -102,7 +103,12 @@ IF EXIST "%PROACTIVE%\lib\commons-cli-1.0.jar" set CLASSPATH=%CLASSPATH%;%PROACT
 IF EXIST "%PROACTIVE%\lib\jcommon-1.0.6.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jcommon-1.0.6.jar
 IF EXIST "%PROACTIVE%\lib\jdom.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jdom.jar
 IF EXIST "%PROACTIVE%\lib\jfreechart-1.0.2.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jfreechart-1.0.2.jar
+=======
+>>>>>>> master:scripts/windows/init.bat
 
+set JARS=
+FOR %%j IN (%PROACTIVE%\lib\*.jar) DO SET JARS=!JARS!;%%j
+SET CLASSPATH=%CLASSPATH%;%JARS%
 
 
 set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Djava.security.manager -Djava.security.policy="%PROACTIVE%\scripts\proactive.java.policy" -Dlog4j.configuration=file:"%PROACTIVE%\scripts\proactive-log4j"

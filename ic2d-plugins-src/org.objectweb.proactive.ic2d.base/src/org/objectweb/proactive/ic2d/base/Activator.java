@@ -1,11 +1,6 @@
 package org.objectweb.proactive.ic2d.base;
 
-import java.net.URL;
-
-import org.apache.log4j.PropertyConfigurator;
-import org.eclipse.ui.internal.util.BundleUtility;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.osgi.framework.BundleContext;
 
 
@@ -18,8 +13,7 @@ public class Activator extends AbstractUIPlugin {
 
     // The shared instance
     private static Activator plugin;
-    
-    
+
     /**
      * The constructor
      */

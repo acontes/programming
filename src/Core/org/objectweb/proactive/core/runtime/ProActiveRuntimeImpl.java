@@ -1406,8 +1406,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                         "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
                 }
             } else {
-                this.name = "PA_JVM" + random ; //+ "_" + this.hostName;
-
+                this.name = "PA_JVM" + random; //+ "_" + this.hostName;
             }
 
             this.capacity = -1;

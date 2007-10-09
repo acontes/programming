@@ -1,17 +1,11 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring;
 
-import java.net.URL;
-import java.util.Properties;
-
-import javassist.ClassClassPath;
-import javassist.ClassPool;
-
-import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.osgi.framework.BundleContext;
+import javassist.ClassClassPath;
+import javassist.ClassPool;
 
 
 /**
@@ -48,7 +42,6 @@ public class Activator extends AbstractUIPlugin {
         // add current classpath for javassist class pool
         ClassPool pool = ClassPool.getDefault();
         pool.insertClassPath(new ClassClassPath(this.getClass()));
-        
         
 //        URL u = PAProperties.class.getResource("proactive-log4j");
 //        Properties p = new Properties();
