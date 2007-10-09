@@ -46,7 +46,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.objectweb.proactive.core.security.Communication.Authorization;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.security.securityentity.CertificatedRuleEntity;
