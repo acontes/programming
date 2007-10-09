@@ -34,7 +34,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -68,15 +68,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * (This feature will may appear in a later version of ProActive group communication).
  *
  * @author Laurent Baduel
- *
  */
+@SuppressWarnings("deprecation")
 public class ProActiveGroup {
 
     /** The logger for the Class */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
 
     /** The name of the default proxy for group communication */
-    public static final Class DEFAULT_PROXYFORGROUP_CLASS = org.objectweb.proactive.core.group.ProxyForGroup.class;
+    public static final Class<?> DEFAULT_PROXYFORGROUP_CLASS = org.objectweb.proactive.core.group.ProxyForGroup.class;
 
     /** The name of the default proxy for group communication */
     public static final String DEFAULT_PROXYFORGROUP_CLASS_NAME = "org.objectweb.proactive.core.group.ProxyForGroup";
@@ -88,7 +88,7 @@ public class ProActiveGroup {
     /**
      * Returns the <code>Group</code> for typed group <code>o</code>. Returns null if <code>o</code> is not a typed group.
      * @param o - the typed group.
-     * @return the <code>Group</code> corresponding to <code>o</code>. <code>null</code> if <code>o</code> is not a typed group.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#getGroup(Object)} instead
      */
     public static Group getGroup(Object o) {
         return ProActiveGroup.findProxyForGroup(o);
@@ -96,9 +96,10 @@ public class ProActiveGroup {
 
     /**
      * Returns the name class of the typed group.
-     * If the parameter is not a typed group, returns the name of Class of the parameter.
-     * @param o the typed group for wich we want the name of the type (Class).
+     * If the parameter is not a typed group, returns the name of Class<?> of the parameter.
+     * @param o the typed group for wich we want the name of the type (Class<?>).
      * @return the name class of the typed group
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#getType(Object)} instead
      */
     public static String getType(Object o) {
         ProxyForGroup tmp = ProActiveGroup.findProxyForGroup(o);
@@ -114,13 +115,14 @@ public class ProActiveGroup {
      * @param className the name of the (upper) class of the group's members.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String)} instead
      */
     public static Object newGroup(String className)
         throws ClassNotFoundException, ClassNotReifiableException {
-        return ProActiveGroup.newGroup(className, (Class[]) null);
+        return ProActiveGroup.newGroup(className, (Class<?>[]) null);
     }
 
     /**
@@ -130,9 +132,10 @@ public class ProActiveGroup {
      * If <code>params</code> is <code>null</code>, builds an empty group.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[][])} instead
      */
     public static Object newGroup(String className, Object[][] params)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -150,9 +153,10 @@ public class ProActiveGroup {
      * @param nodeName the name (String) of the node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[][],String)} instead
      */
     public static Object newGroup(String className, Object[][] params,
         String nodeName)
@@ -170,9 +174,10 @@ public class ProActiveGroup {
      * @param nodeListString the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[][],String[])} instead
      */
     public static Object newGroup(String className, Object[][] params,
         String[] nodeListString)
@@ -191,9 +196,10 @@ public class ProActiveGroup {
      * @param node the node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[][],Node)} instead
      */
     public static Object newGroup(String className, Object[][] params, Node node)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -212,12 +218,13 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[][],Node[])} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[][] params, Node[] nodeList)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Object result = ProActiveGroup.newGroup(className, genericParameters);
@@ -225,7 +232,7 @@ public class ProActiveGroup {
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                g.add(ProActive.newActive(className, params[i],
+                g.add(ProActiveObject.newActive(className, params[i],
                         nodeList[i % nodeList.length]));
             }
         }
@@ -233,11 +240,14 @@ public class ProActiveGroup {
         return result;
     }
 
+    /**
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[][],Node[])} instead
+     */
     public static Object newGroup(String className, Object[][] params,
         Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActiveGroup.newGroup(className, (Class[]) null, params,
+        return ProActiveGroup.newGroup(className, (Class<?>[]) null, params,
             nodeList);
     }
 
@@ -249,9 +259,10 @@ public class ProActiveGroup {
      * @param virtualNode the virtual where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[][],VirtualNodeInternal)} instead
      */
     public static Object newGroup(String className, Object[][] params,
         VirtualNodeInternal virtualNode)
@@ -267,20 +278,21 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[],Node[])} instead
      */
     public static Object newGroup(String className, Object[] params,
         Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className, (Class[]) null);
+        Object result = ProActiveGroup.newGroup(className, (Class<?>[]) null);
         Group g = ProActiveGroup.getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < nodeList.length; i++) {
-                g.add(ProActive.newActive(className, params,
+                g.add(ProActiveObject.newActive(className, params,
                         nodeList[i % nodeList.length]));
             }
         }
@@ -295,9 +307,10 @@ public class ProActiveGroup {
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[],VirtualNodeInternal)} instead
      */
     public static Object newGroup(String className, Object[] params,
         VirtualNodeInternal virtualNode)
@@ -313,9 +326,10 @@ public class ProActiveGroup {
      * @param node the node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[],Node)} instead
      */
     public static Object newGroup(String className, Object[] params, Node node)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -332,9 +346,10 @@ public class ProActiveGroup {
      * @param nodeName the name of the node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[],String)} instead
      */
     public static Object newGroup(String className, Object[] params,
         String nodeName)
@@ -352,9 +367,10 @@ public class ProActiveGroup {
      * @param nodeListString the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[],String[])} instead
      */
     public static Object newGroup(String className, Object[] params,
         String[] nodeListString)
@@ -372,14 +388,15 @@ public class ProActiveGroup {
      * @param ogroup the typed group to turn active.
      * @return a reference on the active object produced.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#turnActiveGroup(Object)} instead
      */
     public static Object turnActiveGroup(Object ogroup)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, null,
+        return ProActiveObject.turnActive(ogroup, null,
             ProActiveGroup.getType(ogroup), (Node) null, null, null);
     }
 
@@ -390,14 +407,15 @@ public class ProActiveGroup {
      * the active object is created localy on a default node
      * @return a reference (possibly remote) on the active object produced.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the specified node can not be reached.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#turnActiveGroup(Object,Node)} instead
      */
     public static Object turnActiveGroup(Object ogroup, Node node)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, null,
+        return ProActiveObject.turnActive(ogroup, null,
             ProActiveGroup.getType(ogroup), node, null, null);
     }
 
@@ -407,14 +425,15 @@ public class ProActiveGroup {
      * @param nodeName the name of the node where to create the active object on.
      * @return a reference (possibly remote) on the active object produced.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the specified node can not be reached.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#turnActiveGroup(Object,String)} instead
      */
     public static Object turnActiveGroup(Object ogroup, String nodeName)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, null,
+        return ProActiveObject.turnActive(ogroup, null,
             ProActiveGroup.getType(ogroup), NodeFactory.getNode(nodeName),
             null, null);
     }
@@ -431,9 +450,10 @@ public class ProActiveGroup {
      * If <code>params</code> is <code>null</code>, builds an empty group.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated  use newGroupInParallel
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
@@ -456,16 +476,17 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated  use newGroupInParallel
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className, (Class[]) null);
+        Object result = ProActiveGroup.newGroup(className, (Class<?>[]) null);
         ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
 
         proxy.createMemberWithMultithread(className, null, params, nodeList);
@@ -483,9 +504,10 @@ public class ProActiveGroup {
      * @param nodeList the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated  use newGroupInParallel
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
@@ -509,9 +531,10 @@ public class ProActiveGroup {
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated  use newGroupInParallel
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
@@ -532,9 +555,10 @@ public class ProActiveGroup {
      * @param nodeList the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated  use newGroupInParallel
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
@@ -557,16 +581,17 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated  use newGroupInParallel
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className, (Class[]) null);
+        Object result = ProActiveGroup.newGroup(className, (Class<?>[]) null);
         ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
 
         proxy.createMemberWithMultithread(className, null, params, nodeList);
@@ -584,9 +609,10 @@ public class ProActiveGroup {
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated  use newGroupInParallel
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
@@ -597,10 +623,6 @@ public class ProActiveGroup {
             params, virtualNode.getNodes());
     }
 
-    // -------------------------------------------------------------------------
-    // End Deprecated
-    // -------------------------------------------------------------------------
-
     /**
      * Creates an object representing a group (a typed group) and creates members on the default node.
      * @param className the name of the (upper) class of the group's member.
@@ -608,9 +630,10 @@ public class ProActiveGroup {
      * If <code>params</code> is <code>null</code>, builds an empty group.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+         * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[][])} instead
      */
     public static Object newGroupInParallel(String className, Object[][] params)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -626,9 +649,10 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[][],Node[])} instead
      */
     public static Object newGroupInParallel(String className,
         Object[][] params, Node[] nodeList)
@@ -646,9 +670,10 @@ public class ProActiveGroup {
      * @param nodeList the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[][],String[])} instead
      */
     public static Object newGroupInParallel(String className,
         Object[][] params, String[] nodeList)
@@ -666,9 +691,10 @@ public class ProActiveGroup {
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[][],VirtualNodeInternal)} instead
      */
     public static Object newGroupInParallel(String className,
         Object[][] params, VirtualNodeInternal virtualNode)
@@ -686,9 +712,10 @@ public class ProActiveGroup {
      * @param nodeList the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[],String[])} instead
      */
     public static Object newGroupInParallel(String className, Object[] params,
         String[] nodeList)
@@ -705,9 +732,10 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[],Node[])} instead
      */
     public static Object newGroupInParallel(String className, Object[] params,
         Node[] nodeList)
@@ -725,9 +753,10 @@ public class ProActiveGroup {
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[],VirtualNodeInternal)} instead
      */
     public static Object newGroupInParallel(String className, Object[] params,
         VirtualNodeInternal virtualNode)
@@ -745,12 +774,13 @@ public class ProActiveGroup {
      * If <code>params</code> is <code>null</code>, builds an empty group.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Class<?>[],Object[][])} instead
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[][] params)
+        Class<?>[] genericParameters, Object[][] params)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
@@ -768,12 +798,13 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Class<?>[],Object[][],Node[])} instead
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[][] params, Node[] nodeList)
+        Class<?>[] genericParameters, Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Object result = ProActiveGroup.newGroup(className, genericParameters);
@@ -794,12 +825,13 @@ public class ProActiveGroup {
      * @param nodeList the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Class<?>[],Object[][],String[])} instead
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[][] params, String[] nodeList)
+        Class<?>[] genericParameters, Object[][] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeListString = new Node[nodeList.length];
@@ -818,12 +850,13 @@ public class ProActiveGroup {
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Class<?>[],Object[][],VirtualNodeInternal)} instead
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[][] params,
+        Class<?>[] genericParameters, Object[][] params,
         VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
@@ -840,12 +873,13 @@ public class ProActiveGroup {
      * @param nodeList the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Class<?>[],Object[],String[])} instead
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[] params, String[] nodeList)
+        Class<?>[] genericParameters, Object[] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeListString = new Node[nodeList.length];
@@ -863,12 +897,13 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Class<?>[],Object[],Node[])} instead
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[] params, Node[] nodeList)
+        Class<?>[] genericParameters, Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Object result = ProActiveGroup.newGroup(className, genericParameters);
@@ -889,12 +924,13 @@ public class ProActiveGroup {
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Class<?>[],Object[],VirtualNodeInternal)} instead
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[] params,
+        Class<?>[] genericParameters, Object[] params,
         VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
@@ -907,10 +943,11 @@ public class ProActiveGroup {
      * @param className the name of the (upper) class of the group's members.
      * @param genericParameters genericParameters parameterizing types
      * @return an empty group of type <code>className</code>.
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[])} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters)
+    public static Object newGroup(String className, Class<?>[] genericParameters)
         throws ClassNotFoundException, ClassNotReifiableException {
         MOP.checkClassIsReifiable(MOP.forName(className));
 
@@ -922,7 +959,7 @@ public class ProActiveGroup {
 
             ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ((StubObject) result).getProxy();
             proxy.className = className;
-            proxy.stub = (StubObject) result;
+            proxy.setStub((StubObject) result);
         } catch (ClassNotReifiableException e) {
             logger.error("**** ClassNotReifiableException ****");
         } catch (InvalidProxyClassException e) {
@@ -944,12 +981,13 @@ public class ProActiveGroup {
      * If <code>params</code> is <code>null</code>, builds an empty group.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[][])} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[][] params)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[][] params)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
@@ -967,12 +1005,13 @@ public class ProActiveGroup {
      * @param nodeName the name (String) of the node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[][],String)} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[][] params, String nodeName)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[][] params, String nodeName)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
@@ -989,12 +1028,13 @@ public class ProActiveGroup {
      * @param nodeListString the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[][],String[])} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[][] params, String[] nodeListString)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[][] params, String[] nodeListString)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[nodeListString.length];
@@ -1012,12 +1052,13 @@ public class ProActiveGroup {
      * @param node the node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[][],Node)} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[][] params, Node node)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[][] params, Node node)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
@@ -1035,12 +1076,14 @@ public class ProActiveGroup {
      * @param virtualNode the virtual where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[][],VirtualNodeInternal)} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[][] params, VirtualNodeInternal virtualNode)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[][] params,
+        VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroup(className, genericParameters, params,
@@ -1055,22 +1098,23 @@ public class ProActiveGroup {
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[],Node[])} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[] params, Node[] nodeList)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Object result = ProActiveGroup.newGroup(className,
-                (Class[]) genericParameters);
+                (Class<?>[]) genericParameters);
         Group g = ProActiveGroup.getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < nodeList.length; i++) {
-                g.add(ProActive.newActive(className, genericParameters, params,
-                        nodeList[i % nodeList.length]));
+                g.add(ProActiveObject.newActive(className, genericParameters,
+                        params, nodeList[i % nodeList.length]));
             }
         }
 
@@ -1085,12 +1129,14 @@ public class ProActiveGroup {
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[],VirtualNodeInternal)} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[] params, VirtualNodeInternal virtualNode)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[] params,
+        VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroup(className, genericParameters, params,
@@ -1105,12 +1151,13 @@ public class ProActiveGroup {
      * @param node the node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[],Node)} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[] params, Node node)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[] params, Node node)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
@@ -1127,12 +1174,13 @@ public class ProActiveGroup {
      * @param nodeName the name of the node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[],String)} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[] params, String nodeName)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[] params, String nodeName)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
@@ -1149,12 +1197,13 @@ public class ProActiveGroup {
      * @param nodeListString the names of the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Class<?>[],Object[],String[])} instead
      */
-    public static Object newGroup(String className, Class[] genericParameters,
-        Object[] params, String[] nodeListString)
+    public static Object newGroup(String className,
+        Class<?>[] genericParameters, Object[] params, String[] nodeListString)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[nodeListString.length];
@@ -1170,15 +1219,16 @@ public class ProActiveGroup {
      * @param ogroup the typed group to turn active.
      * @return a reference on the active object produced.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#turnActiveGroup(Object,Class<?>[])} instead
      */
     public static Object turnActiveGroup(Object ogroup,
-        Class[] genericParameters)
+        Class<?>[] genericParameters)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, genericParameters,
+        return ProActiveObject.turnActive(ogroup, genericParameters,
             ProActiveGroup.getType(ogroup), (Node) null, null, null);
     }
 
@@ -1189,15 +1239,16 @@ public class ProActiveGroup {
      * the active object is created localy on a default node
      * @return a reference (possibly remote) on the active object produced.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the specified node can not be reached.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#turnActiveGroup(Object,Class<?>[],Node)} instead
      */
     public static Object turnActiveGroup(Object ogroup,
-        Class[] genericParameters, Node node)
+        Class<?>[] genericParameters, Node node)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, genericParameters,
+        return ProActiveObject.turnActive(ogroup, genericParameters,
             ProActiveGroup.getType(ogroup), node, null, null);
     }
 
@@ -1207,15 +1258,16 @@ public class ProActiveGroup {
      * @param nodeName the name of the node where to create the active object on.
      * @return a reference (possibly remote) on the active object produced.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the specified node can not be reached.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#turnActiveGroup(Object,Class<?>[],String)} instead
      */
     public static Object turnActiveGroup(Object ogroup,
-        Class[] genericParameters, String nodeName)
+        Class<?>[] genericParameters, String nodeName)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, genericParameters,
+        return ProActiveObject.turnActive(ogroup, genericParameters,
             ProActiveGroup.getType(ogroup), NodeFactory.getNode(nodeName),
             null, null);
     }
@@ -1224,13 +1276,14 @@ public class ProActiveGroup {
      * Gives a view of the group
      * @param ogroup - a typed group
      * @return a typed group, the view of the group
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#captureView(Object)} instead
      */
     public static Object captureView(Object ogroup) {
         Object result = null;
 
         try {
             result = ProActiveGroup.newGroup(ProActiveGroup.getType(ogroup),
-                    (Class[]) null);
+                    (Class<?>[]) null);
         } catch (ClassNotReifiableException e) {
             logger.error("**** ClassNotReifiableException ****");
             e.printStackTrace();
@@ -1253,6 +1306,7 @@ public class ProActiveGroup {
     /**
      * Waits for all the futures are arrived.
      * @param o a typed group.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#waitAll(Object)} instead
      */
     public static void waitAll(Object o) {
         if (MOP.isReifiedObject(o)) {
@@ -1270,6 +1324,7 @@ public class ProActiveGroup {
     /**
      * Waits for (at least) one future is arrived.
      * @param o a typed group.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#waitOne(Object)} instead
      */
     public static void waitOne(Object o) {
         if (MOP.isReifiedObject(o)) {
@@ -1288,6 +1343,7 @@ public class ProActiveGroup {
      * Waits n futures are arrived.
      * @param o a typed group.
      * @param n the number of awaited members.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#waitN(Object,int)} instead
      */
     public static void waitN(Object o, int n) {
         if (MOP.isReifiedObject(o)) {
@@ -1307,6 +1363,7 @@ public class ProActiveGroup {
      * Always returns <code>false</code> if <code>o</code> is not a reified object (future or group).
      * @param o a typed group.
      * @return <code>true</code> if all the members of <code>o</code> are awaited.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#allAwaited(Object)} instead
      */
     public static boolean allAwaited(Object o) {
         // If the object is not reified, it cannot be a future (or a group of future)
@@ -1331,6 +1388,7 @@ public class ProActiveGroup {
      * Always returns <code>true</code> if <code>o</code> is not a reified object (future or group).
      * @param o a typed group.
      * @return <code>true</code> if all the members of <code>o</code> are arrived.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#allArrived(Object)} instead
      */
     public static boolean allArrived(Object o) {
         // If the object is not reified, it cannot be a future (or a group of future)
@@ -1354,6 +1412,7 @@ public class ProActiveGroup {
      * Waits for one future is arrived and get it.
      * @param o a typed group.
      * @return a member of <code>o</code>.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#waitAndGetOne(Object)} instead
      */
     public static Object waitAndGetOne(Object o) {
         if (MOP.isReifiedObject(o)) {
@@ -1378,6 +1437,7 @@ public class ProActiveGroup {
      * Waits for one future is arrived and returns it (removes it from the typed group).
      * @param o a typed group.
      * @return a member of <code>o</code>. (<code>o</code> is removed from the typed group)
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#waitAndGetOneThenRemoveIt(Object)} instead
      */
     public static Object waitAndGetOneThenRemoveIt(Object o) {
         if (MOP.isReifiedObject(o)) {
@@ -1401,6 +1461,7 @@ public class ProActiveGroup {
     /**
      * Waitd for the N-th future in the list is arrived.
      * @param o a typed group.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#waitTheNth(Object,int)} instead
      */
     public static void waitTheNth(Object o, int n) {
         if (MOP.isReifiedObject(o)) {
@@ -1420,6 +1481,7 @@ public class ProActiveGroup {
      * @param o a typed group.
      * @param n the rank of the awaited member.
      * @return the <code>n</code>-th member of th typed group <code>o</code>.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#waitAndGetTheNth(Object,int)} instead
      */
     public static Object waitAndGetTheNth(Object o, int n) {
         if (MOP.isReifiedObject(o)) {
@@ -1444,6 +1506,7 @@ public class ProActiveGroup {
      * Waits that at least one member is arrived and returns its index.
      * @param o a typed group.
      * @return the index of a non-awaited member of the Group, -1 if <code>o</code> is not a reified object.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#waitOneAndGetIndex(Object)} instead
      */
     public static int waitOneAndGetIndex(Object o) {
         if (MOP.isReifiedObject(o)) {
@@ -1470,6 +1533,7 @@ public class ProActiveGroup {
      * @param o a typed group.
      * @return the number of member of the typed group <code>o</code>.
      * @throws IllegalArgumentException if the parameter doesn't represent a group
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#size(Object)} instead
      */
     public static int size(Object o) {
         ProxyForGroup theProxy = ProActiveGroup.findProxyForGroup(o);
@@ -1487,6 +1551,7 @@ public class ProActiveGroup {
      * @param o a typed group.
      * @param n the rank of the wanted member.
      * @return the member of the typed group at the rank <code>n</code>
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#get(Object,int)} instead
      */
     public static Object get(Object o, int n) {
         org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
@@ -1501,6 +1566,7 @@ public class ProActiveGroup {
      * Checks if the object <code>o</code> is an object representing a Group (future or not).
      * @param o the Object to check.
      * @return <code>true</code> if <code>o</code> is a typed group.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#isGroup(Object)} instead
      */
     public static boolean isGroup(Object o) {
         return (ProActiveGroup.findProxyForGroup(o) != null);
@@ -1509,6 +1575,7 @@ public class ProActiveGroup {
     /**
      * Allows the typed group to dispatch parameters
      * @param ogroup the typed group who will change his semantic of communication.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#setScatterGroup(Object)} instead
      */
     public static void setScatterGroup(Object ogroup) {
         Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -1518,8 +1585,25 @@ public class ProActiveGroup {
     }
 
     /**
+     * By default, when a rendez-vous fails an exception is thrown. Instead,
+     * when the automatic purge is enabled, failing objects are removed from
+     * the group
+     * @param ogroup the typed group having its behavior changed
+     * @param autoPurge the new behavior
+     */
+    public static void setAutomaticPurge(Object ogroup, boolean autoPurge) {
+        ProxyForGroup proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
+        if (proxytmp == null) {
+            throw new IllegalArgumentException("argument " +
+                ogroup.getClass().getName() + " is not a group");
+        }
+        proxytmp.setAutomaticPurge(autoPurge);
+    }
+
+    /**
      * Allows the typed group to broadcast parameters
      * @param ogroup the typed group who will change his semantic of communication.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#unsetScatterGroup(Object)} instead
      */
     public static void unsetScatterGroup(Object ogroup) {
         Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -1531,6 +1615,7 @@ public class ProActiveGroup {
     /**
      * Allows the typed group to make an unique serialization of parameters when a broadcast call occurs.
      * @param ogroup the typed group who will change his semantic of communication.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#setUniqueSerialization(Object)} instead
      */
     public static void setUniqueSerialization(Object ogroup) {
         Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -1542,6 +1627,7 @@ public class ProActiveGroup {
     /**
      * Removes the ability of a typed group to make an unique serialization
      * @param ogroup the typed group who will change his semantic of communication.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#unsetUniqueSerialization(Object)} instead
      */
     public static void unsetUniqueSerialization(Object ogroup) {
         Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -1554,6 +1640,7 @@ public class ProActiveGroup {
      * Checks the semantic of communication of the typed group <code>ogroup</code>.
      * @param ogroup a typed group.
      * @return <code>true</code> if the "scatter option" is enabled for the typed group <code>ogroup</code>.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#isScatterGroupOn(Object)} instead
      */
     public static boolean isScatterGroupOn(Object ogroup) {
         Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -1569,6 +1656,7 @@ public class ProActiveGroup {
      * @param ogroup the typed group.
      * @return the <code>ProxyForGroup</code> of the typed group <code>ogroup</code>.
      * <code>null</code> if <code>ogroup</code> does not represent a Group.
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#findProxyForGroup(Object)} instead
      */
     static ProxyForGroup findProxyForGroup(Object ogroup) {
         if (!(MOP.isReifiedObject(ogroup))) {

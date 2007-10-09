@@ -36,7 +36,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 import org.objectweb.proactive.ic2d.security.views.PolicyEditorView;
 
 public class SecurityPerspective implements IPerspectiveFactory {
-
+  
 	public static final String ID = "org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective";
 
 	/** Top folder's id. */

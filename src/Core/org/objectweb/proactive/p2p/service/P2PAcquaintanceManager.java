@@ -38,16 +38,14 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -97,11 +95,10 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
 
         // Create exportAcquaintances group
         try {
-            this.acquaintances = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
-            ProActive.addNFEListenerOnGroup(this.acquaintances,
-                FailedGroupRendezVousException.AUTO_GROUP_PURGE);
-            this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances);
-            this.acquaintancesActived = (P2PService) ProActiveGroup.turnActiveGroup(acquaintances,
+            this.acquaintances = (P2PService) ProGroup.newGroup(P2PService.class.getName());
+            this.groupOfAcquaintances = ProGroup.getGroup(acquaintances);
+            this.groupOfAcquaintances.setAutomaticPurge(true);
+            this.acquaintancesActived = (P2PService) ProGroup.turnActiveGroup(acquaintances,
                     nodeUrl);
         } catch (ClassNotReifiableException e) {
             logger.fatal("Couldn't create the group of exportAcquaintances", e);
@@ -172,7 +169,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     public void add(P2PService peer) {
         try {
             if (!this.groupOfAcquaintances.contains(peer)) {
-                String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
+                String peerUrl = ProActiveObject.getActiveObjectNodeUrl(peer);
                 if (!peerUrl.matches(".*cannot contact the body.*")) {
                     boolean result = this.groupOfAcquaintances.add(peer);
                     logger.info("Acquaintance " + peerUrl + " " + result +
@@ -224,8 +221,11 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return a random acquaintance reference.
      */
     public P2PService randomPeer() {
-        int random = this.randomizer.nextInt(this.groupOfAcquaintances.size());
-        return this.groupOfAcquaintances.get(random);
+        if (this.groupOfAcquaintances.size() != 0) {
+            int random = this.randomizer.nextInt(this.groupOfAcquaintances.size());
+            return this.groupOfAcquaintances.get(random);
+        }
+        return null;
     }
 
     /**

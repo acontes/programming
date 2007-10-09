@@ -42,6 +42,7 @@ import org.apache.soap.SOAPException;
 import org.apache.soap.server.DefaultConfigManager;
 import org.apache.soap.server.DeploymentDescriptor;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
@@ -68,7 +69,8 @@ public class WsdlServlet extends HttpServlet {
             Hashtable<String, String> options = new Hashtable<String, String>();
             String catalinaBase = PAProperties.CATALINA_BASE.getValue();
             options.put("filename",
-                catalinaBase + "/webapps/soap/DeployedServices.ds");
+                catalinaBase + "/webapps/" + WSConstants.WEBAPP_NAME +
+                "/DeployedServices.ds");
             cm.setOptions(options);
             cm.loadRegistry();
 
@@ -81,6 +83,7 @@ public class WsdlServlet extends HttpServlet {
                 return;
             }
 
+            @SuppressWarnings("unchecked")
             Hashtable table = dd.getProps();
             String wsdl = (String) table.get("Wsdl");
 

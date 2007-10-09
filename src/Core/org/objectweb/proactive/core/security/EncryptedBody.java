@@ -47,8 +47,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.event.MessageEventListener;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
@@ -413,11 +411,12 @@ public class EncryptedBody implements Body, Serializable {
     public void createShortcut(Shortcut shortcut) throws IOException {
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) {
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
     }
 
     public UniversalBody getRemoteAdapter() {
@@ -426,16 +425,6 @@ public class EncryptedBody implements Body, Serializable {
 
     public String getReifiedClassName() {
         return null;
-    }
-
-    public void addNFEListener(NFEListener listener) {
-    }
-
-    public void removeNFEListener(NFEListener listener) {
-    }
-
-    public int fireNFE(NonFunctionalException e) {
-        return 0;
     }
 
     /*
@@ -449,7 +438,7 @@ public class EncryptedBody implements Body, Serializable {
         return null;
     }
 
-    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+    public boolean checkMethod(String methodName, Class<?>[] parametersTypes) {
         return false;
     }
 

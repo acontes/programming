@@ -28,7 +28,6 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.ic2d.console;
 
 import java.text.DateFormat;
@@ -36,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.apache.log4j.WriterAppender;
@@ -45,234 +45,239 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 
 /**
  * Used to log informations in a console view.
  */
 public class Console extends MessageConsole {
 
-	/**
-	 * Contains all consoles.
-	 */
-	private static Map<String, Console> consoles = new HashMap<String, Console>();
+    /**
+     * Contains all consoles.
+     */
+    private static Map<String, Console> consoles = new HashMap<String, Console>();
 
-	/**
-	 * To know the date's format.
-	 */
-	private DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    /**
+     * To know the date's format.
+     */
+    private DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-	/**
-	 * Some useful colors.
-	 */
-	private static final Color RED;
-	private static final Color BLUE;
-	//private static final Color GREEN;
-	private static final Color GRAY;
-	private static final Color BLACK;
+    /**
+     * Some useful colors.
+     */
+    private static final Color RED;
+    private static final Color BLUE;
 
-	static {
-		Display device = Display.getCurrent();
-		RED = new Color(device, 255, 0, 0);
-		BLUE = new Color(device, 0, 0, 128);
-		//GREEN = new Color(device, 180, 255, 180);
-		GRAY = new Color(device, 120, 120, 120);
-		BLACK = new Color(device, 0, 0, 0);
-	}
+    //private static final Color GREEN;
+    private static final Color GRAY;
+    private static final Color BLACK;
 
-	public static boolean debug = false;
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+    static {
+        Display device = Display.getCurrent();
+        RED = new Color(device, 255, 0, 0);
+        BLUE = new Color(device, 0, 0, 128);
+        //GREEN = new Color(device, 180, 255, 180);
+        GRAY = new Color(device, 120, 120, 120);
+        BLACK = new Color(device, 0, 0, 0);
+    }
 
-	/**
-	 * Creates a new Console
-	 * @param title Title of the frame console
-	 */
-	private Console(String title) {
-		super(title, null);
-		activate();	
-		
-		// Add the standard output and standard error output stream to the Console.
-//		MessageConsole console = new MessageConsole("System output", null);
-//		
-//		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(
-//		console);
-//		
-//		MessageConsoleStream stream = console.newMessageStream();
-//		System.setOut(new PrintStream(stream));
-//		System.setErr(new PrintStream(stream));
+    public static boolean debug = false;
 
-		//----- Log4j Console ------
-		// log4j output in the console
-		MessageConsole log4jConsole = new MessageConsole("log4j", null);
-		
-		MessageConsoleStream log4jStream = log4jConsole.newMessageStream();
-		
-		Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
-		WriterAppender app = new WriterAppender(new SimpleLayout(), log4jStream);
-		logger.addAppender(app);
-	
-		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
-				new IConsole[] { /*console,*/ log4jConsole });
-		//-------------------------
-		
-		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
-				new IConsole[]{ this });
-	}
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
 
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
+    /**
+     * Creates a new Console
+     * @param title Title of the frame console
+     */
+    private Console(String title) {
+        super(title, null);
+        activate();
 
-	/**
-	 * Returns the console having for title 'title'
-	 * @param title The console's title
-	 */
-	public static synchronized Console getInstance(String title){
-		Console console = (Console) consoles.get(title);
-		if( console == null){
-			console = new Console(title);
-			consoles.put(title, console);
-		}
-		return console;
-	}
+        // Add the standard output and standard error output stream to the Console.
+        //		MessageConsole console = new MessageConsole("System output", null);
+        //
+        //		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(
+        //		console);
+        //
+        //		MessageConsoleStream stream = console.newMessageStream();
+        //		System.setOut(new PrintStream(stream));
+        //		System.setErr(new PrintStream(stream));
 
-	/**
-	 * Logs a message to the console
-	 * @param message
-	 */
-	public synchronized void log(String message){
-		final String text = message;
+        //----- Log4j Console ------
+        // log4j output in the console
+        MessageConsole log4jConsole = new MessageConsole("log4j", null);
 
-		printTime();
+        MessageConsoleStream log4jStream = log4jConsole.newMessageStream();
 
-		// Print the message in the UI Thread in async mode
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				MessageConsoleStream stream = newMessageStream();
-				stream.setColor(Console.BLUE);
-				stream.println(text);
-			}});
-	}
+        //		Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
+        Logger logger = LogManager.getRootLogger();
+        WriterAppender app = new WriterAppender(new SimpleLayout(), log4jStream);
+        //		logger.addAppender(app);
+        ConsolePlugin.getDefault().getConsoleManager()
+                     .addConsoles(new IConsole[] {  /*console,*/log4jConsole });
+        //-------------------------
+        ConsolePlugin.getDefault().getConsoleManager()
+                     .addConsoles(new IConsole[] { this });
+    }
 
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
 
-	/**
-	 * Logs an warning message to the console.
-	 * @param message
-	 */
-	public synchronized void warn(String message){
-		final String text = message;
+    /**
+     * Returns the console having for title 'title'
+     * @param title The console's title
+     */
+    public static synchronized Console getInstance(String title) {
+        Console console = consoles.get(title);
+        if (console == null) {
+            console = new Console(title);
+            consoles.put(title, console);
+        }
+        return console;
+    }
 
-		printTime();
+    /**
+     * Logs a message to the console
+     * @param message
+     */
+    public synchronized void log(String message) {
+        final String text = message;
 
-		// Print the message in the UI Thread in async mode
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				MessageConsoleStream stream = newMessageStream();
-				stream.setColor(Console.RED);
-				stream.println(text);
-			}});
-	}
+        printTime();
 
+        // Print the message in the UI Thread in async mode
+        Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageConsoleStream stream = newMessageStream();
+                    stream.setColor(Console.BLUE);
+                    stream.println(text);
+                }
+            });
+    }
 
-	/**
-	 * Logs an error message to the console.
-	 * @param message
-	 */
-	public synchronized void err(String message){
-		final String text = message;
+    /**
+     * Logs an warning message to the console.
+     * @param message
+     */
+    public synchronized void warn(String message) {
+        final String text = message;
 
-		printTime();
+        printTime();
 
-		// Print the message in the UI Thread in async mode
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				MessageConsoleStream stream = newMessageStream();
-				stream.setColor(Console.GRAY);
-				stream.println(text);
-			}});
-	}
+        // Print the message in the UI Thread in async mode
+        Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageConsoleStream stream = newMessageStream();
+                    stream.setColor(Console.RED);
+                    stream.println(text);
+                }
+            });
+    }
 
-	/**
-	 * Logs an exception in the console
-	 * @param e the exception to log
-	 */
-	public synchronized void logException(Throwable e) {
-/*		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				MessageConsoleStream stream = newMessageStream();
-				stream.print("\n");
-			}});*/
-		printTime();
-		logExceptionWhithoutTime(e, false);
-		e.printStackTrace();
-	}
+    /**
+     * Logs an error message to the console.
+     * @param message
+     */
+    public synchronized void err(String message) {
+        final String text = message;
 
-	
-	/**
-	 * Logs an exception in the console
-	 * @param message the message to display.
-	 * @param e the exception to log
-	 */
-	public synchronized void logException(String message, Throwable e) {
-		printTime();
-		err(message);
-		logExceptionWhithoutTime(e, false);
-		e.printStackTrace();
-	}
-	
-	
-	public synchronized void debug(String message) {
-		if(debug)
-			log(message);
-	}
-	
-	public synchronized void debug(Throwable e) {
-		if(debug)
-			logException(e);
-	}
-	
-	//
-	// -- PRIVATE METHODS -----------------------------------------------
-	//
+        printTime();
 
-	/**
-	 * Prints the current time in the console.
-	 */
-	public void printTime(){
-		// Print the message in the UI Thread in async mode
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				MessageConsoleStream stream = newMessageStream();
-				stream.setColor(Console.BLACK);
-				stream.print(dateFormat.format(new java.util.Date())+" => ");
-			}});
-	}
+        // Print the message in the UI Thread in async mode
+        Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageConsoleStream stream = newMessageStream();
+                    stream.setColor(Console.GRAY);
+                    stream.println(text);
+                }
+            });
+    }
 
-	private synchronized void logExceptionWhithoutTime(Throwable e, boolean cause) {
-		StringBuilder builder = new StringBuilder();
-		if(cause)
-			builder.append("Caused by: ");
+    /**
+     * Logs an exception in the console
+     * @param e the exception to log
+     */
+    public synchronized void logException(Throwable e) {
+        /*                Display.getDefault().asyncExec(new Runnable() {
+                                public void run() {
+                                        MessageConsoleStream stream = newMessageStream();
+                                        stream.print("\n");
+                                }});*/
+        printTime();
+        logExceptionWhithoutTime(e, false);
+        e.printStackTrace();
+    }
 
-		builder.append(e.getClass().getName()+": "+e.getMessage()+"\n");
-		StackTraceElement[] traces = e.getStackTrace();
-		for(int i=0 ; i<traces.length ; i++)
-			builder.append("\t"+traces[i]+"\n");
+    /**
+     * Logs an exception in the console
+     * @param message the message to display.
+     * @param e the exception to log
+     */
+    public synchronized void logException(String message, Throwable e) {
+        printTime();
+        err(message);
+        logExceptionWhithoutTime(e, false);
+        e.printStackTrace();
+    }
 
-		final String log = builder.toString();
+    public synchronized void debug(String message) {
+        if (debug) {
+            log(message);
+        }
+    }
 
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				MessageConsoleStream stream = newMessageStream();
-				stream.setColor(Console.GRAY);
-				stream.print(log);
-			}});
+    public synchronized void debug(Throwable e) {
+        if (debug) {
+            logException(e);
+        }
+    }
 
-		if(e.getCause() != null)
-			logExceptionWhithoutTime(e.getCause(), true);
+    //
+    // -- PRIVATE METHODS -----------------------------------------------
+    //
 
-	}
+    /**
+     * Prints the current time in the console.
+     */
+    public void printTime() {
+        // Print the message in the UI Thread in async mode
+        Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageConsoleStream stream = newMessageStream();
+                    stream.setColor(Console.BLACK);
+                    stream.print(dateFormat.format(new java.util.Date()) +
+                        " => ");
+                }
+            });
+    }
+
+    private synchronized void logExceptionWhithoutTime(Throwable e,
+        boolean cause) {
+        StringBuilder builder = new StringBuilder();
+        if (cause) {
+            builder.append("Caused by: ");
+        }
+
+        builder.append(e.getClass().getName() + ": " + e.getMessage() + "\n");
+        StackTraceElement[] traces = e.getStackTrace();
+        for (int i = 0; i < traces.length; i++)
+            builder.append("\t" + traces[i] + "\n");
+
+        final String log = builder.toString();
+
+        Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageConsoleStream stream = newMessageStream();
+                    stream.setColor(Console.GRAY);
+                    stream.print(log);
+                }
+            });
+
+        if (e.getCause() != null) {
+            logExceptionWhithoutTime(e.getCause(), true);
+        }
+    }
 }

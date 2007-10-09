@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.body.request;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.TypeVariable;
 import java.util.Map;
 
@@ -37,7 +38,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -55,35 +55,35 @@ public class BodyRequest extends MessageImpl implements Request,
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public BodyRequest(Body targetBody, String methodName,
-        Class[] paramClasses, Object[] params, boolean isPriority)
+        Class<?>[] paramClasses, Object[] params, boolean isPriority)
         throws NoSuchMethodException {
         super(null, 0, true, methodName);
         if (paramClasses == null) {
-            paramClasses = new Class[params.length];
+            paramClasses = new Class<?>[params.length];
             for (int i = 0; i < params.length; i++) {
                 paramClasses[i] = params[i].getClass();
             }
         }
         methodCall = MethodCall.getMethodCall(targetBody.getClass()
                                                         .getMethod(methodName,
-                    paramClasses), params, (Map<TypeVariable, Class>) null);
+                    paramClasses), params, (Map<TypeVariable, Class<?>>) null);
         this.isPriority = isPriority;
     }
 
     //Non functional BodyRequests constructor
     public BodyRequest(Body targetBody, String methodName,
-        Class[] paramClasses, Object[] params, boolean isNFRequest,
+        Class<?>[] paramClasses, Object[] params, boolean isNFRequest,
         int nfRequestPriority) throws NoSuchMethodException {
         super(null, 0, true, methodName);
         if (paramClasses == null) {
-            paramClasses = new Class[params.length];
+            paramClasses = new Class<?>[params.length];
             for (int i = 0; i < params.length; i++) {
                 paramClasses[i] = params[i].getClass();
             }
         }
         methodCall = MethodCall.getMethodCall(targetBody.getClass()
                                                         .getMethod(methodName,
-                    paramClasses), params, (Map<TypeVariable, Class>) null);
+                    paramClasses), params, (Map<TypeVariable, Class<?>>) null);
 
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;
@@ -130,12 +130,8 @@ public class BodyRequest extends MessageImpl implements Request,
         return ftres;
     }
 
-    public Reply serve(Body targetBody) throws ServeException {
+    public Reply serve(Body targetBody) {
         serveInternal(targetBody);
-        return null;
-    }
-
-    public Reply serveAlternate(Body targetBody, ProxyNonFunctionalException nfe) {
         return null;
     }
 
@@ -170,13 +166,12 @@ public class BodyRequest extends MessageImpl implements Request,
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected void serveInternal(Body targetBody) throws ServeException {
+    protected void serveInternal(Body targetBody) {
         try {
             methodCall.execute(targetBody);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         } catch (MethodCallExecutionFailedException e) {
-            throw new ServeException("serve method " + methodCall.getName() +
-                " failed", e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
             e.printStackTrace();
         }
     }

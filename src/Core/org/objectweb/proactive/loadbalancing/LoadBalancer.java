@@ -36,12 +36,13 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -168,7 +169,7 @@ public class LoadBalancer implements ProActiveInternalObject {
                         " to " + destNode.getNodeInformation().getURL());
                 }
 
-                ProActive.migrateTo(minBody, destNode, false);
+                ProMobileAgent.migrateTo(minBody, destNode, false);
                 informationRecover.register(this.getName(),
                     this.metric.getLoad(),
                     destNode.getNodeInformation().getURL(),
@@ -202,13 +203,13 @@ public class LoadBalancer implements ProActiveInternalObject {
     public void init(ArrayList<LoadBalancer> loadBalancers,
         InformationRecover ir) {
         try {
-            this.myNode = ProActive.getNode();
+            this.myNode = ProActiveObject.getNode();
             this.informationRecover = ir;
         } catch (NodeException e) {
             e.printStackTrace();
         }
         this.loadBalancers = loadBalancers;
-        this.myThis = (LoadBalancer) ProActive.getStubOnThis();
+        this.myThis = (LoadBalancer) ProActiveObject.getStubOnThis();
         this.balancerName = myNode.getNodeInformation().getURL();
 
         // by now we use only Linux
@@ -237,7 +238,7 @@ public class LoadBalancer implements ProActiveInternalObject {
                         this.metric.getRanking());
                     break;
                 }
-            } catch (NonFunctionalException e) {
+            } catch (ProActiveRuntimeException e) {
                 loadBalancers.remove((first + i) % size);
                 size--;
             }
@@ -246,7 +247,7 @@ public class LoadBalancer implements ProActiveInternalObject {
 
     public void notifyLoadBalancers() {
         LoadBalancer lb;
-        LoadBalancer myThis = (LoadBalancer) ProActive.getStubOnThis();
+        LoadBalancer myThis = (LoadBalancer) ProActiveObject.getStubOnThis();
         Iterator<LoadBalancer> it = loadBalancers.iterator();
         while (it.hasNext()) {
             lb = it.next();

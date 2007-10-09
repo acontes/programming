@@ -34,20 +34,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.proxy.AbstractProxy;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
-import org.objectweb.proactive.core.exceptions.proxy.FutureTimeoutException;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -115,19 +111,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private transient ExceptionMaskLevel exceptionLevel;
 
     /**
-     * The proxy that created this future. Set as transient to avoid
-     * adding remote references when sending the future. Migration is
-     * thus not supported.
-     */
-    private transient AbstractProxy originatingProxy;
-
-    /**
-     * Max timeout when waiting for a future
-     * Can be set with the property proactive.future.maxdelay
-     */
-    protected static long futureMaxDelay = -1;
-
-    /**
      * The methods to call when this future is updated
      */
     private transient LocalFutureUpdateCallbacks callbacks;
@@ -164,7 +147,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * <code>false</code> if <code>obj</code> is not a future object.
      */
     public static boolean isAwaited(Object obj) {
-        return ProActive.isAwaited(obj);
+        return ProFuture.isAwaited(obj);
     }
 
     public synchronized static FutureProxy getFutureProxy() {
@@ -213,17 +196,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         target = obj;
         ExceptionHandler.addResult(this);
         FutureMonitoring.removeFuture(this);
-        ProxyNonFunctionalException nfe = target.getNFE();
-        if (nfe != null) {
-            NFEManager.fireNFE(nfe, originatingProxy);
-        }
 
         if (this.callbacks != null) {
             this.callbacks.run();
             this.callbacks = null;
         }
 
-        originatingProxy = null;
         this.notifyAll();
     }
 
@@ -234,7 +212,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     public synchronized Throwable getRaisedException() {
         waitFor();
-        return target.getExceptionToRaise();
+        return target.getException();
     }
 
     /**
@@ -275,25 +253,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * Blocks the calling thread until the future object is available.
      */
     public synchronized void waitFor() {
-        if (futureMaxDelay == -1) {
-
-            /* First time, hopefully the configuration file has been read */
-            try {
-                futureMaxDelay = Long.parseLong(PAProperties.PA_FUTURE_MAXDELAY.getValue());
-            } catch (IllegalArgumentException iea) {
-                /* The property is not set, that's not a problem */
-                futureMaxDelay = 0;
-            }
-        }
-
         try {
-            waitFor(futureMaxDelay);
+            waitFor(0);
         } catch (ProActiveException e) {
-            ProxyNonFunctionalException nfe = new FutureTimeoutException(
-                    "Exception after waiting for " + futureMaxDelay + "ms", e);
-
-            target = new FutureResult(null, null, nfe);
-            notifyAll();
+            throw new IllegalStateException("Cannot happen");
         }
     }
 
@@ -308,17 +271,15 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
 
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.startTimer(ProActive.getBodyOnThis().getID(),
+            TimerWarehouse.startTimer(ProActiveObject.getBodyOnThis().getID(),
                 TimerWarehouse.WAIT_BY_NECESSITY);
         }
 
         FutureMonitoring.monitorFutureProxy(this);
 
-        UniqueID id = null;
-
         // JMX Notification
         BodyWrapperMBean mbean = null;
-        UniqueID bodyId = ProActive.getBodyOnThis().getID();
+        UniqueID bodyId = ProActiveObject.getBodyOnThis().getID();
         Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
 
         // Send notification only if ActiveObject, not for HalfBodies
@@ -352,7 +313,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.stopTimer(ProActive.getBodyOnThis().getID(),
+            TimerWarehouse.stopTimer(ProActiveObject.getBodyOnThis().getID(),
                 TimerWarehouse.WAIT_BY_NECESSITY);
         }
     }
@@ -397,10 +358,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     public void setSenderID(UniqueID i) {
         senderID = i;
-    }
-
-    public void setOriginatingProxy(AbstractProxy p) {
-        originatingProxy = p;
     }
 
     //
@@ -478,7 +435,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 if (sender != null) { // else we are in a migration forwarder
                     if (continuation) {
                         /* The written future will be updated by the writing body */
-                        writtenUpdater = ProActive.getBodyOnThis();
+                        writtenUpdater = ProActiveObject.getBodyOnThis();
                         for (UniversalBody dest : FuturePool.getBodiesDestination()) {
                             sender.getFuturePool()
                                   .addAutomaticContinuation(id, dest);
@@ -539,8 +496,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         // where the proxy object implements the interface FUTURE_PROXY_INTERFACE
         // if the proxy does not inherit from FUTURE_PROXY_ROOT_CLASS
         // it is not a future
-        Class proxyclass = ((StubObject) obj).getProxy().getClass();
-        Class[] ints = proxyclass.getInterfaces();
+        Class<?> proxyclass = ((StubObject) obj).getProxy().getClass();
+        Class<?>[] ints = proxyclass.getInterfaces();
         for (int i = 0; i < ints.length; i++) {
             if (Constants.FUTURE_PROXY_INTERFACE.isAssignableFrom(ints[i])) {
                 return true;

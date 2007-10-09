@@ -50,7 +50,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.filter.DefaultFilter;
 import org.objectweb.proactive.core.filter.Filter;
 import org.objectweb.proactive.core.jmx.mbean.NodeWrapper;
@@ -83,7 +83,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class LocalNode implements SecurityEntity {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
     private String name;
-    private ArrayList<UniqueID> activeObjectsId;
+    private List<UniqueID> activeObjectsId;
     private String jobId;
     private ProActiveSecurityManager securityManager;
     private String virtualNodeName;
@@ -151,7 +151,7 @@ public class LocalNode implements SecurityEntity {
     /**
      * @return Returns the active objects located inside the node.
      */
-    public ArrayList<UniqueID> getActiveObjectsId() {
+    public List<UniqueID> getActiveObjectsId() {
         return this.activeObjectsId;
     }
 
@@ -159,7 +159,7 @@ public class LocalNode implements SecurityEntity {
      * set the list of active objects contained by the node
      * @param activeObjects active objects to set.
      */
-    public void setActiveObjects(ArrayList<UniqueID> activeObjects) {
+    public void setActiveObjects(List<UniqueID> activeObjects) {
         this.activeObjectsId = activeObjects;
     }
 
@@ -227,7 +227,7 @@ public class LocalNode implements SecurityEntity {
      * Returns all active objects.
      * Returns All active objects.
      */
-    public List<List<Object>> getActiveObjects() {
+    public List<UniversalBody> getActiveObjects() {
         return this.getActiveObjects(new DefaultFilter());
     }
 
@@ -236,8 +236,8 @@ public class LocalNode implements SecurityEntity {
      * @param filter The filter
      * @return all active objects filtered.
      */
-    public List<List<Object>> getActiveObjects(Filter filter) {
-        List<List<Object>> localBodies = new ArrayList<List<Object>>();
+    public List<UniversalBody> getActiveObjects(Filter filter) {
+        List<UniversalBody> localBodies = new ArrayList<UniversalBody>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
 
         if (this.activeObjectsId == null) {
@@ -259,17 +259,8 @@ public class LocalNode implements SecurityEntity {
                     this.activeObjectsId.remove(bodyID);
                 } else {
                     if (filter.filter(body)) {
-                        //the body is on this runtime then return adapter and class name of the reified
-                        //object to enable the construction of stub-proxy couple.
-                        ArrayList bodyAndObjectClass = new ArrayList(2);
-
-                        //adapter
-                        bodyAndObjectClass.add(0, body.getRemoteAdapter());
-
-                        //className
-                        bodyAndObjectClass.add(1,
-                            body.getReifiedObject().getClass().getName());
-                        localBodies.add(bodyAndObjectClass);
+                        //the body is on this runtime then return the remote reference of the active object
+                        localBodies.add(body.getRemoteAdapter());
                     }
                 }
             }
@@ -295,7 +286,7 @@ public class LocalNode implements SecurityEntity {
     }
 
     public void terminate() {
-        ArrayList activeObjects = this.getActiveObjectsId();
+        List activeObjects = this.getActiveObjectsId();
 
         for (int i = 0; i < activeObjects.size(); i++) {
             UniqueID bodyID = (UniqueID) activeObjects.get(i);

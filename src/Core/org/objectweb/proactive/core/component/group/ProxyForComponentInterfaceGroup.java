@@ -39,7 +39,7 @@ import java.util.Vector;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
@@ -67,7 +67,7 @@ import org.objectweb.proactive.core.mop.StubObject;
  */
 public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
     protected ProActiveInterfaceType interfaceType;
-    protected Class itfSignatureClass = null;
+    protected Class<?> itfSignatureClass = null;
     protected ProActiveComponent owner;
     protected ProxyForComponentInterfaceGroup delegatee = null;
 
@@ -177,7 +177,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
         if (((ProActiveInterfaceTypeImpl) interfaceType).isFcCollective()) {
             if (delegatee != null) {
                 Object result;
-                Body body = ProActive.getBodyOnThis();
+                Body body = ProActiveObject.getBodyOnThis();
 
                 // Creates a stub + ProxyForGroup for representing the result
                 try {
@@ -191,8 +191,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                             mc.getReifiedMethod().toString());
                     }
 
-                    Class returnTypeForGroup = (Class) ((ParameterizedType) mc.getReifiedMethod()
-                                                                              .getGenericReturnType()).getActualTypeArguments()[0];
+                    Class<?> returnTypeForGroup = (Class<?>) ((ParameterizedType) mc.getReifiedMethod()
+                                                                                    .getGenericReturnType()).getActualTypeArguments()[0];
                     result = MOP.newInstance(returnTypeForGroup.getName(),
                             null, null, ProxyForGroup.class.getName(),
                             paramProxy);
@@ -251,7 +251,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                 (delegatee != null)) {
             // 2. generate adapted method calls depending on nb members and parameters distribution
             // each method call is assigned a given member index
-            Body body = ProActive.getBodyOnThis();
+            Body body = ProActiveObject.getBodyOnThis();
 
             Map<MethodCall, Integer> generatedMethodCalls;
 

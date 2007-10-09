@@ -49,7 +49,7 @@ public interface Group<E> extends List<E> {
     /**
      * Returns the (upper) class of member.
      */
-    public Class getType() throws java.lang.ClassNotFoundException;
+    public Class<?> getType() throws java.lang.ClassNotFoundException;
 
     /**
      * Returns the name of the (upper) class of member.
@@ -202,6 +202,12 @@ public interface Group<E> extends List<E> {
      * @return a group that contain the members of the group from <code>begin</code> to <code>end</code>. <code>null</code> if <code>begin > end</code>.
      */
     public Group range(int begin, int end);
+
+    /**
+     * Set whether to automatically remove failing elements from the group
+     * instead of throwing an exception
+     */
+    public void setAutomaticPurge(boolean autoPurge);
 
     // Map class style methods
 

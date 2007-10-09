@@ -44,12 +44,12 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
-import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.spmd.MethodCallSetSPMDGroup;
 import org.objectweb.proactive.core.group.threadpool.ThreadPool;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -96,10 +96,13 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     protected boolean uniqueSerialization = false;
 
     /** The stub of the typed group */
-    protected StubObject stub;
+    private StubObject stub;
 
     /** A pool of thread to serve the request */
     transient protected ThreadPool threadpool;
+
+    /** whether to automatically remove failing elements from the group instead of throwing an exception */
+    private boolean autoPurge = false;
 
     /* ----------------------- CONSTRUCTORS ----------------------- */
     public ProxyForGroup(String nameOfClass)
@@ -125,28 +128,28 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     /**
      * Allows the Group to dispatch parameters.
      */
-    protected void setDispatchingOn() {
+    public void setDispatchingOn() {
         this.dispatching = true;
     }
 
     /**
      * Allows the Group to broadcast parameters.
      */
-    protected void setDispatchingOff() {
+    public void setDispatchingOff() {
         this.dispatching = false;
     }
 
     /**
      * Allows the Group to make an unique serialization of parameters.
      */
-    protected void setUniqueSerializationOn() {
+    public void setUniqueSerializationOn() {
         this.uniqueSerialization = true;
     }
 
     /**
      * Removes the ability of the Group to make an unique serialization of parameters..
      */
-    protected void setUniqueSerializationOff() {
+    public void setUniqueSerializationOff() {
         this.uniqueSerialization = false;
     }
 
@@ -154,16 +157,39 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * Checks the semantic of communication of the Group.
      * @return <code>true</code> if the "scatter option" is enabled.
      */
-    protected boolean isDispatchingOn() {
+    public boolean isDispatchingOn() {
         return this.dispatching;
     }
 
     private boolean isDispatchingCall(MethodCall mc) {
         for (int i = 0; i < mc.getNumberOfParameter(); i++)
-            if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i))) {
+            if (ProGroup.isScatterGroupOn(mc.getParameter(i))) {
                 return true;
             }
         return false;
+    }
+
+    /**
+     * Remove failing elements from the group according either to a group of
+     * potential exceptions or an exception list.
+     * result == null XOR exceptionList == null
+     */
+    private void purge(Object result, ExceptionListException exceptionList) {
+        if (result != null) {
+            ProxyForGroup resultGroup = (ProxyForGroup) ((StubObject) result).getProxy();
+            for (int i = this.size() - 1; i >= 0; i--) {
+                Object res = resultGroup.get(i);
+                if ((res != null) && res instanceof Throwable) {
+                    this.remove(i);
+                }
+            }
+        }
+
+        if (exceptionList != null) {
+            for (ExceptionInGroup e : exceptionList) {
+                this.remove(e.getObject());
+            }
+        }
     }
 
     /* ------------------------ THE PROXY'S METHOD ------------------------ */
@@ -180,8 +206,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         throws InvocationTargetException {
         //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.startXAndSkipSendRequest(ProActive.getBodyOnThis()
-                                                             .getID(),
+            TimerWarehouse.startXAndSkipSendRequest(ProActiveObject.getBodyOnThis()
+                                                                   .getID(),
                 ((mc.isOneWayCall() ||
                 (mc.getReifiedMethod().getReturnType() == Void.TYPE))
                 ? TimerWarehouse.GROUP_ONE_WAY_CALL
@@ -234,23 +260,34 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.threadpool.complete();
 
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.stopXAndUnskipSendRequest(ProActive.getBodyOnThis()
-                                                              .getID(),
+            TimerWarehouse.stopXAndUnskipSendRequest(ProActiveObject.getBodyOnThis()
+                                                                    .getID(),
                 ((mc.isOneWayCall() ||
                 (mc.getReifiedMethod().getReturnType() == Void.TYPE))
                 ? TimerWarehouse.GROUP_ONE_WAY_CALL
                 : TimerWarehouse.GROUP_ASYNC_CALL));
         }
 
-        /* Throws the exceptionList if one or more exceptions occur in the oneWayCall */
-        if ((exceptionList != null) && (exceptionList.size() != 0)) {
-            FailedGroupRendezVousException fgrve = new FailedGroupRendezVousException(
-                    "RendezVous failed in group method: " + mc.getName(),
-                    exceptionList, this);
-            NFEManager.fireNFE(fgrve, this);
+        /*
+         * Early returned exceptions are assumed to be caused by a rendez-vous failure
+         * There is a race condition, if an application exception comes back too early
+         * it can be taken for a rendez-vous failure.
+         */
+        if (this.autoPurge) {
+            purge(result, exceptionList);
+        } else if ((exceptionList != null) && (exceptionList.size() != 0)) {
+            throw exceptionList;
         }
 
         return result;
+    }
+
+    /**
+     * Set whether to automatically remove failing elements from the group
+     * instead of throwing an exception
+     */
+    public void setAutomaticPurge(boolean autoPurge) {
+        this.autoPurge = autoPurge;
     }
 
     /** Explicit destructor : Interrupts the threads in the threadpool */
@@ -269,7 +306,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     protected Object asynchronousCallOnGroup(MethodCall mc)
         throws InvocationTargetException {
         Object result;
-        Body body = ProActive.getBodyOnThis();
+        Body body = ProActiveObject.getBodyOnThis();
 
         // Creates a stub + ProxyForGroup for representing the result
         String returnTypeClassName = null;
@@ -321,10 +358,10 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 for (int i = 0; i < mc.getNumberOfParameter(); i++)
-                    if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i))) {
-                        individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(
+                    if (ProGroup.isScatterGroupOn(mc.getParameter(i))) {
+                        individualEffectiveArguments[i] = ProGroup.get(mc.getParameter(
                                     i),
-                                index % ProActiveGroup.size(mc.getParameter(i)));
+                                index % ProGroup.size(mc.getParameter(i)));
                     } else {
                         individualEffectiveArguments[i] = mc.getParameter(i);
                     }
@@ -382,7 +419,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     protected void oneWayCallOnGroup(MethodCall mc,
         ExceptionListException exceptionList) throws InvocationTargetException {
-        Body body = ProActive.getBodyOnThis();
+        Body body = ProActiveObject.getBodyOnThis();
 
         // Creating Threads
         if (isDispatchingCall(mc) == false) {
@@ -398,10 +435,10 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 for (int i = 0; i < mc.getNumberOfParameter(); i++)
-                    if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i))) {
-                        individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(
+                    if (ProGroup.isScatterGroupOn(mc.getParameter(i))) {
+                        individualEffectiveArguments[i] = ProGroup.get(mc.getParameter(
                                     i),
-                                index % ProActiveGroup.size(mc.getParameter(i)));
+                                index % ProGroup.size(mc.getParameter(i)));
                     } else {
                         individualEffectiveArguments[i] = mc.getParameter(i);
                     }
@@ -520,7 +557,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     @Override
     public boolean equals(Object o) {
-        ProxyForGroup p = ProActiveGroup.findProxyForGroup(o);
+        ProxyForGroup p = ProGroup.findProxyForGroup(o);
         if (p != null) {
             // comparing with another group
             return this.memberList.equals(((org.objectweb.proactive.core.group.ProxyForGroup) p).memberList);
@@ -708,13 +745,13 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @return the Class that all Group's members are (or extend).
      * @throws java.lang.ClassNotFoundException if the class name of the Group is not known.
      */
-    public Class getType() throws java.lang.ClassNotFoundException {
+    public Class<?> getType() throws java.lang.ClassNotFoundException {
         return MOP.forName(this.className);
     }
 
     /**
-     * Returns the full name of ("higher") Class of group's member
-     * @return the name of the Class that all Group's members are (or extend).
+     * Returns the full name of ("higher") Class<?> of group's member
+     * @return the name of the Class<?> that all Group's members are (or extend).
      */
     public String getTypeName() {
         return this.className;
@@ -944,14 +981,14 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * Waits for all members are arrived.
      */
     public void waitAll() {
-        ProActive.waitForAll(this.memberList);
+        ProFuture.waitForAll(this.memberList);
     }
 
     /**
      * Waits for at least one member is arrived.
      */
     public void waitOne() {
-        ProActive.waitForAny(this.memberList);
+        ProFuture.waitForAny(this.memberList);
     }
 
     /**
@@ -959,7 +996,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param n - the rank of the awaited member.
      */
     public void waitTheNth(int n) {
-        ProActive.waitFor(this.memberList.get(n));
+        ProFuture.waitFor(this.memberList.get(n));
     }
 
     /**
@@ -977,7 +1014,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @return a non-awaited member of the Group.
      */
     public Object waitAndGetOne() {
-        return this.memberList.get(ProActive.waitForAny(this.memberList));
+        return this.memberList.get(ProFuture.waitForAny(this.memberList));
     }
 
     /**
@@ -985,7 +1022,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
      */
     public Object waitAndGetOneThenRemoveIt() {
-        return this.memberList.remove(ProActive.waitForAny(this.memberList));
+        return this.memberList.remove(ProFuture.waitForAny(this.memberList));
     }
 
     /**
@@ -994,7 +1031,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @return the member (non-awaited) at the rank <code>n</code> in the Group.
      */
     public Object waitAndGetTheNth(int n) {
-        ProActive.waitForTheNth(this.memberList, n);
+        ProFuture.waitForTheNth(this.memberList, n);
         return this.memberList.get(n);
     }
 
@@ -1004,8 +1041,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public int waitOneAndGetIndex() {
         int index = 0;
-        this.memberList.get(ProActive.waitForAny(this.memberList));
-        while (ProActive.isAwaited(this.memberList.get(index))) {
+        this.memberList.get(ProFuture.waitForAny(this.memberList));
+        while (ProFuture.isAwaited(this.memberList.get(index))) {
             index++;
         }
         return index;
@@ -1017,7 +1054,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public boolean allAwaited() {
         for (int i = 0; i < this.memberList.size(); i++)
-            if (!(ProActive.isAwaited(this.memberList.get(i)))) {
+            if (!(ProFuture.isAwaited(this.memberList.get(i)))) {
                 return false;
             }
         return true;
@@ -1029,7 +1066,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public boolean allArrived() {
         for (int i = 0; i < this.memberList.size(); i++)
-            if (ProActive.isAwaited(this.memberList.get(i))) {
+            if (ProFuture.isAwaited(this.memberList.get(i))) {
                 return false;
             }
         return true;
@@ -1087,12 +1124,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
     /**
      * Builds the members using the threads (of the threadpool).
-     * @param className - the name of the Class of the members.
+     * @param className - the name of the Class<?> of the members.
      * @param params - an array that contains the parameters for the constructor of member.
      * @param nodeList - the nodes where the member will be created.
      */
     public void createMemberWithMultithread(String className,
-        Class[] genericParameters, Object[][] params, Node[] nodeList) {
+        Class<?>[] genericParameters, Object[][] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < params.length; i++) {
             this.memberList.add(null);
@@ -1107,12 +1144,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
     /**
      * Builds the members using the threads (of the threadpool).
-     * @param className - the name of the Class of the members.
+     * @param className - the name of the Class<?> of the members.
      * @param params - the parameters for the constructor of members.
      * @param nodeList - the nodes where the member will be created.
      */
-    protected void createMemberWithMultithread(String className,
-        Class[] genericParameters, Object[] params, Node[] nodeList) {
+    public void createMemberWithMultithread(String className,
+        Class<?>[] genericParameters, Object[] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < nodeList.length; i++) {
             this.memberList.add(null);
@@ -1299,5 +1336,13 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public void setStub(StubObject stub) {
+        this.stub = stub;
+    }
+
+    public StubObject getStub() {
+        return stub;
     }
 }

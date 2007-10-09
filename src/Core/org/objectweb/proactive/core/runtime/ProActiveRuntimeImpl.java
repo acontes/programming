@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -60,7 +60,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -229,7 +229,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                     String domainURL = PAProperties.PA_RUNTIME_DOMAIN_URL.getValue();
 
                     if (domainURL != null) {
-                        SecurityEntity domain = (SecurityDomain) ProActive.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
+                        SecurityEntity domain = (SecurityDomain) ProActiveObject.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
                                 domainURL);
                         ProActiveRuntimeImpl.runtimeSecurityManager.setParent(domain);
                     }
@@ -722,12 +722,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return this.roe.getURL();
     }
 
-    public ArrayList<ArrayList<Serializable>> getActiveObjects(String nodeName) {
+    public List<UniversalBody> getActiveObjects(String nodeName) {
         // the array to return
-        ArrayList<ArrayList<Serializable>> localBodies = new ArrayList<ArrayList<Serializable>>();
+        List<UniversalBody> localBodies = new ArrayList<UniversalBody>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
-                                                   .getActiveObjectsId();
+        List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         if (bodyList == null) {
             // Probably the node is killed
@@ -751,15 +750,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                     // the body is on this runtime then return adapter and class
                     // name of the reified
                     // object to enable the construction of stub-proxy couple.
-                    ArrayList<Serializable> bodyAndObjectClass = new ArrayList<Serializable>(2);
-
-                    // adapter
-                    bodyAndObjectClass.add(0, body.getRemoteAdapter());
-
-                    // className
-                    bodyAndObjectClass.add(1,
-                        body.getReifiedObject().getClass().getName());
-                    localBodies.add(bodyAndObjectClass);
+                    localBodies.add(0, body.getRemoteAdapter());
                 }
             }
 
@@ -802,13 +793,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return localNode.getJobId();
     }
 
-    public ArrayList<UniversalBody> getActiveObjects(String nodeName,
+    public List<UniversalBody> getActiveObjects(String nodeName,
         String className) {
         // the array to return
         ArrayList<UniversalBody> localBodies = new ArrayList<UniversalBody>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
-                                                   .getActiveObjectsId();
+        List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         if (bodyList == null) {
             // Probably the node is killed
@@ -963,8 +953,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
-        ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
-                                                   .getActiveObjectsId();
+        List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         synchronized (bodyList) {
             if (!bodyList.contains(bodyID)) {
@@ -988,8 +977,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // System.out.println("in remove id= "+ bodyID.toString());
         // System.out.println("array size
         // "+((ArrayList)nodeMap.get(nodeName)).size());
-        ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
-                                                   .getActiveObjectsId();
+        List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         synchronized (bodyList) {
             bodyList.remove(bodyID);
@@ -1190,7 +1178,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         System.out.println("ProActiveRuntimeImpl.launchMain() -" + className +
             "-");
 
-        Class mainClass = Class.forName(className);
+        Class<?> mainClass = Class.forName(className);
         Method mainMethod = mainClass.getMethod("main",
                 new Class[] { String[].class });
         new LauncherThread(mainMethod, parameters).start();
@@ -1198,7 +1186,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public void newRemote(String className)
         throws ClassNotFoundException, ProActiveException {
-        Class remoteClass = Class.forName(className);
+        Class<?> remoteClass = Class.forName(className);
         new LauncherThread(remoteClass).start();
     }
 
@@ -1477,10 +1465,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private class LauncherThread extends Thread {
         private final boolean launchMain;
         private Method mainMethod;
-        private Class remoteClass;
+        private Class<?> remoteClass;
         private String[] parameters;
 
-        public LauncherThread(Class remoteClass) {
+        public LauncherThread(Class<?> remoteClass) {
             this.remoteClass = remoteClass;
             this.launchMain = false;
         }

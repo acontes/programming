@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.p2p.service.node;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
 import java.util.Iterator;
@@ -39,8 +40,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -72,7 +74,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private ProActiveRuntime proactiveRuntime = null;
     private final Vector<Node> availbaleNodes = new Vector<Node>();
     private final Vector<Object> bookedNodes = new Vector<Object>();
-    private final Vector usingNodes = new Vector();
+    private final Vector<Node> usingNodes = new Vector<Node>();
     private int nodeCounter = 0;
 
     //    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
@@ -114,7 +116,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                 this.bookedNodes.add(new Booking(node));
                 logger.debug("Yes the manager has a node");
                 return new P2PNode(node,
-                    (P2PNodeManager) ProActive.getStubOnThis());
+                    (P2PNodeManager) ProActiveObject.getStubOnThis());
             }
         }
 
@@ -161,11 +163,13 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
             Node node = this.availbaleNodes.remove(0);
             this.bookedNodes.add(new Booking(node));
             logger.debug("Yes, the manager has an empty node");
-            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+            return new P2PNode(node,
+                (P2PNodeManager) ProActiveObject.getStubOnThis());
         } else if (this.bookedNodes.size() > 0) {
             Node node = ((Booking) this.bookedNodes.get(0)).getNode();
             logger.debug("Yes, the manager has a shared node");
-            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+            return new P2PNode(node,
+                (P2PNodeManager) ProActiveObject.getStubOnThis());
         } else {
             // All nodes is already assigned
             logger.debug("Sorry no availbale node for the moment");
@@ -241,6 +245,13 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
             logger.debug("ProActiveRuntime at " +
                 this.proactiveRuntime.getURL());
         }
+        try {
+            ProActiveObject.register(ProActiveObject.getStubOnThis(),
+                URIBuilder.buildURIFromProperties("localhost", "P2PNodeManager")
+                          .toString());
+        } catch (IOException e) {
+            logger.fatal("Couldn't register the P2P node manager", e);
+        }
 
         // Creating shared nodes
         if (this.descriptorPath == null) {
@@ -278,7 +289,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private Node createNewNode()
         throws NodeException, ProActiveException, AlreadyBoundException {
         // security
-        ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
         ProActiveSecurityManager newNodeSecurityManager = null;
         if (psm != null) {
 			newNodeSecurityManager = psm.generateSiblingCertificate(EntityType.NODE, P2PConstants.VN_NAME);
@@ -336,7 +347,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      */
     private void deployingXmlSharedNodes() {
         try {
-            this.pad = ProActive.getProactiveDescriptor(this.descriptorPath);
+            this.pad = ProDeployment.getProactiveDescriptor(this.descriptorPath);
         } catch (ProActiveException e) {
             logger.fatal("Could't get ProActive Descripor at " +
                 this.descriptorPath, e);

@@ -4,12 +4,14 @@ import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 
+
 /**
  * This interface is used to export an action from an extension point.
- * 
+ *
  * @author vbodnart
  *
  */
+
 public interface IActionExtPoint extends IAction{	
 	
 	/**

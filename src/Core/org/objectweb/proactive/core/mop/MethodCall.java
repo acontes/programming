@@ -39,11 +39,12 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
+import org.objectweb.proactive.core.mop.MethodCallInfo.SynchronousReason;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -115,7 +116,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private String key;
     private transient MethodCallExceptionContext exceptioncontext;
     ComponentMethodCallMetadata componentMetaData = null;
-    private transient Map<TypeVariable, Class> genericTypesMapping = null;
+    private transient Map<TypeVariable, Class<?>> genericTypesMapping = null;
 
     /**
      * byte[] to store effectiveArguments. Requiered to optimize multiple serialization
@@ -136,6 +137,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
             this.effectiveArguments = null;
         }
     }
@@ -187,7 +189,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      *        <code>reifiedMethod</code> with arguments <code>effectiveArguments</code>
      */
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
-        Map<TypeVariable, Class> genericTypesMapping,
+        Map<TypeVariable, Class<?>> genericTypesMapping,
         Object[] effectiveArguments, MethodCallExceptionContext exceptioncontext) {
         exceptioncontext = MethodCallExceptionContext.optimize(exceptioncontext);
 
@@ -208,13 +210,14 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 return result;
             }
         }
+
         return new MethodCall(reifiedMethod, genericTypesMapping,
             effectiveArguments, exceptioncontext);
     }
 
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
         Object[] effectiveArguments,
-        Map<TypeVariable, Class> genericTypesMapping) {
+        Map<TypeVariable, Class<?>> genericTypesMapping) {
         MethodCallExceptionContext exceptioncontext = ExceptionHandler.getContextForCall(reifiedMethod);
         return getMethodCall(reifiedMethod, genericTypesMapping,
             effectiveArguments, exceptioncontext);
@@ -231,7 +234,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
-        Map<TypeVariable, Class> genericTypesMapping, String interfaceName,
+        Map<TypeVariable, Class<?>> genericTypesMapping, String interfaceName,
         ItfID senderItfID, short priority) {
         MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments,
                 genericTypesMapping);
@@ -246,7 +249,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
-        Map<TypeVariable, Class> genericTypesMapping, String interfaceName,
+        Map<TypeVariable, Class<?>> genericTypesMapping, String interfaceName,
         ItfID senderItfID) {
         return MethodCall.getComponentMethodCall(reifiedMethod,
             effectiveArguments, genericTypesMapping, interfaceName,
@@ -293,7 +296,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     // because we want to enforce the use of factory methods for getting fresh
     // instances of this class (see <I>Factory</I> pattern in GoF).
     public MethodCall(Method reifiedMethod,
-        Map<TypeVariable, Class> genericTypesMapping,
+        Map<TypeVariable, Class<?>> genericTypesMapping,
         Object[] effectiveArguments, MethodCallExceptionContext exceptionContext) {
         this.reifiedMethod = reifiedMethod;
         this.genericTypesMapping = ((genericTypesMapping != null) &&
@@ -304,7 +307,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     public MethodCall(Method reifiedMethod,
-        Map<TypeVariable, Class> genericTypesMapping,
+        Map<TypeVariable, Class<?>> genericTypesMapping,
         Object[] effectiveArguments) {
         this(reifiedMethod, genericTypesMapping, effectiveArguments, null);
     }
@@ -363,8 +366,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
             this.serializedEffectiveArguments = null;
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("MethodCall.execute() name = " + this.getName());
             logger.debug("MethodCall.execute() reifiedMethod = " +
@@ -374,11 +379,13 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 this.reifiedMethod.getDeclaringClass());
             logger.debug("MethodCall.execute() targetObject " + targetObject);
         }
+
         if (this.reifiedMethod.getParameterTypes().length > 0) {
             this.reifiedMethod.setAccessible(true);
         }
+
         try {
-            targetObject = ProActive.getFutureValue(targetObject);
+            targetObject = ProFuture.getFutureValue(targetObject);
             return this.reifiedMethod.invoke(targetObject,
                 this.effectiveArguments);
         } catch (IllegalAccessException e) {
@@ -443,27 +450,29 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
     // --- PRIVATE METHODS -----------------------------------------------------------------------
     //
-    private Class[] fixBugRead(FixWrapper[] para) {
-        Class[] tmp = new Class[para.length];
+    private Class<?>[] fixBugRead(FixWrapper[] para) {
+        Class<?>[] tmp = new Class<?>[para.length];
         for (int i = 0; i < para.length; i++) {
             //	System.out.println("fixBugRead for " + i + " value is " +para[i]);
             tmp[i] = para[i].getWrapped();
         }
+
         return tmp;
     }
 
-    private FixWrapper[] fixBugWrite(Class[] para) {
+    private FixWrapper[] fixBugWrite(Class<?>[] para) {
         FixWrapper[] tmp = new FixWrapper[para.length];
         for (int i = 0; i < para.length; i++) {
             //	System.out.println("fixBugWrite for " + i + " out of " + para.length + " value is " +para[i] );
             tmp[i] = new FixWrapper(para[i]);
         }
+
         return tmp;
     }
 
     // build a key for uniquely identifying methods, including parameterized ones
     private static String buildKey(Method reifiedMethod,
-        Map<TypeVariable, Class> genericTypesMapping) {
+        Map<TypeVariable, Class<?>> genericTypesMapping) {
         //TODO It seems genericTypesMapping is always an empty map, It is either useless or not correctly built.
         final StringBuffer sb = new StringBuffer((reifiedMethod.getDeclaringClass()
                                                                .getName()));
@@ -476,6 +485,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         } else {
             sb.append(returnType);
         }
+
         sb.append(reifiedMethod.getName());
 
         final Type[] parameters = reifiedMethod.getGenericParameterTypes();
@@ -492,6 +502,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 sb.append(parameters[i]);
             }
         }
+
         return sb.toString();
     }
 
@@ -523,9 +534,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         this.reifiedMethod = reifiedMethodsTable.get(this.key);
         if (this.reifiedMethod == null) {
             // Reads several pieces of data that we need for looking up the method
-            Class declaringClass = (Class) in.readObject();
+            Class<?> declaringClass = (Class<?>) in.readObject();
             String simpleName = (String) in.readObject();
-            Class[] parameters = this.fixBugRead((FixWrapper[]) in.readObject());
+            Class<?>[] parameters = this.fixBugRead((FixWrapper[]) in.readObject());
 
             // Looks up the method
             try {
@@ -541,6 +552,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             in.readObject();
             in.readObject();
         }
+
         if ((this.serializedEffectiveArguments != null) &&
                 (this.effectiveArguments == null)) {
             try {
@@ -548,6 +560,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
             this.serializedEffectiveArguments = null;
         }
     }
@@ -557,31 +570,67 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * Being one-way method is equivalent to <UL>
      * <LI>having <code>void</code> as return type
      * <LI>and not throwing any checked exceptions</UL>. If the caller asks
-     * for a RuntimeException or a NFE, then the call is not one way.
+     * for a RuntimeException, then the call is not one way.
      * @return true if and only if the method call is one way
      */
     public boolean isOneWayCall() {
-        return this.getReifiedMethod().getReturnType()
-                   .equals(java.lang.Void.TYPE) &&
-        (this.getReifiedMethod().getExceptionTypes().length == 0) &&
-        !this.getExceptionContext().isRuntimeExceptionHandled();
+        return getMethodCallInfo().getType() == MethodCallInfo.CallType.OneWay;
     }
 
     /* Used in the REIF_AND_EXCEP cache */
     static class ReifiableAndExceptions {
         boolean reifiable; // Is the method return type reifiable ?
         boolean exceptions; // Does the method throws exceptions ?
+        boolean returnsvoid; // Is the method returning void
         String reason; // Why is the method synchronous ? null if it is asynchronous
     }
 
-    public String getSynchronousReason() {
+    public MethodCallInfo getMethodCallInfo() {
         Method m = this.getReifiedMethod();
+
+        ReifiableAndExceptions cached = getCachedMethodAnalysis(m);
+
+        MethodCallInfo mci = new MethodCallInfo();
+
+        //else
+        if (!cached.reifiable) {
+            mci.setType(MethodCallInfo.CallType.Synchronous);
+            mci.setMessage(cached.reason);
+            mci.setReason(MethodCallInfo.SynchronousReason.NotReifiable);
+        } else {
+            if (cached.exceptions) {
+                if (getExceptionContext().isExceptionAsynchronously()) {
+                    /* ProActive.tryWithCatch() is used, so this call is asynchronous */
+                    mci.setType(MethodCallInfo.CallType.Asynchronous);
+                } else {
+                    mci.setType(MethodCallInfo.CallType.Synchronous);
+                    mci.setReason(SynchronousReason.ThrowsCheckedException);
+                    mci.setMessage(cached.reason);
+                }
+            } else if (cached.returnsvoid) {
+                if (getExceptionContext().isRuntimeExceptionHandled()) {
+                    mci.setType(MethodCallInfo.CallType.Asynchronous);
+                } else {
+                    mci.setType(MethodCallInfo.CallType.OneWay);
+                }
+            } else {
+                mci.setType(MethodCallInfo.CallType.Asynchronous);
+            }
+        }
+
+        return mci;
+    }
+
+    private ReifiableAndExceptions getCachedMethodAnalysis(Method m) {
         ReifiableAndExceptions cached = REIF_AND_EXCEP.get(this.key);
         if (cached == null) {
             cached = new ReifiableAndExceptions();
-            /* void is reifiable even though the check by the MOP would tell otherwise */
-            cached.reifiable = m.getReturnType().equals(java.lang.Void.TYPE);
-            if (!cached.reifiable) {
+
+            if (m.getReturnType().equals(java.lang.Void.TYPE)) {
+                cached.returnsvoid = true;
+                /* void is reifiable even though the check by the MOP would tell otherwise */
+                cached.reifiable = true;
+            } else {
                 try {
                     if ((getGenericTypesMapping() != null) &&
                             getGenericTypesMapping()
@@ -592,6 +641,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                     } else {
                         MOP.checkClassIsReifiable(m.getReturnType());
                     }
+
                     cached.reifiable = true;
                 } catch (ClassNotReifiableException e) {
                     cached.reason = e.getMessage();
@@ -602,17 +652,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             if (cached.exceptions) {
                 cached.reason = "The method can throw a checked exception";
             }
+
             REIF_AND_EXCEP.put(this.key, cached);
         }
 
-        if (cached.reifiable && cached.exceptions &&
-                getExceptionContext().isExceptionAsynchronously()) {
-
-            /* ProActive.tryWithCatch() is used, so this call is asynchronous */
-            return null;
-        }
-
-        return cached.reason;
+        return cached;
     }
 
     /**
@@ -627,7 +671,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @return true if and only if the method call is asynchronous
      */
     public boolean isAsynchronousWayCall() {
-        return getSynchronousReason() == null;
+        return getMethodCallInfo().getType() == MethodCallInfo.CallType.Asynchronous;
     }
 
     /**
@@ -662,7 +706,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         return this.componentMetaData;
     }
 
-    public Map<TypeVariable, Class> getGenericTypesMapping() {
+    public Map<TypeVariable, Class<?>> getGenericTypesMapping() {
         return this.genericTypesMapping;
     }
 
@@ -671,19 +715,20 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
     public class FixWrapper implements java.io.Serializable {
         public boolean isPrimitive;
-        public Class encapsulated;
+        public Class<?> encapsulated;
 
         public FixWrapper() {
         }
 
         /**
-         * Encapsulate primitives types into Class
+         * Encapsulate primitives types into Class<?>
          */
-        public FixWrapper(Class c) {
+        public FixWrapper(Class<?> c) {
             if (!c.isPrimitive()) {
                 this.encapsulated = c;
                 return;
             }
+
             this.isPrimitive = true;
             if (c.equals(Boolean.TYPE)) {
                 this.encapsulated = Boolean.class;
@@ -707,34 +752,43 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         /**
          * Give back the original class
          */
-        public Class getWrapped() {
+        public Class<?> getWrapped() {
             if (!this.isPrimitive) {
                 return this.encapsulated;
             }
+
             if (this.encapsulated.equals(Boolean.class)) {
                 return Boolean.TYPE;
             }
+
             if (this.encapsulated.equals(Byte.class)) {
                 return Byte.TYPE;
             }
+
             if (this.encapsulated.equals(Character.class)) {
                 return Character.TYPE;
             }
+
             if (this.encapsulated.equals(Double.class)) {
                 return Double.TYPE;
             }
+
             if (this.encapsulated.equals(Float.class)) {
                 return Float.TYPE;
             }
+
             if (this.encapsulated.equals(Integer.class)) {
                 return Integer.TYPE;
             }
+
             if (this.encapsulated.equals(Long.class)) {
                 return Long.TYPE;
             }
+
             if (this.encapsulated.equals(Short.class)) {
                 return Short.TYPE;
             }
+
             throw new InternalException("FixWrapper encapsulated class unkown " +
                 this.encapsulated);
         }

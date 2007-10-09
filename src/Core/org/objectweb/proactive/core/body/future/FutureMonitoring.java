@@ -9,7 +9,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.runtime.LocalNode;
@@ -99,8 +98,7 @@ public class FutureMonitoring implements Runnable {
             if (bodyException != null) {
                 synchronized (fp) {
                     if (fp.isAwaited()) {
-                        fp.receiveReply(new FutureResult(null, bodyException,
-                                null));
+                        fp.receiveReply(new FutureResult(null, bodyException));
                     }
                 }
             }

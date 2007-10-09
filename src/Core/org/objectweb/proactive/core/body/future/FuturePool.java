@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -49,9 +49,6 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
@@ -291,7 +288,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                         creatorID).clone());
                 if ((bodiesToContinue != null) &&
                         (bodiesToContinue.size() != 0)) {
-                    ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+                    ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
 
                     // lazy starting of the AC thread
                     if (!this.queueAC.isAlive()) {
@@ -640,7 +637,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 int remainingSends = dests.size();
                 Reply toSend = null;
                 ProActiveSecurityManager psm = (remainingSends > 1)
-                    ? (((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager())
+                    ? (((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager())
                     : null;
 
                 for (int i = 0; i < dests.size(); i++) {
@@ -660,16 +657,15 @@ public class FuturePool extends Object implements java.io.Serializable {
                     }
 
                     // send the reply
-                    try {
-                        if (ftm != null) {
-                            ftm.sendReply(toSend, dest);
-                        } else {
+                    if (ftm != null) {
+                        ftm.sendReply(toSend, dest);
+                    } else {
+                        try {
                             toSend.send(dest);
+                        } catch (IOException ioe) {
+                            UniversalBody.sendReplyExceptionsLogger.error(ioe,
+                                ioe);
                         }
-                    } catch (IOException ioe) {
-                        BodyNonFunctionalException nfe = new SendReplyCommunicationException("Exception occured in while sending reply in AC",
-                                ioe, ownerBody, dest.getID());
-                        NFEManager.fireNFE(nfe, ownerBody);
                     }
                     remainingSends--;
                 }

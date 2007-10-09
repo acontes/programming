@@ -48,7 +48,6 @@ public interface Loggers {
     static final public String MOP = CORE + ".mop";
     public static final String SYNC_CALL = CORE + ".sync_call";
     static final public String GROUPS = CORE + ".groups";
-    public static final String NFE = CORE + ".nfe";
     public static final String GC = CORE + ".gc";
     public static final String HTTP_TRANSPORT = CORE +
         ".communication.transport.http";
@@ -139,11 +138,13 @@ public interface Loggers {
     // Skeleton loggers
     static final public String SKELETONS = CORE + ".skeletons";
     static final public String SKELETONS_STRUCTURE = SKELETONS + ".structure";
-    static final public String SKELETONS_MANAGER = SKELETONS + ".manager";
-    static final public String SKELETONS_KERNEL = SKELETONS + ".kernel";
+    static final public String SKELETONS_ENVIRONMENT = SKELETONS +
+        ".environment";
+    static final public String SKELETONS_KERNEL = SKELETONS + ".taskpool";
     static final public String SKELETONS_APPLICATION = SKELETONS +
         ".application";
     static final public String SKELETONS_DIAGNOSIS = SKELETONS + ".diagnosis";
+    static final public String SKELETONS_SYSTEM = SKELETONS + ".system";
     static final public String SCHEDULER = CORE + ".scheduler";
     static final public String RESOURCE_MANAGER = CORE + ".resourceManager";
 
@@ -177,4 +178,10 @@ public interface Loggers {
     static final public String JMX = CORE + ".jmx";
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
+
+    // Exceptions
+    public static final String EXCEPTIONS = CORE + ".exceptions";
+    public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";
+    public static final String EXCEPTIONS_SEND_REPLY = EXCEPTIONS +
+        ".send_reply";
 }

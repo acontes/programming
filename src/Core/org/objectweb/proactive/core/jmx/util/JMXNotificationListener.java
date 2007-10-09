@@ -10,8 +10,8 @@ import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 
 
@@ -44,7 +44,7 @@ public class JMXNotificationListener implements NotificationListener,
                 return;
             }
             connection.addNotificationListener(oname,
-                (NotificationListener) ProActive.getStubOnThis(), filter,
+                (NotificationListener) ProActiveObject.getStubOnThis(), filter,
                 handback);
         } catch (InstanceNotFoundException e) {
 
@@ -69,8 +69,8 @@ public class JMXNotificationListener implements NotificationListener,
         try {
             if (connection.isRegistered(oname)) {
                 connection.removeNotificationListener(oname,
-                    (NotificationListener) ProActive.getStubOnThis(), filter,
-                    handback);
+                    (NotificationListener) ProActiveObject.getStubOnThis(),
+                    filter, handback);
             }
         } catch (InstanceNotFoundException e) {
 

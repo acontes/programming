@@ -47,9 +47,6 @@ import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.event.MessageEventListener;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
@@ -189,12 +186,13 @@ public class HalfBody extends AbstractBody {
         throw new HalfBodyException();
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) {
         throw new HalfBodyException();
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
         throw new HalfBodyException();
     }
 
@@ -312,38 +310,11 @@ public class HalfBody extends AbstractBody {
         }
     }
 
-    // end inner class LocalHalfBody
-    // NFEProducer implementation
-    private NFEListenerList nfeListeners = null;
-
-    @Override
-    public void addNFEListener(NFEListener listener) {
-        if (this.nfeListeners == null) {
-            this.nfeListeners = new NFEListenerList();
-        }
-        this.nfeListeners.addNFEListener(listener);
-    }
-
-    @Override
-    public void removeNFEListener(NFEListener listener) {
-        if (this.nfeListeners != null) {
-            this.nfeListeners.removeNFEListener(listener);
-        }
-    }
-
-    @Override
-    public int fireNFE(NonFunctionalException e) {
-        if (this.nfeListeners != null) {
-            return this.nfeListeners.fireNFE(e);
-        }
-        return 0;
-    }
-
     public long getNextSequenceID() {
         return this.localBodyStrategy.getNextSequenceID();
     }
 
-    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+    public boolean checkMethod(String methodName, Class<?>[] parametersTypes) {
         throw new HalfBodyException();
     }
 

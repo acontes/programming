@@ -45,165 +45,164 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.WorldListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
+
 public class WorldEditPart extends AbstractMonitoringEditPart {
+    private FreeformLayer layer;
+    private MonitoringView monitoringView;
+    private WorldObject castedModel;
+    private IFigure castedFigure;
+    private Set<IFigure> figuresToUpdate;
+    private Set<GraphicalCommunication> communicationsToDraw;
+    private boolean shouldRepaint = true;
 
-	private FreeformLayer layer;
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    public WorldEditPart(WorldObject model, MonitoringView monitoringView) {
+        super(model);
+        this.monitoringView = monitoringView;
 
-	private MonitoringView monitoringView;
-	
-	private WorldObject castedModel;
-	private IFigure castedFigure;
-	
-	private Set<IFigure> figuresToUpdate;
-	private Set<GraphicalCommunication> communicationsToDraw;
+        this.figuresToUpdate = Collections.synchronizedSet(new HashSet<IFigure>());
+        this.communicationsToDraw = Collections.synchronizedSet(new HashSet<GraphicalCommunication>());
 
-	private boolean shouldRepaint = true;
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+        new Thread() {
+                @Override
+                public void run() {
+                    while (shouldRepaint) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        Control control = getViewer()
+                                              .getControl();
+                        if (control == null) {
+                            return;
+                        }
+                        control.getDisplay().asyncExec(new Runnable() {
+                                public void run() {
+                                    for (GraphicalCommunication communication : communicationsToDraw) {
+                                        communication.draw();
+                                    }
+                                    communicationsToDraw.clear();
 
-	public WorldEditPart(WorldObject model, MonitoringView monitoringView) {
-		super(model);
-		this.monitoringView = monitoringView;
-		
-		
-		this.figuresToUpdate = Collections.synchronizedSet(new HashSet());
-		this.communicationsToDraw = Collections.synchronizedSet(new HashSet());
+                                    /*for (IFigure figure : figuresToUpdate) {
+                                            figure.repaint();
+                                    }
+                                    figuresToUpdate.clear();*/
+                                    getFigure().repaint();
+                                }
+                            });
+                    }
+                }
+            }.start();
+    }
 
-		new Thread(){
-			public void run(){
-				while(shouldRepaint){
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}	
-						Control control = getViewer().getControl();
-						if(control==null){
-							return;
-						}
-						control.getDisplay().asyncExec(new Runnable() {
-						
-						public void run () {
-							for (GraphicalCommunication communication : communicationsToDraw) {
-								communication.draw();
-							}
-							communicationsToDraw.clear();
-							
-							/*for (IFigure figure : figuresToUpdate) {
-								figure.repaint();
-							}
-							figuresToUpdate.clear();*/
-							getFigure().repaint();
-						}
-					});
-				}
-			}
-		}.start();
-	}
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    @Override
+    public void addGraphicalCommunication(GraphicalCommunication communication) {
+        communicationsToDraw.add(communication);
+    }
 
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
+    @Override
+    public void addFigureToUpdtate(IFigure figure) {
+        figuresToUpdate.add(figure);
+    }
 
-	@Override
-	public void addGraphicalCommunication(GraphicalCommunication communication){
-		communicationsToDraw.add(communication);
-	}
-	
-	@Override
-	public void addFigureToUpdtate(IFigure figure){
-		figuresToUpdate.add(figure);
-	}
-	
-	/**
-	 * Convert the result of EditPart.getModel()
-	 * to WorldObject (the real type of the model).
-	 * @return the casted model
-	 */
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public WorldObject getCastedModel() {
-		if(castedModel==null)
-			castedModel = (WorldObject)getModel();
-		return castedModel;
-	}
+    /**
+     * Convert the result of EditPart.getModel()
+     * to WorldObject (the real type of the model).
+     * @return the casted model
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public WorldObject getCastedModel() {
+        if (castedModel == null) {
+            castedModel = (WorldObject) getModel();
+        }
+        return castedModel;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public IFigure getCastedFigure() {
-		if(castedFigure==null)
-			castedFigure = getFigure();
-		return castedFigure;
-	}
-	
-	@Override
-	public IFigure getContentPane() {
-		return layer;
-	}
-	
-	@Override
-	public MonitoringView getMonitoringView(){
-		return this.monitoringView;
-	}
-	
-	@Override
-	public WorldEditPart getWorldEditPart(){
-		return this;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public IFigure getCastedFigure() {
+        if (castedFigure == null) {
+            castedFigure = getFigure();
+        }
+        return castedFigure;
+    }
 
-	//
-	// -- PROTECTED METHODS -----------------------------------------------
-	//
+    @Override
+    public IFigure getContentPane() {
+        return layer;
+    }
 
-	/**
-	 * Returns a new view associated
-	 * with the type of model object the
-	 * EditPart is associated with. So here, it returns a new FreeFormLayer.
-	 * @return a new FreeFormLayer view associated with the WorldObject model.
-	 */
-	protected IFigure createFigure() {
-		layer = new FreeformLayer();
-		FlowLayout layout = /*new FlowLayout()*/new MonitoringLayout();
-		layout.setMajorAlignment(FlowLayout.ALIGN_CENTER);
-		layout.setMajorSpacing(50);
-		layout.setMinorSpacing(50);
-		layer.setLayoutManager(layout);
-		
-		WorldListener listener = new WorldListener(monitoringView); 
-		layer.addMouseListener(listener);
-		layer.addMouseMotionListener(listener);
-		
-		return layer;
-	}
+    @Override
+    public MonitoringView getMonitoringView() {
+        return this.monitoringView;
+    }
 
+    @Override
+    public WorldEditPart getWorldEditPart() {
+        return this;
+    }
 
-	/**
-	 * Returns a List containing the children model objects.
-	 * @return the List of children
-	 */
-	protected List<AbstractData> getModelChildren() {
-		return getCastedModel().getMonitoredChildrenAsList();
-	}
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
 
-	/**
-	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
-	 */
-	protected void createEditPolicies() {/* Do nothing */}
-	
-	//
-	// -- INNER CLASS -----------------------------------------------
-	//
-	
-	private class MonitoringLayout extends FlowLayout {
-		
-		protected void setBoundsOfChild(IFigure parent, IFigure child, Rectangle bounds) {
-			parent.getClientArea(Rectangle.SINGLETON);
-			bounds.translate(Rectangle.SINGLETON.x, Rectangle.SINGLETON.y+100);
-			child.setBounds(bounds);
-		}
-	}
+    /**
+     * Returns a new view associated
+     * with the type of model object the
+     * EditPart is associated with. So here, it returns a new FreeFormLayer.
+     * @return a new FreeFormLayer view associated with the WorldObject model.
+     */
+    @Override
+    protected IFigure createFigure() {
+        layer = new FreeformLayer();
+        FlowLayout layout =  /*new FlowLayout()*/new MonitoringLayout();
+        layout.setMajorAlignment(FlowLayout.ALIGN_CENTER);
+        layout.setMajorSpacing(50);
+        layout.setMinorSpacing(50);
+        layer.setLayoutManager(layout);
+
+        WorldListener listener = new WorldListener(monitoringView);
+        layer.addMouseListener(listener);
+        layer.addMouseMotionListener(listener);
+
+        return layer;
+    }
+
+    /**
+     * Returns a List containing the children model objects.
+     * @return the List of children
+     */
+    @Override
+    protected List<AbstractData> getModelChildren() {
+        return getCastedModel().getMonitoredChildrenAsList();
+    }
+
+    /**
+     * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
+     */
+    @Override
+    protected void createEditPolicies() { /* Do nothing */
+    }
+
+    //
+    // -- INNER CLASS -----------------------------------------------
+    //
+    private class MonitoringLayout extends FlowLayout {
+        @Override
+        protected void setBoundsOfChild(IFigure parent, IFigure child,
+            Rectangle bounds) {
+            parent.getClientArea(Rectangle.SINGLETON);
+            bounds.translate(Rectangle.SINGLETON.x, Rectangle.SINGLETON.y +
+                100);
+            child.setBounds(bounds);
+        }
+    }
 }

@@ -39,7 +39,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.gc.GCTag;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -134,7 +134,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 }
             } else {
                 // instantiate the body locally or remotely
-                Class bodyClass = Constants.DEFAULT_BODY_CLASS;
+                Class<?> bodyClass = Constants.DEFAULT_BODY_CLASS;
                 Node node = (Node) p0;
 
                 //added lines--------------------------
@@ -143,7 +143,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 Active activity = (Active) parameters[1];
                 MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
                 String jobID = (String) parameters[3];
-                Class[] argsClass = new Class[] {
+                Class<?>[] argsClass = new Class<?>[] {
                         ConstructorCall.class, String.class, Active.class,
                         MetaObjectFactory.class, String.class
                     };
@@ -179,7 +179,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             }
 
             if (GarbageCollector.dgcIsEnabled()) {
-                ((AbstractBody) ProActive.getBodyOnThis()).updateReference(this);
+                ((AbstractBody) ProActiveObject.getBodyOnThis()).updateReference(this);
             }
         }
     }
@@ -363,8 +363,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    private ConstructorCall buildBodyConstructorCall(Class bodyClass,
-        Class[] argsClass, Object[] args) throws ProActiveException {
+    private ConstructorCall buildBodyConstructorCall(Class<?> bodyClass,
+        Class<?>[] argsClass, Object[] args) throws ProActiveException {
         // Determines the constructor of the body object: it is the constructor that
         // has only one argument, this argument being of type ConstructorCall
         try {

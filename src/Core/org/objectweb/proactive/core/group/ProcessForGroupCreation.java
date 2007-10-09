@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.group;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -43,13 +43,13 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
     implements Runnable {
     private ProxyForGroup proxyGroup;
     private String className;
-    private Class[] genericParameters;
+    private Class<?>[] genericParameters;
     private Object[] param;
     private Node node;
     private int index;
 
     public ProcessForGroupCreation(ProxyForGroup proxyGroup, String className,
-        Class[] genericParameters, Object[] param, Node node, int index) {
+        Class<?>[] genericParameters, Object[] param, Node node, int index) {
         this.proxyGroup = proxyGroup;
         this.className = className;
         this.genericParameters = genericParameters;
@@ -61,7 +61,8 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
     public void run() {
         try {
             this.proxyGroup.set(this.index,
-                ProActive.newActive(className, genericParameters, param, node));
+                ProActiveObject.newActive(className, genericParameters, param,
+                    node));
             //			this.proxyGroup.decrementWaitedAndNotifyAll();
         } catch (Exception e) {
             e.printStackTrace();

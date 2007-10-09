@@ -41,6 +41,8 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -51,7 +53,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -111,7 +112,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                 this.bookedNodes.add(new Booking(node));
                 logger.debug("Yes the manager has a node");
                 return new P2PNode(node,
-                    (P2PNodeManager) ProActive.getStubOnThis());
+                    (P2PNodeManager) ProActiveObject.getStubOnThis());
             }
         }
 
@@ -158,11 +159,13 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
             Node node = (Node) this.availbaleNodes.remove(0);
             this.bookedNodes.add(new Booking(node));
             logger.debug("Yes, the manager has an empty node");
-            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+            return new P2PNode(node,
+                (P2PNodeManager) ProActiveObject.getStubOnThis());
         } else if (this.bookedNodes.size() > 0) {
             Node node = ((Booking) this.bookedNodes.get(0)).getNode();
             logger.debug("Yes, the manager has a shared node");
-            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+            return new P2PNode(node,
+                (P2PNodeManager) ProActiveObject.getStubOnThis());
         } else {
             // All nodes is already assigned
             logger.debug("Sorry no availbale node for the moment");
@@ -281,6 +284,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis())
 				.getProActiveSecurityManager().generateSiblingCertificate(EntityType.NODE,
 						P2PConstants.VN_NAME);
+
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
                 "_" + this.nodeCounter++, true, newNodeSecurityManager,
                 P2PConstants.VN_NAME, null);
@@ -324,7 +328,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      */
     private void deployingXmlSharedNodes() {
         try {
-            this.pad = ProActive.getProactiveDescriptor(this.descriptorPath);
+            this.pad = ProDeployment.getProactiveDescriptor(this.descriptorPath);
         } catch (ProActiveException e) {
             logger.fatal("Could't get ProActive Descripor at " +
                 this.descriptorPath, e);

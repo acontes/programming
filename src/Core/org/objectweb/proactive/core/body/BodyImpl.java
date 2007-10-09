@@ -39,7 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
@@ -58,17 +57,10 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
-import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
-import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
-import org.objectweb.proactive.core.exceptions.body.ServiceFailedCalleeNFE;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
@@ -124,7 +116,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     protected MessageEventProducerImpl messageEventProducer;
 
     // already checked methods
-    private HashMap<String, HashSet<List<Class>>> checkedMethodNames;
+    private HashMap<String, HashSet<List<Class<?>>>> checkedMethodNames;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -161,7 +153,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
         }
 
-        this.checkedMethodNames = new HashMap<String, HashSet<List<Class>>>();
+        this.checkedMethodNames = new HashMap<String, HashSet<List<Class<?>>>>();
 
         this.requestReceiver = factory.newRequestReceiverFactory()
                                       .newRequestReceiver();
@@ -339,7 +331,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName);
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) {
         // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved
         //    	if (!checkMethod(methodName, parametersTypes)) {
         //    		String signature = methodName+"(";
@@ -359,7 +352,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
         ((RequestReceiverImpl) this.requestReceiver).removeImmediateService(methodName,
             parametersTypes);
     }
@@ -373,12 +366,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         return this.requestReceiver.isInImmediateService();
     }
 
-    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+    public boolean checkMethod(String methodName, Class<?>[] parametersTypes) {
         if (this.checkedMethodNames.containsKey(methodName)) {
             if (parametersTypes != null) {
                 // the method name with the right signature has already been checked
-                List<Class> parameterTlist = Arrays.asList(parametersTypes);
-                HashSet<List<Class>> signatures = this.checkedMethodNames.get(methodName);
+                List<Class<?>> parameterTlist = Arrays.asList(parametersTypes);
+                HashSet<List<Class<?>>> signatures = this.checkedMethodNames.get(methodName);
                 if (signatures.contains(parameterTlist)) {
                     return true;
                 }
@@ -389,7 +382,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         // check if the method is defined as public
-        Class reifiedClass = getReifiedObject().getClass();
+        Class<?> reifiedClass = getReifiedObject().getClass();
         boolean exists = org.objectweb.proactive.core.mop.Utils.checkMethodExistence(reifiedClass,
                 methodName, parametersTypes);
         if (exists) {
@@ -404,8 +397,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      * @param methodName name of the method
      * @param parametersTypes parameter type list
      */
-    private void storeInMethodCache(String methodName, Class[] parametersTypes) {
-        List<Class> parameterTlist = null;
+    private void storeInMethodCache(String methodName,
+        Class<?>[] parametersTypes) {
+        List<Class<?>> parameterTlist = null;
         if (parametersTypes != null) {
             parameterTlist = Arrays.asList(parametersTypes);
         }
@@ -413,12 +407,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // if we already know a version of this method, we store the new version in the existing set
         if (this.checkedMethodNames.containsKey(methodName) &&
                 (parameterTlist != null)) {
-            HashSet<List<Class>> signatures = this.checkedMethodNames.get(methodName);
+            HashSet<List<Class<?>>> signatures = this.checkedMethodNames.get(methodName);
             signatures.add(parameterTlist);
         }
         // otherwise, we create a set containing a single element
         else {
-            HashSet<List<Class>> signatures = new HashSet<List<Class>>();
+            HashSet<List<Class<?>>> signatures = new HashSet<List<Class<?>>>();
             if (parameterTlist != null) {
                 signatures.add(parameterTlist);
             }
@@ -505,146 +499,35 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (request == null) {
                 return;
             }
-            try {
-                // ProActiveEvent
-                messageEventProducer.notifyListeners(request,
-                    MessageEvent.SERVING_STARTED, bodyID,
-                    getRequestQueue().size());
-                // END ProActiveEvent
+            // ProActiveEvent
+            messageEventProducer.notifyListeners(request,
+                MessageEvent.SERVING_STARTED, bodyID, getRequestQueue().size());
+            // END ProActiveEvent
 
-                // JMX Notification
-                if (!isProActiveInternalObject && (mbean != null)) {
-                    mbean.sendNotification(NotificationType.servingStarted,
-                        new Integer(getRequestQueue().size()));
-                }
+            // JMX Notification
+            if (!isProActiveInternalObject && (mbean != null)) {
+                mbean.sendNotification(NotificationType.servingStarted,
+                    new Integer(getRequestQueue().size()));
+            }
 
-                // END JMX Notification
-                Reply reply = null;
-                try {
-                    //If the request is not a "terminate Active Object" request,
-                    //it is served normally.
-                    if (!isTerminateAORequest(request)) {
-                        reply = request.serve(BodyImpl.this);
-                    }
-                } catch (ServeException e) {
-                    // Create a non functional exception encapsulating the service exception
-                    BodyNonFunctionalException calleeNFE = new ServiceFailedCalleeNFE(
-                            "Exception occured while serving pending request = " +
-                            request.getMethodName(), e, this,
-                            ProActive.getBodyOnThis());
-                    NFEManager.fireNFE(calleeNFE, BodyImpl.this);
+            // END JMX Notification
+            Reply reply = null;
 
-                    // Create a non functional exception encapsulating the service exception
-                    ProxyNonFunctionalException callerNFE = new ServiceFailedCallerNFE(
-                            "Exception occured while serving pending request = " +
-                            request.getMethodName(), e);
+            //If the request is not a "terminate Active Object" request,
+            //it is served normally.
+            if (!isTerminateAORequest(request)) {
+                reply = request.serve(BodyImpl.this);
+            }
 
-                    // Create a new reply that contains this NFE instead of the result
-                    Reply replyAlternate = null;
-                    replyAlternate = request.serveAlternate(BodyImpl.this,
-                            callerNFE);
-
-                    // Send reply and stop local node if desired
-                    if (replyAlternate == null) {
-                        if (!isActive()) {
-                            return; //test if active in case of terminate() method otherwise eventProducer would be null
-                        }
-
-                        // ProActiveEvent
-                        messageEventProducer.notifyListeners(request,
-                            MessageEvent.VOID_REQUEST_SERVED, bodyID,
-                            getRequestQueue().size());
-                        // END ProActiveEvent
-
-                        // JMX Notification
-                        if (!isProActiveInternalObject && (mbean != null)) {
-                            mbean.sendNotification(NotificationType.voidRequestServed,
-                                new Integer(getRequestQueue().size()));
-                        }
-
-                        // END JMX Notification
-                        return;
-                    }
-
-                    if (Profiling.TIMERS_COMPILED) {
-                        TimerWarehouse.startTimer(BodyImpl.this.bodyID,
-                            TimerWarehouse.SEND_REPLY);
-                    }
-
-                    // ProActiveEvent
-                    UniqueID destinationBodyId = request.getSourceBodyID();
-                    if ((destinationBodyId != null) &&
-                            (BodyImpl.this.messageEventProducer != null)) {
-                        BodyImpl.this.messageEventProducer.notifyListeners(reply,
-                            MessageEvent.REPLY_SENT, destinationBodyId,
-                            getRequestQueue().size());
-                    }
-
-                    // END ProActiveEvent
-
-                    // JMX Notification
-                    if (!isProActiveInternalObject && (mbean != null)) {
-                        mbean.sendNotification(NotificationType.replySent,
-                            new Integer(getRequestQueue().size()));
-                    }
-
-                    // END JMX Notification
-                    ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
-                    destinations.add(request.getSender());
-                    this.getFuturePool().registerDestinations(destinations);
-
-                    // FAULT-TOLERANCE
-                    if (BodyImpl.this.ftmanager != null) {
-                        BodyImpl.this.ftmanager.sendReply(replyAlternate,
-                            request.getSender());
-                    } else {
-                        replyAlternate.send(request.getSender());
-                    }
-
-                    if (Profiling.TIMERS_COMPILED) {
-                        TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
-                            TimerWarehouse.SEND_REPLY);
-                    }
-
-                    this.getFuturePool().removeDestinations();
-                    return;
-                }
-
-                if (reply == null) {
-                    if (!isActive()) {
-                        return; //test if active in case of terminate() method otherwise eventProducer would be null
-                    }
-
-                    // ProActiveEvent
-                    if (messageEventProducer != null) {
-                        messageEventProducer.notifyListeners(request,
-                            MessageEvent.VOID_REQUEST_SERVED, bodyID,
-                            getRequestQueue().size());
-                    }
-
-                    // END ProActiveEvent
-
-                    // JMX Notification
-                    if (!isProActiveInternalObject && (mbean != null)) {
-                        mbean.sendNotification(NotificationType.voidRequestServed,
-                            new Integer(getRequestQueue().size()));
-                    }
-
-                    // END JMX Notification
-                    return;
-                }
-
-                if (Profiling.TIMERS_COMPILED) {
-                    TimerWarehouse.startTimer(BodyImpl.this.bodyID,
-                        TimerWarehouse.SEND_REPLY);
+            if (reply == null) {
+                if (!isActive()) {
+                    return; //test if active in case of terminate() method otherwise eventProducer would be null
                 }
 
                 // ProActiveEvent
-                UniqueID destinationBodyId = request.getSourceBodyID();
-                if ((destinationBodyId != null) &&
-                        (BodyImpl.this.messageEventProducer != null)) {
-                    BodyImpl.this.messageEventProducer.notifyListeners(reply,
-                        MessageEvent.REPLY_SENT, destinationBodyId,
+                if (messageEventProducer != null) {
+                    messageEventProducer.notifyListeners(request,
+                        MessageEvent.VOID_REQUEST_SERVED, bodyID,
                         getRequestQueue().size());
                 }
 
@@ -652,35 +535,57 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
                 // JMX Notification
                 if (!isProActiveInternalObject && (mbean != null)) {
-                    mbean.sendNotification(NotificationType.replySent,
+                    mbean.sendNotification(NotificationType.voidRequestServed,
                         new Integer(getRequestQueue().size()));
                 }
 
                 // END JMX Notification
-                ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
-                destinations.add(request.getSender());
-                this.getFuturePool().registerDestinations(destinations);
-
-                // FAULT-TOLERANCE
-                if (BodyImpl.this.ftmanager != null) {
-                    BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
-                } else {
-                    reply.send(request.getSender());
-                }
-                if (Profiling.TIMERS_COMPILED) {
-                    TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
-                        TimerWarehouse.SEND_REPLY);
-                }
-
-                this.getFuturePool().removeDestinations();
-            } catch (java.io.IOException e) {
-                // Create a non functional exception encapsulating the network exception
-                BodyNonFunctionalException nfe = new SendReplyCommunicationException(
-                        "Exception occured in while sending reply to request = " +
-                        request.getMethodName(), e, BodyImpl.this,
-                        request.getSourceBodyID());
-                NFEManager.fireNFE(nfe, BodyImpl.this);
+                return;
             }
+
+            if (Profiling.TIMERS_COMPILED) {
+                TimerWarehouse.startTimer(BodyImpl.this.bodyID,
+                    TimerWarehouse.SEND_REPLY);
+            }
+
+            // ProActiveEvent
+            UniqueID destinationBodyId = request.getSourceBodyID();
+            if ((destinationBodyId != null) &&
+                    (BodyImpl.this.messageEventProducer != null)) {
+                BodyImpl.this.messageEventProducer.notifyListeners(reply,
+                    MessageEvent.REPLY_SENT, destinationBodyId,
+                    getRequestQueue().size());
+            }
+
+            // END ProActiveEvent
+
+            // JMX Notification
+            if (!isProActiveInternalObject && (mbean != null)) {
+                mbean.sendNotification(NotificationType.replySent,
+                    new Integer(getRequestQueue().size()));
+            }
+
+            // END JMX Notification
+            ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
+            destinations.add(request.getSender());
+            this.getFuturePool().registerDestinations(destinations);
+
+            // FAULT-TOLERANCE
+            if (BodyImpl.this.ftmanager != null) {
+                BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
+            } else {
+                try {
+                    reply.send(request.getSender());
+                } catch (IOException e) {
+                    sendReplyExceptionsLogger.error(e, e);
+                }
+            }
+            if (Profiling.TIMERS_COMPILED) {
+                TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
+                    TimerWarehouse.SEND_REPLY);
+            }
+
+            this.getFuturePool().removeDestinations();
         }
 
         public void sendRequest(MethodCall methodCall, Future future,

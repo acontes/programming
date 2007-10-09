@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -246,14 +246,14 @@ public class GatherRequestsQueues implements Serializable {
                         methodName + "]");
                 }
 
-                Class[] clientMethodParamTypes = clientMethod.getParameterTypes();
-                Class[] gatherMethodParamTypes = new Class[clientMethodParamTypes.length];
+                Class<?>[] clientMethodParamTypes = clientMethod.getParameterTypes();
+                Class<?>[] gatherMethodParamTypes = new Class<?>[clientMethodParamTypes.length];
 
                 for (int i = 0; i < clientMethodParamTypes.length; i++) {
                     gatherMethodParamTypes[i] = List.class;
                 }
 
-                Class gatherItfClass = Class.forName(((ProActiveInterfaceType) ((ProActiveInterface) owner.getFcInterface(
+                Class<?> gatherItfClass = Class.forName(((ProActiveInterfaceType) ((ProActiveInterface) owner.getFcInterface(
                             serverItfName)).getFcItfType()).getFcItfSignature());
 
                 Method gatherMethod = gatherItfClass.getMethod(clientMethod.getName(),
@@ -278,10 +278,10 @@ public class GatherRequestsQueues implements Serializable {
                 MethodCall gatherMC = MethodCall.getComponentMethodCall(gatherMethod,
                         gatherEffectiveArguments, null, serverItfName,
                         new ItfID(serverItfName, owner.getID()));
-                long sequenceID = ((ComponentBodyImpl) ProActive.getBodyOnThis()).getNextSequenceID();
+                long sequenceID = ((ComponentBodyImpl) ProActiveObject.getBodyOnThis()).getNextSequenceID();
 
                 ComponentRequest gatherRequest = new ComponentRequestImpl(gatherMC,
-                        ProActive.getBodyOnThis(),
+                        ProActiveObject.getBodyOnThis(),
                         firstRequestsInLine.oneWayMethods(), sequenceID);
 
                 // serve the request (do not reenqueue it)
@@ -289,7 +289,7 @@ public class GatherRequestsQueues implements Serializable {
                     logger.debug("gather request queues .serving request [" +
                         gatherRequest.getMethodName() + "]");
                 }
-                Reply reply = gatherRequest.serve(ProActive.getBodyOnThis());
+                Reply reply = gatherRequest.serve(ProActiveObject.getBodyOnThis());
 
                 // handle the future for async invocations
                 if (reply != null) {

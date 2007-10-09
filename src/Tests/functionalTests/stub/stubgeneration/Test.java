@@ -32,6 +32,7 @@ package functionalTests.stub.stubgeneration;
 
 import java.util.Arrays;
 
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.Utils;
 
@@ -67,7 +68,7 @@ public class Test extends FunctionalTest {
         String baseclassName = "functionalTests.stub.stubgeneration.A";
         data = JavassistByteCodeStubBuilder.create(baseclassName, null);
         assertNotNull(data);
-        Class stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.functionalTests.stub.stubgeneration._StubA",
+        Class<?> stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.functionalTests.stub.stubgeneration._StubA",
                 data);
         assertTrue("A isn't parent of its Stub!",
             A.class.isAssignableFrom(stubClass));
@@ -107,6 +108,10 @@ public class Test extends FunctionalTest {
                     My_DSecond_PType.class.getName()
                 }));
 
+        // test Serializable return type
+        A a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] {  });
+        assertEquals(A.RESULT, a.foo().toString());
+
         //BENCH
         //        long begin = System.currentTimeMillis();
         //        for (int i = 0; i < 1000000; i++) {
@@ -127,8 +132,10 @@ public class Test extends FunctionalTest {
         Test test = new Test();
         try {
             test.action();
-        } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("successful");
+        } catch (Throwable t) {
+            System.out.println("failed");
+            t.printStackTrace();
         } finally {
             try {
                 System.exit(0);

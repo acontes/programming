@@ -215,7 +215,7 @@ public class RemoteObjectAdapter implements RemoteObject {
         return false;
     }
 
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         try {
             return remoteObject.getTargetClass();
         } catch (ProActiveException e) {
@@ -228,7 +228,7 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
-    public Class getAdapterClass() {
+    public Class<?> getAdapterClass() {
         try {
             return this.remoteObject.getAdapterClass();
         } catch (ProActiveException e) {

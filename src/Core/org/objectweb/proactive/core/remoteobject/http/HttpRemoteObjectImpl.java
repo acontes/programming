@@ -240,7 +240,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         }
     }
 
-    public Class getTargetClass() throws ProActiveException, IOException {
+    public Class<?> getTargetClass() throws ProActiveException, IOException {
         if (isLocal) {
             return this.remoteObject.getTargetClass();
         } else {
@@ -248,14 +248,14 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
                     new ArrayList<Object>(), this.remoteObjectURL.toString());
             br.send();
             try {
-                return (Class) br.getReturnedObject();
+                return (Class<?>) br.getReturnedObject();
             } catch (Exception e) {
                 throw new HTTPRemoteException("Unexpected exception", e);
             }
         }
     }
 
-    public Class getAdapterClass() throws ProActiveException, IOException {
+    public Class<?> getAdapterClass() throws ProActiveException, IOException {
         if (isLocal) {
             return this.remoteObject.getAdapterClass();
         } else {
@@ -263,7 +263,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
                     new ArrayList<Object>(), this.remoteObjectURL.toString());
             br.send();
             try {
-                return (Class) br.getReturnedObject();
+                return (Class<?>) br.getReturnedObject();
             } catch (Exception e) {
                 throw new HTTPRemoteException("Unexpected exception", e);
             }

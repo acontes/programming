@@ -42,16 +42,15 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.exceptions.FutureCreationException;
+import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
-import org.objectweb.proactive.core.exceptions.proxy.FutureCreationException;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.proxy.SendRequestCommunicationException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.mop.MethodCallInfo;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
@@ -112,6 +111,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         if (cachedMethodResult != null) {
             return cachedMethodResult;
         }
+
         return invokeOnBody(methodCall);
     }
 
@@ -125,32 +125,43 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         "toString".equals(methodCall.getName());
     }
 
+    private static boolean isHashCode(MethodCall methodCall) {
+        return (methodCall.getNumberOfParameter() == 0) &&
+        "hashCode".equals(methodCall.getName());
+    }
+
     private static Set<String> loggedSyncCalls = Collections.synchronizedSet(new HashSet<String>());
 
     private Object invokeOnBody(MethodCall methodCall)
         throws Exception, RenegotiateSessionException, Throwable {
         // Now gives the MethodCall object to the body
         try {
-            if (isOneWayCall(methodCall)) {
+            MethodCallInfo mci = methodCall.getMethodCallInfo();
+
+            if (mci.getType() == MethodCallInfo.CallType.OneWay) {
                 reifyAsOneWay(methodCall);
                 return null;
             }
-            String reason = methodCall.getSynchronousReason();
-            if (reason == null) {
+
+            if (mci.getType() == MethodCallInfo.CallType.Asynchronous) {
                 return reifyAsAsynchronous(methodCall);
             }
-            if (!isToString(methodCall) &&
+
+            if (!isToString(methodCall) && !isHashCode(methodCall) &&
                     syncCallLogger.isEnabledFor(Level.DEBUG)) {
-                String msg = "[WARNING: synchronous call] All calls to the method below are synchronous " +
+                String msg = "[DEBUG: synchronous call] All calls to the method below are synchronous " +
                     "(not an error, but may lead to performance issues or deadlocks):" +
                     System.getProperty("line.separator") +
                     methodCall.getReifiedMethod() +
                     System.getProperty("line.separator") +
-                    "They are synchronous for the following reason: " + reason;
+                    "They are synchronous for the following reason: " +
+                    mci.getMessage();
+
                 if (loggedSyncCalls.add(msg)) {
                     syncCallLogger.debug(msg);
                 }
             }
+
             return reifyAsSynchronous(methodCall);
         } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(e.getMessage(),
@@ -172,6 +183,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                                            .equals(((AbstractBodyProxy) proxy).getBodyID()));
                 }
             }
+
             return new Boolean(false);
         }
 
@@ -192,18 +204,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
      */
     protected void reifyAsOneWay(MethodCall methodCall)
         throws Exception, RenegotiateSessionException {
-        try {
-            sendRequest(methodCall, null);
-        } catch (java.io.IOException e) {
-            // old stuff
-            // throw new MethodCallExecutionFailedException("Exception occured in reifyAsOneWay while sending request for methodcall ="+methodCall.getName(), e);
-            // Create a non functional exception encapsulating the network exception
-            ProxyNonFunctionalException nfe = new SendRequestCommunicationException(
-                    "Exception occured in reifyAsOneWay while sending request for methodcall = " +
-                    methodCall.getName(), e);
-
-            NFEManager.fireNFE(nfe, this);
-        }
+        sendRequest(methodCall, null);
     }
 
     /*
@@ -221,7 +222,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
         // Creates a stub + FutureProxy for representing the result
         try {
-            Class returnType = null;
+            Class<?> returnType = null;
             Type t = methodCall.getReifiedMethod().getGenericReturnType();
             if (t instanceof TypeVariable) {
                 returnType = methodCall.getGenericTypesMapping().get(t);
@@ -238,38 +239,26 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                         Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
             }
         } catch (MOPException e) {
-            // Create a non functional exception encapsulating the network exception
-            ProxyNonFunctionalException nfe = new FutureCreationException(
-                    "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-                    methodCall.getName(), e);
-
-            NFEManager.fireNFE(nfe, this);
+            throw new FutureCreationException(
+                "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
+                methodCall.getName(), e);
         } catch (ClassNotFoundException e) {
-            // Create a non functional exception encapsulating the network exception
-            ProxyNonFunctionalException nfe = new FutureCreationException(
-                    "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-                    methodCall.getName(), e);
-
-            NFEManager.fireNFE(nfe, this);
+            throw new FutureCreationException(
+                "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
+                methodCall.getName(), e);
         }
 
         // Set the id of the body creator in the created future
         FutureProxy fp = (FutureProxy) (futureobject.getProxy());
         fp.setCreatorID(this.getBodyID());
         fp.setUpdater(this.getBody());
-        fp.setOriginatingProxy(this);
 
         try {
             sendRequest(methodCall, fp);
         } catch (java.io.IOException e) {
-            // old stuff
-            // throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while sending request for methodcall ="+methodCall.getName(), e);
-            // Create a non functional exception encapsulating the network exception
-            ProxyNonFunctionalException nfe = new SendRequestCommunicationException(
-                    "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
-                    methodCall.getName(), e);
-
-            NFEManager.fireNFE(nfe, this);
+            throw new SendRequestCommunicationException(
+                "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
+                methodCall.getName(), e);
         }
 
         // And return the future object
@@ -282,22 +271,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         FutureProxy fp = FutureProxy.getFutureProxy();
         fp.setCreatorID(this.getBodyID());
         fp.setUpdater(this.getBody());
-        fp.setOriginatingProxy(this);
 
         try {
             sendRequest(methodCall, fp);
         } catch (java.io.IOException e) {
-            // old stuff 
-            // throw new MethodCallExecutionFailedException("Exception occured in reifyAsSynchronous while sending request for methodcall ="+methodCall.getName(), e);
-            // Create a non functional exception encapsulating the network exception
-            ProxyNonFunctionalException nfe = new SendRequestCommunicationException(
-                    "Exception occured in reifyAsSynchronous while sending request for methodcall = " +
-                    methodCall.getName(), e);
-
-            NFEManager.fireNFE(nfe, this);
+            throw new SendRequestCommunicationException(
+                "Exception occured in reifyAsSynchronous while sending request for methodcall = " +
+                methodCall.getName(), e);
         }
 
-        // Returns the result (exception returned is a functional one -> NFE is not needed)
+        // Returns the result or throws the exception
         if (fp.getRaisedException() != null) {
             throw fp.getRaisedException();
         } else {
