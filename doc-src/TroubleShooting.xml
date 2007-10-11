@@ -41,34 +41,9 @@
         access.</emphasis> If you get the following exceptions, you probably
         didn't change the file java.policy as described in <xref lang=""
         linkend="Create_Java_Policy" />.</para>
-<<<<<<< HEAD:doc-src/TroubleShooting.xml
-
-        <screen>org.objectweb.proactive.NodeException:
-java.security.AccessControlException: access denied
-(java.net.SocketPermission 127.0.0.1:1099 connect,resolve)
-                at org.objectweb.proactive.core.node.rmi.RemoteNodeImpl.&lt;init&gt;(RmiNode.java:17)
-                at org.objectweb.proactive.core.node.rmi.RemoteNodeFactory._createDefaultNode
-                        (RmiNodeFactory.java, Compiled Code)
-                at org.objectweb.proactive.core.node.NodeFactory.createDefaultNode(NodeFactory.java:127)
-                at org.objectweb.proactive.core.node.NodeFactory.getDefaultNode(NodeFactory.java:57)
-                at org.objectweb.proactive.ProActive.newActive(ProActive.java:315)
-                ...
-Exception in thread "main" java.lang.ExceptionInInitializerError:
-java.security.AccessControlException: access denied
-(java.util.PropertyPermission user.home re ad)
-                at java.security.AccessControlContext.checkPermission (AccessControlContext.java, Compiled Code)
-                at java.security.AccessController.checkPermission(AccessController.java:403)
-                at java.lang.SecurityManager.checkPermission(SecurityManager.java:549)
-                at java.lang.SecurityManager.checkPropertyAccess(SecurityManager.java:1243)
-                at java.lang.System.getProperty(System.java:539)
-                at org.objectweb.proactive.mop.MOPProperties.createDefaultProperties (MOPProperties.java:190)
-                ...         </screen>
-=======
        
       <programlisting lang="java"><textobject><textdata fileref="code_snippets/java_policy_error.txt"/></textobject></programlisting>
       
-      
->>>>>>> master:doc-src/TroubleShooting.xml
       </listitem>
 
       <listitem>
@@ -78,13 +53,8 @@ java.security.AccessControlException: access denied
         <literal>-Dlog4j.configuration</literal> property to the java command.
         Be sure that the given path is right, try also to add <literal>file:</literal> before the
         path.</para>
-<<<<<<< HEAD:doc-src/TroubleShooting.xml
 
-        <screen>    log4j:WARN No appender could be found for logger .....
-    log4j:WARN Please initialize the log4j system properly            </screen>
-=======
 <programlisting lang="java"><textobject><textdata fileref="code_snippets/log4j_notfound_error.txt"/></textobject></programlisting>
->>>>>>> master:doc-src/TroubleShooting.xml
       </listitem>
 
       <listitem>
@@ -97,9 +67,7 @@ java.security.AccessControlException: access denied
         D:\java\j2sdk... </literal> ) and then set the <literal>JAVA_HOME </literal> environment variable
         accordingly.</para>
       </listitem>
-<<<<<<< HEAD:doc-src/TroubleShooting.xml
-=======
-      
+
       <listitem>
       	<para>
       		<emphasis role="bold">Java complains about unsupported classes:</emphasis> Check
@@ -110,7 +78,6 @@ java.security.AccessControlException: access denied
       		
       	</para>
       </listitem>
->>>>>>> master:doc-src/TroubleShooting.xml
     </itemizedlist>
 
     
@@ -147,11 +114,7 @@ java.security.AccessControlException: access denied
 
     <para><literal>hostname</literal> should print the hostname
     of the machine as known by the other hosts, and <literal
-<<<<<<< HEAD:doc-src/TroubleShooting.xml
-    role="bold">hostname -i</literal> should return the network interface
-=======
     role="bold">hostname -i</literal> should return the network interface (IP number)
->>>>>>> master:doc-src/TroubleShooting.xml
     accessible by other machines.</para>
   </sect1>
 
@@ -176,11 +139,7 @@ java.security.AccessControlException: access denied
 
     <itemizedlist>
       <listitem>
-<<<<<<< HEAD:doc-src/TroubleShooting.xml
-        <para>ProActlive/lib/ganymed-ssh2-build210.jar must be included in the <literal>CLASSPATH</literal> of the
-=======
         <para><literal>ProActlive/lib/ganymed-ssh2-build210.jar</literal> must be included in the <literal>CLASSPATH</literal> of the
->>>>>>> master:doc-src/TroubleShooting.xml
         concerned machines.</para>
       </listitem>
 
@@ -206,21 +165,7 @@ java.security.AccessControlException: access denied
     different types, this problem usually takes place when invoking a remote
     method on an object of the same type.</para>
 
-<<<<<<< HEAD:doc-src/TroubleShooting.xml
-    <programlisting lang="java">
-    	class A{
-	  		public void foo(A a){ 
-   				...
-   				a.bar();           //This call will not be handled by the remote Active Object!!!
-   				...
- 			}
-			private void bar(){  //To fix this, change this method to public.
-   				...
-  			}
-		}</programlisting>
-=======
 	<programlisting lang="java"><textobject><textdata fileref="code_snippets/public_method_requirement.txt"/></textobject></programlisting>
 
->>>>>>> master:doc-src/TroubleShooting.xml
   </sect1>
 </chapter>

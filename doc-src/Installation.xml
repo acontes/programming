@@ -47,19 +47,11 @@
           </indexterm>
 
           <para>Include in your <literal>CLASSPATH</literal> the 
-<<<<<<< HEAD:doc-src/Installation.xml
-          	ProActive jar file <literal>ProActive/dist/ProActive/ProActive.jar</literal>
-=======
           	ProActive jar file <literal>ProActive/ProActive.jar</literal>
->>>>>>> master:doc-src/Installation.xml
           		along with <literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
-<<<<<<< HEAD:doc-src/Installation.xml
-          		<literal>ProActive/lib/fractal.jar</literal>,  
-=======
           		<literal>ProActive/lib/components/fractal.jar</literal>,  
->>>>>>> master:doc-src/Installation.xml
           		and <literal>ProActive/lib/bouncycastle.jar</literal></para>
         </listitem>
 
@@ -228,11 +220,7 @@
       </listitem>
 
       <listitem>
-<<<<<<< HEAD:doc-src/Installation.xml
-        <para><literal>lib/fractal.jar</literal>
-=======
         <para><literal>lib/components/fractal.jar</literal>
->>>>>>> master:doc-src/Installation.xml
         - component model used for ProActive Components (see
         <xref linkend="intro" />).</para>
       </listitem>
@@ -242,26 +230,9 @@
       </listitem>
     </itemizedlist><para>You do not need to modify your <literal>CLASSPATH</literal> permanently if you
     include the entries above using a Java IDE or a shell script.</para>
-<<<<<<< HEAD:doc-src/Installation.xml
-     <para>Set the <literal>CLASSPATH</literal> as follow, putting on one line:</para>
-=======
    
     <para>Under Linux/Unix:</para>
->>>>>>> master:doc-src/Installation.xml
 
-<<<<<<< HEAD:doc-src/Installation.xml
-    <para>Under linux:</para>
-
-    <para><screen>export CLASSPATH=.:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:\
-./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:\
-./lib/components/fractal.jar:./lib/bouncycastle.jar</screen></para>
-
-    <para>Under windows:</para>
-
-    <para><screen>set CLASSPATH=.;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;\
-.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;\
-.\lib\components\fractal.jar;.\lib\bouncycastle.jar</screen></para>
-=======
     <para>
     Open a  Linux/Unix terminal, change to the install directory using <literal>cd </literal> 
     and set the the <literal>CLASSPATH</literal>.
@@ -280,7 +251,6 @@
    <para>
      <programlisting lang="java"><textobject><textdata fileref="code_snippets/class_path_windows.txt"></textdata></textobject></programlisting>
    	</para>
->>>>>>> master:doc-src/Installation.xml
      
     
     <para>In addition to the jar files above you may want to add the following
@@ -323,62 +293,29 @@
       </listitem>
     </itemizedlist>
     </sect2>
-<<<<<<< HEAD:doc-src/Installation.xml
-    <sect2><title id="Create_Java_Policy">Create A <literal>java.policy</literal> File To Set
-    Permissions</title><para>See <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions
-=======
     <sect2><title id="Create_Java_Policy">Create a <literal>java.policy</literal> File To Set
     Permissions</title><para>See <ulink url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html">Permissions
->>>>>>> master:doc-src/Installation.xml
     in the JavaTM 2 SDK</ulink> to learn more about Java permissions. The
-<<<<<<< HEAD:doc-src/Installation.xml
-    option <literal>-Djava.security.policy=pathToFile</literal> will specify which policy file to
-    use within ProActive. As a first approximation, you can create a simple
-=======
     option <literal>-Djava.security.policy=pathToFile</literal> will specify which security policy file to
     use within ProActive. As a first approximation, you can create a simple security
->>>>>>> master:doc-src/Installation.xml
     policy file granting all permissions:</para>
-<<<<<<< HEAD:doc-src/Installation.xml
-=======
     
->>>>>>> master:doc-src/Installation.xml
     <para>
-<<<<<<< HEAD:doc-src/Installation.xml
-    <programlisting lang="java" >grant {
-    	permission java.security.AllPermission;
-	};        
-	</programlisting>
-=======
     
     <programlisting lang="java" ><textobject><textdata fileref="../scripts/proactive.java.policy" /></textobject></programlisting>
->>>>>>> master:doc-src/Installation.xml
 	</para><note><para>
  	If you use the scripts provided with the distribution to run the
  	examples an existing policy file named
  	<literal>proactive.java.policy</literal>
  	will be used by default.
 	</para></note></sect2>
-<<<<<<< HEAD:doc-src/Installation.xml
-    <sect2><title>Create A log4j Configuration File</title><indexterm>
-=======
     <sect2><title>Create A <literal>log4j</literal> Configuration File</title><indexterm>
->>>>>>> master:doc-src/Installation.xml
       <primary>Log4j</primary>
 
       <secondary>configuration</secondary>
     </indexterm><example>
-<<<<<<< HEAD:doc-src/Installation.xml
-      <title>A simple proactive-log4j file</title>
-=======
      <title>A simple proactive-log4j file</title>
->>>>>>> master:doc-src/Installation.xml
 
-<<<<<<< HEAD:doc-src/Installation.xml
-      <screen><textobject>
-          <textdata fileref="../../scripts/proactive-log4j" />
-        </textobject></screen>
-=======
 		
 	<para>See  for logging using
     the <ulink url="http://logging.apache.org/log4j/1.2/index.html">Apache log4j</ulink>. The
@@ -389,7 +326,6 @@
 			
 		</para>
       <programlisting lang="java"><textobject><textdata fileref="../scripts/proactive-log4j" /></textobject></programlisting>
->>>>>>> master:doc-src/Installation.xml
     </example><note>
       <para>If you use the scripts provided with the distribution to run the
       examples an existing log4j file named <literal>proactive-log4j</literal>
@@ -407,7 +343,6 @@
           <para>script : <literal>readers.sh</literal> or
           <literal>readers.bat</literal></para>
         </listitem>
-<<<<<<< HEAD:doc-src/Installation.xml
 
         <listitem>
           <para>source : <literal>examples/readers</literal></para>
@@ -419,7 +354,6 @@
           <para>script : <literal>philosophers.sh</literal> or
           <literal>philosophers.bat</literal></para>
         </listitem>
-
         <listitem>
           <para>source : <literal>examples/philosophers</literal></para>
         </listitem>
@@ -430,51 +364,10 @@
             <para>script : <literal>nbody.sh</literal> or
             <literal>nbody.bat</literal></para>
           </listitem>
-=======
->>>>>>> master:doc-src/Installation.xml
 
-<<<<<<< HEAD:doc-src/Installation.xml
-          <listitem>
-            <para>source : <literal>examples/nbody</literal></para>
-          </listitem>
-        </itemizedlist></para></sect3></sect2>
-=======
-        <listitem>
-          <para>source : <literal>examples/readers</literal></para>
-        </listitem>
-      </itemizedlist></sect3>
-    	<sect3><title>Local Example 3: The Dining Philosophers</title><para>This example is one possible implementation of the well-known Dining Philosophers synchronization problem. This
-      example is based on a easy to use Swing GUI.</para><itemizedlist>
-        <listitem>
-          <para>script : <literal>philosophers.sh</literal> or
-          <literal>philosophers.bat</literal></para>
-        </listitem>
->>>>>>> master:doc-src/Installation.xml
-
-<<<<<<< HEAD:doc-src/Installation.xml
-=======
-        <listitem>
-          <para>source : <literal>examples/philosophers</literal></para>
-        </listitem>
-      </itemizedlist></sect3>
-    	<sect3><title>Local Example 4: The N-Body Simulation</title><para>This example can be used later on as a deployment example for
-    	 several machines, and also for the fault-tolerance features. <itemizedlist>
-          <listitem>
-            <para>script : <literal>nbody.sh</literal> or
-            <literal>nbody.bat</literal></para>
-          </listitem>
->>>>>>> master:doc-src/Installation.xml
-
-<<<<<<< HEAD:doc-src/Installation.xml
-     
-  </sect1>
-
-
-=======
           <listitem>
             <para>source : <literal>examples/nbody</literal></para>
           </listitem>
         </itemizedlist></para></sect3></sect2>
 	 </sect1>
->>>>>>> master:doc-src/Installation.xml
 </chapter>
