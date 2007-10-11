@@ -873,8 +873,8 @@
 	</target>
 
 	<target name="ic2dLibClean" description="Clean all needed libraries to IC2D">
-		<delete dir="${ic2d-plugin.dir}/${plugin.lib}/lib" />
-		<delete file="${ic2d-plugin.dir}/${plugin.lib}/ProActive.jar" />
+		<delete dir="${ic2d-plugin.dir}/${plugin.lib}/lib"/>
+		<delete file="${ic2d-plugin.dir}/${plugin.lib}/ProActive.jar"/>
 	</target>
 	<!-- ================================================================ -->
 	<!--                      Compile JMX Connector                       -->
