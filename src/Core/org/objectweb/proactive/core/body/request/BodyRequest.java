@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -55,35 +55,35 @@ public class BodyRequest extends MessageImpl implements Request,
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public BodyRequest(Body targetBody, String methodName,
-        Class[] paramClasses, Object[] params, boolean isPriority)
+        Class<?>[] paramClasses, Object[] params, boolean isPriority)
         throws NoSuchMethodException {
         super(null, 0, true, methodName);
         if (paramClasses == null) {
-            paramClasses = new Class[params.length];
+            paramClasses = new Class<?>[params.length];
             for (int i = 0; i < params.length; i++) {
                 paramClasses[i] = params[i].getClass();
             }
         }
         methodCall = MethodCall.getMethodCall(targetBody.getClass()
                                                         .getMethod(methodName,
-                    paramClasses), params, (Map<TypeVariable, Class>) null);
+                    paramClasses), params, (Map<TypeVariable, Class<?>>) null);
         this.isPriority = isPriority;
     }
 
     //Non functional BodyRequests constructor
     public BodyRequest(Body targetBody, String methodName,
-        Class[] paramClasses, Object[] params, boolean isNFRequest,
+        Class<?>[] paramClasses, Object[] params, boolean isNFRequest,
         int nfRequestPriority) throws NoSuchMethodException {
         super(null, 0, true, methodName);
         if (paramClasses == null) {
-            paramClasses = new Class[params.length];
+            paramClasses = new Class<?>[params.length];
             for (int i = 0; i < params.length; i++) {
                 paramClasses[i] = params[i].getClass();
             }
         }
         methodCall = MethodCall.getMethodCall(targetBody.getClass()
                                                         .getMethod(methodName,
-                    paramClasses), params, (Map<TypeVariable, Class>) null);
+                    paramClasses), params, (Map<TypeVariable, Class<?>>) null);
 
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;

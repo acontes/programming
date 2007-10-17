@@ -1,27 +1,30 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
- * computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis Contact:
- * proactive-support@inria.fr
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
  *
- * Initial developer(s): The ProActive Team
- * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
  *
  * ################################################################
  */
@@ -56,7 +59,6 @@ import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 public class SkeletonSystemImpl implements SkeletonSystem {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
     static String DEFAULT_ROOTDIR = System.getProperty("java.io.tmpdir");
-    File fspace; //family space
     WSpaceImpl wspace; // workspace
 
     public SkeletonSystemImpl() throws IOException {
@@ -90,7 +92,7 @@ public class SkeletonSystemImpl implements SkeletonSystem {
         }
 
         try {
-            //TODO change this with JAVA 1.6 features
+            //TODO change this with JAVA 1.6 chmod features
             Process process = execCommandInternal(wspace,
                     new File("/bin/chmod"),
                     ("+x " + command.getPath()).split(" "), "");
@@ -127,8 +129,7 @@ public class SkeletonSystemImpl implements SkeletonSystem {
 
     @Override
     public synchronized void finalize() {
-        wspace.delete();
-        fspace.delete(); //delete only if empty
+        //wspace.delete();
     }
 
     // ************* UTILITY METHODS ******************
@@ -171,6 +172,10 @@ public class SkeletonSystemImpl implements SkeletonSystem {
     }
 
     static public boolean deleteDirectory(File path) {
+        if (path == null) {
+            return false;
+        }
+
         boolean retval = true;
 
         if (path.exists()) {
@@ -229,6 +234,23 @@ public class SkeletonSystemImpl implements SkeletonSystem {
         }
 
         return root;
+    }
+
+    static public boolean checkWritableDirectory(File rootDir) {
+        if (!rootDir.exists() && !rootDir.mkdirs()) {
+            throw new IllegalArgumentException("Can't creat directory: " +
+                rootDir);
+        }
+
+        if (!rootDir.isDirectory()) {
+            throw new IllegalArgumentException("Not a directory: " + rootDir);
+        }
+
+        if (!rootDir.canWrite()) {
+            throw new IllegalArgumentException("Can not write to: " + rootDir);
+        }
+
+        return true;
     }
 
     static public File newDirInTmp(String dirname) {

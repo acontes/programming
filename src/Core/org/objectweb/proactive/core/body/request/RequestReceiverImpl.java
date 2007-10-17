@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -116,7 +116,7 @@ public class RequestReceiverImpl implements RequestReceiver,
                 } else {
                     Iterator it = ((List) immediateServices.get(methodName)).iterator();
                     while (it.hasNext()) {
-                        Class[] next = (Class[]) it.next();
+                        Class<?>[] next = (Class<?>[]) it.next();
                         if (Arrays.equals(next,
                                     request.getMethodCall().getReifiedMethod()
                                                .getParameterTypes())) {
@@ -142,14 +142,14 @@ public class RequestReceiverImpl implements RequestReceiver,
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (!ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
-                List<Class[]> list = (List<Class[]>) immediateServices.get(methodName);
-                List<Class[]> elementsToRemove = new ArrayList<Class[]>(list.size());
-                Iterator<Class[]> it = list.iterator();
+                List<Class<?>[]> list = (List<Class<?>[]>) immediateServices.get(methodName);
+                List<Class<?>[]> elementsToRemove = new ArrayList<Class<?>[]>(list.size());
+                Iterator<Class<?>[]> it = list.iterator();
                 while (it.hasNext()) {
-                    Class[] element = it.next();
+                    Class<?>[] element = it.next();
                     if (Arrays.equals(element, parametersTypes)) {
                         // cannot modify a list while iterating over it => keep reference of 
                         // the elements to remove
@@ -168,16 +168,17 @@ public class RequestReceiverImpl implements RequestReceiver,
         }
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
                 // there is already a filter on all methods with that name, whatever the parameters
                 return;
             } else {
-                ((List<Class[]>) immediateServices.get(methodName)).add(parametersTypes);
+                ((List<Class<?>[]>) immediateServices.get(methodName)).add(parametersTypes);
             }
         } else {
-            List<Class[]> list = new ArrayList<Class[]>();
+            List<Class<?>[]> list = new ArrayList<Class<?>[]>();
             list.add(parametersTypes);
             immediateServices.put(methodName, list);
         }

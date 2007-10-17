@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -116,7 +116,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private String key;
     private transient MethodCallExceptionContext exceptioncontext;
     ComponentMethodCallMetadata componentMetaData = null;
-    private transient Map<TypeVariable, Class> genericTypesMapping = null;
+    private transient Map<TypeVariable, Class<?>> genericTypesMapping = null;
 
     /**
      * byte[] to store effectiveArguments. Requiered to optimize multiple serialization
@@ -189,7 +189,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      *        <code>reifiedMethod</code> with arguments <code>effectiveArguments</code>
      */
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
-        Map<TypeVariable, Class> genericTypesMapping,
+        Map<TypeVariable, Class<?>> genericTypesMapping,
         Object[] effectiveArguments, MethodCallExceptionContext exceptioncontext) {
         exceptioncontext = MethodCallExceptionContext.optimize(exceptioncontext);
 
@@ -217,7 +217,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
         Object[] effectiveArguments,
-        Map<TypeVariable, Class> genericTypesMapping) {
+        Map<TypeVariable, Class<?>> genericTypesMapping) {
         MethodCallExceptionContext exceptioncontext = ExceptionHandler.getContextForCall(reifiedMethod);
         return getMethodCall(reifiedMethod, genericTypesMapping,
             effectiveArguments, exceptioncontext);
@@ -234,7 +234,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
-        Map<TypeVariable, Class> genericTypesMapping, String interfaceName,
+        Map<TypeVariable, Class<?>> genericTypesMapping, String interfaceName,
         ItfID senderItfID, short priority) {
         MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments,
                 genericTypesMapping);
@@ -249,7 +249,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
-        Map<TypeVariable, Class> genericTypesMapping, String interfaceName,
+        Map<TypeVariable, Class<?>> genericTypesMapping, String interfaceName,
         ItfID senderItfID) {
         return MethodCall.getComponentMethodCall(reifiedMethod,
             effectiveArguments, genericTypesMapping, interfaceName,
@@ -296,7 +296,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     // because we want to enforce the use of factory methods for getting fresh
     // instances of this class (see <I>Factory</I> pattern in GoF).
     public MethodCall(Method reifiedMethod,
-        Map<TypeVariable, Class> genericTypesMapping,
+        Map<TypeVariable, Class<?>> genericTypesMapping,
         Object[] effectiveArguments, MethodCallExceptionContext exceptionContext) {
         this.reifiedMethod = reifiedMethod;
         this.genericTypesMapping = ((genericTypesMapping != null) &&
@@ -307,7 +307,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     public MethodCall(Method reifiedMethod,
-        Map<TypeVariable, Class> genericTypesMapping,
+        Map<TypeVariable, Class<?>> genericTypesMapping,
         Object[] effectiveArguments) {
         this(reifiedMethod, genericTypesMapping, effectiveArguments, null);
     }
@@ -450,8 +450,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
     // --- PRIVATE METHODS -----------------------------------------------------------------------
     //
-    private Class[] fixBugRead(FixWrapper[] para) {
-        Class[] tmp = new Class[para.length];
+    private Class<?>[] fixBugRead(FixWrapper[] para) {
+        Class<?>[] tmp = new Class<?>[para.length];
         for (int i = 0; i < para.length; i++) {
             //	System.out.println("fixBugRead for " + i + " value is " +para[i]);
             tmp[i] = para[i].getWrapped();
@@ -460,7 +460,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         return tmp;
     }
 
-    private FixWrapper[] fixBugWrite(Class[] para) {
+    private FixWrapper[] fixBugWrite(Class<?>[] para) {
         FixWrapper[] tmp = new FixWrapper[para.length];
         for (int i = 0; i < para.length; i++) {
             //	System.out.println("fixBugWrite for " + i + " out of " + para.length + " value is " +para[i] );
@@ -472,7 +472,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
     // build a key for uniquely identifying methods, including parameterized ones
     private static String buildKey(Method reifiedMethod,
-        Map<TypeVariable, Class> genericTypesMapping) {
+        Map<TypeVariable, Class<?>> genericTypesMapping) {
         //TODO It seems genericTypesMapping is always an empty map, It is either useless or not correctly built.
         final StringBuffer sb = new StringBuffer((reifiedMethod.getDeclaringClass()
                                                                .getName()));
@@ -534,9 +534,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         this.reifiedMethod = reifiedMethodsTable.get(this.key);
         if (this.reifiedMethod == null) {
             // Reads several pieces of data that we need for looking up the method
-            Class declaringClass = (Class) in.readObject();
+            Class<?> declaringClass = (Class<?>) in.readObject();
             String simpleName = (String) in.readObject();
-            Class[] parameters = this.fixBugRead((FixWrapper[]) in.readObject());
+            Class<?>[] parameters = this.fixBugRead((FixWrapper[]) in.readObject());
 
             // Looks up the method
             try {
@@ -706,7 +706,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         return this.componentMetaData;
     }
 
-    public Map<TypeVariable, Class> getGenericTypesMapping() {
+    public Map<TypeVariable, Class<?>> getGenericTypesMapping() {
         return this.genericTypesMapping;
     }
 
@@ -715,15 +715,15 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
     public class FixWrapper implements java.io.Serializable {
         public boolean isPrimitive;
-        public Class encapsulated;
+        public Class<?> encapsulated;
 
         public FixWrapper() {
         }
 
         /**
-         * Encapsulate primitives types into Class
+         * Encapsulate primitives types into Class<?>
          */
-        public FixWrapper(Class c) {
+        public FixWrapper(Class<?> c) {
             if (!c.isPrimitive()) {
                 this.encapsulated = c;
                 return;
@@ -752,7 +752,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         /**
          * Give back the original class
          */
-        public Class getWrapped() {
+        public Class<?> getWrapped() {
             if (!this.isPrimitive) {
                 return this.encapsulated;
             }

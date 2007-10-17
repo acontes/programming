@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -39,11 +39,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 import org.objectweb.proactive.extensions.calcium.stateness.StateFul;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
 @StateFul(value = false)
+@PrefetchFilesMatching(name = "db.*|query.*|blastall")
 public class ExecuteBlast implements Execute<BlastParams, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
@@ -55,14 +57,15 @@ public class ExecuteBlast implements Execute<BlastParams, File> {
 
         //Put the native program in the wspace
         WSpace wspace = system.getWorkingSpace();
-        File blastProg = wspace.copyInto(param.blastProg);
+
+        //File blastProg = wspace.copyInto(param.blastProg);
 
         //Create a reference to a file in the wspace
         File result = wspace.newFile("result.blast");
         String args = param.getBlastParemeterString(result);
 
         //Execute the native blast
-        system.execCommand(blastProg, args);
+        system.execCommand(param.blastProg, args);
 
         return result;
     }

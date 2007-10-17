@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -42,6 +42,10 @@ public class StatsImpl implements Stats {
     private long initTime;
     private long finitTime;
     private long currentStateStart;
+    private long computationBlockedFetchingData;
+    private long unusedCPUTime;
+    private long uploadedBytes;
+    private long downloadedBytes;
     private Workout workout;
     private int maxResources;
 
@@ -56,6 +60,8 @@ public class StatsImpl implements Stats {
         finitTime = 0;
         currentStateStart = initTime;
         maxResources = 1;
+        computationBlockedFetchingData = unusedCPUTime = 0;
+        uploadedBytes = downloadedBytes = 0;
 
         subTreeSize = numberLeafs = 0;
         workout = new Workout(8);
@@ -67,6 +73,22 @@ public class StatsImpl implements Stats {
 
     public void addComputationTime(long time) {
         computationTime += time;
+    }
+
+    public void addComputationBlockedFetchingData(long time) {
+        computationBlockedFetchingData += time;
+    }
+
+    public void addUnusedCPUTime(long time) {
+        unusedCPUTime += time;
+    }
+
+    public void addUploadedBytes(long time) {
+        uploadedBytes += time;
+    }
+
+    public void addDownloadedBytes(long time) {
+        downloadedBytes += time;
     }
 
     public void exitReadyState() {
@@ -97,9 +119,11 @@ public class StatsImpl implements Stats {
 
         return "Time: " + processingTime + "P " + readyTime + "R " +
         waitingTime + "W " + resultsTime + "F " + getWallClockTime() + "L " +
-        getComputationTime() + "C [ms] " + "TreeSize:" + getTreeSize() + " " +
-        "TreeSpan:" + getTreeSpan() + " " + "TreeDepth:" + getTreeDepth() + ls +
-        workout;
+        getComputationTime() + "C[ms] " + unusedCPUTime + "UC[ms] " +
+        computationBlockedFetchingData + "B[ms] " + uploadedBytes +
+        "Up [bytes] " + downloadedBytes + "Down [bytes] " + "TreeSize:" +
+        getTreeSize() + " " + "TreeSpan:" + getTreeSpan() + " " + "TreeDepth:" +
+        getTreeDepth() + ls + workout;
     }
 
     public void markFinishTime() {
@@ -121,6 +145,11 @@ public class StatsImpl implements Stats {
         this.maxResources = Math.max(maxResources,
                 stats.getMaxAvailableResources());
         this.workout.track(stats.workout);
+
+        this.computationBlockedFetchingData += stats.computationBlockedFetchingData;
+        this.unusedCPUTime += stats.unusedCPUTime;
+        this.uploadedBytes += stats.uploadedBytes;
+        this.downloadedBytes += stats.downloadedBytes;
     }
 
     private int getNumberLeafs() {

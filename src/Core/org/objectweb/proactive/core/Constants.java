@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -42,25 +42,25 @@ package org.objectweb.proactive.core;
 public interface Constants {
 
     /** The explicit local body default class */
-    public static final Class DEFAULT_BODY_CLASS = org.objectweb.proactive.core.body.ActiveBody.class;
+    public static final Class<?> DEFAULT_BODY_CLASS = org.objectweb.proactive.core.body.ActiveBody.class;
 
     /** The name of the explicit local body default class */
     public static final String DEFAULT_BODY_CLASS_NAME = DEFAULT_BODY_CLASS.getName();
 
     /** The explicit local body default class */
-    public static final Class DEFAULT_BODY_INTERFACE = org.objectweb.proactive.Body.class;
+    public static final Class<?> DEFAULT_BODY_INTERFACE = org.objectweb.proactive.Body.class;
 
     /** The name of the explicit local body default class */
     public static final String DEFAULT_BODY_INTERFACE_NAME = DEFAULT_BODY_INTERFACE.getName();
 
     /** The explicit local body default class */
-    public static final Class DEFAULT_BODY_PROXY_CLASS = org.objectweb.proactive.core.body.proxy.UniversalBodyProxy.class;
+    public static final Class<?> DEFAULT_BODY_PROXY_CLASS = org.objectweb.proactive.core.body.proxy.UniversalBodyProxy.class;
 
     /** The name of the explicit local body default class */
     public static final String DEFAULT_BODY_PROXY_CLASS_NAME = DEFAULT_BODY_PROXY_CLASS.getName();
 
     /** The explicit local body default class */
-    public static final Class DEFAULT_FUTURE_PROXY_CLASS = org.objectweb.proactive.core.body.future.FutureProxy.class;
+    public static final Class<?> DEFAULT_FUTURE_PROXY_CLASS = org.objectweb.proactive.core.body.future.FutureProxy.class;
 
     /** The name of the explicit local body default class */
     public static final String DEFAULT_FUTURE_PROXY_CLASS_NAME = DEFAULT_FUTURE_PROXY_CLASS.getName();
@@ -69,7 +69,7 @@ public interface Constants {
      * The interface implemented by all proxies featuring 'future' semantics,
      * depending on whether they are remoteBodyly-accessible or not
      */
-    public static final Class FUTURE_PROXY_INTERFACE = org.objectweb.proactive.core.body.future.Future.class;
+    public static final Class<?> FUTURE_PROXY_INTERFACE = org.objectweb.proactive.core.body.future.Future.class;
 
     /** rmi protocol identifier */
     public static final String RMI_PROTOCOL_IDENTIFIER = "rmi";

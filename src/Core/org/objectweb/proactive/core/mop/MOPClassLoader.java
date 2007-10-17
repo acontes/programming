@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -100,10 +100,10 @@ public class MOPClassLoader extends URLClassLoader {
     public void launchMain(String[] args) throws Throwable {
         try {
             // Looks up the class that contains main
-            Class cl = Class.forName(args[0], true, this);
+            Class<?> cl = Class.forName(args[0], true, this);
 
             // Looks up method main
-            Class[] argTypes = { args.getClass() };
+            Class<?>[] argTypes = { args.getClass() };
             Method mainMethod = cl.getMethod("main", argTypes);
 
             // And calls it
@@ -128,7 +128,7 @@ public class MOPClassLoader extends URLClassLoader {
         ClassLoader currentClassLoader = null;
 
         try {
-            Class c = Class.forName(
+            Class<?> c = Class.forName(
                     "org.objectweb.proactive.core.mop.MOPClassLoader");
             currentClassLoader = c.getClassLoader();
         } catch (ClassNotFoundException e) {
@@ -159,18 +159,18 @@ public class MOPClassLoader extends URLClassLoader {
         return this.loadClass(name, null, null, false);
     }
 
-    public Class loadClass(String name, Class[] genericParameters)
+    public Class<?> loadClass(String name, Class<?>[] genericParameters)
         throws ClassNotFoundException {
         return this.loadClass(name, genericParameters, null, false);
     }
 
-    public Class loadClass(String name, Class[] genericParameters,
+    public Class<?> loadClass(String name, Class<?>[] genericParameters,
         ClassLoader cl) throws ClassNotFoundException {
         return this.loadClass(name, genericParameters, cl, false);
     }
 
-    protected synchronized Class loadClass(String name,
-        Class[] genericParameters, ClassLoader cl, boolean resolve)
+    protected synchronized Class<?> loadClass(String name,
+        Class<?>[] genericParameters, ClassLoader cl, boolean resolve)
         throws ClassNotFoundException {
         if (this.getParent() != null) {
             try {
@@ -226,8 +226,8 @@ public class MOPClassLoader extends URLClassLoader {
                 // class Access checking. This method is supposed to be protected which means 
                 // we should not be accessing it but the access policy file allows us to access it freely.
                 try {
-                    Class clc = Class.forName("java.lang.ClassLoader");
-                    Class[] argumentTypes = new Class[5];
+                    Class<?> clc = Class.forName("java.lang.ClassLoader");
+                    Class<?>[] argumentTypes = new Class<?>[5];
                     argumentTypes[0] = name.getClass();
                     argumentTypes[1] = data.getClass();
                     argumentTypes[2] = Integer.TYPE;
@@ -249,11 +249,11 @@ public class MOPClassLoader extends URLClassLoader {
                     //  we have been loaded through the bootclasspath
                     // so we use the context classloader
                     if (this.getParent() == null) {
-                        return (Class) m.invoke(Thread.currentThread()
-                                                      .getContextClassLoader(),
+                        return (Class<?>) m.invoke(Thread.currentThread()
+                                                         .getContextClassLoader(),
                             effectiveArguments);
                     } else {
-                        return (Class) m.invoke(this.getParent(),
+                        return (Class<?>) m.invoke(this.getParent(),
                             effectiveArguments);
                     }
                 } catch (Exception ex) {

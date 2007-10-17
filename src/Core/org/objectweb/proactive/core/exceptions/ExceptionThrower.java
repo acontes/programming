@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -59,7 +59,7 @@ public class ExceptionThrower {
         "." + THROWER_CLASS_NAME;
     private static Thrower thrower = null;
 
-    private static Class loadClassJavassist() {
+    private static Class<?> loadClassJavassist() {
         try {
             CtClass throwerClass = ClassPool.getDefault()
                                             .makeClass(THROWER_CLASS_FULLNAME);
@@ -79,13 +79,13 @@ public class ExceptionThrower {
     }
 
     /* We load a class given its name and its binary representation */
-    private static Class loadClass(String className, byte[] b)
+    private static Class<?> loadClass(String className, byte[] b)
         throws Exception {
-        Class clazz = null;
+        Class<?> clazz = null;
         ClassLoader loader = ClassLoader.getSystemClassLoader();
-        Class cls = Class.forName("java.lang.ClassLoader");
+        Class<?> cls = Class.forName("java.lang.ClassLoader");
         java.lang.reflect.Method method = cls.getDeclaredMethod("defineClass",
-                new Class[] { String.class, byte[].class, int.class, int.class });
+                new Class<?>[] { String.class, byte[].class, int.class, int.class });
 
         /* protected method invocaton */
         method.setAccessible(true);
@@ -93,7 +93,7 @@ public class ExceptionThrower {
             Object[] args = new Object[] {
                     className, b, new Integer(0), new Integer(b.length)
                 };
-            clazz = (Class) method.invoke(loader, args);
+            clazz = (Class<?>) method.invoke(loader, args);
         } finally {
             method.setAccessible(false);
         }
@@ -103,7 +103,7 @@ public class ExceptionThrower {
     /* The first time the mechanism is used, it has to initialize the thrower */
     private static void activate() {
         try {
-            Class clazz = loadClassJavassist();
+            Class<?> clazz = loadClassJavassist();
             thrower = (Thrower) clazz.newInstance();
         } catch (Exception e) {
             e.printStackTrace();

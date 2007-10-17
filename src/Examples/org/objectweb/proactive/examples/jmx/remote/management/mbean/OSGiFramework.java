@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -47,6 +47,7 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.rmi.ClassServer;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.jmx.remote.management.command.osgi.InstallCommand;
 import org.objectweb.proactive.examples.jmx.remote.management.command.osgi.OSGiCommand;
 import org.objectweb.proactive.examples.jmx.remote.management.exceptions.InvalidTransactionException;
@@ -100,7 +101,7 @@ public class OSGiFramework extends NotificationBroadcasterSupport
         try {
             this.context = context;
             OSGiStore.getInstance().setContext(this.context);
-            this.url = InetAddress.getLocalHost().getCanonicalHostName();
+            this.url = URIBuilder.getLocalAddress().getCanonicalHostName();
             this.port = ClassServer.getServerSocketPort();
             OSGiStore.getInstance().setUrl(url);
             UrlMBean urlMbean = new Url(this.url + '(' + this.port + ')');

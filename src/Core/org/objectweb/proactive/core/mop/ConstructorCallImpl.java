@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -156,7 +156,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
      *        Returns a <code>Class</code> object representing the type of
      * the object this reified constructor will build when reflected
      */
-    protected Class getReifiedClass() {
+    protected Class<?> getReifiedClass() {
         return reifiedConstructor.getDeclaringClass();
     }
 
@@ -168,9 +168,10 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
         // We want to implement a workaround the Constructor
         // not being Serializable
         out.writeObject(this.effectiveArguments);
+
         // Constructor needs to be converted because it is not serializable
-        Class declaringClass;
-        Class[] parameters;
+        Class<?> declaringClass;
+        Class<?>[] parameters;
 
         declaringClass = this.reifiedConstructor.getDeclaringClass();
         out.writeObject(declaringClass);
@@ -181,8 +182,8 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
-        Class declaringClass = null;
-        Class[] parameters;
+        Class<?> declaringClass = null;
+        Class<?>[] parameters;
         try {
             this.effectiveArguments = (Object[]) in.readObject();
         } catch (IOException e) {
@@ -191,8 +192,8 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
             throw e;
         }
 
-        declaringClass = (Class) in.readObject();
-        parameters = (Class[]) in.readObject();
+        declaringClass = (Class<?>) in.readObject();
+        parameters = (Class<?>[]) in.readObject();
 
         try {
             this.reifiedConstructor = declaringClass.getConstructor(parameters);

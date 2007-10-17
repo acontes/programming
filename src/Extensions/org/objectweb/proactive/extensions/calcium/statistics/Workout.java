@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -31,6 +31,9 @@
 package org.objectweb.proactive.extensions.calcium.statistics;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -44,17 +47,20 @@ import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
 
 public class Workout implements Serializable {
     public HashMap<Class<?>, Exercise> muscleWorkout;
+    public static ClassSorterByName classSorterByName = new ClassSorterByName();
 
     public Workout(int initHashSize) {
-        muscleWorkout = new HashMap<Class<?>, Exercise>(initHashSize);
+        muscleWorkout = new HashMap<Class<?>, Exercise>();
     }
 
     @Override
     public String toString() {
         String workout = "Workout: ";
-        java.util.Iterator<Class<?>> it = muscleWorkout.keySet().iterator();
-        while (it.hasNext()) {
-            Class<?> muscle = it.next();
+
+        List<Class<?>> keys = new ArrayList<Class<?>>(muscleWorkout.keySet());
+        Collections.sort(keys, classSorterByName);
+
+        for (Class<?> muscle : keys) {
             workout += (muscle.getSimpleName() + "(" +
             muscleWorkout.get(muscle) + ") ");
         }
@@ -125,5 +131,11 @@ public class Workout implements Serializable {
 
     public List<Exercise> getExecuteExercise() {
         return getExercises(Execute.class);
+    }
+
+    static class ClassSorterByName implements Comparator<Class<?>> {
+        public int compare(Class<?> o1, Class<?> o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
     }
 }

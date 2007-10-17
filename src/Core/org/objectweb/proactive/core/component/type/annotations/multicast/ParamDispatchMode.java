@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -155,16 +155,16 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
         boolean result = false;
         boolean clientSideParamTypeIsParameterizedType = (clientSideInputParameterType instanceof ParameterizedType);
         boolean serverSideParamTypeIsParameterizedType = (serverSideInputParameterType instanceof ParameterizedType);
-        Class clientSideClass = null;
-        Class clientSideElementsType = null;
-        Class clientSideRawType = null;
+        Class<?> clientSideClass = null;
+        Class<?> clientSideElementsType = null;
+        Class<?> clientSideRawType = null;
 
-        Class serverSideClass = null;
-        Class serverSideElementsType = null;
-        Class serverSideRawType = null;
+        Class<?> serverSideClass = null;
+        Class<?> serverSideElementsType = null;
+        Class<?> serverSideRawType = null;
 
         if (clientSideParamTypeIsParameterizedType) {
-            clientSideRawType = (Class) ((ParameterizedType) clientSideInputParameterType).getRawType();
+            clientSideRawType = (Class<?>) ((ParameterizedType) clientSideInputParameterType).getRawType();
             if (!(((ParameterizedType) clientSideInputParameterType).getActualTypeArguments().length == 1)) {
                 throw new ParameterDispatchException(
                     "client side input parameter type " +
@@ -173,13 +173,13 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
             }
             Type cType = ((ParameterizedType) clientSideInputParameterType).getActualTypeArguments()[0];
             if (cType instanceof ParameterizedType) {
-                clientSideElementsType = (Class) ((ParameterizedType) cType).getRawType();
+                clientSideElementsType = (Class<?>) ((ParameterizedType) cType).getRawType();
             } else {
-                clientSideElementsType = (Class) cType;
+                clientSideElementsType = (Class<?>) cType;
             }
         } else {
-            if (clientSideInputParameterType instanceof Class) {
-                clientSideClass = (Class) clientSideInputParameterType;
+            if (clientSideInputParameterType instanceof Class<?>) {
+                clientSideClass = (Class<?>) clientSideInputParameterType;
             } else {
                 throw new ParameterDispatchException(
                     "client side input parameter type " +
@@ -189,7 +189,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
         }
 
         if (serverSideParamTypeIsParameterizedType) {
-            serverSideRawType = ((Class) ((ParameterizedType) serverSideInputParameterType).getRawType());
+            serverSideRawType = ((Class<?>) ((ParameterizedType) serverSideInputParameterType).getRawType());
             if (!(((ParameterizedType) serverSideInputParameterType).getActualTypeArguments().length == 1)) {
                 throw new ParameterDispatchException(
                     "server side input parameter type " +
@@ -198,15 +198,15 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
             }
             Type sType = ((ParameterizedType) serverSideInputParameterType).getActualTypeArguments()[0];
             if (sType instanceof ParameterizedType) {
-                serverSideElementsType = (Class) ((ParameterizedType) sType).getRawType();
+                serverSideElementsType = (Class<?>) ((ParameterizedType) sType).getRawType();
             } else {
-                serverSideElementsType = (Class) sType;
+                serverSideElementsType = (Class<?>) sType;
             }
 
-            //serverSideElementsType = ((Class) ((ParameterizedType) serverSideInputParameterType).getOwnerType());
+            //serverSideElementsType = ((Class<?>) ((ParameterizedType) serverSideInputParameterType).getOwnerType());
         } else {
-            if (serverSideInputParameterType instanceof Class) {
-                serverSideClass = (Class) serverSideInputParameterType;
+            if (serverSideInputParameterType instanceof Class<?>) {
+                serverSideClass = (Class<?>) serverSideInputParameterType;
             } else {
                 throw new ParameterDispatchException(
                     "server side input parameter type " +

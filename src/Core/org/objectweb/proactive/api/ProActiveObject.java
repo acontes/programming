@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.api;
 
 import java.io.IOException;
@@ -57,7 +87,7 @@ public class ProActiveObject {
         ProActiveConfiguration.load();
         @SuppressWarnings("unused") // Execute RuntimeFactory's static blocks
 
-        Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
+        Class<?> c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
     }
 
     //
@@ -129,8 +159,8 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
      */
-    public static Object newActive(String classname, Class[] genericParameters,
-        Object[] constructorParameters)
+    public static Object newActive(String classname,
+        Class<?>[] genericParameters, Object[] constructorParameters)
         throws ActiveObjectCreationException, NodeException {
         // avoid ambiguity for method parameters types
         Node nullNode = null;
@@ -149,9 +179,9 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node URL cannot be resolved as an existing Node
      */
-    public static Object newActive(String classname, Class[] genericParameters,
-        Object[] constructorParameters, String nodeURL)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object newActive(String classname,
+        Class<?>[] genericParameters, Object[] constructorParameters,
+        String nodeURL) throws ActiveObjectCreationException, NodeException {
         if (nodeURL == null) {
             // avoid ambiguity for method parameters types
             Node nullNode = null;
@@ -174,8 +204,8 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newActive(String classname, Class[] genericParameters,
-        Object[] constructorParameters, Node node)
+    public static Object newActive(String classname,
+        Class<?>[] genericParameters, Object[] constructorParameters, Node node)
         throws ActiveObjectCreationException, NodeException {
         return newActive(classname, genericParameters, constructorParameters,
             node, null, null);
@@ -205,9 +235,9 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newActive(String classname, Class[] genericParameters,
-        Object[] constructorParameters, Node node, Active activity,
-        MetaObjectFactory factory)
+    public static Object newActive(String classname,
+        Class<?>[] genericParameters, Object[] constructorParameters,
+        Node node, Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
@@ -343,7 +373,7 @@ public class ProActiveObject {
      * @throws ClassNotFoundException in the case of className is not a class.
      */
     public static Object[] newActiveInParallel(String className,
-        Class[] genericParameters, Object[][] constructorParameters,
+        Class<?>[] genericParameters, Object[][] constructorParameters,
         Node[] nodes) throws ClassNotFoundException {
         if (constructorParameters.length != nodes.length) {
             throw new ProActiveRuntimeException(
@@ -373,7 +403,7 @@ public class ProActiveObject {
             e1.printStackTrace();
         }
 
-        Class classForResult = Class.forName(className);
+        Class<?> classForResult = Class.forName(className);
         return result.toArray((Object[]) Array.newInstance(classForResult,
                 result.size()));
     }
@@ -395,7 +425,7 @@ public class ProActiveObject {
      * @throws ClassNotFoundException in the case of className is not a class.
      */
     public static Object[] newActiveInParallel(String className,
-        Class[] genericParameters, Object[] constructorParameters,
+        Class<?>[] genericParameters, Object[] constructorParameters,
         VirtualNode virtualNode) throws NodeException, ClassNotFoundException {
         // Creation of the thread pool
         ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -426,7 +456,7 @@ public class ProActiveObject {
             e1.printStackTrace();
         }
 
-        Class classForResult = Class.forName(className);
+        Class<?> classForResult = Class.forName(className);
         return result.toArray((Object[]) Array.newInstance(classForResult,
                 result.size()));
     }
@@ -441,7 +471,7 @@ public class ProActiveObject {
      */
     public static Object turnActive(Object target)
         throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, (Class[]) null, (Node) null);
+        return turnActive(target, (Class<?>[]) null, (Node) null);
     }
 
     /**
@@ -574,7 +604,7 @@ public class ProActiveObject {
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object turnActive(Object target, String nameOfTargetType,
-        Class[] genericParameters, Node node, Active activity,
+        Class<?>[] genericParameters, Node node, Active activity,
         MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
         if (factory == null) {
@@ -630,7 +660,7 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Class[] genericParameters)
+    public static Object turnActive(Object target, Class<?>[] genericParameters)
         throws ActiveObjectCreationException, NodeException {
         return turnActive(target, genericParameters, (Node) null,
             (Active) null, (MetaObjectFactory) null);
@@ -648,8 +678,9 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Class[] genericParameters,
-        String nodeURL) throws ActiveObjectCreationException, NodeException {
+    public static Object turnActive(Object target,
+        Class<?>[] genericParameters, String nodeURL)
+        throws ActiveObjectCreationException, NodeException {
         if (nodeURL == null) {
             return turnActive(target, genericParameters,
                 target.getClass().getName(), null, null, null);
@@ -672,8 +703,9 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Class[] genericParameters,
-        Node node) throws ActiveObjectCreationException, NodeException {
+    public static Object turnActive(Object target,
+        Class<?>[] genericParameters, Node node)
+        throws ActiveObjectCreationException, NodeException {
         return turnActive(target, genericParameters,
             target.getClass().getName(), node, null, null);
     }
@@ -694,8 +726,9 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Class[] genericParameters,
-        Node node, Active activity, MetaObjectFactory factory)
+    public static Object turnActive(Object target,
+        Class<?>[] genericParameters, Node node, Active activity,
+        MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
         return turnActive(target, genericParameters,
             target.getClass().getName(), node, activity, factory);
@@ -715,8 +748,8 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Class[] genericParameters,
-        String nameOfTargetType, Node node)
+    public static Object turnActive(Object target,
+        Class<?>[] genericParameters, String nameOfTargetType, Node node)
         throws ActiveObjectCreationException, NodeException {
         return turnActive(target, genericParameters, nameOfTargetType, node,
             null, null);
@@ -744,9 +777,9 @@ public class ProActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Class[] genericParameters,
-        String nameOfTargetType, Node node, Active activity,
-        MetaObjectFactory factory)
+    public static Object turnActive(Object target,
+        Class<?>[] genericParameters, String nameOfTargetType, Node node,
+        Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
@@ -934,7 +967,7 @@ public class ProActiveObject {
      * @param parametersTypes the types of the parameters of the method
      */
     public static void setImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
         ProActiveObject.getBodyOnThis()
                        .setImmediateService(methodName, parametersTypes);
     }
@@ -955,7 +988,7 @@ public class ProActiveObject {
      * @param parametersTypes the types of the parameters of the method
      */
     public static void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
         ProActiveObject.getBodyOnThis()
                        .removeImmediateService(methodName, parametersTypes);
     }

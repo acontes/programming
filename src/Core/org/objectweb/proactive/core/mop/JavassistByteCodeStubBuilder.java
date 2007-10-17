@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -74,12 +74,13 @@ public class JavassistByteCodeStubBuilder {
      * @return the bytecode for the corresponding stub class
      * @throws NoClassDefFoundError if the specified classname does not correspond to a class in the classpath
      */
-    public static byte[] create(String className, Class[] genericParameters)
+    @SuppressWarnings("unchecked")
+    public static byte[] create(String className, Class<?>[] genericParameters)
         throws NoClassDefFoundError {
         CtClass generatedCtClass = null;
 
         if (genericParameters == null) {
-            genericParameters = new Class[0];
+            genericParameters = new Class<?>[0];
         }
         CtMethod[] reifiedMethodsWithoutGenerics;
         try {
@@ -242,7 +243,7 @@ public class JavassistByteCodeStubBuilder {
                         key.append(params[k].getName());
                     }
 
-                    // replace with current one, because this gives the actual declaring Class of this method
+                    // replace with current one, because this gives the actual declaring Class<?> of this method
                     temp.put(key.toString(), currentMethod);
                 }
             }
@@ -269,7 +270,7 @@ public class JavassistByteCodeStubBuilder {
 
             Class realSuperClass = Class.forName(className);
             TypeVariable<GenericDeclaration>[] tv = realSuperClass.getTypeParameters();
-            Map<TypeVariable, Class> genericTypesMapping = new HashMap<TypeVariable, Class>();
+            Map<TypeVariable, Class<?>> genericTypesMapping = new HashMap<TypeVariable, Class<?>>();
             if (genericParameters.length != 0) {
                 // only deal with cases where parameters have been specified
                 for (int i = 0; i < tv.length; i++) {
@@ -485,10 +486,10 @@ public class JavassistByteCodeStubBuilder {
      */
     public static void createStaticInitializer(CtClass generatedClass,
         CtMethod[] reifiedMethods, List<String> classesIndexer,
-        String superClassName, Class[] genericParameters)
+        String superClassName, Class<?>[] genericParameters)
         throws CannotCompileException, NotFoundException {
         if (genericParameters == null) {
-            genericParameters = new Class[0];
+            genericParameters = new Class<?>[0];
         }
         CtConstructor classInitializer = generatedClass.makeClassInitializer();
 

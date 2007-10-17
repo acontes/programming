@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -182,13 +182,14 @@ public class Utils {
             javaInterfaceName) + OUTPUT_INTERCEPTOR_SUFFIX);
     }
 
-    public static Class defineClass(final String className, final byte[] bytes)
+    public static Class<?> defineClass(final String className,
+        final byte[] bytes)
         throws ClassNotFoundException, SecurityException, NoSuchMethodException,
             IllegalArgumentException, IllegalAccessException,
             InvocationTargetException {
         // The following code invokes defineClass on the current thread classloader by reflection
-        Class clc = Class.forName("java.lang.ClassLoader");
-        Class[] argumentTypes = new Class[4];
+        Class<?> clc = Class.forName("java.lang.ClassLoader");
+        Class<?>[] argumentTypes = new Class<?>[4];
         argumentTypes[0] = className.getClass();
         argumentTypes[1] = bytes.getClass();
         argumentTypes[2] = Integer.TYPE;
@@ -203,8 +204,8 @@ public class Utils {
         effectiveArguments[2] = new Integer(0);
         effectiveArguments[3] = new Integer(bytes.length);
 
-        return (Class) method.invoke(Thread.currentThread()
-                                           .getContextClassLoader(),
+        return (Class<?>) method.invoke(Thread.currentThread()
+                                              .getContextClassLoader(),
             effectiveArguments);
     }
 

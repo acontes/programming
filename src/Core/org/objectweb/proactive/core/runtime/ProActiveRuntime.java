@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -223,10 +223,10 @@ public interface ProActiveRuntime extends SecurityEntity {
      * Returns all Active Objects deployed on the node with the given name on
      * this ProActiveRuntime
      * @param nodeName the name of the node
-     * @return ArrayList of ArrayList. The latter contains [body, classname].
+     * @return List of UniversalBody. The latter contains [body, classname].
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public ArrayList getActiveObjects(String nodeName)
+    public List<UniversalBody> getActiveObjects(String nodeName)
         throws ProActiveException;
 
     /**
@@ -237,8 +237,8 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return Active Objects of the specified class name deployed on this ProactiveRuntime
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public ArrayList getActiveObjects(String nodeName, String className)
-        throws ProActiveException;
+    public List<UniversalBody> getActiveObjects(String nodeName,
+        String className) throws ProActiveException;
 
     /**
      * Returns the VirtualNode with the given name

@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -41,10 +41,10 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _initOperationDesc1();
     }
 
-    private java.util.Vector<Class> cachedSerClasses = new java.util.Vector<Class>();
+    private java.util.Vector<Class<?>> cachedSerClasses = new java.util.Vector<Class<?>>();
     private java.util.Vector<QName> cachedSerQNames = new java.util.Vector<QName>();
-    private java.util.Vector<Class> cachedSerFactories = new java.util.Vector<Class>();
-    private java.util.Vector<Class> cachedDeserFactories = new java.util.Vector<Class>();
+    private java.util.Vector<Class<?>> cachedSerFactories = new java.util.Vector<Class<?>>();
+    private java.util.Vector<Class<?>> cachedDeserFactories = new java.util.Vector<Class<?>>();
 
     public Service1SoapStub() throws org.apache.axis.AxisFault {
         this(null);
@@ -64,16 +64,16 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
             super.service = service;
         }
 
-        java.lang.Class cls;
+        java.lang.Class<?> cls;
         javax.xml.namespace.QName qName;
-        java.lang.Class beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
-        java.lang.Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
-        java.lang.Class enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
-        java.lang.Class enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
-        java.lang.Class arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
-        java.lang.Class arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
-        java.lang.Class simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
-        java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
+        java.lang.Class<?> beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
+        java.lang.Class<?> beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
+        java.lang.Class<?> enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
+        java.lang.Class<?> enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
+        java.lang.Class<?> arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
+        java.lang.Class<?> arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
+        java.lang.Class<?> simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
+        java.lang.Class<?> simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
         qName = new javax.xml.namespace.QName("http://tempuri.org/",
                 "ArrayOfInt");
         cachedSerQNames.add(qName);
@@ -267,10 +267,10 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
                     _call.setEncodingStyle(null);
 
                     for (int i = 0; i < cachedSerFactories.size(); ++i) {
-                        java.lang.Class cls = (java.lang.Class) cachedSerClasses.get(i);
+                        java.lang.Class<?> cls = (java.lang.Class<?>) cachedSerClasses.get(i);
                         javax.xml.namespace.QName qName = (javax.xml.namespace.QName) cachedSerQNames.get(i);
-                        java.lang.Class sf = (java.lang.Class) cachedSerFactories.get(i);
-                        java.lang.Class df = (java.lang.Class) cachedDeserFactories.get(i);
+                        java.lang.Class<?> sf = (java.lang.Class<?>) cachedSerFactories.get(i);
+                        java.lang.Class<?> df = (java.lang.Class<?>) cachedDeserFactories.get(i);
                         _call.registerTypeMapping(cls, qName, sf, df, false);
                     }
                 }

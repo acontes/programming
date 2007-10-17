@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.extra.gcmdeployment.process.group;
 
 import java.util.List;
@@ -11,7 +41,6 @@ public class GroupGridEngine extends AbstractGroup {
     private String bookingDuration;
     private PathElement scriptLocation;
     private String parallelEnvironment;
-    private String hostList;
 
     @Override
     public List<String> internalBuildCommands() {
@@ -69,23 +98,5 @@ public class GroupGridEngine extends AbstractGroup {
      */
     public String getParallelEnvironment() {
         return this.parallelEnvironment;
-    }
-
-    /**
-     * Sets the value of the hostList parameter with the given value
-     * Not yet included in the sge command
-     * @param hostList
-     */
-    public void setHostList(String hostList) {
-        this.hostList = hostList;
-    }
-
-    /**
-     * Returns the hostList value of this process.
-     * Not yet included in the sge command
-     * @return String
-     */
-    public String getHostList() {
-        return hostList;
     }
 }

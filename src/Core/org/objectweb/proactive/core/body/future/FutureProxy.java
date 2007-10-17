@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -496,8 +496,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         // where the proxy object implements the interface FUTURE_PROXY_INTERFACE
         // if the proxy does not inherit from FUTURE_PROXY_ROOT_CLASS
         // it is not a future
-        Class proxyclass = ((StubObject) obj).getProxy().getClass();
-        Class[] ints = proxyclass.getInterfaces();
+        Class<?> proxyclass = ((StubObject) obj).getProxy().getClass();
+        Class<?>[] ints = proxyclass.getInterfaces();
         for (int i = 0; i < ints.length; i++) {
             if (Constants.FUTURE_PROXY_INTERFACE.isAssignableFrom(ints[i])) {
                 return true;
