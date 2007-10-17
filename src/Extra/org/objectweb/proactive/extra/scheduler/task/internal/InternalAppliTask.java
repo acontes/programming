@@ -34,6 +34,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
@@ -65,7 +66,7 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
     /**
      * Create a new Java application task descriptor using instantiated java task.
      *
-     * @param task the already instanciated java task.
+     * @param task the already instantiated java task.
      */
     public InternalAppliTask(ExecutableApplicationTask task) {
         this.task = task;
@@ -74,7 +75,7 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
     /**
      * Create a new Java application task descriptor using a specific Class.
      *
-     * @param taskClass the class instance of the class to instanciate.
+     * @param taskClass the class instance of the class to instantiate.
      */
     public InternalAppliTask(Class<ExecutableApplicationTask> taskClass) {
         super(taskClass);
@@ -84,24 +85,23 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() {
-        if (task != null) {
-            return task;
-        }
-        try {
-            task = (ExecutableApplicationTask) taskClass.newInstance();
+    public ExecutableTask getTask() throws TaskCreationException {
+        // create task from taskClass
+        if (task == null) {
             try {
-                task.init(args);
-            } catch (Exception e) {
-                System.err.println("WARING : INIT has failed for task " +
-                    task.getClass().getSimpleName());
-                e.printStackTrace();
+                task = (ExecutableApplicationTask) taskClass.newInstance();
+            } catch (InstantiationException e) {
+                throw new TaskCreationException("Cannot create applitask from task class ",
+                    e);
+            } catch (IllegalAccessException e) {
+                throw new TaskCreationException("Cannot create applitask from task class ",
+                    e);
             }
-            return task;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
+
+        task.setArgs(args);
+
+        return task;
     }
 
     /**
@@ -124,9 +124,9 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
     }
 
     /**
-     * Set the instanciated java application task.
+     * Set the instantiated java application task.
      *
-     * @param task the instanciated java application task.
+     * @param task the instantiated java application task.
      */
     public void setTask(ExecutableApplicationTask task) {
         this.task = task;

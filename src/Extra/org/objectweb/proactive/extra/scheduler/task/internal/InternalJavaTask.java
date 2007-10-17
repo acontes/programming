@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
+import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 
@@ -59,7 +60,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     /**
      * Create a new Java task descriptor using instantiated java task.
      *
-     * @param task the already instanciated java task.
+     * @param task the already instantiated java task.
      */
     public InternalJavaTask(ExecutableJavaTask task) {
         this.task = task;
@@ -68,7 +69,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     /**
      * Create a new Java task descriptor using a specific Class.
      *
-     * @param taskClass the class instance of the class to instanciate.
+     * @param taskClass the class instance of the class to instantiate.
      */
     public InternalJavaTask(Class<ExecutableJavaTask> taskClass) {
         super(taskClass);
@@ -78,30 +79,29 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() {
-        if (task != null) {
-            return task;
-        }
-        try {
-            task = (ExecutableJavaTask) taskClass.newInstance();
+    public ExecutableTask getTask() throws TaskCreationException {
+        // create task from taskClass
+        if (task == null) {
             try {
-                task.init(args);
-            } catch (Exception e) {
-                System.err.println("WARING : INIT has failed for task " +
-                    task.getClass().getSimpleName());
-                e.printStackTrace();
+                task = (ExecutableJavaTask) taskClass.newInstance();
+            } catch (InstantiationException e) {
+                throw new TaskCreationException("Cannot create javatask from task class ",
+                    e);
+            } catch (IllegalAccessException e) {
+                throw new TaskCreationException("Cannot create javatask from task class ",
+                    e);
             }
-            return task;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
+
+        task.setArgs(args);
+
+        return task;
     }
 
     /**
-     * Set the instanciated java task.
+     * Set the instantiated java task.
      *
-     * @param task the instanciated java task.
+     * @param task the instantiated java task.
      */
     public void setTask(ExecutableJavaTask task) {
         this.task = task;

@@ -1,27 +1,30 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
- * computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis Contact:
- * proactive-support@inria.fr
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
  *
- * Initial developer(s): The ProActive Team
- * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
  *
  * ################################################################
  */
@@ -41,12 +44,11 @@ public class TestGrouping {
     /**
      * muscles: a, b, c, d ,e
      *
-     * Group 1: a->x, b->x, b->y c->y
-     * Group 2: d->o, e->p, p->q
+     * Group 1: a->x, b->{x,y}, c->y
+     * Group 2: d->p, p->o, e->q, q->o
      *
      */
-    public void groupTest()
-        throws IllegalArgumentException, IllegalAccessException {
+    public void groupTest() throws Exception {
         //building the graph
         Leaf x = new Leaf();
         Leaf y = new Leaf();
@@ -68,12 +70,14 @@ public class TestGrouping {
         assertTrue(Stateness.shareState(a, b));
         assertFalse(Stateness.shareState(a, c));
 
+        assertTrue(Stateness.shareState(d, e));
+
         //put all the graphs entrypoints inside a list
         ArrayList list = new ArrayList();
         list.add(a);
         list.add(b);
-        list.add(d);
         list.add(c);
+        list.add(d);
         list.add(e);
         list.add(a); //duplicates should be handled independantely
 

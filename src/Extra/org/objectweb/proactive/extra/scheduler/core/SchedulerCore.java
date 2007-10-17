@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -76,6 +77,7 @@ import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResultImpl;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalNativeTask;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -118,7 +120,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     /** Implementation of Infrastructure Manager */
     private InfrastructureManagerProxy resourceManager;
 
-    /** Scheduler frontend. */
+    /** Scheduler front-end. */
     private SchedulerFrontend frontend;
 
     /** Scheduler current policy */
@@ -165,7 +167,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             this.resourceManager = imp;
             this.frontend = frontend;
             //logger
-            host = java.net.InetAddress.getLocalHost().getHostName();
+            host = URIBuilder.getLocalAddress().getHostName();
             try {
                 SimpleLoggerServer slf = SimpleLoggerServer.createLoggerServer();
                 this.port = slf.getPort();
@@ -236,7 +238,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     //block the loop until a method is invoked and serve it
                     service.blockingServeOldest(SCHEDULER_TIME_OUT);
                 } catch (Exception e) {
-                    System.out.println("SchedulerCore.runActivity(MAIN_LOOP)");
+                    System.out.println(
+                        "SchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
                     e.printStackTrace();
                 }
             }
@@ -327,6 +330,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             //TODO improve the way to get the nodes from the resources manager.
             //it can be better to associate scripts and node to ask for more than one node each time,
             //and to be sure that we give the right node with its right script
+            //for the moment, we take the nodes one by one.
             NodeSet nodeSet = resourceManager.getAtMostNodes(internalTask.getNumberOfNodesNeeded(),
                     internalTask.getVerifyingScript());
             Node node = null;
@@ -388,7 +392,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                             currentJob.start();
                             pendingJobs.remove(currentJob);
                             runningJobs.add(currentJob);
-                            // send job event to frontend
+                            // send job event to front-end
                             frontend.pendingToRunningJobEvent(currentJob.getJobInfo());
                             // don't forget to set the task status modify to null after a Job.start() method;
                             currentJob.setTaskStatusModify(null);
@@ -397,7 +401,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                         currentJob.startTask(internalTask,
                             node.getNodeInformation().getVMInformation()
                                 .getHostName());
-                        // send task event to frontend
+                        // send task event to front-end
                         frontend.pendingToRunningTaskEvent(internalTask.getTaskInfo());
                     } else {
                         //if no task can be launched on this job, go to the next job.
@@ -406,16 +410,16 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                         break;
                     }
                 }
-                //if everything were ok, removed this task from the processed task.
+                //if everything were OK, removed this task from the processed task.
                 taskRetrivedFromPolicy.remove(0);
-            } catch (Exception e) {
-                //if we are here, it is that something happend while launching the current task.
-                logger.warn(
-                    "Current node has failed during its initialisation or launching the task : " +
+            } catch (Exception e1) {
+                //if we are here, it is that something append while launching the current task.
+                logger.warn("Current node has failed due to node failure : " +
                     node);
                 //so get back the node to the resource manager
                 resourceManager.freeDownNode(internalTask.getExecuterInformations()
                                                          .getNodeName());
+                e1.printStackTrace();
             }
         }
     }
@@ -436,7 +440,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     if (td.getRerunnableLeft() > 0) {
                         td.setRerunnableLeft(td.getRerunnableLeft() - 1);
                         job.reStartTask(td);
-                        //TODO if the job is paused, send an event to the schedulerto notify that this task is now paused.
+                        //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
                         //free execution node even if it is dead
                         resourceManager.freeDownNode(td.getExecuterInformations()
                                                        .getNodeName());
@@ -555,9 +559,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             logger.info("<<<<<<<< Terminated task on job " + jobId + " [ " +
                 taskId + " ]");
             //if an exception occurred and the user wanted to cancel on exception, cancel the job.
-            if (job.isCancelOnException() && res.hadException()) {
+            if (job.isCancelOnError() &&
+                    (res.hadException() ||
+                    ((descriptor instanceof InternalNativeTask) &&
+                    ((Integer) (res.value()) != 0)))) {
                 failedJob(job, descriptor,
-                    "An error has occured due to a user exception caught in the task and user wanted to cancel on exception.",
+                    "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
                     JobState.CANCELLED);
                 return;
             }

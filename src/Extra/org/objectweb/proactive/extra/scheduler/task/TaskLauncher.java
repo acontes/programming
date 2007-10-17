@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -82,9 +81,8 @@ public class TaskLauncher implements InitActive, Serializable {
     protected Integer port;
 
     // handle streams
-
-    protected transient PrintStream stdout;
-    protected transient PrintStream stderr;
+    protected final transient PrintStream stdout = System.out;
+    protected final transient PrintStream stderr = System.err;
 
     /**
      * ProActive empty constructor.
@@ -105,9 +103,6 @@ public class TaskLauncher implements InitActive, Serializable {
         this.jobId = jobId;
         this.host = host;
         this.port = port;
-
-        this.stdout = System.out;
-        this.stderr = System.err;
     }
 
     /**
@@ -115,10 +110,14 @@ public class TaskLauncher implements InitActive, Serializable {
      *
      * @param taskId represents the task the launcher will execute.
      * @param jobId represents the job where the task is located.
+     * @param pre the script executed before the task.
+     * @param host the host on which to append the standard output/input.
+     * @param port the port number on which to send the standard output/input.
      */
     public TaskLauncher(TaskId taskId, JobId jobId, Script<?> pre, String host,
         Integer port) {
         this(taskId, jobId, host, port);
+        System.out.println("TaskLauncher.TaskLauncher() : " + pre);
         this.pre = pre;
     }
 
@@ -150,17 +149,28 @@ public class TaskLauncher implements InitActive, Serializable {
                 this.executePreScript(null);
             }
 
+            //init task
+            executableTask.init();
+
             //launch task
             TaskResult result = new TaskResultImpl(taskId,
                     executableTask.execute(results));
 
             //return result
             return result;
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
+            // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex);
         } finally {
             // reset stdout/err
-            this.finalizeLoggers();
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to te scheduler core
+                // the result has been computed and must be returned !
+                // TODO : logger.warn
+                System.err.println("WARNING : Loggers are not shut down !");
+            }
             //terminate the task
             core.terminate(taskId, jobId);
         }

@@ -99,7 +99,7 @@ public class AppliTaskLauncher extends TaskLauncher {
      */
     @SuppressWarnings("unchecked")
     public TaskResult doTask(SchedulerCore core,
-        ExecutableApplicationTask task, NodeSet nodes) {
+        ExecutableApplicationTask executableTask, NodeSet nodes) {
         nodesList = nodes;
         try {
             nodesList.add(super.getNodes().get(0));
@@ -116,16 +116,28 @@ public class AppliTaskLauncher extends TaskLauncher {
                 }
             }
 
+            //init task
+            executableTask.init();
+
             //launch task
-            TaskResult result = new TaskResultImpl(taskId, task.execute(nodes));
+            TaskResult result = new TaskResultImpl(taskId,
+                    executableTask.execute(nodes));
 
             //return result
             return result;
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Throwable ex) {
+            // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex);
         } finally {
-            this.finalizeLoggers();
+            // reset stdout/err
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to the scheduler core
+                // the result has been computed and must be returned !
+                // TODO : logger.warn
+                System.err.println("WARNING : Loggers are not shut down !");
+            }
             //terminate the task
             core.terminate(taskId, jobId);
         }

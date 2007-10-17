@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
@@ -84,7 +85,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb.proactive.core.remoteobject.RemoteObject)
      */
-    public RemoteRemoteObject newRemoteObject(RemoteObject target)
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
         throws ProActiveException {
         try {
             return new HttpRemoteObjectImpl(target, null);
@@ -102,7 +103,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive.core.remoteobject.RemoteObject, java.net.URI, boolean)
      */
-    public RemoteRemoteObject register(RemoteObject ro, URI url,
+    public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI url,
         boolean replacePrevious) throws ProActiveException {
         URL u = null;
 
@@ -168,21 +169,22 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     }
 
     /**
-     * Gets a body from an urn in the table that mps urns and bodies
-     * @param urn The urn of the body
-     * @return the body mapping the urn
+     * Gets a remote object from an urn in the table that maps urns and remote objects
+     * @param urn The urn of the remote Object
+     * @return the remote Object that maps the urn
      */
-    public static synchronized RemoteRemoteObject getRemoteObjectFromUrn(
-        String urn) {
-        try {
-            return new HTTPRemoteObjectFactory().newRemoteObject(HTTPRegistry.getInstance()
-                                                                             .lookup(urn));
-        } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
+
+    //    public static synchronized InternalRemoteRemoteObject getRemoteObjectFromUrn(
+    //        String urn) {
+    //        try {
+    //            return new HTTPRemoteObjectFactory().newRemoteObject(HTTPRegistry.getInstance()
+    //                                                                             .lookup(urn));
+    //        } catch (ProActiveException e) {
+    //            // TODO Auto-generated catch block
+    //            e.printStackTrace();
+    //        }
+    //        return null;
+    //    }
 
     /**
      * List all active object previously registered in the registry

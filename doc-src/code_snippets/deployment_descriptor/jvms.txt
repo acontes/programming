@@ -1,0 +1,16 @@
+<deployment>
+	<mapping>
+		<map virtualNode="remoteNode">
+			<jvmSet>
+				<vmName value="JVM" />
+			</jvmSet>
+		</map>
+	</mapping>
+	<jvms>
+		<jvm name="JVM">
+			<creation>
+				<processReference refid="rsh_cheypa" />
+			</creation>
+		</jvm>
+	</jvms>
+</deployment>

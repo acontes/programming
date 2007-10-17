@@ -114,7 +114,7 @@ public class JobFactory {
         String name = null;
         String priority = null;
         String description = null;
-        boolean cancelOnException = false;
+        boolean cancelOnError = false;
         JobType jt = null;
         Map<Task, String> tasks = new HashMap<Task, String>();
         int jobAppliNeededNodes = 0;
@@ -136,10 +136,9 @@ public class JobFactory {
                     priority = node.getNodeValue();
                 }
                 // JOB CANCEL ON EXCEPTION
-                node = jobAttr.getNamedItem("cancelOnException");
+                node = jobAttr.getNamedItem("cancelOnError");
                 if (node != null) {
-                    cancelOnException = node.getNodeValue()
-                                            .equalsIgnoreCase("true");
+                    cancelOnError = node.getNodeValue().equalsIgnoreCase("true");
                 }
                 // JOB TYPE
                 node = jobAttr.getNamedItem("type");
@@ -287,14 +286,14 @@ public class JobFactory {
             //			ParameterSweepingJob jobPS = (ParameterSweepingJob) job;
             //			jobPS.setName(name);
             //			jobPS.setPriority(getPriority(priority));
-            //			jobPS.setCancelOnException(cancelOnException);
+            //			jobPS.setCancelOnError(cancelOnError);
             //			jobPS.setDescription(description);
         } else {
             job = new TaskFlowJob();
             TaskFlowJob jobTF = (TaskFlowJob) job;
             jobTF.setName(name);
             jobTF.setPriority(getPriority(priority));
-            job.setCancelOnException(cancelOnException);
+            job.setCancelOnError(cancelOnError);
             job.setDescription(description);
         }
 
@@ -469,9 +468,10 @@ public class JobFactory {
                 e.printStackTrace();
             }
         }
+
         String engine = (String) xpath.evaluate("@engine", node,
                 XPathConstants.STRING);
-        if (((path != null) && (path != "")) &&
+        if (((engine != null) && (engine != "")) &&
                 (node.getTextContent() != null)) {
             String script = node.getTextContent();
             try {
@@ -480,7 +480,9 @@ public class JobFactory {
                 e.printStackTrace();
             }
         }
-        throw new InvalidScriptException("The script is not valid");
+
+        // schema should check this...?
+        throw new InvalidScriptException("The script is not recognized");
     }
 
     private VerifyingScript createVerifyingScript(Node node, XPath xpath)

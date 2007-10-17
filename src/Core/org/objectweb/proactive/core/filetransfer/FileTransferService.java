@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
@@ -46,6 +47,7 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -500,19 +502,13 @@ public class FileTransferService implements ProActiveInternalObject {
      *  It is used for debugging.
      * @return a String with the hostname and the time*/
     public String sayHello() {
-        return "Hello World from " + getHostName() + " at " +
-        new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
-    }
-
-    /**
-     * Used for debugin. Returns the hostname.
-     * @return The host name.
-     */
-    public String getHostName() {
+        String address = "Unknow";
         try {
-            return java.net.InetAddress.getLocalHost().toString();
-        } catch (Exception e) {
-            return "unknown";
+            address = URIBuilder.getLocalAddress().getHostName();
+        } catch (UnknownHostException e) { /* address will be Unknown */
         }
+
+        return "Hello World from " + address + " at " +
+        new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
     }
 }

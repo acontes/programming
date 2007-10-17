@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.remoteobject.http.util;
 
 import java.util.HashMap;
 
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -45,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class HTTPRegistry {
     private static final String REGISTRY_NAME = "HTTP_REGISTRY";
     private static HTTPRegistry instance;
-    private static HashMap<String, RemoteObject> rRemteObjectMap = new HashMap<String, RemoteObject>();
+    private static HashMap<String, InternalRemoteRemoteObject> rRemteObjectMap = new HashMap<String, InternalRemoteRemoteObject>();
 
     private HTTPRegistry() {
     }
@@ -66,7 +67,7 @@ public class HTTPRegistry {
      * @param name  the name of the body
      * @param body the body to be binded
      */
-    public void bind(String name, RemoteObject body) {
+    public void bind(String name, InternalRemoteRemoteObject body) {
         ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                        .debug("registering remote object at " + name);
         rRemteObjectMap.put(name, body);
@@ -81,7 +82,7 @@ public class HTTPRegistry {
     }
 
     /**
-     * Gives all the names registered in this  registry
+     * Gives all the names registered in this registry
      * @return the names list
      */
     public String[] list() {
@@ -95,7 +96,7 @@ public class HTTPRegistry {
      * @param name The name of the body to be retrieved
      * @return the binded body
      */
-    public RemoteObject lookup(String name) {
+    public InternalRemoteRemoteObject lookup(String name) {
         return rRemteObjectMap.get(name);
     }
 }

@@ -36,6 +36,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
@@ -90,15 +91,15 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /**
      * Return the user task represented by this task descriptor.
-     *
+     * @throws TaskCreationException if the task cannot be created or initialized
      * @return the user task represented by this task descriptor.
      */
-    public abstract ExecutableTask getTask();
+    public abstract ExecutableTask getTask() throws TaskCreationException;
 
     /**
      * Create the launcher for this taskDescriptor.
      *
-     * @param host the hostname on which to send the log.
+     * @param host the host name on which to send the log.
      * @param port the port on which to send the log.
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
@@ -185,8 +186,8 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
             : (task.getExecutionHostName().compareTo(getExecutionHostName()));
         default:
             return (currentOrder == ASC_ORDER)
-            ? (getId().value() - task.getId().value())
-            : (task.getId().value() - getId().value());
+            ? (getId().compareTo(task.getId())) : (task.getId()
+                                                       .compareTo(getId()));
         }
     }
 

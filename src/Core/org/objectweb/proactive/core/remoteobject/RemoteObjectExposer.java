@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.remoteobject;
 
 import java.io.Serializable;
@@ -53,7 +83,7 @@ public class RemoteObjectExposer implements Serializable {
      * @return a remote reference to the remote object ie a RemoteRemoteObject
      * @throws UnknownProtocolException thrown if the protocol specified within the url is unknow
      */
-    public synchronized RemoteRemoteObject activateProtocol(URI url)
+    public synchronized InternalRemoteRemoteObject activateProtocol(URI url)
         throws UnknownProtocolException {
         String protocol = null;
 
@@ -83,16 +113,19 @@ public class RemoteObjectExposer implements Serializable {
             }
 
             // register the object on the register
-            RemoteRemoteObject rmo = rof.register(this.remoteObject, url, true);
+            InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(this.remoteObject,
+                    url);
+            RemoteRemoteObject rmo = rof.register(irro, url, true);
+            irro.setRemoteRemoteObject(rmo);
 
             // put the url within the list of the activated protocols
             this.activatedProtocols.put(url, rmo);
 
-            return rmo;
+            return irro;
         } catch (ProActiveException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to activate a remote object at endpoint " +
-                url.toString());
+                url.toString(), e);
 
             e.printStackTrace();
             return null;

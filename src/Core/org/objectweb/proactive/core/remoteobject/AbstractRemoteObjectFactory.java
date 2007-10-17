@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -51,19 +51,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public abstract class AbstractRemoteObjectFactory {
     protected static ClassServerHelper classServerHelper;
     protected static Hashtable<String, RemoteObjectFactory> activatedRemoteObjectFactories;
-    protected static Hashtable<String, Class<?extends RemoteObjectFactory>> remoteObjectFactories;
 
     static {
-        remoteObjectFactories = new Hashtable<String, Class<?extends RemoteObjectFactory>>();
-        remoteObjectFactories.put(Constants.RMI_PROTOCOL_IDENTIFIER,
-            RmiRemoteObjectFactory.class);
-        remoteObjectFactories.put(Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
-            HTTPRemoteObjectFactory.class);
-        remoteObjectFactories.put(Constants.RMISSH_PROTOCOL_IDENTIFIER,
-            RmiSshRemoteObjectFactory.class);
-        remoteObjectFactories.put(Constants.IBIS_PROTOCOL_IDENTIFIER,
-            IbisRemoteObjectFactory.class);
-
         createClassServer();
         activatedRemoteObjectFactories = new Hashtable<String, RemoteObjectFactory>();
     }
@@ -118,7 +107,7 @@ public abstract class AbstractRemoteObjectFactory {
             if (rof != null) {
                 return rof;
             } else {
-                Class<?> rofClazz = remoteObjectFactories.get(protocol);
+                Class<?> rofClazz = RemoteObjectProtocolFactoryRegistry.get(protocol);
 
                 if (rofClazz != null) {
                     RemoteObjectFactory o = (RemoteObjectFactory) rofClazz.newInstance();

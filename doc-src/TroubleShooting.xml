@@ -44,6 +44,8 @@
        
       <programlisting lang="java"><textobject><textdata fileref="code_snippets/java_policy_error.txt"/></textobject></programlisting>
       
+      
+
       </listitem>
 
       <listitem>
@@ -53,7 +55,6 @@
         <literal>-Dlog4j.configuration</literal> property to the java command.
         Be sure that the given path is right, try also to add <literal>file:</literal> before the
         path.</para>
-
 <programlisting lang="java"><textobject><textdata fileref="code_snippets/log4j_notfound_error.txt"/></textobject></programlisting>
       </listitem>
 
@@ -67,7 +68,7 @@
         D:\java\j2sdk... </literal> ) and then set the <literal>JAVA_HOME </literal> environment variable
         accordingly.</para>
       </listitem>
-
+      
       <listitem>
       	<para>
       		<emphasis role="bold">Java complains about unsupported classes:</emphasis> Check

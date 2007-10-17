@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -41,12 +41,13 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.SynchronousProxy;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
-import org.objectweb.proactive.core.remoteobject.http.message.RemoteObjectRequest;
+import org.objectweb.proactive.core.remoteobject.http.message.HTTPRemoteObjectRequest;
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.remoteobject.http.util.messages.HttpRemoteObjectRequest;
 import org.objectweb.proactive.core.security.Communication;
@@ -68,9 +69,10 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
     //    private String servletURL;
     private URI remoteObjectURL;
     protected Object stub;
-    protected transient RemoteObject remoteObject;
+    protected transient InternalRemoteRemoteObject remoteObject;
 
-    public HttpRemoteObjectImpl(RemoteObject remoteObject, URI remoteObjectURL) {
+    public HttpRemoteObjectImpl(InternalRemoteRemoteObject remoteObject,
+        URI remoteObjectURL) {
         //    	Thread.dumpStack();
 
         //        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
@@ -81,6 +83,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         //
         //        System.out.println("HttpRemoteObjectImpl.HttpRemoteObjectImpl() -------------- servlet "  + this.servletURL);
         //
+        this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
 
         //        try {
@@ -95,7 +98,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         ArrayList<Object> paramsList = new ArrayList<Object>();
         paramsList.add(message);
 
-        RemoteObjectRequest req = new RemoteObjectRequest(message,
+        HTTPRemoteObjectRequest req = new HTTPRemoteObjectRequest(message,
                 this.remoteObjectURL.toString());
 
         req.send();
@@ -212,7 +215,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public String getClassName() throws ProActiveException, IOException {
         if (isLocal) {
-            return this.remoteObject.getClassName();
+            return this.remoteObject.getRemoteObject().getClassName();
         } else {
             HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getClassName",
                     new ArrayList<Object>(), this.remoteObjectURL.toString());
@@ -227,7 +230,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public String getProxyName() throws ProActiveException, IOException {
         if (isLocal) {
-            return this.remoteObject.getProxyName();
+            return this.remoteObject.getRemoteObject().getProxyName();
         } else {
             HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getProxyName",
                     new ArrayList<Object>(), this.remoteObjectURL.toString());
@@ -242,7 +245,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public Class<?> getTargetClass() throws ProActiveException, IOException {
         if (isLocal) {
-            return this.remoteObject.getTargetClass();
+            return this.remoteObject.getRemoteObject().getTargetClass();
         } else {
             HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getTargetClass",
                     new ArrayList<Object>(), this.remoteObjectURL.toString());
@@ -257,7 +260,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public Class<?> getAdapterClass() throws ProActiveException, IOException {
         if (isLocal) {
-            return this.remoteObject.getAdapterClass();
+            return this.remoteObject.getRemoteObject().getAdapterClass();
         } else {
             HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getAdapterClass",
                     new ArrayList<Object>(), this.remoteObjectURL.toString());

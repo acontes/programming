@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+
+	<complexType name="furaProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="description" type="string" minOccurs="0" />
+					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="maxTime" type="pa:PosintOrVariableType" minOccurs="0" />
+				</sequence>
+				<attribute name="jobName" type="string" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="furaGroup" type="paext:furaProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+</schema>

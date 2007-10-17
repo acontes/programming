@@ -50,7 +50,7 @@ public abstract class ExecutableApplicationTask extends ExecutableJavaTask {
     /**
      * <font color="red">Not used anymore in this context</font>
      * This method should never be called.
-     * It is the last point for this method implemention.
+     * It is the last point for this method implementation.
      * That's why it is final. User cannot override/implement this one anymore.
      * Instead, implement the execute(ArrayList<Node>) method.
      */
@@ -61,12 +61,14 @@ public abstract class ExecutableApplicationTask extends ExecutableJavaTask {
 
     /**
      * The content of this method will be execute by the scheduler.
-     * Make your own Proactive implementation using the given nodes.
+     * Make your own ProActive implementation using the given nodes.
      * Note : if you asked for 10 nodes, one will be used to start the task
      * and the other will be sent to you as parameters.
      *
      * @param nodes the nodes you asked for.
+     * @throws any exception thrown by the user's code
      * @return any object from the user.
      */
-    public abstract Object execute(ArrayList<Node> nodes);
+    public abstract Object execute(ArrayList<Node> nodes)
+        throws Throwable;
 }

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.task;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
@@ -39,7 +40,7 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
 /**
  * Native Task Launcher.
- * This launcher is the class that will launch a nativ class.
+ * This launcher is the class that will launch a native class.
  *
  * @author ProActive Team
  * @version 1.0, Jul 10, 2007
@@ -52,7 +53,7 @@ public class NativeTaskLauncher extends TaskLauncher {
     private Process process;
 
     /**
-     * ProActive Empy Constructor
+     * ProActive Empty Constructor
      */
     public NativeTaskLauncher() {
     }
@@ -68,6 +69,17 @@ public class NativeTaskLauncher extends TaskLauncher {
     public NativeTaskLauncher(TaskId taskId, JobId jobId, String host,
         Integer port) {
         super(taskId, jobId, host, port);
+    }
+
+    /**
+     * Constructor with native task identification
+     *
+     * @param taskId represents the task the launcher will execute.
+     * @param jobId represents the job where the task is located.
+     */
+    public NativeTaskLauncher(TaskId taskId, JobId jobId, Script<?> pre,
+        String host, Integer port) {
+        super(taskId, jobId, pre, host, port);
     }
 
     /**
@@ -96,10 +108,19 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             //return result
             return result;
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
+            // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex);
         } finally {
-            this.finalizeLoggers();
+            // reset stdout/err
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to the scheduler core
+                // the result has been computed and must be returned !
+                // TODO : logger.warn
+                System.err.println("WARNING : Loggers are not shut down !");
+            }
             //terminate the task
             core.terminate(taskId, jobId);
         }

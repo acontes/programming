@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.net.URI;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.http.HTTPRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.http.HttpRemoteObjectImpl;
@@ -82,13 +82,14 @@ public class HttpRemoteObjectLookupMessage extends HttpMessage
     @Override
     public Object processMessage() {
         if (this.urn != null) {
-            RemoteObject ro = HTTPRegistry.getInstance().lookup(url);
+            InternalRemoteRemoteObject irro = HTTPRegistry.getInstance()
+                                                          .lookup(url);
 
             //            System.out.println("HttpRemoteObjectLookupMessage.processMessage() ++ ro at " + url +" : " +ro) ;
-            if (ro != null) {
+            if (irro != null) {
                 RemoteRemoteObject rro = null;
                 try {
-                    rro = new HTTPRemoteObjectFactory().newRemoteObject(ro);
+                    rro = new HTTPRemoteObjectFactory().newRemoteObject(irro);
                     ((HttpRemoteObjectImpl) rro).setURI(URI.create(url));
                 } catch (ProActiveException e) {
                     // TODO Auto-generated catch block

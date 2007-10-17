@@ -8,22 +8,22 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -36,6 +36,7 @@ import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
+import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.DivideBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.SolveBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.DivideBT2;
@@ -57,8 +58,8 @@ public class NQueens implements Serializable {
         NQueens nq = new NQueens();
 
         if (args.length != 5) {
-            nq.solve(16, 14, 10,
-                NQueens.class.getResource("LocalDescriptor.xml").getPath(),
+            nq.solve(16, 14, 5,
+                NQueens.class.getResource("../LocalDescriptor.xml").getPath(),
                 "local");
         } else {
             nq.solve(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
@@ -81,9 +82,9 @@ public class NQueens implements Serializable {
 
     public void solve(int boardSize, int solvableSize, int times,
         String descriptor, String virtualNode) throws Exception {
-        EnvironmentFactory manager = new MultiThreadedEnvironment(2);
+        //EnvironmentFactory manager = new MultiThreadedEnvironment(2);
+        EnvironmentFactory manager = new ProActiveEnvironment(descriptor);
 
-        //EnvironmentFactory manager = new ProActiveEnvironment(descriptor, virtualNode);
         Calcium calcium = new Calcium(manager);
         Monitor monitor = new SimpleLogMonitor(calcium, 1);
         monitor.start();
