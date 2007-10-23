@@ -2,9 +2,8 @@
 <GCMDeployment
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
 
-	
 	<resources>
 		<bridge refid="bSea">
 			<group refid="gINRIA">
@@ -12,7 +11,7 @@
 			</group>
 		</bridge>
 	</resources>
-
+	
 	<infrastructure>
 		<hosts>
 			<host id="hSchubby" os="unix" hostCapacity="1" vmCapacity="1">
@@ -32,4 +31,5 @@
 				username="cmathieu"/>
 		</groups>		
 	</infrastructure>
+
 </GCMDeployment>

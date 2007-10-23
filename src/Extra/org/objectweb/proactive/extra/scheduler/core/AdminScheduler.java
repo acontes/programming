@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
@@ -54,7 +55,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
  * This class provides methods to managed jobs as an administrator.
  *
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 28, 2007
  * @since ProActive 3.2
  */
@@ -143,6 +144,9 @@ public class AdminScheduler extends UserScheduler
      * This constructor also requires the username//password of the admin to connect.
      * This will provide a connection interface to allow the access to a restricted number of user.
      * It will return an admin scheduler able to managed the scheduler.
+     * WARNING this method provides a way to connect the scheduler after its creation,
+     * BUT if the scheduler is restarting after failure, this method will create the scheduler
+     * but will throw a SchedulerException due to the failure of admin connection.
      *
      * @param loginFile the path where are stored the allowed login//password.
      * @param groupFile the path where to check the membership of a user.
@@ -165,66 +169,42 @@ public class AdminScheduler extends UserScheduler
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
-     */
-
-    //	public JobResult getResult(JobId jobId) throws SchedulerException {
-    //		return schedulerFrontend.getResult(jobId);
-    //	}
-
-    /**
-     * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
-     */
-
-    //	public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
-    //		schedulerFrontend.listenLog(jobId, hostname, port);
-    //	}
-
-    /**
-     * @see org.objectweb.proactive.extra.scheduler.core.UserScheduler#submit(org.objectweb.proactive.extra.scheduler.common.job.Job)
-     */
-
-    //	public JobId submit(Job job) throws SchedulerException {
-    //		return schedulerFrontend.submit(job);
-    //	}
-
-    /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#start()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#start()
      */
     public BooleanWrapper start() throws SchedulerException {
         return schedulerFrontend.coreStart();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#stop()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#stop()
      */
     public BooleanWrapper stop() throws SchedulerException {
         return schedulerFrontend.coreStop();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pause()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#pause()
      */
     public BooleanWrapper pause() throws SchedulerException {
         return schedulerFrontend.corePause();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pauseImmediate()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
      */
     public BooleanWrapper pauseImmediate() throws SchedulerException {
         return schedulerFrontend.coreImmediatePause();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#resume()
      */
     public BooleanWrapper resume() throws SchedulerException {
         return schedulerFrontend.coreResume();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#shutdown()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#shutdown()
      */
     public BooleanWrapper shutdown() throws SchedulerException {
         return schedulerFrontend.coreShutdown();

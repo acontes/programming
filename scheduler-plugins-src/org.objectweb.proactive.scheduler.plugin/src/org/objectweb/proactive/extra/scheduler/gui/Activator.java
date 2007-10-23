@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.scheduler.gui;
 import java.net.UnknownHostException;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.osgi.framework.BundleContext;
 
@@ -45,9 +44,6 @@ public class Activator extends AbstractUIPlugin {
 
     /** The plug-in ID */
     public static final String PLUGIN_ID = "Scheduler_Plugin";
-
-    /** The listen port for logs */
-    public static final int LISTEN_PORT = 1987;
 
     // The shared instance
     private static Activator plugin;
@@ -70,12 +66,10 @@ public class Activator extends AbstractUIPlugin {
         plugin = this;
 
         // start the log server
-        simpleLoggerServer = new SimpleLoggerServer(LISTEN_PORT);
-        simpleLoggerServerThread = new Thread(simpleLoggerServer);
-        simpleLoggerServerThread.start();
-
+        simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
         try {
-            hostname = URIBuilder.getLocalAddress().getHostName();
+            //FIXME cmathieu
+            hostname = java.net.InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             hostname = "UnknownHost";
         }
@@ -107,5 +101,17 @@ public class Activator extends AbstractUIPlugin {
      */
     public static String getHostname() {
         return hostname;
+    }
+
+    /**
+     * Return the port on which logs are listened.
+     * @return the port on which logs are listened.
+     */
+    public static int getListenPortNumber() {
+        if (simpleLoggerServer != null) {
+            return simpleLoggerServer.getPort();
+        } else {
+            throw new RuntimeException("Logger server is not created yet");
+        }
     }
 }

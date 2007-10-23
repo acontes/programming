@@ -78,16 +78,14 @@ public class InternalRemoteRemoteObjectImpl
         this.remoteRemoteObject = rro;
     }
 
-    
     public URI getURI() throws ProActiveException, IOException {
         return this.uri;
     }
 
-    
     public void setURI(URI uri) throws ProActiveException, IOException {
         this.uri = uri;
     }
- 
+
     public Reply receiveMessage(Request message)
         throws ProActiveException, IOException, RenegotiateSessionException {
         if (message instanceof InternalRemoteRemoteObjectRequest) {
@@ -124,20 +122,17 @@ public class InternalRemoteRemoteObjectImpl
         return this.remoteObject.getPolicy(local,distant);
     }
 
-  
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getPublicKey();
     }
 
-   
     public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
         KeyExchangeException, IOException {
         return this.remoteObject.publicKeyExchange(sessionID, signature);
     }
 
-   
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
@@ -154,39 +149,32 @@ public class InternalRemoteRemoteObjectImpl
             parametersSignature);
     }
 
- 
     public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
         throws SessionException, SecurityNotAvailableException, IOException {
         return this.remoteObject.startNewSession(distantSessionID,policy,distantCertificate);
     }
 
-   
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
         this.remoteObject.terminateSession(sessionID);
     }
 
-    
     public RemoteObject getRemoteObject() {
         return this.remoteObject;
     }
 
-   
     public RemoteRemoteObject getRemoteRemoteObject() {
         return this.remoteRemoteObject;
     }
 
-   
     public void setRemoteRemoteObject(RemoteRemoteObject remoteRemoteObject) {
         this.remoteRemoteObject = remoteRemoteObject;
     }
 
-  
     public void setRemoteObject(RemoteObject remoteObject) {
         this.remoteObject = remoteObject;
     }
 
-   
     public Object getObjectProxy() {
         try {
             return this.remoteObject.getObjectProxy(this.remoteRemoteObject);

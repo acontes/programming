@@ -55,7 +55,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * Here is a class that explains how to simply use the scheduler.
  * You'll create a one task job that will print "HelloWorld !".
  * You'll be able to get the output of the task and/or get the result.
- * According that the API is not yet full implmented,
+ * According that the API is not yet full implemented,
  * adding task and job creation are not on their final implementation.
  * TaskDescriptor may also be removed from user view.
  *
@@ -106,6 +106,7 @@ public class SimpleHelloWorld {
 
             //Create the javatask
             JavaTask desc = new JavaTask();
+            desc.setName("toto");
             //adding the task to the job
             desc.setTaskInstance(task);
             //this task is final, it means that the job result will contain this task result.
@@ -140,7 +141,7 @@ public class SimpleHelloWorld {
             //******************** GET JOB RESULT ***********************
             // it is better to get the result when the job is terminated.
             // if you want the result as soon as possible we suggest this loop.
-            // In the futur you could get the result like a futur in ProActive or with a listener.
+            // In the future you could get the result like a future in ProActive or with a listener.
             JobResult result = null;
             while (result == null) {
                 try {
@@ -153,6 +154,7 @@ public class SimpleHelloWorld {
                     e.printStackTrace();
                 }
             }
+            result.getTaskResults().get("toto");
             System.out.println("Result : " + result);
         } catch (SchedulerException e) {
             //the scheduler had a problem

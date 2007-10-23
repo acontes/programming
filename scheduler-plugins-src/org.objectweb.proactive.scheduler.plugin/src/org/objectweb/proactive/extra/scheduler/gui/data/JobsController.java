@@ -34,11 +34,14 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerState;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
@@ -62,8 +65,6 @@ import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalTaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -74,7 +75,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class JobsController implements SchedulerEventListener {
+public class JobsController implements SchedulerEventListener<InternalJob> {
     private static final long serialVersionUID = -160416757449171779L;
 
     // The shared instance view as a direct reference
@@ -936,7 +937,6 @@ public class JobsController implements SchedulerEventListener {
      * @return true only if no error caught, for synchronous call.
      */
     public boolean init() {
-        System.out.println("JobsController.init() 1");
         SchedulerInitialState<InternalJob> state = null;
         try {
             state = SchedulerProxy.getInstance()
@@ -945,7 +945,6 @@ public class JobsController implements SchedulerEventListener {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println("JobsController.init() 2");
 
         if (state == null) { // addSchedulerEventListener failed
             return false;

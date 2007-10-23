@@ -35,13 +35,15 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
+import org.objectweb.proactive.extra.scheduler.common.task.Status;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.task.Status;
-import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -82,6 +84,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     protected Vector<InternalTask> finalTasks = new Vector<InternalTask>();
 
     /** informations about job execution */
+    // FIXME jlscheef,jfradj this variable can change ???? 
     protected JobEvent jobInfo = new JobEvent();
 
     /** Light job for dependences management */
@@ -128,7 +131,11 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param jobInfo the jobInfo to set
      */
     public synchronized void update(JobEvent jobInfo) {
+        JobResult res = this.jobInfo.getResult();
         this.jobInfo = jobInfo;
+        if (res != null) {
+            this.jobInfo.setResult(res);
+        }
         if (jobInfo.getTaskStatusModify() != null) {
             for (TaskId id : tasks.keySet()) {
                 tasks.get(id).setStatus(jobInfo.getTaskStatusModify().get(id));
@@ -226,6 +233,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         if (task.isFinalTask()) {
             finalTasks.add(task);
         }
+        task.setId(TaskId.nextId(getId()));
         boolean result = (tasks.put(task.getId(), task) == null);
         if (result) {
             jobInfo.setTotalNumberOfTasks(jobInfo.getTotalNumberOfTasks() + 1);
@@ -429,10 +437,9 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
-     * To get the id
-     *
-     * @return the id
+     * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getId()
      */
+    @Override
     public JobId getId() {
         return jobInfo.getJobId();
     }

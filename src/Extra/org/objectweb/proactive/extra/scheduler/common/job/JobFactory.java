@@ -114,6 +114,7 @@ public class JobFactory {
         String name = null;
         String priority = null;
         String description = null;
+        String logFile = null;
         boolean cancelOnError = false;
         JobType jt = null;
         Map<Task, String> tasks = new HashMap<Task, String>();
@@ -150,6 +151,13 @@ public class JobFactory {
                             "Invalid XML : Job must have a valid type");
                     }
                 }
+                // JOB LOG FILE
+                node = jobAttr.getNamedItem("logFile");
+                if (node != null) {
+                    logFile = node.getNodeValue();
+                    System.out.println("Job log file = " + logFile);
+                }
+
                 // JOB DESCRIPTION
                 description = (String) xpath.evaluate("/job/description", doc,
                         XPathConstants.STRING);
@@ -267,6 +275,7 @@ public class JobFactory {
                 jobA.setName(name);
                 jobA.setPriority(getPriority(priority));
                 jobA.setDescription(description);
+                jobA.setLogFile(logFile);
 
                 ApplicationTask td2 = new ApplicationTask();
                 jobA.setTask(td2);
@@ -295,6 +304,7 @@ public class JobFactory {
             jobTF.setPriority(getPriority(priority));
             job.setCancelOnError(cancelOnError);
             job.setDescription(description);
+            job.setLogFile(logFile);
         }
 
         // Dependencies
@@ -448,7 +458,7 @@ public class JobFactory {
     private Script<?> createScript(Node node, XPath xpath)
         throws XPathExpressionException, InvalidScriptException {
         String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
-        if ((url != null) && (url != "")) {
+        if ((url != null) && (!url.equals(""))) {
             try {
                 System.out.println(url);
                 return new SimpleScript(new URL(url));
@@ -460,7 +470,7 @@ public class JobFactory {
         }
         String path = (String) xpath.evaluate("@file", node,
                 XPathConstants.STRING);
-        if ((path != null) && (path != "")) {
+        if ((path != null) && (!path.equals(""))) {
             try {
                 System.out.println(path);
                 return new SimpleScript(new File(path));
@@ -471,7 +481,7 @@ public class JobFactory {
 
         String engine = (String) xpath.evaluate("@engine", node,
                 XPathConstants.STRING);
-        if (((engine != null) && (engine != "")) &&
+        if (((engine != null) && (!engine.equals(""))) &&
                 (node.getTextContent() != null)) {
             String script = node.getTextContent();
             try {
@@ -489,7 +499,7 @@ public class JobFactory {
         throws XPathExpressionException, InvalidScriptException {
         // TODO Verify if script is dynamic or static (default : dynamic)
         String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
-        if ((url != null) && (url != "")) {
+        if ((url != null) && (!url.equals(""))) {
             try {
                 System.out.println(url);
                 return new VerifyingScript(new URL(url));
@@ -501,7 +511,7 @@ public class JobFactory {
         }
         String path = (String) xpath.evaluate("@file", node,
                 XPathConstants.STRING);
-        if ((path != null) && (path != "")) {
+        if ((path != null) && (!path.equals(""))) {
             try {
                 System.out.println(path);
                 return new VerifyingScript(new File(path));
@@ -519,6 +529,6 @@ public class JobFactory {
                 e.printStackTrace();
             }
         }
-        throw new InvalidScriptException("The script is not valid");
+        throw new InvalidScriptException("The script is not recognized");
     }
 }
