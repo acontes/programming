@@ -90,7 +90,9 @@ Bundle-ClassPath: .,
  lib/xercesImpl.jar,
  lib/xml-apis.jar,
  lib/ptolemy.jar,
- ProActive.jar
+ ProActive.jar,
+ lib/derby.jar,
+ lib/derbytools.jar
 Export-Package: .,
  COM.claymoresystems.cert,
  COM.claymoresystems.crypto,
