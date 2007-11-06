@@ -50,11 +50,13 @@ import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeSSHParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupARCParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupCGSPParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupFuraParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGLiteParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGlobusParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGridEngineParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupLSFParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupMPIParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARGridParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupPBSParser;
@@ -62,7 +64,6 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Gr
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupPrunParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupSSHParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupUnicoreParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
@@ -140,18 +141,19 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     protected void registerDefaultGroupParsers() {
-        registerGroupParser(new GroupSSHParser());
-        registerGroupParser(new GroupRSHParser());
-        registerGroupParser(new GroupOARParser());
-        registerGroupParser(new GroupOARGridParser());
-        registerGroupParser(new GroupPBSParser());
-        registerGroupParser(new GroupLSFParser());
+        registerGroupParser(new GroupARCParser());
+        registerGroupParser(new GroupCGSPParser());
+        registerGroupParser(new GroupFuraParser());
         registerGroupParser(new GroupGLiteParser());
         registerGroupParser(new GroupGlobusParser());
         registerGroupParser(new GroupGridEngineParser());
-        registerGroupParser(new GroupMPIParser());
-        registerGroupParser(new GroupUnicoreParser());
+        registerGroupParser(new GroupLSFParser());
+        registerGroupParser(new GroupOARParser());
+        registerGroupParser(new GroupOARGridParser());
+        registerGroupParser(new GroupPBSParser());
         registerGroupParser(new GroupPrunParser());
+        registerGroupParser(new GroupRSHParser());
+        registerGroupParser(new GroupSSHParser());
         // TODO add other group parsers here
     }
 

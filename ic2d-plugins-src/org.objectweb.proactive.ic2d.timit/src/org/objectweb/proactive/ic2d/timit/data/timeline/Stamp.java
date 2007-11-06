@@ -28,35 +28,25 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.actions;
+package org.objectweb.proactive.ic2d.timit.data.timeline;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 
 
-public class ExpandSizeAction extends Action {
-    public static final String EXPAND_TIMELINE_ACTION = "Expand TimeLine Action";
-    private DurationChartEditPart durationChartEditPart;
+public class Stamp {
+    public State state;
+    public long startTime;
+    public long endTime;
 
-    public ExpandSizeAction() {
-        super.setId(EXPAND_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "expand_timeline.gif"));
-        super.setToolTipText(EXPAND_TIMELINE_ACTION);
-        super.setEnabled(false);
+    public Stamp() {
     }
 
-    public final void setTarget(
-        final DurationChartEditPart durationChartEditPart) {
-        super.setEnabled(true);
-        this.durationChartEditPart = durationChartEditPart;
+    public Stamp(State state, long startTime) {
+        this.state = state;
+        this.startTime = startTime;
     }
 
-    @Override
-    public final void run() {
-        if (this.durationChartEditPart != null) {
-            this.durationChartEditPart.expandWidth();
-        }
+    public final String toString() {
+        return state.ordinal() + " " + startTime + " " + endTime;
     }
 }

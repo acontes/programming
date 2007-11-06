@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.figures.duration;
+package org.objectweb.proactive.ic2d.timit.figures.timeline;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
@@ -39,6 +39,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ic2d.timit.data.timeline.TimeIntervalManager;
 
 
 public class TimeAxisFigure extends Figure {
@@ -46,7 +47,7 @@ public class TimeAxisFigure extends Figure {
     /**
      * The size of the reference text.
      */
-    public static int referenceXSize = 90;
+    public static int referenceXSize = 100;
     public static int referenceXSizeHalf = referenceXSize / 2;
     public static int referenceYSize = 10;
     public static int DEFAULT_DASH_SIZE = 5;
@@ -56,6 +57,7 @@ public class TimeAxisFigure extends Figure {
     private static final Color DEFAULT_TIME_LINE_COLOR = new Color(Display.getCurrent(),
             225, 225, 225);
     protected TimeIntervalManager timeIntervalManager;
+    protected boolean bDirty = false;
 
     public TimeAxisFigure(TimeIntervalManager timeIntervalManager) {
         this.setOpaque(false);
@@ -64,23 +66,33 @@ public class TimeAxisFigure extends Figure {
 
     /**
      * The overrided paintFigure method that handles all painting system.
-     * TODO : Optimize me !!
-     * TODO : ADD OFF SCREEN IMAGE STRATEGY
      */
     @Override
     protected final void paintFigure(final Graphics graphics) {
-        final Rectangle r = getClientArea();
-        if ((r.width <= 0) || (r.height <= 0) ||
-                (this.timeIntervalManager.endTime == 0)) {
+        if (this.bDirty) {
+            this.bDirty = false;
+            this.erase();
             return;
         }
+
+        // Get visible rectangle area
+        final Rectangle visibleR = graphics.getClip(Rectangle.SINGLETON);
+        if ((visibleR.width <= 0) || (visibleR.height <= 0) ||
+                (this.timeIntervalManager.getEndTime() == 0)) {
+            return;
+        }
+
+        // Get the client area
+        final Rectangle r = this.getBounds();
+
         graphics.setForegroundColor(DEFAULT_TIME_LINE_COLOR);
-        graphics.drawLine(r.x, (r.y + r.height) - 20, r.x + r.width,
-            (r.y + r.height) - 20);
+        graphics.drawLine(visibleR.x, (r.y + r.height) - 20,
+            visibleR.x + visibleR.width, (r.y + r.height) - 20);
 
         double nrReferences = r.width / referenceXSize;
-        long timeStep = Math.round(this.timeIntervalManager.timeInterval / nrReferences);
-        this.timeIntervalManager.timeStep = timeStep;
+        long timeStep = Math.round(this.timeIntervalManager.getTimeInterval() / nrReferences);
+        this.timeIntervalManager.setTimeStep(timeStep);
+
         int stepInPixels = this.timeIntervalManager.getXPosition(timeStep,
                 r.width);
         long rawTimeCounter = timeStep; // Skip the first step
@@ -95,41 +107,61 @@ public class TimeAxisFigure extends Figure {
         graphics.setForegroundColor(ColorConstants.gray);
         int defaultNbDash = (r.height - DEFAULT_TIME_TEXT_HEIGHT_MARGIN) / DEFAULT_DASH_SIZE;
         int nbDash = defaultNbDash;
-        while (nbDash > 0) {
-            graphics.drawLine(timeStepPosInPixels,
-                r.y + (nbDash * DEFAULT_DASH_SIZE), timeStepPosInPixels,
-                r.y + ((nbDash - 1) * DEFAULT_DASH_SIZE));
-            nbDash -= 2;
-        }
-        graphics.setForegroundColor(ColorConstants.black);
-        graphics.drawString("0ms", r.x,
-            (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
         int correctCrop = FigureUtilities.getTextExtents(sTime,
                 DEFAULT_TEXT_FONT).width;
-        graphics.drawString(sTime, (timeStepPosInPixels - (correctCrop / 2)),
-            (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
 
-        // Write other time values
-        do {
-            timeStepPosInPixels += stepInPixels;
-            rawTimeCounter += timeStep;
-
-            sTime = TimeIntervalManager.convertTimeInMicrosToString(rawTimeCounter); //convertTimeInMillisToString(rawTimeCounter);			
-
-            graphics.setForegroundColor(ColorConstants.gray);
-            nbDash = defaultNbDash;
+        // DRAW IF AND ONLY IF THESE COORDS ARE VISIBLE 
+        if ((visibleR.x <= timeStepPosInPixels) &&
+                (timeStepPosInPixels <= (visibleR.x + visibleR.width))) {
             while (nbDash > 0) {
                 graphics.drawLine(timeStepPosInPixels,
                     r.y + (nbDash * DEFAULT_DASH_SIZE), timeStepPosInPixels,
                     r.y + ((nbDash - 1) * DEFAULT_DASH_SIZE));
                 nbDash -= 2;
             }
-            correctCrop = FigureUtilities.getTextExtents(sTime,
-                    DEFAULT_TEXT_FONT).width;
             graphics.setForegroundColor(ColorConstants.black);
+            graphics.drawString("0ms", r.x,
+                (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
+
             graphics.drawString(sTime,
                 (timeStepPosInPixels - (correctCrop / 2)),
                 (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
+        }
+
+        // Write other time values
+        do {
+            timeStepPosInPixels += stepInPixels;
+            rawTimeCounter += timeStep;
+
+            if (visibleR.x <= timeStepPosInPixels) {
+                if (timeStepPosInPixels > (visibleR.x + visibleR.width)) {
+                    break;
+                }
+
+                sTime = TimeIntervalManager.convertTimeInMicrosToString(rawTimeCounter);
+
+                graphics.setForegroundColor(ColorConstants.gray);
+                nbDash = defaultNbDash;
+
+                // Draw the dotted line 
+                while (nbDash > 0) {
+                    graphics.drawLine(timeStepPosInPixels,
+                        r.y + (nbDash * DEFAULT_DASH_SIZE),
+                        timeStepPosInPixels,
+                        r.y + ((nbDash - 1) * DEFAULT_DASH_SIZE));
+                    nbDash -= 2;
+                }
+                correctCrop = FigureUtilities.getTextExtents(sTime,
+                        DEFAULT_TEXT_FONT).width;
+                graphics.setForegroundColor(ColorConstants.black);
+                graphics.drawString(sTime,
+                    (timeStepPosInPixels - (correctCrop / 2)),
+                    (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
+            }
         } while (timeStepPosInPixels < (r.width - referenceXSizeHalf));
+    }
+
+    public void setBDirty(boolean dirty) {
+        bDirty = dirty;
     }
 }

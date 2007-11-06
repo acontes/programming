@@ -28,13 +28,15 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.data.duration;
+package org.objectweb.proactive.ic2d.timit.data.timeline;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
+import javax.management.ObjectName;
 
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Layout;
@@ -43,7 +45,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
-import org.objectweb.proactive.ic2d.timit.editparts.duration.SequenceEditPart;
+import org.objectweb.proactive.ic2d.timit.data.timeline.utils.ReverseFileReader;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.SequenceEditPart;
 
 
 /**
@@ -53,11 +56,12 @@ import org.objectweb.proactive.ic2d.timit.editparts.duration.SequenceEditPart;
  */
 public class SequenceObject implements NotificationListener {
     protected static final String DEFAULT_LOG_FILE_DIRECTORY = "TimItIC2D_Output";
-    private DurationChartObject parent;
+    private TimeLineChartObject parent;
     private SequenceEditPart ep;
     private final Logger currentLogger;
     private boolean isRecording;
     protected final String name;
+    protected final ObjectName objectName;
     private String outputFileName;
     private long firstTimeStampValue;
     protected long lastTimeStampValue;
@@ -66,10 +70,12 @@ public class SequenceObject implements NotificationListener {
     private FileAppender app;
     private ReverseFileReader reverseFileReader;
 
-    public SequenceObject(String name, DurationChartObject parent) {
+    public SequenceObject(String name, ObjectName objectName,
+        TimeLineChartObject parent) {
         this.name = name;
-        this.firstTimeStampValue = -1;
-        this.lastTimeStampValue = -1;
+        this.objectName = objectName;
+        this.firstTimeStampValue = 0;
+        this.lastTimeStampValue = 0;
         this.parent = parent;
         this.parent.addChild(this);
         // Create the logger
@@ -81,12 +87,13 @@ public class SequenceObject implements NotificationListener {
             app = new FileAppender(outputFormatLayout,
                     DEFAULT_LOG_FILE_DIRECTORY + "/" + this.name, false);
             this.outputFileName = app.getFile();
+
             // Assign appender to the logger programmatically
             currentLogger.addAppender(app);
             currentLogger.setAdditivity(false); // avoid printing logs to console
-            currentLogger.setLevel(Level.INFO); // only info level is used					
-            reverseFileReader = new ReverseFileReader(new File(
-                        this.outputFileName));
+            currentLogger.setLevel(Level.INFO); // only info level is used
+            File f = new File(this.outputFileName);
+            reverseFileReader = new ReverseFileReader(f);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,7 +111,7 @@ public class SequenceObject implements NotificationListener {
         for (Notification notification : notifCollections) {
             String type = notification.getType();
             long notificationTimeStamp = notification.getTimeStamp();
-            if (this.firstTimeStampValue == -1) {
+            if (this.firstTimeStampValue == 0) {
                 this.firstTimeStampValue = notificationTimeStamp;
             } else {
                 this.lastTimeStampValue = (notificationTimeStamp -
@@ -154,6 +161,25 @@ public class SequenceObject implements NotificationListener {
         try {
             this.reverseFileReader.init();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public final void rewind() {
+        this.reverseFileReader.rewind();
+    }
+
+    public void clear() {
+        this.isRecording = false;
+        this.currentServiceStamp = null;
+        this.currentWBNStamp = null;
+        // Close the appender, remove it from logger and close the reader
+        this.app.close();
+        this.currentLogger.removeAllAppenders();
+        try {
+            this.reverseFileReader.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

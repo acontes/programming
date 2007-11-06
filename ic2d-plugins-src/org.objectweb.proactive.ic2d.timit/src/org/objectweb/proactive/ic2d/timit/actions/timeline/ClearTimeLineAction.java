@@ -28,44 +28,35 @@
  *
  * ################################################################
  */
-package functionalTests.remoteobject.registry;
+package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
-import java.net.URI;
-
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
-import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
-public class DummyProtocol implements RemoteObjectFactory {
-    public int getPort() {
-        return 452;
+public class ClearTimeLineAction extends Action {
+    public static final String CLEAR_TIMELINE_ACTION = "Clear TimeLine";
+    private TimeLineChartEditPart durationChartEditPart;
+
+    public ClearTimeLineAction() {
+        super.setId(CLEAR_TIMELINE_ACTION);
+        super.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "delete_obj.gif"));
+        super.setToolTipText(CLEAR_TIMELINE_ACTION);
+        super.setEnabled(false);
     }
 
-    public String getProtocolId() {
-        return "dummy";
+    public final void setTarget(
+        final TimeLineChartEditPart durationChartEditPart) {
+        super.setEnabled(true);
+        this.durationChartEditPart = durationChartEditPart;
     }
 
-    public URI[] list(URI url) throws ProActiveException {
-        return new URI[] {  };
-    }
-
-    public RemoteObject lookup(URI url) throws ProActiveException {
-        return null;
-    }
-
-    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
-        throws ProActiveException {
-        return null;
-    }
-
-    public RemoteRemoteObject register(InternalRemoteRemoteObject target,
-        URI url, boolean replacePreviousBinding) throws ProActiveException {
-        return null;
-    }
-
-    public void unregister(URI url) throws ProActiveException {
+    @Override
+    public final void run() {
+        if (this.durationChartEditPart != null) {
+            this.durationChartEditPart.removeAndClearAll();
+        }
     }
 }

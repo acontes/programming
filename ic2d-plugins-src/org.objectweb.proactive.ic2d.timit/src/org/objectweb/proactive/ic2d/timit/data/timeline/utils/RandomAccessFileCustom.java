@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.data.duration;
+package org.objectweb.proactive.ic2d.timit.data.timeline.utils;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -263,7 +263,7 @@ public class RandomAccessFileCustom extends Reader {
                     charBuffer.limit(charBuffer.position() + 1);
                     int oldPos = charBuffer.position();
                     CoderResult result = decoder.decode(byteBuffer, charBuffer,
-                            false);
+                            true);
                     assert (!result.isError()) : result;
                     n = charBuffer.position() - oldPos;
                     if (n > 0) {

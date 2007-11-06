@@ -28,42 +28,45 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.editparts.duration;
+package org.objectweb.proactive.ic2d.timit.editparts.timeline;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.BorderLayout;
+import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.ToolbarLayout;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.timit.data.duration.DurationChartObject;
-import org.objectweb.proactive.ic2d.timit.data.duration.SequenceObject;
-import org.objectweb.proactive.ic2d.timit.figures.duration.SequenceFigure;
-import org.objectweb.proactive.ic2d.timit.figures.duration.TimeAxisFigure;
-import org.objectweb.proactive.ic2d.timit.figures.duration.TimeIntervalManager;
+import org.objectweb.proactive.ic2d.timit.data.timeline.SequenceObject;
+import org.objectweb.proactive.ic2d.timit.data.timeline.TimeIntervalManager;
+import org.objectweb.proactive.ic2d.timit.data.timeline.TimeLineChartObject;
+import org.objectweb.proactive.ic2d.timit.figures.timeline.SequenceFigure;
+import org.objectweb.proactive.ic2d.timit.figures.timeline.TimeAxisFigure;
 
 
-public class DurationChartEditPart extends AbstractGraphicalEditPart
+public class TimeLineChartEditPart extends AbstractGraphicalEditPart
     implements Runnable {
     private CustomLayer panel;
     private Panel namesPanel;
     private TimeAxisFigure timeAxisFigure;
     private TimeIntervalManager timeIntervalManager;
 
-    public DurationChartEditPart(DurationChartObject model) {
+    public TimeLineChartEditPart(TimeLineChartObject model) {
         model.setEp(this);
         setModel(model);
-        // Create the time interval manager
-        this.timeIntervalManager = new TimeIntervalManager();
+        this.timeIntervalManager = model.getTimeIntervalManager();
     }
 
     @Override
@@ -78,14 +81,18 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
      */
     @Override
     protected List<SequenceObject> getModelChildren() {
-        List<SequenceObject> l = ((DurationChartObject) getModel()).getChildrenList();
+        List<SequenceObject> l = ((TimeLineChartObject) getModel()).getChildrenList();
         return l;
     }
 
     @Override
     protected IFigure createFigure() {
+        // Attach a horizontal range model listener
+        ((FigureCanvas) this.getViewer().getControl()).getViewport()
+         .getHorizontalRangeModel()
+         .addPropertyChangeListener(new CustomHorizontalRangeModelPropertyChangeListener());
+        // Create the whole layer
         this.panel = new CustomLayer();
-
         return panel;
     }
 
@@ -93,25 +100,54 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
     protected void createEditPolicies() {
     }
 
-    public final void asyncRefresh(long longuestTime) {
-        // Init the time interval manager
-        this.timeIntervalManager.init(0, longuestTime);
-        this.asyncRefresh();
+    /**
+     * Clears the model and removes all sequence figures.
+     */
+    public final void removeAndClearAll() {
+        // Clear model
+        ((TimeLineChartObject) getModel()).clearChildrenList();
+
+        // Clear editparts		
+        // In order to avoid concurrent exception create a temporary list to be filled with parts to delete
+        final List<EditPart> toDelete = new ArrayList<EditPart>(this.getChildren()
+                                                                    .size());
+
+        // Deactivate selected parts
+        for (final Object o : this.getChildren()) {
+            EditPart e = (EditPart) o;
+            e.deactivate();
+            toDelete.add(e);
+        }
+
+        // Remove them from the current root editpart
+        for (final EditPart e : toDelete) {
+            this.removeChild(e);
+        }
+
+        // Clear the interval manager
+        this.timeIntervalManager.init(0, 0);
+
+        // Refresh
+        this.asyncRefresh(false);
     }
 
-    private final void asyncRefresh() {
-        this.setDirtyMode();
+    /**
+     * Asynchronous refresh.
+     * @param dirtyMode If true all figures will recompute before paint
+     */
+    public final void asyncRefresh(boolean dirtyMode) {
+        if (dirtyMode) {
+            this.setDirtyMode();
+        }
         Display.getDefault().asyncExec(this);
     }
 
     @Override
     public final void run() {
         refresh();
-        timeAxisFigure.repaint(); // TODO : check if refresh() calls the
-                                  // figure.repaint() method
     }
 
-    public void increaseWidth() {
+    public final void increaseWidth() {
         if (this.timeIntervalManager.getTimeStep() < TimeIntervalManager.MINIMAL_TIMESTAMP_VALUE_IN_MICROSECONDS) {
             return;
         }
@@ -122,7 +158,7 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
         this.panel.revalidate();
     }
 
-    public void decreaseWidth() {
+    public final void decreaseWidth() {
         Rectangle r = this.panel.getBounds();
         if (r.width <= this.getViewer().getControl().getBounds().width) {
             return;
@@ -133,7 +169,7 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
         this.panel.revalidate();
     }
 
-    public void fitWidth() {
+    public final void fitWidth() {
         Rectangle r = this.panel.getBounds();
         setDirtyMode();
         r.width = this.getViewer().getControl().getBounds().width;
@@ -141,7 +177,7 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
         this.panel.revalidate();
     }
 
-    public void expandWidth() {
+    public final void expandWidth() {
         int widthToMatch = Math.round((this.timeIntervalManager.getTimeInterval() / TimeIntervalManager.MINIMAL_TIMESTAMP_VALUE_IN_MICROSECONDS) * TimeAxisFigure.referenceXSize);
         Rectangle r = this.panel.getBounds();
         setDirtyMode();
@@ -150,8 +186,8 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
         this.panel.revalidate();
     }
 
-    private void setDirtyMode() {
-        for (Object o : this.timeAxisFigure.getChildren()) {
+    private final void setDirtyMode() {
+        for (final Object o : this.timeAxisFigure.getChildren()) {
             SequenceFigure f = (SequenceFigure) o;
             f.setBDirty(true);
         }
@@ -175,11 +211,6 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
             layout.setStretchMinorAxis(true);
             layout.setSpacing(20);
             this.setLayoutManager(layout);
-
-            // // ADD HEADER
-            // HeaderFigure labelFigure = new HeaderFigure("Duration Chart");
-            // labelFigure.setBorder(new LineBorder());
-            // this.add(labelFigure);
 
             // CONTAINER PANEL
             Panel containerPanel = new Panel();
@@ -228,7 +259,6 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
         public void add(IFigure arg0, Object arg1, int arg2) {
             if (arg0.getClass() == SequenceFigure.class) {
                 SequenceFigure sFig = (SequenceFigure) arg0;
-                sFig.setBorder(new LineBorder());
                 // Add label to the names panel
                 namesPanel.add(sFig.getLabel(), ToolbarLayout.ALIGN_CENTER);
                 timeAxisFigure.add(arg0, ToolbarLayout.ALIGN_CENTER);
@@ -236,31 +266,25 @@ public class DurationChartEditPart extends AbstractGraphicalEditPart
                 super.add(arg0, arg1, arg2);
             }
         }
+
+        @Override
+        public void remove(IFigure arg0) {
+            if (arg0.getClass() == SequenceFigure.class) {
+                SequenceFigure sFig = (SequenceFigure) arg0;
+                // Add label to the names panel
+                namesPanel.remove(sFig.getLabel());
+                timeAxisFigure.remove(arg0);
+            } else {
+                super.remove(arg0);
+            }
+        }
     }
 
-    public class HeaderFigure extends Label {
-        public HeaderFigure(String s) {
-            super(s);
-        }
-
-        @Override
-        protected Point getTextLocation() {
-            Point p = super.getTextLocation();
-            int viewerWidth = getViewer().getControl().getBounds().width;
-            if (viewerWidth > 20) {
-                p.x = (viewerWidth / 2) - (super.getTextSize().width / 2);
-            }
-            return p;
-        }
-
-        @Override
-        public Rectangle getBounds() {
-            Rectangle r = super.getBounds();
-            int viewerWidth = getViewer().getControl().getBounds().width;
-            if (viewerWidth > 20) {
-                r.width = getViewer().getControl().getBounds().width - 20;
-            }
-            return r;
+    public class CustomHorizontalRangeModelPropertyChangeListener
+        implements PropertyChangeListener {
+        public void propertyChange(PropertyChangeEvent evt) {
+            TimeLineChartEditPart.this.timeAxisFigure.setBDirty(true);
+            TimeLineChartEditPart.this.setDirtyMode();
         }
     }
 }

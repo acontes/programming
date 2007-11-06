@@ -28,35 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.actions;
+package org.objectweb.proactive.ic2d.timit.editparts.timeline;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
+import org.eclipse.gef.EditPart;
+import org.eclipse.gef.EditPartFactory;
+import org.objectweb.proactive.ic2d.timit.data.timeline.SequenceObject;
+import org.objectweb.proactive.ic2d.timit.data.timeline.TimeLineChartObject;
+import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 
-public class IncreaseSizeAction extends Action {
-    public static final String INCREASE_SIZE_ACTION = "Increase Size Action";
-    private DurationChartEditPart durationChartEditPart;
+public class TimeLineEditPartFactory implements EditPartFactory {
+    private TimeLineView view;
 
-    public IncreaseSizeAction() {
-        super.setId(INCREASE_SIZE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "increase_width.gif"));
-        super.setToolTipText(INCREASE_SIZE_ACTION);
-        super.setEnabled(false);
+    public TimeLineEditPartFactory(TimeLineView view) {
+        this.view = view;
     }
 
-    public final void setTarget(
-        final DurationChartEditPart durationChartEditPart) {
-        super.setEnabled(true);
-        this.durationChartEditPart = durationChartEditPart;
-    }
-
-    @Override
-    public final void run() {
-        if (this.durationChartEditPart != null) {
-            this.durationChartEditPart.increaseWidth();
+    public EditPart createEditPart(EditPart context, Object model) {
+        if (model instanceof TimeLineChartObject) {
+            TimeLineChartEditPart d = new TimeLineChartEditPart((TimeLineChartObject) model);
+            this.view.initActionsTarget(d);
+            return d;
+        } else if (model instanceof SequenceObject) {
+            return new SequenceEditPart((SequenceObject) model);
+        } else {
+            return null;
         }
     }
 }

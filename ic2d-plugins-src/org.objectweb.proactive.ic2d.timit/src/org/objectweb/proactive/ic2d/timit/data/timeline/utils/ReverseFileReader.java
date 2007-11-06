@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.data.duration;
+package org.objectweb.proactive.ic2d.timit.data.timeline.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -138,58 +138,15 @@ public class ReverseFileReader extends Reader {
         this.line = this.maxLine;
     }
 
+    public void rewind(int newLine) {
+        this.line = newLine;
+    }
+
+    public int getMaxLine() {
+        return this.maxLine;
+    }
+
     public int getLine() {
         return this.line;
-    }
-
-    public static void main(String[] args) {
-        try {
-            ReverseFileReader r = new ReverseFileReader(new File(
-                        "/user/vbodnart/home/TimItIC2D_Output/Domain#4"));
-            doParse(r);
-            System.out.println(
-                "ReverseFileReader.main() PARSING DONE !!!!!!!!!!!!!!!!!!!!!!");
-            r.line = r.maxLine;
-            //r.init();
-            doParse(r);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void doParse(ReverseFileReader r) throws Exception {
-        String line;
-        while (true) {
-            line = r.readLine();
-
-            if ("".equals(line)) {
-                System.out.println(
-                    "SequenceObject.getNextLoggedStampReversed() ------> READING EMPY LINE:::::: " +
-                    line);
-                line = r.readLine();
-                if ("".equals(line)) {
-                    System.out.println(
-                        "SequenceObject.getNextLoggedStampReversed() ------> TWO CONSECUTIF EMPTY LINES EXITING !!");
-                    line = null;
-                }
-            }
-
-            if (line == null) {
-                //				System.out
-                //						.println("SequenceObject.getNextLoggedStampReversed() -----------------> currentLine " + r.getCurrentLine() );
-                r.rewind();
-                break;
-            }
-
-            String[] splittedLine = line.split(" ");
-            int stateOrdinal = Integer.parseInt(splittedLine[0]);
-            long startTime = Long.parseLong(splittedLine[1]);
-            long stopTime = Long.parseLong(splittedLine[2]);
-            Stamp s = new Stamp(State.values()[stateOrdinal], startTime);
-            s.endTime = stopTime;
-
-            System.out.println(
-                "ReverseFileReader.main()___________________________ " + s);
-        }
     }
 }

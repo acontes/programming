@@ -28,35 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.actions;
+package org.objectweb.proactive.ic2d.timit.editparts.timeline;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.Label;
+import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
+import org.objectweb.proactive.ic2d.timit.data.timeline.SequenceObject;
+import org.objectweb.proactive.ic2d.timit.figures.timeline.SequenceFigure;
 
 
-public class DecreaseSizeAction extends Action {
-    public static final String DECREASE_SIZE_ACTION = "Decrease Size Action";
-    private DurationChartEditPart durationChartEditPart;
+public class SequenceEditPart extends AbstractGraphicalEditPart {
+    protected Label sequenceLabelFigure;
+    protected SequenceFigure sequenceFigure;
 
-    public DecreaseSizeAction() {
-        super.setId(DECREASE_SIZE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "decrease_width.gif"));
-        super.setToolTipText(DECREASE_SIZE_ACTION);
-        super.setEnabled(false);
-    }
-
-    public final void setTarget(
-        final DurationChartEditPart durationChartEditPart) {
-        super.setEnabled(true);
-        this.durationChartEditPart = durationChartEditPart;
+    public SequenceEditPart(SequenceObject model) {
+        setModel(model);
+        model.setEp(this);
     }
 
     @Override
-    public final void run() {
-        if (this.durationChartEditPart != null) {
-            this.durationChartEditPart.decreaseWidth();
-        }
+    protected IFigure createFigure() {
+        SequenceObject model = (SequenceObject) getModel();
+        TimeLineChartEditPart parent = (TimeLineChartEditPart) getParent();
+        this.sequenceFigure = new SequenceFigure(parent.getTimeIntervalManager(),
+                model, (ScrollingGraphicalViewer) parent.getViewer());
+        return sequenceFigure;
+    }
+
+    @Override
+    protected void createEditPolicies() {
     }
 }

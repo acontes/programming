@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.data.duration;
+package org.objectweb.proactive.ic2d.timit.data.timeline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,30 +37,27 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
-import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
-public class DurationChartObject {
+public class TimeLineChartObject {
     private final ArrayList<SequenceObject> childrenList = new ArrayList<SequenceObject>();
-    private DurationChartEditPart ep;
+    private TimeLineChartEditPart ep;
+    private TimeIntervalManager timeIntervalManager;
+
+    public TimeLineChartObject() {
+        // Create the time interval manager
+        this.timeIntervalManager = new TimeIntervalManager();
+    }
 
     public void provideSourceContainer(
         BasicChartContainerObject sourceContainer) {
-        try {
-            for (BasicChartObject c : sourceContainer.getChildrenList()) {
-                ActiveObject a = c.getAoObject();
-                if (a != null) {
-                    SequenceObject sequenceObject = this.createSequence(a);
-                    sequenceObject.startRecord();
-                }
+        for (BasicChartObject c : sourceContainer.getChildrenList()) {
+            ActiveObject a = c.getAoObject();
+            if (a != null) {
+                SequenceObject sequenceObject = this.createSequence(a);
+                sequenceObject.startRecord();
             }
-            if (this.childrenList.size() < 2) {
-                System.out.println(
-                    "DurationChartContainerObject.provideSourceContainer() -----> does not refresh");
-                return;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -75,15 +72,17 @@ public class DurationChartObject {
         }
 
         // Get the longuest time
-        long longuestDurationTime = 0;
+        long longuestTime = 0;
         for (SequenceObject s : this.childrenList) {
-            if ((s.lastTimeStampValue != -1) &&
-                    (s.lastTimeStampValue > longuestDurationTime)) {
-                longuestDurationTime = s.lastTimeStampValue;
+            if ((s.lastTimeStampValue != 0) &&
+                    (s.lastTimeStampValue > longuestTime)) {
+                longuestTime = s.lastTimeStampValue;
             }
         }
-        if (longuestDurationTime != 0) {
-            this.ep.asyncRefresh(longuestDurationTime);
+        if (longuestTime != 0) {
+            // Init the time interval manager
+            this.timeIntervalManager.init(0, longuestTime);
+            this.ep.asyncRefresh(true);
         }
     }
 
@@ -91,14 +90,25 @@ public class DurationChartObject {
         return childrenList;
     }
 
-    public void setEp(DurationChartEditPart ep) {
+    public void clearChildrenList() {
+        // Unsubsrcribe children
+        for (SequenceObject s : this.childrenList) {
+            s.clear();
+            // Unsubscribe the listener
+            JMXNotificationManager.getInstance().unsubscribe(s.objectName, s);
+        }
+        this.childrenList.clear();
+    }
+
+    public void setEp(TimeLineChartEditPart ep) {
         this.ep = ep;
     }
 
     public SequenceObject createSequence(ActiveObject a) {
         SequenceObject sequenceObject = getSequence(a.getName());
         if (sequenceObject == null) {
-            sequenceObject = new SequenceObject(a.getName(), this);
+            sequenceObject = new SequenceObject(a.getName(), a.getObjectName(),
+                    this);
             // Subscribe to notif manager
             JMXNotificationManager.getInstance()
                                   .subscribe(a.getObjectName(), sequenceObject,
@@ -107,12 +117,16 @@ public class DurationChartObject {
         return sequenceObject;
     }
 
-    private SequenceObject getSequence(String name) {
-        for (SequenceObject seq : childrenList) {
+    private final SequenceObject getSequence(final String name) {
+        for (final SequenceObject seq : childrenList) {
             if (seq.name.equals(name)) {
                 return seq;
             }
         }
         return null;
+    }
+
+    public TimeIntervalManager getTimeIntervalManager() {
+        return timeIntervalManager;
     }
 }

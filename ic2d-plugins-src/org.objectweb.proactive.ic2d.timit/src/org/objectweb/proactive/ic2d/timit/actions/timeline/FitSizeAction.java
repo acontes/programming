@@ -28,35 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.editparts.duration;
+package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.Label;
-import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
-import org.objectweb.proactive.ic2d.timit.data.duration.SequenceObject;
-import org.objectweb.proactive.ic2d.timit.figures.duration.SequenceFigure;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
-public class SequenceEditPart extends AbstractGraphicalEditPart {
-    protected Label sequenceLabelFigure;
-    protected SequenceFigure sequenceFigure;
+public class FitSizeAction extends Action {
+    public static final String FIT_SIZE_ACTION = "Fit Size Action";
+    private TimeLineChartEditPart durationChartEditPart;
 
-    public SequenceEditPart(SequenceObject model) {
-        setModel(model);
-        model.setEp(this);
+    public FitSizeAction() {
+        super.setId(FIT_SIZE_ACTION);
+        super.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "fit_timeline.gif"));
+        super.setToolTipText(FIT_SIZE_ACTION);
+        super.setEnabled(false);
+    }
+
+    public final void setTarget(
+        final TimeLineChartEditPart durationChartEditPart) {
+        super.setEnabled(true);
+        this.durationChartEditPart = durationChartEditPart;
     }
 
     @Override
-    protected IFigure createFigure() {
-        SequenceObject model = (SequenceObject) getModel();
-        DurationChartEditPart parent = (DurationChartEditPart) getParent();
-        this.sequenceFigure = new SequenceFigure(parent.getTimeIntervalManager(),
-                model, (ScrollingGraphicalViewer) parent.getViewer());
-        return sequenceFigure;
-    }
-
-    @Override
-    protected void createEditPolicies() {
+    public final void run() {
+        if (this.durationChartEditPart != null) {
+            this.durationChartEditPart.fitWidth();
+        }
     }
 }

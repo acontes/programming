@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.figures.duration;
+package org.objectweb.proactive.ic2d.timit.data.timeline;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -36,6 +36,7 @@ import java.util.Date;
 
 
 public class TimeIntervalManager {
+    public static final int MINIMAL_TIMESTAMP_VALUE_IN_MICROSECONDS = 50000;
     private static final Format MILLISECONDS_FORMATTER = new SimpleDateFormat(
             "SSS");
     private static final Format SECONDS_FORMATTER = new SimpleDateFormat(
@@ -44,7 +45,6 @@ public class TimeIntervalManager {
             "mm.ss.SSS");
     private static final Format HOURS_FORMATTER = new SimpleDateFormat(
             "HH.mm.ss.SSS");
-    public static final int MINIMAL_TIMESTAMP_VALUE_IN_MICROSECONDS = 50000;
 
     /**
      * The time interval represented in microseconds.
@@ -57,10 +57,18 @@ public class TimeIntervalManager {
     protected long beginTime; // since its always 0 ... for futur work on a sliding window
 
     /**
-     * The interval end represented in microseconds.
+     * The end of the time interval represented in microseconds.
      */
     protected long endTime;
+
+    /**
+     * The current time step.
+     */
     protected long timeStep;
+
+    /**
+     * A boolean to know if this time interval manager is initialized
+     */
     protected boolean inited;
 
     public TimeIntervalManager() {
@@ -75,7 +83,6 @@ public class TimeIntervalManager {
     }
 
     /**
-     * PRE: endTime != 0
      * @param beginTime
      * @param endTime
      */
@@ -90,11 +97,19 @@ public class TimeIntervalManager {
      * Gets the x position of the time relative to the axis interval.
      */
     public final int getXPosition(long instant, int clientWidth) {
-        return (int) Math.floor(((double) (instant - beginTime) / timeInterval) * clientWidth);
+        return (int) Math.floor(((double) (instant - this.beginTime) / this.timeInterval) * clientWidth);
+    }
+
+    public final long getTimePosition(int relativePixelPosition, int clientWidth) {
+        return Math.round((((double) relativePixelPosition) / clientWidth) * timeInterval);
     }
 
     public long getTimeInterval() {
         return timeInterval;
+    }
+
+    public long getEndTime() {
+        return endTime;
     }
 
     public long getTimeStep() {
@@ -105,7 +120,13 @@ public class TimeIntervalManager {
         this.timeStep = timeStep;
     }
 
-    public static String convertTimeInMicrosToString(long timeInMicros) {
+    /**
+     * A static method to convert time in microseconds into its human-readable String representation.
+     * @param timeInMicros The time in microseconds to convert
+     * @return A String representation
+     */
+    public static final String convertTimeInMicrosToString(
+        final long timeInMicros) {
         String result = "";
         if ((timeInMicros / 1000) < 1) {
             result = timeInMicros + "\u00b5s";
@@ -134,5 +155,9 @@ public class TimeIntervalManager {
             }
         }
         return result;
+    }
+
+    public boolean isInited() {
+        return inited;
     }
 }

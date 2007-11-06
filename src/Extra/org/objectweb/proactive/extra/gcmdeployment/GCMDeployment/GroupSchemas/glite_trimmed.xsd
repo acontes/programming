@@ -19,30 +19,20 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="requirements" type="pa:TextOrVariableType" minOccurs="0" />
 					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
 					<element name="rank" type="paext:gLiteRankType" />
-					<element name="JDLTransferDeploy" type="pa:fileTransferType" minOccurs="0" maxOccurs="1" />
 					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="configFile" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="JDLFilePath" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="JDLRemoteFilePath" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="arguments" type="pa:argumentListType" minOccurs="0" />
-					<element name="inputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
-					<element name="outputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
 				</sequence>
 				<attribute name="hostname" type="string" />
 				<attribute name="virtualOrganisation" type="string" use="required" />
-				<attribute name="JDLFileName" type="string" />
 				<attribute name="Type" type="string" default="job" />
 				<attribute name="executable" type="string" default="/bin/sh" />
 				<attribute name="jobType" type="string" default="normal" />
-				<attribute name="outputse" type="string" />
-				<attribute name="retryCount" type="string" />
-				<attribute name="myProxyServer" type="string" />
-				<attribute name="nodes" type="string" />
+				<attribute name="nodeNumber" type="string" />
 			</extension>
 		</complexContent>
 	</complexType>
