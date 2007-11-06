@@ -32,8 +32,8 @@ package org.objectweb.proactive.ic2d.timit.editparts.tree;
 
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.timit.data.TimerObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
 
 
@@ -49,7 +49,7 @@ public class TreeEditPartFactory implements EditPartFactory {
         EditPart part = null;
         if (model instanceof TimerTreeHolder) {
             part = new TimerTreeHolderEditPart();
-        } else if (model instanceof TimerObject) {
+        } else if (model instanceof TimerTreeNodeObject) {
             part = new TimerEditPart(timerTreeView);
         }
         if (part != null) {

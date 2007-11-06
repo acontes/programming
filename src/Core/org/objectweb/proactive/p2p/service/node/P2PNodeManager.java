@@ -292,7 +292,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
         ProActiveSecurityManager newNodeSecurityManager = null;
         if (psm != null) {
-			newNodeSecurityManager = psm.generateSiblingCertificate(EntityType.NODE, P2PConstants.VN_NAME);
+            newNodeSecurityManager = psm.generateSiblingCertificate(EntityType.NODE,
+                    P2PConstants.VN_NAME);
         } else {
             ProActiveLogger.getLogger(Loggers.SECURITY_NODE)
                            .debug("Node created without security manager");

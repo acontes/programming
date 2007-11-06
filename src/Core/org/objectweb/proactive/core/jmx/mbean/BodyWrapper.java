@@ -166,9 +166,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                 ", userData=" + userData);
         }
 
-        Notification notification = new Notification(type, source, counter++);
+        Notification notification = new Notification(type, source, counter++,
+                System.nanoTime() / 1000); // timeStamp in microseconds
         notification.setUserData(userData);
-
         // If the migration is finished, we need to inform the
         // JMXNotificationManager
         if (type.equals(NotificationType.migrationFinished)) {
@@ -354,27 +354,27 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         launchNotificationsThread();
     }
 
-	public ProActiveSecurityManager getSecurityManager(Entity user) {
-		try {
-			return body.getProActiveSecurityManager(user);
-		} catch (AccessControlException e) {
-			e.printStackTrace();
-		} catch (SecurityNotAvailableException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	public void setSecurityManager(Entity user, PolicyServer policyServer) {
-		try {
-			body.setProActiveSecurityManager(user, policyServer);
-		} catch (AccessControlException e) {
-			e.printStackTrace();
-		} catch (SecurityNotAvailableException e) {
-			e.printStackTrace();
-		}
-	}
+    public ProActiveSecurityManager getSecurityManager(Entity user) {
+        try {
+            return body.getProActiveSecurityManager(user);
+        } catch (AccessControlException e) {
+            e.printStackTrace();
+        } catch (SecurityNotAvailableException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void setSecurityManager(Entity user, PolicyServer policyServer) {
+        try {
+            body.setProActiveSecurityManager(user, policyServer);
+        } catch (AccessControlException e) {
+            e.printStackTrace();
+        } catch (SecurityNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * returns a list of outgoing active object references.

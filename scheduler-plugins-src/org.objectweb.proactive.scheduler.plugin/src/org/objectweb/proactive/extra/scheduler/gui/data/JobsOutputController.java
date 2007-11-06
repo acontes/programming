@@ -39,8 +39,7 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
-import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
+import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.gui.Activator;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobOutput;
 
@@ -123,7 +122,10 @@ public class JobsOutputController {
                 Activator.getListenPortNumber());
             JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE +
                         jobId));
-            Logger log = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + jobId);
+            joa.setLayout(Log4JTaskLogs.DEFAULT_LOG_LAYOUT);
+            Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                    jobId);
+            log.setAdditivity(false);
             log.setLevel(Level.ALL);
             log.removeAllAppenders();
             log.addAppender(joa);

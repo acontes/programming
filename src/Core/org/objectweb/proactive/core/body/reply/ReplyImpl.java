@@ -43,16 +43,15 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.AuthenticationException;
 import org.objectweb.proactive.core.security.crypto.Session;
-import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.crypto.Session.ActAs;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 
 
-public class ReplyImpl extends MessageImpl implements Reply,
-    Serializable {
+public class ReplyImpl extends MessageImpl implements Reply, Serializable {
 
     /**
      * The hypothetic result
@@ -110,35 +109,33 @@ public class ReplyImpl extends MessageImpl implements Reply,
 
         // security
         if (!ciphered && (psm != null)) {
-
             try {
-            	Session session = this.psm.getSessionTo(destinationBody.getCertificate());
-				if (!session
-						.getSecurityContext().getSendReply().getCommunication()) {
-					throw new CommunicationForbiddenException();
-				}
-				this.sessionID = session.getDistantSessionID();
-				long id = psm.getSessionIDTo(destinationBody.getCertificate());
-				encryptedResult = psm.encrypt(id, result, ActAs.SERVER);
-				ciphered = true;
-
-			} catch (SecurityNotAvailableException e) {
-				// do nothing
-			} catch (CommunicationForbiddenException e) {
-				e.printStackTrace();
-			} catch (RenegotiateSessionException e) {
-				psm.terminateSession(sessionID);
-				try {
-					destinationBody.terminateSession(sessionID);
-				} catch (SecurityNotAvailableException e1) {
-					e.printStackTrace();
-				}
-				this.send(destinationBody);
-			} catch (SessionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+                Session session = this.psm.getSessionTo(destinationBody.getCertificate());
+                if (!session.getSecurityContext().getSendReply()
+                                .getCommunication()) {
+                    throw new CommunicationForbiddenException();
+                }
+                this.sessionID = session.getDistantSessionID();
+                long id = psm.getSessionIDTo(destinationBody.getCertificate());
+                encryptedResult = psm.encrypt(id, result, ActAs.SERVER);
+                ciphered = true;
+            } catch (SecurityNotAvailableException e) {
+                // do nothing
+            } catch (CommunicationForbiddenException e) {
+                e.printStackTrace();
+            } catch (RenegotiateSessionException e) {
+                psm.terminateSession(sessionID);
+                try {
+                    destinationBody.terminateSession(sessionID);
+                } catch (SecurityNotAvailableException e1) {
+                    e.printStackTrace();
+                }
+                this.send(destinationBody);
+            } catch (SessionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
         // end security
         // fault-tolerance returned value

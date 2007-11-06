@@ -37,15 +37,12 @@ package org.objectweb.proactive.core.security;
  *
  */
 public abstract class SecurityConstants {
-//    public static final String XML_CERTIFICATE = "/Policy/Certificate";
-//    public static final String XML_PRIVATE_KEY = "/Policy/PrivateKey";
-//    public static final String XML_TRUSTED_CERTIFICATION_AUTHORITY = "/Policy/TrustedCertificationAuthority/CertificationAuthority";
-//    public static final String XML_CERTIFICATION_AUTHORITY_CERTIFICATE = "Certificate";
-    
+    //    public static final String XML_CERTIFICATE = "/Policy/Certificate";
+    //    public static final String XML_PRIVATE_KEY = "/Policy/PrivateKey";
+    //    public static final String XML_TRUSTED_CERTIFICATION_AUTHORITY = "/Policy/TrustedCertificationAuthority/CertificationAuthority";
+    //    public static final String XML_CERTIFICATION_AUTHORITY_CERTIFICATE = "Certificate";
     public static final int MAX_SESSION_VALIDATION_WAIT = 30;
-    
-    public enum EntityType {
-    	UNKNOWN,
+    public enum EntityType {UNKNOWN,
         ENTITY,
         OBJECT,
         NODE,
@@ -53,51 +50,52 @@ public abstract class SecurityConstants {
         APPLICATION,
         USER,
         DOMAIN;
-		
-		public static EntityType fromString(String string) {
-			for (EntityType value : EntityType.values()) {
-				if (value.toString().equalsIgnoreCase(string)) {
-					return value;
-				}
-			}
-			return EntityType.UNKNOWN;
-		}
-		
-		public EntityType getParentType() {
-			switch (this) {
-			case ENTITY:
-			case OBJECT:
-			case NODE:
-			case RUNTIME:
-				return APPLICATION;
-			case APPLICATION:
-				return USER;
-			case USER:
-			case DOMAIN:
-				return DOMAIN;
-			default:
-				return UNKNOWN;
-			}
-		}
-		
-		public boolean match(EntityType that) {
-			if (this == that) {
-				return true;
-			}
-			
-			if (this == UNKNOWN || that == UNKNOWN) {
-				return true;
-			}
-			
-			if (this == ENTITY && (that == RUNTIME || that == NODE || that == OBJECT)) {
-				return true;
-			}
-			
-			if (that == ENTITY && (this == RUNTIME || this == NODE || this == OBJECT)) {
-				return true;
-			}
-			
-			return false;
-		}
+        public static EntityType fromString(String string) {
+            for (EntityType value : EntityType.values()) {
+                if (value.toString().equalsIgnoreCase(string)) {
+                    return value;
+                }
+            }
+            return EntityType.UNKNOWN;
+        }
+
+        public EntityType getParentType() {
+            switch (this) {
+            case ENTITY:
+            case OBJECT:
+            case NODE:
+            case RUNTIME:
+                return APPLICATION;
+            case APPLICATION:
+                return USER;
+            case USER:
+            case DOMAIN:
+                return DOMAIN;
+            default:
+                return UNKNOWN;
+            }
+        }
+
+        public boolean match(EntityType that) {
+            if (this == that) {
+                return true;
+            }
+
+            if ((this == UNKNOWN) || (that == UNKNOWN)) {
+                return true;
+            }
+
+            if ((this == ENTITY) &&
+                    ((that == RUNTIME) || (that == NODE) || (that == OBJECT))) {
+                return true;
+            }
+
+            if ((that == ENTITY) &&
+                    ((this == RUNTIME) || (this == NODE) || (this == OBJECT))) {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

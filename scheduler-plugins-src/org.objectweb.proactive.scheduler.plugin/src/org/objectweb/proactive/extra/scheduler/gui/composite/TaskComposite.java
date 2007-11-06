@@ -1,30 +1,27 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ * Initial developer(s): The ProActive Team
+ * http://proactive.inria.fr/team_members.htm Contributor(s):
  *
  * ################################################################
  */
@@ -32,6 +29,7 @@ package org.objectweb.proactive.extra.scheduler.gui.composite;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -42,15 +40,28 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
+import org.objectweb.proactive.extra.scheduler.common.task.Status;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
+import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -231,9 +242,73 @@ public class TaskComposite extends Composite {
         tc7.setMoveable(true);
         tc8.setMoveable(true);
         tc9.setMoveable(true);
+
+        table.addListener(SWT.Selection,
+            new Listener() {
+                public void handleEvent(Event event) {
+                    // get the taskId
+                    TaskId taskId = (TaskId) event.item.getData();
+
+                    InternalJob job = JobsController.getLocalView()
+                                                    .getJobById(taskId.getJobId());
+
+                    // set Focus on task result
+                    IWorkbench iworkbench = PlatformUI.getWorkbench();
+                    IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+                    IWorkbenchPage page = currentWindow.getActivePage();
+                    try {
+                        IViewPart part = page.showView(ResultPreview.ID);
+                        part.setFocus();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    // test job owner
+                    if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
+                        InternalTask task = job.getHMTasks().get(taskId);
+
+                        // update its tasks informations if task is finished
+                        if (task.getStatus() == Status.FINISHED) {
+                            try {
+                                ResultPreview resultPreview = ResultPreview.getInstance();
+                                if (resultPreview != null) {
+                                    // get result from scheduler
+                                    // TODO : NO ACCESS TO SCHED HERE ...
+                                    TaskResult tr = getTaskResult(job.getId(),
+                                            taskId);
+                                    if (tr != null) {
+                                        resultPreview.update(tr.getGraphicalDescription());
+                                    } else {
+                                        throw new RuntimeException("Task " +
+                                            taskId +
+                                            " is finished but result is null");
+                                    }
+                                }
+                            } catch (RuntimeException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            });
+
         return table;
     }
 
+    // TMP MKRIS
+    private Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
+
+    private TaskResult getTaskResult(JobId jid, TaskId tid) {
+        TaskResult tr = this.cachedTaskResult.get(tid);
+        if (tr == null) {
+            tr = SchedulerProxy.getInstance()
+                               .getTaskResult(jid, tid.getReadableName());
+            this.cachedTaskResult.put(tid, tr);
+        }
+        return tr;
+    }
+
+    // END TMP MKRIS
     private void sort(SelectionEvent event, int field) {
         if (lastSorting == field) {
             // if the new sort is the same as the last sort, invert order.
@@ -331,14 +406,14 @@ public class TaskComposite extends Composite {
 
             TableColumn[] cols = table.getColumns();
 
-            // I'm must fill item by this way, because all columns are moveable
+            // I'm must fill item by this way, because all columns are movable
             // !
             // So i don't know if the column "Id" is at the first or the "nth"
             // position
             for (int i = 0; i < cols.length; i++) {
                 String title = cols[i].getText();
                 if (title.equals(COLUMN_ID_TITLE)) {
-                    item.setText(i, internalTask.getId().toString());
+                    item.setText(i, "" + internalTask.getId().hashCode());
                 } else if (title.equals(COLUMN_STATUS_TITLE)) {
                     item.setText(i, internalTask.getStatus().toString());
                 } else if (title.equals(COLUMN_NAME_TITLE)) {
@@ -387,7 +462,8 @@ public class TaskComposite extends Composite {
      * This method remove all item of the table and fill it with the tasks
      * vector. The label is also updated.
      *
-     * @param jobId the jobId, just for the label.
+     * @param jobId
+     *            the jobId, just for the label.
      * @param tasks
      */
     public void setTasks(JobId jobId, ArrayList<InternalTask> tasks) {
@@ -403,11 +479,13 @@ public class TaskComposite extends Composite {
 
     /**
      * This method allow to replace only one line on the task table. This method
-     * identify the "good" item with the taskId. The internalTask is use to
-     * fill item.
+     * identify the "good" item with the taskId. The internalTask is use to fill
+     * item.
      *
-     * @param taskId the taskId which must be updated
-     * @param internalTask all informations for fill item
+     * @param taskId
+     *            the taskId which must be updated
+     * @param internalTask
+     *            all informations for fill item
      */
     public void changeLine(TaskId taskId, InternalTask internalTask) {
         if (!table.isDisposed()) {

@@ -26,103 +26,94 @@ import org.objectweb.proactive.ic2d.security.tabs.RuleTab;
 import org.objectweb.proactive.ic2d.security.tabs.SessionTab;
 import org.objectweb.proactive.ic2d.security.tabs.UpdatableTab;
 
+
 public class PolicyEditorView extends ViewPart {
+    public static final String ID = "org.objectweb.proactive.ic2d.security.views.PolicyEditorView";
+    private CertificateTreeList keystore;
+    protected CTabFolder tabFolder;
+    private ScrolledForm form;
+    private CertificateGenerationTab cgt;
+    private KeystoreTab kt;
+    private RuleTab rt;
+    private SessionTab st;
 
-	public static final String ID = "org.objectweb.proactive.ic2d.security.views.PolicyEditorView";
+    public PolicyEditorView() {
+        this.keystore = new CertificateTreeList();
+    }
 
-	private CertificateTreeList keystore;
+    @Override
+    public void createPartControl(Composite parent) {
+        FormToolkit toolkit = new FormToolkit(parent.getDisplay());
+        toolkit.setBorderStyle(SWT.BORDER);
 
-	protected CTabFolder tabFolder;
+        this.form = toolkit.createScrolledForm(parent);
 
-	private ScrolledForm form;
+        this.form.setText("Policy Editor");
+        this.form.getBody().setLayout(new GridLayout());
+        this.tabFolder = new CTabFolder(this.form.getBody(), SWT.FLAT |
+                SWT.TOP);
+        toolkit.adapt(this.tabFolder, true, true);
+        this.tabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Color selectedColor = toolkit.getColors().getColor(FormColors.SEPARATOR);
+        this.tabFolder.setSelectionBackground(new Color[] {
+                selectedColor, toolkit.getColors().getBackground()
+            }, new int[] { 50 });
+        this.tabFolder.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ((UpdatableTab) PolicyEditorView.this.tabFolder.getSelection()).update();
+                }
+            });
 
-	private CertificateGenerationTab cgt;
+        toolkit.paintBordersFor(this.tabFolder);
+        this.cgt = new CertificateGenerationTab(this.tabFolder, this.keystore,
+                toolkit);
+        this.kt = new KeystoreTab(this.tabFolder, this.keystore, toolkit);
+        this.rt = new RuleTab(this.tabFolder, this.keystore, toolkit);
+        this.st = new SessionTab(this.tabFolder, toolkit);
 
-	private KeystoreTab kt;
+        this.tabFolder.setSelection(0);
+    }
 
-	private RuleTab rt;
+    public void update(CertificateTreeList list,
+        List<SimplePolicyRule> policies, String appName,
+        List<String> authorizedUsers, Hashtable<Long, Session> sessions) {
+        if (list != null) {
+            this.keystore.clear();
+            this.keystore.addAll(list);
+        }
 
-	private SessionTab st;
+        this.cgt.update();
 
-	public PolicyEditorView() {
-		this.keystore = new CertificateTreeList();
-	}
+        this.kt.update();
 
-	@Override
-	public void createPartControl(Composite parent) {
+        this.rt.update();
+        this.rt.setAppName(appName);
+        this.rt.setRules(policies);
+        this.rt.setAuthorizedUsers(authorizedUsers);
 
-		FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-		toolkit.setBorderStyle(SWT.BORDER);
+        this.st.setSessions(sessions);
+        this.st.update();
+    }
 
-		this.form = toolkit.createScrolledForm(parent);
+    public CertificateTreeList getKeystore() {
+        return this.keystore;
+    }
 
-		this.form.setText("Policy Editor");
-		this.form.getBody().setLayout(new GridLayout());
-		this.tabFolder = new CTabFolder(this.form.getBody(), SWT.FLAT | SWT.TOP);
-		toolkit.adapt(this.tabFolder, true, true);
-		this.tabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
-		Color selectedColor = toolkit.getColors()
-				.getColor(FormColors.SEPARATOR);
-		this.tabFolder.setSelectionBackground(new Color[] { selectedColor,
-				toolkit.getColors().getBackground() }, new int[] { 50 });
-		this.tabFolder.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				((UpdatableTab) PolicyEditorView.this.tabFolder.getSelection())
-						.update();
-			}
-		});
+    public String getAppName() {
+        return this.rt.getAppName();
+    }
 
-		toolkit.paintBordersFor(this.tabFolder);
-		this.cgt = new CertificateGenerationTab(this.tabFolder, this.keystore,
-				toolkit);
-		this.kt = new KeystoreTab(this.tabFolder, this.keystore, toolkit);
-		this.rt = new RuleTab(this.tabFolder, this.keystore, toolkit);
-		this.st = new SessionTab(this.tabFolder, toolkit);
+    public Map<CertificateTree, Boolean> getKeysToKeep() {
+        return this.kt.getSelected();
+    }
 
-		this.tabFolder.setSelection(0);
-	}
+    @Override
+    public void setFocus() {
+        this.form.setFocus();
+    }
 
-	public void update(CertificateTreeList list,
-			List<SimplePolicyRule> policies, String appName,
-			List<String> authorizedUsers, Hashtable<Long, Session> sessions) {
-		if (list != null) {
-			this.keystore.clear();
-			this.keystore.addAll(list);
-		}
-
-		this.cgt.update();
-
-		this.kt.update();
-
-		this.rt.update();
-		this.rt.setAppName(appName);
-		this.rt.setRules(policies);
-		this.rt.setAuthorizedUsers(authorizedUsers);
-
-		this.st.setSessions(sessions);
-		this.st.update();
-	}
-
-	public CertificateTreeList getKeystore() {
-		return this.keystore;
-	}
-
-	public String getAppName() {
-		return this.rt.getAppName();
-	}
-
-	public Map<CertificateTree, Boolean> getKeysToKeep() {
-		return this.kt.getSelected();
-	}
-
-	@Override
-	public void setFocus() {
-		this.form.setFocus();
-	}
-
-	public RuleTab getRt() {
-		return this.rt;
-	}
-
+    public RuleTab getRt() {
+        return this.rt;
+    }
 }

@@ -108,10 +108,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     implements VirtualNodeInternal, Serializable, ServiceUser {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4112836381808692922L;
-	/** Logger */
+         *
+         */
+    private static final long serialVersionUID = -4112836381808692922L;
+
+    /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     private final static Logger DEPLOYMENT_FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
@@ -1088,9 +1089,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 ProActiveSecurityManager siblingPSM = null;
 
                 if (this.proactiveSecurityManager != null) {
-					siblingPSM = this.proactiveSecurityManager
-							.generateSiblingCertificate(EntityType.NODE, this.name);
-				}
+                    siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(EntityType.NODE,
+                            this.name);
+                }
 
                 int registerAttempts = this.REGISTRATION_ATTEMPTS;
 
@@ -1235,9 +1236,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             ProActiveSecurityManager siblingPSM = null;
 
             if (this.proactiveSecurityManager != null) {
-				siblingPSM = this.proactiveSecurityManager
-						.generateSiblingCertificate(EntityType.NODE, this.name);
-			}
+                siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(EntityType.NODE,
+                        this.name);
+            }
 
             int registrationAttempts = this.REGISTRATION_ATTEMPTS;
 

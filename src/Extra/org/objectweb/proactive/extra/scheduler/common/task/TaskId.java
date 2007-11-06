@@ -45,8 +45,11 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  */
 public final class TaskId implements Comparable<TaskId>, Serializable {
 
+    /** Default task name */
+    public static final String DEFAULT_TASK_NAME = "Not set";
+
     /**
-     * Multiplicatif factor for job id (taskId will be :
+     * Multiplicative factor for job id (taskId will be :
      * this_factor*jobID+taskID)
      */
     public static final int JOB_FACTOR = 1000;
@@ -60,6 +63,12 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
     /** task id */
     private int id;
 
+    /** Human readable name */
+    private String readableName = DEFAULT_TASK_NAME;
+
+    /** Job id */
+    private JobId jobId = null;
+
     /**
      * To reinitialize the initial id value
      */
@@ -72,14 +81,17 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      *
      * @return the next available id.
      */
-    public static TaskId nextId(JobId jobId) {
-        return new TaskId((jobId.getValue() * JOB_FACTOR) + (++currentId));
+    public static synchronized TaskId nextId(JobId jobId) {
+        return new TaskId(jobId);
     }
 
     /**
-     * ProActive empty constructor
+     * Get the next id, and set task name.
+     *
+     * @return the next available id with task name set.
      */
-    public TaskId() {
+    public static synchronized TaskId nextId(JobId jobId, String readableName) {
+        return new TaskId(jobId, readableName);
     }
 
     /**
@@ -87,8 +99,38 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      *
      * @param id the task id to set.
      */
-    private TaskId(int id) {
-        this.id = id;
+    private TaskId(JobId jobId) {
+        this.jobId = jobId;
+        this.id = (jobId.hashCode() * JOB_FACTOR) + (++currentId);
+    }
+
+    /**
+     * Set id and name.
+     *
+     * @param id the task id to set.
+     * @param name the human readable task name.
+     */
+    private TaskId(JobId jobId, String name) {
+        this(jobId);
+        this.readableName = name;
+    }
+
+    /**
+     * Returns the jobId.
+     *
+     * @return the jobId.
+     */
+    public JobId getJobId() {
+        return jobId;
+    }
+
+    /**
+    * Return the human readable name associated to this id.
+    *
+    * @return the human readable name associated to this id.
+    */
+    public String getReadableName() {
+        return this.readableName;
     }
 
     /**
@@ -103,7 +145,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof TaskId) {
+        if ((o != null) && o instanceof TaskId) {
             return ((TaskId) o).id == id;
         }
         return false;
@@ -122,6 +164,6 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      */
     @Override
     public String toString() {
-        return "" + id;
+        return this.readableName;
     }
 }

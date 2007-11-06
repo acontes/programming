@@ -46,122 +46,124 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
-public class AOListener implements MouseListener, MouseMotionListener{
+public class AOListener implements MouseListener, MouseMotionListener {
+    private ActiveObject ao;
+    private AOFigure figure;
+    private ActionRegistry registry;
+    private DragAndDrop dnd;
+    private NodeFigure parentFigure;
 
-	private ActiveObject ao;
-	private AOFigure figure;
-	private ActionRegistry registry;
-	private DragAndDrop dnd;
-	private NodeFigure parentFigure;
+    public AOListener(ActiveObject ao, AOFigure figure,
+        MonitoringView monitoringView, NodeFigure parentFigure) {
+        this.ao = ao;
+        this.figure = figure;
+        this.parentFigure = parentFigure;
+        this.dnd = monitoringView.getDragAndDrop();
+        this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
+    }
 
-	public AOListener(ActiveObject ao, AOFigure figure, MonitoringView monitoringView, NodeFigure parentFigure) {
-		this.ao = ao;
-		this.figure = figure;
-		this.parentFigure = parentFigure;
-		this.dnd = monitoringView.getDragAndDrop();
-		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
-	}
+    public void mousePressed(MouseEvent me) {
+        if (me.button == 1) {
+            dnd.setSource(ao);
+            dnd.setSourceFigure(figure);
+            figure.setHighlight(ColorConstants.green);
 
-	public void mousePressed(MouseEvent me) {
-		if(me.button == 1){
-			dnd.setSource(ao);
-			dnd.setSourceFigure(figure);
-			figure.setHighlight(ColorConstants.green);
-			
-//			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
-//				IAction act = action.next();
-//				if (act instanceof IActionExtPoint) {
-//					IActionExtPoint extensionAction = (IActionExtPoint) act;
-//					extensionAction.setActiveSelect(this.ao);
-//				}
-//			}
-//			// Manual handling of an action for timer snapshot ... needs improvement
-//			IAction anAction = registry.getAction("Get timer snapshot");
-//			if ( anAction != null ){
-//				((IActionExtPoint)anAction).setActiveSelect(this.ao);
-//			}
-			
-		}
-		else if(me.button == 3) {
-			
-			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
-				IAction act = action.next();
-				if (act instanceof IActionExtPoint) {
-					IActionExtPoint extensionAction = (IActionExtPoint) act;
-					extensionAction.setAbstractDataObject(this.ao);
-				} else {
-					act.setEnabled(false);
-				}
-			}
-			
-//			// Monitor a new host
-//			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
-//			
-//			// Set depth control
-//			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(false);
-//				
-//			// Refresh
-//			registry.getAction(RefreshAction.REFRESH).setEnabled(false);
-//			
-//			// Set time to refresh
-//			registry.getAction(SetTTRAction.SET_TTR).setEnabled(false);
-//
-//			// Look for new JVM
-//			registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
-//			
-//			// Look for new Nodes
-//			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
-//			
-//			// Look for new Active Objects
-//			registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
-//			
-//			// Stop monitoring this ...
-//			registry.getAction(StopMonitoringAction.STOP_MONITORING).setEnabled(false);
-//			
-//			// Kill VM
-//			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
-//			
-//			// Set update frequence...
-//			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
-//			
-//			// Vertical Layout
-//			registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT).setEnabled(false);
-//			
-//			// Horizontal Layout
-//			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
-//			
-//			// Manual handling of an action for timer snapshot ... needs improvement
-//			IAction anAction = registry.getAction("Get timer snapshot");
-//			if ( anAction != null ){
-//				((IActionExtPoint)anAction).setAbstractDataObject(this.ao);
-//				anAction.setText("Get Timers Snapshot");
-//				anAction.setEnabled(true);
-//			}
-		}
-	}
+            //			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
+            //				IAction act = action.next();
+            //				if (act instanceof IActionExtPoint) {
+            //					IActionExtPoint extensionAction = (IActionExtPoint) act;
+            //					extensionAction.setActiveSelect(this.ao);
+            //				}
+            //			}
+            //			// Manual handling of an action for timer snapshot ... needs improvement
+            //			IAction anAction = registry.getAction("Get timer snapshot");
+            //			if ( anAction != null ){
+            //				((IActionExtPoint)anAction).setActiveSelect(this.ao);
+            //			}
+        } else if (me.button == 3) {
+            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
+                    action.hasNext();) {
+                IAction act = action.next();
+                if (act instanceof IActionExtPoint) {
+                    IActionExtPoint extensionAction = (IActionExtPoint) act;
+                    extensionAction.setAbstractDataObject(this.ao);
+                } else {
+                    act.setEnabled(false);
+                }
+            }
 
-	public void mouseReleased(MouseEvent me) {
-		parentFigure.handleMouseReleased(me);
-	}
+            //			// Monitor a new host
+            //			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
+            //			
+            //			// Set depth control
+            //			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(false);
+            //				
+            //			// Refresh
+            //			registry.getAction(RefreshAction.REFRESH).setEnabled(false);
+            //			
+            //			// Set time to refresh
+            //			registry.getAction(SetTTRAction.SET_TTR).setEnabled(false);
+            //
+            //			// Look for new JVM
+            //			registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
+            //			
+            //			// Look for new Nodes
+            //			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
+            //			
+            //			// Look for new Active Objects
+            //			registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
+            //			
+            //			// Stop monitoring this ...
+            //			registry.getAction(StopMonitoringAction.STOP_MONITORING).setEnabled(false);
+            //			
+            //			// Kill VM
+            //			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
+            //			
+            //			// Set update frequence...
+            //			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
+            //			
+            //			// Vertical Layout
+            //			registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT).setEnabled(false);
+            //			
+            //			// Horizontal Layout
+            //			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
+            //			
+            //			// Manual handling of an action for timer snapshot ... needs improvement
+            //			IAction anAction = registry.getAction("Get timer snapshot");
+            //			if ( anAction != null ){
+            //				((IActionExtPoint)anAction).setAbstractDataObject(this.ao);
+            //				anAction.setText("Get Timers Snapshot");
+            //				anAction.setEnabled(true);
+            //			}
+        }
+    }
 
-	public void mouseEntered(MouseEvent me) {
-		parentFigure.handleMouseEntered(me);
-	}
-	public void mouseExited(MouseEvent me) {
-		// Disable Timer Snapshot		
-		IAction anAction = registry.getAction("Get timers snapshot");
-		if ( anAction != null ){			
-			anAction.setEnabled(false);
-		}			
-		parentFigure.handleMouseMoved(me);
-	}
+    public void mouseReleased(MouseEvent me) {
+        parentFigure.handleMouseReleased(me);
+    }
 
-	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
-	
-	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
-	
-	public void mouseHover(MouseEvent me) {	/* Do nothing */ }
+    public void mouseEntered(MouseEvent me) {
+        parentFigure.handleMouseEntered(me);
+    }
 
-	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
+    public void mouseExited(MouseEvent me) {
+        // Disable Timer Snapshot		
+        IAction anAction = registry.getAction("Get timers snapshot");
+        if (anAction != null) {
+            anAction.setEnabled(false);
+        }
+        parentFigure.handleMouseMoved(me);
+    }
 
+    public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */
+    }
+
+    public void mouseDragged(MouseEvent me) { /* Do nothing */
+    }
+
+    public void mouseHover(MouseEvent me) { /* Do nothing */
+    }
+
+    public void mouseMoved(MouseEvent me) { /* Do nothing */
+    }
 }

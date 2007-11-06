@@ -120,10 +120,10 @@ public class FileLoginModule implements LoginModule {
         }
 
         // verify the username and password
-		if (!props.containsKey(username)
-				|| !props.get(username).equals(password)) {
-			throw new FailedLoginException("Incorrect Username/Password");
-		}
+        if (!props.containsKey(username) ||
+                !props.get(username).equals(password)) {
+            throw new FailedLoginException("Incorrect Username/Password");
+        }
 
         if (reqGroup != null) {
             Properties groups = new Properties();

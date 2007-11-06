@@ -39,167 +39,166 @@ import org.objectweb.proactive.ic2d.security.core.SimplePolicyRule;
 import org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective;
 import org.objectweb.proactive.ic2d.security.views.PolicyEditorView;
 
+
 public class SetSecurityManager extends Action implements IActionExtPoint {
-	public static final String SET_SECURITY_MANAGER = "Set Security Manager";
+    public static final String SET_SECURITY_MANAGER = "Set Security Manager";
+    private AbstractData object;
 
-	private AbstractData object;
+    public SetSecurityManager() {
+        setId(SET_SECURITY_MANAGER);
+        setToolTipText("Import SM from Policy view");
+        setText("Import SM from Policy view");
+        setEnabled(false);
+    }
 
-	public SetSecurityManager() {
-		setId(SET_SECURITY_MANAGER);
-		setToolTipText("Import SM from Policy view");
-		setText("Import SM from Policy view");
-		setEnabled(false);
-	}
+    @Override
+    public void run() {
+        IWorkbench iworkbench = PlatformUI.getWorkbench();
+        IWorkbenchPage page = null;
+        try {
+            page = iworkbench.showPerspective(SecurityPerspective.ID,
+                    iworkbench.getActiveWorkbenchWindow());
+        } catch (WorkbenchException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        }
+        IViewPart part = null;
+        try {
+            part = page.showView(PolicyEditorView.ID);
+        } catch (PartInitException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        PolicyEditorView pev = (PolicyEditorView) part;
 
-	@Override
-	public void run() {
-		IWorkbench iworkbench = PlatformUI.getWorkbench();
-		IWorkbenchPage page = null;
-		try {
-			page = iworkbench.showPerspective(SecurityPerspective.ID,
-					iworkbench.getActiveWorkbenchWindow());
-		} catch (WorkbenchException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-		IViewPart part = null;
-		try {
-			part = page.showView(PolicyEditorView.ID);
-		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		PolicyEditorView pev = (PolicyEditorView) part;
+        try {
+            iworkbench.showPerspective(MonitoringPerspective.ID,
+                iworkbench.getActiveWorkbenchWindow())
+                      .showView(MonitoringView.ID);
+        } catch (PartInitException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (WorkbenchException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
-		try {
-			iworkbench.showPerspective(MonitoringPerspective.ID,
-					iworkbench.getActiveWorkbenchWindow()).showView(
-					MonitoringView.ID);
-		} catch (PartInitException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (WorkbenchException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+        KeyStore keystore = null;
+        try {
+            keystore = KeystoreUtils.createKeystore(pev.getKeystore(),
+                    pev.getKeysToKeep());
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		KeyStore keystore = null;
-		try {
-			keystore = KeystoreUtils.createKeystore(pev.getKeystore(), pev
-					.getKeysToKeep());
-		} catch (UnrecoverableKeyException e) {
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        List<PolicyRule> policyRules = new ArrayList<PolicyRule>();
+        for (SimplePolicyRule policy : pev.getRt().getRules()) {
+            RuleEntities entitiesFrom = new RuleEntities();
+            for (String name : policy.getFrom()) {
+                try {
+                    entitiesFrom.add(new CertificatedRuleEntity(
+                            EntityType.fromString(name.substring(0,
+                                    name.indexOf(':'))), keystore,
+                            name.substring(name.indexOf(':') + 1)));
+                } catch (UnrecoverableKeyException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (KeyStoreException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            RuleEntities entitiesTo = new RuleEntities();
+            for (String name : policy.getTo()) {
+                try {
+                    entitiesTo.add(new CertificatedRuleEntity(
+                            EntityType.fromString(name.substring(0,
+                                    name.indexOf(':'))), keystore,
+                            name.substring(name.indexOf(':') + 1)));
+                } catch (UnrecoverableKeyException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (KeyStoreException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            Communication reply = new Communication(policy.isReply(),
+                    policy.getRepAuth(), policy.getRepConf(), policy.getRepInt());
+            Communication request = new Communication(policy.isRequest(),
+                    policy.getReqAuth(), policy.getReqConf(), policy.getReqInt());
 
-		List<PolicyRule> policyRules = new ArrayList<PolicyRule>();
-		for (SimplePolicyRule policy : pev.getRt().getRules()) {
-			RuleEntities entitiesFrom = new RuleEntities();
-			for (String name : policy.getFrom()) {
-				try {
-					entitiesFrom.add(new CertificatedRuleEntity(EntityType
-							.fromString(name.substring(0, name.indexOf(':'))),
-							keystore, name.substring(name.indexOf(':') + 1)));
-				} catch (UnrecoverableKeyException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (KeyStoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NoSuchAlgorithmException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			RuleEntities entitiesTo = new RuleEntities();
-			for (String name : policy.getTo()) {
-				try {
-					entitiesTo.add(new CertificatedRuleEntity(EntityType
-							.fromString(name.substring(0, name.indexOf(':'))),
-							keystore, name.substring(name.indexOf(':') + 1)));
-				} catch (UnrecoverableKeyException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (KeyStoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NoSuchAlgorithmException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			Communication reply = new Communication(policy.isReply(),
-					policy.getRepAuth(), policy.getRepConf(), policy
-							.getRepInt());
-			Communication request = new Communication(policy
-					.isRequest(), policy.getReqAuth(), policy.getReqConf(),
-					policy.getReqInt());
+            policyRules.add(new PolicyRule(entitiesFrom, entitiesTo, request,
+                    reply, policy.isAoCreation(), policy.isMigration()));
+        }
 
-			policyRules.add(new PolicyRule(entitiesFrom, entitiesTo, request, reply, policy.isAoCreation(), policy.isMigration()));
-		}
+        RuleEntities users = new RuleEntities();
+        for (String user : pev.getRt().getAuthorizedUsers()) {
+            try {
+                users.add(new CertificatedRuleEntity(EntityType.fromString(
+                            user.substring(0, user.indexOf(':'))), keystore,
+                        user.substring(user.indexOf(':') + 1)));
+            } catch (UnrecoverableKeyException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (KeyStoreException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
-		RuleEntities users = new RuleEntities();
-		for (String user : pev.getRt().getAuthorizedUsers()) {
-			try {
-				users.add(new CertificatedRuleEntity(EntityType.fromString(user
-						.substring(0, user.indexOf(':'))), keystore, user
-						.substring(user.indexOf(':') + 1)));
-			} catch (UnrecoverableKeyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (KeyStoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+        PolicyServer ps = new PolicyServer(keystore, policyRules,
+                pev.getAppName(), "unknown", users);
 
-		PolicyServer ps = new PolicyServer(keystore, policyRules, pev.getAppName(), "unknown", users);
-		
-		try {
-			this.object
-					.invoke(
-							"setSecurityManager",
-							new Object[] { null, ps },
-							new String[] {
-									"org.objectweb.proactive.core.security.securityentity.Entity",
-									"org.objectweb.proactive.core.security.PolicyServer" });
-		} catch (InstanceNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+        try {
+            this.object.invoke("setSecurityManager", new Object[] { null, ps },
+                new String[] {
+                    "org.objectweb.proactive.core.security.securityentity.Entity",
+                    "org.objectweb.proactive.core.security.PolicyServer"
+                });
+        } catch (InstanceNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MBeanException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ReflectionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-	public void setAbstractDataObject(AbstractData ref) {
-		this.object = ref;
-		super.setEnabled(this.object instanceof ActiveObject
-				|| this.object instanceof RuntimeObject
-				|| this.object instanceof NodeObject);
-	}
+    public void setAbstractDataObject(AbstractData ref) {
+        this.object = ref;
+        super.setEnabled(this.object instanceof ActiveObject ||
+            this.object instanceof RuntimeObject ||
+            this.object instanceof NodeObject);
+    }
 
-	public void setActiveSelect(AbstractData ref) {
-		// TODO Auto-generated method stub
-	}
-
+    public void setActiveSelect(AbstractData ref) {
+        // TODO Auto-generated method stub
+    }
 }

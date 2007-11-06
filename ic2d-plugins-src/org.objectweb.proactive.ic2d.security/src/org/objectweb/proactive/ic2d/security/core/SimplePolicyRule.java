@@ -5,173 +5,158 @@ import java.util.List;
 
 import org.objectweb.proactive.core.security.Authorization;
 
+
 public class SimplePolicyRule {
+    private static int num = 0;
+    private String name;
+    private List<String> from;
+    private List<String> to;
+    private boolean request;
+    private Authorization reqAuth;
+    private Authorization reqConf;
+    private Authorization reqInt;
+    private boolean reply;
+    private Authorization repAuth;
+    private Authorization repConf;
+    private Authorization repInt;
+    private boolean aoCreation;
+    private boolean migration;
 
-	private static int num = 0;
+    public SimplePolicyRule(String name) {
+        this();
+        this.name = name;
+        num--;
+    }
 
-	private String name;
+    public SimplePolicyRule() {
+        this.name = "Rule " + ++num;
+        this.from = new ArrayList<String>();
+        this.to = new ArrayList<String>();
 
-	private List<String> from;
+        this.request = true;
+        this.reqAuth = Authorization.OPTIONAL;
+        this.reqConf = Authorization.OPTIONAL;
+        this.reqInt = Authorization.OPTIONAL;
 
-	private List<String> to;
+        this.reply = true;
+        this.repAuth = Authorization.OPTIONAL;
+        this.repConf = Authorization.OPTIONAL;
+        this.repInt = Authorization.OPTIONAL;
 
-	private boolean request;
+        this.aoCreation = true;
+        this.migration = true;
+    }
 
-	private Authorization reqAuth;
+    public void addFrom(String name) {
+        if (name != null) {
+            this.from.add(name);
+        }
+    }
 
-	private Authorization reqConf;
+    public void removeFrom(int i) {
+        this.from.remove(i);
+    }
 
-	private Authorization reqInt;
+    public void addTo(String name) {
+        if (name != null) {
+            this.to.add(name);
+        }
+    }
 
-	private boolean reply;
+    public void removeTo(int i) {
+        this.to.remove(i);
+    }
 
-	private Authorization repAuth;
+    @Override
+    public String toString() {
+        return this.name;
+    }
 
-	private Authorization repConf;
+    public Authorization getRepAuth() {
+        return this.repAuth;
+    }
 
-	private Authorization repInt;
+    public void setRepAuth(Authorization repAuth) {
+        this.repAuth = repAuth;
+    }
 
-	private boolean aoCreation;
+    public Authorization getRepConf() {
+        return this.repConf;
+    }
 
-	private boolean migration;
+    public void setRepConf(Authorization repConf) {
+        this.repConf = repConf;
+    }
 
-	public SimplePolicyRule(String name) {
-		this();
-		this.name = name;
-		num--;
-	}
+    public Authorization getRepInt() {
+        return this.repInt;
+    }
 
-	public SimplePolicyRule() {
+    public void setRepInt(Authorization repInt) {
+        this.repInt = repInt;
+    }
 
-		this.name = "Rule " + ++num;
-		this.from = new ArrayList<String>();
-		this.to = new ArrayList<String>();
+    public boolean isReply() {
+        return this.reply;
+    }
 
-		this.request = true;
-		this.reqAuth = Authorization.OPTIONAL;
-		this.reqConf = Authorization.OPTIONAL;
-		this.reqInt = Authorization.OPTIONAL;
+    public void setReply(boolean reply) {
+        this.reply = reply;
+    }
 
-		this.reply = true;
-		this.repAuth = Authorization.OPTIONAL;
-		this.repConf = Authorization.OPTIONAL;
-		this.repInt = Authorization.OPTIONAL;
+    public Authorization getReqAuth() {
+        return this.reqAuth;
+    }
 
-		this.aoCreation = true;
-		this.migration = true;
-	}
+    public void setReqAuth(Authorization reqAuth) {
+        this.reqAuth = reqAuth;
+    }
 
-	public void addFrom(String name) {
-		if (name != null) {
-			this.from.add(name);
-		}
-	}
+    public Authorization getReqConf() {
+        return this.reqConf;
+    }
 
-	public void removeFrom(int i) {
-		this.from.remove(i);
-	}
+    public void setReqConf(Authorization reqConf) {
+        this.reqConf = reqConf;
+    }
 
-	public void addTo(String name) {
-		if (name != null) {
-			this.to.add(name);
-		}
-	}
+    public Authorization getReqInt() {
+        return this.reqInt;
+    }
 
-	public void removeTo(int i) {
-		this.to.remove(i);
-	}
+    public void setReqInt(Authorization reqInt) {
+        this.reqInt = reqInt;
+    }
 
-	@Override
-	public String toString() {
-		return this.name;
-	}
+    public boolean isRequest() {
+        return this.request;
+    }
 
-	public Authorization getRepAuth() {
-		return this.repAuth;
-	}
+    public void setRequest(boolean request) {
+        this.request = request;
+    }
 
-	public void setRepAuth(Authorization repAuth) {
-		this.repAuth = repAuth;
-	}
+    public List<String> getFrom() {
+        return this.from;
+    }
 
-	public Authorization getRepConf() {
-		return this.repConf;
-	}
+    public List<String> getTo() {
+        return this.to;
+    }
 
-	public void setRepConf(Authorization repConf) {
-		this.repConf = repConf;
-	}
+    public boolean isAoCreation() {
+        return this.aoCreation;
+    }
 
-	public Authorization getRepInt() {
-		return this.repInt;
-	}
+    public void setAoCreation(boolean aoCreation) {
+        this.aoCreation = aoCreation;
+    }
 
-	public void setRepInt(Authorization repInt) {
-		this.repInt = repInt;
-	}
+    public boolean isMigration() {
+        return this.migration;
+    }
 
-	public boolean isReply() {
-		return this.reply;
-	}
-
-	public void setReply(boolean reply) {
-		this.reply = reply;
-	}
-
-	public Authorization getReqAuth() {
-		return this.reqAuth;
-	}
-
-	public void setReqAuth(Authorization reqAuth) {
-		this.reqAuth = reqAuth;
-	}
-
-	public Authorization getReqConf() {
-		return this.reqConf;
-	}
-
-	public void setReqConf(Authorization reqConf) {
-		this.reqConf = reqConf;
-	}
-
-	public Authorization getReqInt() {
-		return this.reqInt;
-	}
-
-	public void setReqInt(Authorization reqInt) {
-		this.reqInt = reqInt;
-	}
-
-	public boolean isRequest() {
-		return this.request;
-	}
-
-	public void setRequest(boolean request) {
-		this.request = request;
-	}
-
-	public List<String> getFrom() {
-		return this.from;
-	}
-
-	public List<String> getTo() {
-		return this.to;
-	}
-
-	public boolean isAoCreation() {
-		return this.aoCreation;
-	}
-
-	public void setAoCreation(boolean aoCreation) {
-		this.aoCreation = aoCreation;
-	}
-
-	public boolean isMigration() {
-		return this.migration;
-	}
-
-	public void setMigration(boolean migration) {
-		this.migration = migration;
-	}
-
+    public void setMigration(boolean migration) {
+        this.migration = migration;
+    }
 }

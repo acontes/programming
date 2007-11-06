@@ -82,9 +82,9 @@ import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.Secure;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.TypedCertificate;
-import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
@@ -225,9 +225,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
                            .debug("current thread is " +
                 Thread.currentThread().getName());
-        
+
             this.isSecurityOn = this.securityManager.getCertificate() != null;
-//          this.securityManager.setBody(this);
+            //          this.securityManager.setBody(this);
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
         }
 
@@ -500,7 +500,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     //}
                     return this.securityManager.getCertificate();
                 }
-                
+
                 return this.internalBodySecurity.getCertificate();
             }
             throw new SecurityNotAvailableException();
@@ -522,26 +522,24 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-			TypedCertificate distantCertificate) throws SessionException,
-			SecurityNotAvailableException, IOException {
-		try {
-			enterInThreadStore();
-			if (this.isSecurityOn) {
+        TypedCertificate distantCertificate)
+        throws SessionException, SecurityNotAvailableException, IOException {
+        try {
+            enterInThreadStore();
+            if (this.isSecurityOn) {
+                if (this.internalBodySecurity.isLocalBody()) {
+                    return this.securityManager.startNewSession(distantSessionID,
+                        policy, distantCertificate);
+                }
 
-				if (this.internalBodySecurity.isLocalBody()) {
-					return this.securityManager.startNewSession(distantSessionID,
-							policy, distantCertificate);
-				}
-
-				return this.internalBodySecurity.startNewSession(distantSessionID,
-						policy, distantCertificate);
-
-			}
-			throw new SecurityNotAvailableException();
-		} finally {
-			exitFromThreadStore();
-		}
-	}
+                return this.internalBodySecurity.startNewSession(distantSessionID,
+                    policy, distantCertificate);
+            }
+            throw new SecurityNotAvailableException();
+        } finally {
+            exitFromThreadStore();
+        }
+    }
 
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
@@ -605,12 +603,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 renegociateSessionIfNeeded(sessionID);
 
                 if (this.internalBodySecurity.isLocalBody()) {
-                	return this.securityManager.publicKeyExchange(sessionID, signature);
+                    return this.securityManager.publicKeyExchange(sessionID,
+                        signature);
                 }
+
                 // else
                 return this.internalBodySecurity.publicKeyExchange(sessionID,
-                            signature);
-                
+                    signature);
             }
             throw new SecurityNotAvailableException();
         } finally {
@@ -672,38 +671,37 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-//    public byte[] getCertificateEncoded()
-//        throws SecurityNotAvailableException, IOException {
-//        try {
-//            enterInThreadStore();
-//
-//            //if (psm == null) {
-//            //	  startDefaultProActiveSecurityManager();
-//            // }
-//            if (!this.isSecurityOn || (this.securityManager == null)) {
-//                throw new SecurityNotAvailableException();
-//            }
-//
-//            if (this.internalBodySecurity.isLocalBody()) {
-//                return this.securityManager.getCertificate().getEncoded();
-//            } else {
-//                return this.internalBodySecurity.getCertificatEncoded();
-//            }
-//        } catch (CertificateEncodingException e) {
-//            e.printStackTrace();
-//        } finally {
-//            exitFromThreadStore();
-//        }
-//        return null;
-//    }
-
+    //    public byte[] getCertificateEncoded()
+    //        throws SecurityNotAvailableException, IOException {
+    //        try {
+    //            enterInThreadStore();
+    //
+    //            //if (psm == null) {
+    //            //	  startDefaultProActiveSecurityManager();
+    //            // }
+    //            if (!this.isSecurityOn || (this.securityManager == null)) {
+    //                throw new SecurityNotAvailableException();
+    //            }
+    //
+    //            if (this.internalBodySecurity.isLocalBody()) {
+    //                return this.securityManager.getCertificate().getEncoded();
+    //            } else {
+    //                return this.internalBodySecurity.getCertificatEncoded();
+    //            }
+    //        } catch (CertificateEncodingException e) {
+    //            e.printStackTrace();
+    //        } finally {
+    //            exitFromThreadStore();
+    //        }
+    //        return null;
+    //    }
     protected void startDefaultProActiveSecurityManager() {
         try {
             //     logger.info("starting a new psm ");
             // TODO SECURITY check type (app/object/...)
             this.securityManager = new DefaultProActiveSecurityManager(EntityType.UNKNOWN);
             this.isSecurityOn = true;
-//            this.securityManager.setBody(this);
+            //            this.securityManager.setBody(this);
             this.internalBodySecurity = new InternalBodySecurity(null);
         } catch (Exception e) {
             logger.error("Error when contructing a DefaultProActiveManager");
@@ -833,17 +831,17 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-//    public void setPolicyServer(PolicyServer server) {
-//        if (server != null) {
-//            if ((this.securityManager != null) &&
-//                    (this.securityManager.getPolicyServer() == null)) {
-//                this.securityManager = new ProActiveSecurityManager(EntityType.UNKNOWN, server);
-//                this.isSecurityOn = true;
-//                logger.debug("Security is on " + this.isSecurityOn);
-////                this.securityManager.setBody(this);
-//            }
-//        }
-//    }
+    //    public void setPolicyServer(PolicyServer server) {
+    //        if (server != null) {
+    //            if ((this.securityManager != null) &&
+    //                    (this.securityManager.getPolicyServer() == null)) {
+    //                this.securityManager = new ProActiveSecurityManager(EntityType.UNKNOWN, server);
+    //                this.isSecurityOn = true;
+    //                logger.debug("Security is on " + this.isSecurityOn);
+    ////                this.securityManager.setBody(this);
+    //            }
+    //        }
+    //    }
 
     //
     // -- implements LocalBody -----------------------------------------------
@@ -901,9 +899,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                             " cert " + cert.getCert().getSubjectDN() + " " +
                             cert.getCert().getPublicKey());
                         try {
-                        	distantSessionID = this.securityManager.getSessionTo(cert).getDistantSessionID();
-						} catch (SessionException e) {
-							distantSessionID = this.securityManager.initiateSession(destinationBody).getDistantSessionID();
+                            distantSessionID = this.securityManager.getSessionTo(cert)
+                                                                   .getDistantSessionID();
+                        } catch (SessionException e) {
+                            distantSessionID = this.securityManager.initiateSession(destinationBody)
+                                                                   .getDistantSessionID();
                         }
                     }
                 } catch (SecurityNotAvailableException e) {
@@ -917,9 +917,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 destinationBody);
         } catch (RenegotiateSessionException e) {
             if (e.getUniversalBody() != null) {
-            	e.printStackTrace();
+                e.printStackTrace();
                 ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO)
-                               .debug("renegotiate session " + distantSessionID);
+                               .debug("renegotiate session " +
+                    distantSessionID);
                 updateLocation(destinationBody.getID(), e.getUniversalBody());
                 this.securityManager.terminateSession(distantSessionID);
                 sendRequest(methodCall, future, e.getUniversalBody());
@@ -928,11 +929,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 sendRequest(methodCall, future, destinationBody);
             }
         } catch (CommunicationForbiddenException e) {
-        	System.out.println("Communication forbidden.");
+            System.out.println("Communication forbidden.");
             bodyLogger.warn(e);
             // if the communication is not allowed, set the result as the exception
-            
-            future.receiveReply(new FutureResult(null,new RuntimeSecurityException(e)));
+            future.receiveReply(new FutureResult(null,
+                    new RuntimeSecurityException(e)));
             //e.printStackTrace();
         }
     }
@@ -1102,20 +1103,22 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
         }
     }
-    
+
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-    throws SecurityNotAvailableException, AccessControlException {
-    	if (this.securityManager == null) {
-    		throw new SecurityNotAvailableException();
-    	}
-    	return this.securityManager.getProActiveSecurityManager(user);
+        throws SecurityNotAvailableException, AccessControlException {
+        if (this.securityManager == null) {
+            throw new SecurityNotAvailableException();
+        }
+        return this.securityManager.getProActiveSecurityManager(user);
     }
-    
-    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
-    	if (this.securityManager == null) {
-    		throw new SecurityNotAvailableException();
-    	}
-    	this.securityManager.setProActiveSecurityManager(user, policyServer);
+
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException {
+        if (this.securityManager == null) {
+            throw new SecurityNotAvailableException();
+        }
+        this.securityManager.setProActiveSecurityManager(user, policyServer);
     }
 
     /**

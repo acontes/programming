@@ -32,115 +32,112 @@ import org.objectweb.proactive.ic2d.security.core.SimplePolicyRule;
 import org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective;
 import org.objectweb.proactive.ic2d.security.views.PolicyEditorView;
 
+
 public class GetSecurityManager extends Action implements IActionExtPoint {
-	public static final String GET_SECURITY_MANAGER = "Get Security Manager";
+    public static final String GET_SECURITY_MANAGER = "Get Security Manager";
+    private AbstractData object;
 
-	private AbstractData object;
+    public GetSecurityManager() {
+        setId(GET_SECURITY_MANAGER);
+        setToolTipText("Export SM to Policy view");
+        setText("Export SM to Policy view");
+        setEnabled(false);
+    }
 
-	public GetSecurityManager() {
-		setId(GET_SECURITY_MANAGER);
-		setToolTipText("Export SM to Policy view");
-		setText("Export SM to Policy view");
-		setEnabled(false);
-	}
+    @Override
+    public final void run() {
+        ProActiveSecurityManager psm = null;
+        try {
+            psm = (ProActiveSecurityManager) this.object.invoke("getSecurityManager",
+                    new Object[] { null },
+                    new String[] {
+                        "org.objectweb.proactive.core.security.securityentity.Entity"
+                    });
+        } catch (InstanceNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        } catch (MBeanException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        } catch (ReflectionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        }
 
-	@Override
-	public final void run() {
-		ProActiveSecurityManager psm = null;
-		try {
-			psm = (ProActiveSecurityManager) this.object
-					.invoke(
-							"getSecurityManager",
-							new Object[] { null },
-							new String[] { "org.objectweb.proactive.core.security.securityentity.Entity" });
-		} catch (InstanceNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		} catch (MBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
+        try {
+            IWorkbench iworkbench = PlatformUI.getWorkbench();
+            IWorkbenchPage page = iworkbench.showPerspective(SecurityPerspective.ID,
+                    iworkbench.getActiveWorkbenchWindow());
+            IViewPart part = page.showView(PolicyEditorView.ID);
 
-		try {
-			IWorkbench iworkbench = PlatformUI.getWorkbench();
-			IWorkbenchPage page = iworkbench.showPerspective(
-					SecurityPerspective.ID, iworkbench
-							.getActiveWorkbenchWindow());
-			IViewPart part = page.showView(PolicyEditorView.ID);
+            PolicyEditorView pev = (PolicyEditorView) part;
 
-			PolicyEditorView pev = (PolicyEditorView) part;
+            List<SimplePolicyRule> sprl = new ArrayList<SimplePolicyRule>();
+            for (PolicyRule policy : psm.getPolicies()) {
+                sprl.add(prToSpr(policy));
+            }
 
-			List<SimplePolicyRule> sprl = new ArrayList<SimplePolicyRule>();
-			for (PolicyRule policy : psm.getPolicies()) {
-				sprl.add(prToSpr(policy));
-			}
+            List<String> users = new ArrayList<String>();
+            for (RuleEntity entity : psm.getAccessAuthorizations()) {
+                users.add(entity.getName());
+            }
 
-			List<String> users = new ArrayList<String>();
-			for (RuleEntity entity : psm.getAccessAuthorizations()) {
-				users.add(entity.getName());
-			}
+            Hashtable<Long, Session> sessions = new Hashtable<Long, Session>();
+            sessions.putAll(psm.getSessions());
 
-			Hashtable<Long, Session> sessions = new Hashtable<Long, Session>();
-			sessions.putAll(psm.getSessions());
+            pev.update(KeystoreUtils.listKeystore(psm.getKeyStore()), sprl,
+                psm.getApplicationName(), users, sessions);
+        } catch (WorkbenchException e2) {
+            e2.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-			pev.update(KeystoreUtils.listKeystore(psm.getKeyStore()), sprl, psm
-					.getApplicationName(), users, sessions);
-		} catch (WorkbenchException e2) {
-			e2.printStackTrace();
-		} catch (UnrecoverableKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    private SimplePolicyRule prToSpr(PolicyRule policy) {
+        SimplePolicyRule rule = new SimplePolicyRule();
+        for (RuleEntity entity : policy.getEntitiesFrom()) {
+            rule.addFrom(entity.getType() + ":" + entity.getName());
+        }
+        for (RuleEntity entity : policy.getEntitiesTo()) {
+            rule.addTo(entity.getType() + ":" + entity.getName());
+        }
+        rule.setRepAuth(policy.getCommunicationReply().getAuthentication());
+        rule.setRepConf(policy.getCommunicationReply().getConfidentiality());
+        rule.setRepInt(policy.getCommunicationReply().getIntegrity());
+        rule.setReply(policy.getCommunicationReply().isCommunicationAllowed());
+        rule.setReqAuth(policy.getCommunicationRequest().getAuthentication());
+        rule.setReqConf(policy.getCommunicationRequest().getConfidentiality());
+        rule.setReqInt(policy.getCommunicationRequest().getIntegrity());
+        rule.setRequest(policy.getCommunicationRequest().isCommunicationAllowed());
+        rule.setAoCreation(policy.isAoCreation());
+        rule.setMigration(policy.isMigration());
 
-	private SimplePolicyRule prToSpr(PolicyRule policy) {
-		SimplePolicyRule rule = new SimplePolicyRule();
-		for (RuleEntity entity : policy.getEntitiesFrom()) {
-			rule.addFrom(entity.getType() + ":" + entity.getName());
-		}
-		for (RuleEntity entity : policy.getEntitiesTo()) {
-			rule.addTo(entity.getType() + ":" + entity.getName());
-		}
-		rule.setRepAuth(policy.getCommunicationReply().getAuthentication());
-		rule.setRepConf(policy.getCommunicationReply().getConfidentiality());
-		rule.setRepInt(policy.getCommunicationReply().getIntegrity());
-		rule.setReply(policy.getCommunicationReply().isCommunicationAllowed());
-		rule.setReqAuth(policy.getCommunicationRequest().getAuthentication());
-		rule.setReqConf(policy.getCommunicationRequest().getConfidentiality());
-		rule.setReqInt(policy.getCommunicationRequest().getIntegrity());
-		rule.setRequest(policy.getCommunicationRequest()
-				.isCommunicationAllowed());
-		rule.setAoCreation(policy.isAoCreation());
-		rule.setMigration(policy.isMigration());
+        return rule;
+    }
 
-		return rule;
-	}
+    public void setAbstractDataObject(AbstractData ref) {
+        this.object = ref;
+        super.setEnabled(this.object instanceof ActiveObject ||
+            this.object instanceof RuntimeObject ||
+            this.object instanceof NodeObject);
+    }
 
-	public void setAbstractDataObject(AbstractData ref) {
-		this.object = ref;
-		super.setEnabled(this.object instanceof ActiveObject
-				|| this.object instanceof RuntimeObject
-				|| this.object instanceof NodeObject);
-	}
-
-	public void setActiveSelect(AbstractData ref) {
-		// TODO Auto-generated method stub
-
-	}
+    public void setActiveSelect(AbstractData ref) {
+        // TODO Auto-generated method stub
+    }
 }

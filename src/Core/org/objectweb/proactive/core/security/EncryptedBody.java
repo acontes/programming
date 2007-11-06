@@ -66,12 +66,13 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  * used for transparency call.
  */
 public class EncryptedBody implements Body, Serializable {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2305678362325921164L;
 
-	// specify if this body is encrypted or not
+    /**
+         *
+         */
+    private static final long serialVersionUID = 2305678362325921164L;
+
+    // specify if this body is encrypted or not
     protected boolean isEncrypted = false;
 
     // session ID
@@ -280,7 +281,8 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
-    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate) {
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate) {
         return 0;
     }
 
@@ -455,13 +457,15 @@ public class EncryptedBody implements Body, Serializable {
         // TODO Auto-generated method stub
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
-		// TODO Auto-generated method stub
-		
-	}
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException {
+        // TODO Auto-generated method stub
+    }
 }

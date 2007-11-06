@@ -32,12 +32,14 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 import java.io.Serializable;
 
+import javax.swing.JPanel;
+
 
 /**
  * Interface representing the task result.
  * A task result can be an exception or an object that you have to cast into your own type.
  * Before getting the object it is recommended that you call the hadException() method.
- * It will tell you if an exception occured in the task that generate this result.
+ * It will tell you if an exception occurred in the task that generate this result.
  *
  * @author ProActive Team
  * @version 1.0, Aug 3, 2007
@@ -72,4 +74,28 @@ public interface TaskResult extends Serializable {
      * @return the exception of the task.
      */
     public Throwable getException();
+
+    /**
+     * Return the output of the execution, including stdout and stderr.
+     * @return the output of the execution, including stdout and stderr.
+     */
+    public TaskLogs getOuput();
+
+    /**
+     * Set the class that is able to describe this result. See ResultDescriptor.
+     * @param descClass the class that is able to describe this result.
+     */
+    public void setDescriptorClass(Class<?extends ResultDescriptor> descClass);
+
+    /**
+     * Return a swing panel describing this result.
+     * @return a swing panel describing this result.
+     */
+    public JPanel getGraphicalDescription();
+
+    /**
+     * Return a string describing this result.
+     * @return a string describing this result.
+     */
+    public String getTextualDescription();
 }

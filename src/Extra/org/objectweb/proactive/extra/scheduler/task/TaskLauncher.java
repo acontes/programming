@@ -37,8 +37,9 @@ import java.util.Collection;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -47,17 +48,18 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.logforwarder.BufferedAppender;
 import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
-import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
+import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
@@ -69,21 +71,21 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
  * You can extend this launcher in order to create a specific launcher.
  * With this default launcher, you can get the node on which the task is running and kill the task.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 10, 2007
  * @since ProActive 3.2
  */
 public class TaskLauncher implements InitActive, Serializable {
     private static final long serialVersionUID = -9159607482957244049L;
     protected TaskId taskId;
-    protected JobId jobId;
-    protected Script<?> pre;
+    protected PreScript pre;
     protected String host;
     protected Integer port;
 
     // handle streams
-    protected final transient PrintStream stdout = System.out;
-    protected final transient PrintStream stderr = System.err;
+    protected transient PrintStream redirectedStdout;
+    protected transient PrintStream redirectedStderr;
+    protected transient BufferedAppender logBuffer;
 
     /**
      * ProActive empty constructor.
@@ -95,13 +97,11 @@ public class TaskLauncher implements InitActive, Serializable {
      * Constructor with task identification
      *
      * @param taskId represents the task the launcher will execute.
-     * @param jobId represents the job where the task is located.
      * @param host the host on which to append the standard output/input.
      * @param port the port number on which to send the standard output/input.
      */
-    public TaskLauncher(TaskId taskId, JobId jobId, String host, Integer port) {
+    public TaskLauncher(TaskId taskId, String host, Integer port) {
         this.taskId = taskId;
-        this.jobId = jobId;
         this.host = host;
         this.port = port;
     }
@@ -110,14 +110,12 @@ public class TaskLauncher implements InitActive, Serializable {
      * Constructor with task identification
      *
      * @param taskId represents the task the launcher will execute.
-     * @param jobId represents the job where the task is located.
      * @param pre the script executed before the task.
      * @param host the host on which to append the standard output/input.
      * @param port the port number on which to send the standard output/input.
      */
-    public TaskLauncher(TaskId taskId, JobId jobId, Script<?> pre, String host,
-        Integer port) {
-        this(taskId, jobId, host, port);
+    public TaskLauncher(TaskId taskId, PreScript pre, String host, Integer port) {
+        this(taskId, host, port);
         System.out.println("TaskLauncher.TaskLauncher() : " + pre);
         this.pre = pre;
     }
@@ -149,51 +147,63 @@ public class TaskLauncher implements InitActive, Serializable {
             if (pre != null) {
                 this.executePreScript(null);
             }
-
             //init task
             executableTask.init();
-
             //launch task
-            TaskResult result = new TaskResultImpl(taskId,
-                    executableTask.execute(results));
+            Object userResult = executableTask.execute(results);
+
+            //logBuffer is filled up
+            TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
+            TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);
 
             //return result
             return result;
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex);
+            return new TaskResultImpl(taskId, ex,
+                new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // reset stdout/err
             try {
                 this.finalizeLoggers();
             } catch (RuntimeException e) {
-                // exception should not be thrown to te scheduler core
+                // exception should not be thrown to the scheduler core
                 // the result has been computed and must be returned !
                 // TODO : logger.warn
                 System.err.println("WARNING : Loggers are not shut down !");
             }
             //terminate the task
-            core.terminate(taskId, jobId);
+            core.terminate(taskId);
         }
     }
 
     /**
      * Redirect stdout/err in the scheduler task logger.
      */
+    @SuppressWarnings("unchecked")
     protected void initLoggers() {
-        //handle loggers
-        Appender out = new SocketAppender(this.host, this.port);
-
+        // error about log should not be logged
+        LogLog.setQuietMode(true);
         // create logger
-        Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + jobId);
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                this.taskId.getJobId());
+        l.setAdditivity(false);
+        Appender out = new SocketAppender(this.host, this.port);
+        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
         l.removeAllAppenders();
         l.addAppender(EmptyAppender.SINK);
-        l.addAppender(out);
+        this.logBuffer = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
+                true);
+        // TODO : connection to the scheduler should be triggered by the scheduler
+        this.logBuffer.addSink(out);
+        l.addAppender(this.logBuffer);
         // redirect stdout and err
-        System.setOut(new PrintStream(new LoggingOutputStream(l, Level.INFO),
-                true));
-        System.setErr(new PrintStream(new LoggingOutputStream(l, Level.INFO),
-                true));
+        this.redirectedStdout = new PrintStream(new LoggingOutputStream(l,
+                    Level.INFO), true);
+        this.redirectedStderr = new PrintStream(new LoggingOutputStream(l,
+                    Level.ERROR), true);
+        System.setOut(redirectedStdout);
+        System.setErr(redirectedStderr);
     }
 
     /**
@@ -201,9 +211,13 @@ public class TaskLauncher implements InitActive, Serializable {
      */
     protected void finalizeLoggers() {
         //Unhandle loggers
-        LogManager.shutdown();
-        System.setOut(this.stdout);
-        System.setErr(this.stderr);
+        this.redirectedStdout.flush();
+        this.redirectedStderr.flush();
+        this.logBuffer.close();
+        //FIXME : want to close only the task logger !
+        //LogManager.shutdown();
+        System.setOut(System.out);
+        System.setErr(System.err);
     }
 
     /**
@@ -211,17 +225,19 @@ public class TaskLauncher implements InitActive, Serializable {
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occured during the execution of the script
+     * @return the value of the variable PreScript.COMMAND_NAME after the script evaluation.
      */
-    protected void executePreScript(Node n)
+    protected String executePreScript(Node n)
         throws ActiveObjectCreationException, NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(n);
-        ScriptResult<Object> res = handler.handle(pre);
+        ScriptResult<String> res = handler.handle(pre);
         if (res.errorOccured()) {
             System.err.println("Error on pre-script occured : ");
             res.getException().printStackTrace();
             throw new UserException(
                 "PreTask script has failed on the current node");
         }
+        return res.getResult();
     }
 
     /**

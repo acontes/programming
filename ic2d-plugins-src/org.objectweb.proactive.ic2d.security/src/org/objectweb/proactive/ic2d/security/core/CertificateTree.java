@@ -18,232 +18,228 @@ import java.util.List;
 import javassist.NotFoundException;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+import org.objectweb.proactive.core.security.TypedCertificate;
+
 
 public class CertificateTree implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7966227118791659019L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -7966227118791659019L;
+    private static KeyPairGenerator keygen;
+    private final List<CertificateTree> children;
+    private CertificateTree parent;
+    private TypedCertificate certificate;
 
-	private static KeyPairGenerator keygen;
+    protected CertificateTree(TypedCertificate certificate) {
+        this.children = new ArrayList<CertificateTree>();
+        this.certificate = certificate;
+        this.parent = null;
+    }
 
-	private final List<CertificateTree> children;
+    public CertificateTree(String name, int keySize, int validity,
+        EntityType type) {
+        this(genCert(name, keySize, validity, type));
+    }
 
-	private CertificateTree parent;
+    private static TypedCertificate genCert(String name, int keySize,
+        int validity, EntityType type) {
+        if (keygen == null) {
+            if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+                Security.addProvider(new BouncyCastleProvider());
+            }
+            try {
+                keygen = KeyPairGenerator.getInstance("RSA",
+                        BouncyCastleProvider.PROVIDER_NAME);
+            } catch (NoSuchAlgorithmException e1) {
+                e1.printStackTrace();
+            } catch (NoSuchProviderException e1) {
+                e1.printStackTrace();
+            }
+        }
 
-	private TypedCertificate certificate;
+        keygen.initialize(keySize);
 
-	protected CertificateTree(TypedCertificate certificate) {
-		this.children = new ArrayList<CertificateTree>();
-		this.certificate = certificate;
-		this.parent = null;
-	}
+        KeyPair kp = keygen.genKeyPair();
 
-	public CertificateTree(String name, int keySize, int validity,
-			EntityType type) {
-		this(genCert(name, keySize, validity, type));
-	}
-	
-	private static TypedCertificate genCert(String name, int keySize, int validity,
-			EntityType type) {
-		if (keygen == null) {
-			if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-				Security.addProvider(new BouncyCastleProvider());
-			}
-			try {
-				keygen = KeyPairGenerator.getInstance("RSA",
-						BouncyCastleProvider.PROVIDER_NAME);
-			} catch (NoSuchAlgorithmException e1) {
-				e1.printStackTrace();
-			} catch (NoSuchProviderException e1) {
-				e1.printStackTrace();
-			}
-		}
-		
-		keygen.initialize(keySize);
+        try {
+            X509Certificate cert = CertTools.genSelfCert(name, validity, null,
+                    kp.getPrivate(), kp.getPublic(), true);
+            return new TypedCertificate(cert, type, kp.getPrivate());
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-		KeyPair kp = keygen.genKeyPair();
+    public List<CertificateTree> getChildren() {
+        return this.children;
+    }
 
-		try {
-			X509Certificate cert = CertTools.genSelfCert(name, validity, null,
-					kp.getPrivate(), kp.getPublic(), true);
-			return  new TypedCertificate(cert, type, kp.getPrivate());
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		} catch (CertificateEncodingException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (SignatureException e) {
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public List<TypedCertificate> getCertChain() {
+        List<TypedCertificate> chain;
+        if (this.parent != null) {
+            chain = this.parent.getCertChain();
+        } else {
+            chain = new ArrayList<TypedCertificate>();
+        }
+        chain.add(0, this.certificate);
+        return chain;
+    }
 
-	public List<CertificateTree> getChildren() {
-		return this.children;
-	}
+    private void setParent(CertificateTree parent) {
+        this.parent = parent;
+    }
 
-	public List<TypedCertificate> getCertChain() {
-		List<TypedCertificate> chain;
-		if (this.parent != null) {
-			chain = this.parent.getCertChain();
-		} else {
-			chain = new ArrayList<TypedCertificate>();
-		}
-		chain.add(0, this.certificate);
-		return chain;
-	}
+    public TypedCertificate getCertificate() {
+        return this.certificate;
+    }
 
-	private void setParent(CertificateTree parent) {
-		this.parent = parent;
-	}
+    private CertificateTree getChild(TypedCertificate cert) {
+        for (CertificateTree child : this.children) {
+            if (child.getCertificate().equals(cert)) {
+                return child;
+            }
+        }
+        return null;
+    }
 
-	public TypedCertificate getCertificate() {
-		return this.certificate;
-	}
+    public void add(CertificateTree newChild) {
+        if (newChild == null) {
+            return;
+        }
 
-	private CertificateTree getChild(TypedCertificate cert) {
-		for (CertificateTree child : this.children) {
-			if (child.getCertificate().equals(cert)) {
-				return child;
-			}
-		}
-		return null;
-	}
+        CertificateTree existingChild = getChild(newChild.getCertificate());
+        if (existingChild == null) {
+            this.children.add(newChild);
+            newChild.setParent(this);
+        } else {
+            existingChild.merge(newChild);
+        }
+    }
 
-	public void add(CertificateTree newChild) {
-		if (newChild == null) {
-			return;
-		}
+    public boolean merge(CertificateTree tree) {
+        if ((tree == null) ||
+                !tree.getCertificate().equals(this.getCertificate())) {
+            return false;
+        }
 
-		CertificateTree existingChild = getChild(newChild.getCertificate());
-		if (existingChild == null) {
-			this.children.add(newChild);
-			newChild.setParent(this);
-		} else {
-			existingChild.merge(newChild);
-		}
-	}
+        if ((this.certificate.getPrivateKey() == null) &&
+                (tree.getCertificate().getPrivateKey() != null)) {
+            this.certificate = tree.getCertificate();
+        }
+        for (CertificateTree newChild : tree.getChildren()) {
+            add(newChild);
+        }
+        return true;
+    }
 
-	public boolean merge(CertificateTree tree) {
-		if (tree == null
-				|| !tree.getCertificate().equals(this.getCertificate())) {
-			return false;
-		}
+    public void add(String name, int keySize, int validity, EntityType type) {
+        keygen.initialize(keySize);
+        KeyPair childKP = keygen.genKeyPair();
 
-		if (this.certificate.getPrivateKey() == null
-				&& tree.getCertificate().getPrivateKey() != null) {
-			this.certificate = tree.getCertificate();
-		}
-		for (CertificateTree newChild : tree.getChildren()) {
-			add(newChild);
-		}
-		return true;
-	}
+        X509Certificate parentCert = this.certificate.getCert();
+        PublicKey parentPublicKey = parentCert.getPublicKey();
+        PrivateKey parentPrivateKey = this.certificate.getPrivateKey();
+        String parentName = parentCert.getSubjectX500Principal().getName();
 
-	public void add(String name, int keySize, int validity, EntityType type) {
-		keygen.initialize(keySize);
-		KeyPair childKP = keygen.genKeyPair();
+        try {
+            X509Certificate cert = CertTools.genCert(name, validity, null,
+                    childKP.getPublic(), true, parentName, parentPrivateKey,
+                    parentPublicKey);
+            CertificateTree newChild = new CertificateTree(new TypedCertificate(
+                        cert, type, childKP.getPrivate()));
+            newChild.setParent(this);
+            add(newChild);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
 
-		X509Certificate parentCert = this.certificate.getCert();
-		PublicKey parentPublicKey = parentCert.getPublicKey();
-		PrivateKey parentPrivateKey = this.certificate.getPrivateKey();
-		String parentName = parentCert.getSubjectX500Principal().getName();
+    public TypedCertificate search(String name, EntityType type)
+        throws NotFoundException {
+        if ((type == this.certificate.getType()) &&
+                this.certificate.getCert().getSubjectX500Principal().getName()
+                                    .equals(name)) {
+            return this.certificate;
+        }
 
-		try {
-			X509Certificate cert = CertTools.genCert(name, validity, null,
-					childKP.getPublic(), true, parentName, parentPrivateKey,
-					parentPublicKey);
-			CertificateTree newChild = new CertificateTree(
-					new TypedCertificate(cert, type, childKP.getPrivate()));
-			newChild.setParent(this);
-			add(newChild);
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		} catch (CertificateEncodingException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (SignatureException e) {
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		}
-	}
+        for (CertificateTree child : this.children) {
+            try {
+                return child.search(name, type);
+            } catch (NotFoundException nfe) {
+                // let's check the other children
+            }
+        }
 
-	public TypedCertificate search(String name, EntityType type)
-			throws NotFoundException {
-		if (type == this.certificate.getType()
-				&& this.certificate.getCert().getSubjectX500Principal()
-						.getName().equals(name)) {
-			return this.certificate;
-		}
+        throw new NotFoundException("Certificate " + name + " : " + type +
+            " not found.");
+    }
 
-		for (CertificateTree child : this.children) {
-			try {
-				return child.search(name, type);
-			} catch (NotFoundException nfe) {
-				// let's check the other children
-			}
-		}
+    public boolean remove() {
+        if (this.parent == null) {
+            return false;
+        }
 
-		throw new NotFoundException("Certificate " + name + " : " + type
-				+ " not found.");
-	}
+        return this.parent.removeChild(this);
+    }
 
-	public boolean remove() {
-		if (this.parent == null) {
-			return false;
-		}
+    public boolean removeChild(CertificateTree child) {
+        return this.children.remove(child);
+    }
 
-		return this.parent.removeChild(this);
-	}
+    public String getName() {
+        String result = this.certificate.getType().toString();
+        result += ":";
+        result += this.certificate.getCert().getSubjectX500Principal().getName();
+        return result;
+    }
 
-	public boolean removeChild(CertificateTree child) {
-		return this.children.remove(child);
-	}
+    public CertificateTree getRoot() {
+        if (this.parent == null) {
+            return this;
+        }
+        return this.parent.getRoot();
+    }
 
-	public String getName() {
-		String result = this.certificate.getType().toString();
-		result += ":";
-		result += this.certificate.getCert().getSubjectX500Principal()
-				.getName();
-		return result;
-	}
+    public static CertificateTree newTree(
+        List<TypedCertificate> certificateChain) {
+        CertificateTree parentNode = null;
+        CertificateTree childNode = null;
+        for (TypedCertificate certificate : certificateChain) {
+            parentNode = new CertificateTree(certificate);
+            parentNode.add(childNode);
 
-	public CertificateTree getRoot() {
-		if (this.parent == null) {
-			return this;
-		}
-		return this.parent.getRoot();
-	}
+            childNode = parentNode;
+        }
+        CertificateTree thisNode = childNode;
+        while (!thisNode.getChildren().isEmpty()) {
+            thisNode = thisNode.getChildren().get(0);
+        }
 
-	public static CertificateTree newTree(
-			List<TypedCertificate> certificateChain) {
-		CertificateTree parentNode = null;
-		CertificateTree childNode = null;
-		for (TypedCertificate certificate : certificateChain) {
-			parentNode = new CertificateTree(certificate);
-			parentNode.add(childNode);
+        return thisNode;
+    }
 
-			childNode = parentNode;
-		}
-		CertificateTree thisNode = childNode;
-		while (!thisNode.getChildren().isEmpty()) {
-			thisNode = thisNode.getChildren().get(0);
-		}
-
-		return thisNode;
-	}
-	
-	@Override
-	public String toString() {
-		return this.certificate.toString();
-	}
+    @Override
+    public String toString() {
+        return this.certificate.toString();
+    }
 }

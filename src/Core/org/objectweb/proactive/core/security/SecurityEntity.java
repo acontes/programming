@@ -65,10 +65,11 @@ public interface SecurityEntity extends Serializable {
      * @return session ID
      * @throws SecurityNotAvailableException if security is not available
      * @throws RenegotiateSessionException if the session immediatly expires
-     * @throws SessionException 
-     * @throws SecurityNotAvailableException 
+     * @throws SessionException
+     * @throws SecurityNotAvailableException
      */
-    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate)
         throws SessionException, SecurityNotAvailableException, IOException;
 
     /**
@@ -158,36 +159,38 @@ public interface SecurityEntity extends Serializable {
         throws SecurityNotAvailableException, IOException;
 
     /**
-	 * Returns this entity's security manager
-	 * 
-	 * @param user
-	 *            an entity representing the user asking for the security
-	 *            manager
-	 * @throws SecurityNotAvailableException
-	 *             if security is not available
-	 * @throws AccessControlException
-	 *             if the user does not have the right to see the security
-	 *             manager
-	 */
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-			throws SecurityNotAvailableException, AccessControlException,
-			IOException;
+         * Returns this entity's security manager
+         *
+         * @param user
+         *            an entity representing the user asking for the security
+         *            manager
+         * @throws SecurityNotAvailableException
+         *             if security is not available
+         * @throws AccessControlException
+         *             if the user does not have the right to see the security
+         *             manager
+         */
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException;
 
-	/**
-	 * Modifiy this entity's security manager
-	 * 
-	 * @param user
-	 *            an entity representing the user modifying for the security
-	 *            manager
-	 * @param policyServer
-	 *            The new policy server of the security manager
-	 * @throws SecurityNotAvailableException
-	 *             if security is not available
-	 * @throws AccessControlException
-	 *             if the user does not have the right to see the security
-	 *             manager
-	 * @throws IOException
-	 */
-	public void setProActiveSecurityManager(Entity user,
-			PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException, IOException;
+    /**
+     * Modifiy this entity's security manager
+     *
+     * @param user
+     *            an entity representing the user modifying for the security
+     *            manager
+     * @param policyServer
+     *            The new policy server of the security manager
+     * @throws SecurityNotAvailableException
+     *             if security is not available
+     * @throws AccessControlException
+     *             if the user does not have the right to see the security
+     *             manager
+     * @throws IOException
+     */
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException;
 }

@@ -32,8 +32,8 @@ package org.objectweb.proactive.ic2d.timit.editparts;
 
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.timit.data.ChartContainerObject;
-import org.objectweb.proactive.ic2d.timit.data.ChartObject;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
 
@@ -45,11 +45,11 @@ public class TimItEditPartFactory implements EditPartFactory {
     }
 
     public EditPart createEditPart(EditPart context, Object model) {
-        if (model instanceof ChartContainerObject) {
-            return new ChartContainerEditPart((ChartContainerObject) model,
+        if (model instanceof BasicChartContainerObject) {
+            return new BasicChartContainerEditPart((BasicChartContainerObject) model,
                 this.timItView);
-        } else if (model instanceof ChartObject) {
-            return new ChartEditPart((ChartObject) model);
+        } else if (model instanceof BasicChartObject) {
+            return new BasicChartEditPart((BasicChartObject) model);
         } else {
             return null;
         }

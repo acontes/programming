@@ -281,9 +281,9 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         // security 
         ProActiveSecurityManager newNodeSecurityManager = null;
 
-        newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis())
-				.getProActiveSecurityManager().generateSiblingCertificate(EntityType.NODE,
-						P2PConstants.VN_NAME);
+        newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
+                                  .generateSiblingCertificate(EntityType.NODE,
+                P2PConstants.VN_NAME);
 
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
                 "_" + this.nodeCounter++, true, newNodeSecurityManager,

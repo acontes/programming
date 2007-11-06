@@ -30,8 +30,13 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import javax.swing.JPanel;
+
+import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 
 
 /**
@@ -58,6 +63,13 @@ public class TaskResultImpl implements TaskResult {
     /** The exception throwed by the task */
     private Throwable exception = null;
 
+    /** Task output */
+    private TaskLogs output = null;
+
+    /** Description definition of this result */
+    private Class<?extends ResultDescriptor> descriptorClass = null;
+    private transient ResultDescriptor descriptor = null;
+
     /** ProActive empty constructor. */
     public TaskResultImpl() {
     }
@@ -68,9 +80,10 @@ public class TaskResultImpl implements TaskResult {
      * @param id the identification of the task that send this result.
      * @param value the result of the task.
      */
-    public TaskResultImpl(TaskId id, Object value) {
+    public TaskResultImpl(TaskId id, Object value, TaskLogs output) {
         this.id = id;
         this.value = value;
+        this.output = output;
     }
 
     /**
@@ -79,9 +92,10 @@ public class TaskResultImpl implements TaskResult {
      * @param id the identification of the task that send this result.
      * @param exception the exception that occured in the task.
      */
-    public TaskResultImpl(TaskId id, Throwable exception) {
+    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output) {
         this.id = id;
         this.exception = exception;
+        this.output = output;
     }
 
     /**
@@ -114,5 +128,83 @@ public class TaskResultImpl implements TaskResult {
      */
     public Throwable getException() {
         return exception;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getOutput()
+     */
+    public TaskLogs getOuput() {
+        return this.output;
+    }
+
+    /**
+     *  @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#setDescriptorClass(Class)
+     */
+    public void setDescriptorClass(Class<?extends ResultDescriptor> descClass) {
+        if (this.descriptorClass != null) {
+            throw new RuntimeException("Descriptor class cannot be changed");
+        } else {
+            this.descriptorClass = descClass;
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getGraphicalDescription()
+     */
+    public JPanel getGraphicalDescription() {
+        boolean instanciation = false;
+        try {
+            instanciation = this.instanciateDescriptor();
+        } catch (InstantiationException e) {
+            return new SimpleTextPanel(
+                "[SCHEDULER] Cannot create descriptor : " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            return new SimpleTextPanel(
+                "[SCHEDULER] Cannot create descriptor : " + e.getMessage());
+        }
+        if (instanciation) {
+            return this.descriptor.getGraphicalDescription(this);
+        } else {
+            return new SimpleTextPanel(this.getTextualDescription());
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getTextualDescription()
+     */
+    public String getTextualDescription() {
+        boolean instanciation = false;
+        try {
+            instanciation = this.instanciateDescriptor();
+        } catch (InstantiationException e) {
+            return "[SCHEDULER] Cannot create descriptor : " + e.getMessage();
+        } catch (IllegalAccessException e) {
+            return "[SCHEDULER] Cannot create descriptor : " + e.getMessage();
+        }
+        if (instanciation) {
+            return this.descriptor.getTextualDescription(this);
+        } else if (!this.hadException()) {
+            return "[DEFAULT DESCRIPTION] " + this.value.toString();
+        } else {
+            // yes, Guillaume, I know...
+            return "[DEFAULT DESCRIPTION] " + this.exception.getMessage();
+        }
+    }
+
+    /**
+     * Create the descriptor instance if descriptor class is available.
+     * @return true if the creation occurs, false otherwise
+     */
+    private boolean instanciateDescriptor()
+        throws InstantiationException, IllegalAccessException {
+        if (this.descriptorClass == null) {
+            // no descriptor available
+            return false;
+        } else if (this.descriptor == null) {
+            this.descriptor = this.descriptorClass.newInstance();
+            return true;
+        } else {
+            return true;
+        }
     }
 }

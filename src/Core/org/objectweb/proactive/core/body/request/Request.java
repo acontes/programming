@@ -105,7 +105,8 @@ public interface Request extends Message, Securizable {
      * @return value for fault-tolerance protocol
      */
     public int send(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException;
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException;
 
     /**
      * Serves this request by executing the embedded method call using the given

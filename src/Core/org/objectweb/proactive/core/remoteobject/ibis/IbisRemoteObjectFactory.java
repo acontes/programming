@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.util.IbisProperties;
@@ -54,6 +55,7 @@ import ibis.rmi.RemoteException;
 public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
     implements RemoteObjectFactory {
     protected static RegistryHelper registryHelper;
+    protected String protocolIdentifier = Constants.IBIS_PROTOCOL_IDENTIFIER;
 
     static {
         IbisProperties.load();
@@ -187,8 +189,10 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
             // connection failed, try to find a rmiregistry at proactive.rmi.port port
             URI url2 = URIBuilder.buildURI(url1.getHost(),
                     URIBuilder.getNameFromURI(url1));
+            url2 = RemoteObjectHelper.expandURI(url2);
             try {
-                o = ibis.rmi.Naming.lookup(url2.toString());
+                o = ibis.rmi.Naming.lookup(URIBuilder.removeProtocol(url2)
+                                                     .toString());
             } catch (Exception e1) {
                 throw new ProActiveException(e);
             }
@@ -212,5 +216,10 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
      */
     public int getPort() {
         return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
+    }
+
+    @Override
+    public String getProtocolId() {
+        return this.protocolIdentifier;
     }
 }

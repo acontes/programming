@@ -70,12 +70,12 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Serializable {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 524923697097028320L;
 
-	protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+    /**
+         *
+         */
+    private static final long serialVersionUID = 524923697097028320L;
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     // note that we do not want to serialize this member but rather handle
     // the serialization by ourselve
@@ -270,7 +270,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 
     @Override
     protected void sendRequest(MethodCall methodCall, Future future)
-        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException {
         // Determines the body that is at the root of the subsystem from which the
         // call was sent.
         // It is always true that the body that issued the request (and not the body
@@ -294,7 +295,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     @Override
     protected void sendRequest(MethodCall methodCall, Future future,
         Body sourceBody)
-        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException {
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.startTimer(sourceBody.getID(),
                 TimerWarehouse.SEND_REQUEST);
@@ -356,7 +358,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 
     protected void sendRequestInternal(MethodCall methodCall, Future future,
         Body sourceBody)
-        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException {
         sourceBody.sendRequest(methodCall, future, this.universalBody);
     }
 

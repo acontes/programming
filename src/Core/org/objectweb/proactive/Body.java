@@ -129,11 +129,11 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      */
     public UniversalBody getShortcutTargetBody(ItfID functionalItfID);
 
-//    /**
-//     * set the policy server of the active object
-//     * @param server the policy server
-//     */
-//    public void setPolicyServer(PolicyServer server);
+    //    /**
+    //     * set the policy server of the active object
+    //     * @param server the policy server
+    //     */
+    //    public void setPolicyServer(PolicyServer server);
 
     /**
      * Set the nodeURL of this body

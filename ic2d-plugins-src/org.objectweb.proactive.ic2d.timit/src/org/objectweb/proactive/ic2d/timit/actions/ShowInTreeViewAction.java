@@ -37,13 +37,13 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.ic2d.timit.data.ChartObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
 
 
 public class ShowInTreeViewAction extends Action {
     public static final String SHOW_IN_TREE_VIEW_ACTION = "Show in Tree View";
-    private ChartObject target;
+    private BasicChartObject target;
 
     public ShowInTreeViewAction() {
         super.setId(SHOW_IN_TREE_VIEW_ACTION);
@@ -53,7 +53,7 @@ public class ShowInTreeViewAction extends Action {
         super.setEnabled(false);
     }
 
-    public final void setTarget(final ChartObject target) {
+    public final void setTarget(final BasicChartObject target) {
         super.setEnabled(true);
         this.target = target;
     }

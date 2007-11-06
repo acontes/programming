@@ -56,10 +56,12 @@ public class SecurityTestSessionKeyExchange extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        ProActiveSecurityManager psm1 = psm.generateSiblingCertificate(EntityType.UNKNOWN, "caller");
+        ProActiveSecurityManager psm1 = psm.generateSiblingCertificate(EntityType.UNKNOWN,
+                "caller");
         DummySecurityEntity entity1 = new DummySecurityEntity(psm1);
 
-        ProActiveSecurityManager psm2 = psm.generateSiblingCertificate(EntityType.UNKNOWN, "Callee");
+        ProActiveSecurityManager psm2 = psm.generateSiblingCertificate(EntityType.UNKNOWN,
+                "Callee");
         DummySecurityEntity entity2 = new DummySecurityEntity(psm2);
 
         entity1.initiateSession(1, entity2);

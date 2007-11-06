@@ -59,11 +59,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class HalfBody extends AbstractBody {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 545137923222704906L;
-	//
+         *
+         */
+    private static final long serialVersionUID = 545137923222704906L;
+
+    //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
     private static final String NAME = "Other thread";
@@ -94,9 +96,9 @@ public class HalfBody extends AbstractBody {
         }
 
         if (this.securityManager != null) {
-            this.securityManager = this.securityManager
-					.generateSiblingCertificate(EntityType.OBJECT, "HalfBody");
-//            this.securityManager.setBody(this);
+            this.securityManager = this.securityManager.generateSiblingCertificate(EntityType.OBJECT,
+                    "HalfBody");
+            //            this.securityManager.setBody(this);
             this.isSecurityOn = this.securityManager.getCertificate() != null;
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
             ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
@@ -220,10 +222,11 @@ public class HalfBody extends AbstractBody {
         java.io.Serializable {
 
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 3183517822839330706L;
-		/** A pool future that contains the pending future objects */
+                 *
+                 */
+        private static final long serialVersionUID = 3183517822839330706L;
+
+        /** A pool future that contains the pending future objects */
         protected FuturePool futures;
         protected RequestFactory internalRequestFactory;
         private long absoluteSequenceID;
@@ -268,7 +271,8 @@ public class HalfBody extends AbstractBody {
 
         public void sendRequest(MethodCall methodCall, Future future,
             UniversalBody destinationBody)
-            throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
+            throws java.io.IOException, RenegotiateSessionException,
+                CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             Request request = this.internalRequestFactory.newRequest(methodCall,
                     HalfBody.this, future == null, sequenceID);
@@ -284,16 +288,17 @@ public class HalfBody extends AbstractBody {
 
             // FAULT TOLERANCE
             // System.out.println("a half body send a request: " + request.getMethodName());
-//            try {
-            	if (HalfBody.this.ftmanager != null) {
-            		HalfBody.this.ftmanager.sendRequest(request, destinationBody);
-            	} else {
-            		request.send(destinationBody);
-            	}
-//            } catch (CommunicationForbiddenException cfe) {
-//            	System.out.println("wtf is happening ?");
-//            	cfe.printStackTrace();
-//            }
+            //            try {
+            if (HalfBody.this.ftmanager != null) {
+                HalfBody.this.ftmanager.sendRequest(request, destinationBody);
+            } else {
+                request.send(destinationBody);
+            }
+
+            //            } catch (CommunicationForbiddenException cfe) {
+            //            	System.out.println("wtf is happening ?");
+            //            	cfe.printStackTrace();
+            //            }
         }
 
         //

@@ -456,16 +456,16 @@ public class CertTools {
             String temp;
             while (((temp = bufRdr.readLine()) != null) &&
                     !temp.equals(beginKey)) {
-				continue;
-			}
+                continue;
+            }
             if (temp == null) {
                 throw new IOException("Error in " + certstream.toString() +
                     ", missing " + beginKey + " boundary");
             }
             while (((temp = bufRdr.readLine()) != null) &&
                     !temp.equals(endKey)) {
-				opstr.print(temp);
-			}
+                opstr.print(temp);
+            }
             if (temp == null) {
                 throw new IOException("Error in " + certstream.toString() +
                     ", missing " + endKey + " boundary");

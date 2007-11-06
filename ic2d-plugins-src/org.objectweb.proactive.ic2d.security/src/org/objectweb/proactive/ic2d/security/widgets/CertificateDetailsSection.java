@@ -10,102 +10,96 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.core.security.TypedCertificate;
 
+
 public class CertificateDetailsSection {
+    private Section section;
+    private Text typeText;
+    private Text subjectText;
+    private Text issuerText;
+    private Text publicText;
+    private Text privateText;
 
-	private Section section;
+    public CertificateDetailsSection(Composite parent, FormToolkit toolkit) {
+        this.section = toolkit.createSection(parent,
+                ExpandableComposite.TITLE_BAR);
+        this.section.setText("Certificate details");
 
-	private Text typeText;
+        Composite client = toolkit.createComposite(this.section);
+        client.setLayout(new GridLayout(1, false));
 
-	private Text subjectText;
+        toolkit.createLabel(client, "Type :");
+        this.typeText = toolkit.createText(client, "");
+        this.typeText.setEditable(false);
+        this.typeText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-	private Text issuerText;
+        toolkit.createLabel(client, "Subject DN :");
+        this.subjectText = toolkit.createText(client, "");
+        this.subjectText.setEditable(false);
+        this.subjectText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
+                false));
 
-	private Text publicText;
+        toolkit.createLabel(client, "Issuer DN :");
+        this.issuerText = toolkit.createText(client, "");
+        this.issuerText.setEditable(false);
+        this.issuerText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
+                false));
 
-	private Text privateText;
+        toolkit.createLabel(client, "Public Key :");
+        this.publicText = toolkit.createText(client, "", SWT.MULTI | SWT.WRAP);
+        this.publicText.setEditable(false);
+        this.publicText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+                true));
 
-	public CertificateDetailsSection(Composite parent, FormToolkit toolkit) {
-		this.section = toolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR);
-		this.section.setText("Certificate details");
+        toolkit.createLabel(client, "Private Key :");
+        this.privateText = toolkit.createText(client, "", SWT.MULTI | SWT.WRAP);
+        this.privateText.setEditable(false);
+        this.privateText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+                true));
 
-		Composite client = toolkit.createComposite(this.section);
-		client.setLayout(new GridLayout(1, false));
+        this.section.setClient(client);
+    }
 
-		toolkit.createLabel(client, "Type :");
-		this.typeText = toolkit.createText(client, "");
-		this.typeText.setEditable(false);
-		this.typeText
-				.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+    public void update(TypedCertificate cert) {
+        if (cert != null) {
+            setType(cert.getType().toString());
+            setSubject(cert.getCert().getSubjectX500Principal().getName());
+            setIssuer(cert.getCert().getIssuerX500Principal().getName());
+            setPublic(cert.getCert().getPublicKey().toString());
+            if (cert.getPrivateKey() != null) {
+                setPrivate(cert.getPrivateKey().toString());
+            } else {
+                setPrivate("");
+            }
+        } else {
+            setType("");
+            setSubject("");
+            setIssuer("");
+            setPublic("");
+            setPrivate("");
+        }
+    }
 
-		toolkit.createLabel(client, "Subject DN :");
-		this.subjectText = toolkit.createText(client, "");
-		this.subjectText.setEditable(false);
-		this.subjectText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-				false));
+    public Section get() {
+        return this.section;
+    }
 
-		toolkit.createLabel(client, "Issuer DN :");
-		this.issuerText = toolkit.createText(client, "");
-		this.issuerText.setEditable(false);
-		this.issuerText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-				false));
+    public void setIssuer(String issuerText) {
+        this.issuerText.setText(issuerText);
+    }
 
-		toolkit.createLabel(client, "Public Key :");
-		this.publicText = toolkit.createText(client, "", SWT.MULTI | SWT.WRAP);
-		this.publicText.setEditable(false);
-		this.publicText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				true));
+    public void setPrivate(String privateText) {
+        this.privateText.setText(privateText);
+    }
 
-		toolkit.createLabel(client, "Private Key :");
-		this.privateText = toolkit.createText(client, "", SWT.MULTI | SWT.WRAP);
-		this.privateText.setEditable(false);
-		this.privateText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				true));
+    public void setPublic(String publicText) {
+        this.publicText.setText(publicText);
+    }
 
-		this.section.setClient(client);
-	}
+    public void setSubject(String subjectText) {
+        this.subjectText.setText(subjectText);
+    }
 
-	public void update(TypedCertificate cert) {
-		if (cert != null) {
-			setType(cert.getType().toString());
-			setSubject(cert.getCert().getSubjectX500Principal().getName());
-			setIssuer(cert.getCert().getIssuerX500Principal().getName());
-			setPublic(cert.getCert().getPublicKey().toString());
-			if (cert.getPrivateKey() != null) {
-				setPrivate(cert.getPrivateKey().toString());
-			} else {
-				setPrivate("");
-			}
-		} else {
-			setType("");
-			setSubject("");
-			setIssuer("");
-			setPublic("");
-			setPrivate("");
-		}
-	}
-
-	public Section get() {
-		return this.section;
-	}
-
-	public void setIssuer(String issuerText) {
-		this.issuerText.setText(issuerText);
-	}
-
-	public void setPrivate(String privateText) {
-		this.privateText.setText(privateText);
-	}
-
-	public void setPublic(String publicText) {
-		this.publicText.setText(publicText);
-	}
-
-	public void setSubject(String subjectText) {
-		this.subjectText.setText(subjectText);
-	}
-
-	public void setType(String typeText) {
-		this.typeText.setText(typeText);
-	}
+    public void setType(String typeText) {
+        this.typeText.setText(typeText);
+    }
 }

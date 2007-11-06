@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -128,11 +127,10 @@ public class RemoteObjectAdapter implements RemoteObject {
         return this.remoteObject.getCertificate();
     }
 
-//    public byte[] getCertificateEncoded()
-//        throws SecurityNotAvailableException, IOException {
-//        return this.remoteObject.getCertificateEncoded();
-//    }
-
+    //    public byte[] getCertificateEncoded()
+    //        throws SecurityNotAvailableException, IOException {
+    //        return this.remoteObject.getCertificateEncoded();
+    //    }
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
@@ -171,11 +169,11 @@ public class RemoteObjectAdapter implements RemoteObject {
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-			TypedCertificate distantCertificate)
-			throws SecurityNotAvailableException, IOException, SessionException {
-		return this.remoteObject.startNewSession(distantSessionID, policy,
-				distantCertificate);
-	}
+        TypedCertificate distantCertificate)
+        throws SecurityNotAvailableException, IOException, SessionException {
+        return this.remoteObject.startNewSession(distantSessionID, policy,
+            distantCertificate);
+    }
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
@@ -194,7 +192,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
                 SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-                this.stub = (Object) reply.getSynchResult();
+                this.stub = reply.getSynchResult();
             } catch (SecurityException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -211,8 +209,6 @@ public class RemoteObjectAdapter implements RemoteObject {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
-            //                ((SynchronousProxy) ((StubObject) this.stub).getProxy()).setRemoteObject(this);
         }
         return this.stub;
     }
@@ -222,14 +218,14 @@ public class RemoteObjectAdapter implements RemoteObject {
         if (this.stub == null) {
             try {
                 Method m = InternalRemoteRemoteObject.class.getDeclaredMethod("getObjectProxy",
-                        new Class<?>[] {  });
+                        new Class<?>[] { RemoteRemoteObject.class });
                 MethodCall mc = MethodCall.getMethodCall(m,
                         new Object[] { rmo }, new HashMap());
                 Request r = new InternalRemoteRemoteObjectRequest(mc);
 
                 SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-                this.stub = (Object) reply.getSynchResult();
+                this.stub = reply.getSynchResult();
             } catch (SecurityException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -350,19 +346,18 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        return this.remoteObject.getProActiveSecurityManager(user);
+    }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-			throws SecurityNotAvailableException, AccessControlException,
-			IOException {
-		return this.remoteObject.getProActiveSecurityManager(user);
-	}
-
-	public void setProActiveSecurityManager(Entity user,
-			PolicyServer policyServer) throws SecurityNotAvailableException,
-			AccessControlException, IOException {
-		this.remoteObject.setProActiveSecurityManager(user, policyServer);
-	}
-
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        this.remoteObject.setProActiveSecurityManager(user, policyServer);
+    }
 
     public URI getURI() {
         try {
@@ -394,5 +389,4 @@ public class RemoteObjectAdapter implements RemoteObject {
         }
         return null;
     }
-
 }

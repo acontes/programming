@@ -49,88 +49,89 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
 public class HostListener implements MouseListener, MouseMotionListener {
-	private ActionRegistry registry;
+    private ActionRegistry registry;
+    private HostObject host;
+    private HostFigure figure;
+    private DragAndDrop dnd;
+    private DragHost dragHost;
 
-	private HostObject host;
-	private HostFigure figure;
+    public HostListener(HostObject host, HostFigure figure,
+        MonitoringView monitoringView) {
+        this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
+        this.host = host;
+        this.figure = figure;
+        this.dnd = monitoringView.getDragAndDrop();
+        this.dragHost = monitoringView.getDragHost();
+    }
 
-	private DragAndDrop dnd;
-	private DragHost dragHost;
-	
-	public HostListener(HostObject host, HostFigure figure, MonitoringView monitoringView) {
-		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
-		this.host = host;
-		this.figure = figure;
-		this.dnd = monitoringView.getDragAndDrop();
-		this.dragHost = monitoringView.getDragHost();
-	}
+    public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */
+    }
 
-	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
+    public void mousePressed(MouseEvent me) {
+        if (me.button == 1) {
+            dnd.reset();
+            dragHost.mousePressed(me);
+        } else if (me.button == 3) {
+            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
+                    action.hasNext();) {
+                IAction act = action.next();
+                if (act instanceof RefreshHostAction) {
+                    RefreshHostAction refreshHostAction = (RefreshHostAction) act;
+                    refreshHostAction.setHost(host);
+                    refreshHostAction.setEnabled(true);
+                } else if (act instanceof StopMonitoringAction) {
+                    StopMonitoringAction stopMonitoringAction = (StopMonitoringAction) act;
+                    stopMonitoringAction.setObject(host);
+                    stopMonitoringAction.setEnabled(true);
+                } else if (act instanceof VerticalLayoutAction) {
+                    VerticalLayoutAction verticalLayoutAction = (VerticalLayoutAction) act;
+                    verticalLayoutAction.setHost(figure);
+                    if (figure.isVerticalLayout()) {
+                        verticalLayoutAction.setChecked(true);
+                    }
+                    verticalLayoutAction.setEnabled(true);
+                } else if (act instanceof HorizontalLayoutAction) {
+                    HorizontalLayoutAction horizontalLayoutAction = (HorizontalLayoutAction) act;
+                    horizontalLayoutAction.setHost(figure);
+                    if (figure.isVerticalLayout()) {
+                        horizontalLayoutAction.setChecked(false);
+                    }
+                    horizontalLayoutAction.setEnabled(true);
+                } else if (act instanceof IActionExtPoint) {
+                    IActionExtPoint extensionAction = (IActionExtPoint) act;
+                    extensionAction.setAbstractDataObject(this.host);
+                } else {
+                    act.setEnabled(false);
+                }
+            }
+        }
+    }
 
-	public void mousePressed(MouseEvent me) {
-		if(me.button == 1){
-			dnd.reset();
-			dragHost.mousePressed(me);
-		}
-		else if(me.button == 3) {
-			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
-				IAction act = action.next();
-				if (act instanceof RefreshHostAction) {
-					RefreshHostAction refreshHostAction = (RefreshHostAction) act;
-					refreshHostAction.setHost(host);
-					refreshHostAction.setEnabled(true);
-				} else if (act instanceof StopMonitoringAction) {
-					StopMonitoringAction stopMonitoringAction = (StopMonitoringAction) act;
-					stopMonitoringAction.setObject(host);
-					stopMonitoringAction.setEnabled(true);
-				} else if (act instanceof VerticalLayoutAction) {
-					VerticalLayoutAction verticalLayoutAction = (VerticalLayoutAction) act;
-					verticalLayoutAction.setHost(figure);
-					if(figure.isVerticalLayout()) {
-						verticalLayoutAction.setChecked(true);
-					}
-					verticalLayoutAction.setEnabled(true);
-				} else if (act instanceof HorizontalLayoutAction) {
-					HorizontalLayoutAction horizontalLayoutAction = (HorizontalLayoutAction) act;
-					horizontalLayoutAction.setHost(figure);
-					if(figure.isVerticalLayout()) {
-						horizontalLayoutAction.setChecked(false);
-					}
-					horizontalLayoutAction.setEnabled(true);
-				} else if (act instanceof IActionExtPoint) {
-					IActionExtPoint extensionAction = (IActionExtPoint) act;
-					extensionAction.setAbstractDataObject(this.host);
-				} else {
-					act.setEnabled(false);
-				}
-			}
+    public void mouseReleased(MouseEvent me) {
+        dnd.reset();
+        dragHost.mouseReleased(me);
+    }
 
-		}
-	}
+    //---- MouseMotionListener 
+    public void mouseEntered(MouseEvent me) {
+        if (dnd.getSource() != null) {
+            dnd.refresh(null);
+        }
+    }
 
-	public void mouseReleased(MouseEvent me) {
-		dnd.reset();
-		dragHost.mouseReleased(me);
-	}
-	
-	//---- MouseMotionListener 
+    public void mouseExited(MouseEvent me) {
+        if (dnd.getSource() != null) {
+            dnd.refresh(null);
+        }
+    }
 
-	public void mouseEntered(MouseEvent me) {		
-		if(dnd.getSource()!=null)
-			dnd.refresh(null);
-	}
+    public void mouseDragged(MouseEvent me) {
+        dragHost.mouseDragged(me);
+    }
 
-	public void mouseExited(MouseEvent me) {
-		if(dnd.getSource()!=null)
-			dnd.refresh(null);
-	}
+    public void mouseHover(MouseEvent me) { /* Do nothing */
+    }
 
-	public void mouseDragged(MouseEvent me) {
-		dragHost.mouseDragged(me);
-	}
-	
-	public void mouseHover(MouseEvent me) { /* Do nothing */ }
-
-	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
-
+    public void mouseMoved(MouseEvent me) { /* Do nothing */
+    }
 }

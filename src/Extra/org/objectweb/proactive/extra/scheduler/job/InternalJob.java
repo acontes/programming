@@ -53,7 +53,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * Specific jobs may extend this class.
  * It provides method to order the job and to set and get every needed properties.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
@@ -76,19 +76,24 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Owner of the job */
     private String owner = "";
 
-    // TODO a way for the user to put whatever he wants in the job and refind it in policy for example.
+    // TODO a way for the user to put whatever he wants in the job and re-find it in policy for example.
     // Then user can interact in the policy using this new field.
+
+    /** List of every tasks in this job. */
     protected HashMap<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
-    /** Instances of the final task, important to know which results will be sent to user */
+    /** Instances of the final task, important to know which results the user wants */
+    //TODO : jlscheef : useless, may be removed ??
     protected Vector<InternalTask> finalTasks = new Vector<InternalTask>();
 
-    /** informations about job execution */
-    // FIXME jlscheef,jfradj this variable can change ???? 
+    /** Informations about job execution */
     protected JobEvent jobInfo = new JobEvent();
 
-    /** Light job for dependences management */
-    private JobDescriptor lightJob;
+    /** Job descriptor for dependences management */
+    private JobDescriptor jobDescriptor;
+
+    /** Job result */
+    private JobResult jobResult;
 
     /**
      * ProActive empty constructor.
@@ -122,7 +127,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     public synchronized void update(TaskEvent event) {
         jobInfo = event.getJobEvent();
-        tasks.get(event.getTaskID()).update(event);
+        tasks.get(event.getTaskId()).update(event);
     }
 
     /**
@@ -131,11 +136,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param jobInfo the jobInfo to set
      */
     public synchronized void update(JobEvent jobInfo) {
-        JobResult res = this.jobInfo.getResult();
         this.jobInfo = jobInfo;
-        if (res != null) {
-            this.jobInfo.setResult(res);
-        }
         if (jobInfo.getTaskStatusModify() != null) {
             for (TaskId id : tasks.keySet()) {
                 tasks.get(id).setStatus(jobInfo.getTaskStatusModify().get(id));
@@ -233,7 +234,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         if (task.isFinalTask()) {
             finalTasks.add(task);
         }
-        task.setId(TaskId.nextId(getId()));
+        task.setId(TaskId.nextId(getId(), task.getName()));
         boolean result = (tasks.put(task.getId(), task) == null);
         if (result) {
             jobInfo.setTotalNumberOfTasks(jobInfo.getTotalNumberOfTasks() + 1);
@@ -253,7 +254,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         if (getState() == JobState.STALLED) {
             setState(JobState.RUNNING);
         }
-        lightJob.start(td.getId());
+        jobDescriptor.start(td.getId());
         td.setStatus(Status.RUNNNING);
         td.setStartTime(System.currentTimeMillis());
         td.setExecutionHostName(hostName);
@@ -267,12 +268,12 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     public void reStartTask(InternalTask task) {
         setNumberOfPendingTasks(getNumberOfPendingTask() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
-        lightJob.reStart(task.getId());
+        jobDescriptor.reStart(task.getId());
         if (getState() == JobState.PAUSED) {
             task.setStatus(Status.PAUSED);
             HashMap<TaskId, Status> hts = new HashMap<TaskId, Status>();
             hts.put(task.getId(), task.getStatus());
-            lightJob.update(hts);
+            jobDescriptor.update(hts);
         } else {
             task.setStatus(Status.PENDING);
         }
@@ -295,16 +296,27 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             setState(JobState.STALLED);
         }
         //terminate this task
-        lightJob.terminate(taskId);
+        jobDescriptor.terminate(taskId);
 
         //creating list of status
         HashMap<TaskId, Status> hts = new HashMap<TaskId, Status>();
         for (InternalTask td : tasks.values()) {
             hts.put(td.getId(), td.getStatus());
         }
-        //updating light job for eligible task
-        lightJob.update(hts);
+        //updating job descriptor for eligible task
+        jobDescriptor.update(hts);
         return descriptor;
+    }
+
+    /**
+     * Simulate that a task have been started and terminated.
+     * Used only by the recovery method in scheduler core.
+     *
+     * @param id the id of the task to start and terminate.
+     */
+    public void simulateStartAndTerminate(TaskId id) {
+        jobDescriptor.start(id);
+        jobDescriptor.terminate(id);
     }
 
     /**
@@ -322,8 +334,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         descriptor.setStatus((jobState == JobState.FAILED) ? Status.FAILED
                                                            : Status.CANCELLED);
         setState(jobState);
-        //terminate this lightjob
-        lightJob.failed();
+        //terminate this job descriptor
+        jobDescriptor.failed();
 
         //creating list of status
         HashMap<TaskId, Status> hts = new HashMap<TaskId, Status>();
@@ -396,7 +408,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             }
             hts.put(td.getId(), td.getStatus());
         }
-        lightJob.update(hts);
+        jobDescriptor.update(hts);
         setTaskStatusModify(hts);
         return true;
     }
@@ -431,7 +443,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             }
             hts.put(td.getId(), td.getStatus());
         }
-        lightJob.update(hts);
+        jobDescriptor.update(hts);
         setTaskStatusModify(hts);
         return true;
     }
@@ -458,11 +470,11 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     @Override
     public void setPriority(JobPriority priority) {
         jobInfo.setPriority(priority);
-        lightJob.setPriority(priority);
+        jobDescriptor.setPriority(priority);
     }
 
     /**
-     * To get the tasks as an arraylist.
+     * To get the tasks as an array list.
      *
      * @return the tasks
      */
@@ -677,21 +689,21 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
-     * To get the lightJob
+     * To get the jobDescriptor
      *
-     * @return the lightJob
+     * @return the jobDescriptor
      */
-    public JobDescriptor getLightJob() {
-        return lightJob;
+    public JobDescriptor getJobDescriptor() {
+        return jobDescriptor;
     }
 
     /**
-     * To set the lightJob
+     * To set the jobDescriptor
      *
-     * @param lightJob the lightJob to set
+     * @param jobDescriptor the jobDescriptor to set
      */
-    public void setLightJob(JobDescriptor lightJob) {
-        this.lightJob = lightJob;
+    public void setJobDescriptor(JobDescriptor jobDescriptor) {
+        this.jobDescriptor = jobDescriptor;
     }
 
     /**
@@ -726,6 +738,24 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    /**
+     * Returns the jobResult.
+     *
+     * @return the jobResult.
+     */
+    public JobResult getJobResult() {
+        return jobResult;
+    }
+
+    /**
+     * Sets the jobResult to the given jobResult value.
+     *
+     * @param jobResult the jobResult to set.
+     */
+    public void setJobResult(JobResult jobResult) {
+        this.jobResult = jobResult;
     }
 
     /**

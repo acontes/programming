@@ -104,12 +104,10 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         return this.internalrrObject.getCertificate();
     }
 
-//    public byte[] getCertificateEncoded()
-//        throws SecurityNotAvailableException, IOException {
-//        return this.remoteObject.getCertificateEncoded();
-//    }
-
-
+    //    public byte[] getCertificateEncoded()
+    //        throws SecurityNotAvailableException, IOException {
+    //        return this.remoteObject.getCertificateEncoded();
+    //    }
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.internalrrObject.getEntities();
@@ -148,11 +146,11 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-			TypedCertificate distantCertificate) throws IOException,
-			SessionException, SecurityNotAvailableException {
-		return this.internalrrObject.startNewSession(distantSessionID, policy,
-				distantCertificate);
-	}
+        TypedCertificate distantCertificate)
+        throws IOException, SessionException, SecurityNotAvailableException {
+        return this.internalrrObject.startNewSession(distantSessionID, policy,
+            distantCertificate);
+    }
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
@@ -171,16 +169,16 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
     //        }
     //        return this.stub;
     //    }
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        return this.internalrrObject.getProActiveSecurityManager(user);
+    }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-			throws SecurityNotAvailableException, AccessControlException,
-			IOException {
-		return this.internalrrObject.getProActiveSecurityManager(user);
-	}
-
-	public void setProActiveSecurityManager(Entity user,
-			PolicyServer policyServer) throws SecurityNotAvailableException,
-			AccessControlException, IOException {
-		this.internalrrObject.setProActiveSecurityManager(user, policyServer);
-	}
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        this.internalrrObject.setProActiveSecurityManager(user, policyServer);
+    }
 }

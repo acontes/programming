@@ -59,11 +59,12 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 public class UniversalBodyWrapper implements UniversalBody, Runnable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7024758149949993234L;
-	protected UniversalBody wrappedBody;
+         *
+         */
+    private static final long serialVersionUID = 7024758149949993234L;
+    protected UniversalBody wrappedBody;
     protected long time;
     protected UniqueID id;
     protected boolean stop;
@@ -206,9 +207,11 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.getCertificate();
     }
 
-    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate)
         throws IOException, SecurityNotAvailableException, SessionException {
-        return this.wrappedBody.startNewSession(distantSessionID, policy, distantCertificate);
+        return this.wrappedBody.startNewSession(distantSessionID, policy,
+            distantCertificate);
     }
 
     public PublicKey getPublicKey()
@@ -236,13 +239,13 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
             tmp3, tmp4);
     }
 
-//    /* (non-Javadoc)
-//     * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
-//     */
-//    public byte[] getCertificateEncoded()
-//        throws IOException, SecurityNotAvailableException {
-//        return this.wrappedBody.getCertificateEncoded();
-//    }
+    //    /* (non-Javadoc)
+    //     * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
+    //     */
+    //    public byte[] getCertificateEncoded()
+    //        throws IOException, SecurityNotAvailableException {
+    //        return this.wrappedBody.getCertificateEncoded();
+    //    }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
@@ -283,15 +286,16 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.wrappedBody.register(url);
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-			throws SecurityNotAvailableException, AccessControlException,
-			IOException {
-		return this.wrappedBody.getProActiveSecurityManager(user);
-	}
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        return this.wrappedBody.getProActiveSecurityManager(user);
+    }
 
-	public void setProActiveSecurityManager(Entity user,
-			PolicyServer policyServer) throws SecurityNotAvailableException,
-			AccessControlException, IOException {
-		this.wrappedBody.setProActiveSecurityManager(user, policyServer);
-	}
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        this.wrappedBody.setProActiveSecurityManager(user, policyServer);
+    }
 }

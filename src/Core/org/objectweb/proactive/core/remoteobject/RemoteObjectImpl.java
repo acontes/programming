@@ -120,14 +120,13 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-//    public byte[] getCertificateEncoded()
-//        throws SecurityNotAvailableException, IOException {
-//        if (this.psm != null) {
-//            return this.psm.getCertificateEncoded();
-//        }
-//        throw new SecurityNotAvailableException();
-//    }
-
+    //    public byte[] getCertificateEncoded()
+    //        throws SecurityNotAvailableException, IOException {
+    //        if (this.psm != null) {
+    //            return this.psm.getCertificateEncoded();
+    //        }
+    //        throw new SecurityNotAvailableException();
+    //    }
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
@@ -139,7 +138,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
     public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException {
         if (this.psm == null) {
-        	throw new SecurityNotAvailableException();
+            throw new SecurityNotAvailableException();
         }
         return this.psm.getPolicy(local, distant);
     }
@@ -183,10 +182,12 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate)
         throws SecurityNotAvailableException, SessionException {
         if (this.psm != null) {
-            return this.psm.startNewSession(distantSessionID, policy, distantCertificate);
+            return this.psm.startNewSession(distantSessionID, policy,
+                distantCertificate);
         }
         throw new SecurityNotAvailableException();
     }
@@ -306,17 +307,20 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         return null;
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
-		if (this.psm == null) {
-			throw new SecurityNotAvailableException();
-		}
-		return this.psm.getProActiveSecurityManager(user);
-	}
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException {
+        if (this.psm == null) {
+            throw new SecurityNotAvailableException();
+        }
+        return this.psm.getProActiveSecurityManager(user);
+    }
 
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
-		if (this.psm == null) {
-			throw new SecurityNotAvailableException();
-		}
-		this.psm.setProActiveSecurityManager(user, policyServer);
-	}
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException {
+        if (this.psm == null) {
+            throw new SecurityNotAvailableException();
+        }
+        this.psm.setProActiveSecurityManager(user, policyServer);
+    }
 }

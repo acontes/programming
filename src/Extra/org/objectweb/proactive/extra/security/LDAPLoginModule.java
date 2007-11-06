@@ -164,36 +164,36 @@ public class LDAPLoginModule implements LoginModule {
         String userID = null;
         try {
             userID = getLDAPUserID(urlLDAP, username);
-		} catch (NamingException e) {
-			throw new FailedLoginException("Cannot connect to LDAP server");
-		}
+        } catch (NamingException e) {
+            throw new FailedLoginException("Cannot connect to LDAP server");
+        }
 
-		if (userID == null || !checkLDAPPassword(urlLDAP, userID, password)) {
-			throw new FailedLoginException("Incorrect Username/Password");
-		}
+        if ((userID == null) || !checkLDAPPassword(urlLDAP, userID, password)) {
+            throw new FailedLoginException("Incorrect Username/Password");
+        }
 
-		if (debug) {
-			System.out.println("\t\t[LDAPLoginModule] "
-					+ "authentication succeeded");
-		}
+        if (debug) {
+            System.out.println("\t\t[LDAPLoginModule] " +
+                "authentication succeeded");
+        }
 
-		succeeded = true;
-		return true;
-	}
+        succeeded = true;
+        return true;
+    }
 
     /**
-	 * <p>
-	 * This method is called if the LoginContext's overall authentication
-	 * succeeded (the relevant REQUIRED, REQUISITE, SUFFICIENT and OPTIONAL
-	 * LoginModules succeeded).
-	 * <p>
-	 * 
-	 * @exception LoginException
-	 *                if the commit fails.
-	 * 
-	 * @return true if this LDAPLoginModule's own login and commit attempts
-	 *         succeeded, or false otherwise.
-	 */
+         * <p>
+         * This method is called if the LoginContext's overall authentication
+         * succeeded (the relevant REQUIRED, REQUISITE, SUFFICIENT and OPTIONAL
+         * LoginModules succeeded).
+         * <p>
+         *
+         * @exception LoginException
+         *                if the commit fails.
+         *
+         * @return true if this LDAPLoginModule's own login and commit attempts
+         *         succeeded, or false otherwise.
+         */
     public boolean commit() throws LoginException {
         return succeeded;
     }

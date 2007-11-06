@@ -113,33 +113,31 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
             return this.remoteObject.getCertificate();
         }
 
-        HttpRemoteObjectRequest br = new HttpRemoteObjectRequest(
-				"getCertificate", new ArrayList<Object>(), this.remoteObjectURL
-						.toString());
-		br.send();
-		try {
-			return (TypedCertificate) br.getReturnedObject();
-		} catch (Exception e) {
-			throw new HTTPRemoteException("Unexpected exception", e);
-		}
+        HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getCertificate",
+                new ArrayList<Object>(), this.remoteObjectURL.toString());
+        br.send();
+        try {
+            return (TypedCertificate) br.getReturnedObject();
+        } catch (Exception e) {
+            throw new HTTPRemoteException("Unexpected exception", e);
+        }
     }
 
-// public byte[] getCertificateEncoded()
-//        throws SecurityNotAvailableException, IOException {
-//        if (isLocal) {
-//            return this.remoteObject.getCertificateEncoded();
-//        } else {
-//            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getCertificateEncoded",
-//                    new ArrayList<Object>(), this.remoteObjectURL.toString());
-//            br.send();
-//            try {
-//                return (byte[]) br.getReturnedObject();
-//            } catch (Exception e) {
-//                throw new HTTPRemoteException("Unexpected exception", e);
-//            }
-//        }
-//    }
-
+    // public byte[] getCertificateEncoded()
+    //        throws SecurityNotAvailableException, IOException {
+    //        if (isLocal) {
+    //            return this.remoteObject.getCertificateEncoded();
+    //        } else {
+    //            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getCertificateEncoded",
+    //                    new ArrayList<Object>(), this.remoteObjectURL.toString());
+    //            br.send();
+    //            try {
+    //                return (byte[]) br.getReturnedObject();
+    //            } catch (Exception e) {
+    //                throw new HTTPRemoteException("Unexpected exception", e);
+    //            }
+    //        }
+    //    }
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
@@ -178,11 +176,11 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-			TypedCertificate distantCertificate)
-			throws SecurityNotAvailableException, IOException, SessionException {
-		return this.remoteObject.startNewSession(distantSessionID, policy,
-				distantCertificate);
-	}
+        TypedCertificate distantCertificate)
+        throws SecurityNotAvailableException, IOException, SessionException {
+        return this.remoteObject.startNewSession(distantSessionID, policy,
+            distantCertificate);
+    }
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
@@ -273,15 +271,16 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         }
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-			throws SecurityNotAvailableException, AccessControlException,
-			IOException {
-		return this.remoteObject.getProActiveSecurityManager(user);
-	}
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        return this.remoteObject.getProActiveSecurityManager(user);
+    }
 
-	public void setProActiveSecurityManager(Entity user,
-			PolicyServer policyServer) throws SecurityNotAvailableException,
-			AccessControlException, IOException {
-		this.remoteObject.setProActiveSecurityManager(user, policyServer);
-	}
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        this.remoteObject.setProActiveSecurityManager(user, policyServer);
+    }
 }

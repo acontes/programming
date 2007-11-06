@@ -10,52 +10,54 @@ import java.security.cert.X509Certificate;
 
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
+
 public class TypedCertificate implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3389269734930919276L;
-	private transient X509Certificate cert;
-	private final EntityType type;
-	private final PrivateKey privateKey;
-	private byte[] encodedCert;
-	
-	public TypedCertificate(X509Certificate cert, EntityType type, PrivateKey privateKey) {
-		this.cert = cert;
-		this.type = type;
-		this.privateKey = privateKey;
-		this.encodedCert = null;
-	}
 
-	public X509Certificate getCert() {
-		return this.cert;
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = -3389269734930919276L;
+    private transient X509Certificate cert;
+    private final EntityType type;
+    private final PrivateKey privateKey;
+    private byte[] encodedCert;
 
-	public PrivateKey getPrivateKey() {
-		return this.privateKey;
-	}
+    public TypedCertificate(X509Certificate cert, EntityType type,
+        PrivateKey privateKey) {
+        this.cert = cert;
+        this.type = type;
+        this.privateKey = privateKey;
+        this.encodedCert = null;
+    }
 
-	public EntityType getType() {
-		return this.type;
-	}
+    public X509Certificate getCert() {
+        return this.cert;
+    }
 
-//	public void setType(EntityType type) {
-//		this.type = type;
-//	}
-	
-	public TypedCertificate noPrivateKey() {
-		return new TypedCertificate(this.cert, this.type, null);
-	}
-	
-	@Override
-	public String toString() {
-		return getType() + ":" + getCert().toString();
-	}
-	
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		if (getCert() != null) {
+    public PrivateKey getPrivateKey() {
+        return this.privateKey;
+    }
+
+    public EntityType getType() {
+        return this.type;
+    }
+
+    //	public void setType(EntityType type) {
+    //		this.type = type;
+    //	}
+    public TypedCertificate noPrivateKey() {
+        return new TypedCertificate(this.cert, this.type, null);
+    }
+
+    @Override
+    public String toString() {
+        return getType() + ":" + getCert().toString();
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        if (getCert() != null) {
             try {
-            	this.encodedCert = this.cert.getEncoded();
+                this.encodedCert = this.cert.getEncoded();
             } catch (CertificateEncodingException e) {
                 e.printStackTrace();
             }
@@ -63,39 +65,37 @@ public class TypedCertificate implements Serializable {
 
         out.defaultWriteObject();
         this.encodedCert = null;
-	}
-	
+    }
 
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         if (this.encodedCert != null) {
-        	this.cert = ProActiveSecurity.decodeCertificate(this.encodedCert);
+            this.cert = ProActiveSecurity.decodeCertificate(this.encodedCert);
         }
 
         this.encodedCert = null;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
-    	if (!(obj instanceof TypedCertificate)) {
-    		return false;
-    	}
-		TypedCertificate otherCert = (TypedCertificate) obj;
-			
-		if (!otherCert.getType().match(this.getType())) {
-			return false;
-		}
-		if (!otherCert.getCert().equals(this.getCert())) {
-			return false;
-		}
-		
-    	return true;
-    }
-    
-    @Override
-    public int hashCode() {
-    	return this.cert.hashCode();
+        if (!(obj instanceof TypedCertificate)) {
+            return false;
+        }
+        TypedCertificate otherCert = (TypedCertificate) obj;
+
+        if (!otherCert.getType().match(this.getType())) {
+            return false;
+        }
+        if (!otherCert.getCert().equals(this.getCert())) {
+            return false;
+        }
+
+        return true;
     }
 
+    @Override
+    public int hashCode() {
+        return this.cert.hashCode();
+    }
 }

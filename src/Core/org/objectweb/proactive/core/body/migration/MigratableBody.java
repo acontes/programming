@@ -58,11 +58,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class MigratableBody extends BodyImpl implements Migratable,
     java.io.Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4176648945308840505L;
-	protected static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
+         *
+         */
+    private static final long serialVersionUID = -4176648945308840505L;
+    protected static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
     protected static Logger migrationLogger = ProActiveLogger.getLogger(Loggers.MIGRATION);
 
     //
@@ -206,44 +207,44 @@ public class MigratableBody extends BodyImpl implements Migratable,
         String saveNodeURL = nodeURL;
         nodeURL = node.getNodeInformation().getURL();
 
-//      security checks
-    	try {
-    		ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
-
-    		if (this.securityManager != null) {
-    			Session session = this.securityManager.initiateSession(runtimeDestination);
-
-    			if (!session.getSecurityContext().isMigration()) {
-    				ProActiveLogger.getLogger(Loggers.SECURITY)
-    				.info("NOTE : Security manager forbids the migration");
-    				return this;
-    			}
-    		} else {
-//  			no local security but need to check if distant runtime accepts migration
-    			SecurityContext scDistant = runtimeDestination.getPolicy(this.getEntities(), runtimeDestination.getEntities());
-    			if (!scDistant.isMigration()) {
-    				ProActiveLogger.getLogger(Loggers.SECURITY)
-    				.info("NOTE : Security manager forbids the migration");
-    				return this;
-    			}
-    		}
-    	} catch (SecurityNotAvailableException e1) {
-    		bodyLogger.debug("Security not available");
-    		e1.printStackTrace();
-    	} catch (CommunicationForbiddenException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
+        //      security checks
         try {
-        	
-        	nodeURL = node.getNodeInformation().getURL();
+            ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
 
-        	// stop accepting communication
-        	blockCommunication();
+            if (this.securityManager != null) {
+                Session session = this.securityManager.initiateSession(runtimeDestination);
+
+                if (!session.getSecurityContext().isMigration()) {
+                    ProActiveLogger.getLogger(Loggers.SECURITY)
+                                   .info("NOTE : Security manager forbids the migration");
+                    return this;
+                }
+            } else {
+                //  			no local security but need to check if distant runtime accepts migration
+                SecurityContext scDistant = runtimeDestination.getPolicy(this.getEntities(),
+                        runtimeDestination.getEntities());
+                if (!scDistant.isMigration()) {
+                    ProActiveLogger.getLogger(Loggers.SECURITY)
+                                   .info("NOTE : Security manager forbids the migration");
+                    return this;
+                }
+            }
+        } catch (SecurityNotAvailableException e1) {
+            bodyLogger.debug("Security not available");
+            e1.printStackTrace();
+        } catch (CommunicationForbiddenException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        try {
+            nodeURL = node.getNodeInformation().getURL();
+
+            // stop accepting communication
+            blockCommunication();
 
             // save the id
             savedID = bodyID;
@@ -320,7 +321,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
         hasJustMigrated = true;
         if (this.isSecurityOn) {
             internalBodySecurity = new InternalBodySecurity(null);
-//            securityManager.setBody(this);
+            //            securityManager.setBody(this);
         }
     }
 

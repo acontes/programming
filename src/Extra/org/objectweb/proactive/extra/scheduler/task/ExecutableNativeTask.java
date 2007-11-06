@@ -30,9 +30,14 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.Map;
 
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**
@@ -44,7 +49,21 @@ import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
  * @version 1.0, Aug 21, 2007
  * @since ProActive 3.2
  */
-public abstract class ExecutableNativeTask extends ExecutableTask {
+public class ExecutableNativeTask extends ExecutableTask {
+
+    /** Process that start the native task */
+    private Process process;
+
+    /** Command that should be executed */
+    private String command;
+
+    /**
+     * Create a new native task that execute command.
+     * @param command the command to be executed.
+     */
+    public ExecutableNativeTask(String command) {
+        this.command = command;
+    }
 
     /**
      * Return the current native running process.
@@ -52,11 +71,64 @@ public abstract class ExecutableNativeTask extends ExecutableTask {
      *
      * @return the current native running process.
      */
-    public abstract Process getProcess();
+    public Process getProcess() {
+        return this.process;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
+     */
+    public Object execute(TaskResult... results) {
+        try {
+            process = Runtime.getRuntime().exec(this.command);
+            // redirect streams
+            BufferedReader sout = new BufferedReader(new InputStreamReader(
+                        process.getInputStream()));
+            BufferedReader serr = new BufferedReader(new InputStreamReader(
+                        process.getErrorStream()));
+            Thread tsout = new Thread(new ThreadReader(sout, System.out));
+            Thread tserr = new Thread(new ThreadReader(serr, System.err));
+            tsout.start();
+            tserr.start();
+            // wait for process completion
+            process.waitFor();
+            // wait for log flush
+            tsout.join();
+            tserr.join();
+            return process.exitValue();
+        } catch (Exception e) {
+            //TODO send the exception or error to the user ?
+            e.printStackTrace();
+            return 255;
+        }
+    }
 
     @Override
     public final void init(Map<String, Object> args) throws Exception {
         throw new RuntimeException(
             "This method should have NEVER been called in this context !!");
+    }
+
+    /** Pipe between two streams */
+    protected class ThreadReader implements Runnable {
+        private BufferedReader in;
+        private PrintStream out;
+
+        public ThreadReader(BufferedReader in, PrintStream out) {
+            this.in = in;
+            this.out = out;
+        }
+
+        public void run() {
+            String str = null;
+            try {
+                while ((str = in.readLine()) != null) {
+                    out.println(str);
+                }
+            } catch (IOException e) {
+                //FIXME cdelbe gros vilain tu dois throw exception
+                e.printStackTrace();
+            }
+        }
     }
 }

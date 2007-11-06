@@ -976,8 +976,7 @@ public class ProActive {
             }
 
             ProActiveSecurityManager psm = clonedFactory.getProActiveSecurityManager();
-            psm = psm.generateSiblingCertificate(EntityType.OBJECT,
-                    classname);
+            psm = psm.generateSiblingCertificate(EntityType.OBJECT, classname);
             clonedFactory.setProActiveSecurityManager(psm);
         }
 
@@ -1289,9 +1288,9 @@ public class ProActive {
                 e.printStackTrace();
             }
 
-            clonedFactory.setProActiveSecurityManager(factory
-					.getProActiveSecurityManager().generateSiblingCertificate(EntityType.OBJECT,
-							nameOfTargetType));
+            clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
+                                                             .generateSiblingCertificate(EntityType.OBJECT,
+                    nameOfTargetType));
 
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");
@@ -1644,9 +1643,9 @@ public class ProActive {
                 e.printStackTrace();
             }
 
-            clonedFactory.setProActiveSecurityManager(factory
-					.getProActiveSecurityManager().generateSiblingCertificate(EntityType.OBJECT,
-							nameOfTargetType));
+            clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
+                                                             .generateSiblingCertificate(EntityType.OBJECT,
+                    nameOfTargetType));
 
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");

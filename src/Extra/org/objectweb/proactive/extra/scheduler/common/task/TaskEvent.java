@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  * These informations are in an other class in order to permit
  * the scheduler listener to send this class as event.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 25, 2007
  * @since ProActive 3.2
  */
@@ -51,7 +51,7 @@ public class TaskEvent implements Serializable {
     private static final long serialVersionUID = -7625483185225564284L;
 
     /** id of the task */
-    private TaskId taskID = null;
+    private TaskId taskId = null;
 
     /** informations about the job */
     private JobEvent jobEvent = null;
@@ -62,7 +62,7 @@ public class TaskEvent implements Serializable {
     /** task started time */
     private long startTime = -1;
 
-    /** task finished time */
+    /** task finished time : IMPORTANT TO BE SET TO -1 */
     private long finishedTime = -1;
 
     /** Number of reRunnable left */
@@ -73,12 +73,6 @@ public class TaskEvent implements Serializable {
 
     /** name of the host where the task is executed */
     private String executionHostName;
-
-    /** Task result : if null, the task result is not available or the task has no result.
-     * If not null the result of this task is available.
-     * WARNING : This field is transient in order to be send only to the scheduler persistence listener.
-     * This field will not be sent to an external user.*/
-    private transient TaskResult result = null;
 
     /**
      * To get the jobEvent
@@ -158,21 +152,21 @@ public class TaskEvent implements Serializable {
     }
 
     /**
-     * To get the taskID
+     * To get the taskId
      *
-     * @return the taskID
+     * @return the taskId
      */
-    public TaskId getTaskID() {
-        return taskID;
+    public TaskId getTaskId() {
+        return taskId;
     }
 
     /**
-     * To set the taskID
+     * To set the taskId
      *
-     * @param taskID the taskID to set
+     * @param taskID the taskId to set
      */
-    public void setTaskID(TaskId taskID) {
-        this.taskID = taskID;
+    public void setTaskId(TaskId taskId) {
+        this.taskId = taskId;
     }
 
     /**
@@ -245,23 +239,5 @@ public class TaskEvent implements Serializable {
      */
     public void setRerunnableLeft(int rerunnableLeft) {
         this.rerunnableLeft = rerunnableLeft;
-    }
-
-    /**
-     * Returns the result.
-     *
-     * @return the result.
-     */
-    public TaskResult getResult() {
-        return result;
-    }
-
-    /**
-     * Sets the result to the given result value.
-     *
-     * @param result the result to set.
-     */
-    public void setResult(TaskResult result) {
-        this.result = result;
     }
 }

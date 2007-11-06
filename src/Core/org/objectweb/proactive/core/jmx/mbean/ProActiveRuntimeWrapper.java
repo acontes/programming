@@ -135,31 +135,29 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
         this.sendNotification(notification);
     }
 
-	public ProActiveSecurityManager getSecurityManager(Entity user) {
-		try {
-			return this.runtime.getProActiveSecurityManager(user);
-		} catch (AccessControlException e) {
-			e.printStackTrace();
-		} catch (SecurityNotAvailableException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
+    public ProActiveSecurityManager getSecurityManager(Entity user) {
+        try {
+            return this.runtime.getProActiveSecurityManager(user);
+        } catch (AccessControlException e) {
+            e.printStackTrace();
+        } catch (SecurityNotAvailableException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-	public void setSecurityManager(Entity user, PolicyServer policyServer) {
-		try {
-			this.runtime.setProActiveSecurityManager(user, policyServer);
-		} catch (AccessControlException e) {
-			e.printStackTrace();
-		} catch (SecurityNotAvailableException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-    
-    
+        return null;
+    }
+
+    public void setSecurityManager(Entity user, PolicyServer policyServer) {
+        try {
+            this.runtime.setProActiveSecurityManager(user, policyServer);
+        } catch (AccessControlException e) {
+            e.printStackTrace();
+        } catch (SecurityNotAvailableException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

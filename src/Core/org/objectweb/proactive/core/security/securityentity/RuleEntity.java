@@ -4,66 +4,66 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
+
 public abstract class RuleEntity implements Serializable {
-	public enum Match {
-		OK, DEFAULT, FAILED;
-	}
+    public enum Match {OK,
+        DEFAULT,
+        FAILED;
+    }
+    public static final int UNDEFINED_LEVEL = 0;
 
-	public static final int UNDEFINED_LEVEL = 0;
+    /**
+     * Level of the entity, equals the depth of its certificate in the
+     * certificate tree (UNDEFINED_LEVEL is the root, above the self signed
+     * certificates)
+     */
+    protected final int level;
+    protected final EntityType type;
 
-	/**
-	 * Level of the entity, equals the depth of its certificate in the
-	 * certificate tree (UNDEFINED_LEVEL is the root, above the self signed
-	 * certificates)
-	 */
-	protected final int level;
+    protected RuleEntity(EntityType type, int level) {
+        this.type = type;
+        this.level = level + levelIncrement();
+    }
 
-	protected final EntityType type;
+    protected int getLevel() {
+        return this.level;
+    }
 
-	protected RuleEntity(EntityType type, int level) {
-		this.type = type;
-		this.level = level + levelIncrement();
-	}
+    public EntityType getType() {
+        return this.type;
+    }
 
-	protected int getLevel() {
-		return this.level;
-	}
+    protected Match match(Entities e) {
+        for (Entity entity : e) {
+            if (match(entity) == Match.FAILED) {
+                return Match.FAILED;
+            }
+        }
+        return Match.OK;
+    }
 
-	public EntityType getType() {
-		return this.type;
-	}
+    // returns the number of levels of the entity above the application
+    // level
+    private int levelIncrement() {
+        switch (this.type) {
+        case RUNTIME:
+        case ENTITY:
+            return 1;
+        case NODE:
+            return 2;
+        case OBJECT:
+            return 3;
+        default:
+            return 0;
+        }
+    }
 
-	protected Match match(Entities e) {
-		for (Entity entity : e) {
-			if (match(entity) == Match.FAILED) {
-				return Match.FAILED;
-			}
-		}
-		return Match.OK;
-	}
+    abstract protected Match match(Entity e);
 
-	// returns the number of levels of the entity above the application
-	// level
-	private int levelIncrement() {
-		switch (this.type) {
-		case RUNTIME:
-		case ENTITY:
-			return 1;
-		case NODE:
-			return 2;
-		case OBJECT:
-			return 3;
-		default:
-			return 0;
-		}
-	}
+    abstract public String getName();
 
-	abstract protected Match match(Entity e);
-
-	abstract public String getName();
-
-	@Override
-	public String toString() {
-		return "RuleEntity :\n\tLevel : " + this.level;
-	}
+    @Override
+    public String toString() {
+        return "RuleEntity :\n\tLevel : " + this.level;
+    }
 }

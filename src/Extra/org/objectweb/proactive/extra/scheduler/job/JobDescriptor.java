@@ -49,7 +49,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * The internal scheduler job is not sent to the policy.
  * Only a restricted number of properties on each jobs is sent to the policy.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 6, 2007
  * @since ProActive 3.2
  */
@@ -67,6 +67,9 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     /** Job type */
     private JobType type;
 
+    /** Total number of tasks. */
+    private int numberOfTasks;
+
     /** Job tasks to be able to be schedule */
     private HashMap<TaskId, EligibleTaskDescriptor> eligibleTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
 
@@ -75,8 +78,6 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
 
     /** Job paused tasks */
     private HashMap<TaskId, TaskDescriptor> pausedTasks = new HashMap<TaskId, TaskDescriptor>();
-
-    //TODO penser à mettre ici un champ pour connaitre le nb de tache total du job.
 
     /**
      * Constructor of light job.
@@ -88,6 +89,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
         id = job.getId();
         priority = job.getPriority();
         type = job.getType();
+        numberOfTasks = job.getTasks().size();
         if (type == JobType.TASKSFLOW) {
             //build dependence tree
             makeTree(job);
@@ -141,8 +143,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
      * @param taskId the task that has just been started.
      */
     void start(TaskId taskId) {
-        runningTasks.put(taskId, eligibleTasks.get(taskId));
-        eligibleTasks.remove(taskId);
+        runningTasks.put(taskId, eligibleTasks.remove(taskId));
     }
 
     /**
@@ -178,7 +179,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     }
 
     /**
-     * Failed this light job by removing every tasks from eligible and running list.
+     * Failed this job descriptor by removing every tasks from eligible and running list.
      * This function considered that the taskIds are in eligible tasks list.
      * Visibility is package because user cannot use this method.
      */
@@ -199,8 +200,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
                 TaskDescriptor lt = eligibleTasks.get(tid.getKey());
                 if (lt != null) {
                     pausedTasks.put(tid.getKey(),
-                        eligibleTasks.get(tid.getKey()));
-                    eligibleTasks.remove(tid.getKey());
+                        eligibleTasks.remove(tid.getKey()));
                 }
             } else if ((tid.getValue() == Status.PENDING) ||
                     (tid.getValue() == Status.SUBMITTED)) {
@@ -259,8 +259,17 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     }
 
     /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * Returns the number Of Tasks.
+     *
+     * @return the number Of Tasks.
      */
+    public int getNumberOfTasks() {
+        return numberOfTasks;
+    }
+
+    /**
+    * @see java.lang.Comparable#compareTo(java.lang.Object)
+    */
     public int compareTo(JobDescriptor o) {
         return o.priority.compareTo(priority);
     }

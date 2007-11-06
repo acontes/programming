@@ -294,7 +294,7 @@ public abstract class FTManager implements java.io.Serializable {
      * @param destination the destination of the request
      * @return the value returned by the sending
      * @throws RenegotiateSessionException
-     * @throws CommunicationForbiddenException 
+     * @throws CommunicationForbiddenException
      */
     public int sendRequest(Request r, UniversalBody destination)
         throws RenegotiateSessionException, CommunicationForbiddenException {
@@ -393,10 +393,11 @@ public abstract class FTManager implements java.io.Serializable {
      * @param destination the destination body of request
      * @return depends on fault-tolerance protocol
      * @throws RenegotiateSessionException
-     * @throws CommunicationForbiddenException 
+     * @throws CommunicationForbiddenException
      */
     public abstract int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination) throws RenegotiateSessionException, CommunicationForbiddenException;
+        UniversalBody destination)
+        throws RenegotiateSessionException, CommunicationForbiddenException;
 
     /**
      * This method is called before the service of a request

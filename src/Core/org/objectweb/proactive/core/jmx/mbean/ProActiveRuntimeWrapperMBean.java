@@ -36,10 +36,10 @@ import java.util.List;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.securityentity.Entity;
-import org.objectweb.proactive.core.jmx.notification.NotificationType;
 
 
 /**

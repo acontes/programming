@@ -70,10 +70,8 @@ public class RunningJobComposite extends AbstractJobComposite
     implements RunningJobsListener, EventTasksListener, EventJobsListener {
 
     /** the unique id and the title for the column "Progress" */
-    public static final String COLUMN_PROGRESS_TEXT_TITLE = "Progress"; // "#
-                                                                        // Finished
-                                                                        // Tasks";
-    public static final String COLUMN_PROGRESS_BAR_TITLE = "***Progress";
+    public static final String COLUMN_PROGRESS_TEXT_TITLE = "# Finished Tasks";
+    public static final String COLUMN_PROGRESS_BAR_TITLE = "Progress";
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -167,24 +165,16 @@ public class RunningJobComposite extends AbstractJobComposite
     protected Table createTable(Composite parent, int tableId) {
         Table table = super.createTable(parent, tableId);
         TableColumn tc = new TableColumn(table, SWT.RIGHT, 2);
-        // tc.addSelectionListener(new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent event) {
-        // sort(event, Job.SORT_BY_ID);
-        // }
-        // });
         tc.setText(COLUMN_PROGRESS_TEXT_TITLE);
         tc.setWidth(70);
         tc.setMoveable(true);
         tc.setToolTipText("You can't sort by this column");
 
-        // **********************************************************************************
         tc = new TableColumn(table, SWT.NONE, 2);
         tc.setText(COLUMN_PROGRESS_BAR_TITLE);
         tc.setWidth(70);
         tc.setMoveable(true);
         tc.setToolTipText("You can't sort by this column");
-        // **********************************************************************************
         return table;
     }
 
@@ -199,19 +189,17 @@ public class RunningJobComposite extends AbstractJobComposite
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();
             if (title.equals(COLUMN_PROGRESS_BAR_TITLE)) {
-                // **********************************************************************************
                 ProgressBar bar = new ProgressBar(table, SWT.NONE);
                 bar.setMaximum(job.getTotalNumberOfTasks());
                 bar.setSelection(job.getNumberOfFinishedTask());
                 TableEditor editor = new TableEditor(table);
                 editor.grabHorizontal = true;
-                //editor.grabVertical = true;
+                editor.grabVertical = true;
                 editor.setEditor(bar, item, i);
                 editor.layout();
                 table.layout();
                 item.setData("bar", bar);
                 item.setData("editor", editor);
-                // **********************************************************************************
             } else if (title.equals(COLUMN_PROGRESS_TEXT_TITLE)) {
                 item.setText(i,
                     job.getNumberOfFinishedTask() + "/" +
@@ -237,7 +225,17 @@ public class RunningJobComposite extends AbstractJobComposite
      */
     @Override
     public void removeRunningJob(JobId jobId) {
-        // removeJob(jobId);
+        //		removeJob(jobId);
+        //		// TODO : deux problème ici :
+        //		// - je ne dispose ni la progress ni le tableEditor
+        //		// - j'envoi le notifyListeners sur toutes les colonnes...
+        //		Display.getDefault().asyncExec(new Runnable() {
+        //			public void run() {
+        //				TableColumn[] cols = getTable().getColumns();
+        //				for (TableColumn col : cols)
+        //					col.notifyListeners(SWT.Move, null);
+        //			}
+        //		});
         if (!isDisposed()) {
             Vector<JobId> jobsId = getJobs();
             int tmp = -1;
@@ -283,13 +281,12 @@ public class RunningJobComposite extends AbstractJobComposite
                             KillJobAction.getInstance().setEnabled(false);
                         }
                         TableItem item = getTable().getItem(i);
-                        //					System.err.println("OOOOOOOOOOOOOO .run()");
-                        getTable().remove(i);
                         ((ProgressBar) item.getData("bar")).dispose();
                         ((TableEditor) item.getData("editor")).dispose();
-                        getTable().layout();
-                        getTable().getParent().layout();
-                        getTable().getShell().layout();
+                        getTable().remove(i);
+                        TableColumn[] cols = getTable().getColumns();
+                        for (TableColumn col : cols)
+                            col.notifyListeners(SWT.Move, null);
                         decreaseCount();
                     }
                 });
@@ -342,8 +339,6 @@ public class RunningJobComposite extends AbstractJobComposite
                             String title = cols[i].getText();
                             if ((title != null) &&
                                     (title.equals(COLUMN_PROGRESS_BAR_TITLE))) {
-                                // TODO a suppr
-                                ;
                                 ((ProgressBar) item.getData("bar")).setSelection(job.getNumberOfFinishedTask());
                             } else if ((title != null) &&
                                     (title.equals(COLUMN_PROGRESS_TEXT_TITLE))) {

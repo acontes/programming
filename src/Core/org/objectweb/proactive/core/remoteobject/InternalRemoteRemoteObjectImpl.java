@@ -110,16 +110,14 @@ public class InternalRemoteRemoteObjectImpl
         return this.remoteObject.getCertificate();
     }
 
-
-    public Entities getEntities() 
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
     }
 
-  
     public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getPolicy(local,distant);
+        return this.remoteObject.getPolicy(local, distant);
     }
 
     public PublicKey getPublicKey()
@@ -129,7 +127,7 @@ public class InternalRemoteRemoteObjectImpl
 
     public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
-        KeyExchangeException, IOException {
+            KeyExchangeException, IOException {
         return this.remoteObject.publicKeyExchange(sessionID, signature);
     }
 
@@ -149,9 +147,11 @@ public class InternalRemoteRemoteObjectImpl
             parametersSignature);
     }
 
-    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate)
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate)
         throws SessionException, SecurityNotAvailableException, IOException {
-        return this.remoteObject.startNewSession(distantSessionID,policy,distantCertificate);
+        return this.remoteObject.startNewSession(distantSessionID, policy,
+            distantCertificate);
     }
 
     public void terminateSession(long sessionID)
@@ -185,16 +185,16 @@ public class InternalRemoteRemoteObjectImpl
         return null;
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-			throws SecurityNotAvailableException, AccessControlException,
-			IOException {
-		return this.remoteObject.getProActiveSecurityManager(user);
-	}
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        return this.remoteObject.getProActiveSecurityManager(user);
+    }
 
-	public void setProActiveSecurityManager(Entity user,
-			PolicyServer policyServer) throws SecurityNotAvailableException,
-			AccessControlException, IOException {
-		this.remoteObject.setProActiveSecurityManager(user, policyServer);
-		
-	}
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        this.remoteObject.setProActiveSecurityManager(user, policyServer);
+    }
 }

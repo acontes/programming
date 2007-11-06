@@ -50,27 +50,23 @@ import org.objectweb.proactive.core.config.PAProperties;
  */
 public class ProActiveLoggerFactory implements LoggerFactory {
 
-	  static {
-	        if (System.getProperty("log4j.configuration") == null) {
-	        	
-	        	
-	        	Properties p = new Properties();
-	        	try {
-	        		InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
-	        		if (in != null) {
-	        			p.load(in);
-	        			PropertyConfigurator.configure(p);
-	        		}
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	          
-	        }
-	    }
+    static {
+        if (System.getProperty("log4j.configuration") == null) {
+            Properties p = new Properties();
+            try {
+                InputStream in = PAProperties.class.getResourceAsStream(
+                        "proactive-log4j");
+                if (in != null) {
+                    p.load(in);
+                    PropertyConfigurator.configure(p);
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
 
-	
-	
     /**
      * Creates a new ProActiveLogger with Diagnostic Context information (hostname and runtime).
      * @see org.apache.log4j.spi.LoggerFactory#makeNewLoggerInstance(java.lang.String)

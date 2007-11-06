@@ -241,39 +241,37 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     private void handleSecurity() throws SAXException, XPathExpressionException {
-		NodeList nodes = (NodeList) xpath.evaluate(SECURITY_TAG, document,
-				XPathConstants.NODESET);
-		Node securityNode = nodes.item(0);
-		if (securityNode != null) {
+        NodeList nodes = (NodeList) xpath.evaluate(SECURITY_TAG, document,
+                XPathConstants.NODESET);
+        Node securityNode = nodes.item(0);
+        if (securityNode != null) {
+            NodeList fileSubNodes = (NodeList) xpath.evaluate(SECURITY_FILE,
+                    securityNode, XPathConstants.NODESET);
+            if (fileSubNodes.getLength() == 1) {
+                String securityFile = getNodeExpandedValue(fileSubNodes.item(0)
+                                                                       .getAttributes()
+                                                                       .getNamedItem(SECURITY_FILE_URI));
+                if ((securityFile == null) || (securityFile.length() <= 0)) {
+                    throw new SAXException("Empty security file");
+                }
 
-			NodeList fileSubNodes = (NodeList) xpath.evaluate(SECURITY_FILE,
-					securityNode, XPathConstants.NODESET);
-			if (fileSubNodes.getLength() == 1) {
-				String securityFile = getNodeExpandedValue(fileSubNodes.item(0)
-						.getAttributes().getNamedItem(SECURITY_FILE_URI));
-				if ((securityFile == null) || (securityFile.length() <= 0)) {
-					throw new SAXException("Empty security file");
-				}
+                File f = new File(securityFile);
+                if (!f.isAbsolute()) {
+                    File descriptorPath = new File(this.proActiveDescriptor.getUrl());
+                    String descriptorDir = descriptorPath.getParent();
+                    if (descriptorDir != null) {
+                        securityFile = descriptorDir + File.separator +
+                            securityFile;
+                    }
+                }
 
-				File f = new File(securityFile);
-				if (!f.isAbsolute()) {
-					File descriptorPath = new File(this.proActiveDescriptor
-							.getUrl());
-					String descriptorDir = descriptorPath.getParent();
-					if (descriptorDir != null) {
-						securityFile = descriptorDir + File.separator
-								+ securityFile;
-					}
-				}
-
-				logger.debug("creating ProActiveSecurityManager : "
-						+ securityFile);
-				proActiveDescriptor
-						.createProActiveSecurityManager(securityFile);
-			} else { // TODO : Policy node
-			}
-		}
-	}
+                logger.debug("creating ProActiveSecurityManager : " +
+                    securityFile);
+                proActiveDescriptor.createProActiveSecurityManager(securityFile);
+            } else { // TODO : Policy node
+            }
+        }
+    }
 
     private void handleMainDefinitions()
         throws XPathExpressionException, SAXException {

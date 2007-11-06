@@ -52,20 +52,22 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class Session implements Serializable {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3314095815395811127L;
 
-	// the session identifiant
+    /**
+         *
+         */
+    private static final long serialVersionUID = 3314095815395811127L;
+
+    // the session identifiant
     private long distantSessionID = 0;
-//    protected static Object synchronizationObject = new Object();
+
+    //    protected static Object synchronizationObject = new Object();
 
     // The clients authentication and signing certificate.
     private TypedCertificate distantOACertificate;
 
-//    // The clients public key for encryption and decryption.
-//    private PublicKey distantAOPublicKey;
+    //    // The clients public key for encryption and decryption.
+    //    private PublicKey distantAOPublicKey;
 
     // Client Side Cipher.
     public transient Cipher cl_cipher;
@@ -73,8 +75,8 @@ public class Session implements Serializable {
     // Server Cipher.
     public transient Cipher se_cipher;
 
-//    //	the communication policy
-//    private SecurityContext communication;
+    //    //	the communication policy
+    //    private SecurityContext communication;
 
     // RSA Cipher.
     public transient Cipher rsa_eng;
@@ -120,16 +122,14 @@ public class Session implements Serializable {
 
     // security context associated to the sesssion
     private SecurityContext securityContext;
-    
-    public enum ActAs {
-    	CLIENT,
-    	SERVER;
+    public enum ActAs {CLIENT,
+        SERVER;
     }
-
     public Session() {
     }
 
-    public Session(long distantId, SecurityContext securityContext, TypedCertificate certificate) throws SessionException {
+    public Session(long distantId, SecurityContext securityContext,
+        TypedCertificate certificate) throws SessionException {
         this.securityContext = securityContext;
         this.isSessionValidated = false;
         //        synchronized (synchronizationObject) {
@@ -137,71 +137,68 @@ public class Session implements Serializable {
         this.cl_rand = new byte[32]; // Client Random
         this.sec_rand = new SecureRandom();
         try {
-			this.cl_cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
-	        this.se_cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC"); // Server Cipher.
-	        this.rsa_eng = Cipher.getInstance("RSA/None/OAEPPadding", "BC"); // RSA Cipher.
-	        this.cl_mac = Mac.getInstance("HMACSHA1", "BC"); // Client side MAC
-	        this.se_mac = Mac.getInstance("HMACSHA1", "BC"); // Server side MAC
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			throw new SessionException("Impossible to create the session.");
-		} catch (NoSuchProviderException e) {
-			e.printStackTrace();
-			throw new SessionException("Impossible to create the session.");
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-			throw new SessionException("Impossible to create the session.");
-		}
-                                                    //      }
-
+            this.cl_cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
+            this.se_cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC"); // Server Cipher.
+            this.rsa_eng = Cipher.getInstance("RSA/None/OAEPPadding", "BC"); // RSA Cipher.
+            this.cl_mac = Mac.getInstance("HMACSHA1", "BC"); // Client side MAC
+            this.se_mac = Mac.getInstance("HMACSHA1", "BC"); // Server side MAC
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new SessionException("Impossible to create the session.");
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+            throw new SessionException("Impossible to create the session.");
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+            throw new SessionException("Impossible to create the session.");
+        }
+        //      }
         this.distantSessionID = distantId;
         this.distantOACertificate = certificate; // The clients public key for encryption and decryption.
-//        this.distantAOPublicKey = null; // The clients authentication and signing certificate.
+                                                 //        this.distantAOPublicKey = null; // The clients authentication and signing certificate.
     }
 
-//    public boolean isID(long ID) {
-//        if (ID == this.sessionID) {
-//            return true;
-//        }
-//
-//        return false;
-//    }
+    //    public boolean isID(long ID) {
+    //        if (ID == this.sessionID) {
+    //            return true;
+    //        }
+    //
+    //        return false;
+    //    }
 
-//    public X509Certificate get_otherPublicCertificate(long id) {
-//        if (this.sessionID == id) {
-//            return distantOACertificate;
-//        }
-//
-//        return null;
-//    }
+    //    public X509Certificate get_otherPublicCertificate(long id) {
+    //        if (this.sessionID == id) {
+    //            return distantOACertificate;
+    //        }
+    //
+    //        return null;
+    //    }
     public long getDistantSessionID() {
         return this.distantSessionID;
     }
-    
+
     public void setDistantSessionID(long id) {
         this.distantSessionID = id;
     }
 
-//    public void setDistantOACertificate(TypedCertificate distantBodyCertificate) {
-//        this.distantOACertificate = distantBodyCertificate;
-//    }
-
+    //    public void setDistantOACertificate(TypedCertificate distantBodyCertificate) {
+    //        this.distantOACertificate = distantBodyCertificate;
+    //    }
     public TypedCertificate getDistantCertificate() {
         return this.distantOACertificate;
     }
-    
+
     public PublicKey getDistantPublicKey() {
-    	return this.distantOACertificate.getCert().getPublicKey();
+        return this.distantOACertificate.getCert().getPublicKey();
     }
 
-//    public PublicKey getDistantOAPublicKey() {
-//        return distantOAPublicKey;
-//    }
-//
-//    public void setDistantOAPublicKey(PublicKey distantOAPublicKey) {
-//        this.distantOAPublicKey = distantOAPublicKey;
-//    }
-
+    //    public PublicKey getDistantOAPublicKey() {
+    //        return distantOAPublicKey;
+    //    }
+    //
+    //    public void setDistantOAPublicKey(PublicKey distantOAPublicKey) {
+    //        this.distantOAPublicKey = distantOAPublicKey;
+    //    }
     public synchronized byte[][] writePDU(byte[] in, ActAs type)
         throws Exception {
         byte[] mac = null;
@@ -213,8 +210,8 @@ public class Session implements Serializable {
             }
             if (this.securityContext.getSendRequest().isConfidentialityEnabled()) {
                 try {
-                    this.cl_cipher.init(Cipher.ENCRYPT_MODE, this.cl_aes_key, this.cl_iv,
-                        this.sec_rand);
+                    this.cl_cipher.init(Cipher.ENCRYPT_MODE, this.cl_aes_key,
+                        this.cl_iv, this.sec_rand);
                     // TODO_SECURITY find why I need to force the encrypt_mode here
                     // seems to happen when a method call is sent by an object to itself.
                     // relation with AC ?
@@ -267,7 +264,7 @@ public class Session implements Serializable {
     }
 
     public static boolean isEqual(byte[] a, byte[] b) {
-        if (a == null || b == null) {
+        if ((a == null) || (b == null)) {
             return false;
         }
 
@@ -311,20 +308,21 @@ public class Session implements Serializable {
                 if (!isEqual(m, mac)) {
                     ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
                                    .debug("PDU Mac code failed , session " +
-                                		   this.distantSessionID);
+                        this.distantSessionID);
                     throw new IOException("PDU Mac code failed ");
                 }
             }
             break;
         case SERVER:
             // act as server
-            if (this.securityContext.getReceiveRequest().isConfidentialityEnabled()) {
+            if (this.securityContext.getReceiveRequest()
+                                        .isConfidentialityEnabled()) {
                 try {
                     in = this.cl_cipher.doFinal(in);
                 } catch (Exception ex) {
                     ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
                                    .debug("PDU Cipher code decryption failed, session " +
-                                		   this.distantSessionID);
+                        this.distantSessionID);
                     throw new IOException("PDU failed to decrypt " +
                         ex.getMessage());
                 }
@@ -340,7 +338,7 @@ public class Session implements Serializable {
                     displayByte(this.cl_hmac_key.getEncoded()));
                 if (!isEqual(m, mac)) {
                     throw new IOException("PDU Mac code failed, session " +
-                    		this.distantSessionID);
+                        this.distantSessionID);
                 }
             }
             break;
@@ -373,16 +371,16 @@ public class Session implements Serializable {
             out.write(new byte[16]);
         }
 
-//        byte[] cert = new byte[0];
-//        try {
-//            if (distantOACertificate != null) {
-//                cert = distantOACertificate.getEncoded();
-//            }
-//        } catch (CertificateEncodingException e) {
-//            e.printStackTrace();
-//        }
-//        out.writeInt(cert.length);
-//        out.write(cert);
+        //        byte[] cert = new byte[0];
+        //        try {
+        //            if (distantOACertificate != null) {
+        //                cert = distantOACertificate.getEncoded();
+        //            }
+        //        } catch (CertificateEncodingException e) {
+        //            e.printStackTrace();
+        //        }
+        //        out.writeInt(cert.length);
+        //        out.write(cert);
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -401,12 +399,11 @@ public class Session implements Serializable {
 
         ProActiveSecurity.loadProvider();
 
-//        int i = in.readInt();
-//        byte[] certEncoded = new byte[i];
-//        in.read(certEncoded);
-//
-//        distantOACertificate = ProActiveSecurity.decodeCertificate(certEncoded);
-
+        //        int i = in.readInt();
+        //        byte[] certEncoded = new byte[i];
+        //        in.read(certEncoded);
+        //
+        //        distantOACertificate = ProActiveSecurity.decodeCertificate(certEncoded);
         try {
             this.cl_cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
             this.se_cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC"); // Server Cipher.
@@ -415,19 +412,20 @@ public class Session implements Serializable {
             this.cl_mac = Mac.getInstance("HMACSHA1", "BC"); // Client side MAC
             this.se_mac = Mac.getInstance("HMACSHA1", "BC"); // Server side MAC
 
-            if (this.se_iv != null && this.se_aes_key != null) {
+            if ((this.se_iv != null) && (this.se_aes_key != null)) {
                 this.se_cipher.init(Cipher.DECRYPT_MODE, this.se_aes_key,
                     this.se_iv);
             }
 
-            if (this.cl_iv != null && this.cl_aes_key != null) {
-                this.cl_cipher.init(Cipher.ENCRYPT_MODE, this.cl_aes_key, this.cl_iv, this.sec_rand);
+            if ((this.cl_iv != null) && (this.cl_aes_key != null)) {
+                this.cl_cipher.init(Cipher.ENCRYPT_MODE, this.cl_aes_key,
+                    this.cl_iv, this.sec_rand);
             }
 
-            if (this.se_mac != null && this.se_hmac_key != null) {
+            if ((this.se_mac != null) && (this.se_hmac_key != null)) {
                 this.se_mac.init(this.se_hmac_key);
             }
-            if (this.cl_mac != null && this.cl_hmac_key != null) {
+            if ((this.cl_mac != null) && (this.cl_hmac_key != null)) {
                 System.out.println("readObject session cl_mac : " +
                     displayByte(this.cl_hmac_key.getEncoded()));
                 this.cl_mac.init(this.cl_hmac_key);
@@ -444,7 +442,7 @@ public class Session implements Serializable {
 
         int i = 0;
 
-        if (in == null || in.length <= 0) {
+        if ((in == null) || (in.length <= 0)) {
             return null;
         }
 
@@ -479,19 +477,20 @@ public class Session implements Serializable {
     @Override
     public String toString() {
         return "ID : " + this.distantSessionID + "\n" + "cl_rand : " +
-        displayByte(this.cl_rand) + "\n" + "se_rand : " + displayByte(this.se_rand);
+        displayByte(this.cl_rand) + "\n" + "se_rand : " +
+        displayByte(this.se_rand);
     }
 
-//    /**
-//     * Method setPolicy.
-//     * @param resultPolicy
-//     */
-//    public void setPolicy(PolicyRule resultPolicy) {
-//    }
+    //    /**
+    //     * Method setPolicy.
+    //     * @param resultPolicy
+    //     */
+    //    public void setPolicy(PolicyRule resultPolicy) {
+    //    }
 
-//    public Communication getCommunication() {
-//        return communication;
-//    }
+    //    public Communication getCommunication() {
+    //        return communication;
+    //    }
 
     /**
      *
@@ -500,13 +499,12 @@ public class Session implements Serializable {
         return this.securityContext;
     }
 
-//    /**
-//     * @param securityContext The securityContext to set.
-//     */
-//    public void setSecurityContext(SecurityContext securityContext) {
-//        this.securityContext = securityContext;
-//    }
-
+    //    /**
+    //     * @param securityContext The securityContext to set.
+    //     */
+    //    public void setSecurityContext(SecurityContext securityContext) {
+    //        this.securityContext = securityContext;
+    //    }
     public boolean isSessionValidated() {
         return this.isSessionValidated;
     }

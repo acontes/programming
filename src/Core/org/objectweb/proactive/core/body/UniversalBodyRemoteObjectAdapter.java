@@ -63,13 +63,13 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
     implements UniversalBody {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 9091467877589392360L;
+         *
+         */
+    private static final long serialVersionUID = 9091467877589392360L;
 
-	/**
-     * Cache the ID of the Body locally for speed
-     */
+    /**
+    * Cache the ID of the Body locally for speed
+    */
     protected UniqueID bodyID;
 
     /**
@@ -194,11 +194,10 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         return target.getCertificate();
     }
 
-//    public byte[] getCertificateEncoded()
-//        throws SecurityNotAvailableException, IOException {
-//        return target.getCertificateEncoded();
-//    }
-
+    //    public byte[] getCertificateEncoded()
+    //        throws SecurityNotAvailableException, IOException {
+    //        return target.getCertificateEncoded();
+    //    }
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return target.getEntities();
@@ -237,26 +236,27 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-			TypedCertificate distantCertificate)
-			throws SecurityNotAvailableException, IOException, SessionException {
-		return target.startNewSession(distantSessionID, policy,
-				distantCertificate);
-	}
+        TypedCertificate distantCertificate)
+        throws SecurityNotAvailableException, IOException, SessionException {
+        return target.startNewSession(distantSessionID, policy,
+            distantCertificate);
+    }
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
         target.terminateSession(sessionID);
     }
 
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-			throws SecurityNotAvailableException, AccessControlException,
-			IOException {
-		return this.target.getProActiveSecurityManager(user);
-	}
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        return this.target.getProActiveSecurityManager(user);
+    }
 
-	public void setProActiveSecurityManager(Entity user,
-			PolicyServer policyServer) throws SecurityNotAvailableException,
-			AccessControlException, IOException {
-		this.target.setProActiveSecurityManager(user, policyServer);
-	}
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        this.target.setProActiveSecurityManager(user, policyServer);
+    }
 }

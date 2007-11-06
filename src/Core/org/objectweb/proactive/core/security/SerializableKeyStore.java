@@ -48,27 +48,27 @@ import java.security.cert.CertificateException;
  *
  */
 public class SerializableKeyStore implements Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2632782516480112932L;
-	protected transient KeyStore keyStore;
+         *
+         */
+    private static final long serialVersionUID = 2632782516480112932L;
+    protected transient KeyStore keyStore;
     protected byte[] encodedKeyStore;
-    
+
     public SerializableKeyStore() {
-		// TODO Auto-generated constructor stub
-	}
+        // TODO Auto-generated constructor stub
+    }
 
     public SerializableKeyStore(KeyStore keyStore) {
         this.keyStore = keyStore;
     }
 
-    private void writeObject(ObjectOutputStream out)
-        throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
         try {
-        	this.keyStore.store(bout, "ha".toCharArray());
+            this.keyStore.store(bout, "ha".toCharArray());
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -91,8 +91,8 @@ public class SerializableKeyStore implements Serializable {
         in.defaultReadObject();
 
         try {
-        	this.keyStore = KeyStore.getInstance("PKCS12", "BC");
-        	this.keyStore.load(new ByteArrayInputStream(this.encodedKeyStore),
+            this.keyStore = KeyStore.getInstance("PKCS12", "BC");
+            this.keyStore.load(new ByteArrayInputStream(this.encodedKeyStore),
                 "ha".toCharArray());
         } catch (KeyStoreException e) {
             // TODOSECURITYSECURITY Auto-generated catch block

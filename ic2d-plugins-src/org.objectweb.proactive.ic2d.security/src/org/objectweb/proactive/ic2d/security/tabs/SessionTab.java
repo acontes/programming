@@ -21,160 +21,152 @@ import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.ic2d.security.widgets.CertificateDetailsSection;
 import org.objectweb.proactive.ic2d.security.widgets.CommunicationDetailsComposite;
 
+
 public class SessionTab extends UpdatableTab {
+    private List<SessionWithID> sessionList;
+    private FormToolkit toolkit;
+    private Table sessionTable;
+    private TableViewer sessionTableViewer;
+    private CertificateDetailsSection certDetailsSection;
+    private CommunicationDetailsComposite requestComposite;
+    private CommunicationDetailsComposite replyComposite;
 
-	private List<SessionWithID> sessionList;
+    public SessionTab(CTabFolder folder, FormToolkit tk) {
+        super(folder, SWT.NULL);
+        setText("Sessions browser");
 
-	private FormToolkit toolkit;
+        this.sessionList = new ArrayList<SessionWithID>();
+        this.toolkit = tk;
 
-	private Table sessionTable;
+        Composite body = this.toolkit.createComposite(folder);
 
-	private TableViewer sessionTableViewer;
+        body.setLayout(new GridLayout(3, true));
 
-	private CertificateDetailsSection certDetailsSection;
+        createSectionSessionList(body)
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-	private CommunicationDetailsComposite requestComposite;
+        createSectionDistantCertificate(body)
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-	private CommunicationDetailsComposite replyComposite;
+        createSectionContext(body)
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-	public SessionTab(CTabFolder folder, FormToolkit tk) {
-		super(folder, SWT.NULL);
-		setText("Sessions browser");
+        setControl(body);
+    }
 
-		this.sessionList = new ArrayList<SessionWithID>();
-		this.toolkit = tk;
+    private Section createSectionSessionList(Composite parent) {
+        Section section = this.toolkit.createSection(parent,
+                ExpandableComposite.TITLE_BAR);
+        section.setText("Sessions List");
 
-		Composite body = this.toolkit.createComposite(folder);
+        Composite client = this.toolkit.createComposite(section);
+        client.setLayout(new GridLayout());
 
-		body.setLayout(new GridLayout(3, true));
+        createListSessions(client);
 
-		createSectionSessionList(body).setLayoutData(
-				new GridData(SWT.FILL, SWT.FILL, true, true));
+        section.setClient(client);
 
-		createSectionDistantCertificate(body).setLayoutData(
-				new GridData(SWT.FILL, SWT.FILL, true, true));
+        return section;
+    }
 
-		createSectionContext(body).setLayoutData(
-				new GridData(SWT.FILL, SWT.FILL, true, true));
+    private Table createListSessions(Composite parent) {
+        this.sessionTable = this.toolkit.createTable(parent, SWT.NULL);
+        this.sessionTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+                true));
+        this.sessionTableViewer = new TableViewer(this.sessionTable);
 
-		setControl(body);
-	}
+        this.sessionTable.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    updateViewers();
 
-	private Section createSectionSessionList(Composite parent) {
-		Section section = this.toolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR);
-		section.setText("Sessions List");
+                    super.widgetSelected(e);
+                }
+            });
 
-		Composite client = this.toolkit.createComposite(section);
-		client.setLayout(new GridLayout());
+        return this.sessionTable;
+    }
 
-		createListSessions(client);
+    private Section createSectionDistantCertificate(Composite parent) {
+        this.certDetailsSection = new CertificateDetailsSection(parent,
+                this.toolkit);
 
-		section.setClient(client);
+        return this.certDetailsSection.get();
+    }
 
-		return section;
-	}
+    private Section createSectionContext(Composite parent) {
+        Section section = this.toolkit.createSection(parent,
+                ExpandableComposite.TITLE_BAR);
+        section.setText("Communication");
 
-	private Table createListSessions(Composite parent) {
-		this.sessionTable = this.toolkit.createTable(parent, SWT.NULL);
-		this.sessionTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				true));
-		this.sessionTableViewer = new TableViewer(this.sessionTable);
+        Composite client = this.toolkit.createComposite(section);
+        client.setLayout(new GridLayout());
 
-		this.sessionTable.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updateViewers();
+        this.requestComposite = new CommunicationDetailsComposite(client,
+                this.toolkit, "Request");
+        this.requestComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+                true, true));
 
-				super.widgetSelected(e);
-			}
-		});
+        this.replyComposite = new CommunicationDetailsComposite(client,
+                this.toolkit, "Reply");
+        this.replyComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+                true, true));
 
-		return this.sessionTable;
-	}
+        section.setClient(client);
 
-	private Section createSectionDistantCertificate(Composite parent) {
-		this.certDetailsSection = new CertificateDetailsSection(parent,
-				this.toolkit);
+        return section;
+    }
 
-		return this.certDetailsSection.get();
-	}
+    private void updateSessionTable() {
+        this.sessionTable.removeAll();
+        for (SessionWithID session : this.sessionList) {
+            this.sessionTableViewer.add(session.getThisID() + " -> " +
+                session.getSession().getDistantSessionID());
+        }
+        updateViewers();
+    }
 
-	private Section createSectionContext(Composite parent) {
-		Section section = this.toolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR);
-		section.setText("Communication");
+    protected void updateViewers() {
+        Session session = this.sessionList.get(this.sessionTable.getSelectionIndex())
+                                          .getSession();
 
-		Composite client = this.toolkit.createComposite(section);
-		client.setLayout(new GridLayout());
+        this.certDetailsSection.update(session.getDistantCertificate());
 
-		this.requestComposite = new CommunicationDetailsComposite(client,
-				this.toolkit, "Request");
-		this.requestComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-				true, true));
+        SecurityContext sc = session.getSecurityContext();
 
-		this.replyComposite = new CommunicationDetailsComposite(client,
-				this.toolkit, "Reply");
-		this.replyComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-				true, true));
+        this.requestComposite.updateCommunication(sc.getSendRequest());
 
-		section.setClient(client);
+        this.replyComposite.updateCommunication(sc.getSendReply());
+    }
 
-		return section;
-	}
+    public void setSessions(Hashtable<Long, Session> sessions) {
+        this.sessionList.clear();
+        for (Long id : sessions.keySet()) {
+            this.sessionList.add(new SessionWithID(sessions.get(id),
+                    id.longValue()));
+        }
+    }
 
-	private void updateSessionTable() {
-		this.sessionTable.removeAll();
-		for (SessionWithID session : this.sessionList) {
-			this.sessionTableViewer.add(session.getThisID() + " -> "
-					+ session.getSession().getDistantSessionID());
-		}
-		updateViewers();
-	}
+    @Override
+    public void update() {
+        updateSessionTable();
+    }
 
-	protected void updateViewers() {
-		Session session = this.sessionList.get(
-				this.sessionTable.getSelectionIndex()).getSession();
+    private class SessionWithID {
+        private Session session;
+        private long id;
 
-		this.certDetailsSection.update(session.getDistantCertificate());
+        public SessionWithID(Session session, long id) {
+            this.session = session;
+            this.id = id;
+        }
 
-		SecurityContext sc = session.getSecurityContext();
+        public Session getSession() {
+            return this.session;
+        }
 
-		this.requestComposite.updateCommunication(sc.getSendRequest());
-
-		this.replyComposite.updateCommunication(sc.getSendReply());
-	}
-
-	public void setSessions(Hashtable<Long, Session> sessions) {
-		this.sessionList.clear();
-		for (Long id : sessions.keySet()) {
-			this.sessionList.add(new SessionWithID(sessions.get(id), id
-					.longValue()));
-		}
-	}
-
-	@Override
-	public void update() {
-		updateSessionTable();
-	}
-
-	private class SessionWithID {
-		private Session session;
-
-		private long id;
-
-		public SessionWithID(Session session, long id) {
-			this.session = session;
-			this.id = id;
-		}
-
-		public Session getSession() {
-			return this.session;
-		}
-
-		public long getThisID() {
-			return this.id;
-		}
-	}
-
+        public long getThisID() {
+            return this.id;
+        }
+    }
 }

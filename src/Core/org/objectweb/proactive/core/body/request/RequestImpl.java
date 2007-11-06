@@ -51,8 +51,8 @@ import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.crypto.Session;
-import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.crypto.Session.ActAs;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
@@ -167,7 +167,8 @@ public class RequestImpl extends MessageImpl implements Request,
     // -- Implements Request -----------------------------------------------
     //
     public int send(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException {
         //System.out.println("RequestSender: sendRequest  " + methodName + " to destination");
         this.sendCounter++;
         return sendRequest(destinationBody);
@@ -273,13 +274,14 @@ public class RequestImpl extends MessageImpl implements Request,
                 if (this.sender == null) {
                     logger.warn("sender is null but why ?");
                 }
-                
-				this.sessionID = psm.getSessionTo(destinationBody.getCertificate()).getDistantSessionID();
-				long id = psm.getSessionIDTo(destinationBody.getCertificate());
-				
+
+                this.sessionID = psm.getSessionTo(destinationBody.getCertificate())
+                                    .getDistantSessionID();
+                long id = psm.getSessionIDTo(destinationBody.getCertificate());
+
                 if (id != 0) {
-                    this.methodCallCiphered = psm.encrypt(id,
-                            this.methodCall, ActAs.CLIENT);
+                    this.methodCallCiphered = psm.encrypt(id, this.methodCall,
+                            ActAs.CLIENT);
                     this.ciphered = true;
                     this.methodCall = null;
                     if (logger.isDebugEnabled()) {
@@ -297,27 +299,30 @@ public class RequestImpl extends MessageImpl implements Request,
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SessionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         return true;
     }
 
     protected int sendRequest(UniversalBody destinationBody)
-        throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
+        throws IOException, RenegotiateSessionException,
+            CommunicationForbiddenException {
         ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
         if (psm != null) {
-        	try {
-        		if (!psm.getSessionTo(destinationBody.getCertificate()).getSecurityContext().getSendRequest().getCommunication()) {
-        			throw new CommunicationForbiddenException();
-        		}
-        	} catch (SecurityNotAvailableException e) {
-        		throw new CommunicationForbiddenException();
-        	} catch (SessionException e) {
-        		throw new CommunicationForbiddenException();
-			}
-        	this.crypt(psm, destinationBody);
+            try {
+                if (!psm.getSessionTo(destinationBody.getCertificate())
+                            .getSecurityContext().getSendRequest()
+                            .getCommunication()) {
+                    throw new CommunicationForbiddenException();
+                }
+            } catch (SecurityNotAvailableException e) {
+                throw new CommunicationForbiddenException();
+            } catch (SessionException e) {
+                throw new CommunicationForbiddenException();
+            }
+            this.crypt(psm, destinationBody);
         }
 
         return destinationBody.receiveRequest(this);

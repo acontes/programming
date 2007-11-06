@@ -440,7 +440,8 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
     @Override
     public synchronized int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination) throws RenegotiateSessionException, CommunicationForbiddenException {
+        UniversalBody destination)
+        throws RenegotiateSessionException, CommunicationForbiddenException {
         //	if return value is RESEDN, receiver have to recover --> resend the message
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
@@ -860,8 +861,8 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
             } catch (RenegotiateSessionException e) {
                 e.printStackTrace();
             } catch (CommunicationForbiddenException e) {
-				e.printStackTrace();
-			}
+                e.printStackTrace();
+            }
         }
     }
 

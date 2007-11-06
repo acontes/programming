@@ -48,67 +48,69 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
 public class WorldListener implements MouseListener, MouseMotionListener {
-	private DragAndDrop dnd;
-	private DragHost dragHost;
-	private ActionRegistry registry;
-	private WorldObject world;
-	
-	public WorldListener(MonitoringView monitoringView) {
-		this.world = monitoringView.getWorld();
-		this.dnd = monitoringView.getDragAndDrop();
-		this.dragHost = monitoringView.getDragHost();
-		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
-	}
+    private DragAndDrop dnd;
+    private DragHost dragHost;
+    private ActionRegistry registry;
+    private WorldObject world;
 
-	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
+    public WorldListener(MonitoringView monitoringView) {
+        this.world = monitoringView.getWorld();
+        this.dnd = monitoringView.getDragAndDrop();
+        this.dragHost = monitoringView.getDragHost();
+        this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
+    }
 
-	public void mousePressed(MouseEvent me) {
-		if(me.button == 1){
-			dnd.reset();
-		}
-		else if (me.button == 3) {
-			
+    public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */
+    }
 
-			for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions(); action
-					.hasNext();) {
-				IAction act = action.next();
-				if (act instanceof NewHostAction
-						|| act instanceof SetDepthAction
-						|| act instanceof RefreshAction
-						|| act instanceof SetTTRAction) {
-					act.setEnabled(true);
-				} else if (act instanceof IActionExtPoint) {
-					IActionExtPoint extensionAction = (IActionExtPoint) act;
-					extensionAction.setAbstractDataObject(this.world);
-				} else {
-					act.setEnabled(false);
-				}
-				}
-		}
-	}
+    public void mousePressed(MouseEvent me) {
+        if (me.button == 1) {
+            dnd.reset();
+        } else if (me.button == 3) {
+            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
+                    action.hasNext();) {
+                IAction act = action.next();
+                if (act instanceof NewHostAction ||
+                        act instanceof SetDepthAction ||
+                        act instanceof RefreshAction ||
+                        act instanceof SetTTRAction) {
+                    act.setEnabled(true);
+                } else if (act instanceof IActionExtPoint) {
+                    IActionExtPoint extensionAction = (IActionExtPoint) act;
+                    extensionAction.setAbstractDataObject(this.world);
+                } else {
+                    act.setEnabled(false);
+                }
+            }
+        }
+    }
 
-	public void mouseReleased(MouseEvent me) {
-		dnd.reset();
-		dragHost.mouseReleased(me);;
-	}
+    public void mouseReleased(MouseEvent me) {
+        dnd.reset();
+        dragHost.mouseReleased(me);
+        ;
+    }
 
-	//---- MouseMotionListener 
+    //---- MouseMotionListener 
+    public void mouseEntered(MouseEvent me) {
+        if (dnd.getSource() != null) {
+            dnd.refresh(null);
+        }
+    }
 
-	public void mouseEntered(MouseEvent me) {		
-		if(dnd.getSource()!=null)
-			dnd.refresh(null);
-	}
+    public void mouseExited(MouseEvent me) {
+        if (dnd.getSource() != null) {
+            dnd.refresh(null);
+        }
+    }
 
-	public void mouseExited(MouseEvent me) {
-		if(dnd.getSource()!=null)
-			dnd.refresh(null);
-	}
+    public void mouseDragged(MouseEvent me) {
+        dragHost.mouseDragged(me);
+    }
 
-	public void mouseDragged(MouseEvent me) {
-		dragHost.mouseDragged(me);
-	}
-	
-	public void mouseHover(MouseEvent me) { /* Do nothing */ }
+    public void mouseHover(MouseEvent me) { /* Do nothing */
+    }
 
-	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
+    public void mouseMoved(MouseEvent me) { /* Do nothing */
+    }
 }

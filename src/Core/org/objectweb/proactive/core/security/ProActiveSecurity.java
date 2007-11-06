@@ -45,7 +45,7 @@ public class ProActiveSecurity {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
             return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                        encodedCert));
+                    encodedCert));
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {
@@ -53,7 +53,7 @@ public class ProActiveSecurity {
         }
         return null;
     }
-    
+
     public static void loadProvider() {
         CertTools.installBCProvider();
     }

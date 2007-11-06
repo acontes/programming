@@ -89,7 +89,8 @@ public class DomainImpl implements SecurityDomain {
      */
     public Entities getEntities() throws SecurityNotAvailableException {
         Entities entities = new Entities();
-//        entities.add(new Entity(new TypedCertificateList));
+
+        //        entities.add(new Entity(new TypedCertificateList));
         return entities;
     }
 
@@ -112,7 +113,8 @@ public class DomainImpl implements SecurityDomain {
         return null;
     }
 
-    public long startNewSession(long distantSessionID, SecurityContext policy, TypedCertificate distantCertificate) {
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate) {
         return 0;
     }
 
@@ -141,12 +143,16 @@ public class DomainImpl implements SecurityDomain {
     public String getVNName() throws SecurityNotAvailableException {
         return null;
     }
-	public ProActiveSecurityManager getProActiveSecurityManager(Entity user) throws SecurityNotAvailableException, AccessControlException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public void setProActiveSecurityManager(Entity user, PolicyServer policyServer) throws SecurityNotAvailableException, AccessControlException {
-		// TODO Auto-generated method stub
-		
-	}
+
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException {
+        // TODO Auto-generated method stub
+    }
 }

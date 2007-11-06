@@ -289,9 +289,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     }
 
     protected abstract void sendRequest(MethodCall methodCall, Future future)
-        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException;
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException;
 
     protected abstract void sendRequest(MethodCall methodCall, Future future,
         Body sourceBody)
-        throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException;
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException;
 }

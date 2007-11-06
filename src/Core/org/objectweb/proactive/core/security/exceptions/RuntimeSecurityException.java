@@ -39,9 +39,8 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
  * To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class RuntimeSecurityException extends ProActiveRuntimeException{
-
-     public RuntimeSecurityException() {
+public class RuntimeSecurityException extends ProActiveRuntimeException {
+    public RuntimeSecurityException() {
         super();
     }
 

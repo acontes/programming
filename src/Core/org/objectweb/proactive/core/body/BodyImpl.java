@@ -260,12 +260,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // request queue length = number of requests in queue
         //							+ the one to add now
         try {
-			return this.requestReceiver.receiveRequest(request, this);
-		} catch (CommunicationForbiddenException e) {
-			System.out.println("Weird shit is happening.");
-			e.printStackTrace();
-		}
-		return 0;
+            return this.requestReceiver.receiveRequest(request, this);
+        } catch (CommunicationForbiddenException e) {
+            System.out.println("Weird shit is happening.");
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     /**
@@ -590,7 +590,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         public void sendRequest(MethodCall methodCall, Future future,
             UniversalBody destinationBody)
-            throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
+            throws IOException, RenegotiateSessionException,
+                CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             Request request = this.internalRequestFactory.newRequest(methodCall,
                     BodyImpl.this, future == null, sequenceID);
@@ -615,7 +616,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (!isProActiveInternalObject && (mbean != null)) {
                 ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
                                                                       .getJMXServerConnector();
-                if (serverConnector != null) {
+
+                // If the connector server is not active the connectorID can be null
+                if ((serverConnector != null) &&
+                        serverConnector.getConnectorServer().isActive()) {
                     UniqueID connectorID = serverConnector.getUniqueID();
                     if (!connectorID.equals(destinationBody.getID())) {
                         mbean.sendNotification(NotificationType.requestSent,
@@ -625,27 +629,26 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                                 destinationBody.getNodeURL(),
                                 methodCall.getName(), -1));
                     }
-				}
-			}
-
-			// END JMX Notification
-
-			// FAULT TOLERANCE
-            if (BodyImpl.this.ftmanager != null) {
-            	BodyImpl.this.ftmanager.sendRequest(request,
-            			destinationBody);
-            } else {
-            	request.send(destinationBody);
+                }
             }
-		}
+
+            // END JMX Notification
+
+            // FAULT TOLERANCE
+            if (BodyImpl.this.ftmanager != null) {
+                BodyImpl.this.ftmanager.sendRequest(request, destinationBody);
+            } else {
+                request.send(destinationBody);
+            }
+        }
 
         /**
-		 * Returns a unique identifier that can be used to tag a future, a
-		 * request
-		 * 
-		 * @return a unique identifier that can be used to tag a future, a
-		 *         request.
-		 */
+                 * Returns a unique identifier that can be used to tag a future, a
+                 * request
+                 *
+                 * @return a unique identifier that can be used to tag a future, a
+                 *         request.
+                 */
         public synchronized long getNextSequenceID() {
             return BodyImpl.this.bodyID.toString().hashCode() +
             ++this.absoluteSequenceID;

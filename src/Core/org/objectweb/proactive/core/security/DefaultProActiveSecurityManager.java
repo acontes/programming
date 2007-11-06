@@ -31,18 +31,19 @@
 package org.objectweb.proactive.core.security;
 
 import java.io.Serializable;
+
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 
 public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
     implements Serializable {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6885646803779608858L;
-//	private transient Logger logger;
 
-    
+    /**
+         *
+         */
+    private static final long serialVersionUID = -6885646803779608858L;
+
+    //	private transient Logger logger;
     public DefaultProActiveSecurityManager(EntityType type)
         throws Exception {
         super(type, new DefaultPolicyServer());

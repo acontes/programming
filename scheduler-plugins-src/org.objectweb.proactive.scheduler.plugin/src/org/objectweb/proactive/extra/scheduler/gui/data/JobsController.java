@@ -37,7 +37,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerState;
@@ -401,7 +400,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                         TaskView taskView = TaskView.getInstance();
                         if (taskView != null) {
                             taskView.lineUpdate(taskEvent,
-                                getTaskDescriptorById(job, taskEvent.getTaskID()));
+                                getTaskDescriptorById(job, taskEvent.getTaskId()));
                         }
                     }
                 });
@@ -436,7 +435,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                         TaskView taskView = TaskView.getInstance();
                         if (taskView != null) {
                             taskView.lineUpdate(taskEvent,
-                                getTaskDescriptorById(job, taskEvent.getTaskID()));
+                                getTaskDescriptorById(job, taskEvent.getTaskId()));
                         }
                     }
                 });
@@ -938,13 +937,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public boolean init() {
         SchedulerInitialState<InternalJob> state = null;
-        try {
-            state = SchedulerProxy.getInstance()
-                                  .addSchedulerEventListener(((SchedulerEventListener) ProActiveObject.getStubOnThis()));
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        state = SchedulerProxy.getInstance()
+                              .addSchedulerEventListener(((SchedulerEventListener) ProActiveObject.getStubOnThis()));
 
         if (state == null) { // addSchedulerEventListener failed
             return false;

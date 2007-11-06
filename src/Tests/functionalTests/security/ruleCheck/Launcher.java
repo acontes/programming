@@ -25,73 +25,70 @@ public class Launcher {
 
         // sets the policy to be used for the current thread
         policy = new PolicyFile(policyFile);
-        
+
         Policy.setPolicy(policy);
 
         // enables security for the current thread
         System.setSecurityManager(new SecurityManager());
 
         try {
-			ProActiveDescriptor descriptor1 = ProActive
-					.getProactiveDescriptor("descriptors/security/simple1.xml");
-			descriptor1.activateMappings();
-			VirtualNode virtualNode1 = descriptor1.getVirtualNode("vn1");
-			Node node1 = virtualNode1.getNodes()[0];
-			SampleObject a = (SampleObject) ProActive.newActive(
-					SampleObject.class.getName(), new Object[] { "CN=Garden1" }, node1);
+            ProActiveDescriptor descriptor1 = ProActive.getProactiveDescriptor(
+                    "descriptors/security/simple1.xml");
+            descriptor1.activateMappings();
+            VirtualNode virtualNode1 = descriptor1.getVirtualNode("vn1");
+            Node node1 = virtualNode1.getNodes()[0];
+            SampleObject a = (SampleObject) ProActive.newActive(SampleObject.class.getName(),
+                    new Object[] { "CN=Garden1" }, node1);
 
-			ProActiveDescriptor descriptor2 = ProActive
-					.getProactiveDescriptor("descriptors/security/simple2.xml");
-			descriptor2.activateMappings();
-			VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
-			Node node2 = virtualNode2.getNodes()[0];
-			SampleObject b = (SampleObject) ProActive.newActive(
-					SampleObject.class.getName(), new Object[] { "CN=Garden2" }, node2);
+            ProActiveDescriptor descriptor2 = ProActive.getProactiveDescriptor(
+                    "descriptors/security/simple2.xml");
+            descriptor2.activateMappings();
+            VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
+            Node node2 = virtualNode2.getNodes()[0];
+            SampleObject b = (SampleObject) ProActive.newActive(SampleObject.class.getName(),
+                    new Object[] { "CN=Garden2" }, node2);
 
-			ProActiveDescriptor descriptor3 = ProActive
-					.getProactiveDescriptor("descriptors/security/simple3.xml");
-			descriptor3.activateMappings();
-			VirtualNode virtualNode3 = descriptor3.getVirtualNode("vn3");
-			Node node3 = virtualNode3.getNodes()[0];
-			SampleObject c = (SampleObject) ProActive.newActive(
-					SampleObject.class.getName(), new Object[] { "CN=Garden3" }, node3);
+            ProActiveDescriptor descriptor3 = ProActive.getProactiveDescriptor(
+                    "descriptors/security/simple3.xml");
+            descriptor3.activateMappings();
+            VirtualNode virtualNode3 = descriptor3.getVirtualNode("vn3");
+            Node node3 = virtualNode3.getNodes()[0];
+            SampleObject c = (SampleObject) ProActive.newActive(SampleObject.class.getName(),
+                    new Object[] { "CN=Garden3" }, node3);
 
-//			a.makeTargetDoSomething(a);
-//            System.out.println("==");
+            //			a.makeTargetDoSomething(a);
+            //            System.out.println("==");
             //a.makeTargetDoSomething(b);
-//            System.out.println("==");
+            //            System.out.println("==");
             //a.makeTargetDoSomething(c);
-            
-//            System.out.println("//////////////////");
-            
-//            b.makeTargetDoSomething(a);
-//            System.out.println("==");
-//            b.makeTargetDoSomething(b);
-//            System.out.println("==");
+
+            //            System.out.println("//////////////////");
+
+            //            b.makeTargetDoSomething(a);
+            //            System.out.println("==");
+            //            b.makeTargetDoSomething(b);
+            //            System.out.println("==");
             b.makeTargetDoSomething(c);
-            
-//            System.out.println("//////////////////");
+
+            //            System.out.println("//////////////////");
             //a.makeTargetDoSomething(b);
-            
-          
             try {
-            String s = b.sayhello(c).get();
-            System.out.println("s : "  + s);
+                String s = b.sayhello(c).get();
+                System.out.println("s : " + s);
             } catch (RuntimeSecurityException ex) {
-            	System.out.println("wwwwwwwaaaouuuuu");
+                System.out.println("wwwwwwwaaaouuuuu");
             }
             try {
-            	
-            b.makeTargetDoSomething(c);
+                b.makeTargetDoSomething(c);
             } catch (RuntimeSecurityException ex) {
-            	System.out.println("void ");
+                System.out.println("void ");
             }
-            
-//            c.makeTargetDoSomething(a);
-//            System.out.println("==");
-//            c.makeTargetDoSomething(b);
-//            System.out.println("==");
-//            c.makeTargetDoSomething(c);
+
+            //            c.makeTargetDoSomething(a);
+            //            System.out.println("==");
+            //            c.makeTargetDoSomething(b);
+            //            System.out.println("==");
+            //            c.makeTargetDoSomething(c);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

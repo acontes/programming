@@ -137,7 +137,8 @@ public class HalfFTManagerCIC extends FTManager {
 
     @Override
     public int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination) throws RenegotiateSessionException, CommunicationForbiddenException {
+        UniversalBody destination)
+        throws RenegotiateSessionException, CommunicationForbiddenException {
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
                 request.resetSendCounter();

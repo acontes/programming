@@ -30,10 +30,11 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
+import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
@@ -42,7 +43,7 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
  * Native Task Launcher.
  * This launcher is the class that will launch a native class.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 10, 2007
  * @since ProActive 3.2
  */
@@ -66,9 +67,8 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @param host the host on which the task is launched.
      * @param port the port on which the task is launched.
      */
-    public NativeTaskLauncher(TaskId taskId, JobId jobId, String host,
-        Integer port) {
-        super(taskId, jobId, host, port);
+    public NativeTaskLauncher(TaskId taskId, String host, Integer port) {
+        super(taskId, host, port);
     }
 
     /**
@@ -77,9 +77,9 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @param taskId represents the task the launcher will execute.
      * @param jobId represents the job where the task is located.
      */
-    public NativeTaskLauncher(TaskId taskId, JobId jobId, Script<?> pre,
-        String host, Integer port) {
-        super(taskId, jobId, pre, host, port);
+    public NativeTaskLauncher(TaskId taskId, PreScript pre, String host,
+        Integer port) {
+        super(taskId, pre, host, port);
     }
 
     /**
@@ -96,21 +96,37 @@ public class NativeTaskLauncher extends TaskLauncher {
         TaskResult... results) {
         this.initLoggers();
         try {
+            ExecutableNativeTask toBeLaunched = (ExecutableNativeTask) executableTask;
+
             //launch pre script
             if (pre != null) {
-                this.executePreScript(null);
+                String preScriptDefinedCommand = this.executePreScript(null);
+
+                // if preScriptDefinedCommand is not null, a new command 
+                // has been defined by the prescript
+                if ((preScriptDefinedCommand != null) &&
+                        (!PreScript.DEFAULT_COMMAND_VALUE.equals(
+                            preScriptDefinedCommand))) {
+                    // a new NativeExecTask should be created
+                    toBeLaunched = new ExecutableNativeTask(preScriptDefinedCommand);
+                }
             }
             //get process
-            process = ((ExecutableNativeTask) executableTask).getProcess();
+            process = toBeLaunched.getProcess();
+
             //launch task
-            TaskResult result = new TaskResultImpl(taskId,
-                    executableTask.execute(results));
+            Object userResult = toBeLaunched.execute(results);
+
+            //logBuffer is filled up
+            TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
+            TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);
 
             //return result
             return result;
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex);
+            return new TaskResultImpl(taskId, ex,
+                new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // reset stdout/err
             try {
@@ -122,7 +138,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 System.err.println("WARNING : Loggers are not shut down !");
             }
             //terminate the task
-            core.terminate(taskId, jobId);
+            core.terminate(taskId);
         }
     }
 

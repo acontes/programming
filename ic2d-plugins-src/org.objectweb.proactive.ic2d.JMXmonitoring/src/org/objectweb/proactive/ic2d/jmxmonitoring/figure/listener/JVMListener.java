@@ -46,74 +46,75 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
 public class JVMListener implements MouseListener, MouseMotionListener {
-	private ActionRegistry registry;
-	private RuntimeObject jvm;
-	private DragAndDrop dnd;
+    private ActionRegistry registry;
+    private RuntimeObject jvm;
+    private DragAndDrop dnd;
 
-	public JVMListener(RuntimeObject jvm, MonitoringView monitoringView) {
-		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
-		this.dnd = monitoringView.getDragAndDrop();
-		this.jvm = jvm;
-	}
-	
-	
-	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
+    public JVMListener(RuntimeObject jvm, MonitoringView monitoringView) {
+        this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
+        this.dnd = monitoringView.getDragAndDrop();
+        this.jvm = jvm;
+    }
 
-	public void mousePressed(MouseEvent me) {
-		if(me.button == 1){
-			dnd.reset();
-			
-//			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
-//				IAction act = action.next();
-//				if (act instanceof IActionExtPoint) {
-//					IActionExtPoint extensionAction = (IActionExtPoint) act;
-//					extensionAction.setActiveSelect(this.jvm);
-//				}
-//			}
-		}
-		else if(me.button == 3) {
-			
-			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
-				IAction act = action.next();
-				if (act instanceof RefreshJVMAction) {
-					RefreshJVMAction refreshJVMAction = (RefreshJVMAction) act;
-					refreshJVMAction.setJVM(jvm);
-					refreshJVMAction.setEnabled(true);
-				} else if (act instanceof StopMonitoringAction) {
-					StopMonitoringAction stopMonitoringAction = (StopMonitoringAction) act;
-					stopMonitoringAction.setObject(jvm);
-					stopMonitoringAction.setEnabled(true);
-				} else if (act instanceof IActionExtPoint) {
-					IActionExtPoint extensionAction = (IActionExtPoint) act;
-					extensionAction.setAbstractDataObject(this.jvm);
-				} else {
-					act.setEnabled(false);
-				}
-			}
+    public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */
+    }
 
-		}
-	}
+    public void mousePressed(MouseEvent me) {
+        if (me.button == 1) {
+            dnd.reset();
 
-	public void mouseReleased(MouseEvent me) {
-		dnd.reset();
-	}
-	
-	//---- MouseMotionListener 
+            //			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
+            //				IAction act = action.next();
+            //				if (act instanceof IActionExtPoint) {
+            //					IActionExtPoint extensionAction = (IActionExtPoint) act;
+            //					extensionAction.setActiveSelect(this.jvm);
+            //				}
+            //			}
+        } else if (me.button == 3) {
+            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
+                    action.hasNext();) {
+                IAction act = action.next();
+                if (act instanceof RefreshJVMAction) {
+                    RefreshJVMAction refreshJVMAction = (RefreshJVMAction) act;
+                    refreshJVMAction.setJVM(jvm);
+                    refreshJVMAction.setEnabled(true);
+                } else if (act instanceof StopMonitoringAction) {
+                    StopMonitoringAction stopMonitoringAction = (StopMonitoringAction) act;
+                    stopMonitoringAction.setObject(jvm);
+                    stopMonitoringAction.setEnabled(true);
+                } else if (act instanceof IActionExtPoint) {
+                    IActionExtPoint extensionAction = (IActionExtPoint) act;
+                    extensionAction.setAbstractDataObject(this.jvm);
+                } else {
+                    act.setEnabled(false);
+                }
+            }
+        }
+    }
 
-	public void mouseEntered(MouseEvent me) {		
-		if(dnd.getSource()!=null)
-			dnd.refresh(null);
-	}
+    public void mouseReleased(MouseEvent me) {
+        dnd.reset();
+    }
 
-	public void mouseExited(MouseEvent me) {
-		if(dnd.getSource()!=null)
-			dnd.refresh(null);
-	}
+    //---- MouseMotionListener 
+    public void mouseEntered(MouseEvent me) {
+        if (dnd.getSource() != null) {
+            dnd.refresh(null);
+        }
+    }
 
-	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
-	
-	public void mouseHover(MouseEvent me) { /* Do nothing */ }
+    public void mouseExited(MouseEvent me) {
+        if (dnd.getSource() != null) {
+            dnd.refresh(null);
+        }
+    }
 
-	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
+    public void mouseDragged(MouseEvent me) { /* Do nothing */
+    }
 
+    public void mouseHover(MouseEvent me) { /* Do nothing */
+    }
+
+    public void mouseMoved(MouseEvent me) { /* Do nothing */
+    }
 }

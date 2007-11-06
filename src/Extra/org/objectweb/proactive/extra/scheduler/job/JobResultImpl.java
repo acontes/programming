@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.scheduler.job;
 import java.util.HashMap;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
@@ -44,7 +43,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * identify the job result, it provides the id of the job in the scheduler and
  * the job name.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 5, 2007
  * @since ProActive 3.2
  */
@@ -55,7 +54,6 @@ public class JobResultImpl implements JobResult {
     private JobId id = null;
     private String name = null;
     private HashMap<String, TaskResult> taskResults = null;
-    private JobLogs jobOutput;
 
     /**
      * ProActive empty constructor
@@ -64,12 +62,10 @@ public class JobResultImpl implements JobResult {
     }
 
     /**
-     * Instanciate a new JobResult with a jobId and a result
+     * Instantiate a new JobResult with a jobId and a result
      *
      * @param id
      *            the jobId associated with this result
-     * @param result
-     *            the result associated with this result
      * @param name
      *            the name of the job that has generate this result.
      */
@@ -139,16 +135,5 @@ public class JobResultImpl implements JobResult {
             }
         }
         return toReturn.toString();
-    }
-
-    @Override
-    public JobLogs getOutput() {
-        return this.jobOutput;
-    }
-
-    @Override
-    public void setOutput(JobLogs op) {
-        assert (this.jobOutput == null);
-        this.jobOutput = op;
     }
 }
