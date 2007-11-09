@@ -231,7 +231,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
             }
         } catch (SecurityNotAvailableException e1) {
             bodyLogger.debug("Security not available");
-            e1.printStackTrace();
         } catch (CommunicationForbiddenException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
