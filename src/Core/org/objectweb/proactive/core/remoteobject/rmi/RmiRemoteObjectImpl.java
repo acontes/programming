@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.remoteobject.rmi;
 
 import java.io.IOException;
-import java.net.URI;
 import java.rmi.RemoteException;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
@@ -65,14 +64,8 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  */
 public class RmiRemoteObjectImpl extends UnicastRemoteObject
     implements RmiRemoteObject {
-
-    /**
-    *
-    */
     protected InternalRemoteRemoteObject internalrrObject;
 
-    //    protected Object stub;
-    //    protected URI uri;
     public RmiRemoteObjectImpl() throws java.rmi.RemoteException {
     }
 
@@ -97,88 +90,5 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         }
 
         return this.internalrrObject.receiveMessage(message);
-    }
-
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getCertificate();
-    }
-
-    //    public byte[] getCertificateEncoded()
-    //        throws SecurityNotAvailableException, IOException {
-    //        return this.remoteObject.getCertificateEncoded();
-    //    }
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getEntities();
-    }
-
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getPolicy(local, distant);
-    }
-
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getPublicKey();
-    }
-
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
-        return this.internalrrObject.publicKeyExchange(sessionID, signature);
-    }
-
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.internalrrObject.randomValue(sessionID, clientRandomValue);
-    }
-
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.internalrrObject.secretKeyExchange(sessionID,
-            encodedAESKey, encodedIVParameters, encodedClientMacKey,
-            encodedLockData, parametersSignature);
-    }
-
-    public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws IOException, SessionException, SecurityNotAvailableException {
-        return this.internalrrObject.startNewSession(distantSessionID, policy,
-            distantCertificate);
-    }
-
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
-        this.internalrrObject.terminateSession(sessionID);
-    }
-
-    //    public Object getObjectProxy() throws ProActiveException, IOException {
-    //        if (this.stub == null) {
-    //            this.stub = this.internalrrObject.getObjectProxy(this);
-    //
-    //            //            if (stub instanceof Adapter) {
-    //            //            	 ((StubObject) ((Adapter)this.stub).getAdapter()).setProxy(new SynchronousProxy(null, new Object[] { this } ));
-    //            //            } else {
-    //            //            ((StubObject) this.stub).setProxy(new SynchronousProxy(null, new Object[] { this } ));
-    //            //            }
-    //        }
-    //        return this.stub;
-    //    }
-    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
-        return this.internalrrObject.getProActiveSecurityManager(user);
-    }
-
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
-        this.internalrrObject.setProActiveSecurityManager(user, policyServer);
     }
 }

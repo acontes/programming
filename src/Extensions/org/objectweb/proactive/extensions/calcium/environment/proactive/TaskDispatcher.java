@@ -31,56 +31,65 @@
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
+import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
 
 public class TaskDispatcher extends Thread {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
-    private AOInterpreterPool intpool;
     private AOTaskPool taskpool;
+    private AOInterpreterPool interpool;
     private boolean shutdown;
 
-    public TaskDispatcher(int maxCInterp, AOTaskPool taskpool,
-        FileServerClient fserver, AOInterpreterPool intpool, AOInterpreter[] aoi)
-        throws NodeException, ActiveObjectCreationException,
-            ClassNotFoundException {
+    public TaskDispatcher(AOTaskPool taskpool, AOInterpreterPool interpool) {
         super();
         shutdown = false;
 
-        // Create Active Objects
         this.taskpool = taskpool;
-        this.intpool = intpool;
-
-        this.intpool.init(aoi);
-
-        //Instantiate Active Objects
-        for (AOInterpreter i : aoi) {
-            i.init(maxCInterp, i, taskpool, fserver, intpool);
-        }
+        this.interpool = interpool;
     }
 
     public void run() {
         shutdown = false;
 
         while (!shutdown) {
+            //TODO fix this blocking call
             Task task = taskpool.getReadyTask(0);
             task = (Task) ProFuture.getFutureValue(task);
 
-            if (task != null) {
+            try {
                 //block until there is an available interpreter
-                AOInterpreter interpreter = intpool.getAOInterpreter();
-                interpreter.interpret(task); //remote async call
+                AOStageIn interp = null;
+
+                while (interp == null) {
+                    interp = interpool.get();
+
+                    if (shutdown) {
+                        interpool.put(interp);
+                        task.setException(new TaskException("Shutting down"));
+                        taskpool.putProcessedTask(task);
+
+                        return;
+                    }
+                }
+
+                interp.stageIn(task); //remote async call
+            } catch (Exception e) {
+                if (task != null) {
+                    task.setException(e);
+                    taskpool.putProcessedTask(task);
+                }
             }
         }
+
+        logger.info("TaskDispatcher has shut down");
     }
 
     public void shutdown() {
+        logger.info("TaskDispatcher is shutting down");
         shutdown = true;
     }
 }

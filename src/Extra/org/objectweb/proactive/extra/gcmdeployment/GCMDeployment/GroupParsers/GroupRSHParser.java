@@ -45,6 +45,7 @@ public class GroupRSHParser extends AbstractGroupParser {
     private static final String ATTR_HOST_LIST = "hostList";
     static final String NODE_NAME = "rshGroup";
 
+    @Override
     public void parseGroupNode(Node groupNode, XPath xpath) {
         super.parseGroupNode(groupNode, xpath);
 

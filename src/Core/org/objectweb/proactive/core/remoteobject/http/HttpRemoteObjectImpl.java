@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.remoteobject.http;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.security.AccessControlException;
 import java.security.PublicKey;
@@ -40,12 +41,8 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.SynchronousProxy;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.remoteobject.http.message.HTTPRemoteObjectRequest;
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
@@ -63,34 +60,15 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-public class HttpRemoteObjectImpl implements RemoteRemoteObject {
+public class HttpRemoteObjectImpl implements RemoteRemoteObject, Serializable {
     private boolean isLocal;
-
-    //    private String servletURL;
     private URI remoteObjectURL;
-    protected Object stub;
     protected transient InternalRemoteRemoteObject remoteObject;
 
     public HttpRemoteObjectImpl(InternalRemoteRemoteObject remoteObject,
         URI remoteObjectURL) {
-        //    	Thread.dumpStack();
-
-        //        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
-        //            this.servletURL = ClassServerServlet.getUrl();
-        //        } else {
-        //            this.servletURL = ClassServer.getUrl();
-        //        }
-        //
-        //        System.out.println("HttpRemoteObjectImpl.HttpRemoteObjectImpl() -------------- servlet "  + this.servletURL);
-        //
         this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
-
-        //        try {
-        //            this.stub = remoteObject.getObjectProxy(this);
-        //        } catch (ProActiveException e) {
-        //            e.printStackTrace();
-        //        }
     }
 
     public Reply receiveMessage(Request message)
@@ -107,180 +85,11 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         return rep;
     }
 
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
-        if (this.isLocal) {
-            return this.remoteObject.getCertificate();
-        }
-
-        HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getCertificate",
-                new ArrayList<Object>(), this.remoteObjectURL.toString());
-        br.send();
-        try {
-            return (TypedCertificate) br.getReturnedObject();
-        } catch (Exception e) {
-            throw new HTTPRemoteException("Unexpected exception", e);
-        }
-    }
-
-    // public byte[] getCertificateEncoded()
-    //        throws SecurityNotAvailableException, IOException {
-    //        if (isLocal) {
-    //            return this.remoteObject.getCertificateEncoded();
-    //        } else {
-    //            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getCertificateEncoded",
-    //                    new ArrayList<Object>(), this.remoteObjectURL.toString());
-    //            br.send();
-    //            try {
-    //                return (byte[]) br.getReturnedObject();
-    //            } catch (Exception e) {
-    //                throw new HTTPRemoteException("Unexpected exception", e);
-    //            }
-    //        }
-    //    }
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getEntities();
-    }
-
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getPolicy(local, distant);
-    }
-
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getPublicKey();
-    }
-
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
-        return this.remoteObject.publicKeyExchange(sessionID, signature);
-    }
-
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.remoteObject.randomValue(sessionID, clientRandomValue);
-    }
-
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.remoteObject.secretKeyExchange(sessionID, encodedAESKey,
-            encodedIVParameters, encodedClientMacKey, encodedLockData,
-            parametersSignature);
-    }
-
-    public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SecurityNotAvailableException, IOException, SessionException {
-        return this.remoteObject.startNewSession(distantSessionID, policy,
-            distantCertificate);
-    }
-
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
-        this.remoteObject.terminateSession(sessionID);
-    }
-
-    public Object getObjectProxy() throws ProActiveException, IOException {
-        ((StubObject) stub).setProxy(new SynchronousProxy(null,
-                new Object[] { this }));
-
-        return stub;
-    }
-
-    public void setObjectProxy(Object stub)
-        throws ProActiveException, IOException {
-        this.stub = stub;
-    }
-
     public void setURI(URI url) {
         this.remoteObjectURL = url;
     }
 
     public URI getURI() {
         return this.remoteObjectURL;
-    }
-
-    public RemoteObject getRemoteObject() throws ProActiveException {
-        return new RemoteObjectAdapter(this);
-    }
-
-    public String getClassName() throws ProActiveException, IOException {
-        if (isLocal) {
-            return this.remoteObject.getRemoteObject().getClassName();
-        } else {
-            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getClassName",
-                    new ArrayList<Object>(), this.remoteObjectURL.toString());
-            br.send();
-            try {
-                return (String) br.getReturnedObject();
-            } catch (Exception e) {
-                throw new HTTPRemoteException("Unexpected exception", e);
-            }
-        }
-    }
-
-    public String getProxyName() throws ProActiveException, IOException {
-        if (isLocal) {
-            return this.remoteObject.getRemoteObject().getProxyName();
-        } else {
-            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getProxyName",
-                    new ArrayList<Object>(), this.remoteObjectURL.toString());
-            br.send();
-            try {
-                return (String) br.getReturnedObject();
-            } catch (Exception e) {
-                throw new HTTPRemoteException("Unexpected exception", e);
-            }
-        }
-    }
-
-    public Class<?> getTargetClass() throws ProActiveException, IOException {
-        if (isLocal) {
-            return this.remoteObject.getRemoteObject().getTargetClass();
-        } else {
-            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getTargetClass",
-                    new ArrayList<Object>(), this.remoteObjectURL.toString());
-            br.send();
-            try {
-                return (Class<?>) br.getReturnedObject();
-            } catch (Exception e) {
-                throw new HTTPRemoteException("Unexpected exception", e);
-            }
-        }
-    }
-
-    public Class<?> getAdapterClass() throws ProActiveException, IOException {
-        if (isLocal) {
-            return this.remoteObject.getRemoteObject().getAdapterClass();
-        } else {
-            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getAdapterClass",
-                    new ArrayList<Object>(), this.remoteObjectURL.toString());
-            br.send();
-            try {
-                return (Class<?>) br.getReturnedObject();
-            } catch (Exception e) {
-                throw new HTTPRemoteException("Unexpected exception", e);
-            }
-        }
-    }
-
-    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
-        return this.remoteObject.getProActiveSecurityManager(user);
-    }
-
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
-        this.remoteObject.setProActiveSecurityManager(user, policyServer);
     }
 }
