@@ -1399,6 +1399,7 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
                 entities = this.parent.getEntities();
             } catch (SecurityNotAvailableException e) {
                 // forget it
+            	e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -1440,7 +1441,7 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
             KeyPair siblingKeyPair = KeyTools.genKeys(1024);
 
             ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
-                           .debug("generate sibling scurity manager for " +
+                           .debug("generate sibling security manager for " +
                 name);
 
             KeyStore keystore = this.policyServer.getKeyStore();
