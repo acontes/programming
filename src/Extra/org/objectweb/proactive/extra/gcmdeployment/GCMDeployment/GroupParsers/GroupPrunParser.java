@@ -40,28 +40,31 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupPrunParser extends AbstractGroupParser {
-    private static final String NODE_NAME_STDOUT = "stdout";
-    private static final String NODE_NAME_WALL_TIME = "wallTime";
-    private static final String NODE_NAME_PROCESSOR_PER_NODE = "processorPerNode";
-    private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
-    private static final String NODE_NAME_HOSTLIST = "hostlist";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
+        "stdout";
+    private static final String NODE_NAME_WALL_TIME = NODE_EXT_NAMESPACE +
+        "wallTime";
+    private static final String NODE_NAME_PROCESSOR_PER_NODE = NODE_EXT_NAMESPACE +
+        "processorPerNode";
+    private static final String NODE_NAME_HOSTS_NUMBER = NODE_EXT_NAMESPACE +
+        "hostsNumber";
+    private static final String NODE_NAME_HOSTLIST = NODE_EXT_NAMESPACE +
+        "hostList";
     private static final String ATTR_QUEUE = "queue";
-    private static final String NODE_NAME = "prunProcess";
+    private static final String NODE_NAME = "prunGroup";
 
     @Override
     public AbstractGroup createGroup() {
         return new GroupPrun();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupPrun prunGroup = (GroupPrun) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupPrun prunGroup = (GroupPrun) super.parseGroupNode(groupNode, xpath);
 
         String queueName = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_QUEUE);
@@ -88,5 +91,7 @@ public class GroupPrunParser extends AbstractGroupParser {
                 prunGroup.setStdout(nodeValue);
             }
         }
+
+        return prunGroup;
     }
 }

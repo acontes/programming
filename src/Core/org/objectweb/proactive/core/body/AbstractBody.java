@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
-import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -932,7 +932,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             System.out.println("Communication forbidden.");
             bodyLogger.warn(e);
             // if the communication is not allowed, set the result as the exception
-            future.receiveReply(new FutureResult(null,
+            future.receiveReply(new MethodCallResult(null,
                     new RuntimeSecurityException(e)));
             //e.printStackTrace();
         }

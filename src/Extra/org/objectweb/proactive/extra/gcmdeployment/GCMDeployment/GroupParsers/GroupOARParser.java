@@ -40,33 +40,34 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupOARParser extends AbstractGroupParser {
-    private static final String NODE_NAME_RESOURCES = "resources";
-    private static final String NODE_NAME_DIRECTORY = "directory";
-    private static final String NODE_NAME_STDOUT = "stdout";
-    private static final String NODE_NAME_STDERR = "stderr";
-    private static final String ATTR_BOOKED_NODES_ACCESS = "bookedNodesAccess";
+    private static final String NODE_NAME_RESOURCES = NODE_EXT_NAMESPACE +
+        "resources";
+    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE +
+        "directory";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
+        "stdout";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
+        "stderr";
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_INTERACTIVE = "interactive";
     private static final String ATTR_TYPE = "type";
     private static final String ATTR_RESOURCES_NODES = "nodes";
-    private static final String ATTR_RESOURCES_CPU = "nodes";
-    private static final String ATTR_RESOURCES_CORE = "nodes";
-    private static final String NODE_NAME = "oarProcess";
+    private static final String ATTR_RESOURCES_CPU = "cpu";
+    private static final String ATTR_RESOURCES_CORE = "core";
+    private static final String NODE_NAME = "oarGroup";
 
     @Override
     public AbstractGroup createGroup() {
         return new GroupOAR();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupOAR oarGroup = (GroupOAR) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupOAR oarGroup = (GroupOAR) super.parseGroupNode(groupNode, xpath);
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_INTERACTIVE);
@@ -128,5 +129,7 @@ public class GroupOARParser extends AbstractGroupParser {
                 oarGroup.setStderr(nodeValue);
             }
         }
+
+        return oarGroup;
     }
 }

@@ -40,10 +40,13 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupCGSPParser extends AbstractGroupParser {
-    private static final String NODE_NAME_STDERR = "stderr";
-    private static final String NODE_NAME_STDOUT = "stdout";
-    private static final String NODE_NAME_DIRECTORY = "directory";
-    private static final String NODE_NAME_COUNT = "count";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
+        "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
+        "stdout";
+    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE +
+        "directory";
+    private static final String NODE_NAME_COUNT = NODE_EXT_NAMESPACE + "count";
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_HOSTNAME = "hostname";
     private static final String NODE_NAME = "cgspGroup";
@@ -53,14 +56,13 @@ public class GroupCGSPParser extends AbstractGroupParser {
         return new GroupCGSP();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-        GroupCGSP cgspGroup = (GroupCGSP) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupCGSP cgspGroup = (GroupCGSP) super.parseGroupNode(groupNode, xpath);
 
         String hostname = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_HOSTNAME);
@@ -91,5 +93,7 @@ public class GroupCGSPParser extends AbstractGroupParser {
                 cgspGroup.setStderr(nodeValue);
             }
         }
+
+        return cgspGroup;
     }
 }

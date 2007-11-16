@@ -42,28 +42,31 @@ import org.w3c.dom.NodeList;
 public class GroupGlobusParser extends AbstractGroupParser {
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_HOSTNAME = "hostname";
-    private static final String NODE_NAME_STDERR = "stderr";
-    private static final String NODE_NAME_STDOUT = "stdout";
-    private static final String NODE_NAME_STDIN = "stdin";
-    private static final String NODE_NAME_DIRECTORY = "directory";
-    private static final String NODE_NAME_MAX_TIME = "maxTime";
-    private static final String NODE_NAME_COUNT = "count";
-    private static final String NODE_NAME = "globusProcess";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
+        "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
+        "stdout";
+    private static final String NODE_NAME_STDIN = NODE_EXT_NAMESPACE + "stdin";
+    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE +
+        "directory";
+    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE +
+        "maxTime";
+    private static final String NODE_NAME_COUNT = NODE_EXT_NAMESPACE + "count";
+    private static final String NODE_NAME = "globusGroup";
 
     @Override
     public AbstractGroup createGroup() {
         return new GroupGlobus();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupGlobus globusGroup = (GroupGlobus) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupGlobus globusGroup = (GroupGlobus) super.parseGroupNode(groupNode,
+                xpath);
 
         String hostname = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_HOSTNAME);
@@ -97,5 +100,7 @@ public class GroupGlobusParser extends AbstractGroupParser {
                 globusGroup.setDirectory(nodeValue);
             }
         }
+
+        return globusGroup;
     }
 }

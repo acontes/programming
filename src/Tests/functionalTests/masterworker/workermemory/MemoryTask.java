@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package functionalTests.masterworker.slavememory;
+package functionalTests.masterworker.workermemory;
 
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
 import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;

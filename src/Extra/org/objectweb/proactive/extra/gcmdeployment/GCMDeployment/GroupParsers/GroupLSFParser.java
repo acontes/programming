@@ -40,12 +40,14 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupLSFParser extends AbstractGroupParser {
+    private static final String NODE_NAME_RESOURCE_REQUIREMENT = NODE_EXT_NAMESPACE +
+        "resourceRequirement";
+    private static final String NODE_NAME_PROCESSOR = NODE_EXT_NAMESPACE +
+        "processor";
+    private static final String NODE_NAME_HOSTLIST = NODE_EXT_NAMESPACE +
+        "hostlist";
+    private static final String NODE_NAME = "lsfGroup";
     private static final String ATTR_INTERACTIVE = "interactive";
-    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
-    private static final String NODE_NAME_RESOURCE_REQUIREMENT = "resourceRequirement";
-    private static final String NODE_NAME_PROCESSOR = "processor";
-    private static final String NODE_NAME_HOSTLIST = "hostlist";
-    private static final String XPATH_LSF_OPTION = "lsfOption";
     private static final String ATTR_JOBNAME = "jobname";
     private static final String ATTR_QUEUE = "queue";
 
@@ -54,15 +56,13 @@ public class GroupLSFParser extends AbstractGroupParser {
         return new GroupLSF();
     }
 
-    public String getNodeName() {
-        return "lsfProcess";
+    public String getBaseNodeName() {
+        return NODE_NAME;
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupLSF lsfGroup = (GroupLSF) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupLSF lsfGroup = (GroupLSF) super.parseGroupNode(groupNode, xpath);
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_INTERACTIVE);
@@ -94,5 +94,7 @@ public class GroupLSFParser extends AbstractGroupParser {
                 lsfGroup.setResourceRequirement(nodeValue);
             }
         }
+
+        return lsfGroup;
     }
 }

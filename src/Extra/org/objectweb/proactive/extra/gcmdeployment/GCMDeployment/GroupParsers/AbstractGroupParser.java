@@ -30,7 +30,9 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -38,60 +40,93 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 public abstract class AbstractGroupParser implements GroupParser {
-    protected AbstractGroup group;
+    protected static final String NODE_EXT_NAMESPACE = "paext:";
 
-    public AbstractGroupParser() {
-        group = createGroup();
-    }
-
-    public void parseGroupNode(Node groupNode, XPath xpath) {
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         String id = GCMParserHelper.getAttributeValue(groupNode, "id");
+
+        AbstractGroup group = createGroup();
+
         group.setId(id);
 
         String username = GCMParserHelper.getAttributeValue(groupNode,
                 "username");
-        group.setUsername(username);
+        if (username != null) {
+            group.setUsername(username);
+        }
 
         String commandPath = GCMParserHelper.getAttributeValue(groupNode,
                 "commandPath");
-        group.setCommandPath(commandPath);
+        if (commandPath != null) {
+            group.setCommandPath(commandPath);
+        }
 
         String bookedNodesAccess = GCMParserHelper.getAttributeValue(groupNode,
                 "bookedNodesAccess");
-        group.setBookedNodesAccess(bookedNodesAccess);
+        if (bookedNodesAccess != null) {
+            group.setBookedNodesAccess(bookedNodesAccess);
+        }
 
         try {
             Node environmentNode = (Node) xpath.evaluate("pa:environment",
-                    groupNode, XPathConstants.NODESET);
+                    groupNode, XPathConstants.NODE);
 
             if (environmentNode != null) {
-                List<String> enviroment = GCMParserHelper.parseEnviromentNode(xpath,
-                        environmentNode);
+                Map<String, String> envVars = new HashMap<String, String>();
 
-                // TODO - properly handle environment
-                //                group.setEnvironment(env);
+                NodeList argNodes = (NodeList) xpath.evaluate("pa:variable",
+                        environmentNode, XPathConstants.NODESET);
+
+                for (int i = 0; i < argNodes.getLength(); ++i) {
+                    Node argNode = argNodes.item(i);
+                    String name = GCMParserHelper.getAttributeValue(argNode,
+                            "name");
+                    String value = GCMParserHelper.getAttributeValue(argNode,
+                            "value");
+                    envVars.put(name, value);
+                }
+
+                group.setEnvironment(envVars);
             }
 
             Node scriptPath = (Node) xpath.evaluate("pa:scriptPath", groupNode,
-                    XPathConstants.NODESET);
+                    XPathConstants.NODE);
 
             if (scriptPath != null) {
-                group.setScriptPath(scriptPath);
+                group.setScriptPath(GCMParserHelper.parsePathElementNode(
+                        scriptPath));
             }
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
         }
-    }
 
-    public Group getGroup() {
         return group;
     }
 
+    /**
+     * Returns the base nodeName associated to a particular parser
+     * (no namespace)
+     * @return the nodeName as a String
+     */
+    protected abstract String getBaseNodeName();
+
     public abstract AbstractGroup createGroup();
+
+    /**
+     * Returns the node's XML namespace associated
+     * @return the namespace as a String
+     */
+    protected String getNodeNameSpace() {
+        return NODE_EXT_NAMESPACE;
+    }
+
+    public String getNodeName() {
+        return getNodeNameSpace() + getBaseNodeName();
+    }
 }

@@ -36,7 +36,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -56,7 +56,7 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     /**
      * The hypothetic result
      */
-    protected FutureResult result;
+    protected MethodCallResult result;
 
     // security features
 
@@ -76,7 +76,7 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     protected transient ProActiveSecurityManager psm = null;
 
     public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
-        FutureResult result, ProActiveSecurityManager psm) {
+        MethodCallResult result, ProActiveSecurityManager psm) {
         super(senderID, sequenceNumber, true, methodName);
         this.result = result;
         this.psm = psm;
@@ -84,13 +84,13 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     }
 
     public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
-        FutureResult result, ProActiveSecurityManager psm,
+        MethodCallResult result, ProActiveSecurityManager psm,
         boolean isAutomaticContinuation) {
         this(senderID, sequenceNumber, methodName, result, psm);
         this.isAC = isAutomaticContinuation;
     }
 
-    public FutureResult getResult() {
+    public MethodCallResult getResult() {
         return result;
     }
 
@@ -104,7 +104,7 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
             (LocalBodyStore.getInstance().getLocalHalfBody(destinationID) != null));
 
         if (isLocal) {
-            result = (FutureResult) Utils.makeDeepCopy(result);
+            result = (MethodCallResult) Utils.makeDeepCopy(result);
         }
 
         // security
@@ -153,7 +153,7 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
             byte[] decryptedMethodCall = psm.decrypt(sessionID,
                     encryptedResult, ActAs.CLIENT);
             try {
-                result = (FutureResult) ByteToObjectConverter.ObjectStream.convert(decryptedMethodCall);
+                result = (MethodCallResult) ByteToObjectConverter.ObjectStream.convert(decryptedMethodCall);
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();

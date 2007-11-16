@@ -65,6 +65,21 @@ public class TestDeploymentDescriptorParser {
         parser.parseResources();
     }
 
+    @Test
+    public void allGroupsTest()
+        throws IOException, XPathExpressionException, SAXException {
+        File descriptor = new File(this.getClass()
+                                       .getResource("testfiles/deployment/allGroupsExample.xml")
+                                       .getFile());
+
+        System.out.println("Parsing " + descriptor.getAbsolutePath());
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
+
+        parser.parseEnvironment();
+        parser.parseInfrastructure();
+        parser.parseResources();
+    }
+
     //
     // Examples of custom group & bridge parsers
     //
@@ -88,16 +103,23 @@ public class TestDeploymentDescriptorParser {
             return new UserGroup();
         }
 
-        public String getNodeName() {
-            return "paext:myGroup";
+        @Override
+        protected String getNodeNameSpace() {
+            return "pauext:";
+        }
+
+        public String getBaseNodeName() {
+            return "myGroup";
         }
 
         @Override
-        public void parseGroupNode(Node groupNode, XPath xpath) {
-            super.parseGroupNode(groupNode, xpath);
+        public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+            AbstractGroup group = super.parseGroupNode(groupNode, xpath);
 
             System.out.println("User Group Parser - someattr value = " +
                 groupNode.getAttributes().getNamedItem("someattr").getNodeValue());
+
+            return group;
         }
     }
 
@@ -107,16 +129,23 @@ public class TestDeploymentDescriptorParser {
             return new UserBridge();
         }
 
-        public String getNodeName() {
-            return "paext:myBridge";
+        @Override
+        protected String getNodeNameSpace() {
+            return "pauext:";
+        }
+
+        public String getBaseNodeName() {
+            return "myBridge";
         }
 
         @Override
-        public void parseBridgeNode(Node bridgeNode, XPath xpath) {
-            super.parseBridgeNode(bridgeNode, xpath);
+        public AbstractBridge parseBridgeNode(Node bridgeNode, XPath xpath) {
+            AbstractBridge bridge = super.parseBridgeNode(bridgeNode, xpath);
             System.out.println("User Bridge Parser - someattr value = " +
                 bridgeNode.getAttributes().getNamedItem("someattr")
                           .getNodeValue());
+
+            return bridge;
         }
     }
 

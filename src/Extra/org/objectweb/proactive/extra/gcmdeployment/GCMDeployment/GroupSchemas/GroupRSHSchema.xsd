@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+
+	<complexType name="groupTypeRSH">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<attribute name="hostList" type="string" use="required" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="rshGroup" substitutionGroup="pa:abstractShElement" type="paext:groupTypeRSH" />
+
+</schema>

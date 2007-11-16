@@ -40,39 +40,25 @@ import org.w3c.dom.Node;
 
 public class GroupSSHParser extends AbstractGroupParser {
     private static final String ATTR_COMMAND_OPTIONS = "commandOptions";
-    private static final String ATTR_COMMAND_PATH = "commandPath";
-    private static final String ATTR_USERNAME = "username";
     private static final String ATTR_HOST_LIST = "hostList";
     static final String NODE_NAME = "sshGroup";
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupSSH groupSSH = (GroupSSH) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupSSH groupSSH = (GroupSSH) super.parseGroupNode(groupNode, xpath);
 
         // Mandatory attributes
         String hostList = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_HOST_LIST);
         groupSSH.setHostList(hostList);
 
-        String username = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_USERNAME);
-        if (username != null) {
-            groupSSH.setUsername(username);
-        }
-
-        String commandPath = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_COMMAND_PATH);
-        if (commandPath != null) {
-            groupSSH.setCommandPath(commandPath);
-        }
-
         String commandOptions = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_COMMAND_OPTIONS);
         if (commandOptions != null) {
             groupSSH.setCommandOption(commandOptions);
         }
+
+        return groupSSH;
     }
 
     @Override
@@ -80,7 +66,7 @@ public class GroupSSHParser extends AbstractGroupParser {
         return new GroupSSH();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 }

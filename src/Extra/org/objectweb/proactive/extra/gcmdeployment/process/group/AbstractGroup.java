@@ -32,24 +32,26 @@ package org.objectweb.proactive.extra.gcmdeployment.process.group;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
-import org.w3c.dom.Node;
 
 
 public abstract class AbstractGroup implements Group {
     private HostInfo hostInfo;
     private String commandPath;
-    private String env;
+    private Map<String, String> env;
     private String id;
     private String username;
     private String bookedNodesAccess;
-    private Node scriptPath;
+    private PathElement scriptPath;
 
     public AbstractGroup() {
     }
@@ -60,8 +62,15 @@ public abstract class AbstractGroup implements Group {
                 ? Utils.makeDeepCopy(group.hostInfo) : null);
             this.commandPath = (group.commandPath != null)
                 ? new String(group.commandPath) : null;
-            this.env = (group.env != null) ? new String(group.env) : null;
+            this.env = (group.env != null)
+                ? new HashMap<String, String>(group.env) : null;
             this.id = (group.id != null) ? new String(group.id) : null;
+            this.username = (group.username != null)
+                ? new String(group.username) : null;
+            this.bookedNodesAccess = (group.bookedNodesAccess != null)
+                ? new String(group.bookedNodesAccess) : null;
+            this.scriptPath = (PathElement) ((group.scriptPath != null)
+                ? Utils.makeDeepCopy(group.scriptPath) : null);
         } catch (IOException e) {
             // can't happen
         }
@@ -71,15 +80,15 @@ public abstract class AbstractGroup implements Group {
         this.commandPath = commandPath;
     }
 
-    public void setEnvironment(String env) {
-        this.env = env;
+    public void setEnvironment(Map<String, String> envVars) {
+        this.env = envVars;
     }
 
     protected String getCommandPath() {
         return commandPath;
     }
 
-    protected String getEnv() {
+    protected Map<String, String> getEnv() {
         return env;
     }
 
@@ -138,7 +147,7 @@ public abstract class AbstractGroup implements Group {
         this.bookedNodesAccess = bookedNodesAccess;
     }
 
-    public void setScriptPath(Node scriptPath) {
+    public void setScriptPath(PathElement scriptPath) {
         this.scriptPath = scriptPath;
     }
 }

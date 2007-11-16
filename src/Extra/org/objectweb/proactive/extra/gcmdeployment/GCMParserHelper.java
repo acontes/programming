@@ -112,6 +112,8 @@ public class GCMParserHelper implements GCMParserConstants {
                 throw new NullPointerException("Null prefix");
             } else if ("pa".equals(prefix)) {
                 return namespace;
+            } else if ("paext".equals(prefix)) {
+                return GCMParserConstants.GCM_DESCRIPTOR_EXTENSION_NAMESPACE;
             } else if ("xml".equals(prefix)) {
                 return XMLConstants.XML_NS_URI;
             }
@@ -177,7 +179,7 @@ public class GCMParserHelper implements GCMParserConstants {
         Node environmentNode) throws XPathExpressionException {
         ArrayList<String> environment = new ArrayList<String>();
 
-        NodeList argNodes = (NodeList) xpath.evaluate("pa:*Variable",
+        NodeList argNodes = (NodeList) xpath.evaluate("pa:variable",
                 environmentNode, XPathConstants.NODESET);
 
         for (int i = 0; i < argNodes.getLength(); ++i) {
