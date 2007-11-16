@@ -106,8 +106,8 @@ public class RemoteObjectAdapter implements RemoteObject {
                     });
             securityMethods[5] = SecurityEntity.class.getDeclaredMethod("getPolicy",
                     new Class<?>[] { Entities.class, Entities.class });
-            securityMethods[6] = SecurityEntity.class.getDeclaredMethod("getCertificateEncoded",
-                    new Class<?>[0]);
+            //            securityMethods[6] = SecurityEntity.class.getDeclaredMethod("getCertificateEncoded",
+            //                    new Class<?>[0]);
             securityMethods[7] = SecurityEntity.class.getDeclaredMethod("getEntities",
                     new Class<?>[0]);
             securityMethods[8] = SecurityEntity.class.getDeclaredMethod("terminateSession",

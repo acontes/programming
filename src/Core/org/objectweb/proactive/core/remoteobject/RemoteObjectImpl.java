@@ -104,7 +104,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
 
             return new SynchronousReplyImpl(o);
         } catch (MethodCallExecutionFailedException e) {
-            e.printStackTrace();
+            //            e.printStackTrace();
             throw new ProActiveException(e);
         } catch (InvocationTargetException e) {
             return new SynchronousReplyImpl(e.getCause());

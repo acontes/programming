@@ -90,11 +90,10 @@ public abstract class KeystoreUtils {
             }
         }
 
-        if (entityNumber != 1) {
-            throw new KeyStoreException(
-                "Only one entity can have a private key in a keystore");
-        }
-
+        //        if (entityNumber != 1) {
+        //            throw new KeyStoreException(
+        //                "Only one entity can have a private key in a keystore");
+        //        }
         for (CertificateTree tree : ctl) {
             addTreeToKeystore(store, tree, keepPrivateKeyMap, appNumber == 1);
         }

@@ -145,13 +145,14 @@ public class ProActiveSecurityDescriptorHandler
         } else if (name.equals(PKCS12_KEYSTORE)) {
             String pkcs12Keystore = (String) activeHandler.getResultObject();
             try {
-            	File keyStoreFile = new File(pkcs12Keystore);
-            	if (! keyStoreFile.exists()) {
-            		// the url does not exist as a complete path
-            		// try it as a relative path from the current descriptor location
-            		String parentDirectory = new File(this.descriptorUrl).getParent();
-            		keyStoreFile = new File(parentDirectory+ File.separator + pkcs12Keystore);
-            	}
+                File keyStoreFile = new File(pkcs12Keystore);
+                if (!keyStoreFile.exists()) {
+                    // the url does not exist as a complete path
+                    // try it as a relative path from the current descriptor location
+                    String parentDirectory = new File(this.descriptorUrl).getParent();
+                    keyStoreFile = new File(parentDirectory + File.separator +
+                            pkcs12Keystore);
+                }
                 this.keystore = KeyStore.getInstance("PKCS12", "BC");
                 this.keystore.load(new FileInputStream(keyStoreFile),
                     "ha".toCharArray());
@@ -405,6 +406,8 @@ public class ProActiveSecurityDescriptorHandler
             KeyStore keystore = ProActiveSecurityDescriptorHandler.this.keystore;
 
             switch (type) {
+            case OBJECT:
+            case ENTITY:
             case NODE:
             case RUNTIME:
                 try {

@@ -157,6 +157,12 @@ public class PolicyServer implements Serializable, Cloneable {
 
             Match matchingTo = policyEntitiesTo.match(distant);
 
+            if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
+                                   .isDebugEnabled()) {
+                ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
+                               .debug("evaluating policy " + policy);
+            }
+
             //
             if ((matchingFrom != Match.FAILED) && (matchingTo != Match.FAILED)) {
                 matchingRules.add(policy);

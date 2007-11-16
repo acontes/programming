@@ -184,9 +184,10 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
                 securityContext = SecurityContext.mergeContexts(securityContext,
                         this.parent.getPolicy(local, distant));
             } catch (SecurityNotAvailableException e) {
-                e.printStackTrace();
+                logger.debug("my parent entity " + this.parent.toString() +
+                    "has no security manager, I ignore him");
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.debug("cannot contact my parent entity " + this.parent);
             }
         }
 
@@ -1399,7 +1400,7 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
                 entities = this.parent.getEntities();
             } catch (SecurityNotAvailableException e) {
                 // forget it
-            	e.printStackTrace();
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
