@@ -43,6 +43,7 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
+import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
@@ -156,7 +157,7 @@ public class MetaObjectInterfaceClassGenerator
                         implField);
                 generatedCtClass.addMethod(implSetter);
 
-                // field for overriden methods
+                // field for overridden methods
                 CtField methodsField = new CtField(pool.get(
                             "java.lang.reflect.Method[]"), "overridenMethods",
                         generatedCtClass);
@@ -205,8 +206,8 @@ public class MetaObjectInterfaceClassGenerator
                     }
                 }
 
-                reifiedMethods = (methodsToImplement.values()
-                                                    .toArray(new CtMethod[methodsToImplement.size()]));
+                reifiedMethods = methodsToImplement.values()
+                                                   .toArray(new CtMethod[methodsToImplement.size()]);
 
                 // Determines which reifiedMethods are valid for reification
                 // It is the responsibility of method checkMethod in class Utils
