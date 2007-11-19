@@ -173,21 +173,18 @@ public class Test extends FunctionalTest {
         public boolean validationError = false;
         public SAXParseException saxParseException = null;
 
-        @Override
         public void error(SAXParseException exception)
             throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
-        @Override
         public void fatalError(SAXParseException exception)
             throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
-        @Override
         public void warning(SAXParseException exception)
             throws SAXException {
         }

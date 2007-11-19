@@ -597,7 +597,6 @@ public class JobFactory {
         public ValidatingErrorHandler() {
         }
 
-        @Override
         public void error(SAXParseException exception)
             throws SAXException {
             System.err.println("ERROR:" + exception.getMessage() + " at line " +
@@ -606,7 +605,6 @@ public class JobFactory {
             mistakes++;
         }
 
-        @Override
         public void fatalError(SAXParseException exception)
             throws SAXException {
             System.err.println("ERROR:" + exception.getMessage() + " at line " +
@@ -615,7 +613,6 @@ public class JobFactory {
             mistakes++;
         }
 
-        @Override
         public void warning(SAXParseException exception)
             throws SAXException {
             System.err.println("WARNING:" + exception.getMessage() +
