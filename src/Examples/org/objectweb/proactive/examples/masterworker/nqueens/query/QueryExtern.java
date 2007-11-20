@@ -33,8 +33,8 @@ package org.objectweb.proactive.examples.masterworker.nqueens.query;
 import java.io.Serializable;
 
 import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extra.masterworker.interfaces.Task;
-import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 
 public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
