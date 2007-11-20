@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="urn:proactive:security:1.0"
-	xmlns="urn:proactive:security:1.0"
+	targetNamespace="urn:proactive:security:1.1"
+	xmlns="urn:proactive:security:1.1"
 	elementFormDefault="qualified" attributeFormDefault="unqualified"
-	version="1.0">
+	version="1.1">
 	<!--  The following element  defines the root of the schema -->
 
 	<xs:element name="Policy">
@@ -16,11 +16,9 @@
 			<xs:sequence>
 				<xs:element name="ApplicationName" minOccurs="1"
 					maxOccurs="1" type="xs:string" />
-				<xs:element name="Certificate" minOccurs="1"
+				<xs:element name="PKCS12KeyStore" minOccurs="1"
 					maxOccurs="1" type="xs:string" />
-				<xs:element name="PrivateKey" minOccurs="1"
-					maxOccurs="1" type="xs:string" />
-				<xs:element name="CertificationAuthority" minOccurs="1"
+				<xs:element name="CertificationAuthority" minOccurs="0"
 					maxOccurs="1" type="CertificateOwnerType" />
 				<xs:element name="TrustedCertificationAuthority"
 					minOccurs="0" maxOccurs="1" type="CertificateOwnerType" />
@@ -32,9 +30,17 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="AccessRights" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Entity" minOccurs="0"
+								maxOccurs="unbounded" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 			<xs:attribute name="schemaVersion" type="xs:decimal"
-				use="required" fixed="1.0" />
+				use="required" fixed="1.1" />
 		</xs:complexType>
 	</xs:element>
 
@@ -98,7 +104,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="Entity" maxOccurs="unbounded"
-					minOccurs="1" />
+					minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -107,7 +113,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="Entity" maxOccurs="unbounded"
-					minOccurs="1" />
+					minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -126,6 +132,4 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
-
 </xs:schema>

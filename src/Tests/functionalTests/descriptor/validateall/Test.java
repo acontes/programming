@@ -120,6 +120,7 @@ public class Test extends FunctionalTest {
         try {
             parser.parse(xmlDescriptor.getAbsolutePath());
         } catch (SAXException exp) {
+            exp.printStackTrace();
         } finally {
             if (handler.validationError) {
                 System.out.println("Error occured when parsing \"" +

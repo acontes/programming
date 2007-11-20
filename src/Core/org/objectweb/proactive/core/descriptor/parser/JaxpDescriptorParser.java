@@ -194,12 +194,16 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         String deploymentSchema = getClass()
                                       .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/deployment/3.3/deployment.xsd")
                                       .toString();
-        String securitySchema = getClass()
-                                    .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd")
-                                    .toString();
-
+        String securitySchemav1_0 = getClass()
+                                        .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd")
+                                        .toString();
+        String securitySchemav1_1 = getClass()
+                                        .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.1/security.xsd")
+                                        .toString();
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-            new Object[] { deploymentSchema, securitySchema });
+            new Object[] {
+                deploymentSchema, securitySchemav1_0, securitySchemav1_1
+            });
         this.xmlDescriptorUrl = xmlDescriptorUrl;
         this.variableContract = variableContract;
     }
@@ -430,9 +434,12 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             String varName = varNameItem.getNodeValue();
 
-            Node varValueItem = node.getAttributes().getNamedItem("value");
-            String varValue = checkNonEmptyNode(varValueItem)
-                ? varValueItem.getNodeValue() : "";
+            String varValue = getNodeExpandedValue(node.getAttributes()
+                                                       .getNamedItem("value"));
+
+            if (varValue == null) {
+                varValue = "";
+            }
 
             variableContract.setDescriptorVariable(varName, varValue,
                 varContractType);

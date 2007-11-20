@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Policy xmlns="urn:proactive:security:1.0" schemaVersion="1.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:security:1.0 /user/nhouillo/home/ws/ProActive/src/Core/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd">
+<Policy xmlns="urn:proactive:security:1.1" schemaVersion="1.1"
+	xsi:schemaLocation="urn:proactive:security:1.1 http://www-sop.inria.fr/oasis/ProActive/schemas/security/1.1/security.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ApplicationName>CN=Garden3</ApplicationName>
 	<PKCS12KeyStore>dev/security/keystores/keystore3.p12</PKCS12KeyStore>
 	<CertificationAuthority>
