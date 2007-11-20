@@ -34,13 +34,11 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.runtime.LocalNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
@@ -206,23 +204,6 @@ public class FutureMonitoring implements Runnable {
                 futures.add(fp);
             }
         }
-    }
-
-    /**
-     * Add a future to the list of monitored future. This is automatically done
-     * when waiting a future. If the active object serving the method for this
-     * future cannot be pinged, the future is updated with a RuntimeException.
-     * @param future the future object to monitor
-     */
-    @PublicAPI
-    public static void monitorFuture(Object future) {
-        if (!MOP.isReifiedObject(future)) {
-            throw new IllegalArgumentException(
-                "Parameter is not a future object (actual type is " +
-                future.getClass().getName() + ")");
-        }
-        FutureProxy fp = (FutureProxy) ((StubObject) future).getProxy();
-        monitorFutureProxy(fp);
     }
 
     /**

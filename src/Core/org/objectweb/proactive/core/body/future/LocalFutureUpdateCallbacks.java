@@ -43,6 +43,10 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
+/**
+ * An implementation of java.util.concurrent.Future wrapping a MethodCallResult.
+ * Passed as parameter to the user defined callback on future update.
+ */
 class ProActiveFuture implements java.util.concurrent.Future<Object> {
     private MethodCallResult result;
 
@@ -78,7 +82,7 @@ class ProActiveFuture implements java.util.concurrent.Future<Object> {
 
 
 /**
- * A callback is method declared as 'void myCallback(FutureResult fr)'
+ * A callback is method declared as 'void myCallback(java.util.concurrent.Future fr)'
  * It is added using addFutureCallback(myFuture, "myCallback"), and will be
  * queued when the future is updated on ProActive.getBodyOnThis()
  * Callbacks are local, so are not copied when a future is serialized.
@@ -118,7 +122,7 @@ public class LocalFutureUpdateCallbacks {
 
     void run() {
         ProActiveFuture[] args = new ProActiveFuture[] {
-                new ProActiveFuture(this.future.getFutureResult())
+                new ProActiveFuture(this.future.getMethodCallResult())
             };
 
         for (Method m : this.methods) {

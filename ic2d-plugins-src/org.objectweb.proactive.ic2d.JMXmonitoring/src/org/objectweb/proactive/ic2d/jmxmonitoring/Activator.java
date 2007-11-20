@@ -30,11 +30,18 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring;
 
-import javassist.ClassClassPath;
-import javassist.ClassPool;
+import java.util.Iterator;
 
+
+//import javassist.ClassClassPath;
+//import javassist.ClassPool;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.BodyMap;
+import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.osgi.framework.BundleContext;
@@ -69,11 +76,12 @@ public class Activator extends AbstractUIPlugin {
 
         RuntimeFactory.getDefaultRuntime();
         ProActiveRuntimeImpl.getProActiveRuntime();
+
         //RuntimeFactory.getDefaultRuntime().getURL();
 
         // add current classpath for javassist class pool
-        ClassPool pool = ClassPool.getDefault();
-        pool.insertClassPath(new ClassClassPath(this.getClass()));
+        //       ClassPool pool = ClassPool.getDefault();
+        //     pool.insertClassPath(new ClassClassPath(this.getClass()));
 
         //        URL u = PAProperties.class.getResource("proactive-log4j");
         //        Properties p = new Properties();
@@ -88,6 +96,12 @@ public class Activator extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         JMXNotificationManager nm = JMXNotificationManager.getInstance();
         nm.kill();
+
+        ProActiveRuntimeImpl.getProActiveRuntime().killAllNodes();
+        ProActiveRuntimeImpl.getProActiveRuntime().getRemoteObjectExposer()
+                            .unregisterAll();
+
+        unregisterAllHalfBodiesFromRegistry();
         plugin = null;
         super.stop(context);
     }
@@ -99,5 +113,28 @@ public class Activator extends AbstractUIPlugin {
      */
     public static Activator getDefault() {
         return plugin;
+    }
+
+    private void unregisterAllHalfBodiesFromRegistry() {
+        BodyMap bm = LocalBodyStore.getInstance().getLocalHalfBodies();
+
+        System.out.println(bm.size() + " half bodies found in the registry. ");
+        Iterator<UniversalBody> halfBodies = bm.bodiesIterator();
+        while (halfBodies.hasNext()) {
+            UniversalBody universalBody = halfBodies.next();
+
+            if (universalBody instanceof AbstractBody) {
+                try {
+                    RemoteObjectExposer roe = ((AbstractBody) universalBody).getRemoteObjectExposer();
+
+                    roe.unregisterAll();
+                    System.out.println("Unregistered Half Body: " +
+                        universalBody.toString() + " ");
+                } catch (Exception e) {
+                    System.out.println("Could not unregister HalfBody " +
+                        universalBody + " from registry." + e.getMessage());
+                }
+            }
+        }
     }
 }
