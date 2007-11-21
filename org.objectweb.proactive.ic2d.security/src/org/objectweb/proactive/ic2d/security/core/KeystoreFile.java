@@ -28,31 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.security.perspectives;
+package org.objectweb.proactive.ic2d.security.core;
 
-import org.eclipse.ui.IFolderLayout;
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPerspectiveFactory;
-import org.objectweb.proactive.ic2d.security.views.PolicyEditorView;
+public class KeystoreFile extends CertificateTreeList {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4612887605387014845L;
+    private String name;
 
-public class SecurityPerspective implements IPerspectiveFactory {
-    public static final String ID = "org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective";
+    public KeystoreFile(String name, CertificateTreeList trees) {
+        super(trees);
+        this.name = name;
+    }
 
-    /** Top folder's id. */
-    public static final String FI_TOP = ID + ".topFolder";
+    public String getName() {
+        return this.name;
+    }
 
-    //
-    // -- PUBLIC METHODS ----------------------------------------------
-    //
-    public void createInitialLayout(IPageLayout layout) {
-        String editorAreaId = layout.getEditorArea();
-        layout.setEditorAreaVisible(false);
-        layout.setFixed(false);
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
-                0.75f, editorAreaId);
-        topFolder.addView(PolicyEditorView.ID);
-        topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
+    @Override
+    public String toString() {
+        return this.name;
     }
 }

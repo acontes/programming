@@ -28,31 +28,38 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.security.perspectives;
+package org.objectweb.proactive.ic2d.security.core;
 
-import org.eclipse.ui.IFolderLayout;
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPerspectiveFactory;
-import org.objectweb.proactive.ic2d.security.views.PolicyEditorView;
+import java.util.List;
 
 
-public class SecurityPerspective implements IPerspectiveFactory {
-    public static final String ID = "org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective";
+public class PolicyFile {
+    private String applicationName;
+    private String keystorePath;
+    private List<SimplePolicyRule> rules;
+    private List<String> authorizedUsers;
 
-    /** Top folder's id. */
-    public static final String FI_TOP = ID + ".topFolder";
+    public PolicyFile(String applicationName, String keystorePath,
+        List<SimplePolicyRule> rules, List<String> authorizedUsers) {
+        this.applicationName = applicationName;
+        this.keystorePath = keystorePath;
+        this.rules = rules;
+        this.authorizedUsers = authorizedUsers;
+    }
 
-    //
-    // -- PUBLIC METHODS ----------------------------------------------
-    //
-    public void createInitialLayout(IPageLayout layout) {
-        String editorAreaId = layout.getEditorArea();
-        layout.setEditorAreaVisible(false);
-        layout.setFixed(false);
+    public String getApplicationName() {
+        return this.applicationName;
+    }
 
-        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
-                0.75f, editorAreaId);
-        topFolder.addView(PolicyEditorView.ID);
-        topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
+    public List<String> getAuthorizedUsers() {
+        return this.authorizedUsers;
+    }
+
+    public String getKeystorePath() {
+        return this.keystorePath;
+    }
+
+    public List<SimplePolicyRule> getRules() {
+        return this.rules;
     }
 }

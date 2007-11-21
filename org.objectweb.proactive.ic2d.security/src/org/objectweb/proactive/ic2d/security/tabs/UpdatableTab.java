@@ -28,31 +28,16 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.security.perspectives;
+package org.objectweb.proactive.ic2d.security.tabs;
 
-import org.eclipse.ui.IFolderLayout;
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPerspectiveFactory;
-import org.objectweb.proactive.ic2d.security.views.PolicyEditorView;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 
 
-public class SecurityPerspective implements IPerspectiveFactory {
-    public static final String ID = "org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective";
-
-    /** Top folder's id. */
-    public static final String FI_TOP = ID + ".topFolder";
-
-    //
-    // -- PUBLIC METHODS ----------------------------------------------
-    //
-    public void createInitialLayout(IPageLayout layout) {
-        String editorAreaId = layout.getEditorArea();
-        layout.setEditorAreaVisible(false);
-        layout.setFixed(false);
-
-        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
-                0.75f, editorAreaId);
-        topFolder.addView(PolicyEditorView.ID);
-        topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
+public abstract class UpdatableTab extends CTabItem {
+    public UpdatableTab(CTabFolder parent, int style) {
+        super(parent, style);
     }
+
+    abstract public void update();
 }

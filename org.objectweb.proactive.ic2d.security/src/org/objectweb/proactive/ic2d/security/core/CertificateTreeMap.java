@@ -28,31 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.security.perspectives;
+package org.objectweb.proactive.ic2d.security.core;
 
-import org.eclipse.ui.IFolderLayout;
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPerspectiveFactory;
-import org.objectweb.proactive.ic2d.security.views.PolicyEditorView;
+import java.util.HashMap;
+import java.util.List;
+
+import org.objectweb.proactive.core.security.TypedCertificate;
 
 
-public class SecurityPerspective implements IPerspectiveFactory {
-    public static final String ID = "org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective";
+public class CertificateTreeMap extends HashMap<CertificateTree, List<TypedCertificate>> {
 
-    /** Top folder's id. */
-    public static final String FI_TOP = ID + ".topFolder";
-
-    //
-    // -- PUBLIC METHODS ----------------------------------------------
-    //
-    public void createInitialLayout(IPageLayout layout) {
-        String editorAreaId = layout.getEditorArea();
-        layout.setEditorAreaVisible(false);
-        layout.setFixed(false);
-
-        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
-                0.75f, editorAreaId);
-        topFolder.addView(PolicyEditorView.ID);
-        topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
-    }
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3833428238200053254L;
 }
