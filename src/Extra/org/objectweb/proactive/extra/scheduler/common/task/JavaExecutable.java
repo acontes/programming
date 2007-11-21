@@ -30,71 +30,28 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.task;
 
+import java.util.Map;
+
 
 /**
- * The status of each task submitted by the user
+ * A java task is a task representing a java .class file.
+ * Extends this abstract class if you want to create your own java task.
+ * This class provides an {@link #init(Map)} your arguments back for this task.
  *
- * @author ProActive Team
- * @version 1.1, Jun 28, 2007
+ * @author jlscheef - ProActiveTeam
+ * @version 1.0, Jun 4, 2007
  * @since ProActive 3.2
  */
-public enum Status implements java.io.Serializable {
-    /**
-     *
-     * The task has just been submitted by the user
-     */
-    SUBMITTED("Submitted"),
-    /**
-     * The task is in the scheduler pending queue
-     */
-    PENDING("Pending"),
-    /**
-     * The task is paused.
-     */
-    PAUSED("Paused"),
-    /**
-     * The task is executing
-     */
-    RUNNNING("Running"),
-    /**
-     * The task is failed
-     */
-    FAILED("Failed"),
-    /**
-     * The task could not be started.
-     * Warning, it means that the task could not be started due to
-     * dependences failure.
-     */
-    NOT_STARTED("Could not start"),
-    /**
-     * The task has been canceled.
-     */
-    CANCELLED("Canceled"),
-    /**
-     * The task has been aborted by an exception on an other task
-     */
-    ABORTED("Aborted"),
-    /**
-     * The task has finished execution
-     */
-    FINISHED("Finished");
-    /** The name of the current status. */
-    private String name;
+public abstract class JavaExecutable extends Executable {
 
     /**
-     * Implicit constructor of a status.
+     * Initialization default method for a task.
+     * By default it puts the parameters in class fields if their names are correctly mapped.
+     * You can override this method to make your own initialization.
      *
-     * @param name the name of the status.
+     * @param args a map containing the different variables names and values.
      */
-    Status(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @see java.lang.Enum#toString()
-     */
-    @Override
-    public String toString() {
-        return name;
+    public void init(Map<String, String> args) throws Exception {
+        // TODO : automatic assignation ?
     }
 }

@@ -43,7 +43,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeComparator;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -109,9 +109,10 @@ public class IMNodeSourceManager extends IMNodeSource {
 
     // METHODS FROM IMNODEMANAGER
     /**
-     * @see IMNodeManager#getNodesByScript(VerifyingScript, boolean)
+     * @see IMNodeManager#getNodesByScript(SelectionScript, boolean)
      */
-    public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+    @Override
+    public ArrayList<IMNode> getNodesByScript(SelectionScript script,
         boolean ordered) {
         ArrayList<IMNode> res = new ArrayList<IMNode>();
         res.addAll(padNS.getNodesByScript(script, false));
@@ -127,6 +128,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * delegate to the imnode's original nodesource.
      */
+    @Override
     public void setBusy(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -137,6 +139,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * delegate to the imnode's original nodesource.
      */
+    @Override
     public void setDown(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -147,6 +150,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * delegate to the imnode's original nodesource.
      */
+    @Override
     public void setFree(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -157,6 +161,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * ShutDown all managed node sources.
      */
+    @Override
     public BooleanWrapper shutdown() {
         Boolean res = padNS.shutdown().booleanValue();
         for (DynamicNodeSource dns : dynNS)

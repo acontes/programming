@@ -43,7 +43,7 @@
         <listitem>
           
           <para>Include in your <literal>CLASSPATH</literal> the 
-          	ProActive jar file <literal>ProActive/dist/ProActive.jar</literal>
+          	ProActive jar file <literal>ProActive/dist/lib/ProActive.jar</literal>
           		along with <literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
@@ -190,7 +190,7 @@
     following jar files :</para>
     <itemizedlist>
       <listitem>
-        <para><literal>dist/ProActive/ProActive.jar</literal> - main library</para>
+        <para><literal>dist/lib/ProActive.jar</literal> - main library</para>
       </listitem>
 
       <listitem>

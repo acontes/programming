@@ -158,6 +158,8 @@ public class LDAPLoginModule implements LoginModule {
         }
 
         // verify the username and password
+        boolean usernameExists = false;
+        boolean passwordMatch = false;
 
         // Get the UID of the user by an anonymous connection to the LDAP server
         // (null = not found)
@@ -167,33 +169,50 @@ public class LDAPLoginModule implements LoginModule {
         } catch (NamingException e) {
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
-
-        if ((userID == null) || !checkLDAPPassword(urlLDAP, userID, password)) {
-            throw new FailedLoginException("Incorrect Username/Password");
+        if (userID != null) {
+            usernameExists = true;
+            // Check if the password match the username
+            passwordMatch = checkLDAPPassword(urlLDAP, userID, password);
         }
 
-        if (debug) {
-            System.out.println("\t\t[LDAPLoginModule] " +
-                "authentication succeeded");
-        }
+        if (usernameExists && passwordMatch) {
+            // authentication succeeded!!!
+            if (debug) {
+                System.out.println("\t\t[LDAPLoginModule] " +
+                    "authentication succeeded");
+            }
 
-        succeeded = true;
-        return true;
+            succeeded = true;
+            return true;
+        } else {
+            // authentication failed -- clean out state
+            if (debug) {
+                System.out.println("\t\t[LDAPLoginModule] " +
+                    "authentication failed");
+            }
+            succeeded = false;
+            username = null;
+            if (!usernameExists) {
+                throw new FailedLoginException("User Name Doesn't exists");
+            } else {
+                throw new FailedLoginException("Password Incorrect");
+            }
+        }
     }
 
     /**
-         * <p>
-         * This method is called if the LoginContext's overall authentication
-         * succeeded (the relevant REQUIRED, REQUISITE, SUFFICIENT and OPTIONAL
-         * LoginModules succeeded).
-         * <p>
-         *
-         * @exception LoginException
-         *                if the commit fails.
-         *
-         * @return true if this LDAPLoginModule's own login and commit attempts
-         *         succeeded, or false otherwise.
-         */
+     * <p>
+     * This method is called if the LoginContext's overall authentication
+     * succeeded (the relevant REQUIRED, REQUISITE, SUFFICIENT and OPTIONAL
+     * LoginModules succeeded).
+     * <p>
+     *
+     * @exception LoginException
+     *                if the commit fails.
+     *
+     * @return true if this LDAPLoginModule's own login and commit attempts
+     *         succeeded, or false otherwise.
+     */
     public boolean commit() throws LoginException {
         return succeeded;
     }
@@ -337,6 +356,8 @@ public class LDAPLoginModule implements LoginModule {
             // Create the initial directory context
             ctx = new InitialDirContext(env);
         } catch (NamingException e) {
+            System.err.println("Problem connecting securely to LDAP server : " +
+                e);
             // Connexion failed, password is incorrect
             return false;
         }

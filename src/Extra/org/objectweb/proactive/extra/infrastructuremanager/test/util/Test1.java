@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 import junit.framework.TestCase;
 
@@ -51,6 +51,7 @@ public class Test1 extends TestCase {
     IMAdmin admin;
     IMMonitoring monitor;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         System.err.println("Creating resource manager...");
@@ -68,16 +69,16 @@ public class Test1 extends TestCase {
 
     public void testPrincipal() {
         try {
-            // Verifying script
-            VerifyingScript verif = new VerifyingScript(new File(
+            // selection script
+            SelectionScript verif = new SelectionScript(new File(
                         "/user/jmartin/home/scripts/test.js"), null);
 
-            // Dispay total nodes
+            // Displays total nodes
             int total = monitor.getNumberOfAllResources().intValue();
             System.err.println("total nodes = " + total);
             assertTrue("At Least one node", total > 0);
 
-            // Get Exactly 2 nodes not on fiacre
+            // Get Exactly 2 nodes not on fiacre for example
             NodeSet nodes = user.getExactlyNodes(new IntWrapper(2), verif);
 
             //Vector<Node> nodes = (Vector<Node>) ProActive.getFutureValue(rm.getExactlyNodes(2, verif, null));
@@ -99,11 +100,11 @@ public class Test1 extends TestCase {
             }
 
             //			URL url = new URL("http://localhost:10080/test.js");
-            //			verif = new VerifyingScript(url);
+            //			verif = new SelectionScript(url);
 
             //			Get At Most 3 nodes not on fiacre (but there is only 2 nodes corresponding"
             nodes = user.getAtMostNodes(new IntWrapper(3), verif);
-            ProFuture.waitFor((Object) nodes);
+            ProFuture.waitFor(nodes);
             if (!nodes.isEmpty()) {
                 System.err.println("nodes obtained = " + nodes.size());
                 for (Node n : nodes)
@@ -113,7 +114,7 @@ public class Test1 extends TestCase {
                     monitor.getNumberOfAllResources().intValue() -
                     monitor.getNumberOfFreeResource().intValue());
                 System.err.println(monitor.getNumberOfFreeResource());
-                // Release thoose nodes
+                // Release those nodes
                 user.freeNodes(nodes);
                 Thread.sleep(5000);
                 assertEquals("freeNodes After",
@@ -125,6 +126,7 @@ public class Test1 extends TestCase {
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         System.err.println("Stopping test");

@@ -33,13 +33,10 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 import java.io.File;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
 
 
 public class IMLauncher {
@@ -61,7 +58,7 @@ public class IMLauncher {
         IMUser user = IMFactory.getUser();
         IMMonitoring monitor = IMFactory.getMonitoring();
         admin.deployAllVirtualNodes(new File(
-                "../../../descriptors/scheduler/deployment/test.xml"), null);
+                "../../../descriptors/scheduler/deployment/test_all.xml"), null);
         // admin.deployAllVirtualNodes(new File(
         // "/user/jmartin/home/test.xml"),
         // null);

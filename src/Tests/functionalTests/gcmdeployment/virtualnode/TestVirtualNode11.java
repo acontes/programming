@@ -28,29 +28,30 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.common.task;
+package functionalTests.gcmdeployment.virtualnode;
 
-import java.util.Map;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.xml.xpath.XPathExpressionException;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.xml.sax.SAXException;
 
 
-/**
- * A java task is a task representing a java .class file.
- * Extends this abstract class if you want to create your own java task.
- *
- * @author ProActive Team
- * @version 1.0, Jun 4, 2007
- * @since ProActive 3.2
- */
-public abstract class ExecutableJavaTask extends ExecutableTask {
+public class TestVirtualNode11 extends Abstract {
+    @Test
+    public void test()
+        throws IllegalArgumentException, XPathExpressionException,
+            FileNotFoundException, SAXException, IOException {
+        GCMApplicationDescriptor gcma = API.getGCMApplicationDescriptor(getDescriptor());
+        waitAllocation();
 
-    /**
-     * Initialization default method for a task.
-     * By default it puts the parameters in class fields if their names are correctly mapped.
-     * You can override this method to make your own initialization.
-     *
-     * @param args a map containing the different variables names and values.
-     */
-    public void init(Map<String, Object> args) throws Exception {
-        // TODO : automatic assignation ?
+        VirtualNode vn = gcma.getVirtualNode("vn");
+        Assert.assertEquals(7, vn.getNodes().size());
     }
 }
