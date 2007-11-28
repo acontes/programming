@@ -1703,6 +1703,8 @@
 		<xs:all>
 			<xs:element minOccurs="1" name="processNumber"
 				type="PosintOrVariableType" />
+			<xs:element minOccurs="0" name="nolocal"
+				type="TextOrVariableType" />				
 			<xs:element minOccurs="1" name="localRelativePath"
 				type="FilePathType" />
 			<xs:element minOccurs="0" name="remoteAbsolutePath"

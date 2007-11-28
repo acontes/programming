@@ -63,7 +63,7 @@ int ProActiveMPI_IRecv(void* buf, int count, MPI_Datatype datatype, int src, int
 int ProActiveMPI_Test(ProActiveMPI_Request *r, int* flag);
 int ProActiveMPI_Wait(ProActiveMPI_Request *r);
 int ProActiveMPI_AllSend(void * buf, int count, MPI_Datatype datatype, int tag, int idjob);
-int ProActiveMPI_Job(int * job);
+void ProActiveMPI_Job(int * job, int * nb_process);
 int ProActiveMPI_Barrier(int job);
 int ProActiveMPI_Finalize();
 
@@ -76,11 +76,13 @@ void proactivempi_init_(int* rank,  int* ierr);
 void proactivempi_job_(int* job, int* ierr);
 void proactivempi_send_(void * buf, int* cnt, MPI_Datatype* datatype, int* dest, int* tag, int* idjob, int* ierr);
 void proactivempi_recv_(void* buf, int* cnt, MPI_Datatype* datatype, int* src, int* tag, int* idjob, int* ierr);
-/*void proActivempi_irecv_(void* buf, int* cnt, MPI_Datatype* datatype, int* src, int* tag, int* idjob, int * request, int* ierr);
+/*
+ * void proActivempi_irecv_(void* buf, int* cnt, MPI_Datatype* datatype, int* src, int* tag, int* idjob, int * request, int* ierr);
 void proactivempi_test_(int *r, int* flag, int* ierr);
-void proactivempi_wait_(int *r, int* ierr);*/
+void proactivempi_wait_(int *r, int* ierr);
+*/
 void proactivempi_finalize_(int* ierr);  
-void proActivempi_barrier_(int* job, int* ierr);
+void proactivempi_barrier_(int* job, int* ierr);
 void proactivempi_allsend_(void * buf, int* cnt, MPI_Datatype* datatype, int* tag, int* idjob, int*ierr);
 
 

@@ -61,6 +61,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
     protected String mpiCommandOptions = null;
     protected String hostsFileName = DEFAULT_HOSTSFILENAME_PATH;
     protected String mpiFileName = null;
+    protected boolean nolocal = false;
     protected String localPath = DEFAULT_FILE_LOCATION;
     protected String remotePath = null;
     protected String hostsNumber = DEFAULT_HOSTS_NUMBER;
@@ -105,19 +106,17 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
             mpiSubCommand.append("-machinefile").append(" ");
             mpiSubCommand.append(remotePath).append("/");
             mpiSubCommand.append(this.hostsFileName).append(" ");
-            mpiSubCommand.append("-nolocal").append(" ");
         } else {
-            mpiSubCommand.append("-machinefile").append(" ");
-            mpiSubCommand.append(this.hostsFileName).append(" ");
-            mpiSubCommand.append("-nolocal").append(" ");
+            mpiSubCommand.append("-machinefile ").append(this.hostsFileName)
+                         .append(" ");
         }
-        //        else {
-        //            mpiSubCommand.append("-machinefile").append(" ");
-        //            mpiSubCommand.append(this.hostsFileName).append(" ");
-        //            mpiSubCommand.append("-nolocal").append(" ");        	
-        //        }
-        mpiSubCommand.append("-np").append(" ");
-        mpiSubCommand.append(this.hostsNumber).append(" ");
+
+        if (nolocal) {
+            mpiSubCommand.append("-nolocal ");
+        }
+
+        mpiSubCommand.append("-np").append(" " + this.hostsNumber + " ");
+
         if (remotePath != null) {
             mpiSubCommand.append(remotePath).append("/");
         } else {
@@ -202,6 +201,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
      * @param localPath The localPath to set.
      */
     public void setLocalPath(String localPath) {
+        //    	this.localPath = "/home/sophia/vcave/proactive.mpi/src/Examples/org/objectweb/proactive/examples/mpi/proactive_poisson3d_sliced";
         this.localPath = localPath;
     }
 
@@ -241,6 +241,10 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
 
     public int getNodeNumber() {
         return 0;
+    }
+
+    public void setNoLocal(String nodeExpandedValue) {
+        nolocal = nodeExpandedValue.equals("true");
     }
 
     /******************************************************************************************

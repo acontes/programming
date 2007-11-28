@@ -62,7 +62,7 @@ public class ProActiveMPIComm {
 
     private native int initSendQueue();
 
-    private native int sendJobNb(int jobNumber);
+    private native int sendJobNb(int jobNumber, int nbJob);
 
     private native int init(String userPath, int r);
 
@@ -144,8 +144,8 @@ public class ProActiveMPIComm {
         t.start();
     }
 
-    public void sendJobNumberAndRegister() {
-        sendJobNumber(jobID);
+    public void sendJobNumberAndRegister(int nbJob) {
+        sendJobNumber(jobID, nbJob);
         this.manager.register(this.jobID, myRank);
     }
 
@@ -191,9 +191,10 @@ public class ProActiveMPIComm {
         return res;
     }
 
-    public void sendJobNumber(int jobNumber) {
+    public void sendJobNumber(int jobNumber, int nbJob) {
+        int ret = sendJobNb(jobNumber, nbJob);
         logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] sendJobNumber> send job number " + sendJobNb(jobNumber));
+            "] sendJobNumber> send job number " + ret);
     }
 
     public void receiveFromMpi(ProActiveMPIData m_r) {
@@ -231,7 +232,7 @@ public class ProActiveMPIComm {
 
         public void run() {
             //      signal the job manager that this daemon is ok to recv message
-            myProxy.register();
+            myProxy.nativeInterfaceReady();
             ProActiveMPIData m_r = new ProActiveMPIData();
             byte[] data;
             Ack ack = new Ack();
@@ -247,7 +248,7 @@ public class ProActiveMPIComm {
                         //check msg_type
                         if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_INIT) {
                             myRank = m_r.getSrc();
-                            myProxy.registerProcess(myRank);
+                            myProxy.register(myRank);
                             asleepThread();
                         } else if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_SEND) {
                             m_r.setData(data);

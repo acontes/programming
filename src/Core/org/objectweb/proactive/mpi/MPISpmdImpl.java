@@ -31,15 +31,12 @@
 package org.objectweb.proactive.mpi;
 
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.text.DefaultCaret;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -64,19 +61,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
 
     /**  Virtual Node containing resources */
     private VirtualNodeInternal vn;
-
-    /** user SPMD classes name */
-    private ArrayList<String> spmdClasses = null;
-
-    /** user SPMD classes params */
-    private Hashtable<String, ArrayList<Object[]>> spmdClassesParams;
-
-    /** user classes name */
-    private ArrayList<String> classes = null;
-
-    /** user classes params */
-    private Hashtable<String, Object[]> classesParams;
-    private Object[] classesParamsByRank;
+    private HashMap<String, LateDeploymentHelper> userClassToDeploy;
 
     // empty no-args constructor 
     public MPISpmdImpl() {
@@ -89,10 +74,11 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         ProActive.setImmediateService("killMPI");
         ProActive.setImmediateService("getStatus");
         ProActive.setImmediateService("isFinished");
-        ProActive.setImmediateService("getSpmdClassesParams");
-        ProActive.setImmediateService("getSpmdClasses");
-        ProActive.setImmediateService("getClassesParams");
-        ProActive.setImmediateService("getClasses");
+        ProActive.setImmediateService("getUserClassToDeploy");
+        //        ProActive.setImmediateService("getSpmdClassesParams");
+        //        ProActive.setImmediateService("getSpmdClasses");
+        //        ProActive.setImmediateService("getClassesParams");
+        //        ProActive.setImmediateService("getClasses");
         return 0; //synchronous call
     }
 
@@ -110,11 +96,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             vn.activate();
         }
         if (vn.hasMPIProcess()) {
-            this.spmdClasses = new ArrayList<String>();
-            this.classes = new ArrayList<String>();
-            this.spmdClassesParams = new Hashtable<String, ArrayList<Object[]>>();
-            this.classesParams = new Hashtable<String, Object[]>();
-            this.classesParamsByRank = new Object[vn.getNodes().length];
+            this.userClassToDeploy = new HashMap<String, LateDeploymentHelper>();
             this.mpiProcess = vn.getMPIProcess();
             this.name = vn.getName();
             this.vn = vn;
@@ -256,7 +238,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         return (MPIProcess) process;
     }
 
-    // returns the rank of MPI process in the processes hierarchie
+    // returns the rank of MPI process in the processes hierarchy
     private int getMPIProcessRank(ExternalProcess process) {
         int res = 0;
         while (!(process instanceof MPIProcess)) {
@@ -277,99 +259,110 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
     //  --+----+---- methods for the future wrapping with control ----+----+----
     //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
-    public void newActiveSpmd(String cl) {
-        if (spmdClasses.contains(cl) || classes.contains(cl)) {
-            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
-                " class has already been added to the list of user classes to instanciate ");
-        } else {
-            this.spmdClasses.add(cl);
-            ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
-            parameters.add(0, null);
-            parameters.add(1, null);
-            this.spmdClassesParams.put(cl, parameters);
-        }
-    }
-
-    public void newActiveSpmd(String cl, Object[] params) {
-        if (spmdClasses.contains(cl) || classes.contains(cl)) {
-            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
-                " class has already been added to the list of user classes to instanciate ");
-        } else {
-            this.spmdClasses.add(cl);
-
-            ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
-
-            // index=0 => Object[] type
-            // index=1 => Object[][] type
-            parameters.add(0, params);
-            parameters.add(1, null);
-            this.spmdClassesParams.put(cl, parameters);
-        }
-    }
-
     public void newActiveSpmd(String cl, Object[][] params) {
-        try {
-            //Vv can't handle null params array
-            if ((params != null) && (params.length != vn.getNodes().length)) {
-                throw new RuntimeException(
-                    "!!! ERROR: mismatch between number of parameters and number of Nodes");
-            }
+        if (params.length != vn.getNumberOfCreatedNodesAfterDeployment()) {
+            throw new RuntimeException(
+                "!!! ERROR: mismatch between number of parameters and number of Nodes");
+        }
 
-            if (spmdClasses.contains(cl) || classes.contains(cl)) {
-                MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
-                    " class has already been added to the list of user classes to instanciate ");
-            } else {
-                this.spmdClasses.add(cl);
-                ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
-
-                // index=0 => Object[] type
-                // index=1 => Object[][] type
-                parameters.add(0, null);
-                parameters.add(1, params);
-                this.spmdClassesParams.put(cl, parameters);
-            }
-        } catch (NodeException e) {
-            e.printStackTrace();
+        if (userClassToDeploy.containsKey(cl)) {
+            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
+                " class has already been added to the list of user classes to instanciate ");
+        } else {
+            userClassToDeploy.put(cl, new LateDeploymentHelper(-1, params));
         }
     }
 
     public void newActive(String cl, Object[] params, int rank)
         throws ArrayIndexOutOfBoundsException {
-        if (spmdClasses.contains(cl) ||
-                (classes.contains(cl) &&
-                (rank < this.classesParamsByRank.length) &&
-                (this.classesParamsByRank[rank] != null))) {
-            MPI_IMPL_LOGGER.info("!!! ERROR newActive: " + cl +
-                " class has already been added to the list of user classes to instanciate ");
-        } else if (rank < this.classesParamsByRank.length) {
-            if (!classes.contains(cl)) {
-                this.classes.add(cl);
+        if (checkRankValidity(rank)) {
+            LateDeploymentHelper di = userClassToDeploy.get(cl);
+            if (di == null) {
+                di = new LateDeploymentHelper();
+                di.update(rank, params);
+                userClassToDeploy.put(cl, di);
+            } else {
+                // check if rank is still available 
+                if (!di.update(rank, params)) {
+                    MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
+                        " class has already been added to the list of user classes to instanciate for this rank " +
+                        rank);
+                }
             }
-            this.classesParamsByRank[rank] = params;
-            this.classesParams.put(cl, this.classesParamsByRank);
         } else {
+            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: rank " + rank +
+                " is not valid ");
             throw new ArrayIndexOutOfBoundsException("Rank " + rank +
                 " is out of range while trying to instanciate class " + cl);
         }
     }
 
-    public ArrayList<String> getSpmdClasses() {
-        return this.spmdClasses;
-    }
-
-    public Hashtable<String, ArrayList<Object[]>> getSpmdClassesParams() {
-        return this.spmdClassesParams;
-    }
-
-    public ArrayList<String> getClasses() {
-        return this.classes;
-    }
-
-    public Hashtable<String, Object[]> getClassesParams() {
-        return this.classesParams;
+    private boolean checkRankValidity(int rank) {
+        //TODO avoid usage of getNumberOfCreatedNodesAfterDeployment
+        return (rank >= 0) &&
+        (rank < this.vn.getNumberOfCreatedNodesAfterDeployment());
     }
 
     public String getRemoteLibraryPath() {
         return getMPIProcess(this.mpiProcess).getRemotePath();
+    }
+
+    public static class LateDeploymentHelper {
+        private List<LateDeploymentHelper> userDefinedList;
+        private int rank;
+        private Object params;
+
+        public List<LateDeploymentHelper> getUserClassesRank() {
+            return userDefinedList;
+        }
+
+        public int getRank() {
+            return rank;
+        }
+
+        public Object getParams() {
+            return params;
+        }
+
+        public LateDeploymentHelper() {
+            userDefinedList = new LinkedList<LateDeploymentHelper>();
+        }
+
+        public LateDeploymentHelper(int i, Object params) {
+            this.rank = i;
+            this.params = params;
+        }
+
+        public boolean isSpmd() {
+            return (userDefinedList == null);
+        }
+
+        public boolean isUserClass() {
+            return !isSpmd();
+        }
+
+        public boolean update(int rank, Object[] params) {
+            if (isAssigned(rank)) {
+                return false;
+            } else {
+                userDefinedList.add(new LateDeploymentHelper(rank, params));
+                return true;
+            }
+        }
+
+        private boolean isAssigned(int rank) {
+            Iterator<LateDeploymentHelper> it = userDefinedList.iterator();
+            while (it.hasNext()) {
+                LateDeploymentHelper ri = it.next();
+                if (rank == ri.rank) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public HashMap<String, LateDeploymentHelper> getUserClassToDeploy() {
+        return userClassToDeploy;
     }
 }

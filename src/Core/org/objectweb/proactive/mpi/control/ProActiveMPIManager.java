@@ -30,10 +30,15 @@
  */
 package org.objectweb.proactive.mpi.control;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -46,8 +51,11 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.filetransfer.*;
-import org.objectweb.proactive.mpi.*;
+import org.objectweb.proactive.filetransfer.FileTransfer;
+import org.objectweb.proactive.filetransfer.FileVector;
+import org.objectweb.proactive.mpi.MPIResult;
+import org.objectweb.proactive.mpi.MPISpmd;
+import org.objectweb.proactive.mpi.MPISpmdImpl.LateDeploymentHelper;
 
 
 public class ProActiveMPIManager implements Serializable {
@@ -58,7 +66,7 @@ public class ProActiveMPIManager implements Serializable {
     private static int currentJobNumber = 0;
 
     /** list of MPISpmd object */
-    private ArrayList mpiSpmdList;
+    private ArrayList<MPISpmd> mpiSpmdList;
 
     /*  Hashtable<jobID, ProActiveCoupling []> */
     private Hashtable<Integer, ProActiveMPICoupling[]> proxyMap;
@@ -67,7 +75,7 @@ public class ProActiveMPIManager implements Serializable {
     private Hashtable<Integer, ProActiveMPICoupling> spmdProxyMap;
 
     /*  Hashtable<jobID, Hashtable<class, ProSPMD user class || user proxy array>> */
-    private Hashtable<Integer, Hashtable> userProxyMap;
+    private Hashtable<Integer, Hashtable<String, Object>> userProxyMap;
 
     /*  ackToStart[jobID] = number of proxy registered */
     private int[] ackToStart;
@@ -79,11 +87,11 @@ public class ProActiveMPIManager implements Serializable {
     public ProActiveMPIManager() {
     }
 
-    public void deploy(ArrayList spmdList) {
+    public void deploy(ArrayList<MPISpmd> spmdList) {
         this.mpiSpmdList = spmdList;
         this.proxyMap = new Hashtable<Integer, ProActiveMPICoupling[]>();
         this.spmdProxyMap = new Hashtable<Integer, ProActiveMPICoupling>();
-        this.userProxyMap = new Hashtable<Integer, Hashtable>();
+        this.userProxyMap = new Hashtable<Integer, Hashtable<String, Object>>();
         this.ackToStart = new int[spmdList.size()];
         this.ackToRecv = new int[spmdList.size()];
 
@@ -91,8 +99,7 @@ public class ProActiveMPIManager implements Serializable {
         try {
             for (int i = 0; i < spmdList.size(); i++) {
                 VirtualNodeInternal vn = (VirtualNodeInternal) ((MPISpmd) spmdList.get(currentJobNumber)).getVn();
-                Node[] allNodes;
-                allNodes = vn.getNodes();
+                Node[] allNodes = vn.getNodes();
                 String remoteLibraryPath = ((MPISpmd) spmdList.get(currentJobNumber)).getRemoteLibraryPath();
 
                 ClassLoader cl = this.getClass().getClassLoader();
@@ -123,17 +130,18 @@ public class ProActiveMPIManager implements Serializable {
                     params[j] = new Object[] {
                             "ProActiveMPIComm",
                             (ProActiveMPIManager) ProActive.getStubOnThis(),
-                            new Integer(currentJobNumber)
+                            currentJobNumber
                         };
                 }
+
                 MPI_IMPL_LOGGER.info("[MANAGER] Create SPMD Proxy for jobID: " +
                     currentJobNumber);
                 ProActiveMPICoupling spmdCouplingProxy = (ProActiveMPICoupling) ProSPMD.newSPMDGroup(ProActiveMPICoupling.class.getName(),
                         params, vn);
 
                 // create ProSPMD proxy
-                this.spmdProxyMap.put(new Integer(currentJobNumber),
-                    spmdCouplingProxy);
+                this.spmdProxyMap.put(currentJobNumber, spmdCouplingProxy);
+
                 MPI_IMPL_LOGGER.info("[MANAGER] Initialize remote environments");
                 // initialize queues & semaphores and start thread
                 Ack ack = spmdCouplingProxy.initEnvironment();
@@ -143,10 +151,12 @@ public class ProActiveMPIManager implements Serializable {
                 // once environment is ready, start thread to get mpi process rank  
                 spmdCouplingProxy.createRecvThread();
                 // initialize joblist & and userProxyList table
-                this.proxyMap.put(new Integer(currentJobNumber),
+                //TODO why would we need this proxyMap as we already have the spmdCouplingProxy ??
+                this.proxyMap.put(currentJobNumber,
                     new ProActiveMPICoupling[allNodes.length]);
-                this.userProxyMap.put(new Integer(currentJobNumber),
-                    new Hashtable());
+
+                this.userProxyMap.put(currentJobNumber,
+                    new Hashtable<String, Object>());
 
                 currentJobNumber++;
                 //Vv Why don't we return a reference on the ProActiveMpiCoupling in order to avoid manipulate hazardous jobId ?
@@ -169,20 +179,24 @@ public class ProActiveMPIManager implements Serializable {
     public void register(int jobID, int rank) {
         // ack of corresponding job is null means that the 
         // job is ready to recv message from another job
-        MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
-            " register mpi process #" + rank);
+        MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID + " rank " + rank +
+            "has notified its mpi interface is ready (" +
+            (this.proxyMap.get(jobID).length - ackToRecv[jobID]) + "/" +
+            this.proxyMap.get(jobID).length + ")");
 
+        // Mpi process of that rank has been initialised 
         if (ackToRecv[jobID] == 0) {
             for (int i = 0; i < currentJobNumber; i++) {
+                // we wait for all jobs to finish Mpi initialisation
                 if (ackToRecv[i] != 0) {
                     return;
                 }
             }
             for (int i = 0; i < currentJobNumber; i++) {
-                ((ProActiveMPICoupling) spmdProxyMap.get(new Integer(i))).wakeUpThread();
+                ((ProActiveMPICoupling) spmdProxyMap.get(i)).wakeUpThread();
             }
         } else {
-            // we decrease the number of daemon rest
+            // we decrease the number of remaining ack to receive
             ackToRecv[jobID]--;
         }
     }
@@ -191,11 +205,7 @@ public class ProActiveMPIManager implements Serializable {
     public void register(int jobID, int rank,
         ProActiveMPICoupling activeProxyComm) {
         if (jobID < currentJobNumber) {
-            MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
-                " register mpi coupling proxy for mpi process #" + rank);
-
-            ProActiveMPICoupling[] mpiCouplingArray = ((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(
-                        jobID)));
+            ProActiveMPICoupling[] mpiCouplingArray = ((ProActiveMPICoupling[]) this.proxyMap.get(jobID));
 
             mpiCouplingArray[rank] = activeProxyComm;
 
@@ -219,17 +229,30 @@ public class ProActiveMPIManager implements Serializable {
                         e.printStackTrace();
                     }
                 }
-                deployUserSpmdClasses(jobID, orderedNodes);
-                deployUserClasses(jobID, orderedNodes);
+                Hashtable<String, Object> userProxyList = new Hashtable<String, Object>();
+                try {
+                    deployUserSpmdClasses(jobID, orderedNodes, userProxyList);
+                    deployUserClasses(jobID, orderedNodes, userProxyList);
+                } catch (ClassNotReifiableException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (ActiveObjectCreationException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NodeException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
 
             /* If all jobs have finished */
             for (int i = 0; i < currentJobNumber; i++) {
-                int jobListLength = ((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(
-                            i))).length;
+                int jobListLength = ((ProActiveMPICoupling[]) this.proxyMap.get(i)).length;
                 for (int j = 0; j < jobListLength; j++) {
-                    if (((ProActiveMPICoupling[]) this.proxyMap.get(
-                                new Integer(i)))[j] == null) {
+                    if (((ProActiveMPICoupling[]) this.proxyMap.get(i))[j] == null) {
                         return;
                     }
                 }
@@ -238,7 +261,8 @@ public class ProActiveMPIManager implements Serializable {
             for (int i = 0; i < currentJobNumber; i++) {
                 // send the table of User ProSpmd object to all the Proxy 
                 try {
-                    ((ProActiveMPICoupling) spmdProxyMap.get(new Integer(i))).notifyProxy(this.proxyMap,
+                    //TODO replace by a group call on the spmd proxy object
+                    ((ProActiveMPICoupling) spmdProxyMap.get(i)).notifyProxy(this.proxyMap,
                         this.spmdProxyMap, this.userProxyMap);
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
@@ -256,94 +280,66 @@ public class ProActiveMPIManager implements Serializable {
         return !this.debugWaitForInit;
     }
 
-    public void deployUserClasses(int jobID, Node[] orderedNodes) {
-        //    get the list of classes to instanciate for this MPISpmd object
-        // 	  and send it as parameter.
-        ArrayList classes = ((MPISpmd) mpiSpmdList.get(jobID)).getClasses();
-        if (!classes.isEmpty()) {
-            MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
-                " deploy user classes");
-            // get the table of parameters
-            Hashtable paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getClassesParams();
-            Hashtable<String, Object[]> userProxyList = new Hashtable<String, Object[]>();
-            Iterator iterator = classes.iterator();
-            while (iterator.hasNext()) {
-                String cl = (String) iterator.next();
-                try {
-                    Object[] parameters = (Object[]) paramsTable.get(cl);
-                    Object[] proxyList = new Object[parameters.length];
-                    for (int i = 0; i < parameters.length; i++) {
-                        Object[] params = (Object[]) parameters[i];
-                        if (params != null) {
-                            proxyList[i] = ProActive.newActive(cl, params,
-                                    orderedNodes[i]);
-                        }
-                    }
-                    userProxyList.put(cl, proxyList);
-                    this.userProxyMap.put(new Integer(jobID), userProxyList);
-                } catch (ActiveObjectCreationException e) {
-                    e.printStackTrace();
-                } catch (NodeException e) {
-                    e.printStackTrace();
+    public void deployUserClasses(int jobID, Node[] orderedNodes,
+        Hashtable<String, Object> userProxyList)
+        throws ActiveObjectCreationException, NodeException {
+        final HashMap<String, LateDeploymentHelper> userClassMap = mpiSpmdList.get(jobID)
+                                                                              .getUserClassToDeploy();
+
+        for (Iterator<Entry<String, LateDeploymentHelper>> iterator = userClassMap.entrySet()
+                                                                                  .iterator();
+                iterator.hasNext();) {
+            final Entry<String, LateDeploymentHelper> e = iterator.next();
+            LateDeploymentHelper d = null;
+            if ((d = e.getValue()).isUserClass()) {
+                final String classname = e.getKey();
+                final Object[] proxyList = new Object[orderedNodes.length];
+                final List<LateDeploymentHelper> list = d.getUserClassesRank();
+
+                /* Iterate over user class to instantiate */
+                for (Iterator<LateDeploymentHelper> rankIt = list.iterator();
+                        rankIt.hasNext();) {
+                    final LateDeploymentHelper userClassInfo = rankIt.next();
+                    proxyList[userClassInfo.getRank()] = ProActive.newActive(classname,
+                            (Object[]) userClassInfo.getParams(),
+                            orderedNodes[userClassInfo.getRank()]);
                 }
+                userProxyList.put(classname, proxyList);
             }
         }
+
+        this.userProxyMap.put(jobID, userProxyList);
     }
 
-    public void deployUserSpmdClasses(int jobID, Node[] orderedNodes) {
-        //  get the list of SPMD class to instanciate for this MPISpmd object
-        // 	  and send it as parameter.
-        ArrayList classes = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClasses();
-        if (!classes.isEmpty()) {
-            MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
-                " deploy user SPMD classes");
-            // get the table of parameters
-            Hashtable paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClassesParams();
-            Hashtable<String, Object> userProxyList = new Hashtable<String, Object>();
-            Iterator iterator = classes.iterator();
-            while (iterator.hasNext()) {
-                String cl = (String) iterator.next();
-                try {
-                    ArrayList parameters = (ArrayList) paramsTable.remove(cl);
+    public void deployUserSpmdClasses(int jobID, Node[] orderedNodes,
+        Hashtable<String, Object> userProxyList)
+        throws ClassNotReifiableException, ActiveObjectCreationException,
+            NodeException, ClassNotFoundException {
+        //  get the list of SPMD class to instantiate for this MPISpmd object and send it as parameter.
+        final HashMap<String, LateDeploymentHelper> userClassMap = mpiSpmdList.get(jobID)
+                                                                              .getUserClassToDeploy();
 
-                    // simple array parameter
-                    if (parameters.get(0) != null) {
-                        Object[] params = (Object[]) parameters.get(0);
-                        Object[][] p = new Object[orderedNodes.length][];
-                        for (int i = 0; i < orderedNodes.length; i++) {
-                            p[i] = params;
-                        }
-                        userProxyList.put(cl,
-                            ProSPMD.newSPMDGroup(cl, p, orderedNodes));
-                    } // matrix parameter 
-                    else if (parameters.get(1) != null) {
-                        Object[][] params = (Object[][]) parameters.get(1);
-                        userProxyList.put(cl,
-                            ProSPMD.newSPMDGroup(cl, params, orderedNodes));
-                    } // no parameters 
-                    else {
-                        Object[][] params = new Object[orderedNodes.length][];
-                        userProxyList.put(cl,
-                            ProSPMD.newSPMDGroup(cl, params, orderedNodes));
-                    }
-                    this.userProxyMap.put(new Integer(jobID), userProxyList);
-                } catch (ClassNotReifiableException e) {
-                    e.printStackTrace();
-                } catch (ActiveObjectCreationException e) {
-                    e.printStackTrace();
-                } catch (NodeException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } // end_try
-            } // end_while
-        } // end_if_classes
+        for (Iterator<Entry<String, LateDeploymentHelper>> iterator = userClassMap.entrySet()
+                                                                                  .iterator();
+                iterator.hasNext();) {
+            final Entry<String, LateDeploymentHelper> e = iterator.next();
+            LateDeploymentHelper d = null;
+            if ((d = e.getValue()).isSpmd()) {
+                userProxyList.put(e.getKey(),
+                    ProSPMD.newSPMDGroup(e.getKey(),
+                        (Object[][]) d.getParams(), orderedNodes));
+            }
+        }
+
+        this.userProxyMap.put(jobID, userProxyList);
     }
 
-    public void register(int jobID) {
+    public void notifyNativeInterfaceIsReady(int jobID) {
         // ack of job is null means we can start MPI application
         MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
-            " register mpi process before starting #");
+            " has notified its native interface is ready (" +
+            (this.proxyMap.get(jobID).length - ackToStart[jobID]) + "/" +
+            this.proxyMap.get(jobID).length + ")");
         if (ackToStart[jobID] == 0) {
             MPISpmd mpiSpmd = (MPISpmd) mpiSpmdList.get(jobID);
             MPIResult res = mpiSpmd.startMPI();
@@ -359,15 +355,13 @@ public class ProActiveMPIManager implements Serializable {
 
     public void unregister(int jobID, int rank) {
         if (jobID < currentJobNumber) {
-            ((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(jobID)))[rank] = null;
+            ((ProActiveMPICoupling[]) this.proxyMap.get(jobID))[rank] = null;
             MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID +
                 " unregister mpi process #" + rank);
             for (int i = 0; i < currentJobNumber; i++) {
-                int jobListLength = ((ProActiveMPICoupling[]) this.proxyMap.get(new Integer(
-                            i))).length;
+                int jobListLength = ((ProActiveMPICoupling[]) this.proxyMap.get(i)).length;
                 for (int j = 0; j < jobListLength; j++) {
-                    if (((ProActiveMPICoupling[]) this.proxyMap.get(
-                                new Integer(i)))[j] != null) {
+                    if (((ProActiveMPICoupling[]) this.proxyMap.get(i))[j] != null) {
                         return;
                     }
                 }
@@ -404,8 +398,7 @@ public class ProActiveMPIManager implements Serializable {
         m_r.setTag(tag);
         m_r.setJobID(jobID);
         if (jobID < proxyMap.size()) {
-            ProActiveMPICoupling[] arrayComm = (ProActiveMPICoupling[]) proxyMap.get(new Integer(
-                        jobID));
+            ProActiveMPICoupling[] arrayComm = (ProActiveMPICoupling[]) proxyMap.get(jobID);
             if ((dest < arrayComm.length) && (arrayComm[dest] != null)) {
                 return arrayComm[dest].receiveFromProActive(m_r);
             } else {

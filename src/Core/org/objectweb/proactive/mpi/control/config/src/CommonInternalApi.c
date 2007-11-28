@@ -1,7 +1,33 @@
 #include "CommonInternalApi.h" 
 
 int myRank=-1;
-FILE* mslog;
+//FILE* mslog;
+
+
+FILE * open_debug_log(char *path, int rank, char * prefix) {
+	char hostname[MAX_NOM];
+	char nombre[2];
+	int err = 0;
+	sprintf(nombre, "%d", rank);
+	gethostname(hostname, MAX_NOM);
+	umask(000);
+	err = mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO);
+	printf("MKDIR RET %d\n", err);
+//	if (err < 0) {
+//		perror("MKDIR failed because");
+//	}
+	
+	//TODO possible bug as EEXIST indicate that it could be a file
+	strcat(path, "/");
+	strcat(path, prefix);
+	strcat(path, "_");
+	strcat(path, hostname);
+	strcat(path, "_");
+	strcat(path, nombre);
+	printf("PATH %s\n", path);
+	
+	return fopen(path, "w");
+}
 
 void print_msg_t(FILE * f, msg_t * msg) {
 	fprintf(f, "[MSG_T] msgtype   %d\n", msg->msg_type);
@@ -22,18 +48,18 @@ void print_splitted_msg_t(FILE * f, splitted_msg_t * msg) {
 
 
 int debug_get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size) {
-//	MPI_Datatype mpi_datatype = type_conversion_proactive_to_MPI (datatype);
+	ProActive_Datatype pa_datatype = type_conversion_MPI_to_proactive (datatype);
 	
-	if (datatype == CONV_MPI_PROACTIVE_INT) {
-		return 4 * count;	
-	} else if (datatype == CONV_MPI_PROACTIVE_DOUBLE) {
-		return 8* count;
-	} else if (datatype == CONV_MPI_PROACTIVE_CHAR) {
-		return 1* count;
-	} else if (datatype == CONV_MPI_PROACTIVE_LONG) {
-		return 8* count;
+	if (pa_datatype == CONV_MPI_PROACTIVE_INT) {
+		return sizeof(int) * count;	
+	} else if (pa_datatype == CONV_MPI_PROACTIVE_DOUBLE) {
+		return sizeof(double) * count;
+	} else if (pa_datatype == CONV_MPI_PROACTIVE_CHAR) {
+		return sizeof(char)* count;
+	} else if (pa_datatype == CONV_MPI_PROACTIVE_LONG) {
+		return sizeof(long)* count;
 	} else {
-		printf("DEBUG UNKNOW TYPE\n");
+		printf("ERROR UNKNOW PROACTIVE_DATATYPE %d \n",pa_datatype);
 		exit(-4);
 	}
 	
@@ -112,7 +138,7 @@ int same_MPI_Datatype(MPI_Datatype datatype1, MPI_Datatype datatype2, char * nam
 	MPI_Type_get_name(datatype1, name1, &lg1);
 	MPI_Type_get_name(datatype2, name2, &lg2);
 	res = ((lg1 == lg2) && ((res = strcmp(name1, name2)) == 0)) ? 1 : -1;
-//	printf("[DEBUG_H ] same datatype %d,%s and %d,%s ? answer: %d \n", datatype1, name1,  datatype2, name2, res);
+//	printf("[DEBUG_COMMON_API ] same datatype %d,%s and %d,%s ? answer: %d \n", datatype1, name1,  datatype2, name2, res);
 	
 	return  res;
 }  */
@@ -299,13 +325,13 @@ int get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size) {
 		return byte_size * count * type_length;
 	
 	if (res == MPI_ERR_TYPE) {
-		if (VERBOSE_H_MSG) {
+		if (DEBUG_COMMON_API) {
 			fprintf(mslog, "ProActiveMPIComm: get_buffer_length: MPI_Type_size: Invalid datatype argument %d", MPI_ERR_TYPE);
 		}
 	}
 	
 	if (res == MPI_ERR_ARG) {
-		if (VERBOSE_H_MSG) {
+		if (DEBUG_COMMON_API) {
 			fprintf(mslog, "ProActiveMPIComm: get_buffer_length: MPI_Type_size: Invalid argument %d", MPI_ERR_ARG);
 		}
 	}
@@ -345,19 +371,24 @@ int recv_raw_msg_from_ipc_queue (int qid, long msg_type, void * recv_msg_buf,  i
  	int error = 0;
  	
 	error = msgrcv(qid, recv_msg_buf, size, msg_type, 0);
-	while (error < 0){	
-		strerror(errno);
-		if (VERBOSE_H_MSG) {
-			fprintf(mslog, "[recv_raw_msg_from_ipc_queue] !!! ERROR: msgrcv error ERRNO = %d, \n", errno);
-					perror("[recv_raw_msg_from_ipc_queue] !!! ERROR: ");
+	
+	while (error < 0){
+		error = errno;
+		if (DEBUG_COMMON_API) {
+			fprintf(mslog, "[recv_raw_msg_from_ipc_queue] !!! ERROR: msgrcv error ERRNO = %d, \n", error);
+			fprintf(mslog, "[recv_raw_msg_from_ipc_queue] ERROR dUmp: qid %d, msg_type %ld, size %d\n", qid, msg_type, size);
+			fprintf(mslog, "[recv_raw_msg_from_ipc_queue] PERROR STR :: %s", strerror(error));
 		}
 		
-		if (errno == EINTR){
-			if (VERBOSE_H_MSG) { fprintf(mslog, "!!! ERRNO = EINTR, \n");}
+		if (error == EINTR){
+			if (DEBUG_COMMON_API) { 
+				fprintf(mslog, "!!! ERRNO = EINTR, \n");
+			}
+			//TODO recursive call
 			error = msgrcv(qid, recv_msg_buf, size, msg_type, 0);
 		}
 		else{
-			perror("ERROR");
+			fprintf(mslog, "[recv_raw_msg_from_ipc_queue] msgrcv failed, exiting...");
 			return error; 
 		}
 	}
@@ -373,8 +404,8 @@ int recv_ipc_message(int qid, long int tag, msg_t * recv_msg) {
 	}
 	
 		
-	if (VERBOSE_H_MSG) {
-		fprintf(mslog,"[recv_ipc_message] Received message \n");			
+	if (DEBUG_COMMON_API) {
+		fprintf(mslog,"[recv_ipc_message] Received message \n");
 		print_msg_t(mslog, recv_msg);
 	}
 		
@@ -385,8 +416,13 @@ int recv_ipc_message(int qid, long int tag, msg_t * recv_msg) {
 			char * data_ptr_save;
 			char * data_ptr;
 			splitted_msg_t recv_splitted_msg_buf;
-				
-			if ((data_ptr_save = calloc(data_size_to_recv, sizeof(char))) < 0 ) { // when do we free this one ??
+			
+			
+			if (DEBUG_COMMON_API) {
+				fprintf(mslog,"[recv_ipc_message] [BEGIN] Receiving splitted message \n");
+			}
+			
+			if ((data_ptr_save = (char *) calloc(data_size_to_recv, sizeof(char))) < 0 ) { // when do we free this one ??
 	 			perror("MALLOC ERROR");
 	 			return -1; //TODO errno ?
 			}
@@ -415,9 +451,10 @@ int recv_ipc_message(int qid, long int tag, msg_t * recv_msg) {
 					// updating data ptr to the concatenated buffer
 					recv_msg->data = data_ptr_save;
 					//TODO check updated
-					if(DEBUG_H){
+					if (DEBUG_COMMON_API) {
+						fprintf(mslog,"[recv_ipc_message] [END] Receiving splitted message DUMP :\n");
 						print_msg_t(mslog,recv_msg);
-					}	
+					}
 				}
 			}
 	} else {
@@ -439,13 +476,13 @@ int send_raw_msg_to_ipc_queue(int id, void * send_msg_buf, int size) {
 	int error = msgsnd(id, send_msg_buf, size, 0);
 
 	if (error < 0) {
-		if (DEBUG_H) {
+		if (DEBUG_COMMON_API) {
 			fprintf(mslog, "[send_raw_msg_to_ipc_queue] !!! ERROR: msgsnd error\n");
 		}
 		perror("[send_raw_msg_to_ipc_queue] ERROR "); 
 		return -1;  
 	}
-	if (DEBUG_H) {fflush(mslog);}
+	if (DEBUG_COMMON_API) {fflush(mslog);}
 	return 0;
 }
 
@@ -465,12 +502,12 @@ int populate_msg(msg_t * send_msg_buf, int msg_type, long int TAG, void * buf, i
 	length = debug_get_mpi_buffer_length(count, datatype, sizeof(char));	
 	
 	if (length < 0) {
-		if (DEBUG_H) {fprintf(mslog, "[populate_msg] !!! BAD DATATYPE \n");}
+		if (DEBUG_COMMON_API) {fprintf(mslog, "[populate_msg] [ERROR] !!! BAD DATATYPE \n");}
 		return -1;
 	} else if (length > get_data_payload_size(send_msg_buf)) {
 		// this message will have to be split because it oversize message buffer capacity.
-			if (DEBUG_H) {fprintf(mslog, "[populate_msg] Populating a message to be splitted \n");}
-		send_msg_buf->data = buf;
+			if (DEBUG_COMMON_API) {fprintf(mslog, "[populate_msg] Populating a message to be splitted \n");}
+		send_msg_buf->data = (char *) buf;
 	} else {
 		memcpy(send_msg_buf->data_backend, buf, length);
 		send_msg_buf->data = send_msg_buf->data_backend;
@@ -495,7 +532,7 @@ int send_ipc_message(int qid, msg_t * send_msg_buf) {
 
 	int pms = get_payload_size(send_msg_buf);
 		
-	if (DEBUG_H) {
+	if (DEBUG_COMMON_API) {
 		fprintf(mslog, "[send_ipc_message] Sending message ... \n");
 		print_msg_t(mslog, send_msg_buf);
 	}
@@ -532,7 +569,7 @@ int send_splitted_message(int qid, msg_t * send_msg_buf) {
 	max_elt_in_msg = (get_data_payload_size_splitted_msg(&splitted_msg) / datatype_size_unit);
 	
 	// data to send is pointing a buffer allocated outside of the msg_t
-	void * buffer_ind = send_msg_buf->data;
+	char * buffer_ind = send_msg_buf->data;
 
 	/* void * buf, int count, MPI_Datatype datatype, int dest, int tag, int idjob */
 
@@ -560,7 +597,7 @@ int send_splitted_message(int qid, msg_t * send_msg_buf) {
 				msg_type = MSG_SEND_SPLIT;
 			}
 
-			if (DEBUG_H) {
+			if (DEBUG_COMMON_API) {
 				fprintf(mslog, "DEBUG length_to_send %d\n",length_to_send);
 				fprintf(mslog, "DEBUG remaining_elt_to_send %d\n",remaining_elt_to_send);
 				fprintf(mslog, "DEBUG datatype_size_unit %d\n",datatype_size_unit);
@@ -573,7 +610,7 @@ int send_splitted_message(int qid, msg_t * send_msg_buf) {
 												nb_elem_to_send * datatype_size_unit)) < 0) {
 				return err;
 			}
-			if (DEBUG_H) {
+			if (DEBUG_COMMON_API) {
 				fprintf(mslog, "Sending splitted message \n");
 				print_splitted_msg_t(mslog, &splitted_msg);
 			}										
@@ -605,10 +642,10 @@ int send_to_ipc(int qid, int msg_type, long int TAG, void * buf, int count, MPI_
 	}
 	
 	if(is_splittable_msg(&send_msg_buf)) {
-		if (DEBUG_H) {fprintf(mslog, "Sending splitted message\n");}
+		if (DEBUG_COMMON_API) {fprintf(mslog, "Sending splitted message\n");}
 		return send_splitted_message(qid, &send_msg_buf);
 	} else {
-		if (DEBUG_H) {fprintf(mslog, "Sending regular message\n");}
+		if (DEBUG_COMMON_API) {fprintf(mslog, "Sending regular message\n");}
 		return send_ipc_message(qid, &send_msg_buf);
 	}
  }

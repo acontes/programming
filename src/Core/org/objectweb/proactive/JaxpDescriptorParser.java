@@ -1794,6 +1794,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         mpiProcess.setRemotePath(path);
                     } else if (nodeName.equals(PROCESS_NUMBER_TAG)) {
                         mpiProcess.setHostsNumber(nodeExpandedValue);
+                    } else if (nodeName.equals(MPI_NOLOCAL)) {
+                        mpiProcess.setNoLocal(getNodeExpandedValue(
+                                childNode.getFirstChild()));
                     }
                 }
             }

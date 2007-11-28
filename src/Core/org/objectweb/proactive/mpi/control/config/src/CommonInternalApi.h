@@ -31,9 +31,11 @@
 #define MPI_MAX_OBJECT_NAME 128
 #endif
 
-#define DEBUG_STMT 1
-
 #define MAX_INT (1 << 30)
+
+/***********************************************************/
+/* IPC QUEUE RELATED DEFINITIONS */
+/***********************************************************/
 
 #define MSQ_SIZE	16384
 #define MSG_DATA_SIZE 8020
@@ -58,18 +60,28 @@
 #define ANY_SRC -2
 #define ANY_TAG -1
 
-//TODO simplify the debugging process
-/* Common Debug control */
-#define VERBOSE_H_MSG 1
-#define DEBUG_H 1
+/***********************************************************/
+/* DEBUG AND LOGGING RELATED DEFINITIONS */
+/***********************************************************/
+
+
+// run some debugging function (slow down the code)
+#define DEBUG_STMT 0
+
+#define DEBUG_COMMON_API 0
+#define MAX_NOM 256
 
 /* MPI Side Debug control */
-#define DEBUG 1	// most verbose debug info
-#define DEBUG_PRINT(f, statement) if (DEBUG) {statement; fflush(f);}
+#define DEBUG_NATIVE_SIDE 0	// most verbose debug info
+#define DEBUG_PRINT_NATIVE_SIDE(f, statement) if (DEBUG_NATIVE_SIDE) {statement; fflush(f);}
 
 /* ProActive Side Debug control */
-#define VERBOSE_MSG 1
-#define VERBOSE_STAT 1
+#define DEBUG_PROACTIVE_SIDE 0
+#define DEBUG_PROACTIVE_SIDE_IPC_STAT 0
+
+/* Logging macro */
+
+#define DEBUG_LOG_OUTPUT_DIR "/tmp/proactive_mpi"
 
 
 /* TAGs used in message's "msg_type" block */
@@ -91,8 +103,25 @@ union semun{
 };
 
 
-// Data types
+/* DATA TYPE DEFINITION */
 typedef int ProActive_Datatype;
+
+#define CONV_MPI_PROACTIVE_NULL ((ProActive_Datatype) 0)
+#define CONV_MPI_PROACTIVE_CHAR ((ProActive_Datatype) 1)
+#define CONV_MPI_PROACTIVE_UNSIGNED_CHAR ((ProActive_Datatype) 2)
+#define CONV_MPI_PROACTIVE_BYTE ((ProActive_Datatype) 3)
+#define CONV_MPI_PROACTIVE_SHORT ((ProActive_Datatype) 4)
+#define CONV_MPI_PROACTIVE_UNSIGNED_SHORT ((ProActive_Datatype) 5)
+#define CONV_MPI_PROACTIVE_INT ((ProActive_Datatype) 6)
+#define CONV_MPI_PROACTIVE_UNSIGNED ((ProActive_Datatype) 7)
+#define CONV_MPI_PROACTIVE_LONG ((ProActive_Datatype) 8)
+#define CONV_MPI_PROACTIVE_UNSIGNED_LONG ((ProActive_Datatype) 9)
+#define CONV_MPI_PROACTIVE_FLOAT ((ProActive_Datatype) 10)
+#define CONV_MPI_PROACTIVE_DOUBLE ((ProActive_Datatype) 11)
+#define CONV_MPI_PROACTIVE_LONG_DOUBLE ((ProActive_Datatype) 12)
+#define CONV_MPI_PROACTIVE_LONG_LONG_INT ((ProActive_Datatype) 13)
+
+/* MESSAGE TYPE DEFINITION */ 
 
 typedef struct _msg {	// to be put into common header file "javampi.h"
   long int TAG; /* 8 */
@@ -119,46 +148,9 @@ typedef struct _proactiveRequest {	// to be put into common header file
 } ProActiveMPI_Request;
 
 
-#define CONV_MPI_PROACTIVE_NULL ((ProActive_Datatype) 0)
-#define CONV_MPI_PROACTIVE_CHAR ((ProActive_Datatype) 1)
-#define CONV_MPI_PROACTIVE_UNSIGNED_CHAR ((ProActive_Datatype) 2)
-#define CONV_MPI_PROACTIVE_BYTE ((ProActive_Datatype) 3)
-#define CONV_MPI_PROACTIVE_SHORT ((ProActive_Datatype) 4)
-#define CONV_MPI_PROACTIVE_UNSIGNED_SHORT ((ProActive_Datatype) 5)
-#define CONV_MPI_PROACTIVE_INT ((ProActive_Datatype) 6)
-#define CONV_MPI_PROACTIVE_UNSIGNED ((ProActive_Datatype) 7)
-#define CONV_MPI_PROACTIVE_LONG ((ProActive_Datatype) 8)
-#define CONV_MPI_PROACTIVE_UNSIGNED_LONG ((ProActive_Datatype) 9)
-#define CONV_MPI_PROACTIVE_FLOAT ((ProActive_Datatype) 10)
-#define CONV_MPI_PROACTIVE_DOUBLE ((ProActive_Datatype) 11)
-#define CONV_MPI_PROACTIVE_LONG_DOUBLE ((ProActive_Datatype) 12)
-#define CONV_MPI_PROACTIVE_LONG_LONG_INT ((ProActive_Datatype) 13)
-
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
 /*---+----+----- TODO MOVE TO IMPL -+-----+- */
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
-
-/*
-int INTERVAL = 5 ;
-
-char * path; 
-
-char *daemon_address, *jobmanager, *myhostname;
-
-#define RECV_QUEUE_SIZE 10
-msg_t * recv_queue [RECV_QUEUE_SIZE];
-int recv_queue_order [RECV_QUEUE_SIZE];
-int msg_recv_nb = 1;
-
-int C2S_Q_ID, S2C_Q_ID;
-int sem_set_id_mpi;            // semaphore set ID.
-int myJob=-1;
-int myRank=-1;
-
-int TAG_S_KEY;
-int TAG_R_KEY;
-FILE* mslog;
-*/
 
 extern FILE* mslog;
 extern int myRank;
@@ -166,6 +158,7 @@ extern int myRank;
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
 /*---+----+----- UTILS FUNCTIONS  -+-----+- */
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
+FILE * open_debug_log(char *path, int rank, char * prefix);
 void print_msg_t(FILE * f, msg_t * msg);
 void print_splitted_msg_t(FILE * f, splitted_msg_t * msg);
 void init_msg_t(msg_t * msg);
@@ -175,9 +168,7 @@ int get_data_payload_size (msg_t * msg);
 int get_payload_size_splitted_msg(splitted_msg_t * msg);
 int get_data_payload_size_splitted_msg(splitted_msg_t * msg);
 
-//int get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size);
 int get_proactive_buffer_length(int count, ProActive_Datatype datatype);
-//int same_MPI_Datatype(MPI_Datatype datatype1, MPI_Datatype datatype2, char * name1, char * name2);
 int same_MPI_Datatype(MPI_Datatype datatype1, MPI_Datatype datatype2);
 ProActive_Datatype type_conversion_MPI_to_proactive (MPI_Datatype datatype);
 MPI_Datatype type_conversion_proactive_to_MPI (ProActive_Datatype datatype);

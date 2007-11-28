@@ -36,24 +36,19 @@ import java.util.Vector;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.mpi.MPISpmd;
 
 
 public class ProActiveMPI {
     private static ProActiveMPIManager manager;
 
-    public static Vector deploy(ArrayList spmdList) {
+    public static Vector deploy(ArrayList<MPISpmd> spmdList) {
         if (manager == null) {
             // create manager
             try {
                 manager = (ProActiveMPIManager) ProActive.newActive(ProActiveMPIManager.class.getName(),
                         new Object[] {  });
-                //  VectorResult vres = 
                 manager.deploy(spmdList);
-                //Vv remove return null vector
-                return null;
-                // get a future and wait on future
-                // System.out.println("[PROACTIVEMPI] RETURNS VECTOR OF FUTURES ");
-                //  return vres.getVectorResult();
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {
@@ -63,7 +58,6 @@ public class ProActiveMPI {
             throw new IllegalStateException(
                 " ERROR: Application has already been deployed once !!!!!!!");
         }
-
         return null;
     }
 
