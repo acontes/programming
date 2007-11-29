@@ -317,9 +317,10 @@ DEBUG_PRINT_NATIVE_SIDE(mslog, fprintf(mslog, "Cannot open receiving queue: %d  
 /*
  * ProActiveMPI_Job
  */
-void ProActiveMPI_Job(int * job_, int * nb_job_){
+int ProActiveMPI_Job(int * job_, int * nb_job_){
 	*job_ = my_job_id;
 	*nb_job_ = nb_job;
+	return 0;
 }
 
 
