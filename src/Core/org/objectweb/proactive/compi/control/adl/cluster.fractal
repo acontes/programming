@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<!-- cluster wrapper component -->
+<definition name="org.objectweb.proactive.compi.control.adl.cluster">
+
+    <!-- The interfaces the component defines -->
+    <interface signature="org.objectweb.proactive.compi.control.ProActiveMPICluster" role="server" name="cluster"/>
+    <interface signature="org.objectweb.proactive.compi.control.ProActiveMPINode" role="client" cardinality="collection"
+               name="cluster2node"/>
+
+    <!-- The implementation of the component -->
+    <content class="org.objectweb.proactive.compi.control.ProActiveMPIClusterComp"/>
+    <controller desc="primitive"/>
+
+</definition>
+
