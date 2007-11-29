@@ -331,7 +331,7 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
 
     public void notifyClusterProxy() {
         if (!proxyNotified) {
-            this.myClusterProxy.notifyProxy();
+            this.myClusterProxy.notifyProxy(this.getMaxJobID());
             this.proxyNotified = true;
         }
     }
