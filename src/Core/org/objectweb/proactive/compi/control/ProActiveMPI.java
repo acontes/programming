@@ -30,32 +30,32 @@
  */
 package org.objectweb.proactive.compi.control;
 
-import java.util.*;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.*;
 
-import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.fractal.adl.*;
+import org.objectweb.fractal.adl.Factory;
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.IllegalBindingException;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.compi.MPISpmd;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.adl.FactoryFactory;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.*;
-import org.objectweb.proactive.filetransfer.FileVector;
-import org.objectweb.proactive.filetransfer.FileTransfer;
-import org.objectweb.proactive.compi.MPISpmd;
-import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.fractal.api.control.IllegalBindingException;
-import org.objectweb.fractal.api.type.ComponentType;
-import org.objectweb.fractal.util.Fractal;
-import org.objectweb.fractal.adl.*;
-import org.objectweb.fractal.adl.Factory;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.filetransfer.FileTransfer;
+import org.objectweb.proactive.filetransfer.FileVector;
 
 
 public class ProActiveMPI {
@@ -77,41 +77,57 @@ public class ProActiveMPI {
                 Node[] allNodes = vn.getNodes();
                 pushNativeLib(allNodes, (MPISpmd) spmdList.get(i));
 
-
                 Component boot = Fractal.getBootstrapComponent();
                 ProActiveGenericFactory cf = Fractive.getGenericFactory(boot);
                 Factory f = FactoryFactory.getFactory();
                 Map<String, Object> context = new HashMap<String, Object>();
 
                 /*create clusterItf component*/
-                Object[] clusterParams = new Object[]{(MPISpmd) spmdList.get(i), allNodes.length, i, spmdList.size()};
-                ComponentType clusterType = (ComponentType)f.newComponentType("org.objectweb.proactive.compi.control.adl.cluster", context);
-                ControllerDescription clusterController = new ControllerDescription("Cluster", Constants.PRIMITIVE);
-                ContentDescription clusterContent = new ContentDescription(ProActiveMPIClusterComp.class.getName(), clusterParams);
+                Object[] clusterParams = new Object[] {
+                        (MPISpmd) spmdList.get(i), allNodes.length, i,
+                        spmdList.size()
+                    };
+                ComponentType clusterType = (ComponentType) f.newComponentType("org.objectweb.proactive.compi.control.adl.cluster",
+                        context);
+                ControllerDescription clusterController = new ControllerDescription("Cluster",
+                        Constants.PRIMITIVE);
+                ContentDescription clusterContent = new ContentDescription(ProActiveMPIClusterComp.class.getName(),
+                        clusterParams);
 
-                manager[i] = cf.newFcInstance(clusterType, clusterController, clusterContent, allNodes[0]);
+                manager[i] = cf.newFcInstance(clusterType, clusterController,
+                        clusterContent, allNodes[0]);
 
                 /*create nodes component*/
-                Object[] nodeParams = new Object[]{"ProActiveMPIComm", i};
-                ComponentType nodeType = (ComponentType) f.newComponentType("org.objectweb.proactive.compi.control.adl.node", context);
-                ControllerDescription nodeController = new ControllerDescription("Node", Constants.PRIMITIVE);
-                ContentDescription nodeContent = new ContentDescription(ProActiveMPINodeComp.class.getName(), nodeParams);
+                Object[] nodeParams = new Object[] { "ProActiveMPIComm", i };
+                ComponentType nodeType = (ComponentType) f.newComponentType("org.objectweb.proactive.compi.control.adl.node",
+                        context);
+                ControllerDescription nodeController = new ControllerDescription("Node",
+                        Constants.PRIMITIVE);
+                ContentDescription nodeContent = new ContentDescription(ProActiveMPINodeComp.class.getName(),
+                        nodeParams);
 
-
-                nodeCompListList.add(i, cf.newFcInstanceAsList(nodeType, nodeController, nodeContent, allNodes));
+                nodeCompListList.add(i,
+                    cf.newFcInstanceAsList(nodeType, nodeController,
+                        nodeContent, allNodes));
 
                 /*do bindings*/
                 for (int j = 0; j < nodeCompListList.get(i).size(); j++) {
                     Component nodeComp = nodeCompListList.get(i).get(j);
-                    Fractal.getBindingController(nodeComp).bindFc("node2cluster", manager[i].getFcInterface("cluster"));
+                    Fractal.getBindingController(nodeComp)
+                           .bindFc("node2cluster",
+                        manager[i].getFcInterface("cluster"));
                     Fractal.getLifeCycleController(nodeComp).startFc();
-                    Fractal.getBindingController(manager[i]).bindFc("cluster2node", nodeComp.getFcInterface("node"));
+                    Fractal.getBindingController(manager[i])
+                           .bindFc("cluster2node",
+                        nodeComp.getFcInterface("node"));
                 }
             }
 
             for (int i = 0; i < spmdList.size(); i++) {
                 for (int j = 0; j < spmdList.size(); j++) {
-                    Fractal.getBindingController(manager[i]).bindFc("cluster2cluster", manager[j].getFcInterface("cluster"));
+                    Fractal.getBindingController(manager[i])
+                           .bindFc("cluster2cluster",
+                        manager[j].getFcInterface("cluster"));
                 }
                 Fractal.getLifeCycleController(manager[i]).startFc();
             }
@@ -120,17 +136,16 @@ public class ProActiveMPI {
                 ((ProActiveMPICluster) manager[i].getFcInterface("cluster")).createClusterProxy();
             }
 
-
-
-           //  wait for termination (works, but must be changed)
-           boolean finishNow = true;
-            while(true){
+            //  wait for termination (works, but must be changed)
+            boolean finishNow = true;
+            while (true) {
                 for (int i = 0; i < spmdList.size(); i++) {
-                    if(!((ProActiveMPICluster) manager[i].getFcInterface("cluster")).isReadyToFinalize()){
-                       finishNow = false;
+                    if (!((ProActiveMPICluster) manager[i].getFcInterface(
+                                "cluster")).isReadyToFinalize()) {
+                        finishNow = false;
                     }
                 }
-                if(finishNow){
+                if (finishNow) {
                     for (Object aSpmdList : spmdList) {
                         ((MPISpmd) aSpmdList).getVn().killAll(false);
                     }
@@ -139,7 +154,6 @@ public class ProActiveMPI {
                 finishNow = true;
                 Thread.sleep(1000);
             }
-
         } catch (org.objectweb.fractal.api.factory.InstantiationException e) {
             e.printStackTrace();
         } catch (NoSuchInterfaceException e) {
@@ -162,7 +176,6 @@ public class ProActiveMPI {
         return null;
     }
 
-
     /**
      * push native lib into first node of a clusterItf (obs: requires NFS,
      * otherwise change it to push lib into the whole clusterItf)
@@ -172,22 +185,20 @@ public class ProActiveMPI {
      * @throws IOException throwed if the native file does not exist locally
      * @throws ProActiveException node could not be accessed
      */
-    public static void pushNativeLib(Node[] allNodes, MPISpmd mpiSpmd) throws IOException, ProActiveException {
+    public static void pushNativeLib(Node[] allNodes, MPISpmd mpiSpmd)
+        throws IOException, ProActiveException {
         String remoteLibraryPath = mpiSpmd.getRemoteLibraryPath();
 
         ClassLoader cl = ProActiveMPI.class.getClassLoader();
-        URL u = cl.getResource(
-                "org/objectweb/proactive/compi/control/" +
-                        DEFAULT_LIBRARY_NAME);
+        URL u = cl.getResource("org/objectweb/proactive/compi/control/" +
+                DEFAULT_LIBRARY_NAME);
 
         File remoteDest = new File(remoteLibraryPath +
                 "/libProActiveMPIComm.so");
         File localSource = new File(u.getFile());
 
-        FileVector filePushed = FileTransfer.pushFile(allNodes[0],
-                localSource, remoteDest);
+        FileVector filePushed = FileTransfer.pushFile(allNodes[0], localSource,
+                remoteDest);
         filePushed.waitForAll();
     }
-
-
 }

@@ -30,19 +30,18 @@
  */
 package org.objectweb.proactive.compi.control;
 
+import java.net.UnknownHostException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.net.UnknownHostException;
 
 
 public class ProActiveMPIComm {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.MPI_CONTROL_COUPLING);
     private String hostname = "NULL";
     private volatile boolean shouldRun = true;
-
     private ProActiveMPINode myNode;
 
     /* flag that determines whether process is ready to receive messages */
@@ -54,11 +53,9 @@ public class ProActiveMPIComm {
     /* rank of the wrapped mpi process */
     private int rank = -1;
 
-
     ////////////////////////
     //// NATIVE METHODS ////
     ////////////////////////
-
     private native int initRecvQueue();
 
     private native int initSendQueue();
@@ -87,19 +84,19 @@ public class ProActiveMPIComm {
         try {
             hostname = java.net.InetAddress.getLocalHost().getHostName();
             logger.info("[MPI COMM] [" + this.hostname +
-                    "] Constructor> : Loading library.");
+                "] Constructor> : Loading library.");
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-	if (logger.isInfoEnabled()) {
+        if (logger.isInfoEnabled()) {
             logger.info(System.getProperty("java.library.path"));
         }
 
         System.loadLibrary(libName);
 
         logger.info("[MPI COMM] [" + this.hostname +
-                "] Constructor> : Library loaded.");
+            "] Constructor> : Library loaded.");
         this.jobID = jobID;
         // initialize semaphores & log files
         this.init(uniqueID);
@@ -110,27 +107,26 @@ public class ProActiveMPIComm {
     ////////////////////////////////
     public void initQueues() {
         logger.info("[MPI COMM] [" + this.hostname +
-                "] initQueues> : init receiving queue: " + initRecvQueue());
+            "] initQueues> : init receiving queue: " + initRecvQueue());
 
         logger.info("[MPI COMM] [" + this.hostname +
-                "] initQueues> : init sending queue: " + initSendQueue());
+            "] initQueues> : init sending queue: " + initSendQueue());
     }
 
     public void closeQueues() {
         logger.info("[MPI COMM] [" + this.hostname +
-                "] closeQueues> : closeQueue: " + closeQueue());
+            "] closeQueues> : closeQueue: " + closeQueue());
     }
 
     public void closeAllSRQueues() {
         logger.info("[MPI COMM] [" + this.hostname +
-                "] closeAllSRQueues> : closeAllQueues: " + closeAllQueues());
+            "] closeAllSRQueues> : closeAllQueues: " + closeAllQueues());
     }
 
     public void createRecvThread() {
         Runnable r = new MessageRecvHandler();
         Thread t = new Thread(r, "Thread Message Recv");
-        logger.info("[MPI COMM] [" + this.hostname +
-                "]  creating recvThread");
+        logger.info("[MPI COMM] [" + this.hostname + "]  creating recvThread");
         t.start();
     }
 
@@ -142,7 +138,7 @@ public class ProActiveMPIComm {
 
     public void wakeUpThread() {
         logger.info("[MPI COMM] [" + this.hostname +
-                "] activeThread> : activate thread");
+            "] activeThread> : activate thread");
         this.readyToReceive = true;
     }
 
@@ -158,7 +154,8 @@ public class ProActiveMPIComm {
     }
 
     public void init(int uniqueID) {
-        logger.info("[MPI COMM] [" + this.hostname + "] init> : init: " + init(System.getProperty("user.home"), uniqueID));
+        logger.info("[MPI COMM] [" + this.hostname + "] init> : init: " +
+            init(System.getProperty("user.home"), uniqueID));
         this.closeAllSRQueues();
         this.initQueues();
     }
@@ -172,7 +169,8 @@ public class ProActiveMPIComm {
 
     public void sendJobNumber(int jobNumber, int maxJobID) {
         logger.info("[MPI COMM] [" + this.hostname +
-                "] sendJobNumber> send job number " + sendJobNb(jobNumber, maxJobID));
+            "] sendJobNumber> send job number " +
+            sendJobNb(jobNumber, maxJobID));
     }
 
     public void receiveFromMpi(ProActiveMPIData m_r) {
@@ -191,8 +189,9 @@ public class ProActiveMPIComm {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("\n Class: ").append(this.getClass().getName()).append("\n Hostname: ").
-                append(this.hostname).append("\n rank: ").append(this.rank);
+        sb.append("\n Class: ").append(this.getClass().getName())
+          .append("\n Hostname: ").append(this.hostname).append("\n rank: ")
+          .append(this.rank);
         return sb.toString();
     }
 
@@ -216,10 +215,11 @@ public class ProActiveMPIComm {
                     try {
                         if ((data = recvRequest(m_r)) == null) {
                             throw new RuntimeException(
-                                    "[MPI COMM]!!! ERROR data received are NULL from native method");
+                                "[MPI COMM]!!! ERROR data received are NULL from native method");
                         }
+
                         //check TAG1
-                        if (m_r.getMsgType()  == ProActiveMPIConstants.COMM_MSG_INIT) {
+                        if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_INIT) {
                             rank = m_r.getSrc();
                             myNode.registerProcess(rank);
                             asleepThread();

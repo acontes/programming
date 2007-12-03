@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.NodeException;
@@ -44,7 +45,6 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ProActive;
 
 
 public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
@@ -80,7 +80,8 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
      * API method for creating a new MPISPMD object from an existing Virtual Node
      * @throws NodeException
      */
-    public MPISpmdImpl(VirtualNodeInternal vn) throws RuntimeException, NodeException {
+    public MPISpmdImpl(VirtualNodeInternal vn)
+        throws RuntimeException, NodeException {
         MPI_IMPL_LOGGER.debug(
             "[MPISpmd object] creating MPI SPMD active object: " +
             vn.getName());

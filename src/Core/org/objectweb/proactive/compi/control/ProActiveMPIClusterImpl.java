@@ -30,11 +30,18 @@
  */
 package org.objectweb.proactive.compi.control;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.compi.MPISpmd;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -43,23 +50,14 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.compi.MPISpmd;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
 
 
-public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluster, InitActive {
+public class ProActiveMPIClusterImpl implements Serializable,
+    ProActiveMPICluster, InitActive {
     private final static Logger MPI_IMPL_LOGGER = ProActiveLogger.getLogger(Loggers.MPI_CONTROL_MANAGER);
     public final static String DEFAULT_LIBRARY_NAME = "libProActiveMPIComm.so";
-
     private int jobID;
-    
     private int maxJobID;
-
     private MPISpmd mpiSpmd;
 
     /* hash containing references to all of the clusters */
@@ -73,7 +71,6 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
 
     /* Hashtable<class, ProSPMD user class || user proxy array>> */
     private Hashtable<String, Object> userProxySpmdMap;
-
     private Hashtable<String, Object[]> userProxyClassesMap;
 
     /* proxy to do group-calls in all the nodes of the given clusterItf */
@@ -96,7 +93,8 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
     public ProActiveMPIClusterImpl() {
     }
 
-    public ProActiveMPIClusterImpl(MPISpmd spmd, Integer numbOfNodes, Integer jobID, Integer maxJobID) {
+    public ProActiveMPIClusterImpl(MPISpmd spmd, Integer numbOfNodes,
+        Integer jobID, Integer maxJobID) {
         this.mpiSpmd = spmd;
         this.jobID = jobID;
         this.maxJobID = maxJobID;
@@ -110,22 +108,21 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
     }
 
     public void initActivity(Body body) {
-            ProActive.setImmediateService("isReadyToRun");
-            ProActive.setImmediateService("isReadyToCommunicate");
-            ProActive.setImmediateService("isReadyToFinalize");
+        ProActive.setImmediateService("isReadyToRun");
+        ProActive.setImmediateService("isReadyToCommunicate");
+        ProActive.setImmediateService("isReadyToFinalize");
     }
 
     public void register(int jobID) {
         // ack of job is null means we can start MPI application
         if (ackToStart == 0) {
-            MPI_IMPL_LOGGER.info("[MPI CLUSTER] Starting MPI for jobID: " + jobID);
+            MPI_IMPL_LOGGER.info("[MPI CLUSTER] Starting MPI for jobID: " +
+                jobID);
             mpiSpmd.startMPI();
-
         } else {
             ackToStart--;
         }
     }
-
 
     public void register(int jobID, int rank) {
         if (ackToRecv == 0) {
@@ -149,12 +146,11 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
         }
     }
 
-
     // insert Comm Active Object at the correct location
     public void register(int jobID, int rank, ProActiveMPINode activeProxyComm) {
-        if (jobID < this.maxJobID && jobID == this.getJobID()) {
+        if ((jobID < this.maxJobID) && (jobID == this.getJobID())) {
             MPI_IMPL_LOGGER.info("[MPI CLUSTER] JobID #" + jobID +
-                    " register mpi process #" + rank);
+                " register mpi process #" + rank);
 
             this.nodes[rank] = activeProxyComm;
 
@@ -177,7 +173,8 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
                         e.printStackTrace();
                     }
                 }
-                MPI_IMPL_LOGGER.info("[MPI CLUSTER] deploy user classes and spmd ");
+                MPI_IMPL_LOGGER.info(
+                    "[MPI CLUSTER] deploy user classes and spmd ");
                 deployUserSpmdClasses(jobID, orderedNodes);
                 deployUserClasses(jobID, orderedNodes);
             }
@@ -189,7 +186,6 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
                     if (!clusterIterator.isReadyToRun()) {
                         return;
                     }
-
                 }
             }
 
@@ -198,10 +194,12 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
             for (int i = 0; i < this.maxJobID; i++) {
                 ProActiveMPICluster cluster = this.getCluster(i);
                 if (cluster != null) {
-                    MPI_IMPL_LOGGER.info("[MPI CLUSTER] deploy notify cluster proxy ");
+                    MPI_IMPL_LOGGER.info(
+                        "[MPI CLUSTER] deploy notify cluster proxy ");
                     cluster.notifyClusterProxy();
                 } else {
-                    System.err.println("ERROR: No MPI job exists with num " + jobID);
+                    System.err.println("ERROR: No MPI job exists with num " +
+                        jobID);
                 }
             }
         }
@@ -211,23 +209,20 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
         if (jobID < this.maxJobID) {
             this.nodes[rank] = null;
             MPI_IMPL_LOGGER.info("[MPI CLUSTER] JobID #" + jobID +
-                    " unregister mpi process #" + rank);
+                " unregister mpi process #" + rank);
 
             for (ProActiveMPINode aProxyMap : this.nodes) {
-                if (aProxyMap != null)
+                if (aProxyMap != null) {
                     return;
+                }
             }
 
             this.readyToFinalize = true;
-
         } else {
             throw new IndexOutOfBoundsException(" No MPI job exists with num " +
-                    jobID);
+                jobID);
         }
     }
-
-
-
 
     public void deployUserClasses(int jobID, Node[] orderedNodes) {
         //    get the list of classes to instanciate for this MPISpmd object
@@ -235,7 +230,7 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
         ArrayList classes = mpiSpmd.getClasses();
         if (!classes.isEmpty()) {
             MPI_IMPL_LOGGER.info("[MPI CLUSTER] JobID #" + jobID +
-                    " deploy user classes");
+                " deploy user classes");
             // get the table of parameters
             Hashtable paramsTable = mpiSpmd.getClassesParams();
             Hashtable<String, Object[]> userProxyList = new Hashtable<String, Object[]>();
@@ -247,7 +242,8 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
                     for (int i = 0; i < parameters.length; i++) {
                         Object[] params = (Object[]) parameters[i];
                         if (params != null) {
-                            proxyList[i] = ProActive.newActive(cl, params, orderedNodes[i]);
+                            proxyList[i] = ProActive.newActive(cl, params,
+                                    orderedNodes[i]);
                         }
                     }
                     userProxyList.put(cl, proxyList);
@@ -267,7 +263,7 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
         ArrayList classes = mpiSpmd.getSpmdClasses();
         if (!classes.isEmpty()) {
             MPI_IMPL_LOGGER.info("[MPI CLUSTER] JobID #" + jobID +
-                    " deploy user SPMD classes");
+                " deploy user SPMD classes");
             // get the table of parameters
             Hashtable paramsTable = mpiSpmd.getSpmdClassesParams();
             Hashtable<String, Object> userProxyList = new Hashtable<String, Object>();
@@ -283,15 +279,18 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
                         for (int i = 0; i < orderedNodes.length; i++) {
                             p[i] = params;
                         }
-                        userProxyList.put(cl, ProSPMD.newSPMDGroup(cl, p, orderedNodes));
+                        userProxyList.put(cl,
+                            ProSPMD.newSPMDGroup(cl, p, orderedNodes));
                     } // matrix parameter 
                     else if (parameters.get(1) != null) {
                         Object[][] params = (Object[][]) parameters.get(1);
-                        userProxyList.put(cl, ProSPMD.newSPMDGroup(cl, params, orderedNodes));
+                        userProxyList.put(cl,
+                            ProSPMD.newSPMDGroup(cl, params, orderedNodes));
                     } // no parameters 
                     else {
                         Object[][] params = new Object[orderedNodes.length][];
-                        userProxyList.put(cl, ProSPMD.newSPMDGroup(cl, params, orderedNodes));
+                        userProxyList.put(cl,
+                            ProSPMD.newSPMDGroup(cl, params, orderedNodes));
                     }
                     this.userProxySpmdMap = userProxyList;
                 } catch (ClassNotReifiableException e) {
@@ -310,10 +309,10 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
     ////////////////////////////////
     //// SPMD  RELATED METHODS  ////
     ////////////////////////////////
-
     public void createClusterProxy() {
         try {
-            MPI_IMPL_LOGGER.info("[MPI CLUSTER] Create SPMD Proxy for jobID: " + jobID);
+            MPI_IMPL_LOGGER.info("[MPI CLUSTER] Create SPMD Proxy for jobID: " +
+                jobID);
             ProxyForGroup proxy = new ProxyForGroup(ProActiveMPINode.class.getName());
             proxy.addAll(nodeList);
             myClusterProxy = (ProActiveMPINode) proxy.getGroupByType();
@@ -339,16 +338,13 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
     ////////////////////////////////////////////
     //// COLLECTIVE MESSAGE PASSING METHODS ////
     ////////////////////////////////////////////
-
     public void clusterReceiveFromMpi(ProActiveMPIData m_r) {
         this.myClusterProxy.receiveFromMpi(m_r);
     }
 
-
     ////////////////////////////////
     //// GETTER/SETTER METHODS  ////
     ////////////////////////////////
-
     public synchronized void addNode(ProActiveMPINode newNode) {
         this.nodeList.add(newNode);
     }
@@ -378,7 +374,6 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
         return null;
     }
 
-
     public int getJobID() {
         return this.jobID;
     }
@@ -398,7 +393,6 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
     public ProActiveMPINode[] getNodes() {
         return this.nodes;
     }
-
 
     public Hashtable<String, Object[]> getUserProxyClassesMap() {
         return userProxyClassesMap;
@@ -432,4 +426,3 @@ public class ProActiveMPIClusterImpl implements Serializable, ProActiveMPICluste
         return this.proxyNotified;
     }
 }
-

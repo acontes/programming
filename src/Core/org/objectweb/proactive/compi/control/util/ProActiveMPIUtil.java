@@ -75,9 +75,9 @@ public class ProActiveMPIUtil {
      */
     public static int bytesToInt(byte[] bytes, int startIndex) {
         return (((int) bytes[startIndex] & 0xff) |
-                (((int) bytes[startIndex + 1] & 0xff) << 8) |
-                (((int) bytes[startIndex + 2] & 0xff) << 16) |
-                (((int) bytes[startIndex + 3] & 0xff) << 24));
+        (((int) bytes[startIndex + 1] & 0xff) << 8) |
+        (((int) bytes[startIndex + 2] & 0xff) << 16) |
+        (((int) bytes[startIndex + 3] & 0xff) << 24));
     }
 
     /**
@@ -126,7 +126,7 @@ public class ProActiveMPIUtil {
      */
     public static short bytesToShort(byte[] bytes, int startIndex) {
         return (short) (((int) bytes[startIndex] & 0xff) |
-                (((int) bytes[startIndex + 1] & 0xff) << 8));
+        (((int) bytes[startIndex + 1] & 0xff) << 8));
     }
 
     /**
@@ -147,7 +147,7 @@ public class ProActiveMPIUtil {
         temp = str.getBytes();
         if (len > 255) {
             System.err.println(
-                    "String has more than 255 bytes in \"stringToBytes\", it will be truncated.");
+                "String has more than 255 bytes in \"stringToBytes\", it will be truncated.");
 
             bytes[startIndex++] = (byte) 255;
             System.arraycopy(temp, 0, bytes, startIndex, 255);
@@ -199,13 +199,13 @@ public class ProActiveMPIUtil {
         //	long temp = (long)bytesToInt(bytes, startIndex) & (long)0xffffffff;
         //return temp | ((long)bytesToInt(bytes, startIndex+4) << 32);
         return (((long) bytes[startIndex] & 0xff) |
-                (((long) bytes[startIndex + 1] & 0xff) << 8) |
-                (((long) bytes[startIndex + 2] & 0xff) << 16) |
-                (((long) bytes[startIndex + 3] & 0xff) << 24) |
-                (((long) bytes[startIndex + 4] & 0xff) << 32) |
-                (((long) bytes[startIndex + 5] & 0xff) << 40) |
-                (((long) bytes[startIndex + 6] & 0xff) << 48) |
-                (((long) bytes[startIndex + 7] & 0xff) << 56));
+        (((long) bytes[startIndex + 1] & 0xff) << 8) |
+        (((long) bytes[startIndex + 2] & 0xff) << 16) |
+        (((long) bytes[startIndex + 3] & 0xff) << 24) |
+        (((long) bytes[startIndex + 4] & 0xff) << 32) |
+        (((long) bytes[startIndex + 5] & 0xff) << 40) |
+        (((long) bytes[startIndex + 6] & 0xff) << 48) |
+        (((long) bytes[startIndex + 7] & 0xff) << 56));
     }
 
     /**

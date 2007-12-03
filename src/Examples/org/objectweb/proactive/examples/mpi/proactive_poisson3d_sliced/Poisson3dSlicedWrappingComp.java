@@ -35,15 +35,15 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.compi.MPI;
+import org.objectweb.proactive.compi.MPISpmd;
+import org.objectweb.proactive.compi.control.ProActiveMPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.compi.MPI;
-import org.objectweb.proactive.compi.MPISpmd;
-import org.objectweb.proactive.compi.control.ProActiveMPI;
 
 
 /**
