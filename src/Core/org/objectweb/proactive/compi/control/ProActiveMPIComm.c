@@ -44,7 +44,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <mpi.h>
-#include "org_objectweb_proactive_mpi_control_ProActiveMPIComm.h"
+#include "org_objectweb_proactive_compi_control_ProActiveMPIComm.h"
 #include "./config/src/ProActiveMPI.h"
 
 //###########################
