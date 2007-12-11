@@ -1,6 +1,5 @@
-mpicode=jacobi
 
-all: CommonInternalApi.o ProActiveMPI.o $(mpicode).o
+all: CommonInternalApi.o ProActiveMPI.o 
 
 ProActiveMPI.o: ProActiveMPI.c
 	$(MPICC) $(LDFLAGS) $(CPPFLAGS) -c $<
@@ -11,12 +10,10 @@ CommonInternalApi.o: CommonInternalApi.c
 			
 .c.o:
 	$(MPICC)  $(LDFLAGS) $(CPPFLAGS)  -c $<
-	$(MPICC)  $(LDFLAGS) $(CPPFLAGS)  $(mpicode).o CommonInternalApi.o ProActiveMPI.o -o $(mpicode)
 	mv $(mpicode) ../bin
 
 .f.o:
 	$(MPIF77)  $(LDFLAGS) $(CPPFLAGS) -fno-second-underscore -c $<
-	$(MPIF77)  $(LDFLAGS) $(CPPFLAGS) -fno-second-underscore $(mpicode).o CommonInternalApi.o ProActiveMPI.o -o $(mpicode)
 	mv $(mpicode) ../bin
 	
 clean:
