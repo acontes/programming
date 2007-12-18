@@ -270,6 +270,10 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      *
      */
     private class PlainListenerList implements java.io.Serializable, ListenerList {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
         protected java.util.ArrayList list;
 
         public PlainListenerList() {
@@ -314,6 +318,11 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      *
      */
     private class WeakReferenceListenerList extends PlainListenerList {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
+
         public WeakReferenceListenerList() {
         }
 

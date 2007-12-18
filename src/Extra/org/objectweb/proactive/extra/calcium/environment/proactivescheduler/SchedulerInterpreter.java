@@ -39,6 +39,10 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaE
 
 
 public class SchedulerInterpreter extends JavaExecutable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     Task task;
     FileServerClient fserver;
 

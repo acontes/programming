@@ -37,6 +37,11 @@ package org.objectweb.proactive.core.group;
  */
 public class ExceptionInGroup extends RuntimeException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** The Object who throwns the Throwable */
     private Object object;
 

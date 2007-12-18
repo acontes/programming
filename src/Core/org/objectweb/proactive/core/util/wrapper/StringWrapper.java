@@ -44,6 +44,10 @@ import java.io.Serializable;
 public class StringWrapper implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      * The not reifiable value.
      */
     private String value;

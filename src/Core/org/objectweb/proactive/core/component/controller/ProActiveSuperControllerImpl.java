@@ -47,6 +47,11 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  */
 public class ProActiveSuperControllerImpl extends AbstractProActiveController implements Serializable,
         ProActiveSuperController {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public ProActiveSuperControllerImpl(Component owner) {
         super(owner);
     }

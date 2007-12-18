@@ -42,6 +42,10 @@ import java.io.Serializable;
  */
 public class RMEvent implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     /** Resource manager URL */
     private String RMUrl = null;
 

@@ -51,6 +51,10 @@ import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.Invalid
 public class AOSimpleScilab implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     static String nl = System.getProperty("line.separator");

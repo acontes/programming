@@ -67,6 +67,10 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  */
 public class PADNodeSource extends NodeSource implements PADNSInterface, PadDeployInterface {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     /** PADs list of pad handled by the source */
     private HashMap<String, ProActiveDescriptor> listPad;
 

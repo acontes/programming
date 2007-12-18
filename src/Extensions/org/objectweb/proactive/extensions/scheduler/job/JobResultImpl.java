@@ -49,6 +49,10 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * @since ProActive 3.9
  */
 public class JobResultImpl implements JobResult {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private JobId id = null;
     private String name = null;
     private HashMap<String, TaskResult> allResults = null;

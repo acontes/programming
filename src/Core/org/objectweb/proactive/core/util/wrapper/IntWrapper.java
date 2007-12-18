@@ -44,6 +44,10 @@ import java.io.Serializable;
 public class IntWrapper implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      * The primitive value.
      */
     private int value;

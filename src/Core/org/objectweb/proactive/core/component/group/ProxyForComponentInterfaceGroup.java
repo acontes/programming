@@ -66,6 +66,10 @@ import org.objectweb.proactive.core.mop.StubObject;
  *
  */
 public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected ProActiveInterfaceType interfaceType;
     protected Class<?> itfSignatureClass = null;
     protected ProActiveComponent owner;

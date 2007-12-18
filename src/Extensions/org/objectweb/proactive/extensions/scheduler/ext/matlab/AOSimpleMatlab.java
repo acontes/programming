@@ -43,6 +43,10 @@ import ptolemy.data.Token;
 public class AOSimpleMatlab implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     static String nl = System.getProperty("line.separator");

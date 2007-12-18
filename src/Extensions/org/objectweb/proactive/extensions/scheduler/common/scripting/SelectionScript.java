@@ -50,6 +50,11 @@ public class SelectionScript extends Script<Boolean> {
     /**  */
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * The variable name which must be set after the evaluation
      * of a verifying script.
      */

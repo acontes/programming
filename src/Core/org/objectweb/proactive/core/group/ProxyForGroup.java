@@ -70,6 +70,11 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 @PublicAPI
 public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.io.Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** The logger for the Class */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
 

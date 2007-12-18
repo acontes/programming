@@ -68,6 +68,11 @@ public class AOTaskRepository implements TaskRepository<Task<? extends Serializa
      */
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * logger of the task repository
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_REPOSITORY);

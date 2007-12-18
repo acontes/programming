@@ -65,6 +65,10 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 @PublicAPI
 public class P2PNodeLookup implements InitActive, RunActive, EndActive, P2PConstants, Serializable,
         ProActiveInternalObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private Vector<Node> waitingNodesList;
     private Vector<String> nodesToKillList;

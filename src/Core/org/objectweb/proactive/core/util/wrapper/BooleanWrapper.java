@@ -44,6 +44,10 @@ import java.io.Serializable;
 public class BooleanWrapper implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      * The primitive value.
      */
     private boolean value;

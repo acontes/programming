@@ -47,6 +47,10 @@ import org.objectweb.proactive.core.security.TypedCertificateList;
 public class Entity implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
 

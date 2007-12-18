@@ -409,6 +409,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     //
     private class ActiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
 
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
+
         /** A pool future that contains the pending future objects */
         protected FuturePool futures;
 
@@ -638,6 +643,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
     // end inner class LocalBodyImpl
     private class InactiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
         // An inactive body strategy can have a futurepool if some ACs to do
         // remain after the termination of the active object
         private FuturePool futures;

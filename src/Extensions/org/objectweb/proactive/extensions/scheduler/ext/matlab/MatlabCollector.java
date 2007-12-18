@@ -35,6 +35,10 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 
 
 public class MatlabCollector extends SimpleMatlab {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private static AOMatlabCollector collectorWorker = null;
 
     /**

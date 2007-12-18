@@ -49,6 +49,10 @@ import javax.swing.JTextField;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class UnicorePasswordGUI extends JFrame implements ActionListener {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     String keypassword = "";
     JTextField password;
 

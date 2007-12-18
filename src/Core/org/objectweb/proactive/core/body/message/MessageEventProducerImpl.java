@@ -40,6 +40,11 @@ import org.objectweb.proactive.core.event.ProActiveListener;
 
 public class MessageEventProducerImpl extends AbstractEventProducer implements MessageEventProducer,
         java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public MessageEventProducerImpl() {
     }
 

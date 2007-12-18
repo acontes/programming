@@ -36,6 +36,10 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
 public class GroupOARGrid extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String queueName;
     private String accessProtocol;
     private String wallTime;

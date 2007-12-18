@@ -34,6 +34,10 @@ import java.util.List;
 
 
 public class GroupGlobus extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String count;
     private String queue;
     private String maxTime;

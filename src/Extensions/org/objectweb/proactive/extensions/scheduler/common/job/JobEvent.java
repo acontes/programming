@@ -52,6 +52,11 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskState;
 @PublicAPI
 public class JobEvent implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** job id  : must be initialize to a value in order to create temp taskId */
     private JobId jobId = JobId.makeJobId("0");
 

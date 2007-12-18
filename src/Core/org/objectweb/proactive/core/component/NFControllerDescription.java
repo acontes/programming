@@ -52,6 +52,10 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
  * @author Paul Naoumenko
  */
 public class NFControllerDescription extends ControllerDescription {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     public static final String DEFAULT_NFCOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/config/default-nfcomponent-config.xml";
 
     /**

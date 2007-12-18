@@ -37,6 +37,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ProActiveRmiMetaObjectFactory extends ProActiveMetaObjectFactory implements java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     //

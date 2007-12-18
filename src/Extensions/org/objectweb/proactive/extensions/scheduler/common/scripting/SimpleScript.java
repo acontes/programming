@@ -44,6 +44,10 @@ public class SimpleScript extends Script {
 
     /**  */
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     /**  */
     private String id = null;
 

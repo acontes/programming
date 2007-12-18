@@ -41,6 +41,11 @@ public class InvalidPolicyFile extends Exception {
      */
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      *
      */
     public InvalidPolicyFile() {

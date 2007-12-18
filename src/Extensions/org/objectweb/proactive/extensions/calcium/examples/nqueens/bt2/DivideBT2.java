@@ -38,6 +38,11 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class DivideBT2 implements Divide<Board, Board> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public Vector<Board> divide(SkeletonSystem system, Board board) throws RuntimeException {
         if (board.isRootBoard()) {
             return initDivideBT2(board);

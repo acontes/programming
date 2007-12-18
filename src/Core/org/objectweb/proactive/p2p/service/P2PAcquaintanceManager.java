@@ -63,6 +63,10 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  */
 public class P2PAcquaintanceManager implements InitActive, RunActive, Serializable, P2PConstants,
         ProActiveInternalObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
     private P2PService localService = null;
     private P2PService acquaintances = null;

@@ -42,6 +42,10 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
 public class CommEventData implements EventData {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     private String name;

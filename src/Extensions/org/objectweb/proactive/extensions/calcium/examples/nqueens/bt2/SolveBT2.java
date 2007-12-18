@@ -37,6 +37,11 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class SolveBT2 extends SolveBoard {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public Result execute(SkeletonSystem system, Board board) {
         n1 = board.n - 1;
         n2 = n1 - 1;

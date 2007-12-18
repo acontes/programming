@@ -34,6 +34,11 @@ import ptolemy.data.type.Type;
 
 
 public class InvalidParameterException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public InvalidParameterException(Class<?> class1) {
         super(class1.getCanonicalName());
     }

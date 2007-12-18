@@ -50,6 +50,10 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  */
 public class ComponentParametersControllerImpl extends AbstractProActiveController implements Serializable,
         ComponentParametersController {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private ComponentParameters componentParameters;
 
     /**

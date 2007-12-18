@@ -39,6 +39,10 @@ import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 
 public class GroupOAR extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     final static public int BEST = -1;
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;

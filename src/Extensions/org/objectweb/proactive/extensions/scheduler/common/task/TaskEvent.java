@@ -49,6 +49,11 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 @PublicAPI
 public class TaskEvent implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** id of the task */
     private TaskId taskId = null;
 

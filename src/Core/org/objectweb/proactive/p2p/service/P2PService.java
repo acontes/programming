@@ -79,6 +79,11 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 @PublicAPI
 public class P2PService implements InitActive, P2PConstants, Serializable, ProActiveInternalObject {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Logger. */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SERVICE);
 
@@ -120,6 +125,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
     // For asking nodes
     private Service service = null;
     private RequestFilter filter = new RequestFilter() {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
 
         /**
          * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)

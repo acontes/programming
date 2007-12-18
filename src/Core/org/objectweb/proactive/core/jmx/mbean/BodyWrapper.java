@@ -75,6 +75,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class BodyWrapper extends NotificationBroadcasterSupport implements Serializable, BodyWrapperMBean {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     /** JMX Logger */
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
     private transient Logger notificationsLogger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);

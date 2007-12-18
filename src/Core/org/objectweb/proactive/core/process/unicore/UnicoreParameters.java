@@ -46,6 +46,10 @@ import com.pallas.unicore.extensions.Usite.Type;
  * UnicoreProActiveClient.
  */
 public class UnicoreParameters implements java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String jobName;
     private String keyPassword;
     private boolean submitJob;

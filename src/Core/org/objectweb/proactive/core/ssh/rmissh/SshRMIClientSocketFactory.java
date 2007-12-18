@@ -42,6 +42,10 @@ import org.objectweb.proactive.core.util.ProActiveInet;
  * @author mlacage
  */
 public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     String username;
     String hostname;
 

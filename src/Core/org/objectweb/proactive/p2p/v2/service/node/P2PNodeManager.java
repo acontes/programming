@@ -65,6 +65,10 @@ import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
  */
 public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PConstants,
         ProActiveInternalObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Node p2pServiceNode = null;

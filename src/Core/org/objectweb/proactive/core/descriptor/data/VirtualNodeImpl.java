@@ -110,6 +110,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
      *
      */
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);

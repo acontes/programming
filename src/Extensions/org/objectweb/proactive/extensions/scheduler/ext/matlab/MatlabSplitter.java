@@ -39,6 +39,10 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 public class MatlabSplitter extends SimpleMatlab {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     private static AOMatlabSplitter splitterWorker = null;

@@ -39,6 +39,10 @@ import org.objectweb.proactive.core.UniqueID;
  * @author cdelbe
  **/
 public class JacobiWorker implements java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     // ORIENTATION
     static final int UP = 1;
     static final int DOWN = 2;

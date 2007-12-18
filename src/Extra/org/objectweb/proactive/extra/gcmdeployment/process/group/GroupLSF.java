@@ -36,6 +36,10 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
 public class GroupLSF extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String interactive;
     private String jobName;
     private String queueName;

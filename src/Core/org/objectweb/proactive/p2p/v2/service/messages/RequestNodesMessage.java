@@ -43,6 +43,10 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
 
 public class RequestNodesMessage extends BreadthFirstMessage {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected int numberOfNodes;
     protected P2PNodeLookup lookup;
     protected String vnName;

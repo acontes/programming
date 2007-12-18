@@ -34,6 +34,10 @@ import java.util.List;
 
 
 public class GroupGridBus extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private List<String> argumentsList;
 
     @Override

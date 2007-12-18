@@ -31,6 +31,11 @@
 package org.objectweb.proactive.extensions.scheduler.ext.scilab.exception;
 
 public class ScilabInitException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public ScilabInitException(String string) {
         super(string);
     }

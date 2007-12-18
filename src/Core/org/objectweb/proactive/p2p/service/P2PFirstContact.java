@@ -54,6 +54,10 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * Created on Jan 4, 2005
  */
 public class P2PFirstContact implements Serializable, RunActive, P2PConstants, ProActiveInternalObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_FIRST_CONTACT);
     private Vector peers;
     private P2PAcquaintanceManager acqGroup;

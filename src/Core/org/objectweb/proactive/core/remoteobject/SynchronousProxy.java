@@ -52,6 +52,10 @@ import org.objectweb.proactive.core.mop.Proxy;
  *  @author acontes
  */
 public class SynchronousProxy implements Proxy, Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected RemoteObject remoteObject;
 
     public SynchronousProxy(ConstructorCall contructorCall, Object[] params) throws ProActiveException {

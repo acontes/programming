@@ -53,6 +53,11 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  */
 public class InternalNativeTask extends InternalTask {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Command line to execute */
     private String cmd;
 

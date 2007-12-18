@@ -42,6 +42,10 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
  * @author vbodnart
  */
 public class TimItTechnicalService implements TechnicalService, java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String timitActivation;
     private String reduceResults;
     private static String generateOutputFile;

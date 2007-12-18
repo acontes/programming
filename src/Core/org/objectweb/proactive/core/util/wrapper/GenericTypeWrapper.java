@@ -42,6 +42,10 @@ import java.io.Serializable;
 public class GenericTypeWrapper<T extends Object> implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     private T o;

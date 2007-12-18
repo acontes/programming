@@ -85,6 +85,11 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
      */
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * log4j logger for the worker manager
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);

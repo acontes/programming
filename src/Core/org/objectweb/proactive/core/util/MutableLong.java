@@ -38,6 +38,10 @@ import java.io.Serializable;
  * @author cdelbe
  */
 public class MutableLong implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private long value;
 
     public MutableLong() {

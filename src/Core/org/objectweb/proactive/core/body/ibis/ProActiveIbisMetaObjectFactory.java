@@ -69,6 +69,11 @@ import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
  */
 public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory implements
         java.io.Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     //static {
     //IbisProperties.load();
     //}

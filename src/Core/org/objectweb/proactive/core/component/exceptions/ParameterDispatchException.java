@@ -37,6 +37,11 @@ package org.objectweb.proactive.core.component.exceptions;
  *
  */
 public class ParameterDispatchException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public ParameterDispatchException() {
         super();
     }

@@ -44,6 +44,10 @@ import java.net.URL;
  * @author The ProActive Team (mleyton)
  */
 public class WSpaceImpl implements WSpace, java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     File wspace;
 
     public WSpaceImpl(File wspace) throws IOException {

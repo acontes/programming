@@ -42,6 +42,10 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
  */
 public class Cube extends Plan { // implements Topology3D {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     /** depth of the three-dimensional topology group */
     protected int depth; //  => Z => number of plans
 

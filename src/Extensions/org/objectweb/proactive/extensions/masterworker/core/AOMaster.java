@@ -89,6 +89,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      */
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * log4j logger for the master
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
@@ -700,6 +705,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
          */
 
         /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
+
+        /**
          * Creates a filter
          */
         public FindWaitFilter() {
@@ -730,6 +740,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         /**
          *
          */
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
 
         /**
          * Creates the filter

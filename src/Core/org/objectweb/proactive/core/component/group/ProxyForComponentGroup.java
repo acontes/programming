@@ -48,6 +48,10 @@ import org.objectweb.proactive.core.mop.StubObject;
  *
  */
 public class ProxyForComponentGroup extends ProxyForGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected ComponentType componentType;
     protected ControllerDescription controllerDesc;
 

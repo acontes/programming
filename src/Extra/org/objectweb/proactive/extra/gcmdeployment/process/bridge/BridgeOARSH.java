@@ -31,6 +31,10 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.bridge;
 
 public class BridgeOARSH extends BridgeSSH {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String jobId;
 
     @Override

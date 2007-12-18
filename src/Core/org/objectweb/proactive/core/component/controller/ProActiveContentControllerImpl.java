@@ -67,6 +67,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveContentControllerImpl extends AbstractProActiveController implements
         ProActiveContentController, Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected List<Component> fcSubComponents;
     protected Map<Component, IllegalContentException> contentExceptions = new Hashtable<Component, IllegalContentException>();

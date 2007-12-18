@@ -47,6 +47,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RequestReceiverImpl implements RequestReceiver, java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     public static Logger logger = ProActiveLogger.getLogger(Loggers.REQUESTS);
     private static final String ANY_PARAMETERS = "any-parameters";
 

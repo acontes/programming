@@ -38,6 +38,11 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
 
 public class ExplorationMessage extends BreadthFirstMessage implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public ExplorationMessage(int ttl, UniversalUniqueID id, P2PService sender) {
         super(ttl, id, sender);
     }

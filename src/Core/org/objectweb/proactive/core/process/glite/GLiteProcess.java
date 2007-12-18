@@ -62,6 +62,10 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 public class GLiteProcess extends AbstractExternalProcessDecorator implements FileDependant {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      * Firsts parameters
      */
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";

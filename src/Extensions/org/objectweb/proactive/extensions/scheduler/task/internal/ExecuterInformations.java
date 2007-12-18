@@ -47,6 +47,11 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  */
 public class ExecuterInformations implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Reference to the launcher of this task. */
     private TaskLauncher launcher;
 

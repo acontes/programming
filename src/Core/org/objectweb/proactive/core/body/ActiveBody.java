@@ -65,6 +65,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ActiveBody extends ComponentBodyImpl implements Runnable, java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     //
@@ -285,6 +290,11 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable, java.io.S
     // -- INNER CLASSES -----------------------------------------------
     //
     private class FIFORunActive implements RunActive, java.io.Serializable {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
+
         public void runActivity(Body body) {
             new Service(body).fifoServing();
         }

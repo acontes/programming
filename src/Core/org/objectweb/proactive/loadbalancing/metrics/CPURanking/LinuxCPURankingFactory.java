@@ -35,6 +35,11 @@ import org.objectweb.proactive.loadbalancing.metrics.MetricFactory;
 
 
 public class LinuxCPURankingFactory implements MetricFactory {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public Metric getNewMetric() {
         return new LinuxCPURanking();
     }

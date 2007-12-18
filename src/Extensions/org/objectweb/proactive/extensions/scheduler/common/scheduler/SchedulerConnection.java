@@ -54,6 +54,11 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
 @PublicAPI
 public class SchedulerConnection implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** default scheduler node name */
     public static final String SCHEDULER_DEFAULT_NAME = "SCHEDULER";
 

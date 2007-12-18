@@ -37,6 +37,10 @@ import org.objectweb.proactive.core.node.Node;
 
 
 public class GCMRuntimeRegistrationNotificationData implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String childURL;
     private long deploymentId;
     private long topologyId;

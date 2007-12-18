@@ -36,6 +36,11 @@ package org.objectweb.proactive.core.jmx.mbean;
  * @author ProActive Team
  */
 public class JMXClassLoader extends ClassLoader implements JMXClassLoaderMBean {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public JMXClassLoader() {
 
         /* Empty Constructor required by JMX */

@@ -62,6 +62,10 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 public class AOJobListener implements SchedulerEventListener, InitActive {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
     AOTaskPool taskpool;
     HashMap<JobId, Collection<Task>> processing;

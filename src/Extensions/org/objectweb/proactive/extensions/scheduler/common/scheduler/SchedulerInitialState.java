@@ -48,6 +48,11 @@ import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 @PublicAPI
 public final class SchedulerInitialState<E extends Job> implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** pending jobs */
     private Vector<E> pendingJobs = new Vector<E>();
 

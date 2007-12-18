@@ -57,6 +57,10 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @since   ProActive 2.0.1
  */
 public class P2PDescriptorService implements UniversalService, P2PConstants {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_DESC_SERV);
     protected static String serviceName = P2P_NODE_NAME;
     protected int askedNodes = 0;

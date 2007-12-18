@@ -44,6 +44,10 @@ import java.io.Serializable;
 public class FloatMutableWrapper implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      * The primitive value.
      */
     private float value;

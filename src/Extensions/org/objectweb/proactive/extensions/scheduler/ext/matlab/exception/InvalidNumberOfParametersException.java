@@ -31,6 +31,11 @@
 package org.objectweb.proactive.extensions.scheduler.ext.matlab.exception;
 
 public class InvalidNumberOfParametersException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public InvalidNumberOfParametersException(int number) {
         super("" + number + " parameters");
     }

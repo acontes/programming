@@ -37,6 +37,11 @@ package org.objectweb.proactive.core.security.exceptions;
 public class CommunicationForbiddenException extends Exception {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      *
      */
     public CommunicationForbiddenException() {

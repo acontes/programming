@@ -45,6 +45,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public final class JobId implements Comparable<JobId>, Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** global id count */
     private static int currentId = 0;
 

@@ -31,6 +31,10 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.group;
 
 public class GroupOARSH extends GroupSSH {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String jobId;
 
     public void setJobId(String jobId) {

@@ -50,6 +50,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 3.0
  */
 public class UnicoreProcess extends AbstractExternalProcessDecorator {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     public UnicoreParameters uParam;
 
     public UnicoreProcess() {

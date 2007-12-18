@@ -59,6 +59,11 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
 @PublicAPI
 public class RMInitialState implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Free Nodes */
     private ArrayList<RMNodeEvent> freeNodes = new ArrayList<RMNodeEvent>();
 

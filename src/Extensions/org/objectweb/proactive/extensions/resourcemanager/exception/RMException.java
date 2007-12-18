@@ -48,6 +48,11 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMConnection;
 public class RMException extends Exception {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * Attaches a message to the Exception
      * @param message message attached
      */

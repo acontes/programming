@@ -35,6 +35,11 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class IntervalDivideCondition implements Condition<Interval> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public boolean evalCondition(SkeletonSystem system, Interval params) {
         return (params.max - params.min) > params.solvableSize;
     }

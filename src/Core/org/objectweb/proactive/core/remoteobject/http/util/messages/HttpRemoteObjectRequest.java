@@ -50,6 +50,10 @@ import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableExce
  * @see java.io.Serializable
  */
 public class HttpRemoteObjectRequest extends ReflectRequest implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private static HashMap hMapMethods;
 
     static {

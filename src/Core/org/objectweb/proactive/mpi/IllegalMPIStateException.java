@@ -31,6 +31,11 @@
 package org.objectweb.proactive.mpi;
 
 public class IllegalMPIStateException extends IllegalStateException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public IllegalMPIStateException() {
         super();
     }

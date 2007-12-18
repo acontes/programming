@@ -36,6 +36,10 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Gr
 
 
 public class GroupARC extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String jobName;
     private String count;
     private List<String> args;

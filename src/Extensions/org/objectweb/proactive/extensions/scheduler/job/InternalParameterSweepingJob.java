@@ -46,6 +46,11 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 public class InternalParameterSweepingJob extends InternalJob {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * ProActive empty constructor.
      */
     public InternalParameterSweepingJob() {

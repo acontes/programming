@@ -65,6 +65,11 @@ import org.objectweb.proactive.extensions.scheduler.util.Shell;
 public class SimpleScilab extends JavaExecutable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      *
      */
     final private static String[] DEFAULT_OUT_VARIABLE_SET = { "out" };
@@ -460,6 +465,11 @@ public class SimpleScilab extends JavaExecutable {
      *
      */
     private static class DummyJVMProcess extends JVMProcessImpl {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
 
         /**
          *

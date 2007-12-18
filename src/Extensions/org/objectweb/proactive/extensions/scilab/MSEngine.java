@@ -53,6 +53,10 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public class MSEngine implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     private MSEngineWorker mSEngineWorker;

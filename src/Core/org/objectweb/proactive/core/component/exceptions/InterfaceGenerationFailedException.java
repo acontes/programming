@@ -36,6 +36,11 @@ package org.objectweb.proactive.core.component.exceptions;
  * @author Matthieu Morel
  */
 public class InterfaceGenerationFailedException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public InterfaceGenerationFailedException() {
         super();
     }

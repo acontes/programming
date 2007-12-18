@@ -83,6 +83,11 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 public class SchedulerFrontend implements InitActive, SchedulerEventListener<InternalJob>,
         UserSchedulerInterface, SchedulerCoreInterface {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 

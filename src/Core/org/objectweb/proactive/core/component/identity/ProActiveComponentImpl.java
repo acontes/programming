@@ -86,6 +86,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveComponentImpl extends AbstractRequestHandler implements ProActiveComponent, Interface,
         Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private transient ProActiveComponent representativeOnMyself = null;
     private Map<String, Interface> serverItfs = new HashMap<String, Interface>();

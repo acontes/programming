@@ -46,6 +46,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class Binding implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private final ProActiveInterface clientInterface;
     private final ProActiveInterface serverInterface;

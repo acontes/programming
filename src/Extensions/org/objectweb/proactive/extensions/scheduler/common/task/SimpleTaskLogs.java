@@ -36,6 +36,11 @@ package org.objectweb.proactive.extensions.scheduler.common.task;
  * @since ProActive 3.9
  */
 public class SimpleTaskLogs implements TaskLogs {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     // logs on standard output
     private final String standardLogs;
 

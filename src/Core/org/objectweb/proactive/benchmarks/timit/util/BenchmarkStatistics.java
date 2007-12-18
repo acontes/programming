@@ -47,6 +47,10 @@ import org.objectweb.proactive.ProActive;
 public class BenchmarkStatistics implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     private HierarchicalTimerStatistics time;

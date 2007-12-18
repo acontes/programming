@@ -35,6 +35,10 @@ import java.util.List;
 
 
 public class GroupGLite extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String fileName;
     private String filePath;
     private String gLiteCommandPath;

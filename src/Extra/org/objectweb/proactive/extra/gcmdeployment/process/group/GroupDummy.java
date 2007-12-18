@@ -38,6 +38,10 @@ import java.util.List;
  *
  */
 public class GroupDummy extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     List<String> commands;
 
     public GroupDummy(List<String> commands) {

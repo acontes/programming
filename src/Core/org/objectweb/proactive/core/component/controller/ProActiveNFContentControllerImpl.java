@@ -42,6 +42,11 @@ import org.objectweb.fractal.api.Component;
 public class ProActiveNFContentControllerImpl extends ProActiveContentControllerImpl {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * Constructor for ProActiveNFContentController.
      */
     public ProActiveNFContentControllerImpl(Component owner) {

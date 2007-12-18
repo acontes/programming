@@ -41,6 +41,10 @@ import java.util.Vector;
  */
 public class ExceptionListException extends RuntimeException implements Iterable<ExceptionInGroup> {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     /** A vector implements the list */
     private Vector<ExceptionInGroup> list;
 

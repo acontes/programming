@@ -57,6 +57,10 @@ import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
  */
 @PublicAPI
 public class Worker implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_WORKER);
     private Worker selfWorkerGroup = null;
     private Result bestCurrentResult = null;

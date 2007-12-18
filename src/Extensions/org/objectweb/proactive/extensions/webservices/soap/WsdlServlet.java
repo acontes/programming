@@ -50,6 +50,11 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
  * @author vlegrand
  */
 public class WsdlServlet extends HttpServlet {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         DefaultConfigManager cm = new DefaultConfigManager();

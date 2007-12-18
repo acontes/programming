@@ -34,6 +34,11 @@ import org.objectweb.proactive.extensions.scheduler.common.task.Task;
 
 
 public class IllegalTaskException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public IllegalTaskException(Class<? extends Task> class1) {
         super(class1.getCanonicalName());
     }

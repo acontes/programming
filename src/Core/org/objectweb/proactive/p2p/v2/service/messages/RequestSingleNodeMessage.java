@@ -38,6 +38,10 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
 
 public class RequestSingleNodeMessage extends RandomWalkMessage {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected String vnName;
     protected String jobId;
     protected P2PNodeLookup lookup;

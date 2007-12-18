@@ -45,6 +45,10 @@ import ptolemy.data.Token;
 public class AOMatlabSplitter extends AOSimpleMatlab {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     private int numberOfChildren;

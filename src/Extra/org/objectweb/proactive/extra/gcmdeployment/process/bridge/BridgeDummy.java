@@ -34,6 +34,10 @@ package org.objectweb.proactive.extra.gcmdeployment.process.bridge;
  * A dummy bridge to be used in unit tests
  */
 public class BridgeDummy extends AbstractBridge {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     String command;
 
     public BridgeDummy(String command) {

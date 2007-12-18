@@ -35,6 +35,11 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class SearchInterval implements Execute<Interval, Primes> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public Primes execute(SkeletonSystem system, Interval param) {
         Primes primes = new Primes();
 

@@ -60,6 +60,11 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      */
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * log4j logger of the master
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);

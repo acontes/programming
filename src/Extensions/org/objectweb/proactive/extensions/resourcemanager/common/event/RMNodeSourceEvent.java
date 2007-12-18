@@ -61,6 +61,11 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
 @PublicAPI
 public class RMNodeSourceEvent extends RMEvent {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** name of the source concerned by the event. */
     private String nodeSourceName = null;
 

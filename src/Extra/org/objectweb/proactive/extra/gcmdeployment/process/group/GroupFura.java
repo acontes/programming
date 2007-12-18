@@ -34,6 +34,10 @@ import java.util.List;
 
 
 public class GroupFura extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String jobName;
     private String description;
     private String stdout;

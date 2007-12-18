@@ -394,6 +394,10 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
     // -- INNER CLASSES -----------------------------------------------
     //
     private static class ThreadActivityMonitor implements java.io.Serializable {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
         private boolean isActive;
 
         public boolean isActive() {
@@ -410,6 +414,11 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
      */
     public static class StandardOutputMessageLogger implements RemoteProcessMessageLogger,
             java.io.Serializable {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
+
         public StandardOutputMessageLogger() {
             //messageLogger.addAppender(new ConsoleAppender(new PatternLayout("%-5p %m %n")));
         }
@@ -434,6 +443,11 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
      * Implementation of a RemoteProcessMessageLogger that discard all output
      */
     public static class NullMessageLogger implements RemoteProcessMessageLogger, java.io.Serializable {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
+
         public NullMessageLogger() {
         }
 
@@ -453,6 +467,10 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
      * Implementation of a MessageSink that can receive one message at a time
      */
     public static class SimpleMessageSink implements MessageSink, java.io.Serializable {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
         private String message;
         private boolean isActive = true;
 

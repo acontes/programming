@@ -41,6 +41,11 @@ import java.util.LinkedList;
 public class ProActiveSPMDGroupManager implements java.io.Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      *  The spmd group he object belongs to
      */
     private Object spmdGroup = null;

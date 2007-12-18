@@ -35,6 +35,10 @@ import org.objectweb.proactive.loadbalancing.metrics.MetricFactory;
 
 
 public class CurrentTimeMillisMetricFactory implements MetricFactory {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private double creationTime;
 
     public CurrentTimeMillisMetricFactory() {

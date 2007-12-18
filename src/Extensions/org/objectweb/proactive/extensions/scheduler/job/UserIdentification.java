@@ -46,6 +46,11 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEv
  */
 public class UserIdentification implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** user name */
     private String username;
 

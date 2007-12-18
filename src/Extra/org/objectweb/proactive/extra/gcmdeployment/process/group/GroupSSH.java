@@ -37,6 +37,10 @@ import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
 
 
 public class GroupSSH extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     public final static String DEFAULT_SSHPATH = "ssh";
     private String hostList;
     private String username;

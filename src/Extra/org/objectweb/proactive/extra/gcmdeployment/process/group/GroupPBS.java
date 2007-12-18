@@ -34,6 +34,10 @@ import java.util.List;
 
 
 public class GroupPBS extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String hostList;
     private String hostNumber;
     private String processorPerNode;

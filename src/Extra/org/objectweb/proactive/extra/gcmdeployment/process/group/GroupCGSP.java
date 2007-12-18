@@ -34,6 +34,10 @@ import java.util.List;
 
 
 public class GroupCGSP extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String hostName;
     private String queue;
     private String count;

@@ -40,6 +40,11 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
  * @author Laurent Baduel
  */
 public class Tetrahedron extends TopologyGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public Tetrahedron(Group g, int size) throws ConstructionOfReifiedObjectFailedException {
         super(g, size);
         for (int i = 0; i < size; i++) {

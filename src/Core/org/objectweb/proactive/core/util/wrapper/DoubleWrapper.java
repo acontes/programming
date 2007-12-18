@@ -44,6 +44,10 @@ import java.io.Serializable;
 public class DoubleWrapper implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      * The primitive value.
      */
     private double value;

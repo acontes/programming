@@ -52,6 +52,10 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProAc
  *
  */
 public class ProActiveExample extends ProActiveExecutable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private int numberToFind = 5003;
 
     /**

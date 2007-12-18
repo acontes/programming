@@ -52,6 +52,11 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.TaskConstru
 @PublicAPI
 public class ProActiveTask extends Task {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Task as an instance */
     private ProActiveExecutable taskInstance = null;
 

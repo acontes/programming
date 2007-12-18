@@ -56,6 +56,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class MigratableBody extends BodyImpl implements Migratable, java.io.Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     protected static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);

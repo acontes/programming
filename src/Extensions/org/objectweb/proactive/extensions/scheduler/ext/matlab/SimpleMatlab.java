@@ -67,6 +67,11 @@ import org.objectweb.proactive.extensions.scheduler.util.Shell;
 public class SimpleMatlab extends JavaExecutable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      *
      */
 
@@ -521,6 +526,11 @@ public class SimpleMatlab extends JavaExecutable {
      *
      */
     private static class DummyJVMProcess extends JVMProcessImpl {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
 
         /**
          *

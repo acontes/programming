@@ -92,6 +92,10 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Resul
 public class ProActiveMaster<T extends Task<R>, R extends Serializable> implements Master<T, R>, Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     protected AOMaster aomaster = null;

@@ -48,6 +48,11 @@ import org.objectweb.proactive.extensions.scheduler.task.EligibleTaskDescriptor;
 public class PriorityPolicy implements PolicyInterface {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * This method return the tasks using FIFO policy according to the jobs priorities.
      *
      * @see org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)

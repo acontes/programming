@@ -48,6 +48,11 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 public class EligibleTaskDescriptor extends TaskDescriptor {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * Get a new eligible task descriptor using a taskDescriptor.
      * Same constructor as TaskDescriptor
      *

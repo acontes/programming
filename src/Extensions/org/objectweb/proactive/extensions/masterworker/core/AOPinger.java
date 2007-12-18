@@ -67,6 +67,11 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
      */
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * pinger log4j logger
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);

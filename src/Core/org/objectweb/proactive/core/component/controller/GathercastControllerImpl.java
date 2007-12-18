@@ -61,6 +61,10 @@ import org.objectweb.proactive.core.node.Node;
 
 
 public class GathercastControllerImpl extends AbstractProActiveController implements GathercastController {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private Map<String, List<ItfID>> bindingsOnServerItfs = new HashMap<String, List<ItfID>>();
     private Map<String, ProActiveInterface> gatherItfs = new HashMap<String, ProActiveInterface>();
     private GatherRequestsQueues gatherRequestsHandler;

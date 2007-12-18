@@ -110,6 +110,10 @@ public class ResultPreviewTool {
      * @since 3.9
      */
     public static class SimpleImagePanel extends JPanel {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
         private transient Image img;
         private String path;
 
@@ -145,6 +149,10 @@ public class ResultPreviewTool {
      * @since 3.9
      */
     public static class SimpleTextPanel extends JPanel {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 390L;
         private String text;
         JTextArea textZone = new JTextArea(15, 40);
 

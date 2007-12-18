@@ -31,6 +31,10 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.bridge;
 
 public class BridgeRSH extends AbstractBridge {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     public final static String DEFAULT_RSHPATH = "rsh";
 
     public BridgeRSH() {

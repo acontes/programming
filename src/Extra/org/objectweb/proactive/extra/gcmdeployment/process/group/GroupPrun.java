@@ -34,6 +34,10 @@ import java.util.List;
 
 
 public class GroupPrun extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private String queueName;
     private String hostList;
     private String wallTime;

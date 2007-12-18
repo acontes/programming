@@ -43,6 +43,11 @@ import ptolemy.data.Token;
 public class AOMatlabCollector extends AOSimpleMatlab {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      *
      */
     public AOMatlabCollector() {

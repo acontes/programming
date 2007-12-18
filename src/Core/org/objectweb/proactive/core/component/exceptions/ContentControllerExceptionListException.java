@@ -46,6 +46,10 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
  *
  */
 public class ContentControllerExceptionListException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     Map<Component, IllegalLifeCycleException> lifeCycleExceptions = null;
     Map<Component, IllegalContentException> contentExceptions = null;
 

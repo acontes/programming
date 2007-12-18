@@ -47,6 +47,11 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationS
 @PublicAPI
 public class NativeTask extends Task {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Command line for this native task */
     private String commandLine = null;
 

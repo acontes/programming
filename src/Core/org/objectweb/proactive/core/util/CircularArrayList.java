@@ -58,6 +58,10 @@ import static junit.framework.Assert.assertTrue;
  *
  */
 public class CircularArrayList extends java.util.AbstractList implements java.util.List, java.io.Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
     private static final int DEFAULT_SIZE = 5;
     protected Object[] array;

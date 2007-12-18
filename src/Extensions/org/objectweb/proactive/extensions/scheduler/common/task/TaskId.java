@@ -47,6 +47,11 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 @PublicAPI
 public final class TaskId implements Comparable<TaskId>, Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Default task name */
     public static final String DEFAULT_TASK_NAME = "Not set";
 

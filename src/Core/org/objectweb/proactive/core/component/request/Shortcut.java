@@ -64,6 +64,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class Shortcut implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     public static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
     private transient UniversalBody sender;
     private List<UniversalBody> steps; // the list of crossed membranes; TODO_M transient 

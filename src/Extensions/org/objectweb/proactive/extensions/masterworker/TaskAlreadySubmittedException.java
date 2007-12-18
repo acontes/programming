@@ -42,6 +42,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class TaskAlreadySubmittedException extends Exception {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      *
      */
 }

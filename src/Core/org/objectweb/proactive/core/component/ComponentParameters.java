@@ -49,6 +49,10 @@ import org.objectweb.fractal.api.type.InterfaceType;
  * @author Matthieu Morel
  */
 public class ComponentParameters implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private ComponentType componentType;
     private ControllerDescription controllerDesc;
 

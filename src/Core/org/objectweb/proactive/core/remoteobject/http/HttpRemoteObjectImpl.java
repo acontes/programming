@@ -46,6 +46,10 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
 
 
 public class HttpRemoteObjectImpl implements RemoteRemoteObject, Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     private boolean isLocal;
     private URI remoteObjectURL;
     protected transient InternalRemoteRemoteObject remoteObject;

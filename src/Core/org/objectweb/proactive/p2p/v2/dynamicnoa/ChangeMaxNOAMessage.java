@@ -35,6 +35,10 @@ import org.objectweb.proactive.p2p.v2.service.messages.Message;
 
 
 public class ChangeMaxNOAMessage extends Message {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     protected int noa;
 
     public ChangeMaxNOAMessage(int ttl, int noa) {

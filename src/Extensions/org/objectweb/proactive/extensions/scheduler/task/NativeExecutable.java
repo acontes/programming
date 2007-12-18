@@ -52,6 +52,11 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.Execu
  */
 public class NativeExecutable extends Executable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Process that start the native task */
     private transient Process process;
 

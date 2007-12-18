@@ -56,6 +56,10 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.RMDeplo
  *
  */
 public class DummyNodeSource extends DynamicNodeSource implements PadDeployInterface {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     // static nodes with their states (available=true - not available=false)
     private HashMap<Node, Boolean> StaticNodes;
 

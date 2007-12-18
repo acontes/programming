@@ -38,6 +38,11 @@ public class ScriptHandler implements Serializable {
     /**  */
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
+    /**
      * ProActive Constructor
      */
     public ScriptHandler() {

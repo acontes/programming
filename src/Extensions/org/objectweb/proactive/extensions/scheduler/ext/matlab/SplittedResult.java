@@ -39,6 +39,10 @@ import ptolemy.data.Token;
 public class SplittedResult implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     private ArrayToken token;

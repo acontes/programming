@@ -42,6 +42,10 @@ import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorC
  * @since ProActive 3.0 (December 2005)
  */
 public class VariableContractType implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     static final public VariableContractType DescriptorVariable = new VariableContractType(0, new String[] {
             "Descriptor", "Program" }, new String[] { "Descriptor" }, new String[] { "Program" });
     static final public VariableContractType ProgramVariable = new VariableContractType(1, new String[] {

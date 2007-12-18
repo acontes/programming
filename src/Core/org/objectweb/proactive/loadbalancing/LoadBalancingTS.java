@@ -39,6 +39,11 @@ import org.objectweb.proactive.loadbalancing.metrics.MetricFactory;
 
 
 public class LoadBalancingTS implements TechnicalService, Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public void init(Map argValues) {
         // TODO Auto-generated method stub
         String metricFactoryName = (String) argValues.get("MetricFactory");

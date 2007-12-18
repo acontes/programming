@@ -34,6 +34,11 @@ import java.util.List;
 
 
 public class GroupSGE extends AbstractGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     @Override
     public List<String> internalBuildCommands() {
         // TODO Auto-generated method stub

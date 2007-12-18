@@ -60,6 +60,10 @@ import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 public class Line2dChart implements Chart {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+    /**
      *
      */
     private Element[] series;

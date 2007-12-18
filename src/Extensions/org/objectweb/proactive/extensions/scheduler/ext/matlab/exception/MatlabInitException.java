@@ -31,6 +31,11 @@
 package org.objectweb.proactive.extensions.scheduler.ext.matlab.exception;
 
 public class MatlabInitException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     public MatlabInitException(String string) {
         super(string);
     }
