@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition name="org.objectweb.proactive.compi2.control.adl.cluster">
+
+	<!-- MxN server interface -->
+	<interface name="inMxNServerItf" role="server" signature="org.objectweb.proactive.compi2.control.DGCluster" cardinality="gathercast"/>
+	<interface name="outMxNServerItf" role="server" signature="org.objectweb.proactive.compi2.control.DGCluster" cardinality="multicast"/>
+	<binding client="this.inMxNServerItf" server="this.outMxNServerItf"/>
+		
+	<!-- MxN client interface -->
+	<interface name="inMxNClientItf" role="client" signature="org.objectweb.proactive.compi2.control.DGCluster" cardinality="gathercast"/>
+	<interface name="outMxNClientItf" role="client" signature="org.objectweb.proactive.compi2.control.DGCluster" cardinality="multicast"/>
+	<binding client="this.inMxNClientItf" server="this.outMxNClientItf"/>
+
+	<controller desc="org/objectweb/proactive/compi2/control/mxn-cluster-config.xml"/>
+
+</definition>
