@@ -8,8 +8,9 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.compi.MPIResult;
-import org.objectweb.proactive.compi.MPISpmd;
+import org.objectweb.proactive.compi2.MPIResult;
+import org.objectweb.proactive.compi2.MPISpmd;
+import org.objectweb.proactive.compi2.control.DGConstants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
@@ -23,10 +24,7 @@ public class DGFractiveControllerImpl extends AbstractProActiveController implem
 	//protected Map <Integer, Component> fcSubComponents;
 	private ProActiveContentController ownerContentController;
 	private MPISpmd mpiSpmd;
-	
-	public String DG_FRACTIVE_CONTROLLER = "dgfractive-controller";
-	public String PRIMITIVE_COMPONENTS_ADL = "org.objectweb.proactive.compi2.control.adl.nodes";
-	
+		
 
 	public DGFractiveControllerImpl(Component owner) {
 		super(owner);
@@ -44,7 +42,7 @@ public class DGFractiveControllerImpl extends AbstractProActiveController implem
 	@Override
 	protected void setControllerItfType() {
 		try {
-			setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(this.DG_FRACTIVE_CONTROLLER, 
+			setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(DGConstants.DG_FRACTIVE_CONTROLLER, 
 					DGFractiveController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
 		} catch (InstantiationException e) {
 			throw new ProActiveRuntimeException("cannot create controller " +
@@ -53,10 +51,6 @@ public class DGFractiveControllerImpl extends AbstractProActiveController implem
 		
 	}
 	
-	private MPIResult startMPI(){
-		//start owner (starts recursivelly the inner components)
-		return this.mpiSpmd.startMPI();
-	}
 	
 	public boolean createInnerComponents(MPISpmd mpiSpmd){
 		this.mpiSpmd = mpiSpmd;
@@ -65,8 +59,7 @@ public class DGFractiveControllerImpl extends AbstractProActiveController implem
 			//deploy components on each node
 			// if owner is "running", stop it
 			//include them as subcomponents of the owner
-			//do all the binding between primitives and owner  TODO: think on have a controller to do it
-			// must see if should start subcomponents, or let the owner to be encharged of it
+			//do all the binding between primitives and owner 
 		} catch (NodeException e) {
 			e.printStackTrace();
 			return false;

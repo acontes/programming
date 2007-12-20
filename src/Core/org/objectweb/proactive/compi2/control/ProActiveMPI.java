@@ -33,9 +33,13 @@ package org.objectweb.proactive.compi2.control;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
-import org.objectweb.fractal.adl.*;
+import org.objectweb.fractal.adl.ADLException;
+import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -43,25 +47,24 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.compi.control.ProActiveMPIClusterComp;
 import org.objectweb.proactive.compi2.MPISpmd;
+import org.objectweb.proactive.compi2.control.controller.DGFractiveController;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.adl.FactoryFactory;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.*;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.ext.util.FutureList;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 
 
 public class ProActiveMPI {
-    public final static String DEFAULT_LIBRARY_NAME = "libProActiveMPIComm.so";
-
+    
     /**
      * Deploy an array of MPI applications, wrapping native process within components
      * bound through their interfaces
@@ -70,20 +73,45 @@ public class ProActiveMPI {
      */
     public static Vector deploy(ArrayList spmdList) {
     	Component[] clusters = new Component[spmdList.size()];
-
+    	FutureList readyToStartAcks = new FutureList();
+    	
     	try {
     		Map<String, Object> context = new HashMap<String, Object>();
 
-    		for(int i=0; i < spmdList.size(); i++){
+    		//create cluster composites on first node of each Vn (hopefully a frontent ;))
+    		for(int i=0; i < spmdList.size(); i++){ 
     			MPISpmd spmd = (MPISpmd) spmdList.get(i);
     			VirtualNode vn = ((MPISpmd) spmdList.get(i)).getVn();
                 Node[] allNodes = vn.getNodes();
                 
                 clusters[i] = newClusterInstance(allNodes[0], context);
-                                
+                DGFractiveController fractiveController = (DGFractiveController) clusters[i].getFcInterface(DGConstants.DG_FRACTIVE_CONTROLLER);
+                fractiveController.createInnerComponents(spmd);
     		}
+    		
+    		//bind collective interfaces  of cluster composites
+    		for(int i=0; i < spmdList.size(); i++){
+    			for(int j=0; j < spmdList.size(); j++){
+    				if(i != j){
+    					 Fractal.getBindingController(clusters[i]).bindFc("outMxNClientItf", clusters[j].getFcInterface("inMxNServerItf"));
+    				}
+    			}
+    		}
+    		
+    		//start environment
+    		for(int i=0; i < spmdList.size(); i++){
+    			Fractal.getLifeCycleController(clusters[i]).startFc();
+    			//readyToStartAcks.add(((DGController) clusters[i].getFcInterface(DGConstants.DG_FRACTIVE_CONTROLLER)).isReadyto);
+    		}
+    		
 
     	} catch (NodeException e) {
+			e.printStackTrace();
+		} catch (NoSuchInterfaceException e) {
+			e.printStackTrace();
+		} catch (IllegalBindingException e) {
+			e.printStackTrace();
+		} catch (IllegalLifeCycleException e) {
 			e.printStackTrace();
 		}
 
@@ -96,12 +124,14 @@ public class ProActiveMPI {
     	Component cluster = null;
 
     	try {
+    		
     		Component boot = Fractal.getBootstrapComponent();
-
     		ProActiveGenericFactory cf = Fractive.getGenericFactory(boot);
     		Factory f = FactoryFactory.getFactory();
-    		ComponentType clusterType = (ComponentType) f.newComponentType("org.objectweb.proactive.compi2.control.adl.cluster", context);
-    		ControllerDescription clusterController = new ControllerDescription("cluster", Constants.COMPOSITE, "do it"); //new ControllerDescription("Cluster",  Constants.PRIMITIVE);
+    		ComponentType clusterType = (ComponentType) f.newComponentType(DGConstants.DG_CLUSTER_ADL, context);
+    		ControllerDescription clusterController = new ControllerDescription("cluster", Constants.COMPOSITE, 
+    				ProActiveMPI.class.getClass().getResource(DGConstants.DG_CLUSTER_CONTROLLER_CONFIG).getPath()); 
+    		
     		cluster = cf.newFcInstance(clusterType, clusterController, null, node);
 
     	} catch (InstantiationException e) {
@@ -130,7 +160,7 @@ public class ProActiveMPI {
         String remoteLibraryPath = mpiSpmd.getRemoteLibraryPath();
 
         ClassLoader cl = ProActiveMPI.class.getClassLoader();
-        URL u = cl.getResource("org/objectweb/proactive/compi/control/" + DEFAULT_LIBRARY_NAME);
+        URL u = cl.getResource("org/objectweb/proactive/compi2/control/" + DGConstants.DEFAULT_LIBRARY_NAME);
 
         File remoteDest = new File(remoteLibraryPath + "/libProActiveMPIComm.so");
         File localSource = new File(u.getFile());
