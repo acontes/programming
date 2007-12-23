@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ModelRecorder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Grid3DController;
 import org.osgi.framework.BundleContext;
 

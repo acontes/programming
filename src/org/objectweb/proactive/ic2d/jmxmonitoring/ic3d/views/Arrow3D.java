@@ -5,10 +5,8 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
-import javax.media.j3d.Shape3D;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.Vector3f;
-
 
 /**
  * @author vjuresch
@@ -21,9 +19,7 @@ public class Arrow3D extends AbstractArrow3D {
         this.setGeometry(createGeometry(start, stop));
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
      */
     @Override
@@ -31,9 +27,7 @@ public class Arrow3D extends AbstractArrow3D {
         // TODO Auto-generated method stub
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createAppearance()
      */
     @Override
@@ -41,9 +35,7 @@ public class Arrow3D extends AbstractArrow3D {
         return AppearanceBasket.defaultLineAppearance;
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
      */
     @Override
@@ -52,7 +44,7 @@ public class Arrow3D extends AbstractArrow3D {
     }
 
     private Geometry createGeometry(Vector3f start, Vector3f stop) {
-        return GeometryBasket.getDefaultLineGeometry(start, stop);
+    	return GeometryBasket.getDefaultLineGeometry(start, stop);
     }
 
     @Override
@@ -60,4 +52,13 @@ public class Arrow3D extends AbstractArrow3D {
         // TODO Auto-generated method stub
         return null;
     }
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
+	 */
+	@Override
+	protected void animateCreation() {
+		// TODO Auto-generated method stub
+		
+	}
 }

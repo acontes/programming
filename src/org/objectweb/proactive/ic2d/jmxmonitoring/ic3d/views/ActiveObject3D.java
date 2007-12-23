@@ -1,28 +1,24 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
-import java.awt.Font;
 
-import javax.media.j3d.Alpha;
 import javax.media.j3d.Appearance;
-import javax.media.j3d.BoundingSphere;
-import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Geometry;
 import javax.media.j3d.RotationInterpolator;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
-import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Vector3d;
 
-import com.sun.j3d.utils.geometry.Text2D;
-
-
 /**
+ * An implementation for an active
+ * object figure. This implementation uses
+ * a sphere geometry. 
  * @author vjuresch
  *
  */
 public class ActiveObject3D extends AbstractActiveObject3D {
     RotationInterpolator rot;
-
+	private Queue3D queue = new Queue3D(""); //an active object has only one queue
+	private boolean noQueue = true;
     public ActiveObject3D(String name) {
         super(name);
         // //add a rotation interpolator for
@@ -42,73 +38,98 @@ public class ActiveObject3D extends AbstractActiveObject3D {
     protected Appearance createAppearance() {
         return AppearanceBasket.defaultActiveObjectAppearance;
     }
-
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setQueueSize(int)
+     */
     @Override
     public void setQueueSize(int size) {
-        // TODO Auto-generated method stub
+    	//TODO hacky, change
+    	if (noQueue ){
+    		addSubFigure(new Double(Math.random()).toString(),
+				queue);
+    		noQueue = false;
+
+    	}
+    	assert size > 0;
+		TransformGroup trans = (TransformGroup)queue.getParent().getParent();
+		Transform3D  resize = new Transform3D();
+		trans.getTransform(resize);
+		Vector3d oldScale =  new Vector3d();
+		resize.getScale(oldScale);
+		//TODO remove constant
+		resize.setScale(new Vector3d(size/2,
+				oldScale.y , oldScale.z));
+
+		System.out.println(size);
+		trans.setTransform(resize);
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
+     */
     @Override
-    public void arrangeSubFigures() {
-        // TODO Auto-generated method stub
-    }
+    public void arrangeSubFigures() {    
+     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
+     */
     @Override
     protected Geometry createGeometry() {
         return GeometryBasket.getDefaultActiveObjectGeometry();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
+     */
     @Override
     protected TransformGroup createTextBranch() {
-        // add the text
-        Text2D figureName = new Text2D(this.getShortenedName(10),
-                ColorPalette.BLACK, Font.MONOSPACED, 30, Font.BOLD);
-
-        TransformGroup fontRotate = createTransform();
-        Transform3D rotate = new Transform3D();
-        rotate.rotX(Math.PI / 2);
-        fontRotate.setTransform(rotate);
-
-        // move a little the font shape
-        TransformGroup fontTrans = createTransform();
-        Transform3D translate = new Transform3D();
-        // TODO remove constants
-        translate.setTranslation(new Vector3d(1.5d, -1d, 0d));
-        translate.setScale(6);
-        // TODO make text slanted on object
-        fontTrans.setTransform(translate);
-
-        fontRotate.addChild(figureName);
-        fontTrans.addChild(fontRotate);
-        // add the transform the the branch group
-        return fontTrans;
+    	return  TextStylesBasket.activeObjectText(this.getShortenedName(10));
+    }    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setStateMigrating()
+     */
+    @Override
+	public void setStateMigrating() {
+        
+    	this.setAppearance(AppearanceBasket.objectMigratingAppearance);
     }
 
-    public void setMigrating() {
-        this.setAppearance(AppearanceBasket.objectMigratingAppearance);
-    }
-
-    public void setServingRequest() {
-        // Transform3D t = new Transform3D();
-        // t.set(new AxisAngle4d(0d, 1d, 1d, Math.PI));
-        // rot.setTransformAxis(t);
-        // rot.setEnable(true);
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setStateServingRequest()
+     */
+    @Override
+	public void setStateServingRequest() {
+//        Transform3D t = new Transform3D();
+//        t.set(new AxisAngle4d(0d, 1d, 1d, Math.PI));
+//        rot.setTransformAxis(t);
+//        rot.setEnable(true);
         this.setAppearance(AppearanceBasket.servingRequestAppearance);
     }
 
-    public void setWaitingForRequest() {
-        // rot.setEnable(false);
-        this.setAppearance(AppearanceBasket.waitingForRequest);
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setStateWaitingForRequest()
+     */
+    @Override
+	public void setStateWaitingForRequest() {
+  //      rot.setEnable(false);
+        this.setAppearance(AppearanceBasket.waitingForRequestAppearance);
     }
 
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setStateActive()
+     */
     @Override
-    public void setActive() {
+    public void setStateActive() {
         // TODO Auto-generated method stub
     }
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
+	 */
+	@Override
+	protected void animateCreation() {
+		new AnimationBasket().fadeInto(this,2000);
+	}
 
-    @Override
-    public void setUnknown() {
-        // rot.setEnable(false);
-        this.setAppearance(AppearanceBasket.unkown);
-    }
 }

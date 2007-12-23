@@ -12,6 +12,8 @@ import javax.media.j3d.TextureUnitState;
 import javax.media.j3d.TransparencyAttributes;
 import javax.vecmath.Color3f;
 
+
+
 import com.sun.j3d.utils.image.TextureLoader;
 
 
@@ -29,16 +31,98 @@ public class AppearanceBasket {
     public static Appearance defaultHostAppearance = getDefaultHostAppearance();
     public static Appearance defaultLineAppearance = getDefaultLineAppearance();
     public static Appearance coordinatesAppearance = getDefaultCoordinatesAppearance();
+    public static Appearance queueAppearance = getDefaultQueueAppearance();
 
     // generic unknown appeareance
-    public static Appearance defaultUnkownState = getDefaultUnknownStateAppearance();
+    public static Appearance defaultUnkownStateAppearance = getDefaultUnknownStateAppearance();
 
     // active objects states
     public static Appearance objectMigratingAppearance = getActiveObjectMigrating();
     public static Appearance defaultActiveObjectAppearance = getDefaultActiveObjectAppearance();
     public static Appearance servingRequestAppearance = getServingRequestAppearance();
-    public static Appearance waitingForRequest = getWaitingForRequestAppearance();
-    public static Appearance unkown = getUnkownAppearance();
+    public static Appearance waitingForRequestAppearance = getWaitingForRequestAppearance();
+
+    //Earth grid appearances
+    public static Appearance earthGridAppearance = getEarthGridAppearance();
+    
+    //make this class non instantiable
+    private AppearanceBasket(){};
+
+    private static Appearance getDefaultQueueAppearance() {
+        Appearance appear = new Appearance();
+
+        ColoringAttributes colorAttrib = new ColoringAttributes(1f, 1f, 0.0f, 3);
+
+        Color3f matAmbient = ColorPalette.YELLOW;
+        Color3f matEmissive = ColorPalette.LIGHT_GRAY;
+        Color3f matDiffuse = ColorPalette.BLUE;
+        Color3f matSpecular = ColorPalette.GREEN;
+        float matShininess = 73.0f;
+
+        Material material = new Material(matAmbient, matEmissive, matDiffuse,
+                matSpecular, matShininess);
+
+        PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(2);
+        polyAttributes.setCullFace(PolygonAttributes.CULL_NONE);
+        appear.setPolygonAttributes(polyAttributes);
+
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(TransparencyAttributes.NONE,
+                0.7f);
+
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
+        return appear;
+	}
+
+    private static Appearance getEarthGridAppearance() {
+        Appearance appear = new Appearance();
+
+        ColoringAttributes colorAttrib = new ColoringAttributes(0.0f, 0.0f,
+                0.0f, 3);
+
+        Color3f matAmbient = new Color3f(0.2f, 0.2f, 0.2f);
+        Color3f matEmissive = new Color3f(0.0f, 0.0f, 0.0f);
+        Color3f matDiffuse = new Color3f(1.0f, 1.0f, 1.0f);
+        Color3f matSpecular = new Color3f(1.0f, 1.0f, 1.0f);
+        float matShininess = 73.0f;
+
+        Material material = new Material(matAmbient, matEmissive, matDiffuse,
+                matSpecular, matShininess);
+
+        TextureUnitState[] textureUnitState = new TextureUnitState[2];
+        TextureAttributes texAttr1 = new TextureAttributes();
+        texAttr1.setTextureMode(3);
+        TextureLoader tex;
+
+        try {
+            tex = new TextureLoader(TextureBasket.earth);
+            Texture texture1 = tex.getTexture();
+            textureUnitState[0] = new TextureUnitState();
+            textureUnitState[0].setTexture(texture1);
+            textureUnitState[0].setTextureAttributes(texAttr1);
+            appear.setTextureUnitState(textureUnitState);
+        } catch (Exception ex) {
+            System.out.println("imgeURL1 - texture null !");
+            ex.printStackTrace();
+        }
+
+        PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(PolygonAttributes.POLYGON_POINT);
+        polyAttributes.setCullFace(1);
+        appear.setPolygonAttributes(polyAttributes);
+
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(TransparencyAttributes.NICEST,
+                0f);
+
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
+        return appear;
+	}
 
     private static Appearance getDefaultUnknownStateAppearance() {
         Appearance appear = new Appearance();
@@ -60,8 +144,8 @@ public class AppearanceBasket {
         appear.setPolygonAttributes(polyAttributes);
 
         TransparencyAttributes transparencyAttributes = new TransparencyAttributes(TransparencyAttributes.NONE,
-                0.7f);
-
+                0f);
+        transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
         appear.setTransparencyAttributes(transparencyAttributes);
         appear.setMaterial(material);
         appear.setColoringAttributes(colorAttrib);
@@ -240,7 +324,7 @@ public class AppearanceBasket {
         polyAttributes.setCullFace(1);
         appear.setPolygonAttributes(polyAttributes);
 
-        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(2,
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(TransparencyAttributes.NONE,
                 0f);
 
         appear.setTransparencyAttributes(transparencyAttributes);
@@ -282,8 +366,8 @@ public class AppearanceBasket {
             ex.printStackTrace();
         }
 
-        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(2,
-                0.26f);
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(TransparencyAttributes.NONE,
+                0f);
 
         PolygonAttributes polyAttributes = new PolygonAttributes();
         polyAttributes.setPolygonMode(2);
@@ -382,7 +466,7 @@ public class AppearanceBasket {
         polyAttributes.setCullFace(1);
         appear.setPolygonAttributes(polyAttributes);
 
-        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(2,
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(TransparencyAttributes.NONE,
                 0f);
 
         appear.setTransparencyAttributes(transparencyAttributes);
@@ -429,7 +513,7 @@ public class AppearanceBasket {
         polyAttributes.setCullFace(1);
         appear.setPolygonAttributes(polyAttributes);
 
-        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(2,
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(TransparencyAttributes.NONE,
                 0f);
 
         appear.setTransparencyAttributes(transparencyAttributes);
@@ -476,7 +560,7 @@ public class AppearanceBasket {
         polyAttributes.setCullFace(1);
         appear.setPolygonAttributes(polyAttributes);
 
-        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(2,
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(TransparencyAttributes.NONE,
                 0f);
 
         appear.setTransparencyAttributes(transparencyAttributes);

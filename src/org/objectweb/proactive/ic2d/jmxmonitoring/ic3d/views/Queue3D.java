@@ -23,7 +23,7 @@ public class Queue3D extends AbstractQueue3D {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.view3d.AbstractFigure3D#arrangeSubFigures()
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
 	 */
 	@Override
 	public void arrangeSubFigures() {
@@ -32,7 +32,7 @@ public class Queue3D extends AbstractQueue3D {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.view3d.AbstractFigure3D#createAppearance()
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createAppearance()
 	 */
 	@Override
 	protected Appearance createAppearance() {
@@ -40,7 +40,7 @@ public class Queue3D extends AbstractQueue3D {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.view3d.AbstractFigure3D#createGeometry()
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
 	 */
 	@Override
 	protected Geometry createGeometry() {
@@ -48,7 +48,7 @@ public class Queue3D extends AbstractQueue3D {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.view3d.AbstractFigure3D#createTextBranch()
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
 	 */
 	@Override
 	protected TransformGroup createTextBranch() {
@@ -57,10 +57,10 @@ public class Queue3D extends AbstractQueue3D {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.view3d.AbstractFigure3D#animateCreation()
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
 	 */
 	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.view3d.AbstractFigure3D#animateCreation()
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
 	 */
 	@Override
 	protected void animateCreation() {

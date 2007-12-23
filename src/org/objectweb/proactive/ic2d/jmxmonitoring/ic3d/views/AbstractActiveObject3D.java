@@ -1,50 +1,70 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
-import javax.media.j3d.Alpha;
-import javax.media.j3d.BoundingSphere;
-import javax.media.j3d.BranchGroup;
-import javax.media.j3d.RotationInterpolator;
-import javax.media.j3d.Transform3D;
-import javax.media.j3d.TransformGroup;
-import javax.vecmath.AxisAngle4d;
-
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
-
+/**
+ * All representation of active objects should extend this
+ * class.
+ * @author vasile
+ *
+ */
 public abstract class AbstractActiveObject3D extends AbstractFigure3D {
     public AbstractActiveObject3D(String name) {
         super(name);
         // TODO Auto-generated constructor stub
     }
 
+    /**
+     * The implementation should change the 
+     * appearance or do something to represent 
+     * the queue (perhaps add another queue figure).
+     * @param size queue size
+     */
     public abstract void setQueueSize(int size);
 
-    public abstract void setMigrating();
+    /**
+     * Sets the appearance for migrating objects.
+     */
+    public abstract void setStateMigrating();
 
-    public abstract void setServingRequest();
+    /**
+     * Sets the appearance for active objects serving requests.
+     */
+    public abstract void setStateServingRequest();
 
-    public abstract void setActive();
+    /**
+     * //TODO what is this used for again?
+     * Sets the appearance for active objects (????)
+     */
+    public abstract void setStateActive();
 
-    public abstract void setWaitingForRequest();
+    /**
+     * Sets the appearance for active
+     * objects waiting for requests.
+     */
+    public abstract void setStateWaitingForRequest();
 
-    public abstract void setUnknown();
-
-    public void setState(State state) {
+    /* (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State)
+     */
+    @Override
+	public void setState(State state) {
         switch (state) {
         case SERVING_REQUEST:
-            setServingRequest();
+            setStateServingRequest();
             break;
         case MIGRATING:
-            setMigrating();
+            setStateMigrating();
             break;
         case ACTIVE:
-            setActive();
+            setStateActive();
             break;
         case WAITING_FOR_REQUEST:
-            setWaitingForRequest();
+            setStateWaitingForRequest();
             break;
         default:
-            setUnknown();
+            this.setStateUnkown();
             break;
         }
     }

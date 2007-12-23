@@ -22,11 +22,12 @@ public class TextureBasket {
     public static BufferedImage node_border = loadImage(path + "node_skin.jpg");
     public static BufferedImage round_corners = loadImage(path +
             "round_corners.png");
+    public static BufferedImage earth = loadImage(path + "EarthMap.jpg");
 
     private static BufferedImage loadImage(String fname) {
         // Level logLevel = Level.FINE;
         // Logger logger =
-        // Logger.getLogger("org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views");
+        // Logger.getLogger("org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.views");
         // ConsoleHandler handler = new ConsoleHandler();
         //
         // logger.log(Level.FINE,"Loading texture: " + fname);
