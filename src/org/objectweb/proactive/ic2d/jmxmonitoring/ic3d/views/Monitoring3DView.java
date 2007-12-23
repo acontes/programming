@@ -37,29 +37,71 @@ import java.util.Set;
 
 import javax.media.j3d.Canvas3D;
 
+
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.EnableDisableMonitoringAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction;
+
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetDepthAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetTTRAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ModelRecorder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Grid3DController;
-import org.osgi.framework.BundleContext;
 
 
 public class Monitoring3DView extends ViewPart {
     public static final String ID = "org.objectweb.proactive.ic2d.jmxmonitoring.view.Legend";
+    /** The World */
+    private WorldObject world;
+    private String title;
 
+    
     public Monitoring3DView() {
-        // TODO Auto-generated constructor stub
+        super();
+        world = new WorldObject();
+        title = world.getName();
     }
 
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new FillLayout());
+        
+        //**********ADD  TOOLBAR BUTTONS********************
+        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
+        // Adds "Monitor a new Host" action to the view's toolbar
+        NewHostAction toolBarNewHost = new NewHostAction(parent.getDisplay(), world);
+        toolBarManager.add(toolBarNewHost);
+
+        // Adds "Set depth" action to the view's toolbar
+        SetDepthAction toolBarSetDepth = new SetDepthAction(parent.getDisplay(), world);
+        toolBarManager.add(toolBarSetDepth);
+
+        toolBarManager.add(new Separator());
+
+        // Adds "Set Time to refresh" action to the view's toolbar
+        SetTTRAction toolBarTTR = new SetTTRAction(parent.getDisplay(), world.getMonitorThread());
+        toolBarManager.add(toolBarTTR);
+
+
+        // Adds enable/disable monitoring action to the view's toolbar
+        EnableDisableMonitoringAction toolBarEnableDisableMonitoring = new EnableDisableMonitoringAction(
+            world);
+        toolBarManager.add(toolBarEnableDisableMonitoring);
+
+
+        toolBarManager.add(new Separator());
+
+        //******************************
+        
+        
         // create swt container:
         Composite SWT_AWT_container = new Composite(parent, SWT.EMBEDDED);
 
@@ -155,24 +197,13 @@ public class Monitoring3DView extends ViewPart {
         grid.addGrid(g);
 
         // get the world object,
-        Set<String> modelNames = ModelRecorder.getInstance().getNames();
-        try{
-        WorldObject root = ModelRecorder.getInstance()
-                                        .getModel(modelNames.iterator().next());
-        Grid3DController controller = new Grid3DController(root, g, null);
+//        Set<String> modelNames = ModelRecorder.getInstance().getNames();
+//        WorldObject root = ModelRecorder.getInstance()
+//                                        .getModel(modelNames.iterator().next());
+        Grid3DController controller = new Grid3DController(world, g, null);
 
         // Root3dController c = new Root3dController(g);
         return grid.newView();
-        }
-        catch (Exception e)
-        {
-        	System.out.println("Could not load 3D view. At least one IC2D monitoring view has to be opened.");
-        	//TODO: remove this view
-        }
-        // create the grid controller,
-        // the grid controller will be responsible with creating/removing
-        // the host controllers and so on
-        return null;
     }
 
     @Override
