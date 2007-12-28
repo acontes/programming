@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"	
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                 ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
+	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd
+	">
+
+	<resources>
+		<bridge refid="bSea">
+			<group refid="gINRIA">
+				<host refid="hSchubby"/>	
+			</group>
+		</bridge>
+	</resources>
+	
+	<infrastructure>
+		<hosts>
+			<host id="hSchubby" os="unix" hostCapacity="1" vmCapacity="1">
+				<homeDirectory base="root" relpath="/user/cmathieu/home" />
+			</host>
+		</hosts>
+		
+		<bridges>
+			<paext:sshBridge id="bSea"
+				hostname="sea.inria.fr"
+				username="cmathieu"/>
+		</bridges>
+		
+		<groups>
+			<paext:sshGroup id="gINRIA" 
+				hostList="schubby cheypa duff"  
+				username="cmathieu"/>
+		</groups>		
+	</infrastructure>
+
+</GCMDeployment>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+
+	<simpleType name="variableRefType">
+		<restriction base="string">
+			<pattern value="\$\{[A-Za-z0-9._]+\}" />
+		</restriction>
+	</simpleType>
+
+	<!--PosintOrVariableType is defined as a union of a positive integer or a variable ref-->
+	<simpleType name="PosintOrVariableType">
+		<union memberTypes="positiveInteger pa:variableRefType" />
+	</simpleType>
+	<!--BooleanOrVariableType is defined as a union of a positive integer or a variable ref-->
+	<simpleType name="BooleanOrVariableType">
+		<union memberTypes="boolean pa:variableRefType" />
+	</simpleType>
+	<simpleType name="TimeOrVariableType">
+		<union memberTypes="time pa:variableRefType" />
+	</simpleType>
+	<simpleType name="TextOrVariableType">
+		<union memberTypes="string pa:variableRefType" />
+	</simpleType>
+	<!--ListType is defined as a union of a positive integer or a variable ref-->
+	<simpleType name="ListType">
+		<union memberTypes="pa:variableRefType">
+			<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
+			<simpleType>
+				<list itemType="string" />
+			</simpleType>
+		</union>
+	</simpleType>
+
+	<!--CloseStreamType is defined as a global element, it's the union of a CloseStream and a variable type.-->
+	<simpleType name="CloseStreamType">
+		<union memberTypes="pa:variableRefType">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="yes" />
+					<enumeration value="no" />
+				</restriction>
+			</simpleType>
+		</union>
+	</simpleType>
+
+
+	<simpleType name="pathElementBaseType">
+		<restriction base="string">
+			<enumeration value="proactive" />
+			<enumeration value="home" />
+			<enumeration value="root" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="idType">
+		<restriction base="string">
+			<pattern value="[0-9a-zA-Z_-]+"></pattern>
+			<whiteSpace value="collapse"></whiteSpace>
+			<minLength value="1"></minLength>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="capacityType">
+		<restriction base="string">
+			<pattern value="([0-9]+)|max"></pattern>
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="pathElementGeneralType">
+		<restriction base="string">
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<complexType name="pathElementType">
+		<attribute name="base" type="pa:pathElementBaseType" use="required"></attribute>
+		<attribute name="relpath" type="pa:pathElementGeneralType" use="required"></attribute>
+	</complexType>
+
+	<complexType name="pathType">
+		<sequence>
+			<element name="pathElement" type="pa:pathElementType" maxOccurs="unbounded" minOccurs="1"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="classpathType">
+		<complexContent>
+			<extension base="pa:pathType">
+				<attribute name="type" use="required">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="append"></enumeration>
+							<enumeration value="overwrite"></enumeration>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="fileTransferType">
+		<all>
+			<element name="source">
+				<complexType>
+					<attribute name="path" type="pa:pathElementGeneralType"></attribute>
+				</complexType>
+			</element>
+			<element name="dest">
+				<complexType>
+					<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
+				</complexType>
+			</element>
+		</all>
+	</complexType>
+
+	<simpleType name="osType">
+		<restriction base="string">
+			<enumeration value="unix"></enumeration>
+			<enumeration value="windows"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="hostnameType">
+		<union memberTypes="pa:variableRefType">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[a-z0-9.]+" />
+				</restriction>
+			</simpleType>
+		</union>
+	</simpleType>
+
+	<simpleType name="usernameType">
+		<union memberTypes="pa:variableRefType">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[a-z0-9]+" />
+				</restriction>
+			</simpleType>
+		</union>
+	</simpleType>
+
+	<complexType name="variableType">
+		<attribute name="name">
+			<simpleType>
+				<restriction base="string"></restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="value">
+			<simpleType>
+				<restriction base="string"></restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+
+	<element name="abstractVariable" abstract="true" type="pa:variableType"></element>
+	<element name="descriptorVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="descriptorDefaultVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="javaPropertyVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="programVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="programDefaultVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="javaPropertyDescriptorDefault" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="javaPropertyProgramDefault" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="includeXMLFile" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="includePropertyFile" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+
+	<complexType name="dummyType"></complexType>
+
+	<complexType name="environmentType">
+		<sequence>
+			<element ref="pa:abstractVariable" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<complexType name="environmentVariablesType">
+		<sequence>
+			<element name="variable" type="pa:variableType" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+
+
+	<complexType name="argumentListType">
+		<sequence>
+			<element name="arg" type="string" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+
+</schema>
