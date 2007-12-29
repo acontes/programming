@@ -96,7 +96,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
      * 
      */
     private static final long serialVersionUID = 390L;
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected Map<String, Interface> fcInterfaceReferences;
     protected Map<String, Interface> nfInterfaceReferences;
     protected Proxy proxy;

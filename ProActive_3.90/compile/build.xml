@@ -74,6 +74,8 @@
 				<include name="functionalTests/**/**/*Test*.class" />
 				<!-- <exclude name="functionalTests/security/*/*.class" /> -->
 				<exclude name="functionalTests/*.class" />
+				<exclude name="functionalTests/**/**/*TesterImpl.class" />
+				<exclude name="functionalTests/**/**/*TesterItf.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/ClientTestItf.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/MulticastTestItf.class" />

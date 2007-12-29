@@ -71,7 +71,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
      * 
      */
     private static final long serialVersionUID = 390L;
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected List<Component> fcSubComponents;
     protected Map<Component, IllegalContentException> contentExceptions = new Hashtable<Component, IllegalContentException>();
     protected Map<Component, IllegalLifeCycleException> lifeCycleExceptions = new Hashtable<Component, IllegalLifeCycleException>();

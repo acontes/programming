@@ -78,7 +78,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
      */
     private static final long serialVersionUID = 390L;
 
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
 
     //private int shortcutCounter = 0;
     //private Shortcut shortcut;

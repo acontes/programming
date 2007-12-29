@@ -49,12 +49,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Serializable {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 390L;
-
+public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType,
+    Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
@@ -96,8 +92,9 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     /**
      * Constructor for ProActiveInterfaceTypeImpl.
      */
-    public ProActiveInterfaceTypeImpl(String name, String signature, boolean isClient, boolean isOptional,
-            String cardinality) throws InstantiationException {
+    public ProActiveInterfaceTypeImpl(String name, String signature,
+        boolean isClient, boolean isOptional, String cardinality)
+        throws InstantiationException {
         this.name = name;
         this.signature = signature;
         this.isClient = isClient;
@@ -107,25 +104,27 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     }
 
     private boolean checkMethodsSignatures(String signature, String cardinality)
-            throws InstantiationException {
-        try {
-            if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
-                Class<?> c = Class.forName(signature);
-                Method[] methods = c.getMethods();
-                for (Method m : methods) {
-                    if (!(m.getGenericReturnType() instanceof ParameterizedType) &&
-                        !(Void.TYPE == m.getReturnType())) {
-                        throw new InstantiationException(
-                            "methods of a multicast interface must return parameterized types or void, " +
-                                "which is not the case for method " + m.toString() + " in interface " +
-                                signature);
-                    }
-                }
-            }
-        } catch (ClassNotFoundException e) {
-            throw new ProActiveRuntimeException(
-                "cannot find interface defined in component interface signature : " + e.getMessage());
-        }
+        throws InstantiationException {
+    	// removed constraint in order to allow reduction
+//        try {
+//            if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
+//                Class<?> c = Class.forName(signature);
+//                Method[] methods = c.getMethods();
+//                for (Method m : methods) {
+//                    if (!(m.getGenericReturnType() instanceof ParameterizedType) &&
+//                            !(Void.TYPE == m.getReturnType())) {
+//                        throw new InstantiationException(
+//                            "methods of a multicast interface must return parameterized types or void, " +
+//                            "which is not the case for method " + m.toString() +
+//                            " in interface " + signature);
+//                    }
+//                }
+//            }
+//        } catch (ClassNotFoundException e) {
+//            throw new ProActiveRuntimeException(
+//                "cannot find interface defined in component interface signature : " +
+//                e.getMessage());
+//        }
         return true;
     }
 
@@ -174,8 +173,8 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     }
 
     public boolean isFcCollective() {
-        return (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality) || (ProActiveTypeFactory.MULTICAST_CARDINALITY
-                .equals(cardinality)));
+        return (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality) ||
+        (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)));
     }
 
     public boolean isFcGathercastItf() {

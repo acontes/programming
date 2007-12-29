@@ -405,26 +405,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        //        List<Object> itfs = new ArrayList<Object>(15); //we have at least 10 control itfs
-        //
-        //        // add interface component
-        //        itfs.add(this);
-        //        // add controller interface
-        //        for (Object object : controlItfs.values()) {
-        //            itfs.add(object);
-        //        }
-        //
-        //        //add server interface
-        //        for (Object object : serverItfs.values()) {
-        //            itfs.add(object);
-        //        }
-        //
-        //        //add client interface
-        //        for (Object object : clientItfs.values()) {
-        //            itfs.add(object);
-        //        }
-        //
-        //        return itfs.toArray(new Object[itfs.size()]);
         return getRepresentativeOnThis().getFcInterfaces();
     }
 

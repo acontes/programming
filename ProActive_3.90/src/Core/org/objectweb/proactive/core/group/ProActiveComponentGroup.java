@@ -62,7 +62,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  *
  *
- *
  * A class for creating groups of interfaces
  * Indeed, the standard mechanism cannot be used here, as we are referencing components
  * through interfaces of component representatives.
@@ -104,6 +103,7 @@ public class ProActiveComponentGroup {
         } catch (InvalidProxyClassException e) {
             logger.error("**** InvalidProxyClassException ****");
         } catch (ConstructionOfProxyObjectFailedException e) {
+            e.printStackTrace();
             logger.error("**** ConstructionOfProxyObjectFailedException ****");
         } catch (ConstructionOfReifiedObjectFailedException e) {
             logger.error("**** ConstructionOfReifiedObjectFailedException ****");
