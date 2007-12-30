@@ -80,15 +80,17 @@ public class BasicTaskFactory implements TaskFactory {
         // of parameters to dispatch
         int maxParameters = 0;
         boolean broadcast = false;
-        for (int i = 0; i < mc.getNumberOfParameter(); i++) {
-            if (PAGroup.isGroup(mc.getParameter(i))) {
-                if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {
-                    int nbParams = (PAGroup.getGroup(mc.getParameter(i)).size());
-                    if (nbParams > maxParameters) {
-                        maxParameters = nbParams;
+        if (mc.getEffectiveArguments() != null) { 
+            for (int i = 0; i < mc.getNumberOfParameter(); i++) {
+                if (PAGroup.isGroup(mc.getParameter(i))) {
+                    if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {
+                        int nbParams = (PAGroup.getGroup(mc.getParameter(i)).size());
+                        if (nbParams > maxParameters) {
+                            maxParameters = nbParams;
+                        }
+                    } else {
+                        broadcast = true;
                     }
-                } else {
-                    broadcast = true;
                 }
             }
         }
@@ -155,8 +157,8 @@ public class BasicTaskFactory implements TaskFactory {
             if (dispatchAnnotation.mode().equals(DispatchMode.CUSTOM)) {
                 // TODO cache instance !
                 try {
-                    DispatchBehavior allocationBehavior = (DispatchBehavior) dispatchAnnotation
-                            .customMode().newInstance();
+                    DispatchBehavior allocationBehavior = (DispatchBehavior) dispatchAnnotation.customMode()
+                            .newInstance();
                     return allocationBehavior.getTaskIndexes(originalMethodCall, generatedMethodCalls,
                             nbWorkers);
                 } catch (InstantiationException e) {
@@ -195,8 +197,7 @@ public class BasicTaskFactory implements TaskFactory {
         if (groupProxy.balancing().equals(DispatchMode.DYNAMIC) ||
             (groupProxy.balancing().equals(DispatchMode.UNSPECIFIED) && ((originalMethodCall
                     .getReifiedMethod().getAnnotation(Dispatch.class) != null) && (originalMethodCall
-                    .getReifiedMethod().getAnnotation(Dispatch.class).mode()
-                    .equals(DispatchMode.DYNAMIC))))) {
+                    .getReifiedMethod().getAnnotation(Dispatch.class).mode().equals(DispatchMode.DYNAMIC))))) {
             task.setDynamicallyDispatchable(true);
         }
     }
