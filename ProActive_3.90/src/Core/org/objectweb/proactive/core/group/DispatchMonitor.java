@@ -242,12 +242,11 @@ public class DispatchMonitor {
             if (refIsBodyProxy) {
                 if (groupMemberProxy.getBodyID().equals(((BodyProxy) originatingProxy).getBodyID())) {
                     updatedResult(i);
+                    return;
                 }
             }
- 
         }
         throw new ProActiveRuntimeException("could not find proxy to set updated result!!!!");
-        // System.out.println("could not find proxy to set updated result!!!!");
     }
 
     public void updatedResult(int index) {
