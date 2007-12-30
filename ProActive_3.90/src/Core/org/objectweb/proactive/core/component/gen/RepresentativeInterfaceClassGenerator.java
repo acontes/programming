@@ -323,6 +323,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             CtClass returnType = reifiedMethods[i].getReturnType();
             String postWrap = null;
             String preWrap = "";
+            String reduction = "";
 
             if (returnType != CtClass.voidType) {
                 if ((itfType != null) && itfType.isFcMulticastItf()) {
@@ -334,8 +335,14 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                     for (int j = 0; j < parametersCtTypes.length; j++) {
                         parametersTypes[j] = Class.forName(parametersCtTypes[j].getName());
                     }
-                    preWrap += PAGroup.class.getName() + ".getGroup(";
-                    postWrap = ")";
+                    Method itfMethod = itfClass.getMethod(reifiedMethods[i].getName(), parametersTypes);
+                    Reduce reduceAnnotation = itfMethod.getAnnotation(Reduce.class);
+                    ReduceMode reductionMode = null;
+
+                    if (reduceAnnotation == null) {
+                        preWrap += PAGroup.class.getName() + ".getGroup(";
+                        postWrap = ")";
+                    }
                 } else if (!returnType.isPrimitive()) {
                     body += "Object result = null;\n";
                     preWrap = "(" + returnType.getName() + ")";
@@ -392,9 +399,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
                 body += "result = ";
 
-                if (preWrap != null) {
-                    body += preWrap;
-                }
+                body += preWrap;
             }
 
             body += (" myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
@@ -407,6 +412,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
             if (returnType != CtClass.voidType) {
                 if (!returnType.isPrimitive()) {
+                    body += reduction;
                     // need a cast from List to actual return type
                     body += "return (" + returnType.getName() + ")result;\n";
                 } else {
