@@ -6,23 +6,37 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
 import javax.media.j3d.TransformGroup;
+import javax.vecmath.Vector3f;
 
 /**
  * An implementation of an active object queue.
+ * 
  * @author vasile
- *
+ * 
  */
 public class Queue3D extends AbstractQueue3D {
 
 	/**
+	 * Creates a new queues
+	 * 
 	 * @param name
+	 *            name of the queue
 	 */
 	public Queue3D(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Constructor that has an empty string as the default name for the queue.
+	 */
+	public Queue3D() {
+		super("");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
 	 */
 	@Override
@@ -31,7 +45,9 @@ public class Queue3D extends AbstractQueue3D {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createAppearance()
 	 */
 	@Override
@@ -39,7 +55,9 @@ public class Queue3D extends AbstractQueue3D {
 		return AppearanceBasket.queueAppearance;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
 	 */
 	@Override
@@ -47,7 +65,9 @@ public class Queue3D extends AbstractQueue3D {
 		return GeometryBasket.getDefaultQueueGeometry();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
 	 */
 	@Override
@@ -56,16 +76,33 @@ public class Queue3D extends AbstractQueue3D {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
 	 */
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
 	 */
 	@Override
 	protected void animateCreation() {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setArrow(javax.vecmath.Vector3f,
+	 *      javax.vecmath.Vector3f)
+	 */
+	@Override
+	protected AbstractFigure3D setArrow(String name, Vector3f start,
+			Vector3f stop) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
