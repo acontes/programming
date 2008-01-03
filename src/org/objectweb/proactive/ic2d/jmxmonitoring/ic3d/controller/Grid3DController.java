@@ -45,7 +45,7 @@ public class Grid3DController extends AbstractGrid3DController {
     }
 
     @Override
-    protected Host3DController createChildController(AbstractData figure) {
+    protected AbstractFigure3DController createChildController(AbstractData figure) {
         // TODO Auto-generated method stub
         return new Host3DController(figure, getFigure(), this);
     }
