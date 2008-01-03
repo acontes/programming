@@ -1,24 +1,15 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.ActiveObject3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Grid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
-
 
 public abstract class AbstractFigure3DController implements Observer {
     // private AbstractData modelParent;
@@ -27,7 +18,7 @@ public abstract class AbstractFigure3DController implements Observer {
     // private HashMap<String, AbstractFigure3D> figures =
     // new HashMap<String, AbstractFigure3D>();
     // model object for the 3D figure
-    protected static Map<AbstractData, AbstractFigure3DController> registry = new java.util.concurrent.ConcurrentHashMap<AbstractData, AbstractFigure3DController>();
+    protected static Map<AbstractData, AbstractFigure3DController> registry = new ConcurrentHashMap<AbstractData, AbstractFigure3DController>();
     private AbstractData modelObject; // model object
                                       // 3D figure controlled
     private AbstractFigure3D figure; // 3dFigure
@@ -114,10 +105,11 @@ public abstract class AbstractFigure3DController implements Observer {
         }
         }
     }
-
     /**
-     * removes all children unsubscribes this controller (this listener) from
-     * the modelObject remove graphical representation
+     * removes all children
+     * unsubscribes this controller (this listener) from
+     * the modelObject 
+     * remove graphical representation
      */
     public void remove() {
         // System.out.println("Starting remove");
@@ -129,23 +121,21 @@ public abstract class AbstractFigure3DController implements Observer {
         // System.out.println("Object model removed");
 
         // ---not right---
-        figure.getRootBranch().removeAllChildren();
+        //    figure.getRootBranch().removeAllChildren();
 
         //        
         // //the parent of this figure (the one
         // //corresponding to the controller that called remove
         // //should remove this particular figure)
         // System.out.println(figure);
-        // parentFigure.removeSubFigure(figure);
+         parentFigure.removeSubFigure(figure);
         // System.out.println("Remove done");
     }
-
     public void removeChildren() {
         for (AbstractFigure3DController c : this.childrenControllers) {
             c.remove();
         }
     }
-
     /**
      *
      * @param fig
@@ -188,11 +178,8 @@ public abstract class AbstractFigure3DController implements Observer {
      *
      */
     protected abstract AbstractFigure3D createFigure(String name);
-
     // use it to create the appropriate child controller
-    protected abstract AbstractFigure3DController createChildController(
-        AbstractData figure);
-
+    protected abstract AbstractFigure3DController createChildController(AbstractData figure);
     public AbstractData getModelObject() {
         return modelObject;
     }
