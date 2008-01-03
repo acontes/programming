@@ -1,6 +1,8 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,9 +15,9 @@ import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
-
 /**
  * This class is the parent of all figures. It implements some basic actions
  * like remove subfigures, add subfigures, branch creation and transform creation.
@@ -29,6 +31,15 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 */
 	private Hashtable<String, AbstractFigure3D> figures = new Hashtable<String, AbstractFigure3D>();
 	/**
+	 * Arrows for this figure. 
+	 */
+	private Hashtable<String, AbstractFigure3D> arrows = new Hashtable<String, AbstractFigure3D>();
+	/**
+	 * Timer for the threads specified to run as a daemon
+	 * so as not to keep the application running.
+	 */
+	private Timer arrowTimer = new Timer(true);
+	/**
 	 * This name will be displayed according to 
 	 * the formatting chosen through createTextBranch() from the TextStyleBasket class
 	 */
@@ -36,8 +47,8 @@ public abstract class AbstractFigure3D extends Shape3D {
 	private Geometry voGeometry; // geometry of the figure
 	private Appearance voAppearance; // appearance of the figure
 	private Level logLevel = Level.OFF;
-    private Logger logger = Logger.getLogger(
-            "org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.views");
+	private Logger logger = Logger.getLogger(
+	"org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.views");
 	private static ConsoleHandler handler = new ConsoleHandler();
 	/**
 	 * The figureBranch and the subFiguresBranch connect to the rootBranch.
@@ -55,7 +66,7 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 * When implemented this abstract method should arrange the subfigures
 	 * attached to this figure.
 	 */
-    public abstract void arrangeSubFigures();
+	public abstract void arrangeSubFigures();
 	/**
 	 * This method sets the geometry of the figure. All geometries are stored in
 	 * GeometryBasket and can be accessed statically. If one type of geometry is
@@ -64,7 +75,7 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 * changes it in all.
 	 * @return geometry of the figure
 	 */
-    protected abstract Geometry createGeometry();
+	protected abstract Geometry createGeometry();
 	/**
 	 * This method sets the state of the object. This should be implemented as a
 	 * change of appearance or geometry. Takes as a parameter an enumeration
@@ -95,7 +106,7 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 *   
 	 *   The implementations of AbstractFigure3D should 
 	 *   implement different appearances for different states.  
-     */
+	 */
 	public void setState(State state) {
 		switch (state) {
 		case UNKNOWN:
@@ -114,9 +125,9 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 * This method sets the appearance of the figure. All appearances are stored
 	 * in AppearanceBasket and can be accessed statically.
 	 */
-    protected abstract Appearance createAppearance();
+	protected abstract Appearance createAppearance();
 
-  //  private RotationInterpolator rot;
+	//  private RotationInterpolator rot;
 
 	/**
 	 * The constructor creates the Shape3D with the geometry and appearance from
@@ -187,9 +198,9 @@ public abstract class AbstractFigure3D extends Shape3D {
 		// create the BG for the subfigures
 		subFiguresBranch = createBranch();
 		// connect
-		
+
 		//rootBranch.addChild(subFiguresBranch);
-		
+
 		rootBranch.addChild(figureBranch);
 		// and a transform group for rotation and translation
 		TransformGroup trans = createTransform();
@@ -200,11 +211,11 @@ public abstract class AbstractFigure3D extends Shape3D {
 		transRotate.addChild(createTextBranch());
 		// add this figure to the rotation transform
 		transRotate.addChild(this);
-		
+
 		//TODO maybe change like this, needs to be checked
 		transRotate.addChild(subFiguresBranch);
-		
-		
+
+
 		// connect the transforms to the figure branch
 		figureBranch.addChild(trans);
 		// optimize
@@ -221,11 +232,11 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 * This method calls removeSubFigure(AbstractFigure3D figure)
 	 * for each subfigure.
 	 */
-   public void removeAllSubFigures() {
-        logger.log(Level.FINE, "Removing all subfigures...");
-        while (!figures.isEmpty())
-            removeSubFigure(figures.keys().nextElement());
-    }
+	public void removeAllSubFigures() {
+		logger.log(Level.FINE, "Removing all subfigures...");
+		while (!figures.isEmpty())
+			removeSubFigure(figures.keys().nextElement());
+	}
 	/**
 	 * This method returns a subfigure from the list of subfigures.
 	 * @param key the key of the subfigure
@@ -235,40 +246,40 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 * 
 	 * 	@return the AbstractFigure3D with the corresponding key	 
 	 */
-    public AbstractFigure3D getSubFigure(String key) {
-        return figures.get(key);
-    }
+	public AbstractFigure3D getSubFigure(String key) {
+		return figures.get(key);
+	}
 	/**
 	 * Removes a subfigure by key. This method calls 
 	 * removeSubFigure(AbstractFigure3D figure).
 	 * @param key
 	 */
-    public void removeSubFigure(String key) {
-        removeSubFigure(figures.get(key));
-    }
+	public void removeSubFigure(String key) {
+		removeSubFigure(figures.get(key));
+	}
 
-    /**
-     * @return a String cotaining the figure name
-     */
-    public String getFigureName() {
-        return new String(this.name);
-    }
-    
-    /**
-     * Sets the figure name.
-     * @param name
-     */
-    //TODO also update the text branch for the figure
-    public void setFigureName(String name) {
-        logger.log(Level.FINE, "Changing figure name...");
-        this.name = new String(name);
-    }
+	/**
+	 * @return a String containing the figure name
+	 */
+	public String getFigureName() {
+		return new String(this.name);
+	}
+
+	/**
+	 * Sets the figure name.
+	 * @param name
+	 */
+	//TODO also update the text branch for the figure
+	public void setFigureName(String name) {
+		logger.log(Level.FINE, "Changing figure name...");
+		this.name = new String(name);
+	}
 	/**
 	 * @return a Hashtable containing the subfigures
 	 */
-    public Hashtable<String, AbstractFigure3D> getSubFigures() {
-        return figures;
-    }
+	public Hashtable<String, AbstractFigure3D> getSubFigures() {
+		return figures;
+	}
 
 	/**
 	 * Adds a subfigure to the subFigures
@@ -281,7 +292,7 @@ public abstract class AbstractFigure3D extends Shape3D {
 		logger.log(Level.FINE, "Adding a new figure:" + key);
 		// gets the main branch group of the subFigure
 		// and it adds it to the subFigures BranchGroup
-	
+
 		// figure ->rotTG ->generalTG-> particularBG -> rootBG (from the constructor)
 		BranchGroup root = figure.getRootBranch();
 
@@ -293,7 +304,6 @@ public abstract class AbstractFigure3D extends Shape3D {
 		arrangeSubFigures();
 		//animate the creation
 		figure.animateCreation();
-
 	}
 	/**
 	 * Method that animates the creation of a
@@ -307,20 +317,20 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 * Utility method for creating a BranchGroup
 	 * @return a BranchGroup with the needed capabilities set
 	 */
-    protected BranchGroup createBranch() {
-        // create the general runtime branch
-        BranchGroup branch = new BranchGroup();
-        // set the capabilities (detach, add)
-        branch.setCapability(BranchGroup.ALLOW_DETACH);
-        branch.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
-        branch.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
-        branch.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
-        branch.setCapability(BranchGroup.ENABLE_PICK_REPORTING);
-        branch.setCapability(BranchGroup.ALLOW_BOUNDS_READ);
+	protected BranchGroup createBranch() {
+		// create the general runtime branch
+		BranchGroup branch = new BranchGroup();
+		// set the capabilities (detach, add)
+		branch.setCapability(BranchGroup.ALLOW_DETACH);
+		branch.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
+		branch.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
+		branch.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
+		branch.setCapability(BranchGroup.ENABLE_PICK_REPORTING);
+		branch.setCapability(BranchGroup.ALLOW_BOUNDS_READ);
 
-        branch.setCapability(BranchGroup.ALLOW_PARENT_READ);
-        return branch;
-    }
+		branch.setCapability(BranchGroup.ALLOW_PARENT_READ);
+		return branch;
+	}
 	/**
 	 * Places an AbstractFigure3D at the x,y,z coordinates in the universe.
 	 * For now it is used by the PlacementBasket class. 
@@ -330,32 +340,32 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 * @param y
 	 * @param z
 	 */
-    //TODO pass a Transform3D instead of x.y.x coordinates so
-    //rotation can be also applied
-    public void placeSubFigure(AbstractFigure3D figure, double x, double y,
-        double z) {
-        // get the parent transform
-        TransformGroup trans = (TransformGroup) figure.getParent().getParent();
-        Transform3D translate = new Transform3D();
-        translate.setTranslation(new Vector3d(x, y, z));
-        trans.setTransform(translate);
-    }
+	//TODO pass a Transform3D instead of x.y.x coordinates so
+	//rotation can be also applied
+	public void placeSubFigure(AbstractFigure3D figure, double x, double y,
+			double z) {
+		// get the parent transform
+		TransformGroup trans = (TransformGroup) figure.getParent().getParent();
+		Transform3D translate = new Transform3D();
+		translate.setTranslation(new Vector3d(x, y, z));
+		trans.setTransform(translate);
+	}
 	/**
 	 * Utility method for creating a TransformGroup
 	 * with the correct capabilities set
 	 * @return a TransformGroup with the needed capabilities set
 	 */
-    protected TransformGroup createTransform() {
-        TransformGroup trans = new TransformGroup();
-        // set the transform group capabilities
-        trans.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-        trans.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-        trans.setCapability(TransformGroup.ALLOW_CHILDREN_WRITE);
-        trans.setCapability(TransformGroup.ALLOW_LOCAL_TO_VWORLD_READ);
-        trans.setCapability(TransformGroup.ENABLE_PICK_REPORTING);
-        trans.setCapability(TransformGroup.ALLOW_CHILDREN_EXTEND);
-        return trans;
-    }
+	protected TransformGroup createTransform() {
+		TransformGroup trans = new TransformGroup();
+		// set the transform group capabilities
+		trans.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+		trans.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+		trans.setCapability(TransformGroup.ALLOW_CHILDREN_WRITE);
+		trans.setCapability(TransformGroup.ALLOW_LOCAL_TO_VWORLD_READ);
+		trans.setCapability(TransformGroup.ENABLE_PICK_REPORTING);
+		trans.setCapability(TransformGroup.ALLOW_CHILDREN_EXTEND);
+		return trans;
+	}
 
 	/**
 	 * This method removes a subfigure for the caller figure.
@@ -370,7 +380,7 @@ public abstract class AbstractFigure3D extends Shape3D {
 		BranchGroup generalBranch = figure.getRootBranch();
 		//get the parent branch (the subfigure branch of the superfigure)
 		BranchGroup superBranch = (BranchGroup)generalBranch.getParent();
-		
+
 		// tell the subfigure to remove all the subsubfigures
 		figure.removeAllSubFigures();
 		generalBranch.detach();
@@ -382,16 +392,16 @@ public abstract class AbstractFigure3D extends Shape3D {
 	/**
 	 * @return the highest BranchGroup of this figure
 	 */
-    public BranchGroup getRootBranch() {
-        return rootBranch;
-    }
-    /**
+	public BranchGroup getRootBranch() {
+		return rootBranch;
+	}
+	/**
 	 *  @return the BranchGroup immediate bellow the root branch
 	 *  (the BranchGroup to which the actual shape is connected).
 	 */
-    public BranchGroup getParticularBranch() {
-        return figureBranch;
-    }
+	public BranchGroup getParticularBranch() {
+		return figureBranch;
+	}
 	/**
 	 * Utility method that returns the shortened name of the figure.
 	 * It returns characters number of characters or the full name
@@ -399,8 +409,77 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 * 
 	 * @param characters
 	 */
-    public String getShortenedName(int characters) {
-        // return the first 10 or less characters
-        return new String(name.substring(0, Math.min(characters, name.length())));
-    }
+	public String getShortenedName(int characters) {
+		// return the first 10 or less characters
+		return new String(name.substring(0, Math.min(characters, name.length())));
+	}
+
+	/**
+	 * Draws communication between two figures. It 
+	 * uses the setArrow and removeArrow methods to 
+	 * set the arrow figure and remove it.
+	 * Each arrow has an unique key and 
+	 * a TTL.  For each arrow created a daemon 
+	 * thread is spawned that will delete the arrow after
+	 * timeToLive milliseconds. The start and stop communication
+	 * points are given as references to figures. 
+	 * 
+	 * @param key
+	 * @param timeToLive
+	 * @param startAO
+	 * @param stopAO
+	 */
+	public void drawCommunication(final String key, String name, long timeToLive,
+			AbstractFigure3D startAO, AbstractFigure3D stopAO){
+		Transform3D start = new Transform3D();
+		Transform3D stop = new Transform3D();
+		//got the coordinates of start and stop
+		startAO.getLocalToVworld(start);
+		stopAO.getLocalToVworld(stop);
+		Vector3f begin = new Vector3f();
+		Vector3f end = new Vector3f();
+		start.get(begin);
+		stop.get(end);
+		begin = new Vector3f(begin);
+		end = new Vector3f(end);
+		//put in the list of arrows
+		AbstractFigure3D arrow = setArrow(name,begin, end); 
+		arrows.put(key, arrow);
+		//add to the figure tree
+
+		subFiguresBranch.addChild(arrow.getRootBranch());
+		//set destruction time
+		TimerTask arrowDestruction = new TimerTask() {
+			@Override
+			public void run() {
+				AbstractFigure3D.this.removeArrow(key);
+			}
+		};
+		//start the timer   
+		arrowTimer.schedule(arrowDestruction, timeToLive);
+		Timer t = new Timer();
+		t.schedule(arrowDestruction, timeToLive);
+	}
+	/**
+	 * This method returns a figure that represents
+	 * a communication (arrow, line, etc). It should
+	 * set the geometry of the figure to start at the 
+	 * coordinates start and end with the coordinates
+	 * of stop.
+	 * 
+	 * @param start
+	 * @param stop
+	 * @return
+	 */
+	protected abstract AbstractFigure3D setArrow(String name, Vector3f start, Vector3f stop);
+	/**
+	 * Removes the arrow identified by the UUID.
+	 * @param key
+	 */
+	protected void removeArrow(String key){
+		AbstractFigure3D arrow = arrows.get(key);
+		arrow.getRootBranch().detach();
+		subFiguresBranch.removeChild(arrow.getRootBranch());
+		arrows.remove(key);
+	}
 }
