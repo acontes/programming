@@ -10,6 +10,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import javax.media.j3d.Canvas3D;
 import javax.swing.JFrame;
@@ -34,8 +35,8 @@ AbstractGrid3D grid;
      */
     public Test() {
        // testMany();
-       testFew();
-      // testRandom();
+      // testFew();
+      testRandom();
     	//testPicking();
     }
     private void testPicking(){
@@ -61,7 +62,7 @@ AbstractGrid3D grid;
         double chance;
         Host3D picked;
         int cati = 0;
-        while (cati < 20) {
+        while (cati < 50) {
             pick = (int) Math.round(Math.random() * (size - 1));
             //pick a host
             picked = (Host3D) grid.getSubFigures().values().toArray()[pick];
@@ -108,9 +109,9 @@ AbstractGrid3D grid;
                         a = (int) Math.round(Math.random() * (aoNumber - 1));
                         b = (int) Math.round(Math.random() * (aoNumber - 1));
 
-                        grid.drawArrow(new Double(Math.random()).toString(),
+                        grid.drawCommunication(UUID.randomUUID().toString(),
                             new Double(a).toString(),
-                           1, obiecte.get(a),
+                           Math.round(Math.random()*100), obiecte.get(a),
                             obiecte.get(b));
 
 //                      grid.drawSphereArrow(new Double(Math.random()).toString(),
@@ -121,7 +122,7 @@ AbstractGrid3D grid;
                     }
                 }).start();
             try {
-				Thread.sleep(1);
+				Thread.sleep(5);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -359,18 +360,19 @@ AbstractGrid3D grid;
                                     stop = o2;
                                     break;
                                 }
-        
-                                grid.drawArrow(new Double(Math.random()).toString(),
-                                    new Double(a).toString(),
-                                    1, start, stop);
+                                
+
+                                UUID cheie  = UUID.randomUUID();
+                                grid.drawCommunication(cheie.toString(),"",                                    
+                                    50, start, stop);
                             }
                         }).start();
-//                	try {
-//    					System.in.read();
-//    				} catch (IOException e) {
-//    					// TODO Auto-generated catch block
-//    					e.printStackTrace();
-//    				}
+                    try {
+						Thread.sleep(70);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
                     
                     	o1.setQueueSize((int)Math.round(Math.random()*20+1));
