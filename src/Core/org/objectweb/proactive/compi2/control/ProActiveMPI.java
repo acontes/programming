@@ -86,13 +86,13 @@ public class ProActiveMPI {
                 
                 clusters[i] = newClusterInstance(allNodes[0], context);
                 DGFractiveController fractiveController = (DGFractiveController) clusters[i].getFcInterface(DGConstants.DG_FRACTIVE_CONTROLLER);
-                fractiveController.createInnerComponents(spmd);
+                fractiveController.createInnerComponents(spmd, context);
     		}
     		
     		//bind collective interfaces  of cluster composites
     		for(int i=0; i < spmdList.size(); i++){
     			for(int j=0; j < spmdList.size(); j++){
-    				if(i != j){
+    				if(i != j){ //?
     					 Fractal.getBindingController(clusters[i]).bindFc("outMxNClientItf", clusters[j].getFcInterface("inMxNServerItf"));
     				}
     			}
