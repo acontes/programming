@@ -431,6 +431,7 @@ public abstract class AbstractFigure3D extends Shape3D {
 	 */
 	public void drawCommunication(final String key, String name, long timeToLive,
 			AbstractFigure3D startAO, AbstractFigure3D stopAO){
+		//TODO this is still not right, there must be a better way to draw communications
 		Transform3D start = new Transform3D();
 		Transform3D stop = new Transform3D();
 		//got the coordinates of start and stop
@@ -446,8 +447,7 @@ public abstract class AbstractFigure3D extends Shape3D {
 		AbstractFigure3D arrow = setArrow(name,begin, end); 
 		arrows.put(key, arrow);
 		//add to the figure tree
-
-		subFiguresBranch.addChild(arrow.getRootBranch());
+		rootBranch.addChild(arrow.getRootBranch());
 		//set destruction time
 		TimerTask arrowDestruction = new TimerTask() {
 			@Override
@@ -457,8 +457,6 @@ public abstract class AbstractFigure3D extends Shape3D {
 		};
 		//start the timer   
 		arrowTimer.schedule(arrowDestruction, timeToLive);
-		Timer t = new Timer();
-		t.schedule(arrowDestruction, timeToLive);
 	}
 	/**
 	 * This method returns a figure that represents
@@ -479,7 +477,7 @@ public abstract class AbstractFigure3D extends Shape3D {
 	protected void removeArrow(String key){
 		AbstractFigure3D arrow = arrows.get(key);
 		arrow.getRootBranch().detach();
-		subFiguresBranch.removeChild(arrow.getRootBranch());
+		rootBranch.removeChild(arrow.getRootBranch());
 		arrows.remove(key);
 	}
 }
