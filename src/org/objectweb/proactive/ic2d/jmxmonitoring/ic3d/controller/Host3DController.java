@@ -3,6 +3,8 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractHost3DController;
@@ -21,12 +23,6 @@ public class Host3DController extends AbstractHost3DController {
         super(modelObject, figure3D, parent);
         // TODO Auto-generated constructor stub
     }
-
-    /**
-     * @param figureModel
-     * @param parentFigure
-     */
-
     /*
      * (non-Javadoc)
      *
@@ -35,8 +31,8 @@ public class Host3DController extends AbstractHost3DController {
      */
     @Override
     protected AbstractFigure3D createFigure(String name) {
-        System.out.println("Host3DController: Adding host " + name);
-        return new Host3D(name);
+//    	Logger.getRootLogger().log(Priority.INFO_INT, "Creating figure for host controller:"+name);
+    	return new Host3D(name);
     }
 
     /*
