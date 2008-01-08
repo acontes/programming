@@ -21,12 +21,6 @@ public class Runtime3DController extends AbstractRuntime3DController {
         super(modelObject, figure3D, parent);
         // TODO Auto-generated constructor stub
     }
-
-    /**
-     * @param figureModel
-     * @param parentFigure
-     */
-
     /*
      * (non-Javadoc)
      *
