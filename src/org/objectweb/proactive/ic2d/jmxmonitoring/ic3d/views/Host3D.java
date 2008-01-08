@@ -92,6 +92,6 @@ public class Host3D extends AbstractHost3D {
 	protected AbstractFigure3D setArrow(String name, Vector3f start,
 			Vector3f stop) {
 		// TODO Auto-generated method stub
-		return null;
+		return new Arrow3D("", start, stop);
 	}
 }
