@@ -17,15 +17,6 @@ public class Arrow3D extends AbstractArrow3D {
 		super(name);
 		this.setGeometry(createGeometry(start, stop));
 	}
-
-	public Arrow3D(String name) {
-		super(name);
-	}
-
-	public Arrow3D() {
-		super("");
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
