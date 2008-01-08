@@ -12,7 +12,9 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 public abstract class AbstractFigure3DController implements Observer {
-    // private AbstractData modelParent;
+    /**
+     * The figure of the parent controller
+     */
     private AbstractFigure3D parentFigure;
 
     // private HashMap<String, AbstractFigure3D> figures =
@@ -22,55 +24,62 @@ public abstract class AbstractFigure3DController implements Observer {
     private AbstractData modelObject; // model object
                                       // 3D figure controlled
     private AbstractFigure3D figure; // 3dFigure
+    /**
+     * The parent controller
+     */
     private AbstractFigure3DController parent;
 
     // children controllers
     private ArrayList<AbstractFigure3DController> childrenControllers = new ArrayList<AbstractFigure3DController>();
 
     public AbstractFigure3DController(AbstractData modelObject,
-        AbstractFigure3D figure3D, AbstractFigure3DController parent) {
+        AbstractFigure3D parentFigure3D, AbstractFigure3DController parent) {
         this.modelObject = modelObject;
         this.parent = parent;
         // set the parent figure
-        this.parentFigure = figure3D;
+        this.parentFigure = parentFigure3D;
+        
         // add the figure in the 3D world
         AbstractFigure3D abstractFig3d = createFigure(modelObject.getName());
-        putFigureOn3DGraphics(abstractFig3d);
+        figure = abstractFig3d;
+        parentFigure.addSubFigure(modelObject.getKey(), abstractFig3d);
+        
         // set this as the observer for the figureModel
         modelObject.addObserver(this);
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        // TODO Auto-generated method stub
-        // System.out.println("obs:"+o+" obj:"+arg);
         // get the notification data
         MVCNotification notif = (MVCNotification) arg;
         MVCNotificationTag mvcNotif = notif.getMVCNotification();
 
         // check the posibilities
-        switch (mvcNotif) {
-        case ADD_CHILD: { // add new controller/figure
-                          // get key
-            String figureKey = (String) notif.getData();
+		switch (mvcNotif) {
+		case ADD_CHILD: {
+			// add new controller/figure
+			// get key
+			String figureKey = (String) notif.getData();
 
-            // get data on the figure
-            AbstractData childModelObject = ((AbstractData) o).getMonitoredChild(figureKey);
+			// get data on the figure
+			AbstractData childModelObject = ((AbstractData) o)
+					.getMonitoredChild(figureKey);
 
             // System.out.println("----------->> new host added: "+hostKey);
             AbstractFigure3DController controller = createChildController(childModelObject);
             this.addChildController(controller);
             AbstractFigure3DController.registry.put(childModelObject, controller);
 
-            break;
-        }
-        case ADD_CHILDREN: {
-            // HostObject hostObj=this.host;
-            ArrayList<String> keys = (ArrayList) notif.getData();
+			break;
+		}
+		case ADD_CHILDREN: {
+			// HostObject hostObj=this.host;
+			ArrayList<String> keys = (ArrayList) notif.getData();
 
-            for (int k = 0; k < keys.size(); k++) {
-                String modelObjectKey = keys.get(k);
-                AbstractData childModelObject = (AbstractData) modelObject.getChild(modelObjectKey);
+			for (int k = 0; k < keys.size(); k++) {
+				String modelObjectKey = keys.get(k);
+				AbstractData childModelObject = (AbstractData) modelObject
+						.getChild(modelObjectKey);
 
                 AbstractFigure3DController controller = createChildController(childModelObject);
                 this.addChildController(controller);
@@ -106,11 +115,9 @@ public abstract class AbstractFigure3DController implements Observer {
         }
     }
     /**
-     * removes all children
-     * unsubscribes this controller (this listener) from
-     * the modelObject 
-     * remove graphical representation
-     */
+	 * removes all children unsubscribes this controller (this listener) from
+	 * the modelObject remove graphical representation
+	 */
     public void remove() {
         // System.out.println("Starting remove");
         removeChildren();
@@ -136,14 +143,6 @@ public abstract class AbstractFigure3DController implements Observer {
             c.remove();
         }
     }
-    /**
-     *
-     * @param fig
-     */
-    protected void putFigureOn3DGraphics(AbstractFigure3D fig) {
-        figure = fig;
-        parentFigure.addSubFigure(modelObject.getKey(), fig);
-    }
 
     public void addChildController(AbstractFigure3DController figureController) {
         this.childrenControllers.add(figureController);
@@ -151,6 +150,10 @@ public abstract class AbstractFigure3DController implements Observer {
 
     public AbstractFigure3D getFigure() {
         return figure;
+    }
+    
+    public AbstractFigure3D getParentFigure() {
+        return parentFigure;
     }
 
     public abstract void removeFigure(String key);
