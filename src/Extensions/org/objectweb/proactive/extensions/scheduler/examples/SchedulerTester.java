@@ -121,7 +121,7 @@ public class SchedulerTester {
         Vector<String> jobs = null;
         try {
             // read logins
-            FileReader l = new FileReader(SchedulerTester.class.getResource("login.cfg").getFile());
+            FileReader l = new FileReader("login.cfg");
             BufferedReader br = new BufferedReader(l);
             String current = br.readLine();
             while (current != null) {

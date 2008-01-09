@@ -83,11 +83,6 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 public class SchedulerFrontend implements InitActive, SchedulerEventListener<InternalJob>,
         UserSchedulerInterface, SchedulerCoreInterface {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 390L;
-
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
@@ -154,8 +149,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         try {
             scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
                     resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
-            //ProActive.addNFEListenerOnAO(scheduler,
-            //    new NFEHandler("Scheduler Core"));
             logger.info("Scheduler successfully created on " +
                 PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
         } catch (ActiveObjectCreationException e) {
@@ -302,6 +295,11 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             throw new SchedulerException(ACCESS_DENIED);
         }
 
+        //check if the scheduler is stopped
+        if (!scheduler.isSubmitPossible()) {
+            throw new SchedulerException("Scheduler is stopped, cannot submit job !!");
+        }
+
         //get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob);
 
@@ -322,6 +320,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //setting the job properties
         job.setId(JobId.nextId());
         job.setOwner(identifications.get(id).getUsername());
+        //reinit taskId count
         TaskId.initialize();
 
         for (InternalTask td : job.getTasks()) {
