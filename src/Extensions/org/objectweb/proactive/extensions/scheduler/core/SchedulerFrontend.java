@@ -74,7 +74,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * Scheduler Front-end. This is the API to talk to when you want to managed a scheduler core.
  * Creating this class can only be done by using <code>AdminScheduler</code>.
  * You can join this front-end by using the <code>join()</code> method
- * in {@link SchedulerConnection} .
+ * in {@link SchedulerConnection}.
  *
  * @author jlscheef - ProActiveTeam
  * @version 3.9, Jun 28, 2007
@@ -82,6 +82,8 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  */
 public class SchedulerFrontend implements InitActive, SchedulerEventListener<InternalJob>,
         UserSchedulerInterface, SchedulerCoreInterface {
+
+    private static final long serialVersionUID = 390L;
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
