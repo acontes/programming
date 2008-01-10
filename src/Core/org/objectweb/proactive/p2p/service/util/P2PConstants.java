@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.p2p.service.util;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
 /**
  * Java system properties name and P2P constants.
  *
@@ -37,6 +40,7 @@ package org.objectweb.proactive.p2p.service.util;
  *
  * Created on Jan 13, 2005
  */
+@PublicAPI
 public interface P2PConstants {
 
     /**
