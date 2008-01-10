@@ -101,8 +101,8 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
         String groupFile = authPath + GROUP_FILENAME;
 
         if (new File(loginFile).exists() && new File(groupFile).exists()) {
-            logger.info("Use Login file at : " + loginFile);
-            logger.info("Use Group file at : " + groupFile);
+            logger.info("Using Login file at : " + loginFile);
+            logger.info("Using Group file at : " + groupFile);
         } else {
             throw new AdminSchedulerException(
                 "The authentication path does not exist or does not contain the group and login files !");
