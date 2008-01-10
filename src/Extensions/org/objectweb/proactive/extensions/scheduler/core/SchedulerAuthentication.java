@@ -109,7 +109,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
                     + "\tclasses/Extensions/org.objectweb.proactive.extensions.security.loginmodule/");
         }
 
-        System.setProperty("java.security.auth.login.config", jaasConfig.getFile());
+        System.setProperty("java.security.auth.login.config", jaasConfig.toString());
         this.loginFile = loginFile;
         this.groupFile = groupFile;
         this.scheduler = scheduler;
