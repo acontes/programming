@@ -52,6 +52,12 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  *
  */
 public class GetJobResult {
+    /**
+     * @param args
+     * [0] username
+     * [1] password
+     * [3] schedulerURL
+     */
     public static void main(String[] args) {
         try {
             //GET SCHEDULER
