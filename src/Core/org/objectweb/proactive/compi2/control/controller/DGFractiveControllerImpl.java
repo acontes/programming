@@ -16,12 +16,10 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.compi.control.ProActiveMPIClusterComp;
-import org.objectweb.proactive.compi2.MPIResult;
 import org.objectweb.proactive.compi2.MPISpmd;
 import org.objectweb.proactive.compi2.control.DGConstants;
 import org.objectweb.proactive.compi2.control.ProActiveMPI;
-import org.objectweb.proactive.compi2.control.ProActiveMPINodeImpl;
+import org.objectweb.proactive.compi2.control.DGNodeImpl;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
@@ -89,15 +87,19 @@ public class DGFractiveControllerImpl extends AbstractProActiveController implem
 	    				ProActiveMPI.class.getClass().getResource(DGConstants.DG_NODE_CONTROLLER_CONFIG).getPath());
 	    		
 	    		//get ID from the attributeController
-	    		ContentDescription nodeContent = new ContentDescription(ProActiveMPINodeImpl.class.getName(), new Object[]{new Integer(1)});
+	    		ContentDescription nodeContent = new ContentDescription(DGNodeImpl.class.getName(), new Object[]{DGConstants.DEFAULT_LIBRARY_NAME, new Integer(1)});
 	    	
 	    		if(Fractal.getLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)){
 	    			Fractal.getLifeCycleController(owner).stopFc();
 	    			wasStopped = true;
-	    		}
+	    		} 
 	    			
 	    		for (int i = 0; i< nodes.length; i++){
 	    			nodes[i] = cf.newFcInstance(nodeType, nodeController, nodeContent, allNodes[i]);
+	    		}
+	    		
+	    		//TODO: must wait and get rank to add subcomponents ordered by rank
+	    		for (int i = 0; i< nodes.length; i++){
 	    			ownerContentController.addFcSubComponent(nodes[i]);
 	    			Fractal.getBindingController(owner).bindFc("outMxNServerItf", nodes[i].getFcInterface("serverItf"));
 	    			Fractal.getBindingController(nodes[i]).bindFc("clientItf", owner.getFcInterface("inMxNClientItf"));

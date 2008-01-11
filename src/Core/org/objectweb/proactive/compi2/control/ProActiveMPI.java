@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -47,7 +48,9 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.compi2.MPIResult;
 import org.objectweb.proactive.compi2.MPISpmd;
+import org.objectweb.proactive.compi2.control.controller.DGController;
 import org.objectweb.proactive.compi2.control.controller.DGFractiveController;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
@@ -71,40 +74,48 @@ public class ProActiveMPI {
      * @param spmdList The list of MPI applications to be deployed
      * @return a vector of results (return code of each MPI application)
      */
-    public static Vector deploy(ArrayList spmdList) {
+    public static List deploy(ArrayList spmdList) {
     	Component[] clusters = new Component[spmdList.size()];
-    	FutureList readyToStartAcks = new FutureList();
+    	FutureList mpiResults = new FutureList();
     	
     	try {
     		Map<String, Object> context = new HashMap<String, Object>();
 
-    		//create cluster composites on first node of each Vn (hopefully a frontent ;))
+    		//create cluster composites on first node of each Vn (hopefully a frontend ;))
     		for(int i=0; i < spmdList.size(); i++){ 
     			MPISpmd spmd = (MPISpmd) spmdList.get(i);
     			VirtualNode vn = ((MPISpmd) spmdList.get(i)).getVn();
                 Node[] allNodes = vn.getNodes();
                 
                 clusters[i] = newClusterInstance(allNodes[0], context);
+                
+                //TODO: now, queues must be cleaned up and started in native MPI Code ProActiveMPI_Init
+                MPIResult result = ((DGController) clusters[i].getFcInterface(DGConstants.DG_CONTROLLER)).startMPI();
+                mpiResults.add(result);
+                
                 DGFractiveController fractiveController = (DGFractiveController) clusters[i].getFcInterface(DGConstants.DG_FRACTIVE_CONTROLLER);
                 fractiveController.createInnerComponents(spmd, context);
     		}
     		
     		//bind collective interfaces  of cluster composites
     		for(int i=0; i < spmdList.size(); i++){
+    			DGController dgController = (DGController) clusters[i].getFcInterface(DGConstants.DG_CONTROLLER);
     			for(int j=0; j < spmdList.size(); j++){
-    				if(i != j){ //?
+    				//if(i != j){ //?
     					 Fractal.getBindingController(clusters[i]).bindFc("outMxNClientItf", clusters[j].getFcInterface("inMxNServerItf"));
-    				}
+    					 dgController.addDGController(j, (DGController) clusters[j].getFcInterface(DGConstants.DG_CONTROLLER));
+    				//}
     			}
     		}
     		
     		//start environment
     		for(int i=0; i < spmdList.size(); i++){
     			Fractal.getLifeCycleController(clusters[i]).startFc();
-    			//readyToStartAcks.add(((DGController) clusters[i].getFcInterface(DGConstants.DG_FRACTIVE_CONTROLLER)).isReadyto);
     		}
     		
-
+    		mpiResults.waitAll();
+    		return (List) mpiResults;
+    		
     	} catch (NodeException e) {
 			e.printStackTrace();
 		} catch (NoSuchInterfaceException e) {
@@ -114,8 +125,6 @@ public class ProActiveMPI {
 		} catch (IllegalLifeCycleException e) {
 			e.printStackTrace();
 		}
-
-
 
     	return null;
     }
