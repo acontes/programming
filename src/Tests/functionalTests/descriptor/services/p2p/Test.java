@@ -104,7 +104,7 @@ public class Test extends FunctionalTest {
         Test test = new Test();
 
         try {
-            test.action();
+            //test.action();
         } catch (Exception e) {
             e.printStackTrace();
         }

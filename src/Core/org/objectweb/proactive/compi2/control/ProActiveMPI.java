@@ -89,12 +89,13 @@ public class ProActiveMPI {
                 
                 clusters[i] = newClusterInstance(allNodes[0], context);
                 
-                //TODO: now, queues must be cleaned up and started in native MPI Code ProActiveMPI_Init
+                DGFractiveController fractiveController = (DGFractiveController) clusters[i].getFcInterface(DGConstants.DG_FRACTIVE_CONTROLLER);
+                fractiveController.createInnerComponents(spmd, context);
+                
                 MPIResult result = ((DGController) clusters[i].getFcInterface(DGConstants.DG_CONTROLLER)).startMPI();
                 mpiResults.add(result);
                 
-                DGFractiveController fractiveController = (DGFractiveController) clusters[i].getFcInterface(DGConstants.DG_FRACTIVE_CONTROLLER);
-                fractiveController.createInnerComponents(spmd, context);
+                fractiveController.orderInnerComponentsAndBindThem();
     		}
     		
     		//bind collective interfaces  of cluster composites

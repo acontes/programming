@@ -24,7 +24,7 @@ public class DGNodeImpl implements DGNode, BindingController {
 	private ProActiveMPIComm target;   
 	private DGCluster clusterItf;
 	private int jobID;
-	private int rank;
+	private int rank = -1;
 	private boolean isRegistered = false;
 
 
@@ -218,5 +218,16 @@ public class DGNodeImpl implements DGNode, BindingController {
 	}
 	//======================================================
 
-
+	public int getRank() {
+		while(rank == -1){
+			System.out.println("Dormindo pq rank indisponivel ...");
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return this.rank;
+	}
 }

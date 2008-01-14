@@ -5,6 +5,6 @@ public interface DGNode {
 	void register(int rank);
 	boolean blockUntilReady();
 	void wakeUpThread();
-	
+	int getRank();
 
 }
