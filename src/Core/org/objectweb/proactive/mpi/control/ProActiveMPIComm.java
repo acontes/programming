@@ -62,6 +62,12 @@ public class ProActiveMPIComm {
 
     private native int initSendQueue();
 
+    /**
+	 * Send information regarding current job to the native code. 
+	 * @param jobNumber The current jobId
+	 * @param nbJob The number of processes involved in this job.
+	 * @return
+	 */
     private native int sendJobNb(int jobNumber, int nbJob);
 
     private native int init(String userPath, int r);
