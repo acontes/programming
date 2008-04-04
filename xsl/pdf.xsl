@@ -4,7 +4,7 @@
  xmlns:date="http://exslt.org/dates-and-times"
  exclude-result-prefixes="date" version="1.0">
 
- <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" />
+ <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
  <xsl:import href="common.xsl" />
 
 <!-- numbering depth: will remove numbers from sections but still display them in TOC  
