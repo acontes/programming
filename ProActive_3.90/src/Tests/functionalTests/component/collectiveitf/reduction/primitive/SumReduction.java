@@ -1,4 +1,4 @@
-package functionalTests.component.collectiveitf.reduction;
+package functionalTests.component.collectiveitf.reduction.primitive;
 
 import java.util.Iterator;
 import java.util.List;

@@ -1,4 +1,4 @@
-package functionalTests.component.collectiveitf.reduction;
+package functionalTests.component.collectiveitf.reduction.primitive;
 
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;

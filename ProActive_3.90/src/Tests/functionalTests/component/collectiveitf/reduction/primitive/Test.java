@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package functionalTests.component.collectiveitf.reduction;
+package functionalTests.component.collectiveitf.reduction.primitive;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,7 +96,7 @@ public class Test extends ComponentTest {
 
         // test case: simple invocation on component with unicast - annotated interface
         Component simpleTestCase = (Component) f.newComponent(
-                "functionalTests.component.collectiveitf.reduction.testcase", context);
+                "functionalTests.component.collectiveitf.reduction.primitive.testcase", context);
         Fractal.getLifeCycleController(simpleTestCase).startFc();
         boolean result2 = ((TesterItf) simpleTestCase.getFcInterface("runTestItf")).runTest();
         Assert.assertTrue(result2);
