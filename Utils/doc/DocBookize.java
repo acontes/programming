@@ -38,18 +38,23 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
+
 
 /**
  * This works this way: Some kind of ugly sax parsing is done on the xml file,
@@ -59,574 +64,553 @@ import org.xml.sax.helpers.DefaultHandler;
  * and 'textdata'.
  */
 public class DocBookize extends DefaultHandler implements LexicalHandler {
-	private static Logger logger = Logger.getLogger(DocBookize.class.getName());
-	private static final String UTF8 = "UTF8";
-	private static final String TMP_EXTENSION = ".tmp";
-	private static final String XML = "xml";
-	private static final String JAVA = "java";
-	private static final String LT = "&lt;";
-	private static final String AMPERSAND_REPLACE = "&amp;";
-	private static final String AMPERSAND = "&";
-	private static final String TAG_START = "<";
-	private static final String TAG_CLOSE = ">";
-	private static final String END_TAG_BEGIN = "</";
-	private static final String PROGRAMLISTING = "programlisting";
-	private static final String ID = "id";
-	private static final String HTTP = "http";
-	private static final String URL = "url";
-	private static final String LANG = "lang";
-	private static final String EQUAL_QUOTES = "=\"";
-	private static final String QUOTES = "\"";
-	private static final String EXAMPLE_END = "</example>";
-	private static final String PARA_OS_HTML = " <para os=\"html\" /> ";
-	private static final String PROGRAMLISTING_END = " </programlisting>";
-	private static final String TAG_END = "\">";
-	private static final String PROGRAMLISTING_OS_PDF_LANG = " <programlisting os=\"pdf\" lang=\"";
-	private static final String TITLE_END = " </title> ";
-	private static final String PHRASE_END = "</phrase>";
-	private static final String PHRASE_OS_PDF = " <phrase os=\"pdf\" > ";
-	private static final String ULINK_PHRASE = "</ulink></phrase>";
-	private static final String PHRASE_OS_HTML_ULINK_URL = " <phrase os=\"html\" > <ulink url=\"../";
-	private static final String TITLE_START = " <title> ";
-	private static final String EXAMPLE_ID_START = "<example id=\"";
-	private static final String HTML_EXT = ".html";
-	private static final String JAVA_FILE_SRC = "javaFileSrc";
-	private static final String XREF = "xref";
-	private static final String FILEREF = "fileref";
-	private static final String TEXTDATA = "textdata";
-	private static final String TEXTOBJECT = "textobject";
-	private static final String DOC_RUN_COMMENT = "<!-- DocBookize has been run to highlight keywords in code examples -->";
-	private static final String XML_ENCODING = "<?xml version='1.0' encoding='UTF-8'?>";
-	private static final String SAX_PROPERTIES = "http://xml.org/sax/properties/lexical-handler";
-	private static final String ROLE = "role";
-	private static final String LINKEND = "linkend";
-	static String EOL = System.getProperty("line.separator");
-	static boolean SHORT_LINES;
-	/** places where to look for cited files */
-	private final String[] filePath;
-	/** when reading programlisting, stores the characters for highlighting */
-	private String programContent;
-	/** the output stream, ie the initial file decoration */
-	private BufferedWriter out;
-	/** the name of the output file */
-	private final String outputFileName;
-	private final String htmlizedJavaPath;
-	/** when storing programlisting, the language in which the code is written */
-	private String language = "";
-	/** An association between 'language' ==> 'highlighter for language' */
-	private final Map<String, LanguageToDocBook> languageHighlighters = new HashMap<String, LanguageToDocBook>();
-	/**
-	 * fields needed to know where to add the source code at the end of the
-	 * docbook xml
-	 */
-	private Vector<String> listOFids;
-	private final HashMap<String, String> srcContentsToAdd = new HashMap<String, String>();
-	private final Vector<String> srcFilesAlreadyAdded = new Vector<String>();
-
-	/**
-	 * @param fileName
-	 *            The name of the XML file which should have its <screen> tags
-	 *            decorated
-	 * @param path
-	 *            The paths on which to find the files to include in the docbook
-	 */
-	public DocBookize(final String fileName, final String htmlizedJava,
-			final String[] path) {
-		this.outputFileName = fileName;
-		this.htmlizedJavaPath = htmlizedJava;
-		// the possible places where to look for cited files
-		this.filePath = path.clone();
-		this.languageHighlighters.put(DocBookize.JAVA,
-				new JavaToDocBookRegexp());
-		this.languageHighlighters.put(DocBookize.XML, new XmlToDocBookRegexp());
-	}
-
-	public static void main(final String[] argv) {
-		// usage warning
-		if (argv.length < 2) {
-			DocBookize.logger.error("Usage: docBookize filename "
-					+ "pathForJavaHtmlized [pathForTextData]*");
-			DocBookize.logger.error("Transforms <programlisting> tags "
-					+ "(side-effect: removes docbook indentation)");
-			System.exit(-1);
-		}
-
-		final String fileToBeautify = argv[0];
-		final String htmlizedJava = argv[1];
-		DocBookize.logger.info("Beautifying code examples within <programlisting> tags ("
-						+ fileToBeautify + ")");
-
-		// Create SAX machinery
-		final File inputFile = new File(fileToBeautify);
-
-		// path to look for files = argv - (2 first occurrence) + (inputFile
-		// Directory)
-		final String[] path = new String[argv.length - 1];
-		// the directory of file to beautify
-		path[0] = inputFile.getParent() + "/";
-		System.arraycopy(argv, 2, path, 1, argv.length - 2);
-
-		final DocBookize handler = new DocBookize(fileToBeautify
-				+ DocBookize.TMP_EXTENSION, htmlizedJava, path);
-
-		final SAXParserFactory factory = SAXParserFactory.newInstance();
-
-		factory.setNamespaceAware(true);
-
-		try {
-			final SAXParser saxParser = factory.newSAXParser();
-			saxParser.getXMLReader().setProperty(DocBookize.SAX_PROPERTIES,
-					handler);
-			// parse the file, using DocBookize.methods to handle tags
-			saxParser.parse(inputFile, handler);
-
-			// rename output file to first name ==> overwrite
-			final File resultFile = handler.getOutputFile();
-
-			if (!inputFile.delete()) {
-				throw new IOException("Could not delete file " + inputFile
-						+ ".");
-			}
-
-			if (!resultFile.renameTo(inputFile)) {
-				throw new IOException("Could not rename file " + resultFile
-						+ " to " + inputFile + ".");
-			}
-		} catch (final Throwable t) {
-			t.printStackTrace();
-		}
-	}
-
-	/** Default handler operation when start document is encountered */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.xml.sax.helpers.DefaultHandler#startDocument()
-	 */
-	@Override
-	public void startDocument() throws SAXException {
-		// Create the output file
-		try {
-			this.out = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(this.outputFileName), DocBookize.UTF8));
-		} catch (final IOException e) {
-			throw new SAXException("I/O error opening temp file", e);
-		}
-
-		this.print(DocBookize.XML_ENCODING + DocBookize.EOL);
-		this.print(DocBookize.DOC_RUN_COMMENT + DocBookize.EOL);
-	}
-
-	/** Default handler operation when end document is encountered */
-	@Override
-	public void endDocument() throws SAXException {
-		try {
-			this.out.close();
-		} catch (final IOException e) {
-			throw new SAXException("I/O error closing temp file", e);
-		}
-	}
-
-	/** Default handler operation when new tag is encountered */
-	@Override
-	public void startElement(final String namespaceURI, final String localName,
-			final String realName, final Attributes attrs) throws SAXException {
-		// element name
-		String tagName = localName;
-		boolean filerefChanged = false;
-
-		if ("".equals(tagName)) {
-			// namespaceAware = false
-			tagName = realName;
-		}
-
-		// Just skip textobjects in programlistings (see following comment).
-		if (tagName.equals(DocBookize.TEXTOBJECT)
-				&& (this.programContent != null)) {
-			return;
-		}
-
-		// replace textdata from file by the file content (shouldn't the ant
-		// xslt task do that?)
-		if (tagName.equals(DocBookize.TEXTDATA)
-				&& (this.programContent != null)) {
-			String fileReferenced = "";
-
-			for (int i = 0; i < attrs.getLength(); i++) {
-				// Attr name
-				String aName = attrs.getLocalName(i);
-
-				if ("".equals(aName)) {
-					aName = attrs.getQName(i);
-				}
-
-				if (aName.equals(DocBookize.FILEREF)) {
-					fileReferenced = attrs.getValue(i);
-				}
-			}
-
-			this.programContent += this.getFileContent(fileReferenced);
-
-			return;
-		}
-
-		// XREF with role=xmlFileSrc or javaFileSrc are wraped to add the
-		// correct references.
-		if (tagName.equals(DocBookize.XREF) && (attrs != null)) {
-			String fileRef = "";
-			String role = "";
-
-			for (int i = 0; i < attrs.getLength(); i++) {
-				// Attr name
-				String aName = attrs.getLocalName(i).toLowerCase();
-
-				if (aName.equals("")) {
-					aName = attrs.getQName(i).toLowerCase();
-				}
-
-				if (aName.equals(DocBookize.LINKEND)) {
-					filerefChanged = true;
-					fileRef = attrs.getValue(i);
-				}
-
-				if (aName.equals(DocBookize.ROLE)) {
-					role = attrs.getValue(i);
-				}
-			}
-
-			if (!role.equals("") && !fileRef.equals("")) {
-				this.language = fileRef.substring(fileRef.lastIndexOf(".") + 1)
-						.toLowerCase();
-				// We shall only add the same file once!
-				if (!this.srcFilesAlreadyAdded.contains(fileRef)) {
-					this.srcFilesAlreadyAdded.add(fileRef);
-
-					String listing = "";
-					listing += DocBookize.EXAMPLE_ID_START
-							+ fileRef.replaceAll("/", ".") + DocBookize.TAG_END;
-					listing += DocBookize.TITLE_START;
-
-					// In html, just point to the file, wherever it is.
-					String location = fileRef;
-
-					if (role.equals(DocBookize.JAVA_FILE_SRC)) {
-						location = this.htmlizedJavaPath + fileRef
-								+ DocBookize.HTML_EXT;
-					}
-
-					listing += DocBookize.PHRASE_OS_HTML_ULINK_URL + location
-							+ DocBookize.TAG_END + fileRef
-							+ DocBookize.ULINK_PHRASE;
-
-					// in pdf, copy the file to the docbook xml
-					listing += DocBookize.PHRASE_OS_PDF + fileRef
-							+ DocBookize.PHRASE_END;
-					listing += DocBookize.TITLE_END;
-					listing += DocBookize.PROGRAMLISTING_OS_PDF_LANG
-							+ this.language + DocBookize.TAG_END;
-					listing += this.highlight(this.getFileContent(fileRef));
-					listing += DocBookize.PROGRAMLISTING_END;
-					// don't leave the example empty if using html
-					listing += DocBookize.PARA_OS_HTML;
-					listing += DocBookize.EXAMPLE_END;
-
-					if (this.srcContentsToAdd.containsKey(role)) {
-						final String old = this.srcContentsToAdd.remove(role);
-						this.srcContentsToAdd.put(role, old + listing);
-					} else {
-						this.srcContentsToAdd.put(role, listing);
-					}
-				}
-			}
-		} // keep on with startElement method, because we haven't even printed
-		// the <xref> tag!,
-
-		this.print(DocBookize.TAG_START + tagName);
-
-		String id = null;
-
-		if (attrs != null) {
-			for (int i = 0; i < attrs.getLength(); i++) {
-				// Attr name
-				String aName = attrs.getLocalName(i);
-
-				if (aName.equals("")) {
-					aName = attrs.getQName(i);
-				}
-
-				this.print(' ' + aName);
-				this.print(DocBookize.EQUAL_QUOTES);
-
-				if (filerefChanged && aName.equals(DocBookize.LINKEND)) {
-					this.print(attrs.getValue(i).replaceAll("/", "."));
-				} else {
-					this.print(attrs.getValue(i));
-				}
-
-				this.print(DocBookize.QUOTES);
-
-				if (aName.toLowerCase().equals(DocBookize.LANG)) {
-					this.language = attrs.getValue(i).toLowerCase();
-				}
-
-				if (aName.toLowerCase().equals(DocBookize.URL)
-						&& !attrs.getValue(i).startsWith(DocBookize.HTTP)) {
-				}
-
-				if (aName.equals(DocBookize.ID)) {
-					id = attrs.getValue(i);
-				}
-			}
-		}
-
-		if ("srcCodeAppendix".equals(id)) {
-			assert this.listOFids == null : "Hey, listOfIds should have"
-					+ " been null, meaning 'not yet found srcCodeAppendix'";
-			// used to avoid searching in srcContentsToAdd too often.
-			this.listOFids = new Vector<String>();
-		}
-
-		if (this.listOFids != null) {
-			// just remembering the current id if there is one.
-			this.listOFids.add(id);
-		}
-
-		this.print(DocBookize.TAG_CLOSE);
-
-		// Only highlight programlistings.
-		if (tagName.equals(DocBookize.PROGRAMLISTING)) {
-			// start storing the next characters, until en dof programlisting
-			this.programContent = "";
-		}
-	}
-
-	/** Default handler operation when a tag is closed */
-	@Override
-	public void endElement(final String namespaceURI, final String localName,
-			final String realName) throws SAXException {
-		// Code to add remembered elements in the src appendix
-		if (this.listOFids != null) {
-			final String id = this.listOFids.remove(this.listOFids.size() - 1);
-			// we have stepped out of the appendix
-			if (this.listOFids.size() == 0) {
-				this.listOFids = null;
-			}
-			// end of a tag labelled to have extra info? ==> paste this extra
-			// info
-			if (this.srcContentsToAdd.containsKey(id)) {
-				this.print(this.srcContentsToAdd.get(id));
-			}
-		}
-
-		// Just skip textobjects in programlistings.
-		if (realName.toLowerCase().equals(DocBookize.TEXTOBJECT)
-				&& (this.programContent != null)) {
-			return;
-		}
-
-		// Just skip textdata END TAGS in programlistings.
-		if (realName.toLowerCase().equals(DocBookize.TEXTDATA)
-				&& (this.programContent != null)) {
-			return;
-		}
-
-		if (realName.toLowerCase().equals(DocBookize.PROGRAMLISTING)) {
-			final String highlighted = this.highlight(this.programContent);
-			// No longer in a programlisting tag ==> no longer have to store
-			// characters
-			this.programContent = null;
-			this.print(highlighted);
-		}
-
-		// print also a newline to have reasonably lengthed lines but some
-		// scrren listings will be ill-formed.
-		if (DocBookize.SHORT_LINES) {
-			this.print(DocBookize.END_TAG_BEGIN + realName
-					+ DocBookize.TAG_CLOSE + DocBookize.EOL);
-		} else {
-			this.print(DocBookize.END_TAG_BEGIN + realName
-					+ DocBookize.TAG_CLOSE);
-		}
-	}
-
-	/** Default handler operation when a string of characters is encountered */
-	@Override
-	public void characters(final char[] buf, final int offset, final int len)
-			throws SAXException {
-		final String s = new String(buf, offset, len);
-		this.print(s.replaceAll(DocBookize.AMPERSAND,
-				DocBookize.AMPERSAND_REPLACE).replaceAll(DocBookize.TAG_START,
-				DocBookize.LT));
-	}
-
-	/**
-	 * This Parser writes to an output file.
-	 * 
-	 * @return the File which has been created.
-	 */
-	private File getOutputFile() {
-		return new File(this.outputFileName);
-	}
-
-	/**
-	 * Return the content of a file as a single String (without the first PA
-	 * license comment, for java files)
-	 * 
-	 * @param fileReferenced
-	 *            the file which is to be returned as a string
-	 * @return one very big string equal to the content of the file
-	 * @throws SAXException
-	 *             if having trouble reading the given file
-	 */
-	private String getFileContent(final String fileReferenced)
-			throws SAXException {
-		String fileContent = "";
-
-		BufferedReader in = null;
-
-		// try to find the cited file, on the allowed paths
-		String fullFileName = "";
-
-		for (int i = 0; i < this.filePath.length; i++) {
-			fullFileName = this.filePath[i] + fileReferenced;
-			// it's not a file when it doesn't exist or it is a directory
-			if (new File(fullFileName).isFile()) {
-				// file found ? Cool, we've got our file!
-				break;
-			}
-		}
-
-		try {
-			in = new BufferedReader(new FileReader(fullFileName));
-		} catch (final FileNotFoundException e1) {
-			DocBookize.logger.error("Couldn't find file called "
-					+ fileReferenced);
-
-			return "XXXXXXXXXXXX  " + fileReferenced + " missing  XXXXXXXXXXXX";
-		}
-
-		try {
-			// Remove PA standard java file header, if any. This means reading
-			// the first two lines
-			final String str1 = in.readLine();
-
-			if (str1 == null) {
-				in.close();
-
-				return "";
-			}
-
-			String str2 = in.readLine();
-
-			if (str2 == null) {
-				in.close();
-
-				return str1;
-			}
-
-			if (str2.startsWith(" * #########################"
-					+ "#######################################")) {
-				// begin PA comment, so just read it until end comment found
-				do {
-					str2 = in.readLine();
-
-					// if EndOfFile, just return with empty String
-					if (str2 == null) {
-						return "";
-					}
-				} while (!str2.endsWith("*/"));
-			} else {
-				fileContent += str1 + DocBookize.EOL + str2 + DocBookize.EOL;
-			}
-
-			// just dump rest of the file into the return value
-			String str;
-
-			while ((str = in.readLine()) != null) {
-				fileContent += str + DocBookize.EOL;
-			}
-
-			in.close();
-		} catch (final IOException e) {
-			throw new SAXException("Warning - trouble reading referenced file "
-					+ fileReferenced + ": " + e.getMessage());
-		}
-
-		return fileContent.replaceAll(DocBookize.AMPERSAND,
-				DocBookize.AMPERSAND_REPLACE).replaceAll(DocBookize.TAG_START,
-				DocBookize.LT);
-	}
-
-	/**
-	 * Just write to the output file the given string. Need to Wrap I/O
-	 * exceptions in SAX exceptions, to suit handler signature requirements.
-	 * 
-	 * @throws SAXException
-	 *             if an error happened with file IO operations
-	 */
-	private void print(final String s) throws SAXException {
-		if (this.programContent != null) {
-			this.programContent += s;
-		} else {
-			try {
-				this.out.write(s);
-			} catch (final IOException e) {
-				throw new SAXException("I/O error writing to temp file", e);
-			}
-		}
-	}
-
-	/**
-	 * Transform the given string into nice docbook highlighted stuff
-	 * 
-	 * @param s
-	 *            The String which is to contain tags highlighting its elements.
-	 * @throws SAXException
-	 *             if writing to the stream caused problem
-	 */
-	private String highlight(final String s) {
-		String result = "";
-
-		if (s.length() > 0) {
-			final LanguageToDocBook converter = this.languageHighlighters
-					.get(this.language);
-
-			if (converter == null) {
-				DocBookize.logger.error("Language '" + this.language
-						+ "' is unsupported in programlistings.");
-				result = s;
-				// Do the highlighting
-			} else {
-				result = converter.convert(s);
-			}
-		}
-
-		return result;
-	}
-
-	public void startDTD(final String baseElement, final String publicId,
-			final String systemId) throws SAXException {
-		// also include in the output the dtd in original file.
-		this.print("<!DOCTYPE " + baseElement + " PUBLIC \"" + publicId
-				+ "\" \"" + systemId + DocBookize.TAG_END + DocBookize.EOL);
-	}
-
-	public void endDTD() throws SAXException {
-	}
-
-	public void comment(final char[] s, final int i, final int j)
-			throws SAXException {
-	}
-
-	public void startCDATA() throws SAXException {
-	}
-
-	public void endCDATA() throws SAXException {
-	}
-
-	public void startEntity(final String ent) throws SAXException {
-	}
-
-	public void endEntity(final String ent) throws SAXException {
-	}
+    private static Logger logger = Logger.getLogger(DocBookize.class.getName());
+    private static final String UTF8 = "UTF8";
+    private static final String TMP_EXTENSION = ".tmp";
+    private static final String XML = "xml";
+    private static final String JAVA = "java";
+    private static final String LT = "&lt;";
+    private static final String AMPERSAND_REPLACE = "&amp;";
+    private static final String AMPERSAND = "&";
+    private static final String TAG_START = "<";
+    private static final String TAG_CLOSE = ">";
+    private static final String END_TAG_BEGIN = "</";
+    private static final String PROGRAMLISTING = "programlisting";
+    private static final String ID = "id";
+    private static final String HTTP = "http";
+    private static final String URL = "url";
+    private static final String LANG = "lang";
+    private static final String EQUAL_QUOTES = "=\"";
+    private static final String QUOTES = "\"";
+    private static final String EXAMPLE_END = "</example>";
+    private static final String PARA_OS_HTML = " <para os=\"html\" /> ";
+    private static final String PROGRAMLISTING_END = " </programlisting>";
+    private static final String TAG_END = "\">";
+    private static final String PROGRAMLISTING_OS_PDF_LANG = " <programlisting os=\"pdf\" lang=\"";
+    private static final String TITLE_END = " </title> ";
+    private static final String PHRASE_END = "</phrase>";
+    private static final String PHRASE_OS_PDF = " <phrase os=\"pdf\" > ";
+    private static final String ULINK_PHRASE = "</ulink></phrase>";
+    private static final String PHRASE_OS_HTML_ULINK_URL = " <phrase os=\"html\" > <ulink url=\"../";
+    private static final String TITLE_START = " <title> ";
+    private static final String EXAMPLE_ID_START = "<example id=\"";
+    private static final String HTML_EXT = ".html";
+    private static final String JAVA_FILE_SRC = "javaFileSrc";
+    private static final String XREF = "xref";
+    private static final String FILEREF = "fileref";
+    private static final String TEXTDATA = "textdata";
+    private static final String TEXTOBJECT = "textobject";
+    private static final String DOC_RUN_COMMENT = "<!-- DocBookize has been run to highlight keywords in code examples -->";
+    private static final String XML_ENCODING = "<?xml version='1.0' encoding='UTF-8'?>";
+    private static final String SAX_PROPERTIES = "http://xml.org/sax/properties/lexical-handler";
+    private static final String ROLE = "role";
+    private static final String LINKEND = "linkend";
+    static String EOL = System.getProperty("line.separator");
+    static boolean SHORT_LINES;
+    /** places where to look for cited files */
+    private final String[] filePath;
+    /** when reading programlisting, stores the characters for highlighting */
+    private String programContent;
+    /** the output stream, ie the initial file decoration */
+    private BufferedWriter out;
+    /** the name of the output file */
+    private final String outputFileName;
+    private final String htmlizedJavaPath;
+    /** when storing programlisting, the language in which the code is written */
+    private String language = "";
+    /** An association between 'language' ==> 'highlighter for language' */
+    private final Map<String, LanguageToDocBook> languageHighlighters = new HashMap<String, LanguageToDocBook>();
+    /**
+     * fields needed to know where to add the source code at the end of the
+     * docbook xml
+     */
+    private Vector<String> listOFids;
+    private final HashMap<String, String> srcContentsToAdd = new HashMap<String, String>();
+    private final Vector<String> srcFilesAlreadyAdded = new Vector<String>();
+
+    /**
+     * @param fileName
+     *            The name of the XML file which should have its <screen> tags
+     *            decorated
+     * @param path
+     *            The paths on which to find the files to include in the docbook
+     */
+    public DocBookize(final String fileName, final String htmlizedJava, final String[] path) {
+        this.outputFileName = fileName;
+        this.htmlizedJavaPath = htmlizedJava;
+        // the possible places where to look for cited files
+        this.filePath = path.clone();
+        this.languageHighlighters.put(DocBookize.JAVA, new JavaToDocBookRegexp());
+        this.languageHighlighters.put(DocBookize.XML, new XmlToDocBookRegexp());
+    }
+
+    public static void main(final String[] argv) {
+        // usage warning
+        if (argv.length < 2) {
+            DocBookize.logger.error("Usage: docBookize filename " + "pathForJavaHtmlized [pathForTextData]*");
+            DocBookize.logger.error("Transforms <programlisting> tags "
+                + "(side-effect: removes docbook indentation)");
+            System.exit(-1);
+        }
+
+        final String fileToBeautify = argv[0];
+        final String htmlizedJava = argv[1];
+        DocBookize.logger.info("Beautifying code examples within <programlisting> tags (" + fileToBeautify +
+            ")");
+
+        // Create SAX machinery
+        final File inputFile = new File(fileToBeautify);
+
+        // path to look for files = argv - (2 first occurrence) + (inputFile
+        // Directory)
+        final String[] path = new String[argv.length - 1];
+        // the directory of file to beautify
+        path[0] = inputFile.getParent() + "/";
+        System.arraycopy(argv, 2, path, 1, argv.length - 2);
+
+        final DocBookize handler = new DocBookize(fileToBeautify + DocBookize.TMP_EXTENSION, htmlizedJava,
+            path);
+
+        final SAXParserFactory factory = SAXParserFactory.newInstance();
+
+        factory.setNamespaceAware(true);
+
+        try {
+            final SAXParser saxParser = factory.newSAXParser();
+            saxParser.getXMLReader().setProperty(DocBookize.SAX_PROPERTIES, handler);
+            // parse the file, using DocBookize.methods to handle tags
+            saxParser.parse(inputFile, handler);
+
+            // rename output file to first name ==> overwrite
+            final File resultFile = handler.getOutputFile();
+
+            if (!inputFile.delete()) {
+                throw new IOException("Could not delete file " + inputFile + ".");
+            }
+
+            if (!resultFile.renameTo(inputFile)) {
+                throw new IOException("Could not rename file " + resultFile + " to " + inputFile + ".");
+            }
+        } catch (final IOException t) {
+            DocBookize.logger.error(t.getMessage(), t);
+        } catch (final SAXNotRecognizedException e) {
+            DocBookize.logger.error(e.getMessage(), e);
+        } catch (final SAXNotSupportedException e) {
+            DocBookize.logger.error(e.getMessage(), e);
+        } catch (final SAXException e) {
+            DocBookize.logger.error(e.getMessage(), e);
+        } catch (final ParserConfigurationException e) {
+            DocBookize.logger.error(e.getMessage(), e);
+        }
+    }
+
+    /** Default handler operation when start document is encountered 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.xml.sax.helpers.DefaultHandler#startDocument()
+     */
+    @Override
+    public void startDocument() throws SAXException {
+        // Create the output file
+        try {
+            this.out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.outputFileName),
+                DocBookize.UTF8));
+            this.print(DocBookize.XML_ENCODING + DocBookize.EOL);
+            this.print(DocBookize.DOC_RUN_COMMENT + DocBookize.EOL);
+        } catch (final UnsupportedEncodingException e) {
+            DocBookize.logger.error(e.getMessage(), e);
+        } catch (final FileNotFoundException e) {
+            DocBookize.logger.error(e.getMessage(), e);
+        }
+
+    }
+
+    /** Default handler operation when end document is encountered */
+    @Override
+    public void endDocument() throws SAXException {
+        try {
+            this.out.close();
+        } catch (final IOException e) {
+            DocBookize.logger.error("Could not close file: " + e.getMessage(), e);
+        }
+    }
+
+    /** Default handler operation when new tag is encountered */
+    @Override
+    public void startElement(final String namespaceURI, final String localName, final String realName,
+            final Attributes attrs) throws SAXException {
+        // element name
+        String tagName = localName;
+        boolean filerefChanged = false;
+
+        if ("".equals(tagName)) {
+            // namespaceAware = false
+            tagName = realName;
+        }
+
+        // Just skip textobjects in programlistings (see following comment).
+        if (tagName.equals(DocBookize.TEXTOBJECT) && (this.programContent != null)) {
+            return;
+        }
+
+        // replace textdata from file by the file content (shouldn't the ant
+        // xslt task do that?)
+        if (tagName.equals(DocBookize.TEXTDATA) && (this.programContent != null)) {
+            String fileReferenced = "";
+
+            for (int i = 0; i < attrs.getLength(); i++) {
+                // Attr name
+                String aName = attrs.getLocalName(i);
+
+                if ("".equals(aName)) {
+                    aName = attrs.getQName(i);
+                }
+
+                if (aName.equals(DocBookize.FILEREF)) {
+                    fileReferenced = attrs.getValue(i);
+                }
+            }
+
+            this.programContent += this.getFileContent(fileReferenced);
+
+            return;
+        }
+
+        // XREF with role=xmlFileSrc or javaFileSrc are wraped to add the
+        // correct references.
+        if (tagName.equals(DocBookize.XREF) && (attrs != null)) {
+            String fileRef = "";
+            String role = "";
+
+            for (int i = 0; i < attrs.getLength(); i++) {
+                // Attr name
+                String aName = attrs.getLocalName(i).toLowerCase();
+
+                if (aName.equals("")) {
+                    aName = attrs.getQName(i).toLowerCase();
+                }
+
+                if (aName.equals(DocBookize.LINKEND)) {
+                    filerefChanged = true;
+                    fileRef = attrs.getValue(i);
+                }
+
+                if (aName.equals(DocBookize.ROLE)) {
+                    role = attrs.getValue(i);
+                }
+            }
+
+            if (!role.equals("") && !fileRef.equals("")) {
+                this.language = fileRef.substring(fileRef.lastIndexOf(".") + 1).toLowerCase();
+                // We shall only add the same file once!
+                if (!this.srcFilesAlreadyAdded.contains(fileRef)) {
+                    this.srcFilesAlreadyAdded.add(fileRef);
+
+                    String listing = "";
+                    listing += DocBookize.EXAMPLE_ID_START + fileRef.replaceAll("/", ".") +
+                        DocBookize.TAG_END;
+                    listing += DocBookize.TITLE_START;
+
+                    // In html, just point to the file, wherever it is.
+                    String location = fileRef;
+
+                    if (role.equals(DocBookize.JAVA_FILE_SRC)) {
+                        location = this.htmlizedJavaPath + fileRef + DocBookize.HTML_EXT;
+                    }
+
+                    listing += DocBookize.PHRASE_OS_HTML_ULINK_URL + location + DocBookize.TAG_END + fileRef +
+                        DocBookize.ULINK_PHRASE;
+
+                    // in pdf, copy the file to the docbook xml
+                    listing += DocBookize.PHRASE_OS_PDF + fileRef + DocBookize.PHRASE_END;
+                    listing += DocBookize.TITLE_END;
+                    listing += DocBookize.PROGRAMLISTING_OS_PDF_LANG + this.language + DocBookize.TAG_END;
+                    listing += this.highlight(this.getFileContent(fileRef));
+                    listing += DocBookize.PROGRAMLISTING_END;
+                    // don't leave the example empty if using html
+                    listing += DocBookize.PARA_OS_HTML;
+                    listing += DocBookize.EXAMPLE_END;
+
+                    if (this.srcContentsToAdd.containsKey(role)) {
+                        final String old = this.srcContentsToAdd.remove(role);
+                        this.srcContentsToAdd.put(role, old + listing);
+                    } else {
+                        this.srcContentsToAdd.put(role, listing);
+                    }
+                }
+            }
+        } // keep on with startElement method, because we haven't even printed
+        // the <xref> tag!,
+
+        this.print(DocBookize.TAG_START + tagName);
+
+        String id = null;
+
+        if (attrs != null) {
+            for (int i = 0; i < attrs.getLength(); i++) {
+                // Attr name
+                String aName = attrs.getLocalName(i);
+
+                if (aName.equals("")) {
+                    aName = attrs.getQName(i);
+                }
+
+                this.print(' ' + aName);
+                this.print(DocBookize.EQUAL_QUOTES);
+
+                if (filerefChanged && aName.equals(DocBookize.LINKEND)) {
+                    this.print(attrs.getValue(i).replaceAll("/", "."));
+                } else {
+                    this.print(attrs.getValue(i));
+                }
+
+                this.print(DocBookize.QUOTES);
+
+                if (aName.toLowerCase().equals(DocBookize.LANG)) {
+                    this.language = attrs.getValue(i).toLowerCase();
+                }
+
+                if (aName.toLowerCase().equals(DocBookize.URL) &&
+                    !attrs.getValue(i).startsWith(DocBookize.HTTP)) {
+                }
+
+                if (aName.equals(DocBookize.ID)) {
+                    id = attrs.getValue(i);
+                }
+            }
+        }
+
+        if ("srcCodeAppendix".equals(id)) {
+            assert this.listOFids == null : "Hey, listOfIds should have"
+                + " been null, meaning 'not yet found srcCodeAppendix'";
+            // used to avoid searching in srcContentsToAdd too often.
+            this.listOFids = new Vector<String>();
+        }
+
+        if (this.listOFids != null) {
+            // just remembering the current id if there is one.
+            this.listOFids.add(id);
+        }
+
+        this.print(DocBookize.TAG_CLOSE);
+
+        // Only highlight programlistings.
+        if (tagName.equals(DocBookize.PROGRAMLISTING)) {
+            // start storing the next characters, until en dof programlisting
+            this.programContent = "";
+        }
+    }
+
+    /** Default handler operation when a tag is closed */
+    @Override
+    public void endElement(final String namespaceURI, final String localName, final String realName)
+            throws SAXException {
+        // Code to add remembered elements in the src appendix
+        if (this.listOFids != null) {
+            final String id = this.listOFids.remove(this.listOFids.size() - 1);
+            // we have stepped out of the appendix
+            if (this.listOFids.size() == 0) {
+                this.listOFids = null;
+            }
+            // end of a tag labelled to have extra info? ==> paste this extra
+            // info
+            if (this.srcContentsToAdd.containsKey(id)) {
+                this.print(this.srcContentsToAdd.get(id));
+            }
+        }
+
+        // Just skip textobjects in programlistings.
+        if (realName.toLowerCase().equals(DocBookize.TEXTOBJECT) && (this.programContent != null)) {
+            return;
+        }
+
+        // Just skip textdata END TAGS in programlistings.
+        if (realName.toLowerCase().equals(DocBookize.TEXTDATA) && (this.programContent != null)) {
+            return;
+        }
+
+        if (realName.toLowerCase().equals(DocBookize.PROGRAMLISTING)) {
+            final String highlighted = this.highlight(this.programContent);
+            // No longer in a programlisting tag ==> no longer have to store
+            // characters
+            this.programContent = null;
+            this.print(highlighted);
+        }
+
+        // print also a newline to have reasonably lengthed lines but some
+        // scrren listings will be ill-formed.
+        if (DocBookize.SHORT_LINES) {
+            this.print(DocBookize.END_TAG_BEGIN + realName + DocBookize.TAG_CLOSE + DocBookize.EOL);
+        } else {
+            this.print(DocBookize.END_TAG_BEGIN + realName + DocBookize.TAG_CLOSE);
+        }
+    }
+
+    /** Default handler operation when a string of characters is encountered */
+    @Override
+    public void characters(final char[] buf, final int offset, final int len) throws SAXException {
+        final String s = new String(buf, offset, len);
+        this.print(s.replaceAll(DocBookize.AMPERSAND, DocBookize.AMPERSAND_REPLACE).replaceAll(
+                DocBookize.TAG_START, DocBookize.LT));
+    }
+
+    /**
+     * This Parser writes to an output file.
+     * 
+     * @return the File which has been created.
+     */
+    private File getOutputFile() {
+        return new File(this.outputFileName);
+    }
+
+    /**
+     * Return the content of a file as a single String (without the first PA
+     * license comment, for java files)
+     * 
+     * @param fileReferenced
+     *            the file which is to be returned as a string
+     * @return one very big string equal to the content of the file
+     * @throws SAXException
+     *             if having trouble reading the given file
+     */
+    private String getFileContent(final String fileReferenced) throws SAXException {
+        String fileContent = "";
+
+        BufferedReader in = null;
+
+        // try to find the cited file, on the allowed paths
+        String fullFileName = "";
+
+        for (int i = 0; i < this.filePath.length; i++) {
+            fullFileName = this.filePath[i] + fileReferenced;
+            // it's not a file when it doesn't exist or it is a directory
+            if (new File(fullFileName).isFile()) {
+                // file found ? Cool, we've got our file!
+                break;
+            }
+        }
+
+        try {
+            in = new BufferedReader(new FileReader(fullFileName));
+            // Remove PA standard java file header, if any. This means reading
+            // the first two lines
+            final String str1 = in.readLine();
+
+            if (str1 == null) {
+                in.close();
+
+                return "";
+            }
+
+            String str2 = in.readLine();
+
+            if (str2 == null) {
+                in.close();
+
+                return str1;
+            }
+
+            if (str2.startsWith(" * #########################" + "#######################################")) {
+                // begin PA comment, so just read it until end comment found
+                do {
+                    str2 = in.readLine();
+
+                    // if EndOfFile, just return with empty String
+                    if (str2 == null) {
+                        return "";
+                    }
+                } while (!str2.endsWith("*/"));
+            } else {
+                fileContent += str1 + DocBookize.EOL + str2 + DocBookize.EOL;
+            }
+
+            // just dump rest of the file into the return value
+            String str;
+
+            while ((str = in.readLine()) != null) {
+                fileContent += str + DocBookize.EOL;
+            }
+
+            in.close();
+            return fileContent.replaceAll(DocBookize.AMPERSAND, DocBookize.AMPERSAND_REPLACE).replaceAll(
+                    DocBookize.TAG_START, DocBookize.LT);
+        } catch (final FileNotFoundException e1) {
+            DocBookize.logger.error("Couldn't find file called " + fileReferenced + e1.getMessage(), e1);
+        } catch (final IOException e) {
+            DocBookize.logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    /**
+     * Just write to the output file the given string. Need to Wrap I/O
+     * exceptions in SAX exceptions, to suit handler signature requirements.
+     * 
+     * @throws SAXException
+     *             if an error happened with file IO operations
+     */
+    private void print(final String s) throws SAXException {
+        if (this.programContent != null) {
+            this.programContent += s;
+        } else {
+            try {
+                this.out.write(s);
+            } catch (final IOException e) {
+                throw new SAXException("I/O error writing to temp file", e);
+            }
+        }
+    }
+
+    /**
+     * Transform the given string into nice docbook highlighted stuff
+     * 
+     * @param s
+     *            The String which is to contain tags highlighting its elements.
+     * @throws SAXException
+     *             if writing to the stream caused problem
+     */
+    private String highlight(final String s) {
+        String result = "";
+
+        if (s.length() > 0) {
+            final LanguageToDocBook converter = this.languageHighlighters.get(this.language);
+
+            if (converter == null) {
+                DocBookize.logger
+                        .error("Language '" + this.language + "' is unsupported in programlistings.");
+                result = s;
+                // Do the highlighting
+            } else {
+                result = converter.convert(s);
+            }
+        }
+
+        return result;
+    }
+
+    public void startDTD(final String baseElement, final String publicId, final String systemId)
+            throws SAXException {
+        // also include in the output the dtd in original file.
+        this.print("<!DOCTYPE " + baseElement + " PUBLIC \"" + publicId + "\" \"" + systemId +
+            DocBookize.TAG_END + DocBookize.EOL);
+    }
+
+    public void endDTD() throws SAXException {
+    }
+
+    public void comment(final char[] s, final int i, final int j) throws SAXException {
+    }
+
+    public void startCDATA() throws SAXException {
+    }
+
+    public void endCDATA() throws SAXException {
+    }
+
+    public void startEntity(final String ent) throws SAXException {
+    }
+
+    public void endEntity(final String ent) throws SAXException {
+    }
 }
