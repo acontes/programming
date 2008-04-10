@@ -191,7 +191,7 @@
 			<!-- If a needed file doesn't exist, it will be fetched on the web -->
 
 			<classpath>
-				<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
+				<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.73.2.zip-->
 				<pathelement location="${base.dir}/dev/lib/docbook/docbook-xsl-1.73.2.zip" />
 			</classpath>
 
