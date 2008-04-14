@@ -106,5 +106,13 @@
 	<classpathentry kind="lib" path="lib/saxon8-dom.jar"/>
 	<classpathentry kind="lib" path="lib/sunxacml.jar"/>
 	<classpathentry kind="lib" path="lib/xsdlib.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/jboss-aop-jdk50-4.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/jboss-aspect-library-jdk50-4.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/jboss-common-4.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/jbossha-4.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/jboss-j2ee-4.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/jboss-jmx-4.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/jbossmq-4.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/jboss-system-4.0.4.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -95,6 +95,10 @@
 		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
 		</fileset>
+		<!-- jboss patch TODO -->
+		<fileset dir="${lib.dir}/jboss">
+			<include name="*.jar" />
+		</fileset>
 		<!-- XXX ${dev.dir} is not included in the source release ! -->
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>

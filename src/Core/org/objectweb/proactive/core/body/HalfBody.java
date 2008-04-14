@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.body;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
@@ -76,7 +77,8 @@ public class HalfBody extends AbstractBody {
             return new HalfBody(factory);
         } catch (ActiveObjectCreationException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            // e.printStackTrace();
+        	bodyLogger.error(e.getMessage() , e);
         }
         return null;
     }
