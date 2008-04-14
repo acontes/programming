@@ -422,7 +422,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
                     result = reduceAnnotation.reductionMode().reduce(PAGroup.getGroup(result));
                     //					result = reduceAnnotation.reductionMode().reduce((List<?>)result);
                 } else {
-                    ReduceBehavior reduction = (ReduceBehavior) reduceAnnotation.customReductionMode().newInstance();
+                    ReduceBehavior reduction = (ReduceBehavior) reduceAnnotation.customReductionMode()
+                            .newInstance();
                     result = reduction.reduce(PAGroup.getGroup(result));
                 }
             } catch (ReductionException e) {

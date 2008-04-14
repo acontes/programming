@@ -56,11 +56,10 @@ public class TaskFactoryCollectiveItfs extends BasicTaskFactory implements TaskF
         // knowledge based means dynamic dispatch
         // info specified through proxy API has priority
 
-        Dispatch balancingModeAnnotation = originalMethodCall.getReifiedMethod().getAnnotation(
-                Dispatch.class);
+        Dispatch balancingModeAnnotation = originalMethodCall.getReifiedMethod()
+                .getAnnotation(Dispatch.class);
         if (balancingModeAnnotation != null) {
-            task.setDynamicallyDispatchable(balancingModeAnnotation.mode().equals(
-                    DispatchMode.DYNAMIC));
+            task.setDynamicallyDispatchable(balancingModeAnnotation.mode().equals(DispatchMode.DYNAMIC));
         }
     }
     //	@Override

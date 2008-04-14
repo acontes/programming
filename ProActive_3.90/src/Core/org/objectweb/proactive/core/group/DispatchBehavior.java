@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.objectweb.proactive.core.mop.MethodCall;
 
+
 /**
  * Specifies the mapping between tasks and workers.
  * 
@@ -22,7 +23,7 @@ public interface DispatchBehavior {
      * @param nbWorkers the number of available workers
      * @return the mapping tasks --> worker index, for the given list of tasks
      */
-    public List<Integer> getTaskIndexes(MethodCall originalMethodCall, final List<MethodCall> generatedMethodCalls,
-            int nbWorkers);
+    public List<Integer> getTaskIndexes(MethodCall originalMethodCall,
+            final List<MethodCall> generatedMethodCalls, int nbWorkers);
 
 }

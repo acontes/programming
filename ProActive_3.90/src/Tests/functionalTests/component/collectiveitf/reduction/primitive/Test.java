@@ -30,6 +30,8 @@
  */
 package functionalTests.component.collectiveitf.reduction.primitive;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,25 +43,18 @@ import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.exceptions.ReductionException;
-import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ReduceMode;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.ComponentTest;
 
 
 public class Test extends ComponentTest {
-
-    /**
-         *
-         */
     private static final long serialVersionUID = 6353128567772870415L;
     public static final String MESSAGE = "-Main-";
     public static final int NB_CONNECTED_ITFS = 2;
 
     public Test() {
-        super("Multicast reduction for components", "Multicast reduction for components");
+        super("Multicast reduction for primitive components", "Multicast reduction for primitive components");
     }
 
     /*
@@ -67,45 +62,30 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-        Map context = new HashMap();
-
-        // test selection of unique value
-
-        List<IntWrapper> l = new ArrayList<IntWrapper>();
-        l.add(new IntWrapper(12));
-        //		l.add(new StringWrapper("toti"));
-
-        Object result = null;
         try {
-            result = org.objectweb.proactive.core.component.type.annotations.multicast.ReduceMode.SELECT_UNIQUE_VALUE
-                    .reduce(l);
-        } catch (ReductionException e) {
-            // TODO Auto-generated catch block
+            // test selection of unique value
+            List<IntWrapper> l = new ArrayList<IntWrapper>();
+            l.add(new IntWrapper(12));
+            Object result = null;
+            try {
+                result = org.objectweb.proactive.core.component.type.annotations.multicast.ReduceMode.SELECT_UNIQUE_VALUE
+                        .reduce(l);
+            } catch (ReductionException e) {
+                e.printStackTrace();
+            }
+            Assert.assertEquals(new IntWrapper(12), result);
+
+            // test case: simple invocation on component with unicast - annotated interface
+            Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+            Map<String, Object> context = new HashMap<String, Object>();
+            Component root = (Component) f.newComponent(
+                    "functionalTests.component.collectiveitf.reduction.primitive.adl.Testcase", context);
+            Fractal.getLifeCycleController(root).startFc();
+            boolean result2 = ((TesterItf) root.getFcInterface("runTestItf")).runTest();
+            Assert.assertTrue(result2);
+        } catch (Exception e) {
             e.printStackTrace();
+            fail();
         }
-
-        //		System.out.println("result = " + result);
-        Assert.assertEquals(new IntWrapper(12), result);
-
-        Class<?> clazz = RequiredService.class.getMethod("method1", new Class[] { List.class })
-                .getAnnotation(Reduce.class).customReductionMode();
-        //		l.clear();
-
-        System.out.println(clazz.getName());
-
-        // test case: simple invocation on component with unicast - annotated interface
-        Component simpleTestCase = (Component) f.newComponent(
-                "functionalTests.component.collectiveitf.reduction.primitive.testcase", context);
-        Fractal.getLifeCycleController(simpleTestCase).startFc();
-        boolean result2 = ((TesterItf) simpleTestCase.getFcInterface("runTestItf")).runTest();
-        Assert.assertTrue(result2);
-
-        //        Component testcase = (Component) f.newComponent("functionalTests.component.collectiveitf.multicast.testcase",
-        //                context);
-
-        //        Fractal.getLifeCycleController(testcase).startFc();
-        //        ((Tester) testcase.getFcInterface("runTestItf")).testConnectedServerMulticastItf();
-        //        ((Tester) testcase.getFcInterface("runTestItf")).testOwnClientMulticastItf();
     }
 }

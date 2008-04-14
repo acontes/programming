@@ -11,7 +11,6 @@ import java.lang.annotation.RetentionPolicy;
  *
  */
 
-
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Dispatch {
 
@@ -20,7 +19,7 @@ public @interface Dispatch {
     Class<?> customMode() default DispatchMode.class;
 
     int bufferSize() default 1;
-    
-//    String context() default "";
+
+    //    String context() default "";
 
 }

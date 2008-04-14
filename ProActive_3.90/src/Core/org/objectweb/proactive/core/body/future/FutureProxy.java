@@ -210,7 +210,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         if (dispatchMonitor != null) {
             dispatchMonitor.updatedResult(originatingProxy);
-        } 
+        }
         target = obj;
         ExceptionHandler.addResult(this);
         FutureMonitoring.removeFuture(this);

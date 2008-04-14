@@ -93,7 +93,8 @@ public class Dispatcher {
             bufferSize = loadBalancingAnnotation.bufferSize();
         }
         DispatchMonitor dispatchMonitor = (balancingMode.equals(DispatchMode.DYNAMIC) || balancingMode
-                .equals(DispatchMode.STATIC_RANDOM)) ? new DispatchMonitor(groupProxy, dispatcherIndex++) : null;
+                .equals(DispatchMode.STATIC_RANDOM)) ? new DispatchMonitor(groupProxy, dispatcherIndex++)
+                : null;
 
         // BlockingQueue<AbstractProcessForGroup> spawnedTasks = new
         // LinkedBlockingQueue<AbstractProcessForGroup>();

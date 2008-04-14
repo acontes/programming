@@ -14,6 +14,7 @@ import org.objectweb.proactive.core.component.exceptions.AllocationException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
+
 /**
  * This class implements a task factory applicable for standard ProActive groups.
  * 
@@ -80,7 +81,7 @@ public class BasicTaskFactory implements TaskFactory {
         // of parameters to dispatch
         int maxParameters = 0;
         boolean broadcast = false;
-        if (mc.getEffectiveArguments() != null) { 
+        if (mc.getEffectiveArguments() != null) {
             for (int i = 0; i < mc.getNumberOfParameter(); i++) {
                 if (PAGroup.isGroup(mc.getParameter(i))) {
                     if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {

@@ -31,14 +31,11 @@
 package org.objectweb.proactive.core.component.controller;
 
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -59,15 +56,11 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastBindingChecker;
-import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
-import org.objectweb.proactive.core.component.type.annotations.multicast.MethodDispatchMetadata;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -81,15 +74,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class MulticastControllerImpl extends AbstractProActiveController implements MulticastController,
         Serializable {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 390L;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
-    private static Logger multicastLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST);
     private Map<String, ProActiveInterface> multicastItfs = new HashMap<String, ProActiveInterface>();
-    private Map clientSideProxies = new HashMap();
-    private Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethods = new HashMap<String, Map<SerializableMethod, SerializableMethod>>();
+    private Map<String, Proxy> clientSideProxies = new HashMap<String, Proxy>();
+    // Mapping between methods of client side and methods of server side
+    // Map<clientSideItfName, Map<serverSideItfSignature, Map<clientSideMethod, serverSideMethod>>>
+    private Map<String, Map<String, Map<SerializableMethod, SerializableMethod>>> matchingMethods = new HashMap<String, Map<String, Map<SerializableMethod, SerializableMethod>>>();
 
     public MulticastControllerImpl(Component owner) {
         super(owner);
@@ -130,39 +121,50 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
     public void ensureCompatibility(ProActiveInterfaceType clientSideItfType, ProActiveInterface serverSideItf)
             throws IllegalBindingException {
         try {
+            Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethodsForThisClientItf = matchingMethods
+                    .get(clientSideItfType.getFcItfName());
+            if (matchingMethodsForThisClientItf == null)
+                matchingMethodsForThisClientItf = new HashMap<String, Map<SerializableMethod, SerializableMethod>>();
+
             ProActiveInterfaceType serverSideItfType = (ProActiveInterfaceType) serverSideItf.getFcItfType();
-            Class<?> clientSideItfClass;
-            clientSideItfClass = Class.forName(clientSideItfType.getFcItfSignature());
-            Class<?> serverSideItfClass = Class.forName(serverSideItfType.getFcItfSignature());
 
-            Method[] clientSideItfMethods = clientSideItfClass.getMethods();
-            Method[] serverSideItfMethods = serverSideItfClass.getMethods();
+            if (!matchingMethodsForThisClientItf.containsKey(serverSideItfType.getFcItfSignature())) {
 
-            if (clientSideItfMethods.length != serverSideItfMethods.length) {
-                throw new IllegalBindingException("incompatible binding between client interface " +
-                    clientSideItfType.getFcItfName() + " (" + clientSideItfType.getFcItfSignature() +
-                    ")  and server interface " + serverSideItfType.getFcItfName() + " (" +
-                    serverSideItfType.getFcItfSignature() +
-                    ") : there is not the same number of methods (including those inherited) in both interfaces !");
-            }
+                Class<?> clientSideItfClass;
+                clientSideItfClass = Class.forName(clientSideItfType.getFcItfSignature());
+                Class<?> serverSideItfClass = Class.forName(serverSideItfType.getFcItfSignature());
 
-            Map<SerializableMethod, SerializableMethod> matchingMethodsForThisItf = new HashMap<SerializableMethod, SerializableMethod>(
-                clientSideItfMethods.length);
+                Method[] clientSideItfMethods = clientSideItfClass.getMethods();
+                Method[] serverSideItfMethods = serverSideItfClass.getMethods();
 
-            for (Method method : clientSideItfMethods) {
-                Method serverSideMatchingMethod = searchMatchingMethod(method, serverSideItfMethods,
-                        clientSideItfType.isFcMulticastItf(), serverSideItfType.isFcGathercastItf(),
-                        serverSideItf);
-                if (serverSideMatchingMethod == null) {
-                    throw new IllegalBindingException("binding incompatibility between " +
-                        clientSideItfType.getFcItfName() + " and " + serverSideItfType.getFcItfName() +
-                        " : cannot find matching method");
+                if (clientSideItfMethods.length != serverSideItfMethods.length) {
+                    throw new IllegalBindingException("incompatible binding between client interface " +
+                        clientSideItfType.getFcItfName() + " (" + clientSideItfType.getFcItfSignature() +
+                        ")  and server interface " + serverSideItfType.getFcItfName() + " (" +
+                        serverSideItfType.getFcItfSignature() +
+                        ") : there is not the same number of methods (including those inherited) in both interfaces !");
                 }
-                matchingMethodsForThisItf.put(new SerializableMethod(method), new SerializableMethod(
-                    serverSideMatchingMethod));
-            }
 
-            matchingMethods.put(clientSideItfType.getFcItfName(), matchingMethodsForThisItf);
+                Map<SerializableMethod, SerializableMethod> matchingMethodsForThisServerItf = new HashMap<SerializableMethod, SerializableMethod>(
+                    clientSideItfMethods.length);
+
+                for (Method method : clientSideItfMethods) {
+                    Method serverSideMatchingMethod = searchMatchingMethod(method, serverSideItfMethods,
+                            clientSideItfType.isFcMulticastItf(), serverSideItfType.isFcGathercastItf(),
+                            serverSideItf);
+                    if (serverSideMatchingMethod == null) {
+                        throw new IllegalBindingException("binding incompatibility between " +
+                            clientSideItfType.getFcItfName() + " and " + serverSideItfType.getFcItfName() +
+                            " : cannot find matching method");
+                    }
+                    matchingMethodsForThisServerItf.put(new SerializableMethod(method),
+                            new SerializableMethod(serverSideMatchingMethod));
+                }
+
+                matchingMethodsForThisClientItf.put(serverSideItfType.getFcItfSignature(),
+                        matchingMethodsForThisServerItf);
+                matchingMethods.put(clientSideItfType.getFcItfName(), matchingMethodsForThisClientItf);
+            }
         } catch (ClassNotFoundException e) {
             throw new IllegalBindingException("cannot find class corresponding to given signature " +
                 e.getMessage());
@@ -170,7 +172,8 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#searchMatchingMethod(java.lang.reflect.Method, java.lang.reflect.Method[])
+     * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#searchMatchingMethod(java.lang.reflect.Method,
+     *      java.lang.reflect.Method[])
      */
     protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
             boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf) {
@@ -221,7 +224,8 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.controller.MulticastController#bindFc(java.lang.String, org.objectweb.proactive.core.component.ProActiveInterface)
+     * @see org.objectweb.proactive.core.component.controller.MulticastController#bindFc(java.lang.String,
+     *      org.objectweb.proactive.core.component.ProActiveInterface)
      */
     public void bindFcMulticast(String clientItfName, ProActiveInterface serverItf) {
         try {
@@ -240,7 +244,8 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.controller.MulticastController#unbindFc(java.lang.String, org.objectweb.proactive.core.component.ProActiveInterface)
+     * @see org.objectweb.proactive.core.component.controller.MulticastController#unbindFc(java.lang.String,
+     *      org.objectweb.proactive.core.component.ProActiveInterface)
      */
     public void unbindFcMulticast(String clientItfName, ProActiveInterface serverItf) {
         if (multicastItfs.containsKey(clientItfName)) {
@@ -353,9 +358,6 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
             //                System.out.println("########## \n" +
             //                    matchingMethods.toString());
             //            }
-            Method matchingMethodInServerInterface = matchingMethods.get(
-                    mc.getComponentMetadata().getComponentInterfaceName()).get(
-                    new SerializableMethod(mc.getReifiedMethod())).getMethod();
 
             // now we have all dispatched parameters
             // proceed to generation of method calls
@@ -379,6 +381,11 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
             //			}
 
             for (int generatedMethodCallIndex = 0; generatedMethodCallIndex < expectedMethodCallsNb; generatedMethodCallIndex++) {
+                Method matchingMethodInServerInterface = matchingMethods.get(
+                        mc.getComponentMetadata().getComponentInterfaceName()).get(
+                        ((ProActiveInterfaceType) ((ProActiveInterface) delegatee
+                                .get(generatedMethodCallIndex%delegatee.size())).getFcItfType()).getFcItfSignature()).get(
+                        new SerializableMethod(mc.getReifiedMethod())).getMethod();
                 Object[] individualEffectiveArguments = new Object[matchingMethodInServerInterface
                         .getParameterTypes().length];
 
