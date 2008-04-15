@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.objectweb.proactive.core.mop.MethodCall;
 
+
 /**
  * This enumeration defines the dispatch behavior to be applied during a group communication operation.
 

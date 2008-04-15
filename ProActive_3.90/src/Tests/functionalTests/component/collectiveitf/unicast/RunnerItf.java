@@ -1,6 +1,6 @@
 package functionalTests.component.collectiveitf.unicast;
 
-public interface TesterItf {
+public interface RunnerItf {
 
     public boolean runTest();
 

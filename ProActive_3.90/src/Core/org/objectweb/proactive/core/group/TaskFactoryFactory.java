@@ -3,6 +3,7 @@ package org.objectweb.proactive.core.group;
 import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.component.group.TaskFactoryCollectiveItfs;
 
+
 /**
  * A factory for task factories. 
  * 

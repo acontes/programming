@@ -53,6 +53,7 @@ public class PrimitiveComponentE implements I1, BindingController {
 
     // typed collective interface
     Map<String, I2> i2 = new HashMap<String, I2>(); // collection interface
+
     //    I2 i2 = (I2) Fractive.createMulticastClientInterface(I2_ITF_NAME,
     //            I2.class.getName());
 

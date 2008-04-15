@@ -33,7 +33,7 @@ public class Test extends ComponentTest {
             Map<String, Object> context = new HashMap<String, Object>();
 
             Component root = (Component) f.newComponent(
-                    "functionalTests.component.collectiveitf.reduction.composite.adl.Testcase", context);
+                    "functionalTests.component.collectiveitf.reduction.composite.adl.testcase", context);
             Fractal.getLifeCycleController(root).startFc();
             Reduction reductionItf = ((Reduction) root.getFcInterface("mcast"));
 

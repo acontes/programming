@@ -384,8 +384,9 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
                 Method matchingMethodInServerInterface = matchingMethods.get(
                         mc.getComponentMetadata().getComponentInterfaceName()).get(
                         ((ProActiveInterfaceType) ((ProActiveInterface) delegatee
-                                .get(generatedMethodCallIndex%delegatee.size())).getFcItfType()).getFcItfSignature()).get(
-                        new SerializableMethod(mc.getReifiedMethod())).getMethod();
+                                .get(generatedMethodCallIndex % delegatee.size())).getFcItfType())
+                                .getFcItfSignature()).get(new SerializableMethod(mc.getReifiedMethod()))
+                        .getMethod();
                 Object[] individualEffectiveArguments = new Object[matchingMethodInServerInterface
                         .getParameterTypes().length];
 

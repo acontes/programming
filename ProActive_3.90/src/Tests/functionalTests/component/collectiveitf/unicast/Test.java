@@ -68,7 +68,7 @@ public class Test extends ComponentTest {
         Component simpleTestCase = (Component) f.newComponent(
                 "functionalTests.component.collectiveitf.unicast.testcase", context);
         Fractal.getLifeCycleController(simpleTestCase).startFc();
-        boolean result = ((TesterItf) simpleTestCase.getFcInterface("runTestItf")).runTest();
+        boolean result = ((RunnerItf) simpleTestCase.getFcInterface("runTestItf")).runTest();
         Assert.assertTrue(result);
 
         //        Component testcase = (Component) f.newComponent("functionalTests.component.collectiveitf.multicast.testcase",

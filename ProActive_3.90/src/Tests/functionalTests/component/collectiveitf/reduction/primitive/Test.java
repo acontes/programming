@@ -81,7 +81,7 @@ public class Test extends ComponentTest {
             Component root = (Component) f.newComponent(
                     "functionalTests.component.collectiveitf.reduction.primitive.adl.Testcase", context);
             Fractal.getLifeCycleController(root).startFc();
-            boolean result2 = ((TesterItf) root.getFcInterface("runTestItf")).runTest();
+            boolean result2 = ((RunnerItf) root.getFcInterface("runTestItf")).runTest();
             Assert.assertTrue(result2);
         } catch (Exception e) {
             e.printStackTrace();

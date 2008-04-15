@@ -1,38 +1,27 @@
-package functionalTests.component.collectiveitf.unicast;
-
-import java.util.ArrayList;
-import java.util.List;
+package functionalTests.component.collectiveitf.reduction.primitive;
 
 import junit.framework.Assert;
 
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
-public class TesterImpl implements TesterItf, org.objectweb.fractal.api.control.BindingController {
-
-    public static final String PARAMETER_2 = "parameter 2";
-    public static final String PARAMETER_1 = "parameter 1";
-    RequiredService services;
+public class ReductionImpl implements RunnerItf, org.objectweb.fractal.api.control.BindingController {
+    Reduction services;
 
     public boolean runTest() {
 
         // run unicast test
 
-        List<String> parameters = new ArrayList<String>();
-        parameters.add(TesterImpl.PARAMETER_1);
-        //		parameters.add("parameter 2");
+        IntWrapper rval = services.doIt();
+        Assert.assertEquals(new IntWrapper(30), rval);
 
-        // first dispatch
-        Assert.assertEquals("server " + 1 + " received parameter 1", services.method1(parameters)
-                .stringValue());
+        rval = services.doItInt(new IntWrapper(100));
+        Assert.assertEquals(new IntWrapper(230), rval);
 
-        parameters.clear();
-        parameters.add(TesterImpl.PARAMETER_2);
-
-        // second dispatch
-        Assert.assertEquals("server 2 received parameter 2", services.method1(parameters).stringValue());
+        services.voidDoIt();
 
         // has been executed
         return true;
@@ -40,8 +29,8 @@ public class TesterImpl implements TesterItf, org.objectweb.fractal.api.control.
 
     public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
             IllegalBindingException, IllegalLifeCycleException {
-        if (clientItfName.equals("requiredServiceItf")) {
-            services = (RequiredService) serverItf;
+        if (clientItfName.equals("mcast")) {
+            services = (Reduction) serverItf;
         } else {
             throw new NoSuchInterfaceException(clientItfName);
         }
@@ -59,7 +48,7 @@ public class TesterImpl implements TesterItf, org.objectweb.fractal.api.control.
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
     public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
-        if ("requiredServiceItf".equals(clientItfName)) {
+        if ("mcast".equals(clientItfName)) {
             return services;
         }
         throw new NoSuchInterfaceException(clientItfName);
@@ -72,5 +61,4 @@ public class TesterImpl implements TesterItf, org.objectweb.fractal.api.control.
             IllegalLifeCycleException {
         throw new RuntimeException("not implemented");
     }
-
 }

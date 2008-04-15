@@ -18,9 +18,9 @@ public class CustomUnicastDispatch implements DispatchBehavior {
         if (!(generatedMethodCall.size() == 1)) {
             throw new RuntimeException("invalid number");
         }
-        if (TesterImpl.PARAMETER_1.equals(generatedMethodCall.iterator().next().getEffectiveArguments()[0])) {
+        if (RunnerImpl.PARAMETER_1.equals(generatedMethodCall.iterator().next().getEffectiveArguments()[0])) {
             l.add(0);
-        } else if (TesterImpl.PARAMETER_2.equals(generatedMethodCall.iterator().next()
+        } else if (RunnerImpl.PARAMETER_2.equals(generatedMethodCall.iterator().next()
                 .getEffectiveArguments()[0])) {
             l.add(1);
         }

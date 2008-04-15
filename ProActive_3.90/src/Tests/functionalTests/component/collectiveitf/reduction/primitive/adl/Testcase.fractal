@@ -2,14 +2,14 @@
 <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 
 <definition name="functionalTests.component.collectiveitf.reduction.primitive.adl.Testcase">
-	<interface signature="functionalTests.component.collectiveitf.reduction.primitive.TesterItf" role="server" name="runTestItf"/>
-	<component name="tester" definition="functionalTests.component.collectiveitf.reduction.primitive.adl.Tester"/>
+	<interface signature="functionalTests.component.collectiveitf.reduction.primitive.RunnerItf" role="server" name="runTestItf"/>
+	<component name="runner" definition="functionalTests.component.collectiveitf.reduction.primitive.adl.Reduce"/>
 	<component name="serverA" definition="functionalTests.component.collectiveitf.reduction.primitive.adl.NonReduce1(10)"/>
 	<component name="serverB" definition="functionalTests.component.collectiveitf.reduction.primitive.adl.NonReduce2(20)"/>
 
-	<binding client="this.runTestItf" server="tester.runTestItf"/>
-	<binding client="tester.mcast" server="serverA.server"/>
-	<binding client="tester.mcast" server="serverB.server"/>
+	<binding client="this.runTestItf" server="runner.runTestItf"/>
+	<binding client="runner.mcast" server="serverA.server"/>
+	<binding client="runner.mcast" server="serverB.server"/>
 
 	<controller desc="composite"/>
 </definition>

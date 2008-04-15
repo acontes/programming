@@ -13,7 +13,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
-public class TesterImpl implements TesterItf, org.objectweb.fractal.api.control.BindingController {
+public class RunnerImpl implements RunnerItf, org.objectweb.fractal.api.control.BindingController {
 
     RequiredService services;
     int nbTasks = 10;
