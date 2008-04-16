@@ -21,9 +21,31 @@ where $PROACTIVE_HOME is the path to the root directory of the ProActive distrib
     <classpath codebase="file://${PROACTIVE_HOME}/dist/lib" archives="*"/>
 
     <!-- proactive loader mbean service entry point -->
-    <mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoader" name="proactive:service=loader">
-	<attribute name="Log4jConfigFile">${jboss.server.config.url}jboss-log4j.xml</attribute>
-	<attribute name="vmName">testJbossVM</attribute> 
-	<attribute name="ProActiveRuntimeURL"></attribute>
+    <mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderP2P" name="proactive:service=p2p">
+        <attribute name="vmName">
+            testJbossVM
+        </attribute>
+        <attribute name="Log4jConfigFile">
+            ${jboss.server.config.url}jboss-log4j.xml
+        </attribute>
     </mbean>
+
+<!--
+<mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderSimple" name="proactive:service=registry">
+    <attribute name="vmName">
+	testJbossVM
+    </attribute>
+    <attribute name="Log4jConfigFile">
+	${jboss.server.config.url}jboss-log4j.xml
+    </attribute>
+    <attribute name="NodeName">
+	UnNod
+    </attribute>
+    <attribute name="ProActiveRuntimeURL"></attribute>
+    <attribute name="ProActiveNodeUrl"></attribute>
+</mbean>
+
+-->
+
+
 </server>
