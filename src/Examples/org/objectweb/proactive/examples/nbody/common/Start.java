@@ -78,6 +78,7 @@ public class Start implements Serializable {
         new Start().run(args);
     }
 
+    private static String WORKERS_NODE_NAME = "jboss";
     public void run(String[] args) {
         int input = 0;
         boolean display = true;
@@ -93,7 +94,7 @@ public class Start implements Serializable {
                 usage();
                 logger.info("No xml descriptor specified - aborting");
                 System.exit(1);
-            case 2:
+            case 3:
                 if (args[1].equals("-nodisplay")) {
                     display = false;
                     break;
@@ -108,11 +109,11 @@ public class Start implements Serializable {
                     ddd = true;
                     break;
                 }
-            case 3:
+            case 4:
                 totalNbBodies = Integer.parseInt(args[1]);
                 maxIter = Integer.parseInt(args[2]);
                 break;
-            case 4:
+            case 5:
                 if (args[1].equals("-nodisplay")) {
                     display = false;
                     totalNbBodies = Integer.parseInt(args[2]);
@@ -182,7 +183,7 @@ public class Start implements Serializable {
         if (display) {
             try {
                 deployer = (Deployer) PAActiveObject.newActive(Deployer.class.getName(),
-                        new Object[] { new File(xmlFileName) });
+                        new Object[] { xmlFileName , WORKERS_NODE_NAME });
 
                 displayer = (Displayer) PAActiveObject.newActive(Displayer.class.getName(),
                         new Object[] { new Integer(totalNbBodies), new Boolean(displayft), deployer,

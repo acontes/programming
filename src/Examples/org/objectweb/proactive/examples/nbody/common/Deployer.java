@@ -6,10 +6,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
@@ -20,8 +24,10 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 public class Deployer {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    GCMApplication gcmad;
-    GCMVirtualNode workers;
+    /*GCMApplication gcmad;*/
+    
+    ProActiveDescriptor _pad;
+    VirtualNode _workersNode;
 
     /**
      * A list of remote references to terminate
@@ -32,11 +38,11 @@ public class Deployer {
         // No args constructor 
     }
 
-    public Deployer(File applicationDescriptor) {
+    public Deployer(String applicationDescriptor,String virtualNodeName) {
         try {
-            gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor);
-            gcmad.startDeployment();
-            workers = gcmad.getVirtualNode("Workers");
+        	_pad = PADeployment.getProactiveDescriptor(applicationDescriptor);
+        	_pad.activateMappings();
+        	_workersNode = _pad.getVirtualNode(virtualNodeName);
             this.referencesToTerminate = new ArrayList<Object>();
         } catch (ProActiveException e) {
             logger.error("Cannot load GCM Application Descriptor: " + applicationDescriptor, e);
@@ -44,12 +50,16 @@ public class Deployer {
     }
 
     public Node[] getWorkerNodes() {
-        if (workers == null)
+        if (_workersNode == null)
             return null;
 
-        logger.info("Waiting Workers virtual node becomes ready");
-        workers.waitReady();
-        return workers.getCurrentNodes().toArray(new Node[0]);
+        try {
+			return _workersNode.getNodes();
+		} catch (NodeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
     }
 
     /**
@@ -96,8 +106,14 @@ public class Deployer {
     }
 
     public void shutdown() {
-        this.gcmad.kill();
-        PALifeCycle.exitSuccess();
+        try {
+			_pad.killall(true);
+	        PALifeCycle.exitSuccess();
+		} catch (ProActiveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			PALifeCycle.exitFailure();
+		}
     }
 
     public void abortOnError(Exception e) {
