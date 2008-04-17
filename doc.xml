@@ -262,11 +262,10 @@
 		<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
 		<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
 			<classpath>
-				<pathelement location="${base.dir}/dev/lib/docbook/fop.jar" />
-				<pathelement location="${base.dir}/dev/lib/docbook/jimi.zip" />
-				<pathelement location="${base.dir}/dev/lib/docbook/avalon.jar" />
-				<pathelement location="${base.dir}/dev/lib/docbook/batik.jar" />
-				<pathelement location="${lib.dir}/ws/commons-logging.jar" />
+				<fileset dir="${base.dir}/dev/lib/docbook/">
+					<include name="*.jar" />
+				</fileset>
+				
 			</classpath>
 		</taskdef>
 
