@@ -561,7 +561,7 @@
 					observers.
 				</para>
 
-				<table xml:id="observerObservableTable"><info><title>Observable and Observer objects</title></info>
+				<informaltable xml:id="observerObservableTable"><info><title>Observable and Observer objects</title></info>
 					
 					<tgroup cols="2">
 						<thead>
@@ -651,7 +651,7 @@
 							</row>
 						</tbody>
 					</tgroup>
-				</table>
+				</informaltable>
 
 			</section><!-- Observer/Observable -->
 
