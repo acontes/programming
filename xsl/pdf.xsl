@@ -31,7 +31,8 @@
  <xsl:param name="monospace.font.family">Helvetica</xsl:param>
 
  <!-- This avoids having "Draft" mode set on. Avoids the other two lines -->
- <xsl:param name="fop.extensions" select="'1'" />
+<!-- setting a value of 1 here breaks fop see http://www.mail-archive.com/docbook-apps@lists.oasis-open.org/msg09900.html -->
+ <xsl:param name="fop.extensions" select="'0'" />
  <!-- <xsl:param name="draft.mode">no</xsl:param>  -->
  <!-- <xsl:param name="draft.watermark.image"></xsl:param>  -->
  <xsl:param name="draft.watermark.image" />
@@ -309,10 +310,13 @@
      <fo:table-row height="15pt">
 
       <fo:table-cell text-align="left" display-align="before">
+		<fo:block>
        <xsl:copy-of select="$leftS" />
+       </fo:block>
       </fo:table-cell>
 
       <fo:table-cell text-align="center" display-align="before">
+      <fo:block>
        <fo:external-graphic>
         <xsl:attribute name="src">
          <xsl:call-template name="fo-external-image">
@@ -322,10 +326,13 @@
         <xsl:attribute name="height">14pt</xsl:attribute>
         <xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
        </fo:external-graphic>
+       </fo:block>
       </fo:table-cell>
 
       <fo:table-cell text-align="right" display-align="before">
-       <xsl:copy-of select="$rightS" />
+      	<fo:block> 
+       		<xsl:copy-of select="$rightS" />
+      	</fo:block>
       </fo:table-cell>
      </fo:table-row>
     </fo:table-body>
