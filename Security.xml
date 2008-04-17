@@ -431,7 +431,7 @@
       case that the agreed security policy includes confidentiality, the two
       entities negotiate a session key.</para>
 
-      <table frame="none" xml:id="Result_of_security_negotiations"><info><title>Result of security negotiations</title></info>
+      <informaltable frame="none" xml:id="Result_of_security_negotiations"><info><title>Result of security negotiations</title></info>
         
 
         <tgroup cols="1">
@@ -447,7 +447,7 @@
             </row>
           </tbody>
         </tgroup>
-      </table>
+      </informaltable>
     </section>
 
     <section><info><title>Migration and Negotiation</title></info>

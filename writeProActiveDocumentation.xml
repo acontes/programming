@@ -317,7 +317,7 @@ public class Dummy {
    
    <para>The tag to use is TABLE.</para>
    
-   <table><info><title>This is an example table</title></info>
+   <informaltable><info><title>This is an example table</title></info>
     
     
     <tgroup cols="2">
@@ -343,7 +343,7 @@ public class Dummy {
       </row>
      </tbody>
     </tgroup>
-   </table>
+   </informaltable>
   </section>
   
  </section>

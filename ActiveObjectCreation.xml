@@ -1134,8 +1134,9 @@
 				<xref linkend="exceptions"/>
 				.
 			</para>
+		
 
-			<table><info><title>
+			<informaltable><info><title>
 					Future creation, and asynchronous calls depending on
 					return type
 				</title></info>
@@ -1295,10 +1296,10 @@
 								<para>No</para>
 							</entry>
 						</row>
-
+			
 					</tbody>
 				</tgroup>
-			</table>
+			</informaltable>
 
 			<para>
 				As we can see, the creation of a future depends not only

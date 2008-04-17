@@ -298,7 +298,7 @@
   <section><info><title>MPI to ProActive Summary</title></info>
         
 
-        <table xml:id="mpi_to_proactive_summary"><info><title>MPI to ProActive</title></info>
+        <informaltable xml:id="mpi_to_proactive_summary"><info><title>MPI to ProActive</title></info>
           
 
           <tgroup cols="2">
@@ -370,6 +370,6 @@
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
       </section>
 </chapter>

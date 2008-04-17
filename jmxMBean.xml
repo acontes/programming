@@ -117,7 +117,7 @@ public class MyListener implements NotificationListener{
 				</para>
 				</note>
 				<para>Migration informations</para>
-				<table><info><title>Migration informations</title></info>
+				<informaltable><info><title>Migration informations</title></info>
 				
 			    <tgroup cols="2">
 				     <tbody>
@@ -147,11 +147,11 @@ public class MyListener implements NotificationListener{
 				      </row>      
 				     </tbody>
 				    </tgroup>
-				   </table>
+				   </informaltable>
 				   
 				   
 				<para>Request informations</para>
-				   <table><info><title>Request informationss</title></info>
+				   <informaltable><info><title>Request informationss</title></info>
 				
 			    <tgroup cols="2">
 				     <tbody>
@@ -197,10 +197,10 @@ public class MyListener implements NotificationListener{
       
 				     </tbody>
 				    </tgroup>
-				   </table>
+				   </informaltable>
 				   
-				<para>Future informations</para>
-				    <table><info><title>Future informationss</title></info>
+				<para>Future information</para>
+				    <informaltable><info><title>Future information</title></info>
 				
 			    <tgroup cols="2">
 				     <tbody>
@@ -221,12 +221,12 @@ public class MyListener implements NotificationListener{
             
 				     </tbody>
 				    </tgroup>
-				   </table>
+				   </informaltable>
 			</section>
 			<section xml:id="ProActiveRuntimeJMXNotifications"><info><title>Notifications sent by the ProActiveRuntime</title></info>
 				
-				<para>Creation informations</para>
-			<table><info><title>Creation informations</title></info>
+				<para>Creation information</para>
+			<informaltable><info><title>Creation information</title></info>
 				
 			    <tgroup cols="2">
 				     <tbody>
@@ -256,10 +256,10 @@ public class MyListener implements NotificationListener{
 				      </row>      
 				     </tbody>
 				    </tgroup>
-				   </table>
+				   </informaltable>
 				   
 				<para>Destruction informations</para>
-				   <table><info><title>Destruction informations</title></info>
+				   <informaltable><info><title>Destruction informations</title></info>
 				
 			    <tgroup cols="2">
 				     <tbody>
@@ -289,7 +289,7 @@ public class MyListener implements NotificationListener{
 				      </row>      
 				     </tbody>
 				    </tgroup>
-				   </table>
+				   </informaltable>
 			</section>
 		</section>
 	</section>

@@ -19,7 +19,7 @@
   <emphasis role="bold">RMI</emphasis> and <emphasis role="bold">ProActive</emphasis> that provides asynchronous calls and
   migration.</para>
 
-  <table><info><title>IC2D basic features</title></info>
+  <informaltable><info><title>IC2D basic features</title></info>
     
 
     <tgroup cols="3">
@@ -67,7 +67,7 @@
         </row>
       </tbody>
     </tgroup>
-  </table>
+  </informaltable>
 
   <para>The full source of IC2D is included in the distribution and is also
   browseable on line, or wherever you built the javadoc:</para>

@@ -24,7 +24,7 @@
     <section xml:id="dbdoclet.id.VariableContract_html_variableTypes"><info><title>    Variable Types</title></info>
       
 
-      <table><info><title>Variable Types</title></info>
+      <informaltable><info><title>Variable Types</title></info>
         
 
         <tgroup cols="4">
@@ -114,7 +114,7 @@
             </row>
           </tbody>
         </tgroup>
-      </table>
+      </informaltable>
 
       <para>Variables can be set in more than one place. When the value is set
       on multiple places, then the definition specified in the priority column

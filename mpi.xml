@@ -2032,7 +2032,7 @@ created VirtualNode name=Cluster_Nina
     <section xml:id="API_Simple"><info><title>Simple Wrapping and Deployment of MPI Code</title></info>
       
 
-      <table><info><title>Simple Wrapping of MPI Code</title></info>
+      <informaltable><info><title>Simple Wrapping of MPI Code</title></info>
         
 
         <tgroup cols="3">
@@ -2226,7 +2226,7 @@ created VirtualNode name=Cluster_Nina
             </row>
           </tbody>
         </tgroup>
-      </table>
+      </informaltable>
     </section>
 
     <section xml:id="API_Control"><info><title>Wrapping with Control</title></info>
@@ -2235,7 +2235,7 @@ created VirtualNode name=Cluster_Nina
       <section><info><title>One Active Object per MPI process</title></info>
         
 
-        <table><info><title>API for creating one Active Object per MPI process</title></info>
+        <informaltable><info><title>API for creating one Active Object per MPI process</title></info>
           
 
           <tgroup cols="3">
@@ -2340,13 +2340,13 @@ created VirtualNode name=Cluster_Nina
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
       </section>
 
       <section><info><title>MPI to ProActive Communications</title></info>
         
 
-        <table><info><title>MPI to ProActive Communications API</title></info>
+        <informaltable><info><title>MPI to ProActive Communications API</title></info>
           
 
           <tgroup cols="3">
@@ -2363,9 +2363,9 @@ created VirtualNode name=Cluster_Nina
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
 
-        <table><info><title>Java API for MPI message conversion</title></info>
+        <informaltable><info><title>Java API for MPI message conversion</title></info>
           
 
           <tgroup cols="3">
@@ -2607,13 +2607,13 @@ created VirtualNode name=Cluster_Nina
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
       </section>
 
       <section><info><title>ProActive to MPI Communications</title></info>
         
 
-        <table><info><title>ProActiveMPI API for sending messages to MPI</title></info>
+        <informaltable><info><title>ProActiveMPI API for sending messages to MPI</title></info>
           
 
           <tgroup cols="3">
@@ -2805,9 +2805,9 @@ created VirtualNode name=Cluster_Nina
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
 
-        <table><info><title>MPI message reception from ProActive</title></info>
+        <informaltable><info><title>MPI message reception from ProActive</title></info>
           
 
           <tgroup cols="3">
@@ -2857,13 +2857,13 @@ created VirtualNode name=Cluster_Nina
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
       </section>
 
       <section><info><title>MPI to MPI Communications through ProActive</title></info>
         
 
-        <table><info><title>MPI to MPI through ProActive C API</title></info>
+        <informaltable><info><title>MPI to MPI through ProActive C API</title></info>
           
 
           <tgroup cols="3">
@@ -2971,14 +2971,14 @@ created VirtualNode name=Cluster_Nina
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
 
         <para><emphasis role="bold">Datatypes:</emphasis> MPI_CHAR,
         MPI_UNSIGNED_CHAR, MPI_BYTE, MPI_SHORT, MPI_UNSIGNED_SHORT, MPI_INT,
         MPI_UNSIGNED, MPI_LONG, MPI_UNSIGNED_LONG, MPI_FLOAT, MPI_DOUBLE,
         MPI_LONG_DOUBLE, MPI_LONG_LONG_INT</para>
 
-        <table><info><title>MPI to MPI through ProActive Fortran API</title></info>
+        <informaltable><info><title>MPI to MPI through ProActive Fortran API</title></info>
           
 
           <tgroup cols="3">
@@ -3058,7 +3058,7 @@ created VirtualNode name=Cluster_Nina
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
 
         <para><emphasis role="bold">Datatypes:</emphasis> MPI_CHARACTER,
         MPI_BYTE, MPI_INTEGER, MPI_DOUBLE</para>

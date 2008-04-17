@@ -88,7 +88,7 @@
     	 command-line utility under most Linux/Unix systems. 
     	 Unzipping the archive creates a ProActive directory and all the files contained in 
     	 the archive go into this directory and its subdirectories.</para><para>Here is a quick 
-    	 overview of the directory structure of the archive:</para><table frame="all"><info><title>ProActive.zip contents</title></info>
+    	 overview of the directory structure of the archive:</para><informaltable frame="all"><info><title>ProActive.zip contents</title></info>
       
 
       <tgroup cols="2">
@@ -172,7 +172,7 @@
           </row>
         </tbody>
       </tgroup>
-    </table></section>
+    </informaltable></section>
 
     
 
