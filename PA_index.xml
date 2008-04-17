@@ -2,7 +2,7 @@
 <!-- Converted by db4-upgrade version 1.0 
 !DOCTYPE book PUBLIC "-//INRIA//DTD DocBook V5.0-Based Subset V0.1//EN"-->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
-                "http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd" [
+                "docbook.dtd" [
 	  <!-- WARNING: Please do not edit with XXE -->
 	  <!-- This file is only meant as a concatenation of the other xml files -->
 	  <!ENTITY bookinfo SYSTEM "bookinfo.xml">
