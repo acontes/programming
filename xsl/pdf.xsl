@@ -2,6 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
  xmlns:fo="http://www.w3.org/1999/XSL/Format"
  xmlns:date="http://exslt.org/dates-and-times"
+ xmlns:destination="http://xml.apache.org/fop/extensions"
  exclude-result-prefixes="date" version="1.0">
 
  <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
@@ -59,7 +60,8 @@
  <xsl:param name="paper.type">A4</xsl:param>
  <xsl:param name="page.margin.inner">10mm</xsl:param>
  <xsl:param name="page.margin.outer">13mm</xsl:param>
- <xsl:param name="double.sided">1</xsl:param>
+ <!-- http://www.mail-archive.com/docbook-apps@lists.oasis-open.org/msg09900.html -->
+ <xsl:param name="double.sided">0</xsl:param>
 
 
 <!-- Make "compact" listitems be *very* close to each other -->
