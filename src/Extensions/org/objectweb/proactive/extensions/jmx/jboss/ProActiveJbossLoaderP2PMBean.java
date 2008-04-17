@@ -42,12 +42,16 @@ public interface ProActiveJbossLoaderP2PMBean extends ServiceMBean {
 	
 	/**
 	 * Gets the name of the JVM into which the ProActive runtime resides
+	 * It is not supposed to contain the prefix PA_JVM, as it will be 
+	 * automatically added when the PART is created  
 	 * @return string containing a JVM name
 	 */
 	public String getvmName();
 	
 	/**
 	 * Gets the name of the JVM into which the ProActive runtime resides
+	 * It is not supposed to contain the prefix PA_JVM, as it will be 
+	 * automatically added when the PART is created
 	 * @param the name which will be assigned to this JVM 
 	 */
 	public void setvmName(String vmName);
@@ -63,6 +67,17 @@ public interface ProActiveJbossLoaderP2PMBean extends ServiceMBean {
 	 * @param configFile the name of the log4j config file
 	 */
 	public void setLog4jConfigFile(String configFile);
-
-
+	
+	public String getPeersListFile();
+	
+	public void setPeersListFile(String peersListFile);
+	
+	public String getAcquisitionMethod();
+	
+	public void setAcquisitionMethod(String acquisitionMethod);
+	
+	public int getPortNumber();
+	
+	public void setPortNumber(int portNumber);
+	
 }

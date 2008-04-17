@@ -68,12 +68,16 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 public class ProActiveJbossLoaderP2P extends ServiceMBeanSupport implements
 		ProActiveJbossLoaderP2PMBean {
 
-	
 	private P2PService _p2pService; 
+	private static final String PART_PREFIX = "PA_JVM";
 	
 	private void startP2PService() throws ProActiveException {
 		
-		StartP2PService service = new StartP2PService();
+		StartP2PService service;
+		if( _peersListFile!=null )
+			service = new StartP2PService(_peersListFile);
+		else
+			service = new StartP2PService();
 		service.start();
 		_p2pService = service.getP2PService();
 		
@@ -90,13 +94,22 @@ public class ProActiveJbossLoaderP2P extends ServiceMBeanSupport implements
 		log.info("Creating service " + serviceName.getCanonicalName());
 		// configure ProActive separate logging
 		configureLogging();
+		log.debug("peersListFile=" + _peersListFile + ";acq=" + _acquisitionMethod + ";port=" + _portNumber );
 		
 	}
 
 	private void configureLogging() {
 		// override the default log4j initialization phase		
 		System.setProperty("log4j.defaultInitOverride", "true");
-		System.setProperty("log4j.configuration", _log4jConfigFile ); 		
+		System.setProperty("log4j.configuration", _log4jConfigFile );
+		// set p2p properties
+		if( _acquisitionMethod != null )
+			System.setProperty("proactive.p2p.acq", _acquisitionMethod);
+		if( _portNumber != 0 )
+			System.setProperty("proactive.p2p.port" , ""+_portNumber);
+		// the PART name
+		if( _vmName != null)
+			System.setProperty("proactive.runtime.name", PART_PREFIX + _vmName );
 	 }
 	
 	@Override
@@ -116,6 +129,9 @@ public class ProActiveJbossLoaderP2P extends ServiceMBeanSupport implements
 	////////// 		MBean 	config 	params
 	private String _vmName;
 	private String _log4jConfigFile;
+	private String _peersListFile;
+	private String _acquisitionMethod;
+	private int _portNumber;
 
 	/**
     * {@inheritDoc}
@@ -149,6 +165,54 @@ public class ProActiveJbossLoaderP2P extends ServiceMBeanSupport implements
 	@Override
 	public void setLog4jConfigFile(String configFile) {
 		_log4jConfigFile = configFile;
+	}
+
+	/**
+    * {@inheritDoc}
+    */
+	@Override
+	public String getAcquisitionMethod() {
+		return _acquisitionMethod;
+	}
+
+	/**
+    * {@inheritDoc}
+    */
+	@Override
+	public String getPeersListFile() {
+		return _peersListFile; 
+	}
+
+	/**
+    * {@inheritDoc}
+    */
+	@Override
+	public int getPortNumber() {
+		return _portNumber;
+	}
+
+	/**
+    * {@inheritDoc}
+    */
+	@Override
+	public void setAcquisitionMethod(String acquisitionMethod) {
+		_acquisitionMethod = acquisitionMethod;
+	}
+
+	/**
+	* {@inheritDoc}
+	*/
+	@Override
+	public void setPeersListFile(String peersListFile) {
+		_peersListFile = peersListFile;
+	}
+
+	/**
+	* {@inheritDoc}
+	*/
+	@Override
+	public void setPortNumber(int portNumber) {
+		_portNumber = portNumber;
 	}
 		
 }

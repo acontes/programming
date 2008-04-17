@@ -39,13 +39,4 @@ public interface ProActiveJbossLoaderSimpleMBean extends ServiceMBean {
 	public String getProActiveRuntimeURL();
 	
 	
-	/**
-	 * @return The stringified URL of the local node created in the PART
-	 */
-	public String getProActiveNodeUrl();
-	
-	public String getNodeName();
-	
-	public void setNodeName(String nodeName);
-	
 }

@@ -38,11 +38,7 @@ where $PROACTIVE_HOME is the path to the root directory of the ProActive distrib
     <attribute name="Log4jConfigFile">
 	${jboss.server.config.url}jboss-log4j.xml
     </attribute>
-    <attribute name="NodeName">
-	UnNod
-    </attribute>
     <attribute name="ProActiveRuntimeURL"></attribute>
-    <attribute name="ProActiveNodeUrl"></attribute>
 </mbean>
 
 -->
