@@ -337,6 +337,10 @@
                 "http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd">
 %DocBookDTD;
 
+<!ENTITY % LocalDocBookDTD PUBLIC "-//LOCALOASIS//DTD DocBook XML V5.0//EN"
+                "docbook.dtd">
+%LocalDocBookDTD;
+
 <!-- ...................................................................... -->
 <!-- ........... Define things here which reference docbook V4.2  ......... -->
 <!-- ...................................................................... -->
