@@ -47,6 +47,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -64,6 +65,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * and 'textdata'.
  */
 public class DocBookize extends DefaultHandler implements LexicalHandler {
+    private static final String SRC_CODE_APPENDIX = "srcCodeAppendix";
     private static Logger logger = Logger.getLogger(DocBookize.class.getName());
     private static final String UTF8 = "UTF8";
     private static final String TMP_EXTENSION = ".tmp";
@@ -76,24 +78,25 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     private static final String TAG_CLOSE = ">";
     private static final String END_TAG_BEGIN = "</";
     private static final String PROGRAMLISTING = "programlisting";
-    private static final String ID = "id";
+    private static final String ID = "xml:id";
     private static final String HTTP = "http";
     private static final String URL = "url";
-    private static final String LANG = "lang";
+    private static final String LANG = "xml:lang";
     private static final String EQUAL_QUOTES = "=\"";
     private static final String QUOTES = "\"";
     private static final String EXAMPLE_END = "</example>";
     private static final String PARA_OS_HTML = " <para os=\"html\" /> ";
     private static final String PROGRAMLISTING_END = " </programlisting>";
     private static final String TAG_END = "\">";
-    private static final String PROGRAMLISTING_OS_PDF_LANG = " <programlisting os=\"pdf\" lang=\"";
+    private static final String PROGRAMLISTING_OS_PDF_LANG = " <programlisting os=\"pdf\" xml:lang=\"";
     private static final String TITLE_END = " </title> ";
     private static final String PHRASE_END = "</phrase>";
     private static final String PHRASE_OS_PDF = " <phrase os=\"pdf\" > ";
-    private static final String ULINK_PHRASE = "</ulink></phrase>";
-    private static final String PHRASE_OS_HTML_ULINK_URL = " <phrase os=\"html\" > <ulink url=\"../";
+    private static final String ULINK_PHRASE = "</uri></phrase>";
+    private static final String PHRASE_OS_HTML_ULINK_URL = " <phrase os=\"html\" > "
+        + "<uri xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:href=\"../";
     private static final String TITLE_START = " <title> ";
-    private static final String EXAMPLE_ID_START = "<example id=\"";
+    private static final String EXAMPLE_ID_START = "<example xml:id=\"";
     private static final String HTML_EXT = ".html";
     private static final String JAVA_FILE_SRC = "javaFileSrc";
     private static final String XREF = "xref";
@@ -130,12 +133,15 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
 
     /**
      * @param fileName
-     *            The name of the XML file which should have its <screen> tags
-     *            decorated
+     * 				The name of the XML file which should have its <screen> tags
+     *            	decorated
+     * @param htmlizedJava
      * @param path
-     *            The paths on which to find the files to include in the docbook
+     * 			The paths on which to find the files to include in the docbook
      */
     public DocBookize(final String fileName, final String htmlizedJava, final String[] path) {
+        //TODO do external 
+        DocBookize.logger.setLevel(Level.INFO);
         this.outputFileName = fileName;
         this.htmlizedJavaPath = htmlizedJava;
         // the possible places where to look for cited files
@@ -155,8 +161,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
 
         final String fileToBeautify = argv[0];
         final String htmlizedJava = argv[1];
-        DocBookize.logger.info("Beautifying code examples within <programlisting> tags (" + fileToBeautify +
-            ")");
+        DocBookize.logger.info("Beautifying code examples within" + " <programlisting> tags (" +
+            fileToBeautify + ")");
 
         // Create SAX machinery
         final File inputFile = new File(fileToBeautify);
@@ -204,24 +210,22 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
         }
     }
 
-    /** Default handler operation when start document is encountered 
-    /*
-     * (non-Javadoc)
+    /**
+     * Creates the output file and inserts the  XML_ENCODING and DOC_RUN_COMMENT 
      * 
-     * @see org.xml.sax.helpers.DefaultHandler#startDocument()
-     */
+     * @throws SAXException 
+     * */
     @Override
     public void startDocument() throws SAXException {
-        // Create the output file
         try {
             this.out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.outputFileName),
                 DocBookize.UTF8));
-            this.print(DocBookize.XML_ENCODING + DocBookize.EOL);
-            this.print(DocBookize.DOC_RUN_COMMENT + DocBookize.EOL);
+            this.writeToOutputFile(DocBookize.XML_ENCODING + DocBookize.EOL);
+            this.writeToOutputFile(DocBookize.DOC_RUN_COMMENT + DocBookize.EOL);
         } catch (final UnsupportedEncodingException e) {
             DocBookize.logger.error(e.getMessage(), e);
         } catch (final FileNotFoundException e) {
-            DocBookize.logger.error(e.getMessage(), e);
+            DocBookize.logger.error("Cannot create file: " + this.outputFileName + "\n" + e.getMessage(), e);
         }
 
     }
@@ -232,14 +236,18 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
         try {
             this.out.close();
         } catch (final IOException e) {
-            DocBookize.logger.error("Could not close file: " + e.getMessage(), e);
+            DocBookize.logger.error("Could not close file: " + this.out + "\n" + e.getMessage(), e);
         }
     }
 
-    /** Default handler operation when new tag is encountered */
+    /** Default handler operation when new tag is encountered.
+     * Process the tags localName according to the tag type.
+     * If the tags is TEXTOBJECT it just returns.
+     * */
     @Override
     public void startElement(final String namespaceURI, final String localName, final String realName,
             final Attributes attrs) throws SAXException {
+        DocBookize.logger.debug("Processing local name [ " + localName + " ] real name [ " + realName + " ]");
         // element name
         String tagName = localName;
         boolean filerefChanged = false;
@@ -258,15 +266,15 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
         // xslt task do that?)
         if (tagName.equals(DocBookize.TEXTDATA) && (this.programContent != null)) {
             String fileReferenced = "";
-
+            //iterate through the attributes and search for a FILEREF attribute
             for (int i = 0; i < attrs.getLength(); i++) {
                 // Attr name
                 String aName = attrs.getLocalName(i);
-
+                DocBookize.logger.debug("Processing attribute:" + aName);
                 if ("".equals(aName)) {
                     aName = attrs.getQName(i);
                 }
-
+                //there can be only FILEREF attribute in the tag
                 if (aName.equals(DocBookize.FILEREF)) {
                     fileReferenced = attrs.getValue(i);
                 }
@@ -284,7 +292,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             String role = "";
 
             for (int i = 0; i < attrs.getLength(); i++) {
-                // Attr name
+                // Unqualified attribute name
                 String aName = attrs.getLocalName(i).toLowerCase();
 
                 if (aName.equals("")) {
@@ -304,6 +312,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             if (!role.equals("") && !fileRef.equals("")) {
                 this.language = fileRef.substring(fileRef.lastIndexOf(".") + 1).toLowerCase();
                 // We shall only add the same file once!
+                // checks if the file has already been used and if not
+                // adds to the lists of files added
                 if (!this.srcFilesAlreadyAdded.contains(fileRef)) {
                     this.srcFilesAlreadyAdded.add(fileRef);
 
@@ -343,29 +353,25 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
         } // keep on with startElement method, because we haven't even printed
         // the <xref> tag!,
 
-        this.print(DocBookize.TAG_START + tagName);
+        this.writeToOutputFile(DocBookize.TAG_START + tagName);
 
         String id = null;
 
         if (attrs != null) {
             for (int i = 0; i < attrs.getLength(); i++) {
                 // Attr name
-                String aName = attrs.getLocalName(i);
+                String aName = attrs.getQName(i);
 
-                if (aName.equals("")) {
-                    aName = attrs.getQName(i);
-                }
-
-                this.print(' ' + aName);
-                this.print(DocBookize.EQUAL_QUOTES);
+                this.writeToOutputFile(' ' + aName);
+                this.writeToOutputFile(DocBookize.EQUAL_QUOTES);
 
                 if (filerefChanged && aName.equals(DocBookize.LINKEND)) {
-                    this.print(attrs.getValue(i).replaceAll("/", "."));
+                    this.writeToOutputFile(attrs.getValue(i).replaceAll("/", "."));
                 } else {
-                    this.print(attrs.getValue(i));
+                    this.writeToOutputFile(attrs.getValue(i));
                 }
 
-                this.print(DocBookize.QUOTES);
+                this.writeToOutputFile(DocBookize.QUOTES);
 
                 if (aName.toLowerCase().equals(DocBookize.LANG)) {
                     this.language = attrs.getValue(i).toLowerCase();
@@ -381,7 +387,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             }
         }
 
-        if ("srcCodeAppendix".equals(id)) {
+        if (SRC_CODE_APPENDIX.equals(id)) {
             assert this.listOFids == null : "Hey, listOfIds should have"
                 + " been null, meaning 'not yet found srcCodeAppendix'";
             // used to avoid searching in srcContentsToAdd too often.
@@ -393,7 +399,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             this.listOFids.add(id);
         }
 
-        this.print(DocBookize.TAG_CLOSE);
+        this.writeToOutputFile(DocBookize.TAG_CLOSE);
 
         // Only highlight programlistings.
         if (tagName.equals(DocBookize.PROGRAMLISTING)) {
@@ -416,7 +422,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             // end of a tag labelled to have extra info? ==> paste this extra
             // info
             if (this.srcContentsToAdd.containsKey(id)) {
-                this.print(this.srcContentsToAdd.get(id));
+                this.writeToOutputFile(this.srcContentsToAdd.get(id));
             }
         }
 
@@ -435,15 +441,16 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             // No longer in a programlisting tag ==> no longer have to store
             // characters
             this.programContent = null;
-            this.print(highlighted);
+            this.writeToOutputFile(highlighted);
         }
 
         // print also a newline to have reasonably lengthed lines but some
         // scrren listings will be ill-formed.
         if (DocBookize.SHORT_LINES) {
-            this.print(DocBookize.END_TAG_BEGIN + realName + DocBookize.TAG_CLOSE + DocBookize.EOL);
+            this.writeToOutputFile(DocBookize.END_TAG_BEGIN + realName + DocBookize.TAG_CLOSE +
+                DocBookize.EOL);
         } else {
-            this.print(DocBookize.END_TAG_BEGIN + realName + DocBookize.TAG_CLOSE);
+            this.writeToOutputFile(DocBookize.END_TAG_BEGIN + realName + DocBookize.TAG_CLOSE);
         }
     }
 
@@ -451,7 +458,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     @Override
     public void characters(final char[] buf, final int offset, final int len) throws SAXException {
         final String s = new String(buf, offset, len);
-        this.print(s.replaceAll(DocBookize.AMPERSAND, DocBookize.AMPERSAND_REPLACE).replaceAll(
+        this.writeToOutputFile(s.replaceAll(DocBookize.AMPERSAND, DocBookize.AMPERSAND_REPLACE).replaceAll(
                 DocBookize.TAG_START, DocBookize.LT));
     }
 
@@ -536,21 +543,24 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             return fileContent.replaceAll(DocBookize.AMPERSAND, DocBookize.AMPERSAND_REPLACE).replaceAll(
                     DocBookize.TAG_START, DocBookize.LT);
         } catch (final FileNotFoundException e1) {
-            DocBookize.logger.error("Couldn't find file called " + fileReferenced + e1.getMessage(), e1);
+            DocBookize.logger.info("Could not read file: " + fullFileName);
+            DocBookize.logger.debug("Could not find file: " + fullFileName, e1);
         } catch (final IOException e) {
-            DocBookize.logger.error(e.getMessage(), e);
+            DocBookize.logger.info("Could not read or write to file: " + fullFileName);
+            DocBookize.logger.debug("Could not read or write to file: " + fullFileName, e);
         }
         return null;
     }
 
     /**
-     * Just write to the output file the given string. Need to Wrap I/O
+     * Writes to the output file the given string. Need to Wrap I/O
      * exceptions in SAX exceptions, to suit handler signature requirements.
      * 
+     * @param s the string to be written to the output file
      * @throws SAXException
      *             if an error happened with file IO operations
      */
-    private void print(final String s) throws SAXException {
+    private void writeToOutputFile(final String s) throws SAXException {
         if (this.programContent != null) {
             this.programContent += s;
         } else {
@@ -592,7 +602,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     public void startDTD(final String baseElement, final String publicId, final String systemId)
             throws SAXException {
         // also include in the output the dtd in original file.
-        this.print("<!DOCTYPE " + baseElement + " PUBLIC \"" + publicId + "\" \"" + systemId +
+        this.writeToOutputFile("<!DOCTYPE " + baseElement + " PUBLIC \"" + publicId + "\" \"" + systemId +
             DocBookize.TAG_END + DocBookize.EOL);
     }
 
