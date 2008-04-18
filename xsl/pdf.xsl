@@ -7,6 +7,10 @@
 
  <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
  <xsl:import href="common.xsl" />
+<!-- ignore the scaling values the someone might put in the XML files 
+<xsl:param name="ignore.image.scaling" select="0">1</xsl:param>-->
+
+<xsl:param name="default.image.width">30px</xsl:param>
 
 <!-- numbering depth: will remove numbers from sections but still display them in TOC  
 <xsl:param name="section.autolabel.max.depth">2</xsl:param>
@@ -16,12 +20,15 @@
 <!--  center all images in the tag figure horizontally  -->
 <xsl:attribute-set name="figure.properties">
   <xsl:attribute name="text-align">center</xsl:attribute>
+  <xsl:attribute name="width">100px </xsl:attribute>
 </xsl:attribute-set>
 
 
 <!--  align all images in the tag informalfigure horizontally  -->
 <xsl:attribute-set name="informalfigure.properties">
   <xsl:attribute name="text-align">center</xsl:attribute>
+  <xsl:attribute name="width">100px </xsl:attribute>
+
 </xsl:attribute-set>
 
 <xsl:attribute-set name="table.properties">
@@ -61,6 +68,7 @@
  <xsl:param name="page.margin.inner">10mm</xsl:param>
  <xsl:param name="page.margin.outer">13mm</xsl:param>
  <!-- http://www.mail-archive.com/docbook-apps@lists.oasis-open.org/msg09900.html -->
+ <!--  usefull for : Double-sided documents are printed with a slightly wider margin on the binding edge of the page. -->
  <xsl:param name="double.sided">0</xsl:param>
 
 
@@ -325,7 +333,7 @@
           <xsl:with-param name="filename" select="$header.image.filename" />
          </xsl:call-template>
         </xsl:attribute>
-        <xsl:attribute name="height">14pt</xsl:attribute>
+        <xsl:attribute name="content-height">14pt</xsl:attribute>
         <xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
        </fo:external-graphic>
        </fo:block>
@@ -491,7 +499,7 @@
   <xsl:template match="bookinfo/subtitle" mode="book.titlepage.recto.mode">
   <fo:inline color="#0010FF" >
    <xsl:attribute name="font-weight">bold</xsl:attribute>
-   <xsl:attribute name="font-size">21pt</xsl:attribute>
+   <xsl:attribute name="font-size">38pt</xsl:attribute>
      <xsl:apply-templates mode="titlepage.mode" /> 
   </fo:inline>
 
@@ -549,19 +557,19 @@
   </fo:block>
 
 <!-- The Subtitle -->
-  <fo:block text-align="center" space-before="25mm"  
-         margin-left="0cm" margin-right="0cm"  line-height="25mm"
+  <fo:block text-align="center" space-before="15mm"  
+         margin-left="0cm" margin-right="0cm"  line-height="15mm"
          padding-top="5mm">
      <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/subtitle"/>
   </fo:block>
 
 <!-- The author's name -->
-  <fo:block text-align="center" space-before="35mm"  >
+  <fo:block text-align="center" space-before="10mm"  >
      <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/author"/>
   </fo:block>
 
 <!-- The three logos, in a 1x3 table: INRIA, UNSA, CNRS/I3S -->
-  <fo:table table-layout="fixed" space-before="25mm">
+  <fo:table table-layout="fixed" space-before="30mm">
 
     <fo:table-column />
     <fo:table-column />
@@ -573,8 +581,8 @@
        <fo:block text-align="center">
           <fo:external-graphic >
             <xsl:attribute name="src">images/logo-INRIA.png</xsl:attribute>
-            <xsl:attribute name="height">40pt</xsl:attribute>
-            <xsl:attribute name="content-height">60pt</xsl:attribute>
+            <xsl:attribute name="height">64px</xsl:attribute>
+            <xsl:attribute name="content-height">64px</xsl:attribute>
            </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
@@ -582,8 +590,8 @@
        <fo:block text-align="center">
        <fo:external-graphic>
         <xsl:attribute name="src">images/logo-UNSA.png</xsl:attribute>
-        <xsl:attribute name="height">40pt</xsl:attribute>
-        <xsl:attribute name="content-height">40pt</xsl:attribute>
+        <xsl:attribute name="height">74px</xsl:attribute>
+        <xsl:attribute name="content-height">74pt</xsl:attribute>
        </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
@@ -591,8 +599,8 @@
        <fo:block text-align="center">
         <fo:external-graphic>
          <xsl:attribute name="src">images/logo-CNRS.png</xsl:attribute>
-         <xsl:attribute name="height">60pt</xsl:attribute>
-         <xsl:attribute name="content-height">60pt</xsl:attribute>
+         <xsl:attribute name="height">74px</xsl:attribute>
+         <xsl:attribute name="content-height">74px</xsl:attribute>
         </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
@@ -601,7 +609,7 @@
   </fo:table>
 
  <!-- The Revision and copyright -->
-  <fo:table table-layout="fixed" space-before="25mm" >
+  <fo:table table-layout="fixed" space-before="5mm" >
 
     <fo:table-column/>
     <fo:table-column/>
