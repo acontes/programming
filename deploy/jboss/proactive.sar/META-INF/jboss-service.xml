@@ -15,33 +15,45 @@ where $PROACTIVE_HOME is the path to the root directory of the ProActive distrib
    If you have ProActive installed on Windows in the directory C:\ProActive_3.90 , the classpath tag should look like this:
     <classpath codebase="file:/C:/ProActive_3.90/dist/lib" archives="*"/>
 
+    Actually there is no need for that above: just set proactive.home System property, and it will be allright!
+
 -->
 <server>
     <!-- classpath setup  -->
-    <classpath codebase="file://${PROACTIVE_HOME}/dist/lib" archives="*"/>
+    <classpath codebase="${proactive.home}/dist/lib" archives="*"/>
+    <!--classpath codebase="file://${PROACTIVE_HOME}/dist/lib" archives="*"/-->
+
+   <classpath codebase="${proactive.home}/dist/lib" archives="*"/>
+
+    <!-- If you want to go with the default configuration for any of the p2p params, just don't specify the attribute tag  -->
+<!--
+    <mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderP2P" name="proactive:service=p2p">
+        <attribute name="vmName">testJbossVM</attribute>
+        <attribute name="Log4jConfigFile">
+	    ${jboss.server.config.url}jboss-log4j.xml
+	</attribute>
+	<attribute name="HostName"></attribute>
+        <attribute name="CodebaseUrl"></attribute>
+        <attribute name="PeersListFile">
+	    ${proactive.home}/p2p/config/hosts.less
+	</attribute>
+        <attribute name="AcquisitionMethod">rmi</attribute>
+        <attribute name="PortNumber">1234</attribute>
+    </mbean>
+-->
 
     <!-- proactive loader mbean service entry point -->
-    <mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderP2P" name="proactive:service=p2p">
-        <attribute name="vmName">
-            testJbossVM
+    <mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderRegistry" name="proactive:service=registry">                                                          
+	<attribute name="vmName">
+	    jbossVM
         </attribute>
         <attribute name="Log4jConfigFile">
             ${jboss.server.config.url}jboss-log4j.xml
         </attribute>
+        <attribute name="HostName"></attribute>
+        <attribute name="CodebaseUrl"></attribute>
+        <attribute name="ProActiveRuntimeURL"></attribute>
     </mbean>
-
-<!--
-<mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderSimple" name="proactive:service=registry">
-    <attribute name="vmName">
-	testJbossVM
-    </attribute>
-    <attribute name="Log4jConfigFile">
-	${jboss.server.config.url}jboss-log4j.xml
-    </attribute>
-    <attribute name="ProActiveRuntimeURL"></attribute>
-</mbean>
-
--->
 
 
 </server>

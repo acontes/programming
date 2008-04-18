@@ -6,7 +6,6 @@
 	<classpathentry kind="src" output="classes/Extra" path="src/Extra"/>
 	<classpathentry kind="src" output="classes/Tests" path="src/Tests"/>
 	<classpathentry excluding="doc/PublishedAPIDoclet.java" kind="src" output="classes/Utils" path="src/Utils"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ajo.jar"/>
 	<classpathentry kind="lib" path="lib/asm-2.2.1.jar"/>
@@ -114,5 +113,10 @@
 	<classpathentry kind="lib" path="lib/jboss/jboss-jmx-4.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/jboss/jbossmq-4.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/jboss/jboss-system-4.0.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
+	<classpathentry kind="lib" path="lib/bcel-5.1-fixes-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/concurrent.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

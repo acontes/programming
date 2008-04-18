@@ -30,13 +30,7 @@
  */
 package org.objectweb.proactive.extensions.jmx.jboss;
 
-import java.net.URI;
-import java.rmi.AlreadyBoundException;
-import java.rmi.RemoteException;
-
 import org.jboss.system.ServiceMBeanSupport;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Job;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -65,7 +59,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class ProActiveJbossLoaderP2P extends ServiceMBeanSupport implements
+public class ProActiveJbossLoaderP2P extends ProActiveJbossLoader implements
 		ProActiveJbossLoaderP2PMBean {
 
 	private P2PService _p2pService; 
@@ -85,23 +79,19 @@ public class ProActiveJbossLoaderP2P extends ServiceMBeanSupport implements
 	
 	private void stopP2PService() {
 		// terminate the p2p Service AO
+		// TODO how ???
 		PAActiveObject.terminateActiveObject(_p2pService, false);
 	}
 
-
 	@Override
 	protected void createService() throws Exception {
-		log.info("Creating service " + serviceName.getCanonicalName());
-		// configure ProActive separate logging
-		configureLogging();
-		log.debug("peersListFile=" + _peersListFile + ";acq=" + _acquisitionMethod + ";port=" + _portNumber );
+		super.createService();
 		
+		//specific P2P loader config
+		configureP2P();
 	}
-
-	private void configureLogging() {
-		// override the default log4j initialization phase		
-		System.setProperty("log4j.defaultInitOverride", "true");
-		System.setProperty("log4j.configuration", _log4jConfigFile );
+		
+	private void configureP2P() {
 		// set p2p properties
 		if( _acquisitionMethod != null )
 			System.setProperty("proactive.p2p.acq", _acquisitionMethod);
@@ -110,62 +100,27 @@ public class ProActiveJbossLoaderP2P extends ServiceMBeanSupport implements
 		// the PART name
 		if( _vmName != null)
 			System.setProperty("proactive.runtime.name", PART_PREFIX + _vmName );
-	 }
+		_jbossLogger.debug("peersListFile=" + _peersListFile + ";acq=" + _acquisitionMethod + ";port=" + _portNumber );
+	}
 	
 	@Override
 	protected void startService() throws Exception {
-		log.info("Starting the service " + serviceName.getCanonicalName());
+		_jbossLogger.info("Starting the service " + serviceName.getCanonicalName());
 
 		startP2PService();
 	}
 
 	@Override
 	protected void stopService() throws Exception {
-		log.info("Stopping the service " + serviceName.getCanonicalName());
+		_jbossLogger.info("Stopping the service " + serviceName.getCanonicalName());
 		
 		stopP2PService();
 	}
 	
 	////////// 		MBean 	config 	params
-	private String _vmName;
-	private String _log4jConfigFile;
 	private String _peersListFile;
 	private String _acquisitionMethod;
 	private int _portNumber;
-
-	/**
-    * {@inheritDoc}
-    */	
-	@Override
-	public String getvmName() {
-		return _vmName;
-	}
-
-
-	/**
-    * {@inheritDoc}
-    */
-	@Override
-	public void setvmName(String vmName) {
-		_vmName = vmName;
-		
-	}
-
-	/**
-    * {@inheritDoc}
-    */
-	@Override
-	public String getLog4jConfigFile() {
-		return _log4jConfigFile;
-	}
-
-	/**
-    * {@inheritDoc}
-    */
-	@Override
-	public void setLog4jConfigFile(String configFile) {
-		_log4jConfigFile = configFile;
-	}
 
 	/**
     * {@inheritDoc}
