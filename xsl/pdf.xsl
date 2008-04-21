@@ -9,26 +9,29 @@
  <xsl:import href="common.xsl" />
 <!-- ignore the scaling values the someone might put in the XML files 
 <xsl:param name="ignore.image.scaling" select="0">1</xsl:param>-->
-
-<xsl:param name="default.image.width">30px</xsl:param>
-
+ 
 <!-- numbering depth: will remove numbers from sections but still display them in TOC  
 <xsl:param name="section.autolabel.max.depth">2</xsl:param>
+-->
+
+
+<!--
+  to scale images in the pdf to the page width if the image is 
+  bigger than the page width and to keep it the same size if smaller use 
+  scalefit="1" width="100%" contentdepth="100%" 
+  on every image :(
 -->
 
 
 <!--  center all images in the tag figure horizontally  -->
 <xsl:attribute-set name="figure.properties">
   <xsl:attribute name="text-align">center</xsl:attribute>
-  <xsl:attribute name="width">100px </xsl:attribute>
 </xsl:attribute-set>
 
 
 <!--  align all images in the tag informalfigure horizontally  -->
 <xsl:attribute-set name="informalfigure.properties">
   <xsl:attribute name="text-align">center</xsl:attribute>
-  <xsl:attribute name="width">100px </xsl:attribute>
-
 </xsl:attribute-set>
 
 <xsl:attribute-set name="table.properties">
@@ -1385,7 +1388,7 @@
   </fo:block>
 </xsl:template>
 
-
+<!-- //FIXME  change ulink to uri -->
 <!-- copy of xref.xsl, line 783. The link on [url] is also clickeable-->
 <xsl:template match="ulink" name="ulink">
   <fo:basic-link xsl:use-attribute-sets="xref.properties">
