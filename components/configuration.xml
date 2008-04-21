@@ -349,7 +349,11 @@ l invocation");
 
         <mediaobject>
           <imageobject>
+<<<<<<< .mine
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/shortcuts.png" format="PNG" />
+=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/shortcuts.png" format="PNG"/>
+>>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
