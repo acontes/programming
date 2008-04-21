@@ -26,7 +26,7 @@
 
 				<mediaobject>
 					<imageobject>
-						<imagedata contentwidth="100" fileref="jmx/jmx-proactive.png" format="PNG" width="6in"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="jmx/jmx-proactive.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>

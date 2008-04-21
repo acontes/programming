@@ -30,7 +30,7 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100" fileref="images/proActiveModel.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/proActiveModel.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -87,7 +87,7 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100" fileref="images/activeObjectMethodCall_only_Node.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/activeObjectMethodCall_only_Node.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>

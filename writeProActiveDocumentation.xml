@@ -166,7 +166,7 @@
    
    <mediaobject>
     <imageobject>
-     <imagedata align="center" fileref="images/e1.png" format="PNG"/>
+     <imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="images/e1.png" format="PNG"/>
     </imageobject>
    </mediaobject>
   </figure>

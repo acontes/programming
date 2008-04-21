@@ -106,7 +106,7 @@
    &guidedComp;
    &conclusion;  -->
   </part>
-  
+
   <part xml:id="ProActiveProgramming"><info><title>Programming With Active Objects</title></info>
     
      &ProActiveBasis; 
@@ -182,11 +182,10 @@
     &FAQ;   
     &referenceCard;
     <index xml:id="keywordIndex"/>
-    &srcCodeAppendix;
-    <!-- TODO not written yet --> 
-   <!--   &glossary;  
-    &reference;--> 
+    &srcCodeAppendix;    
     &biblio; 
    </part>
-
+ <!-- TODO not written yet --> 
+   <!--   &glossary;  
+    &reference;--> 
  </book>

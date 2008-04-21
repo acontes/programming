@@ -23,7 +23,7 @@
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="osgi_files/framework.jpg" format="JPG"/>
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="osgi_files/framework.jpg" format="JPG"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -100,7 +100,7 @@
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="osgi_files/proactive_bundle.jpg" format="JPG"/>
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="osgi_files/proactive_bundle.jpg" format="JPG"/>
         </imageobject>
       </mediaobject>
     </figure>

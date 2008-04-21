@@ -64,7 +64,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="images/CalciumTaskFlow.png"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/CalciumTaskFlow.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>

@@ -61,7 +61,7 @@ vg.f1();</programlisting></para>
 			
 			<mediaobject>
 				<imageobject>
-					<imagedata fileref="images/groupCreationMethodsTable.png" contentwidth="100" format="PNG" width="6in" align="center"/>
+					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/groupCreationMethodsTable.png"  format="PNG"  align="center"/>
 				</imageobject>
 			</mediaobject>
 	</figure>

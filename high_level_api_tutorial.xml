@@ -1,5 +1,3 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="high_level_api_tutorial"><info><title> High-Level API Tutorials</title></info>
 	
   	<section xml:id="MWDP"><info><title>Master-Worker DistributedPrimes Application</title></info>
@@ -38,16 +36,14 @@
 	      	the results back to the master.</para>
       	</listitem>
       </itemizedlist>
-          <para>      
       	<figure><info><title> Architecture of Distributed Primes  Using Master-Worker API </title></info> 
 		  <mediaobject>
           <imageobject>
 
-            <imagedata contentwidth="100" fileref="guided_tour/pics/masterworker/DistributedPrimesMWdia.jpg" format="JPG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/masterworker/DistributedPrimesMWdia.jpg" format="JPG" />
           </imageobject>
         </mediaobject>
       </figure>
-      </para>
      <section><info><title>Application components</title></info>
      	  
       	<para>
@@ -178,7 +174,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	<figure><info><title> Component with inner component distributed </title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100" fileref="guided_tour/pics/gcm/gcm_nodes.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_nodes.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -257,12 +253,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					  stripping a data buffer and using the scatter primitive. In
 					  this case, you will use scatter or one-to-one dispatch mode (see Figure 2.b).
 					  </para>
-					  
-
+					  		
       	<figure><info><title> Component parameters </title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100" fileref="guided_tour/pics/gcm/gcm_parameters.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_parameters.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -286,7 +281,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	<figure><info><title> Invocation parameter with a gathercast interface </title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100" fileref="guided_tour/pics/gcm/gcm_gathercast_invocation.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_gathercast_invocation.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -296,7 +291,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	<figure><info><title> Distribution policies </title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100" fileref="guided_tour/pics/gcm/distribution_policies.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/distribution_policies.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -416,7 +411,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	      	<figure xml:id="component_assembly"><info><title>Component assembly </title></info> 
 			  <mediaobject>
 	          <imageobject>
-	            <imagedata contentwidth="100" fileref="guided_tour/pics/gcm/component_assembly.png" format="PNG" width="6in"/>
+	            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/component_assembly.png" format="PNG" />
 	          </imageobject>
 	        </mediaobject>
 	      </figure>

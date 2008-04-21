@@ -184,7 +184,7 @@
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100" fileref="images/MasterWorker1.png" format="PNG" width="6in"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MasterWorker1.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -228,7 +228,7 @@
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100" fileref="images/MasterWorker2.png" format="PNG" width="6in"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MasterWorker2.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -264,7 +264,7 @@
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100" fileref="images/MasterWorker3.png" format="PNG" width="6in"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MasterWorker3.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -306,7 +306,7 @@
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100" fileref="images/MSResult1.png" format="PNG" width="6in"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MSResult1.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -317,7 +317,7 @@
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100" fileref="images/MSResult2.png" format="PNG" width="6in"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MSResult2.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>

@@ -87,7 +87,7 @@
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="mpi_files/deployment.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/deployment.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -286,7 +286,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="mpi_files/status.png" format="PNG"/>
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/status.png" format="PNG"/>
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1107,7 +1107,7 @@ public class MyClass{
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="mpi_files/MPItoPA.png" format="PNG" width="6in"/>
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/MPItoPA.png" format="PNG" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1418,7 +1418,7 @@ public class MyClass{
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="mpi_files/MPItoPAtoMPI.png" format="PNG" width="6in"/>
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/MPItoPAtoMPI.png" format="PNG" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1445,7 +1445,7 @@ public class MyClass{
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="mpi_files/MPItoMPI.jpg" format="JPG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/MPItoMPI.jpg" format="JPG" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -1691,7 +1691,7 @@ public class MyClass{
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="mpi_files/jacobi_schema.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/jacobi_schema.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -1937,7 +1937,7 @@ created VirtualNode name=Cluster_Nina
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="mpi_files/ic2dShot16x16.jpg" format="JPG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/ic2dShot16x16.jpg" format="JPG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -1961,7 +1961,7 @@ created VirtualNode name=Cluster_Nina
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="mpi_files/Design.png" format="PNG" width="6in"/>
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/Design.png" format="PNG" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1985,7 +1985,7 @@ created VirtualNode name=Cluster_Nina
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="mpi_files/architecture.png" format="PNG" width="6in"/>
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/architecture.png" format="PNG" />
               </imageobject>
             </mediaobject>
           </figure></para>

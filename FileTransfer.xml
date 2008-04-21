@@ -435,7 +435,7 @@ File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arri
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="development/imgs/fileTransferDesign.png" format="PNG"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/imgs/fileTransferDesign.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure>

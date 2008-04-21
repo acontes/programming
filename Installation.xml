@@ -1,7 +1,4 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Installation"><info><title>ProActive And IC2D Installation</title></info>
-  
 
   <para>ProActive is available for <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/download_proactive_latest.htm"> download </link>under 
   the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"> GPL 2</link>
@@ -427,7 +424,7 @@
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/eclipse_import.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_import.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure></para>
@@ -435,7 +432,7 @@
 						<para><informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/eclipse_import_browse.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_import_browse.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure></para>
@@ -446,7 +443,7 @@
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/browse_window.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/browse_window.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -457,7 +454,7 @@
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/eclipse_with_plugins.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_with_plugins.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>						
@@ -474,7 +471,7 @@
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/update_manager.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/update_manager.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -483,7 +480,7 @@
 		 			<para>	<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/europa_discovery.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/europa_discovery.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>		
@@ -492,7 +489,7 @@
 		 			<para>	<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/birt_selected.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/birt_selected.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -506,7 +503,7 @@
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/ic2dproduct.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/ic2dproduct.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -521,7 +518,7 @@
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/select_run_plugins.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/select_run_plugins.png"/>
 								</imageobject>
 							</mediaobject>
 							</informalfigure>

@@ -82,7 +82,7 @@
         <mediaobject>
         
           <imageobject>
-            <imagedata contentwidth="100" fileref="images/ProActive_Features.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/ProActive_Features.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -239,7 +239,7 @@
         <mediaobject>
         
           <imageobject>
-            <imagedata contentwidth="100" fileref="images/MetaObject_Architecture.png" format="PNG" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MetaObject_Architecture.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure>

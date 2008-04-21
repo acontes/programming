@@ -52,7 +52,7 @@
 			
 			<mediaobject>
 				<imageobject>
-					<imagedata fileref="images/creationMethodsTable.png" contentwidth="100" format="PNG" width="6in" align="center"/>
+					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/creationMethodsTable.png"  format="PNG"  align="center"/>
 
 				</imageobject>
 			</mediaobject>
@@ -565,10 +565,10 @@
 			
 			<mediaobject>
 				<imageobject>
-			<!--  		<imagedata  width="6in" depth="5.5in" scalefit="0" format="PNG" 
+			<!--  		<imagedata scalefit="1" width="100%" contentdepth="100%"    depth="5.5in" scalefit="0" format="PNG" 
 						fileref="images/init_run_end_Activity.png" />
 				-->
-					<imagedata contentwidth="100" width="500px" fileref="images/init_run_end_Activity.png"/>
+					<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="images/init_run_end_Activity.png"/>
 				
 				</imageobject>
 			</mediaobject>
@@ -853,7 +853,7 @@
 
 				<mediaobject>
 					<imageobject>
-						<imagedata fileref="images/workerActiveObject.png" contentwidth="100" format="PNG" width="6in"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/workerActiveObject.png"  format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -1316,7 +1316,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/stubProxyFuture.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/stubProxyFuture.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1482,7 +1482,7 @@
 
 						<mediaobject>
 							<imageobject>
-								<imagedata fileref="images/sequentialCall.png" format="PNG"/>
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/sequentialCall.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1529,7 +1529,7 @@
 
 				<mediaobject>
 					<imageobject>
-						<imagedata contentwidth="100" fileref="images/workerActiveObject.png" format="PNG" width="6in"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/workerActiveObject.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -1561,7 +1561,7 @@
 
 								<mediaobject>
 									<imageobject>
-										<imagedata contentwidth="100" fileref="images/workerActiveObjectWithFuture.png" format="PNG" width="6in"/>
+										<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/workerActiveObjectWithFuture.png" format="PNG" />
 									</imageobject>
 								</mediaobject>
 							</figure>
@@ -1592,7 +1592,7 @@
 
 								<mediaobject>
 									<imageobject>
-										<imagedata contentwidth="100" fileref="images/workerActiveObjectWithUpdatedFuture.png" format="PNG" width="6in"/>
+										<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/workerActiveObjectWithUpdatedFuture.png" format="PNG" />
 									</imageobject>
 								</mediaobject>
 							</figure>
@@ -1705,7 +1705,7 @@
 
 						<mediaobject>
 							<imageobject>
-								<imagedata contentwidth="100" fileref="images/threadedCallWithFuture.png"/>
+								<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/threadedCallWithFuture.png"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1725,7 +1725,7 @@
 
 						<mediaobject>
 							<imageobject>
-								<imagedata contentwidth="100" fileref="images/threadedCallWithWaitForFuture.png" format="PNG" width="6in"/>
+								<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/threadedCallWithWaitForFuture.png" format="PNG" />
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -2018,7 +2018,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation1.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation1.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2034,7 +2034,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation2.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation2.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2045,7 +2045,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation3.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation3.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2062,7 +2062,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation4.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation4.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2078,7 +2078,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation5.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation5.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2094,7 +2094,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100" fileref="images/automaticContinuation6.png" format="PNG" width="6in"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/automaticContinuation6.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2110,7 +2110,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100" fileref="images/automaticContinuation7.png" format="PNG" width="6in"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/automaticContinuation7.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2123,7 +2123,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100" fileref="images/automaticContinuation8.png" format="PNG" width="6in"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/automaticContinuation8.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</informalfigure>

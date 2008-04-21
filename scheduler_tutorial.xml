@@ -1,5 +1,3 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="scheduler_tutorial"><info><title> Scheduler Tutorial</title></info>
 	
 
@@ -109,14 +107,16 @@
 		</listitem>
 		</itemizedlist>
 		</para>
+		
 		<figure xml:id="scheduler_arch"><info><title>Scheduler architecture</title></info>
-				
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center" fileref="scheduler/pics/tuto/arch.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="scheduler/pics/tuto/arch.jpg" format="jpg"/>
 					</imageobject>
 				</mediaobject>
-	</figure>
+		</figure>
+		
+		
 	<para>
 		These two components (Scheduler and IM) are independent and run as non GUI daemon/service.
 		So they can run on two different hosts.
@@ -140,7 +140,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 	</figure>
@@ -741,7 +741,7 @@ public class HelloTask extends JavaExecutable{
 		
 		<mediaobject>
 		<imageobject>
-		<imagedata align="center" fileref="scheduler/pics/tuto/rcp_startup.png" format="PNG"/>
+		<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="scheduler/pics/tuto/rcp_startup.png" format="PNG"/>
 		</imageobject>
 	</mediaobject>
 	</figure>
@@ -752,7 +752,7 @@ public class HelloTask extends JavaExecutable{
 		
 		<mediaobject>
 		<imageobject>
-		<imagedata align="center" fileref="scheduler/pics/tuto/connect.png" format="PNG"/>
+		<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="scheduler/pics/tuto/connect.png" format="PNG"/>
 		</imageobject>
 	</mediaobject>
 	</figure>
@@ -770,7 +770,7 @@ public class HelloTask extends JavaExecutable{
 		
 		<mediaobject>
 		<imageobject>
-		<imagedata align="center" fileref="scheduler/pics/tuto/context_menu.png" format="PNG"/>
+		<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="scheduler/pics/tuto/context_menu.png" format="PNG"/>
 		</imageobject>
 	</mediaobject>
 	</figure>
