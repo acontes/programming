@@ -152,7 +152,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/monitoringPerspective4.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitoringPerspective4.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -198,7 +204,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/monitor_new_host.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitor_new_host.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -212,7 +224,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/monitorNewHostButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitorNewHostButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -224,7 +242,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/SetDepthControlButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/SetDepthControlButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -242,7 +266,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/SetTimeRefreshButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/SetTimeRefreshButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -255,7 +285,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/RefreshButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/RefreshButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -264,7 +300,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/EnableMonitoringButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/EnableMonitoringButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -275,7 +317,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/P2PButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/P2PButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -284,7 +332,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/ZoomInButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/ZoomInButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -292,7 +346,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/ZoomOutButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/ZoomOutButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -300,7 +360,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/NewMonitoringViewButton.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/NewMonitoringViewButton.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -323,7 +389,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="ic2d/images/features/virtualnodes.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/virtualnodes.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -427,7 +499,13 @@
                 
                 <mediaobject>
                     <imageobject>
+<<<<<<< .mine
+                        <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                            fileref="ic2d/images/features/showViewJobMonitoring.png"
+                            format="PNG" />
+=======
                         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/showViewJobMonitoring.png" format="PNG"/>
+>>>>>>> .r8623
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -440,7 +518,13 @@
                 
                 <mediaobject>
                     <imageobject>
+<<<<<<< .mine
+                        <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                            fileref="ic2d/images/features/jobMonitoringButton.png"
+                            format="PNG" />
+=======
                         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/jobMonitoringButton.png" format="PNG"/>
+>>>>>>> .r8623
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -448,7 +532,13 @@
                 
                 <mediaobject>
                     <imageobject>
+<<<<<<< .mine
+                        <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                            fileref="ic2d/images/features/monitoringadded.png"
+                            format="PNG" />
+=======
                         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitoringadded.png" format="PNG"/>
+>>>>>>> .r8623
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -462,7 +552,13 @@
                 
                 <mediaobject>
                     <imageobject>
+<<<<<<< .mine
+                        <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                            fileref="ic2d/images/features/RunMonitoring3.png"
+                            format="PNG" />
+=======
                         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/RunMonitoring3.png" format="PNG"/>
+>>>>>>> .r8623
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -523,7 +619,13 @@
                         
                         <mediaobject>
                             <imageobject>
+<<<<<<< .mine
+                                <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                    fileref="ic2d/images/timit/timit-context-menu.png"
+                                    format="PNG" />
+=======
                                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-context-menu.png" format="PNG"/>
+>>>>>>> .r8623
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -548,7 +650,13 @@
                             
                             <mediaobject>
                                 <imageobject>
+<<<<<<< .mine
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                        fileref="ic2d/images/timit/timit-main-view.png"
+                                        format="PNG" />
+=======
                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-main-view.png" format="PNG"/>
+>>>>>>> .r8623
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -857,7 +965,13 @@
                             
                             <mediaobject>
                                 <imageobject>
+<<<<<<< .mine
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                        fileref="ic2d/images/timit/timit-tree-view.png"
+                                        format="PNG" />
+=======
                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-tree-view.png" format="PNG"/>
+>>>>>>> .r8623
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -881,7 +995,13 @@
                             
                             <mediaobject>
                                 <imageobject>
+<<<<<<< .mine
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                        fileref="ic2d/images/timit/timit-timeline-view.png"
+                                        format="PNG" />
+=======
                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-timeline-view.png" format="PNG"/>
+>>>>>>> .r8623
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -1081,7 +1201,14 @@
                         
                         <mediaobject>
                             <imageobject>
+<<<<<<< .mine
+                                <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                    fileref="ic2d/images/features/perspectiveLauncher.png"
+                                    format="PNG" 
+                                     />
+=======
                                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/perspectiveLauncher.png" format="PNG"  />
+>>>>>>> .r8623
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -1112,7 +1239,14 @@
                         
                         <mediaobject>
                             <imageobject>
+<<<<<<< .mine
+                                <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                    fileref="ic2d/images/features/openWith.png"
+                                    format="PNG" 
+                                     />
+=======
                                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/openWith.png" format="PNG"  />
+>>>>>>> .r8623
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -1155,7 +1289,14 @@
                         
                         <mediaobject>
                             <imageobject>
+<<<<<<< .mine
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
+                                    fileref="ic2d/images/features/LauncherPerspective.png"
+                                    format="PNG" 
+                                     />
+=======
                                 <imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/features/LauncherPerspective.png" format="PNG"  />
+>>>>>>> .r8623
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -1194,7 +1335,13 @@
                 
                 <mediaobject>
                     <imageobject>
+<<<<<<< .mine
+                        <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                            fileref="development/plugin_files/wizard_active.jpg"
+                            format="JPG"   />
+=======
                         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  />
+>>>>>>> .r8623
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -1210,7 +1357,13 @@
                 
                 <mediaobject>
                     <imageobject>
+<<<<<<< .mine
+                        <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                            fileref="development/plugin_files/editor.jpg"
+                            format="JPG"   />
+=======
                         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/editor.jpg" format="JPG"  />
+>>>>>>> .r8623
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -1227,7 +1380,13 @@
             
             <mediaobject>
                 <imageobject>
+<<<<<<< .mine
+                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                        fileref="development/plugin_files/guided_tour.jpg"
+                        format="JPG"   />
+=======
                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/guided_tour.jpg" format="JPG"  />
+>>>>>>> .r8623
                 </imageobject>
             </mediaobject>
         </figure>
