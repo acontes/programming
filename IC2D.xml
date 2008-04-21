@@ -88,7 +88,11 @@
 
         <mediaobject>
           <imageobject>
+<<<<<<< .mine
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/ic2d_c3d.png" format="PNG" />
+=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/ic2d_c3d.png" format="PNG"/>
+>>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -108,7 +112,11 @@
 
         <mediaobject>
           <imageobject>
+<<<<<<< .mine
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/RemoteControl.png" format="PNG" />
+=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/RemoteControl.png" format="PNG"/>
+>>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -138,7 +146,11 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
+<<<<<<< .mine
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/jobmonitor2_logo.png" format="PNG" />
+=======
           <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/jobmonitor2_logo.png" format="PNG"/>
+>>>>>>> .r8623
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -146,7 +158,11 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
+<<<<<<< .mine
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/jobmonitor1_logo.png" format="PNG" />
+=======
           <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/jobmonitor1_logo.png" format="PNG"/>
+>>>>>>> .r8623
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -164,7 +180,11 @@
        
        <mediaobject>
         <imageobject>
+<<<<<<< .mine
+         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/fractal_GUI_launch.png" format="PNG" />
+=======
          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/fractal_GUI_launch.png" format="PNG"/>
+>>>>>>> .r8623
         </imageobject>
        </mediaobject>
       </figure></para>
@@ -316,7 +336,11 @@
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/launcher_menu.png" format="PNG"   />
+=======
                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/launcher_menu.png" format="PNG"  />
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -332,7 +356,11 @@
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/launcher_frame.png" format="PNG"   />
+=======
                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/launcher_frame.png" format="PNG"  />
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -359,7 +387,11 @@
       
       <mediaobject>
         <imageobject>
+<<<<<<< .mine
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/clusterLogo.png" format="PNG" />
+=======
           <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/clusterLogo.png" format="PNG"/>
+>>>>>>> .r8623
         </imageobject>
         <caption><para>This is between a globus cluster and an LSF cluster</para></caption>
       </mediaobject>
@@ -368,7 +400,11 @@
     <para>This experiment was partly sponsored by 
      <inlinemediaobject>
       <imageobject>
+<<<<<<< .mine
+       <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/logoSun.png" format="PNG" />
+=======
        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/logoSun.png" format="PNG"/>
+>>>>>>> .r8623
       </imageobject>
      </inlinemediaobject> .
     </para>

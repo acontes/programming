@@ -61,7 +61,13 @@ vg.f1();</programlisting></para>
 			
 			<mediaobject>
 				<imageobject>
+<<<<<<< .mine
+					<imagedata scalefit="1" width="100%" contentdepth="100%" 
+						fileref="images/groupCreationMethodsTable.png" 
+						 format="PNG"	 align="center" />
+=======
 					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/groupCreationMethodsTable.png"  format="PNG"  align="center"/>
+>>>>>>> .r8623
 				</imageobject>
 			</mediaobject>
 	</figure>

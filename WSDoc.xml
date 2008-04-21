@@ -74,7 +74,13 @@
 
         <mediaobject>
           <imageobject>
+<<<<<<< .mine
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  
+                       fileref="webservices/provider_en.png" format="PNG"
+                        />
+=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/provider_en.png" format="PNG" />
+>>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -387,7 +393,13 @@ string s = hw.helloWorld ();
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
+                         fileref="webservices/dispatcher_en.png" format="PNG"
+                          />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/dispatcher_en.png" format="PNG" />
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -417,7 +429,13 @@ string s = hw.helloWorld ();
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
+                         fileref="webservices/scc3djava.png" format="PNG"
+                          />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/scc3djava.png" format="PNG" />
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure> <figure><info><title>C# application communicating via SOAP</title></info>
@@ -425,7 +443,12 @@ string s = hw.helloWorld ();
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/scC3dcs.png"
+                         format="PNG"  />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/scC3dcs.png" format="PNG" />
+>>>>>>> .r8623
             </imageobject>
 
             <caption><para>The application is using the same dispatcher the

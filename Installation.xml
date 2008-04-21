@@ -424,7 +424,13 @@
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%" 
+										fileref="images/IC2D_development_installation/eclipse_import.png" 
+										 />
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_import.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 						</informalfigure></para>
@@ -432,7 +438,12 @@
 						<para><informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%" 
+										fileref="images/IC2D_development_installation/eclipse_import_browse.png"/>
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_import_browse.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 						</informalfigure></para>
@@ -443,7 +454,12 @@
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%" 
+										fileref="images/IC2D_development_installation/browse_window.png"/>
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/browse_window.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -454,7 +470,11 @@
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/IC2D_development_installation/eclipse_with_plugins.png"/>
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_with_plugins.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 						</informalfigure>						
@@ -471,7 +491,11 @@
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/IC2D_development_installation/update_manager.png"/>
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/update_manager.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -480,7 +504,11 @@
 		 			<para>	<informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/IC2D_development_installation/europa_discovery.png"/>
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/europa_discovery.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 						</informalfigure>		
@@ -489,7 +517,11 @@
 		 			<para>	<informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/IC2D_development_installation/birt_selected.png"/>
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/birt_selected.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -503,7 +535,11 @@
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/IC2D_development_installation/ic2dproduct.png"/>
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/ic2dproduct.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -518,7 +554,11 @@
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
+<<<<<<< .mine
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/IC2D_development_installation/select_run_plugins.png"/>
+=======
 									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/select_run_plugins.png"/>
+>>>>>>> .r8623
 								</imageobject>
 							</mediaobject>
 							</informalfigure>

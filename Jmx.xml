@@ -26,7 +26,12 @@
 
 				<mediaobject>
 					<imageobject>
+<<<<<<< .mine
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  
+							fileref="jmx/jmx-proactive.png" format="PNG"  />
+=======
 						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="jmx/jmx-proactive.png" format="PNG" />
+>>>>>>> .r8623
 					</imageobject>
 				</mediaobject>
 			</figure>

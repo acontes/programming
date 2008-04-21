@@ -52,7 +52,11 @@
 			
 			<mediaobject>
 				<imageobject>
+<<<<<<< .mine
+					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/creationMethodsTable.png"  format="PNG"  />
+=======
 					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/creationMethodsTable.png"  format="PNG"  align="center"/>
+>>>>>>> .r8623
 
 				</imageobject>
 			</mediaobject>
@@ -565,7 +569,11 @@
 			
 			<mediaobject>
 				<imageobject>
+<<<<<<< .mine
+			<!--  		<imagedata scalefit="1" width="100%" contentdepth="100%"  format="PNG" 
+=======
 			<!--  		<imagedata scalefit="1" width="100%" contentdepth="100%"    depth="5.5in" scalefit="0" format="PNG" 
+>>>>>>> .r8623
 						fileref="images/init_run_end_Activity.png" />
 				-->
 					<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="images/init_run_end_Activity.png"/>

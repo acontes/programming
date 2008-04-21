@@ -225,7 +225,11 @@
 
             <mediaobject>
               <imageobject>
+<<<<<<< .mine
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/example.png" format="PNG" />
+=======
                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/example.png" format="PNG"/>
+>>>>>>> .r8623
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -554,7 +558,11 @@
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/descriptor.png" format="PNG" />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/descriptor.png" format="PNG"/>
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -639,7 +647,11 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
         <mediaobject>
           <imageobject>
+<<<<<<< .mine
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/overlaynetwork.png" format="PNG" />
+=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/overlaynetwork.png" format="PNG"/>
+>>>>>>> .r8623
           </imageobject>
           <caption><para> Example of a ProActive P2P infrastructure.</para></caption>
         </mediaobject>
@@ -782,7 +794,11 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
             <mediaobject>
               <imageobject>
+<<<<<<< .mine
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/firstContact.png" format="PNG" />
+=======
                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/firstContact.png" format="PNG"/>
+>>>>>>> .r8623
               </imageobject>
               <caption><para> Example of first contact (Bootstrapping).</para></caption>
 
@@ -941,7 +957,11 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
             <mediaobject>
               <imageobject>
+<<<<<<< .mine
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/heartbeat.png" format="PNG" />
+=======
                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/heartbeat.png" format="PNG"/>
+>>>>>>> .r8623
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1094,7 +1114,11 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
             <mediaobject>
               <imageobject>
+<<<<<<< .mine
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/sendingNode.png" format="PNG" />
+=======
                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/sendingNode.png" format="PNG"/>
+>>>>>>> .r8623
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1169,7 +1193,11 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/implementation.png" format="PNG" />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/implementation.png" format="PNG"/>
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -1234,7 +1262,11 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/dynamicGroup.png" format="PNG" />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/dynamicGroup.png" format="PNG"/>
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -1330,7 +1362,11 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/screenshot.png" format="PNG" />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/screenshot.png" format="PNG"/>
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
