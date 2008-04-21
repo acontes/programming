@@ -152,7 +152,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/monitoringPerspective4.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitoringPerspective4.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -198,7 +198,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/monitor_new_host.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitor_new_host.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -212,7 +212,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/monitorNewHostButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitorNewHostButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -224,7 +224,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/SetDepthControlButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/SetDepthControlButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -242,7 +242,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/SetTimeRefreshButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/SetTimeRefreshButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -255,7 +255,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/RefreshButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/RefreshButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -264,7 +264,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/EnableMonitoringButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/EnableMonitoringButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -275,7 +275,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/P2PButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/P2PButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -284,7 +284,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/ZoomInButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/ZoomInButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -292,7 +292,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/ZoomOutButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/ZoomOutButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -300,7 +300,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/NewMonitoringViewButton.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/NewMonitoringViewButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -323,7 +323,7 @@
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="ic2d/images/features/virtualnodes.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/virtualnodes.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -427,7 +427,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="ic2d/images/features/showViewJobMonitoring.png" format="PNG"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/showViewJobMonitoring.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -440,7 +440,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="ic2d/images/features/jobMonitoringButton.png" format="PNG"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/jobMonitoringButton.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -448,7 +448,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="ic2d/images/features/monitoringadded.png" format="PNG"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitoringadded.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -462,7 +462,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="ic2d/images/features/RunMonitoring3.png" format="PNG"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/RunMonitoring3.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -523,7 +523,7 @@
                         
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="ic2d/images/timit/timit-context-menu.png" format="PNG"/>
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-context-menu.png" format="PNG"/>
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -548,7 +548,7 @@
                             
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="ic2d/images/timit/timit-main-view.png" format="PNG"/>
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-main-view.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -857,7 +857,7 @@
                             
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="ic2d/images/timit/timit-tree-view.png" format="PNG"/>
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-tree-view.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -881,7 +881,7 @@
                             
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="ic2d/images/timit/timit-timeline-view.png" format="PNG"/>
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-timeline-view.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -1081,7 +1081,7 @@
                         
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="ic2d/images/features/perspectiveLauncher.png" format="PNG" contentwidth="100" width="6in"/>
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/perspectiveLauncher.png" format="PNG"  />
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -1112,7 +1112,7 @@
                         
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="ic2d/images/features/openWith.png" format="PNG" contentwidth="100" width="6in"/>
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/openWith.png" format="PNG"  />
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -1155,7 +1155,7 @@
                         
                         <mediaobject>
                             <imageobject>
-                                <imagedata align="center" fileref="ic2d/images/features/LauncherPerspective.png" format="PNG" contentwidth="100" width="6in"/>
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/features/LauncherPerspective.png" format="PNG"  />
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -1194,7 +1194,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="development/plugin_files/wizard_active.jpg" format="JPG" contentwidth="100" width="6in"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -1210,7 +1210,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="development/plugin_files/editor.jpg" format="JPG" contentwidth="100" width="6in"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/editor.jpg" format="JPG"  />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -1227,7 +1227,7 @@
             
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="development/plugin_files/guided_tour.jpg" format="JPG" contentwidth="100" width="6in"/>
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/guided_tour.jpg" format="JPG"  />
                 </imageobject>
             </mediaobject>
         </figure>
