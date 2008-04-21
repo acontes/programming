@@ -68,7 +68,13 @@
 					<mediaobject>
 						<imageobject>
 							<!-- CHANGE ME !! -->
+<<<<<<< .mine
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  
+								fileref="guided_tour/pics/hello/DistributedPrimes.png"
+								format="PNG"  />
+=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" />
+>>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -221,7 +227,13 @@
 					
 					<mediaobject>
 						<imageobject>
+<<<<<<< .mine
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  
+								fileref="guided_tour/pics/primes/primes_dg.png" format="PNG"
+								 />
+=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/primes/primes_dg.png" format="PNG" />
+>>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -301,7 +313,13 @@
 					
 					<mediaobject>
 						<imageobject>
+<<<<<<< .mine
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  
+								fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG"
+								 />
+=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG" />
+>>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -462,7 +480,13 @@
 					<mediaobject>
 						<imageobject>
 							<!-- CHANGE ME !! -->
+<<<<<<< .mine
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  
+								fileref="guided_tour/pics/hello/DistributedPrimes.png"
+								format="PNG"  />
+=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" />
+>>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>

@@ -350,7 +350,13 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
+                         fileref="guided_tour/pics/screenshots/jacobiic2d.png"
+                         format="PNG"  />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG" />
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -385,7 +391,13 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
+                         fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png"
+                         format="PNG"  />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG" />
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -395,7 +407,13 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
+                         fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png"
+                         format="PNG"  />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG" />
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -459,7 +477,13 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
+<<<<<<< .mine
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
+                         fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png"
+                         format="PNG"  />
+=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG" />
+>>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>

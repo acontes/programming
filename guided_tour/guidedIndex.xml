@@ -71,7 +71,12 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
+<<<<<<< .mine
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="./eclipse_files/wizard_new_project.jpg"
+                     format="JPG" />
+=======
           <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="./eclipse_files/wizard_new_project.jpg" format="JPG"/>
+>>>>>>> .r8623
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -95,7 +100,12 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
+<<<<<<< .mine
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="./eclipse_files/wizard_java_settings.jpg"
+                     format="JPG" />
+=======
           <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="./eclipse_files/wizard_java_settings.jpg" format="JPG"/>
+>>>>>>> .r8623
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -107,7 +117,11 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
+<<<<<<< .mine
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="./eclipse_files/navigator.jpg" format="JPG" />
+=======
           <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="./eclipse_files/navigator.jpg" format="JPG"/>
+>>>>>>> .r8623
         </imageobject>
       </mediaobject>
     </informalfigure>

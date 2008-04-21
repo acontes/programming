@@ -34,7 +34,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="guided_tour/pics/nbody/gui.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/gui.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -47,7 +53,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="guided_tour/pics/nbody/gui3d.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/gui3d.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -88,7 +100,13 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
+<<<<<<< .mine
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                                        fileref="guided_tour/pics/nbody/interactions.png"
+                                                        format="PNG" />
+=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/interactions.png" format="PNG"/>
+>>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -99,7 +117,13 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
+<<<<<<< .mine
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                                        fileref="guided_tour/pics/nbody/forces_simple.png"
+                                                        format="PNG" />
+=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
+>>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -124,7 +148,13 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
+<<<<<<< .mine
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                                        fileref="guided_tour/pics/nbody/forces_sum.png"
+                                                        format="PNG" />
+=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/forces_sum.png" format="PNG"/>
+>>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -147,7 +177,13 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
+<<<<<<< .mine
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                                        fileref="guided_tour/pics/nbody/acc.png"
+                                                        format="PNG" />
+=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/acc.png" format="PNG"/>
+>>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -163,7 +199,13 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
+<<<<<<< .mine
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                                        fileref="guided_tour/pics/nbody/movement_equations.png"
+                                                        format="PNG" />
+=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/movement_equations.png" format="PNG"/>
+>>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -298,7 +340,13 @@
                     
                     <mediaobject>
                         <imageobject>
+<<<<<<< .mine
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                fileref="guided_tour/pics/nbody/directory.png"
+                                format="PNG" />
+=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/directory.png" format="PNG"/>
+>>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -387,7 +435,13 @@
                             
                             <mediaobject>
                                 <imageobject>
+<<<<<<< .mine
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                        fileref="guided_tour/pics/nbody/forces_simple.png"
+                                        format="PNG" />
+=======
                                     <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
+>>>>>>> .r8623
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -917,7 +971,13 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
+<<<<<<< .mine
+                                                <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                                    fileref="guided_tour/pics/nbody/Domain_subdivision.png"
+                                                    format="PNG" />
+=======
                                                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/Domain_subdivision.png" format="PNG"/>
+>>>>>>> .r8623
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -928,7 +988,13 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
+<<<<<<< .mine
+                                                <imagedata scalefit="1" width="100%" contentdepth="100%" 
+                                                    fileref="guided_tour/pics/nbody/tree.png"
+                                                    format="PNG" />
+=======
                                                 <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/tree.png" format="PNG"/>
+>>>>>>> .r8623
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
