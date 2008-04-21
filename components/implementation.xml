@@ -59,7 +59,7 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="components/pics/fractal.png" format="PNG"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal.png" format="PNG"/>
           </imageobject>
 
         </mediaobject>
@@ -71,7 +71,7 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="components/pics/fractal-proactive-distributed.png" format="PNG"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal-proactive-distributed.png" format="PNG"/>
           </imageobject>
 
         </mediaobject>
@@ -83,7 +83,7 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="components/pics/fractal-proactive-aos.png" format="PNG"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal-proactive-aos.png" format="PNG"/>
           </imageobject>
 
         </mediaobject>
@@ -297,7 +297,7 @@
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="components/pics/standard-mop.png" format="PNG"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/standard-mop.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -333,7 +333,7 @@
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="components/pics/components-mop.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/components-mop.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
