@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 /** Adding docbook highlighting tags through regular expressionn replacement. */
 public abstract class RegexpHighLighter implements LanguageToDocBook {
     /** can be overridden if you want line break to happen on shorter/longer lines */
-    private int maxLineLength = 120;
+    private int maxLineLength = 100;
     // this regexp represents docbook tags in the line
     private final Pattern PAT = Pattern.compile("<.*?>");
     // the characters eventually returned are stored here
