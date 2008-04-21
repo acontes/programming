@@ -140,19 +140,13 @@
 
 					<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" 
-								fileref="components/pics/multicast-itfs.png" format="PNG"
-								 />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/multicast-itfs.png" format="PNG" />
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
 			</para>
 		</section>
-
+ 
 		<section><info><title>Data distribution</title></info>
 			
 
@@ -196,13 +190,7 @@
 
 					<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" 
-								fileref="components/pics/parameters-broadcast-scatter.png"
-								format="PNG"  />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/parameters-broadcast-scatter.png" format="PNG" />
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -487,13 +475,7 @@
 
 					<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" 
-								fileref="components/pics/multicast-signatures-lists.png"
-								format="PNG" />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/multicast-signatures-lists.png" format="PNG"/>
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -613,13 +595,7 @@
 
 				<mediaobject>
 					<imageobject>
-<<<<<<< .mine
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" 
-							fileref="components/pics/gathercast-itfs.png" format="PNG"
-							 />
-=======
 						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/gathercast-itfs.png" format="PNG" />
->>>>>>> .r8623
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -655,14 +631,7 @@
 
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									
-									fileref="components/pics/gathercast-aggregation.png"
-									format="PNG"  />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/gathercast-aggregation.png" format="PNG" />
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -823,13 +792,7 @@
 
 				<mediaobject>
 					<imageobject>
-<<<<<<< .mine
-						<imagedata scalefit="1" width="100%" contentdepth="100%"
-							fileref="components/pics/gathercast-signatures.png" format="PNG"
-							 />
-=======
 						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/gathercast-signatures.png" format="PNG" />
->>>>>>> .r8623
 					</imageobject>
 				</mediaobject>
 			</figure>

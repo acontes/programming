@@ -141,13 +141,7 @@
 	a client and uses the <literal>CMAgent</literal> class as a server</title></info> 
 		  <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                       fileref="guided_tour/pics/cma/simpleCMA.jpg"
-                       format="JPG"  />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/cma/simpleCMA.jpg" format="JPG" />
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
@@ -156,7 +150,7 @@
 	object is located on. This object will be use as return value for the <literal>getCurrentState()</literal>
 	method in the <literal>CMAgent</literal> class.
 	</para>
-	
+	 
 	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/state_full.snip"/></textobject></programlisting>
 	
 	<para>
@@ -306,13 +300,7 @@
       		 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                         fileref="guided_tour/pics/cma/initCMA.jpg"
-                         format="JPG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/cma/initCMA.jpg" format="JPG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -1295,13 +1283,7 @@
 					
 					<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  
-								fileref="guided_tour/pics/primes/primes_dg.png" format="PNG"
-								 />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/primes/primes_dg.png" format="PNG" />
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1317,13 +1299,7 @@
 					
 					<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  
-								fileref="guided_tour/pics/cma/primes_distrib.jpg" format="JPEG"
-								 />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/cma/primes_distrib.jpg" format="JPEG" />
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1396,13 +1372,7 @@
 					
 					<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  
-								fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG"
-								 />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG" />
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1563,13 +1533,7 @@
 					<mediaobject>
 						<imageobject>
 							<!-- CHANGE ME !! -->
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  
-							fileref="guided_tour/pics/cma/primes_distrib_mw.jpg" format="JPEG"
-								 />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/cma/primes_distrib_mw.jpg" format="JPEG" />
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>

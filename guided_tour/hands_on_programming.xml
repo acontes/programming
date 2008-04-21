@@ -49,13 +49,7 @@
 	<figure><info><title> Client-Server architecture</title></info> 
 		  <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                       fileref="guided_tour/pics/hello/clientserver.png"
-                       format="PNG"  />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/clientserver.png" format="PNG" />
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
@@ -69,7 +63,7 @@
 		the <literal>HelloWorld</literal> class corresponds to the server and its instance is an active object which provides a sayHello
 		method as a remote service.
 	</para>		
-	<para>
+	<para> 
 		To safely use the <literal>HelloWorld</literal> class as an active object
 		we have to meet three requirements.
 	</para>
@@ -184,13 +178,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       		 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                         fileref="guided_tour/pics/screenshots/ic2d_simplehello.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_simplehello.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -235,13 +223,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       		 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                         fileref="guided_tour/pics/hello/initializedhello.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/initializedhello.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -312,13 +294,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       		 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                         fileref="guided_tour/pics/screenshots/ic2d_initialized_hello.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_initialized_hello.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -572,13 +548,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   				
   				<mediaobject>
   					<imageobject>
-<<<<<<< .mine
-  						<imagedata scalefit="1" width="100%" contentdepth="100%"  
-  							fileref="guided_tour/pics/hello/DeployedHelloWorld.png"
-  							format="PNG"  />
-=======
   						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DeployedHelloWorld.png" format="PNG" />
->>>>>>> .r8623
   					</imageobject>
   				</mediaobject>
   			</figure>
@@ -668,13 +638,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   				
   				<mediaobject>
   					<imageobject>
-<<<<<<< .mine
-  						<imagedata scalefit="1" width="100%" contentdepth="100%"  
-  							fileref="guided_tour/pics/screenshots/ic2d_deployed_hello.png"
-  							format="PNG"  />
-=======
   						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_deployed_hello.png" format="PNG" />
->>>>>>> .r8623
   					</imageobject>
   				</mediaobject>
   			</figure>
@@ -717,13 +681,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                         fileref="guided_tour/pics/hello/MigratableHelloWorld.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/MigratableHelloWorld.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -829,13 +787,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       		 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                         fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_started.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_started.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -850,13 +802,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       		 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                         fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_final.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_final.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -881,11 +827,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -899,11 +841,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			
 		  <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/distributed_primes_bootstrap.png" format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/distributed_primes_bootstrap.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -918,11 +856,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			
 		  <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/distributed_primes_regular.png" format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/distributed_primes_regular.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -1021,11 +955,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       		 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_primes.png" format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_primes.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>
@@ -1045,11 +975,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
           
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_primes_migrated.png" format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_primes_migrated.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure>

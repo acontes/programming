@@ -59,12 +59,7 @@
 
         <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal.png"
-                       format="PNG" />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal.png" format="PNG"/>
->>>>>>> .r8623
           </imageobject>
 
         </mediaobject>
@@ -73,15 +68,10 @@
     <para>ProActive/Fractal features distributed components:</para>
     <para><figure><info><title>A system of distributed ProActive/Fractal components (blue, yellow and white represent distinct locations)</title></info>
         
-
+ 
         <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal-proactive-distributed.png"
-                       format="PNG" />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal-proactive-distributed.png" format="PNG"/>
->>>>>>> .r8623
           </imageobject>
 
         </mediaobject>
@@ -93,12 +83,7 @@
 
         <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal-proactive-aos.png"
-                       format="PNG" />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal-proactive-aos.png" format="PNG"/>
->>>>>>> .r8623
           </imageobject>
 
         </mediaobject>
@@ -312,12 +297,7 @@
 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/standard-mop.png"
-                         format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/standard-mop.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -353,12 +333,7 @@
 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/components-mop.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/components-mop.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>

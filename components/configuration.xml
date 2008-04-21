@@ -349,18 +349,14 @@ l invocation");
 
         <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/shortcuts.png" format="PNG" />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/shortcuts.png" format="PNG"/>
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
     </section>
 
     <section><info><title>Configuration</title></info>
-      
+       
 
       <para>Shortcuts are available when composite components are synchronous
       components (this does not break the ProActive model, as composite

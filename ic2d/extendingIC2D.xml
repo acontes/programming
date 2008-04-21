@@ -95,12 +95,7 @@
 					
 					<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  
-								fileref="ic2d/images/architecture/graphicalHierarchy.png" format="PNG" />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/architecture/graphicalHierarchy.png" format="PNG"/>
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -109,7 +104,7 @@
 			<section xml:id="hierarchyPart"><info><title>Class Diagrams</title></info>
 
 				
-
+ 
 				<para>
 					The diagram	<xref linkend="hierarchy"/> describes relationships between Java classes:
 				</para>
@@ -158,12 +153,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png" format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -231,13 +221,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/sequenceDiagram.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/sequenceDiagram.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -320,13 +304,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/GEFDataTransparency.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/GEFDataTransparency.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -337,13 +315,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/GEFEditPartTransparency.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/GEFEditPartTransparency.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -354,13 +326,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/GEFFigureTransparency.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/GEFFigureTransparency.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -418,13 +384,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/treeArchitectureGef.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/treeArchitectureGef.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -568,13 +528,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/ObservableTransparency.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/ObservableTransparency.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -594,13 +548,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/ObserverTransparency.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/ObserverTransparency.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -720,13 +668,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/SpyTransparency.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/SpyTransparency.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -754,13 +696,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"
-									fileref="ic2d/images/architecture/sequenceDiagramSpies.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/sequenceDiagramSpies.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1142,12 +1078,7 @@
 					
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/svnRepository.png" format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/svnRepository.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 				</figure>
@@ -1174,12 +1105,7 @@
 					
 					<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%" 
-								fileref="ic2d/images/extending/launch.png" format="PNG" />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/launch.png" format="PNG"/>
->>>>>>> .r8623
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1259,12 +1185,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/new_project.png" format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/new_project.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1326,13 +1247,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/new_plugin_project.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/new_plugin_project.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1369,13 +1284,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/new_plugin_project_2.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/new_plugin_project_2.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1407,13 +1316,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/package_explorer.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/package_explorer.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1449,12 +1352,7 @@
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/overview.png" format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/overview.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1655,12 +1553,7 @@ bin.includes = META-INF/,\ .
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/ic2d_product.png" format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/ic2d_product.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1673,13 +1566,7 @@ bin.includes = META-INF/,\ .
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/plugin_selection.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/plugin_selection.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1726,13 +1613,7 @@ bin.includes = META-INF/,\ .
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/product_plugins.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/product_plugins.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1749,13 +1630,7 @@ bin.includes = META-INF/,\ .
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/workbench_decomposed.png"
-									format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/workbench_decomposed.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1840,12 +1715,7 @@ bin.includes = META-INF/,\ .
 						
 						<mediaobject>
 						<imageobject>
-<<<<<<< .mine
-							<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/extensions-0.png" format="PNG" />
-=======
 							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/extensions-0.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1894,12 +1764,7 @@ bin.includes = META-INF/,\ .
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/extensions-1.png" format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/extensions-1.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1932,12 +1797,7 @@ bin.includes = META-INF/,\ .
 						
 						<mediaobject>
 							<imageobject>
-<<<<<<< .mine
-								<imagedata scalefit="1" width="100%" contentdepth="100%" 
-									fileref="ic2d/images/extending/extensions-2.png" format="PNG" />
-=======
 								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/extensions-2.png" format="PNG"/>
->>>>>>> .r8623
 							</imageobject>
 						</mediaobject>
 					</figure>

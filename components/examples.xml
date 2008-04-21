@@ -269,18 +269,14 @@ public class AImpl implements A, BindingController {
 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/model.png" format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/model.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
     </section>
 
     <section><info><title>Distributed deployment</title></info>
-      
+       
 
       <para>This section is specific to the ProActive implementation, as it
       uses the deployment framework of this library.</para>
@@ -310,12 +306,7 @@ public class AImpl implements A, BindingController {
 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/distributed-components-no-wrappers.png"
-                         format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/distributed-components-no-wrappers.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -326,12 +317,7 @@ public class AImpl implements A, BindingController {
 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/distributed-components-wrappers.png"
-                         format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/distributed-components-wrappers.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>

@@ -35,18 +35,12 @@
                 
                 <mediaobject>
                     <imageobject>
-<<<<<<< .mine
-                        <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                            fileref="components/pics/C3D-Components-UML.png"
-                            format="PNG"  />
-=======
                         <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="components/pics/C3D-Components-UML.png" format="PNG" />
->>>>>>> .r8623
                     </imageobject>
                 </mediaobject>
             </figure>
         </para>
-        <para>
+        <para> 
             We consider the working C3D application. It's nice, and has
             a sleak GUI, but we now want to add component power to it!
             What we do is shown on the image: add wrappers around the
