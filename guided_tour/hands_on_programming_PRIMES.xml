@@ -68,7 +68,7 @@
 					<mediaobject>
 						<imageobject>
 							<!-- CHANGE ME !! -->
-							<imagedata contentwidth="100" fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" width="6in"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -221,7 +221,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100" fileref="guided_tour/pics/primes/primes_dg.png" format="PNG" width="6in"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/primes/primes_dg.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -301,7 +301,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100" fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG" width="6in"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -462,7 +462,7 @@
 					<mediaobject>
 						<imageobject>
 							<!-- CHANGE ME !! -->
-							<imagedata contentwidth="100" fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" width="6in"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>

@@ -350,7 +350,7 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -385,7 +385,7 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -395,7 +395,7 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -459,7 +459,7 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>

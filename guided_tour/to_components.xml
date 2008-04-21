@@ -35,7 +35,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata contentwidth="100" fileref="components/pics/C3D-Components-UML.png" format="PNG" width="6in"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="components/pics/C3D-Components-UML.png" format="PNG" />
                     </imageobject>
                 </mediaobject>
             </figure>

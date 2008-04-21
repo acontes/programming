@@ -1,5 +1,3 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="capabilities-intro"><info><title xml:id="Introduction_Proactive_Features">ProActive Example
    Applications</title></info>
   
@@ -53,7 +51,7 @@
 
       <mediaobject>
         <imageobject>
-          <imagedata contentwidth="100" fileref="images/c3d.png" format="PNG" width="6in"/>
+          <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="images/c3d.png" format="PNG"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -95,7 +93,7 @@
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png" format="PNG" width="4.5in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -118,7 +116,7 @@
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.png" format="PNG"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_specify_host.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -132,7 +130,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.png" format="PNG" width="4.5in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_user_alice.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -253,7 +251,7 @@
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/readers_app.png" format="PNG"/>
+                <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/readers_app.png" format="PNG"/>
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -303,7 +301,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
             
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.png" format="PNG"/>
+                <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/philosophers_app.png" format="PNG"/>
               </imageobject>
             </mediaobject>
           </figure>
@@ -316,7 +314,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/think.png" format="PNG"/>
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/think.png" format="PNG"/>
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">philosophizing</emphasis></para>
           </listitem>
@@ -324,7 +322,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/wait.png" format="PNG"/>
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/wait.png" format="PNG"/>
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">hungry, wants the
             fork!</emphasis></para>
@@ -333,7 +331,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/eat.png" format="PNG"/>
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/eat.png" format="PNG"/>
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">eating</emphasis></para>
           </listitem>
@@ -345,7 +343,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/fork1.png" format="PNG"/>
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/fork1.png" format="PNG"/>
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">taken</emphasis></para>
           </listitem>
@@ -353,7 +351,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/fork0.png" format="PNG"/>
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/fork0.png" format="PNG"/>
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">free</emphasis></para>
           </listitem>
@@ -414,7 +412,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/penguin.png" format="PNG"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/penguin.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -881,7 +879,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -916,7 +914,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -926,7 +924,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -990,7 +988,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG" width="6in"/>
+              <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -1253,7 +1251,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="guided_tour/pics/nbody/gui.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/gui.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -1266,7 +1264,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="guided_tour/pics/nbody/gui3d.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/gui3d.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -1307,7 +1305,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata fileref="guided_tour/pics/nbody/interactions.png" format="PNG"/>
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/interactions.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -1318,7 +1316,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -1343,7 +1341,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata fileref="guided_tour/pics/nbody/forces_sum.png" format="PNG"/>
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/forces_sum.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -1366,7 +1364,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata fileref="guided_tour/pics/nbody/acc.png" format="PNG"/>
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/acc.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -1382,7 +1380,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata fileref="guided_tour/pics/nbody/movement_equations.png" format="PNG"/>
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/movement_equations.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -1514,7 +1512,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                     
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="guided_tour/pics/nbody/directory.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/directory.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -1597,7 +1595,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                             
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -2096,7 +2094,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
-                                                <imagedata fileref="guided_tour/pics/nbody/Domain_subdivision.png" format="PNG"/>
+                                                <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/Domain_subdivision.png" format="PNG"/>
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -2107,7 +2105,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
-                                                <imagedata fileref="guided_tour/pics/nbody/tree.png" format="PNG"/>
+                                                <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/tree.png" format="PNG"/>
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -2203,7 +2201,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata contentwidth="100" fileref="components/pics/C3D-Components-UML.png" format="PNG" width="6in"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="components/pics/C3D-Components-UML.png" format="PNG" />
                     </imageobject>
                 </mediaobject>
             </figure>
