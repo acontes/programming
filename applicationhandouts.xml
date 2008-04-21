@@ -33,13 +33,7 @@
 
       <mediaobject>
         <imageobject>
-<<<<<<< .mine
-          <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                     fileref="images/c3d.png" format="PNG"
-                      />
-=======
           <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="images/c3d.png" format="PNG" />
->>>>>>> .r8623
         </imageobject>
       </mediaobject>
     </figure>
@@ -75,12 +69,7 @@
       <informalfigure>
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -89,12 +78,7 @@
        <informalfigure>
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/c3d_specify_host.png"
-                         format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_specify_host.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -103,12 +87,7 @@
 		<informalfigure>
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/c3d_user_alice.png"
-                         format="PNG"  />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_user_alice.png" format="PNG" />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -159,12 +138,7 @@
 
             <mediaobject>
               <imageobject>
-<<<<<<< .mine
-                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/readers_app.png"
-                           format="PNG" />
-=======
                 <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/readers_app.png" format="PNG"/>
->>>>>>> .r8623
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -204,12 +178,7 @@
             
             <mediaobject>
               <imageobject>
-<<<<<<< .mine
-                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/philosophers_app.png"
-                           format="PNG" />
-=======
                 <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/philosophers_app.png" format="PNG"/>
->>>>>>> .r8623
               </imageobject>
             </mediaobject>
           </figure>
@@ -222,11 +191,7 @@
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-<<<<<<< .mine
-                  <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/think.png" format="PNG" />
-=======
                   <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/think.png" format="PNG"/>
->>>>>>> .r8623
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">philosophizing</emphasis></para>
           </listitem>
@@ -234,11 +199,7 @@
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-<<<<<<< .mine
-                  <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/wait.png" format="PNG" />
-=======
                   <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/wait.png" format="PNG"/>
->>>>>>> .r8623
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">hungry, wants the
             fork!</emphasis></para>
@@ -247,11 +208,7 @@
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-<<<<<<< .mine
-                  <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/eat.png" format="PNG" />
-=======
                   <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/eat.png" format="PNG"/>
->>>>>>> .r8623
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">eating</emphasis></para>
           </listitem>
@@ -263,11 +220,7 @@
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-<<<<<<< .mine
-                  <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/fork1.png" format="PNG" />
-=======
                   <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/fork1.png" format="PNG"/>
->>>>>>> .r8623
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">taken</emphasis></para>
           </listitem>
@@ -275,11 +228,7 @@
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-<<<<<<< .mine
-                  <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/fork0.png" format="PNG" />
-=======
                   <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/fork0.png" format="PNG"/>
->>>>>>> .r8623
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">free</emphasis></para>
           </listitem>
@@ -325,12 +274,7 @@
 	<informalfigure>
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/penguin_controller.png"
-                         format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/penguin_controller.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -339,12 +283,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/penguin.png"
-                         format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/penguin.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -412,12 +351,7 @@
 		<informalfigure>
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/toto_chat.png"
-                         format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/toto_chat.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -429,12 +363,7 @@
 		<informalfigure>
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/tutu_chat.png"
-                         format="PNG" />
-=======
               <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/tutu_chat.png" format="PNG"/>
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -812,30 +741,19 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-<<<<<<< .mine
-                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                                        fileref="guided_tour/pics/nbody/interactions.png"
-                                                        format="PNG" />
-=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/interactions.png" format="PNG"/>
->>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
                                     </para>
                                 </entry>
                                 <entry>
+
                                     <para>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-<<<<<<< .mine
-                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                                        fileref="guided_tour/pics/nbody/forces_simple.png"
-                                                        format="PNG" />
-=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
->>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -860,13 +778,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-<<<<<<< .mine
-                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                                        fileref="guided_tour/pics/nbody/forces_sum.png"
-                                                        format="PNG" />
-=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/forces_sum.png" format="PNG"/>
->>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -889,13 +801,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-<<<<<<< .mine
-                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                                        fileref="guided_tour/pics/nbody/acc.png"
-                                                        format="PNG" />
-=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/acc.png" format="PNG"/>
->>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -911,13 +817,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-<<<<<<< .mine
-                                                    <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                                        fileref="guided_tour/pics/nbody/movement_equations.png"
-                                                        format="PNG" />
-=======
                                                     <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/movement_equations.png" format="PNG"/>
->>>>>>> .r8623
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -1087,13 +987,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
-<<<<<<< .mine
-                                                <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                                    fileref="guided_tour/pics/nbody/Domain_subdivision.png"
-                                                    format="PNG" />
-=======
                                                 <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/Domain_subdivision.png" format="PNG"/>
->>>>>>> .r8623
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -1104,13 +998,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
-<<<<<<< .mine
-                                                <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                                    fileref="guided_tour/pics/nbody/tree.png"
-                                                    format="PNG" />
-=======
                                                 <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/tree.png" format="PNG"/>
->>>>>>> .r8623
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -1151,13 +1039,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-<<<<<<< .mine
-                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                fileref="guided_tour/pics/nbody/gui.png"
-                                format="PNG" />
-=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/gui.png" format="PNG"/>
->>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -1171,13 +1053,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-<<<<<<< .mine
-                            <imagedata scalefit="1" width="100%" contentdepth="100%" 
-                                fileref="guided_tour/pics/nbody/gui3d.png"
-                                format="PNG" />
-=======
                             <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/gui3d.png" format="PNG"/>
->>>>>>> .r8623
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -1226,13 +1102,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                 
                 <mediaobject>
                     <imageobject>
-<<<<<<< .mine
-                        <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                            fileref="components/pics/C3D-Components-UML.png"
-                            format="PNG"  />
-=======
                         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/C3D-Components-UML.png" format="PNG"/>
->>>>>>> .r8623
                     </imageobject>
                 </mediaobject>
             </figure>
