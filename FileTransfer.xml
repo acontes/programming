@@ -432,15 +432,10 @@ File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arri
 
       <figure><info><title>File Transfer Design</title></info>
         
-
+ 
         <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/imgs/fileTransferDesign.png"
-                       format="PNG" />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/imgs/fileTransferDesign.png" format="PNG"/>
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>

@@ -40,18 +40,12 @@
 		  <mediaobject>
           <imageobject>
 
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                       fileref="guided_tour/pics/masterworker/DistributedPrimesMWdia.jpg"
-                       format="JPG"  />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/masterworker/DistributedPrimesMWdia.jpg" format="JPG" />
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
      <section><info><title>Application components</title></info>
-     	  
+      	  
       	<para>
       		The general simple algorithm for using the Master-Worker API is the following:
       	</para>
@@ -180,13 +174,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	<figure><info><title> Component with inner component distributed </title></info> 
 		  <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                       fileref="guided_tour/pics/gcm/gcm_nodes.png"
-                       format="PNG"  />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_nodes.png" format="PNG" />
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
@@ -269,13 +257,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	<figure><info><title> Component parameters </title></info> 
 		  <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                       fileref="guided_tour/pics/gcm/gcm_parameters.png"
-                       format="PNG"  />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_parameters.png" format="PNG" />
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
@@ -299,13 +281,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	<figure><info><title> Invocation parameter with a gathercast interface </title></info> 
 		  <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                       fileref="guided_tour/pics/gcm/gcm_gathercast_invocation.png"
-                       format="PNG"  />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_gathercast_invocation.png" format="PNG" />
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
@@ -315,13 +291,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	<figure><info><title> Distribution policies </title></info> 
 		  <mediaobject>
           <imageobject>
-<<<<<<< .mine
-            <imagedata scalefit="1" width="100%" contentdepth="100%"  
-                       fileref="guided_tour/pics/gcm/distribution_policies.png"
-                       format="PNG"  />
-=======
             <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/distribution_policies.png" format="PNG" />
->>>>>>> .r8623
           </imageobject>
         </mediaobject>
       </figure>
@@ -441,13 +411,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	      	<figure xml:id="component_assembly"><info><title>Component assembly </title></info> 
 			  <mediaobject>
 	          <imageobject>
-<<<<<<< .mine
-	            <imagedata scalefit="1" width="100%" contentdepth="100%"  
-	                       fileref="guided_tour/pics/gcm/component_assembly.png"
-	                       format="PNG"  />
-=======
 	            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/component_assembly.png" format="PNG" />
->>>>>>> .r8623
 	          </imageobject>
 	        </mediaobject>
 	      </figure>

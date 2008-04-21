@@ -488,11 +488,7 @@ rvice(body);
 
           <mediaobject>
             <imageobject>
-<<<<<<< .mine
-             <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/nbodyft.png" format="PNG"   />
-=======
              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/nbodyft.png" format="PNG"  />
->>>>>>> .r8623
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -531,7 +527,7 @@ rvice(body);
       location as follow, assuming that the script
       <literal>startGlobalFTServer.sh</literal> has been started on the host
       <emphasis role="bold">SERVER_HOSTAME</emphasis>:</para>
-
+ 
       <screen>...                        
   &lt;services&gt;
    &lt;serviceDefinition id='appli'&gt;

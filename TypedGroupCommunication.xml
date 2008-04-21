@@ -61,17 +61,11 @@ vg.f1();</programlisting></para>
 			
 			<mediaobject>
 				<imageobject>
-<<<<<<< .mine
-					<imagedata scalefit="1" width="100%" contentdepth="100%" 
-						fileref="images/groupCreationMethodsTable.png" 
-						 format="PNG"	 align="center" />
-=======
 					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/groupCreationMethodsTable.png"  format="PNG"  align="center"/>
->>>>>>> .r8623
 				</imageobject>
 			</mediaobject>
 	</figure>
-    
+     
     <para>
     	In this chapter we will show how to create a group, send a request to the
     	members of the group, and retrieve the results. 
