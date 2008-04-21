@@ -152,7 +152,7 @@
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="scilab/pics/ScilabToolBox.png"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -175,7 +175,7 @@
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="scilab/pics/ScilabToolBox1.png"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox1.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -198,7 +198,7 @@
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="scilab/pics/ScilabToolBox2.png"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox2.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -220,7 +220,7 @@
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="scilab/pics/ScilabToolBox4.png"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox4.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -281,7 +281,7 @@
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="scilab/pics/ScilabToolBox3.png"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox3.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>

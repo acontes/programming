@@ -32,7 +32,7 @@
         <para>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="timit/pics/chartsExamples.png" format="PNG"/>
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="timit/pics/chartsExamples.png" format="PNG"/>
                 </imageobject>
             </mediaobject>
             <programlisting xml:lang="xml">&lt;timit&gt;

@@ -29,7 +29,7 @@
        
         <mediaobject>
           <imageobject>
-            <imagedata fileref="development/plugin_files/guided_tour.jpg" format="JPG" contentwidth="100" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/guided_tour.jpg" format="JPG"  />
           </imageobject>
         </mediaobject>
       </figure>
@@ -69,7 +69,7 @@
        
         <mediaobject>
           <imageobject>
-           <imagedata fileref="development/plugin_files/wizard_active.jpg" format="JPG" contentwidth="100" width="6in"/>
+           <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  />
           </imageobject>
         </mediaobject>
       </figure>
@@ -82,7 +82,7 @@
        
         <mediaobject>
           <imageobject>
-            <imagedata fileref="development/plugin_files/editor.jpg" format="JPG" contentwidth="100" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/editor.jpg" format="JPG"  />
           </imageobject>
         </mediaobject>
       </figure>

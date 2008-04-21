@@ -87,7 +87,7 @@
                 
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="development/imgs/descriptorProcessClassDiagram.png" format="PNG"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/imgs/descriptorProcessClassDiagram.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
