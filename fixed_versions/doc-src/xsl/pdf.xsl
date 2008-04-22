@@ -14,7 +14,7 @@
 <xsl:param name="section.autolabel.max.depth">2</xsl:param>
 -->
 
-
+ <!-- Make graphics in pdf be smaller than page width, if needed-->
 <!--
   to scale images in the pdf to the page width if the image is 
   bigger than the page width and to keep it the same size if smaller use 
@@ -42,8 +42,7 @@
  <xsl:param name="monospace.font.family">Helvetica</xsl:param>
 
  <!-- This avoids having "Draft" mode set on. Avoids the other two lines -->
-<!-- setting a value of 1 here breaks fop see http://www.mail-archive.com/docbook-apps@lists.oasis-open.org/msg09900.html -->
- <xsl:param name="fop.extensions" select="'0'" />
+ <xsl:param name="fop1.extensions" select="'1'" />
  <!-- <xsl:param name="draft.mode">no</xsl:param>  -->
  <!-- <xsl:param name="draft.watermark.image"></xsl:param>  -->
  <xsl:param name="draft.watermark.image" />
@@ -182,10 +181,6 @@
   
   
  </xsl:template>
-
- <!-- Make graphics in pdf be smaller than page width, if needed-->
- <!--  ??? How do I do that, I need to compare a measure of imagewidth with pagewidth! -->
- <!-- default.image.width exists, should be set maybe only for pdf and big images?? -->
 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -572,7 +567,7 @@
   </fo:block>
 
 <!-- The three logos, in a 1x3 table: INRIA, UNSA, CNRS/I3S -->
-  <fo:table table-layout="fixed" space-before="30mm">
+  <fo:table table-layout="fixed" space-before="27mm">
 
     <fo:table-column />
     <fo:table-column />
