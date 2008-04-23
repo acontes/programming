@@ -30,19 +30,10 @@
  */
 package org.objectweb.proactive.extensions.jmx.jboss;
 
-import org.jboss.system.ServiceMBeanSupport;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.jmx.notification.NotificationType;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.rmi.RegistryHelper;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.extensions.jmx.jboss.tests.DeployerTest;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.StartP2PService;
-import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 /**
  * This is the ProActive loader implemented as JBoss service. See

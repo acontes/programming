@@ -37,9 +37,6 @@ import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.axis.wsdl.fromJava.Emitter;
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.xml.sax.SAXException;
 
@@ -48,8 +45,6 @@ import org.xml.sax.SAXException;
  * @author The ProActive Team
  */
 public class WSDLGenerator extends WSConstants {
-	
-	protected static Logger logger = ProActiveLogger.getLogger(Loggers.WS_LOGGER);
 
     /**
      * Generates the WSDL document associate with an  active object exposed as a web service
@@ -86,10 +81,7 @@ public class WSDLGenerator extends WSConstants {
             emitter.setServiceElementName(serviceName);
 
             String wsdl = emitter.emitToString(Emitter.MODE_ALL);
-            if (logger.isInfoEnabled()) {
-				logger.info(wsdl);
-			}
-            //System.out.println(wsdl);
+            System.out.println(wsdl);
             return wsdl;
         } catch (WSDLException e) {
             e.printStackTrace();

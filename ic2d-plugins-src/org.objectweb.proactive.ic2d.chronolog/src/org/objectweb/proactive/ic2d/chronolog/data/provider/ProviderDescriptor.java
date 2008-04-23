@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.chronolog.data.provider;
 
+import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.DoubleArrayDataProvider;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.LoadedClassCountDataProvider;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.ThreadCountDataProvider;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.UsedHeapMemoryDataProvider;
@@ -67,7 +68,9 @@ public enum ProviderDescriptor {
 
     THREAD_COUNT(ThreadCountDataProvider.NAME, ThreadCountDataProvider.class),
 
-    USED_HEAP_MEMORY(UsedHeapMemoryDataProvider.NAME, UsedHeapMemoryDataProvider.class);
+    USED_HEAP_MEMORY(UsedHeapMemoryDataProvider.NAME, UsedHeapMemoryDataProvider.class),
+
+    DOUBLE_ARRAY(DoubleArrayDataProvider.NAME, DoubleArrayDataProvider.class);
 
     /** The name of the provider */
     private final String name;

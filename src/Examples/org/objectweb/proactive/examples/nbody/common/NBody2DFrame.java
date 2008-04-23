@@ -35,19 +35,26 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -60,7 +67,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         WindowListener, NBodyFrame {
     // functional
     private String[] bodyname;
-    private int[][] bodies; //[index]-> [x,y,w,d,vx,vy]
+    private int[][] bodies; // [index]-> [x,y,w,d,vx,vy]
     private ArrayList names;
     private int nbBodies;
     private CircularPostionList[] historics;
@@ -197,46 +204,107 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
     private class PlanetDisplayPanel extends JPanel {
         private final Image bkground;
         private int iter = 0;
-        private Color[] colors = { Color.RED, Color.BLUE, Color.CYAN, Color.GREEN, Color.DARK_GRAY,
-                Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK };
+        private BufferedImage[] stars;
+        private Color[] colors = { Color.GREEN, Color.RED, Color.BLUE, Color.YELLOW, Color.CYAN, Color.WHITE };
+
+        // private Color[] colors = { Color.RED, Color.BLUE, Color.CYAN, Color.GREEN,
+        // Color.DARK_GRAY,
+        // Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK };
 
         private PlanetDisplayPanel(Image bkground) {
             super();
             this.bkground = bkground;
+
+            // Image planets
+            try {
+                ClassLoader cl = this.getClass().getClassLoader();
+                stars = new BufferedImage[6];
+                for (int i = 0; i < stars.length; i++) {
+                    stars[i] = ImageIO.read(cl
+                            .getResource("org/objectweb/proactive/examples/nbody/common/gflare" + (i + 1) +
+                                ".png"));
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
             iter++;
-            g.drawImage(bkground, 0, 0, this);
+
+            Insets inset = this.getInsets();
+            Rectangle clip = g.getClipBounds();
+            Rectangle clippingRegion = new Rectangle(this.getWidth() - (inset.left + inset.right), this
+                    .getHeight() -
+                (inset.top + inset.bottom));
+
+            int xRepeat = 0;
+            int yRepeat = 0;
+
+            ImageIcon image = new ImageIcon(bkground);
+
+            int height = getSize().height - inset.bottom;
+            int width = getSize().width - inset.right;
+
+            yRepeat = (int) Math.ceil(clippingRegion.getHeight() / image.getIconHeight());
+            xRepeat = (int) Math.ceil(clippingRegion.getWidth() / image.getIconWidth());
+
+            if (clip.y + clip.height > height)
+                clip.height = height - clip.y;
+
+            if (clip.x + clip.width > width)
+                clip.width = width - clip.x;
+
+            for (int i = 0; i <= yRepeat; i++) {
+                for (int j = 0; j <= xRepeat; j++) {
+                    image.paintIcon(this, g, j * image.getIconWidth() + inset.left, i *
+                        image.getIconHeight() + inset.top);
+                }
+            }
+
+            g.drawImage(image.getImage(), 0, 0, this);
+
             // draw historics
             if (showTrace) {
                 for (int i = 0; i < nbBodies; i++) {
                     for (int j = 0; j < histoSize; j++) {
-                        int diameter = bodies[i][3] > 10 ? bodies[i][3] : 6;
-                        g.setColor(getColor(i));
-                        g.fillOval(historics[i].getX(j) + diameter / 2, historics[i].getY(j) + diameter / 2,
-                                6, 6);
-                        g.setColor(Color.DARK_GRAY);
-                        g.drawOval(historics[i].getX(j) + diameter / 2, historics[i].getY(j) + diameter / 2,
-                                6, 6);
+                        if ((historics[i].getX(j) | historics[i].getY(j)) != 0) {
+                            int diameter = bodies[i][3] > 10 ? bodies[i][3] : 6;
+                            g.setColor(getColor(i));
+                            g.fillOval(historics[i].getX(j) + 2 * diameter, historics[i].getY(j) + 2 *
+                                diameter, 6, 6);
+                            g.setColor(Color.DARK_GRAY);
+                            g.drawOval(historics[i].getX(j) + 2 * diameter, historics[i].getY(j) + 2 *
+                                diameter, 6, 6);
+                        }
                     }
                 }
             }
 
+            Graphics2D g2d = (Graphics2D) g;
+            AffineTransform originalAT = g2d.getTransform();
             g.setFont(g.getFont().deriveFont(Font.ITALIC, 12));
             for (int i = 0; i < nbBodies; i++) {
-                g.setColor(getColor(i));
+                // g.setColor(getColor(i));
                 int diameter = bodies[i][3];
                 int zoomedX = getZoomedCoord(bodies[i][0]) + xCenter;
                 int zoomedY = getZoomedCoord(bodies[i][1]) + yCenter;
-                g.fillOval(zoomedX, zoomedY, diameter, diameter);
-                g.setColor(Color.WHITE);
-                g.drawOval(zoomedX, zoomedY, diameter, diameter);
+                // g.fillOval(zoomedX, zoomedY, diameter, diameter);
+                // g.setColor(Color.WHITE);
+                // g.drawOval(zoomedX, zoomedY, diameter, diameter);
+                g.setColor(Color.LIGHT_GRAY);
                 g.drawString(bodyname[i], zoomedX + diameter, zoomedY);
+                AffineTransform newAT = (AffineTransform) (originalAT.clone());
+                newAT.rotate(Math.toRadians((i % 2 == 0 ? -1 : 1) * (iter % 360)), zoomedX + 2 * diameter,
+                        zoomedY + 2 * diameter);
+                g2d.setTransform(newAT);
+                g.drawImage(stars[i % stars.length], zoomedX, zoomedY, 4 * diameter, 4 * diameter, null);
+                g2d.setTransform(originalAT);
 
-                //update histo
+                // update histo
                 if (iter % 8 == 0) {
                     historics[i].addValues(zoomedX, zoomedY);
                 }
@@ -293,7 +361,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         }
     }
 
-    /// EVENT HANDLING
+    // / EVENT HANDLING
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == zoomIn) {
             changeZoom(1.5);
@@ -314,7 +382,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         // else logger.info("Event not caught : " + e);
     }
 
-    // WindowListener methods 
+    // WindowListener methods
     public void windowOpened(WindowEvent e) {
     }
 

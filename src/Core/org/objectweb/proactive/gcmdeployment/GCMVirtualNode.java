@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.LocalNode;
 
@@ -97,7 +98,7 @@ public interface GCMVirtualNode {
      */
     public void waitReady();
 
-    public void waitReady(int timeout) throws TimeoutException;
+    public void waitReady(int timeout) throws ProActiveTimeoutException;
 
     /**
      * Returns the number of Nodes needed to become Ready
@@ -148,7 +149,7 @@ public interface GCMVirtualNode {
      *            the object to be notified
      * @param methodName
      *            the method name to be called. The method must have this signature:
-     *            <code>void method(Node, GCMVirtualNode)</code>
+     *            <code>void method(Node, String virtualNodeName)</code>
      * @param withHistory
      *            If true already attached Node will generate notification too.
      * @return true is returned if a method named methodName with the right signature exists, false
@@ -172,7 +173,7 @@ public interface GCMVirtualNode {
      * When a client subscribe to isReady notification, the method passed as parameter is invoked
      * when the Virtual Node becomes Ready.
      * 
-     * The method must have the following signature: <code>void method(GCMVirtualNode)</code>
+     * The method must have the following signature: <code>void method(String virtualNodeName)</code>
      * 
      * This notification is not available on Greedy Virtual Node
      * 

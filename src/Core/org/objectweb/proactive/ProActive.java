@@ -40,6 +40,7 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -49,11 +50,11 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicManager;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -72,7 +73,6 @@ import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
@@ -81,11 +81,8 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorHandler;
 import org.objectweb.proactive.core.descriptor.parser.JaxpDescriptorParser;
-import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
-import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
@@ -102,7 +99,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
-import org.objectweb.proactive.core.util.NodeCreationListenerForAoCreation;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
 import org.objectweb.proactive.core.util.ProcessForAoCreation;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
@@ -1516,7 +1512,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#waitFor(Object,long)} instead
      */
     @Deprecated
-    public static void waitFor(Object future, long timeout) throws ProActiveException {
+    public static void waitFor(Object future, long timeout) throws ProActiveTimeoutException {
         // If the object is not reified, it cannot be a future
         if ((MOP.isReifiedObject(future)) == false) {
             return;
@@ -2153,7 +2149,7 @@ public class ProActive {
     public static void waitForAll(java.util.Vector futures) {
         try {
             ProActive.waitForAll(futures, 0);
-        } catch (ProActiveException e) {
+        } catch (ProActiveTimeoutException e) {
             // Exception above should never be thrown since timeout=0 means no
             // timeout
             e.printStackTrace();
@@ -2173,11 +2169,11 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#waitForAll(java.util.Vector,long)} instead
      */
     @Deprecated
-    public static void waitForAll(java.util.Vector futures, long timeout) throws ProActiveException {
+    public static void waitForAll(java.util.Vector futures, long timeout) throws ProActiveTimeoutException {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         for (Object future : futures) {
             if (time.isTimeoutElapsed()) {
-                throw new ProActiveException("Timeout expired while waiting for future update");
+                throw new ProActiveTimeoutException("Timeout expired while waiting for future update");
             }
             ProActive.waitFor(future, time.getRemainingTimeout());
         }
@@ -2212,7 +2208,8 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#waitForTheNth(java.util.Vector,int,long)} instead
      */
     @Deprecated
-    public static void waitForTheNth(java.util.Vector futures, int n, long timeout) throws ProActiveException {
+    public static void waitForTheNth(java.util.Vector futures, int n, long timeout)
+            throws ProActiveTimeoutException {
         waitFor(futures.get(n), timeout);
     }
 

@@ -50,7 +50,6 @@ public class TestVirtualNodeSubscribe {
 
     @Test
     public void test() throws FileNotFoundException, ProActiveException, InterruptedException {
-        GCMApplication gcma;
 
         gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this));
         GCMVirtualNode vnGreedy = gcma.getVirtualNode("greedy");
@@ -80,13 +79,15 @@ public class TestVirtualNodeSubscribe {
         Assert.assertEquals(2, nodes);
     }
 
-    public void isReady(GCMVirtualNode vn) {
+    public void isReady(String vnName) {
+        Assert.assertNotNull(gcma.getVirtualNode(vnName));
         isReady = true;
     }
 
-    public void nodeAttached(Node node, GCMVirtualNode vn) {
+    public void nodeAttached(Node node, String vnName) {
         nodes++;
         if (nodes == 2) {
+            GCMVirtualNode vn = gcma.getVirtualNode(vnName);
             vn.unsubscribeNodeAttachment(this, "nodeAttached");
         }
     }

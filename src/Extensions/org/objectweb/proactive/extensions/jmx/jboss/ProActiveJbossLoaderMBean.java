@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.jmx.jboss;
 
-import org.jboss.system.ServiceMBean;
-
 /**
  * This interface contains common functionality that should be implemented 
  * by all the ProActive JBoss Service MBeans

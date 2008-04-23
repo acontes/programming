@@ -4,8 +4,8 @@
 # The default logging level is INFO
 # The root logger logs in the test.log file
 
-log4j.rootLogger=DEBUG,CONSOLE,FILE
-log4j.logger.testsuite=DEBUG,CONSOLE
+log4j.rootLogger=INFO,CONSOLE
+log4j.logger.testsuite=INFO,CONSOLE
 
 #log4j.logger.testsuite = TRACE
 
@@ -15,7 +15,7 @@ log4j.logger.testsuite=DEBUG,CONSOLE
 #log4j.logger.proactive.events = DEBUG
 #log4j.logger.proactive.runtime = DEBUG
 #log4j.logger.proactive.body = DEBUG
-log4j.logger.proactive.mop = INFO
+#log4j.logger.proactive.mop = DEBUG
 #log4j.logger.proactive.groups = DEBUG
 #log4j.logger.proactive.sync_call = DEBUG
 #log4j.logger.proactive.deployment = DEBUG
@@ -78,7 +78,7 @@ log4j.logger.proactive.mop = INFO
 #log4j.logger.proactive.scheduler = DEBUG
 #log4j.logger.proactive.resourceManager = DEBUG
 
-log4j.logger.proactive.configuration = INFO
+#log4j.logger.proactive.configuration = DEBUG
 #log4j.logger.proactive.remoteobject = DEBUG,CONSOLE
 
 #log4j.logger.proactive.jmx = DEBUG
@@ -87,15 +87,14 @@ log4j.logger.proactive.configuration = INFO
 
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender
-log4j.appender.FILE.File=logs/jboss_nbody.log
+log4j.appender.FILE.File=tests.log
 # the following recreates a file for each run
 log4j.appender.FILE.Append=false
 # Appender FILE uses the PatternLayout.
 log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
 # %X{hostname} adds the hostname
 # %X{runtime} adds the runtime url
-log4j.appender.FILE.layout.ConversionPattern=%5p [%C line:%L]: %m%n
-
+log4j.appender.FILE.layout.ConversionPattern=%5p [%t]: %m%n
 
 
 #CONSOLE uses PatternLayout
@@ -107,8 +106,7 @@ log4j.appender.FILE.layout.ConversionPattern=%5p [%C line:%L]: %m%n
 
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-log4j.appender.CONSOLE.threshold=INFO
 # %X{hostname} adds the hostname
 # %X{runtime} adds the runtime url
 #log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{runtime} - [%20.20c{2}] %m
-log4j.appender.CONSOLE.layout.ConversionPattern=%5p [%t]: %m%n
+log4j.appender.CONSOLE.layout.ConversionPattern=%m %n

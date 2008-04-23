@@ -108,9 +108,6 @@ public interface Loggers {
     public static final String FAULT_TOLERANCE = CORE + ".ft";
     public static final String FAULT_TOLERANCE_CIC = FAULT_TOLERANCE + ".cic";
     public static final String FAULT_TOLERANCE_PML = FAULT_TOLERANCE + ".pml";
-    
-    // Webservice loggers
-    public static final String WS_LOGGER = CORE + ".webservice";
 
     // MPI loggers
     static final public String MPI = CORE + ".mpi";
@@ -168,13 +165,11 @@ public interface Loggers {
     static final public String JMX = CORE + ".jmx";
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
+    // JBOSS
+    public static final String JBOSS = JMX + ".jboss";
 
     // Exceptions
     public static final String EXCEPTIONS = CORE + ".exceptions";
     public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";
     public static final String EXCEPTIONS_SEND_REPLY = EXCEPTIONS + ".send_reply";
-    
-    // JBoss integration
-    public static final String JBOSS = JMX + ".jboss";
-    
 }
