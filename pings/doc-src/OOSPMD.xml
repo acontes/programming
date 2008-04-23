@@ -1,0 +1,375 @@
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="OOSPMD"><info><title>OOSPMD</title></info>
+  
+
+  <section><info><title>OOSPMD: Introduction</title></info>
+    
+
+    <indexterm><primary>OOSPMD</primary><secondary>definition</secondary></indexterm>
+    
+    <para>SPMD stands for Single Program Multiple Data. Merged into an
+    object-oriented framework, an SPMD programming model becomes an OOSPMD
+    programming model.</para>
+
+    <para>The typed group communication system can be used to simulate
+    MPI-style collective communication. Contrary to MPI that requires all
+    members of a group to collectively call the same communication primitive,
+    our group communication scheme let the possibility to one activity to call
+    a method on the group.</para>
+
+    <para>The purpose of our group communication is to free the programmer
+    from having to implement the complex communication code required for
+    setting identical group in each SPMD activity, group communication,
+    thereby allowing the focus to be on the application itself.</para>
+
+    <para>This page presents the mechanism of typed group communication as an
+    new alternative to the old SPMD programming model. While being placed in
+    an object-oriented context, this mechanism helps the definition and the
+    coordination of distributed activities. The approach offers, through
+    modest size API, a better structuring flexibility and implementation. The
+    automation of key communication mechanisms and synchronization simplifies
+    the writing of the code.</para>
+
+    <para>The main principle is rather simple: an spmd group is a group of
+    active objects where each one has a group referencing all the active
+    objects.</para>
+    
+    <para>A MPI to ProActive summary will be presented at the end of this
+    chapter (see <xref linkend="mpi_to_proactive_summary"/>).</para>
+  </section>
+
+  <section><info><title>SPMD Groups</title></info>
+    
+
+    <indexterm><primary>OOSPMD</primary><secondary>groups</secondary></indexterm>
+    
+    <para>An spmd group is a ProActive typed group built with the <emphasis role="bold">PASPMD.newSPMDGroup()</emphasis> method. This method looks
+    like the <emphasis role="bold">ProActiveGroup.newGroup()</emphasis>; they
+    have similar behavior (and overloads). The difference is that each members
+    of an spmd group have a reference to a group containing all the others
+    members and itself (i.e. a reference to the spmd group itself).</para>
+
+    <para>Given a standard Java class:</para>
+
+    
+      <para><programlisting xml:lang="java">class A { 
+  public A() {}
+  public void foo (...) {...}
+  public void bar (...) {...}
+  ...
+}</programlisting></para>
+    
+
+    <para>The spmd group is built as follow:</para>
+
+    
+      <para><programlisting xml:lang="java">  Object[][] params = {{...} , {...} , ... }; 
+  Node[] nodes  = { ... , ..., ... }; 
+  A agroup = (A) PASPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
+    
+
+    <para>Object members of an spmd group are aware about the whole group.
+    They can obtain some informations about the spmd group they belong to such
+    as the size of the group, their rank in the group, and a reference to the
+    group in order to get more informations or to communicate with method
+    invocations. Those informations are respectively obtained using the static
+    methods <emphasis role="bold">getMySPMDGroupSize()</emphasis>, <emphasis role="bold">getMyRank()</emphasis>, and <emphasis role="bold">getSPMDGroup()</emphasis> of the <emphasis role="bold">PASPMD</emphasis> class.</para>
+  </section>
+
+  <section><info><title>Synchronizing activities with barriers</title></info>
+    
+
+    <indexterm><primary>Barriers</primary><secondary>definition</secondary></indexterm>
+    
+    <para>Synchronizing processes is an important operation in any distributed
+    system. For example, it can help to coordinate the action of several
+    processes to perform a joint computation. It can also help to manage
+    concurrency when several processes try to reach the same resource.</para>
+    
+    <para>There is different techniques to synchronize processes between them.
+    With a SPMD application, there is the <emphasis role="bold">synchronization
+    barriers</emphasis> mechanism.</para>
+    
+
+    
+    <para><emphasis role="bold">Particularities of the ProActive barriers
+    </emphasis></para>
+    
+    <para>Traditional barriers as those provided for example by MPI
+    have a blocking behavior. When a process meets such a barrier, it fully
+    stops its execution <emphasis>immediately</emphasis> and informs all the
+    other members of the SPMD group about its state. It is only when all the
+    other members have reach this barrier too that all the processes will be
+    able to continue their execution.</para>
+    
+    <para>However, the barriers are often used to synchronize the communication
+    between processes. Thus, a blocking barrier which will completely stop the
+    execution of a process without distinction between local computation and
+    communication is not efficient.</para>
+    
+    <para>Then ProActive provides <emphasis>non-blocking</emphasis> barriers
+    to only synchronize communication between activities.</para>
+    
+    <para>When an activity reaches during a service a <emphasis>barrier
+    instruction</emphasis>, it continues the execution of the current service
+    until its end, and tag all the next outgoing requests as <emphasis>post
+    barrier</emphasis>. Consequently, any activity receiving a request tagged
+    like this will delay its service until all the activities implied in this
+    synchronization are ready to synchronize.
+    An example of this behavior is illustrated on the
+    <xref linkend="oospmd_barriers_behavior"/>.</para>
+    <para>This example presents the timelines of three active objects which are
+    performing a <emphasis>total barrier</emphasis>. As they was sent
+    <emphasis>before</emphasis> the reach of the barrier instruction
+    (symbolized by a red point), the requests <emphasis>A</emphasis> and
+    <emphasis>B</emphasis> are served <emphasis>before</emphasis> the
+    synchronization. On the contrary, as they was sent <emphasis>after
+    </emphasis> the barrier instruction, the requests <emphasis>X</emphasis>
+    and <emphasis>Y</emphasis> are served <emphasis>after</emphasis> the
+    synchronization.</para>
+        
+    <figure xml:id="oospmd_barriers_behavior"><info><title>Behavior example of a total barrier</title></info>
+      
+
+      <mediaobject>
+        <imageobject role="fo">
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/oospmd_barriers_schema.svg" format="SVG"/>
+        </imageobject>
+        <imageobject role="html">
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/oospmd_barriers_schema.png" format="PNG"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <para>The OO SPMD programming model provided by ProActive offers three
+    kinds of barriers to synchronize activities:</para>
+    
+    <itemizedlist>
+      <listitem>
+        <para>the <emphasis role="bold">Total Barrier</emphasis></para>
+      </listitem>
+
+      <listitem>
+        <para>the <emphasis role="bold">Neighbor Barrier</emphasis></para>
+      </listitem>
+
+      <listitem>
+        <para>the <emphasis role="bold">Method-based Barrier</emphasis></para>
+      </listitem>
+    </itemizedlist>
+    
+    <para>Here is a presentation about how to use those barriers.</para>
+
+  <section><info><title>Total Barrier</title></info>
+    
+
+    <para>Total barrier directly involves the spmd group. A call to <emphasis role="bold">barrier(String)</emphasis> will block until all the members in
+    the spmd group have themselves reach and called the identical <emphasis role="bold">PASPMD.barrier()</emphasis> primitive. Such call communicates
+    with all the members of the spmd group. The barrier is released when the
+    Active Object has received a <emphasis>barrier message</emphasis> from all
+    other members of the spmd group (including itself).</para>
+
+    <para>The string parameter is used as a unique identity name for the
+    barrier. <emphasis>It is the programmer responsibility to ensure that two (or more)
+    different barriers with the same id name are not invoked
+    simultaneously.</emphasis></para>
+
+    <para>Let us take a Java class that contains a method calling a total
+    barrier, here the method <emphasis role="bold">foo</emphasis>:</para>
+
+    
+      <para><programlisting xml:lang="java">class A { 
+  public A() {}
+  public void foo (...) {
+    ...
+    PASPMD.barrier('MyBarrier');
+  }
+  public void bar (...) {...}
+  ...
+}</programlisting></para>
+    
+
+    <para>Note that usually, strings used as unique ID are more complex; they
+    can be based on the full name of the class or the package (<emphasis role="bold">org.objectweb.proactive.ClassName</emphasis>), for example.
+    The spmd group is built as follow:</para>
+
+    
+      <para><programlisting xml:lang="java">  Object[][] params = {{...} , {...} , ... }; 
+  Node[] nodes  = { ... , ..., ... }; 
+  A agroup = (A) PASPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
+    
+
+    <para>Here the main method of our application:</para>
+
+    
+      <para><programlisting xml:lang="java">  agroup.foo();
+  agroup.bar();</programlisting></para>
+    
+
+    <para>The call to <emphasis role="bold">barrier</emphasis> launched by all
+    members (in the invocation of <emphasis role="bold">foo</emphasis>)
+    ensures that no one will initiate the <emphasis role="bold">bar</emphasis>
+    method before all the <emphasis role="bold">foo</emphasis> methods
+    end.</para>
+
+    <para>The programmer have to ensure that <emphasis role="bold">all the
+    members of an spmd group call the barrier method</emphasis> otherwise the
+    members of the group may indefinitely wait.</para>
+  </section>
+
+  <section><info><title>Neighbor
+    barrier</title></info>
+    
+
+    <para>The Neighbor barrier is a kind of light weighted barrier, involving
+    not all the member of an spmd group, but only the Active Objects specified
+    in a given group.</para>
+
+    <para><emphasis role="bold">barrier(String,group)</emphasis> initiates a
+    barrier only with the objects of the specified group. Those objects, that
+    contribute to the end of the barrier state, are called
+    <emphasis>neighbors</emphasis> as they are usually local to a given
+    topology, an object that invokes the Neighbor barrier HAVE TO BE IN THE
+    GROUP given as parameter. The <emphasis>barrier message</emphasis> is only
+    sent to the group of neighbors.</para>
+
+    <para>The programmer has to explicitly build this group of neighbors. The
+    topology API can be used to build such group. Topologies are
+    groups. They just give special access to their members or (sub)groups
+    members. For instance, a matrix fits well with the topology <emphasis role="bold">Plan</emphasis> that provides methods to get the reference of
+    neighbor members (<emphasis role="bold">left</emphasis>, <emphasis role="bold">right</emphasis>, <emphasis role="bold">up</emphasis>,
+    <emphasis role="bold">down</emphasis>). 
+    
+    See the javadoc of the topology package for more information:</para>
+   
+    <!-- This url can only work in the html generated files: in pdf there's no ".." -->
+   <screen><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/core/group/topology/package-summary.html" os="html">org.objectweb.proactive.core.group.topology</link><phrase os="pdf">org.objectweb.proactive.core.group.topology</phrase></screen>
+   
+    <para>Like for the Total barrier, the string parameter represents a unique
+    identity name for the barrier. The second parameter is the group of
+    neighbors built by the programmer. Here is an example:</para>
+
+    
+      <para><programlisting xml:lang="java"> PASPMD.barrier('MyString', neighborGroup); </programlisting></para>
+    
+
+    <para>Refer to the <emphasis>Jacobi</emphasis> example to see a use-case of the
+    Neighbor barrier. Each submatrix needs only to be synchronized with the
+    submatrixes which are in its cardinal neighbors.</para>
+
+    <para>This barrier increases the asynchronism and reduce the amount of
+    exchanged messages.</para>
+  </section>
+
+  <section><info><title>Method Barrier</title></info>
+    
+
+    <para>The Method barrier does no more involve extra messages to
+    communicate (i.e. the <emphasis>barrier messages</emphasis>).
+    Communications between objects to release a barrier are achieved by the
+    standard method call and request reception of ProActive.</para>
+
+    <para>As a standard barrier, the method <emphasis role="bold">barrier(String[])</emphasis>
+    will finish the current request served by the active object that calls it, but it then wait for a request on the specified
+    methods to resume. The array of string contains the name of the awaited
+    methods. The order of the methods does not matter. For example:</para>
+
+    
+      <para><programlisting xml:lang="java"> PASPMD.barrier({'foo', 'bar', 'gee'}); </programlisting></para>
+    
+
+    <para>The caller will stop and wait for the three methods. bar or gee can
+    came first, then foo. If one wants wait for foo, then wait for bar, then
+    wait for gee, three calls can be successively done:</para>
+
+    
+      <para><programlisting xml:lang="java">   PASPMD.barrier({'foo'});
+   PASPMD.barrier({'bar'});
+   PASPMD.barrier({'gee'}); </programlisting></para>
+    
+
+    <para>A method barrier is used without any group (spmd or not). To learn
+     more on Groups, please refer to <xref linkend="TypedGroupCommunication"/>.</para>
+  
+  </section>
+  </section>
+  
+  <section><info><title>MPI to ProActive Summary</title></info>
+        
+
+        <informaltable xml:id="mpi_to_proactive_summary"><info><title>MPI to ProActive</title></info>
+          
+
+          <tgroup cols="2">
+            <colspec colname="col1" colnum="1" colwidth="2*"/>
+
+            <colspec colname="col2" colnum="2" colwidth="2*"/>
+
+            <thead>
+              <row>
+                <entry>MPI</entry>
+
+                <entry>ProActive</entry>
+              </row>
+            </thead>
+
+            <tbody>
+              <row>
+                <entry>MPI_Init and MPI_Finalize</entry>
+
+                <entry>Activities creation</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Comm_Size</entry>
+
+                <entry>PASPMD.getMyGroupSize</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Comm_Rank</entry>
+
+                <entry>PASPMD.getMyRank</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Send and MPI_Recv</entry>
+
+                <entry>Method call</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Barrier</entry>
+
+                <entry>PASPMD.barrier</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Bcast</entry>
+
+                <entry>Method call on a group</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Scatter</entry>
+
+                <entry>Method call with a scatter group as parameter</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Gather</entry>
+
+                <entry>Result of a group communication</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Reduce</entry>
+
+                <entry>Programmer's method</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </section>
+</chapter>

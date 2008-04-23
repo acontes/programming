@@ -1,0 +1,39 @@
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive <systemitem role="VERSION"/> Documentation</title><subtitle>A Comprehensive Solution For
+Multithreaded, Parallel, Distributed,
+And Concurrent Computing</subtitle> <!-- to change the version and date look in the html.xsl 
+and compile/build.xml as the date
+and version is passed as a parameter in the ant task 
+to -->
+  
+ <!--if you want to change the title in the html version on
+ change the subtitle tag in the  xsl/html.xsl
+ 
+ changing here applies only to the pdf  -->
+  
+
+  <author><personname><surname>OASIS Research Team</surname></personname></author>
+
+  <author><orgname/></author>
+
+<copyright>
+    <year>1997-2008</year>
+
+    <holder>INRIA</holder>
+  </copyright>
+
+  <legalnotice xml:id="LegalNotice">
+    <para>ProActive is a GRID Java middleware, with the source code under the GPL2 licence. </para>
+
+    <para>Copyright INRIA 1997-2008.</para>
+  </legalnotice>
+
+  <mediaobject>
+    <imageobject>
+      <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/ProActiveLogo.png" format="PNG"/>
+    </imageobject>
+  </mediaobject>
+
+  
+</info>
