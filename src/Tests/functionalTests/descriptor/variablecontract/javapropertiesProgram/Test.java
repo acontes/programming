@@ -52,7 +52,7 @@ import functionalTests.FunctionalTest;
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/variablecontract/javapropertiesProgram/Test.xml").getPath();
-    GCMApplication  gcma;
+    GCMApplication gcma;
     boolean bogusFromProgram;
     boolean bogusFromDescriptor;
 
@@ -108,9 +108,7 @@ public class Test extends FunctionalTest {
 
         gcma = PAGCMDeployment.loadApplicationDescriptor(new File(XML_LOCATION), variableContract);
         variableContract = (VariableContractImpl) gcma.getVariableContract();
-        
-        
-        
+
         variableContract.getValue("user.home").equals(System.getProperty("user.home"));
 
         //Empty value in descriptor should have less priority, and not set to empty

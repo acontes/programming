@@ -51,7 +51,7 @@ import functionalTests.FunctionalTest;
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/variablecontract/programdefaultvariable/Test.xml").getPath();
-    GCMApplication  gcma;
+    GCMApplication gcma;
     boolean bogusFromDescriptor;
     boolean bogusFromProgram;
 

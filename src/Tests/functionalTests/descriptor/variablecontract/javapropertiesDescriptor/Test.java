@@ -95,6 +95,6 @@ public class Test extends FunctionalTest {
         variableContract = (VariableContractImpl) gcma.getVariableContract();
         Assert.assertEquals(System.getProperty("user.home"), variableContract.getValue("user.home"));
 
-        assertTrue("Variable Contract should be closed",variableContract.isClosed());
+        assertTrue("Variable Contract should be closed", variableContract.isClosed());
     }
 }
