@@ -154,12 +154,16 @@
     </xsd:element>
     <xsd:element name="javaPropertyProgramDefault"
         substitutionGroup="abstractVariable" type="variableType">
+    </xsd:element>    
+    <xsd:element name="includeXMLFile" substitutionGroup="abstractVariable">
+        <xsd:complexType>
+			<xsd:attribute name="location" type="xsd:string"	use="required" />
+		</xsd:complexType>
     </xsd:element>
-    <xsd:element name="includeXMLFile" substitutionGroup="abstractVariable"
-        type="variableType">
-    </xsd:element>
-    <xsd:element name="includePropertyFile"
-        substitutionGroup="abstractVariable" type="variableType">
+    <xsd:element name="includePropertyFile" substitutionGroup="abstractVariable">
+ 		<xsd:complexType>
+			<xsd:attribute name="location" type="xsd:string" use="required" />
+		</xsd:complexType>
     </xsd:element>
     <xsd:complexType name="dummyType"></xsd:complexType>
     <xsd:complexType name="environmentType">
