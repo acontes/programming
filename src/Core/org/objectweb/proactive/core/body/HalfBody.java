@@ -142,12 +142,9 @@ public class HalfBody extends AbstractBody {
             } else {
                 this.ftmanager = null;
             }
-        } catch (NodeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            bodyLogger.error("**ERROR** Unable read node configuration. Fault-tolerance is disabled " + e);
+            this.ftmanager = null;
         }
         this.gc = HalfBodies.getInstance();
     }

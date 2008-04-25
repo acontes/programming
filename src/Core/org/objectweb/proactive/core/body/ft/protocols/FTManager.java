@@ -121,8 +121,8 @@ public abstract class FTManager implements java.io.Serializable {
     }
 
     /**
-     * Initialize the FTManager. This method establihes all needed connections with the servers.
-     * The owner object is registred in the location server (@see xxx).
+     * Initialize the FTManager. This method establishes all needed connections with the servers.
+     * The owner object is registered in the location server (@see xxx).
      * @param owner The object linked to this FTManager
      * @return still not used
      * @throws ProActiveException A problem occurs during the connection with the servers

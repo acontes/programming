@@ -40,14 +40,14 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 
 import functionalTests.FunctionalTest;
-import functionalTests.ft.cic.Test;
+import functionalTests.ft.cic.TestCIC;
 
 
 public class TestFaultTolerance extends FunctionalTest {
 
     private JVMProcessImpl server;
-    private static String FT_XML_LOCATION_UNIX = Test.class.getResource("/functionalTests/ft/testFT_CIC.xml")
-            .getPath();
+    private static String FT_XML_LOCATION_UNIX = TestCIC.class.getResource(
+            "/functionalTests/ft/cic/testFT_CIC.xml").getPath();
 
     /**
      * We will try to perform a failure during a sending, and then verify that the sending restart

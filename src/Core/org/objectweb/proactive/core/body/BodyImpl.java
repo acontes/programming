@@ -163,9 +163,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-
-        // TODO : SHOULD NOT IMPORT NODE HERE !!!
-        // implement a PANodeProperty...
         try {
             Node node = NodeFactory.getNode(this.getNodeURL());
             if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED_PROP))) {
@@ -198,11 +195,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             } else {
                 this.ftmanager = null;
             }
-            // TODO : MANAGE EXCPETION...
-        } catch (NodeException e) {
-            e.printStackTrace();
         } catch (ProActiveException e) {
-            e.printStackTrace();
+            bodyLogger.error("**ERROR** Unable to read node configuration. Fault-tolerance is disabled");
+            this.ftmanager = null;
         }
 
         this.gc = new GarbageCollector(this);
