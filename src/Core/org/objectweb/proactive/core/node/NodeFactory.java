@@ -79,13 +79,20 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 @PublicAPI
 public class NodeFactory {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
-    private static final String DEFAULT_NODE_NAME;
+    
     public static final String DEFAULT_VIRTUAL_NODE_NAME = "DefaultVN";
+    
+    private static final String DEFAULT_NODE_NAME;       
     private static Node defaultNode = null;
 
+    private static final String DEFAULT_HALFBODIES_NAME;
+    private static Node halfBodiesNode = null;
+    
+    
     static {
         ProActiveConfiguration.load();
         DEFAULT_NODE_NAME = URIBuilder.buildURI("localhost", "Node").toString();
+        DEFAULT_HALFBODIES_NAME = URIBuilder.buildURI("localhost", "HalfbodiesNode").toString();
     }
 
     // test with class loader
@@ -108,7 +115,7 @@ public class NodeFactory {
                         DEFAULT_VIRTUAL_NODE_NAME, jobID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
-            } catch (AlreadyBoundException e) { //if this exception is risen, we generate an othe random name for the node
+            } catch (AlreadyBoundException e) { //if this exception is risen, we generate another random name for the node
                 getDefaultNode();
             }
 
@@ -119,6 +126,36 @@ public class NodeFactory {
         return defaultNode;
     }
 
+    
+    
+    public static synchronized Node getHalfBodiesNode() { //throws NodeException {
+    	String nodeURL = null;
+
+        ProActiveRuntime defaultRuntime = null;
+        //String jobID = PAActiveObject.getJobId();
+        ProActiveSecurityManager securityManager = null;
+
+        if (halfBodiesNode == null) {
+            try {
+                defaultRuntime = RuntimeFactory.getDefaultRuntime();
+                nodeURL = defaultRuntime.createLocalNode(DEFAULT_HALFBODIES_NAME, false, securityManager,
+                        DEFAULT_VIRTUAL_NODE_NAME, "JOBID FOR HB");//jobID); // TODO : RANDOM NAME ???? How can I check as with local ??
+            } catch (ProActiveException e) {
+                //throw new NodeException("Cannot create the halfbodies hosting Node", e);
+            	e.printStackTrace();
+            } catch (AlreadyBoundException e) { //if this exception is risen, we generate another random name for the node
+                // getDefaultNode(); ????
+            	e.printStackTrace();
+            }
+
+            halfBodiesNode = new NodeImpl(defaultRuntime, nodeURL, PAProperties.PA_COMMUNICATION_PROTOCOL
+                    .getValue(), "JOBID FOR HB");
+        }
+
+        return halfBodiesNode;
+    }
+    
+    
     /**
      * Returns true if the given node belongs to this JVM false else.
      * @return true if the given node belongs to this JVM false else

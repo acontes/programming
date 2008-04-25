@@ -138,6 +138,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             // apply Application-wide tech services on local node
             //
             Node defaultNode = NodeFactory.getDefaultNode();
+            Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
             TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
 
             for (Map.Entry<String, HashMap<String, String>> tsp : appTSProperties) {
@@ -145,6 +146,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 TechnicalService ts = TechnicalServicesFactory.create(tsp.getKey(), tsp.getValue());
                 if (ts != null) {
                     ts.apply(defaultNode);
+                    ts.apply(halfBodiesNode);
                 }
             }
 

@@ -30,18 +30,21 @@
  */
 package functionalTests.ft.cic;
 
+import static junit.framework.Assert.assertTrue;
+
+import java.io.File;
+
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
 import functionalTests.ft.Agent;
 import functionalTests.ft.Collector;
 import functionalTests.ft.ReInt;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -69,14 +72,17 @@ public class Test extends FunctionalTest {
         Thread.sleep(3000);
 
         // ProActive descriptor
-        ProActiveDescriptor pad;
-        VirtualNode vnode;
+        // ProActiveDescriptor pad;
+        GCMApplication gcma;
+        GCMVirtualNode vnode;
 
         //	create nodes
-        pad = PADeployment.getProactiveDescriptor(Test.FT_XML_LOCATION_UNIX);
-        pad.activateMappings();
-        vnode = pad.getVirtualNode("Workers");
-        Node[] nodes = vnode.getNodes();
+        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(Test.FT_XML_LOCATION_UNIX));
+        gcma.startDeployment();
+        vnode = gcma.getVirtualNode("Workers");
+        Node[] nodes = new Node[2];
+        nodes[0] = vnode.getANode();
+        nodes[1] = vnode.getANode();
 
         Agent a = (Agent) PAActiveObject.newActive(Agent.class.getName(), new Object[0], nodes[0]);
         Agent b = (Agent) PAActiveObject.newActive(Agent.class.getName(), new Object[0], nodes[1]);
@@ -95,6 +101,7 @@ public class Test extends FunctionalTest {
         //failure in 11 sec...
         Thread.sleep(11000);
         try {
+        	System.out.println("KILLIIIIIIIIIIIIIIIIIIIIIIIIIIIING");
             nodes[1].getProActiveRuntime().killRT(false);
         } catch (Exception e) {
             //e.printStackTrace();
@@ -105,7 +112,7 @@ public class Test extends FunctionalTest {
 
         //cleaning
         this.server.stopProcess();
-        pad.killall(false);
+//        gcma.killall(false);
 
         //System.out.println(" ---------> RES = " + r.getValue()); //1771014405
         assertTrue(this.result == Test.AWAITED_RESULT);

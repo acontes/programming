@@ -49,9 +49,12 @@ import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector
 import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
+import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -127,22 +130,24 @@ public abstract class FTManager implements java.io.Serializable {
     public int init(AbstractBody owner) throws ProActiveException {
         this.owner = owner;
         this.ownerID = owner.getID();
+        Node node = NodeFactory.getNode(this.owner.getNodeURL());
+        
         try {
-            String ttcValue = PAProperties.PA_FT_TTC.getValue();
+            String ttcValue = node.getProperty(FaultToleranceTechnicalService.TTC_PROP);
             if (ttcValue != null) {
                 this.ttc = Integer.parseInt(ttcValue) * 1000;
             } else {
                 this.ttc = FTManager.DEFAULT_TTC_VALUE;
             }
-            String urlGlobal = PAProperties.PA_FT_SERVER_GLOBAL.getValue();
+            String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER_PROP);
             if (urlGlobal != null) {
                 this.storage = (CheckpointServer) (Naming.lookup(urlGlobal));
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
                 this.recovery = (RecoveryProcess) (Naming.lookup(urlGlobal));
             } else {
-                String urlCheckpoint = PAProperties.PA_FT_SERVER_CHECKPOINT.getValue();
-                String urlRecovery = PAProperties.PA_FT_SERVER_RECOVERY.getValue();
-                String urlLocation = PAProperties.PA_LOCATION_SERVER.getValue();
+                String urlCheckpoint = node.getProperty(FaultToleranceTechnicalService.CKPT_SERVER_PROP);
+                String urlRecovery = node.getProperty(FaultToleranceTechnicalService.RECOVERY_SERVER_PROP);
+                String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER_PROP);
                 if ((urlCheckpoint != null) && (urlRecovery != null) && (urlLocation != null)) {
                     this.storage = (CheckpointServer) (Naming.lookup(urlCheckpoint));
                     this.location = (LocationServer) (Naming.lookup(urlLocation));

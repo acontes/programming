@@ -78,6 +78,7 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
@@ -252,7 +253,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // if (PAProperties.PA_JMX_MBEAN.isTrue()) {
         if (!isProActiveInternalObject) {
             // If the node is not a HalfBody
-            if (!nodeURL.equals("LOCAL")) {
+            if (!nodeURL.equals(NodeFactory.getHalfBodiesNode().getNodeInformation().getURL())) {
                 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
                 ObjectName oname = FactoryName.createActiveObjectName(getID());
                 if (!mbs.isRegistered(oname)) {
