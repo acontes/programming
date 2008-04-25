@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.node.Node;

@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.mpi;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -85,55 +85,55 @@ public interface MPISpmd {
     public VirtualNode getVn();
 
     /**
-     * API method for adding class that will be instanciate on nodes of applications
+     * API method for adding class that will be instantiate on nodes of applications
      * @param cl - the name of the user class
      */
     public void newActiveSpmd(String cl);
 
     /**
-     * API method for adding class that will be instanciate on nodes of applications
+     * API method for adding class that will be instantiate on nodes of applications
      * @param cl - the name of the user class
      * @param params - the array that contain the parameters
      */
     public void newActiveSpmd(String cl, Object[] params);
 
     /**
-     * API method for adding class that will be instanciate on nodes of applications
+     * API method for adding class that will be instantiate on nodes of applications
      * @param cl - the name of the user class
      * @param params - the array that contain the parameters
      */
     public void newActiveSpmd(String cl, Object[][] params);
 
     /**
-     * API method for adding class that will be instanciate on a specific node of applications
+     * API method for adding class that will be instantiate on a specific node of applications
      * @param cl - the name of the user class
      * @param params - the array that contains the parameters
      */
     public void newActive(String cl, Object[] params, int rank);
 
     /**
-     * API method for getting list of SPMD classes
-     * @return ArrayList - the list of classes to instanciate
+     * API method for getting list of SPMD classes names
+     * @return ArrayList - the list of classes to instantiate
      */
-    public ArrayList getSpmdClasses();
+    public List<String> getSpmdClasses();
 
     /**
-     * API method for getting table of params
-     * @return Hashtable - the table of params
+     * API method for getting table of parameters
+     * @return Map - the parameters map
      */
-    public Hashtable getSpmdClassesParams();
+    public Map<String, List<?>> getSpmdClassesParams();
 
     /**
-     * API method for getting list of classes
-     * @return ArrayList - the list of classes to instanciate
+     * API method for getting list of classes name
+     * @return ArrayList - the list of classes to instantiate
      */
-    public ArrayList getClasses();
+    public List<String> getClasses();
 
     /**
-     * API method for getting array of params
-     * @return Hashtable - the table of params
+     * API method for getting array of parameters
+     * @return Map - the parameters map
      */
-    public Hashtable getClassesParams();
+    public Map<String, Object[]> getClassesParams();
 
     /**
      * API method for getting remote library path

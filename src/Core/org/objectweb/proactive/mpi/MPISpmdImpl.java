@@ -33,6 +33,8 @@ package org.objectweb.proactive.mpi;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -62,13 +64,13 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     private ArrayList<String> spmdClasses = null;
 
     /** user SPMD classes params */
-    private Hashtable<String, ArrayList<Object[]>> spmdClassesParams;
+    private Hashtable<String, List<?>> spmdClassesParams;
 
     /** user classes name */
     private ArrayList<String> classes = null;
 
     /** user classes params */
-    private Hashtable<String, Object[]> classesParams;
+    private Map<String, Object[]> classesParams;
     private Object[] classesParamsByRank;
 
     // empty no-args constructor 
@@ -102,7 +104,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         if (vn.hasMPIProcess()) {
             this.spmdClasses = new ArrayList<String>();
             this.classes = new ArrayList<String>();
-            this.spmdClassesParams = new Hashtable<String, ArrayList<Object[]>>();
+            this.spmdClassesParams = new Hashtable<String, List<?>>();
             this.classesParams = new Hashtable<String, Object[]>();
             this.classesParamsByRank = new Object[vn.getNodes().length];
             this.mpiProcess = vn.getMPIProcess();
@@ -325,15 +327,15 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         return this.spmdClasses;
     }
 
-    public Hashtable<String, ArrayList<Object[]>> getSpmdClassesParams() {
+    public Map<String, List<?>> getSpmdClassesParams() {
         return this.spmdClassesParams;
     }
 
-    public ArrayList<String> getClasses() {
+    public List<String> getClasses() {
         return this.classes;
     }
 
-    public Hashtable<String, Object[]> getClassesParams() {
+    public Map<String, Object[]> getClassesParams() {
         return this.classesParams;
     }
 

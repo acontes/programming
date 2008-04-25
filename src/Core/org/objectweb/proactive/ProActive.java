@@ -40,7 +40,6 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -2680,7 +2679,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAException#getAllExceptions()} instead
      */
     @Deprecated
-    public static Collection getAllExceptions() {
+    public static Collection<Throwable> getAllExceptions() {
         return ExceptionHandler.getAllExceptions();
     }
 
