@@ -1,106 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
-	<componentDefinition>
-		<virtualNodesDefinition>
-			<virtualNode name="Workers" property="multiple" ftServiceId="appli"/>
-                        <virtualNode name="Failed" property="multiple" ftServiceId="resource"/>
-		</virtualNodesDefinition>
-	</componentDefinition>
-	<deployment>
-		<mapping>
-			<map virtualNode="Workers">
-				<jvmSet>
-					<vmName value="Jvm1"/>
-					<vmName value="Jvm2"/>
-				</jvmSet>
-			</map>
-			 <map virtualNode="Failed">
-                                <jvmSet>
-                                        <vmName value="JvmS1"/>
-                                        <vmName value="JvmS2"/>
-                                </jvmSet>
-                        </map>
-		</mapping>
-		<jvms>
-			<jvm name="Jvm1">
-				<creation>
-					<processReference refid="linuxJVM1"/>
-				</creation>
-			</jvm>
-			<jvm name="Jvm2">
-				<creation>
-					<processReference refid="linuxJVM2"/>
-				</creation>
-			</jvm>
-			<jvm name="JvmS1">
-				<creation>
-					<processReference refid="linuxJVM3"/>
-				</creation>
-			</jvm>
-			<jvm name="JvmS2">
-				<creation>
-					<processReference refid="linuxJVM4"/>
-				</creation>
-			</jvm>
-		</jvms>
-	</deployment>
-	<infrastructure>
-		<processes>
-			<processDefinition id="linuxJVM1">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>
-						<parameter value="-Dproactive.test=true"/>
-					<!-- 	<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001" /> -->
-						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
-					</jvmParameters>
-				</jvmProcess>
-			</processDefinition>
-						<processDefinition id="linuxJVM2">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>
-						<parameter value="-Dproactive.test=true"/>
-					<!-- 	<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8002" /> -->
-						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
-					</jvmParameters>
-				</jvmProcess>
-			</processDefinition>
-						<processDefinition id="linuxJVM3">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>
-						<parameter value="-Dproactive.test=true"/>
-					<!-- 	<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8003" /> -->
-						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
-					</jvmParameters>
-				</jvmProcess>
-			</processDefinition>
-						<processDefinition id="linuxJVM4">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>
-						<parameter value="-Dproactive.test=true"/>
-							<!-- <parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8004" /> -->
-					
-										<parameter  value="-Dproactive.test.timeout=9999999999"/> 
-					</jvmParameters>
-				</jvmProcess>
-			</processDefinition>
-		</processes>
-		 <services>
-                        <serviceDefinition id="appli">
-                                <faultTolerance>
-                                		<protocol type="cic"></protocol>
-                                        <globalServer url="rmi://localhost:1100/FTServer"></globalServer>
-                                        <ttc value="5"></ttc>
-                                </faultTolerance>
-                        </serviceDefinition>
+<GCMApplication
+	xmlns="urn:gcm:application:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
 
-                        <serviceDefinition id="resource">
-                                <faultTolerance>
-                                        <protocol type="cic"></protocol>
-                                        <globalServer url="rmi://localhost:1100/FTServer"></globalServer>
-				             			<resourceServer url="rmi://localhost:1100/FTServer"></resourceServer>
-                                        <ttc value="5"></ttc>
-                                </faultTolerance>
-                        </serviceDefinition>
-                </services>
-	</infrastructure>
-</ProActiveDescriptor>
+	<environment>
+		<javaPropertyVariable name="proactive.home"/>
+		<javaPropertyVariable name="java.home"/>
+
+		<descriptorDefaultVariable name="deploymentDescriptor" value="../_CONFIG/localhost/4x1.xml" />		
+		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
+	</environment>
+	
+	<application>
+		
+		<proactive relpath="${proactive.home}" base="root">
+			<configuration>
+				<java base="root" relpath="${java.home}/bin/java" />
+				<jvmarg
+					value="-Dproactive.test=true ${jvmargDefinedByTest} -Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db" />
+				<proactiveClasspath type="append">
+					<pathElement base="proactive"
+						relpath="classes/Tests" />
+					<pathElement base="proactive"
+						relpath="dist/lib/clover.jar" />
+				</proactiveClasspath>
+			</configuration>
+			
+			<virtualNode id="Workers" capacity="2">
+				<technicalServices>
+					<class name="org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService">
+						<property name="global" value="rmi://localhost:1100/FTServer" />
+						<property name="ttc" value="5" />
+						<property name="protocol" value="cic" />
+					</class>
+				</technicalServices>
+			</virtualNode>
+
+			<virtualNode id="Failed" capacity="1">
+				<technicalServices>
+					<class name="org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService">
+						<property name="global" value="rmi://localhost:1100/FTServer" />
+						<property name="ttc" value="5" />
+						<property name="protocol" value="cic" />
+						<property name="resource" value="rmi://localhost:1100/FTServer" />
+					</class>
+				</technicalServices>
+			</virtualNode>
+
+		</proactive>
+	</application>
+
+	<resources>	
+		<nodeProvider id="remote">
+			<file path="${deploymentDescriptor}"/>
+		</nodeProvider>
+	</resources>
+</GCMApplication>
