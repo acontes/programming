@@ -81,13 +81,13 @@ public class HalfFTManagerCIC extends FTManager {
     public int init(AbstractBody owner) throws ProActiveException {
         //super.init(owner);
         // a half body need only a location server...
-    	Node node = NodeFactory.getNode(owner.getNodeURL());
+        Node node = NodeFactory.getNode(owner.getNodeURL());
         try {
-        	String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER_PROP);
+            String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER_PROP);
             if (urlGlobal != null) {
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
             } else {
-            	String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER_PROP);
+                String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER_PROP);
                 if (urlLocation != null) {
                     this.location = (LocationServer) (Naming.lookup(urlLocation));
                 } else {

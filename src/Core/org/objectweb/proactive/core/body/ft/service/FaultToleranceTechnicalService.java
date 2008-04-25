@@ -45,14 +45,13 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-
 public class FaultToleranceTechnicalService implements TechnicalService {
-    
-	// logger
+
+    // logger
     final protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
-    
+
     public static final String FT_ENABLED_PROP = "ftenabled";
-    
+
     public static final String GLOBAL_SERVER_PROP = "global";
     public static final String CKPT_SERVER_PROP = "checkpoint";
     public static final String LOCATION_SERVER_PROP = "location";
@@ -60,7 +59,7 @@ public class FaultToleranceTechnicalService implements TechnicalService {
     public static final String RECOVERY_SERVER_PROP = "recovery";
     public static final String TTC_PROP = "ttc";
     public static final String PROTOCOL_PROP = "protocol";
-    
+
     // protocol Type
     private String protocolType;
 
@@ -76,69 +75,68 @@ public class FaultToleranceTechnicalService implements TechnicalService {
     // attached resource server
     private String attachedResourceServer; // null if not registered has a resource node
 
-    
-	public void apply(Node node) {
-		try {
-			node.setProperty(FT_ENABLED_PROP, "true");
-			if (this.globalServerURL!=null){
-				node.setProperty(GLOBAL_SERVER_PROP, this.globalServerURL);
-			} else {
-				node.setProperty(CKPT_SERVER_PROP, this.checkpointServerURL);
-				node.setProperty(LOCATION_SERVER_PROP, this.locationServerURL);
-				node.setProperty(RECOVERY_SERVER_PROP, this.recoveryProcessURL);
-			}
+    public void apply(Node node) {
+        try {
+            node.setProperty(FT_ENABLED_PROP, "true");
+            if (this.globalServerURL != null) {
+                node.setProperty(GLOBAL_SERVER_PROP, this.globalServerURL);
+            } else {
+                node.setProperty(CKPT_SERVER_PROP, this.checkpointServerURL);
+                node.setProperty(LOCATION_SERVER_PROP, this.locationServerURL);
+                node.setProperty(RECOVERY_SERVER_PROP, this.recoveryProcessURL);
+            }
 
-			if (this.ttcValue!=null){
-				node.setProperty(TTC_PROP, this.ttcValue);
-			}
-			
-			if (this.protocolType!=null){
-				node.setProperty(PROTOCOL_PROP, this.protocolType);
-			}
+            if (this.ttcValue != null) {
+                node.setProperty(TTC_PROP, this.ttcValue);
+            }
 
-			if (this.attachedResourceServer!=null){
-				this.registerResource(node);
-			}
-		} catch (ProActiveException e) {
-			e.printStackTrace();
-		}
-	}
+            if (this.protocolType != null) {
+                node.setProperty(PROTOCOL_PROP, this.protocolType);
+            }
 
-	public void init(Map<String,String> argValues) {
-	
-		this.globalServerURL = argValues.get(GLOBAL_SERVER_PROP);
-		this.checkpointServerURL = argValues.get(CKPT_SERVER_PROP);
-		this.recoveryProcessURL = argValues.get(RECOVERY_SERVER_PROP);
-		this.locationServerURL = argValues.get(LOCATION_SERVER_PROP);
+            if (this.attachedResourceServer != null) {
+                this.registerResource(node);
+            }
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+    }
 
-		if (this.globalServerURL!=null && (this.checkpointServerURL!=null || this.recoveryProcessURL!=null || this.locationServerURL!=null)){
-			logger.warn("A global server is set : other servers are ignored !!");
-			this.checkpointServerURL = null;
-			this.recoveryProcessURL = null;
-			this.locationServerURL = null;
-		}
+    public void init(Map<String, String> argValues) {
 
-		// TODO : CHECK VALUES
-		
-		this.ttcValue = argValues.get(TTC_PROP);
-		this.attachedResourceServer = argValues.get(RESOURCE_SERVER_PROP);
-		this.protocolType = argValues.get(PROTOCOL_PROP);
-	}
-    
+        this.globalServerURL = argValues.get(GLOBAL_SERVER_PROP);
+        this.checkpointServerURL = argValues.get(CKPT_SERVER_PROP);
+        this.recoveryProcessURL = argValues.get(RECOVERY_SERVER_PROP);
+        this.locationServerURL = argValues.get(LOCATION_SERVER_PROP);
 
-	public boolean registerResource(Node node) {
-		try {
-			ResourceServer rs = (ResourceServer) (Naming.lookup(this.attachedResourceServer));
-			rs.addFreeNode(node);
-			return true;
-		} catch (MalformedURLException e) {
-			logger.error("**ERROR** RessourceServer unreachable : ressource is not registred." + e);
-		} catch (RemoteException e) {
-			logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
-		} catch (NotBoundException e) {
-			logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
-		}
-		return false;
-	}
+        if (this.globalServerURL != null &&
+            (this.checkpointServerURL != null || this.recoveryProcessURL != null || this.locationServerURL != null)) {
+            logger.warn("A global server is set : other servers are ignored !!");
+            this.checkpointServerURL = null;
+            this.recoveryProcessURL = null;
+            this.locationServerURL = null;
+        }
+
+        // TODO : CHECK VALUES
+
+        this.ttcValue = argValues.get(TTC_PROP);
+        this.attachedResourceServer = argValues.get(RESOURCE_SERVER_PROP);
+        this.protocolType = argValues.get(PROTOCOL_PROP);
+    }
+
+    public boolean registerResource(Node node) {
+        try {
+            ResourceServer rs = (ResourceServer) (Naming.lookup(this.attachedResourceServer));
+            rs.addFreeNode(node);
+            return true;
+        } catch (MalformedURLException e) {
+            logger.error("**ERROR** RessourceServer unreachable : ressource is not registred." + e);
+        } catch (RemoteException e) {
+            logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
+        } catch (NotBoundException e) {
+            logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
+        }
+        return false;
+    }
 
 }

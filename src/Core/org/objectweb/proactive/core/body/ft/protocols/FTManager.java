@@ -131,7 +131,7 @@ public abstract class FTManager implements java.io.Serializable {
         this.owner = owner;
         this.ownerID = owner.getID();
         Node node = NodeFactory.getNode(this.owner.getNodeURL());
-        
+
         try {
             String ttcValue = node.getProperty(FaultToleranceTechnicalService.TTC_PROP);
             if (ttcValue != null) {

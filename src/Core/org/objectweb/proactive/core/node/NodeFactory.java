@@ -79,16 +79,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 @PublicAPI
 public class NodeFactory {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
-    
+
     public static final String DEFAULT_VIRTUAL_NODE_NAME = "DefaultVN";
-    
-    private static final String DEFAULT_NODE_NAME;       
+
+    private static final String DEFAULT_NODE_NAME;
     private static Node defaultNode = null;
 
     private static final String DEFAULT_HALFBODIES_NAME;
     private static Node halfBodiesNode = null;
-    
-    
+
     static {
         ProActiveConfiguration.load();
         DEFAULT_NODE_NAME = URIBuilder.buildURI("localhost", "Node").toString();
@@ -126,10 +125,8 @@ public class NodeFactory {
         return defaultNode;
     }
 
-    
-    
     public static synchronized Node getHalfBodiesNode() { //throws NodeException {
-    	String nodeURL = null;
+        String nodeURL = null;
 
         ProActiveRuntime defaultRuntime = null;
         //String jobID = PAActiveObject.getJobId();
@@ -142,10 +139,10 @@ public class NodeFactory {
                         DEFAULT_VIRTUAL_NODE_NAME, "JOBID FOR HB");//jobID); // TODO : RANDOM NAME ???? How can I check as with local ??
             } catch (ProActiveException e) {
                 //throw new NodeException("Cannot create the halfbodies hosting Node", e);
-            	e.printStackTrace();
+                e.printStackTrace();
             } catch (AlreadyBoundException e) { //if this exception is risen, we generate another random name for the node
                 // getDefaultNode(); ????
-            	e.printStackTrace();
+                e.printStackTrace();
             }
 
             halfBodiesNode = new NodeImpl(defaultRuntime, nodeURL, PAProperties.PA_COMMUNICATION_PROTOCOL
@@ -154,8 +151,7 @@ public class NodeFactory {
 
         return halfBodiesNode;
     }
-    
-    
+
     /**
      * Returns true if the given node belongs to this JVM false else.
      * @return true if the given node belongs to this JVM false else

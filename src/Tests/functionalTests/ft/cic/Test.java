@@ -101,7 +101,7 @@ public class Test extends FunctionalTest {
         //failure in 11 sec...
         Thread.sleep(11000);
         try {
-        	System.out.println("KILLIIIIIIIIIIIIIIIIIIIIIIIIIIIING");
+            System.out.println("KILLIIIIIIIIIIIIIIIIIIIIIIIIIIIING");
             nodes[1].getProActiveRuntime().killRT(false);
         } catch (Exception e) {
             //e.printStackTrace();
@@ -112,7 +112,7 @@ public class Test extends FunctionalTest {
 
         //cleaning
         this.server.stopProcess();
-//        gcma.killall(false);
+        //        gcma.killall(false);
 
         //System.out.println(" ---------> RES = " + r.getValue()); //1771014405
         assertTrue(this.result == Test.AWAITED_RESULT);

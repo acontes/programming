@@ -159,48 +159,48 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-        
-        
+
         // TODO : SHOULD NOT IMPORT NODE HERE !!!
         // implement a PANodeProperty...
         try {
-			Node node = NodeFactory.getNode(this.getNodeURL());
-			if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED_PROP))) {
-			    // if the object is a ProActive internal object, FT is disabled
-			    if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
-			        // if the object is not serilizable, FT is disabled
-			        if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
-			            try {
-			                // create the fault tolerance manager
-			                int protocolSelector = FTManager.getProtoSelector(node.getProperty(FaultToleranceTechnicalService.PROTOCOL_PROP));
-			                this.ftmanager = factory.newFTManagerFactory().newFTManager(protocolSelector);
-			                this.ftmanager.init(this);
-			                if (bodyLogger.isDebugEnabled()) {
-			                    bodyLogger.debug("Init FTManager on " + this.getNodeURL());
-			                }
-			            } catch (ProActiveException e) {
-			                bodyLogger.error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
-			                    e);
-			                this.ftmanager = null;
-			            }
-			        } else {
-			            // target body is not serilizable
-			            bodyLogger
-			                    .error("**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
-			            this.ftmanager = null;
-			        }
-			    }
-			} else {
-			    this.ftmanager = null;
-			}
-			// TODO : MANAGE EXCPETION...
-		} catch (NodeException e) {
-			e.printStackTrace();
-		} catch (ProActiveException e) {
-			e.printStackTrace();
-		}
-        
-        
+            Node node = NodeFactory.getNode(this.getNodeURL());
+            if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED_PROP))) {
+                // if the object is a ProActive internal object, FT is disabled
+                if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
+                    // if the object is not serilizable, FT is disabled
+                    if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
+                        try {
+                            // create the fault tolerance manager
+                            int protocolSelector = FTManager.getProtoSelector(node
+                                    .getProperty(FaultToleranceTechnicalService.PROTOCOL_PROP));
+                            this.ftmanager = factory.newFTManagerFactory().newFTManager(protocolSelector);
+                            this.ftmanager.init(this);
+                            if (bodyLogger.isDebugEnabled()) {
+                                bodyLogger.debug("Init FTManager on " + this.getNodeURL());
+                            }
+                        } catch (ProActiveException e) {
+                            bodyLogger
+                                    .error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
+                                        e);
+                            this.ftmanager = null;
+                        }
+                    } else {
+                        // target body is not serilizable
+                        bodyLogger
+                                .error("**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
+                        this.ftmanager = null;
+                    }
+                }
+            } else {
+                this.ftmanager = null;
+            }
+            // TODO : MANAGE EXCPETION...
+        } catch (NodeException e) {
+            e.printStackTrace();
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+
         this.gc = new GarbageCollector(this);
     }
 
@@ -221,7 +221,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
             // If the node is not a HalfBody
-            if (!(request.getSender().getNodeURL().equals(NodeFactory.getHalfBodiesNode().getNodeInformation().getURL()))) {
+            if (!(request.getSender().getNodeURL().equals(NodeFactory.getHalfBodiesNode()
+                    .getNodeInformation().getURL()))) {
                 RequestNotificationData requestNotificationData = new RequestNotificationData(request
                         .getSourceBodyID(), request.getSender().getNodeURL(), this.bodyID, this.nodeURL,
                     request.getMethodName(), getRequestQueue().size() + 1);

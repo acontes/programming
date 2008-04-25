@@ -72,20 +72,18 @@ public class HalfBody extends AbstractBody {
     //
     private static final String NAME = "Other thread";
 
-//    public static String HOSTING_NODE_URL;
-//    
-//    static {
-//    	try {
-//			HOSTING_NODE_URL = NodeFactory.getHalfBodiesNode().getNodeInformation().getURL();
-//			System.out.println("HalfBody NODE URL is " + HOSTING_NODE_URL);
-//		} catch (NodeException e) {
-//			HOSTING_NODE_URL = "RHAAAAAAAAAAAAAAAAAAA";
-//			e.printStackTrace();
-//		}
-//    }
-    
-    
-    
+    //    public static String HOSTING_NODE_URL;
+    //    
+    //    static {
+    //    	try {
+    //			HOSTING_NODE_URL = NodeFactory.getHalfBodiesNode().getNodeInformation().getURL();
+    //			System.out.println("HalfBody NODE URL is " + HOSTING_NODE_URL);
+    //		} catch (NodeException e) {
+    //			HOSTING_NODE_URL = "RHAAAAAAAAAAAAAAAAAAA";
+    //			e.printStackTrace();
+    //		}
+    //    }
+
     /** The component in charge of receiving reply */
     private ReplyReceiver replyReceiver;
 
@@ -104,8 +102,8 @@ public class HalfBody extends AbstractBody {
     //
     private HalfBody(MetaObjectFactory factory) throws ActiveObjectCreationException {
         //super(null, NodeFactory.getDefaultNode().getNodeInformation().getURL(), factory, Job.DEFAULT_JOBID);
-    	super(null, NodeFactory.getHalfBodiesNode().getNodeInformation().getURL(), factory, Job.DEFAULT_JOBID);
-    	
+        super(null, NodeFactory.getHalfBodiesNode().getNodeInformation().getURL(), factory, Job.DEFAULT_JOBID);
+
         //SECURITY
         if (this.securityManager == null) {
             this.securityManager = factory.getProActiveSecurityManager();
@@ -127,30 +125,31 @@ public class HalfBody extends AbstractBody {
 
         // FAULT TOLERANCE
         try {
-			Node node = NodeFactory.getNode(this.getNodeURL());
-			if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED_PROP))) {
-			    try {
-			        // create the fault-tolerance manager
-			        int protocolSelector = FTManager.getProtoSelector(node.getProperty(FaultToleranceTechnicalService.PROTOCOL_PROP));
-			        this.ftmanager = factory.newFTManagerFactory().newHalfFTManager(protocolSelector);
-			        this.ftmanager.init(this);
-			        if (bodyLogger.isDebugEnabled()) {
-			            bodyLogger.debug("Init FTManager on " + this.getNodeURL());
-			        }
-			    } catch (ProActiveException e) {
-			        bodyLogger.error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " + e);
-			        this.ftmanager = null;
-			    }
-			} else {
-			    this.ftmanager = null;
-			}
-		} catch (NodeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ProActiveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            Node node = NodeFactory.getNode(this.getNodeURL());
+            if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED_PROP))) {
+                try {
+                    // create the fault-tolerance manager
+                    int protocolSelector = FTManager.getProtoSelector(node
+                            .getProperty(FaultToleranceTechnicalService.PROTOCOL_PROP));
+                    this.ftmanager = factory.newFTManagerFactory().newHalfFTManager(protocolSelector);
+                    this.ftmanager.init(this);
+                    if (bodyLogger.isDebugEnabled()) {
+                        bodyLogger.debug("Init FTManager on " + this.getNodeURL());
+                    }
+                } catch (ProActiveException e) {
+                    bodyLogger.error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " + e);
+                    this.ftmanager = null;
+                }
+            } else {
+                this.ftmanager = null;
+            }
+        } catch (NodeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         this.gc = HalfBodies.getInstance();
     }
 
