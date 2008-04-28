@@ -57,4 +57,4 @@ if [ $(expr "$0" : "\." ) = "1" ] ; then
 	fi
 fi
 
-/usr/local/bin/maprsh "$EXECFILE -e" ${MACHINES[@]}
+/usr/local/bin/maprsh -t 10 "$EXECFILE -e" ${MACHINES[@]}

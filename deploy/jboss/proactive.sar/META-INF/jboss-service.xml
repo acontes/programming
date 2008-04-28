@@ -20,10 +20,8 @@ where $PROACTIVE_HOME is the path to the root directory of the ProActive distrib
 -->
 <server>
     <!-- classpath setup  -->
-    <classpath codebase="${proactive.home}/dist/lib" archives="*"/>
     <!--classpath codebase="file://${PROACTIVE_HOME}/dist/lib" archives="*"/-->
-
-   <classpath codebase="${proactive.home}/dist/lib" archives="*"/>
+    <classpath codebase="${PROACTIVE_HOME}/dist/lib" archives="*"/>
 
     <!-- If you want to go with the default configuration for any of the p2p params, just don't specify the attribute tag  -->
 <!--
@@ -44,12 +42,8 @@ where $PROACTIVE_HOME is the path to the root directory of the ProActive distrib
 
     <!-- proactive loader mbean service entry point -->
     <mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderRegistry" name="proactive:service=registry">                                                          
-	<attribute name="vmName">
-	    jbossVM
-        </attribute>
-        <attribute name="Log4jConfigFile">
-            ${jboss.server.config.url}jboss-log4j.xml
-        </attribute>
+	<attribute name="vmName">jbossVM</attribute>
+        <attribute name="Log4jConfigFile">${jboss.server.config.url}jboss-log4j.xml</attribute>
         <attribute name="HostName"></attribute>
         <attribute name="CodebaseUrl"></attribute>
         <attribute name="ProActiveRuntimeURL"></attribute>
