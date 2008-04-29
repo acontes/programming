@@ -50,14 +50,39 @@ public class FaultToleranceTechnicalService implements TechnicalService {
     // logger
     final protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
+    // Properties name
+    /**
+     * "true" if fault-tolerance is enabled for this node.
+     */
     public static final String FT_ENABLED_PROP = "ftenabled";
-
+    /**
+     * URL of the global fault-tolerance server.
+     */
     public static final String GLOBAL_SERVER_PROP = "global";
+    /**
+     * URL of the fault-tolerance checkpoint server.
+     */
     public static final String CKPT_SERVER_PROP = "checkpoint";
+    /**
+     * URL of the fault-tolerance location server.
+     */
     public static final String LOCATION_SERVER_PROP = "location";
+    /**
+     * URL of the fault-tolerance resource server.
+     */
     public static final String RESOURCE_SERVER_PROP = "resource";
+    /**
+     * URL of the fault-tolerance recovery server.
+     */
     public static final String RECOVERY_SERVER_PROP = "recovery";
+    /**
+     * Value of the TimeToCheckpoint, in second.
+     */
     public static final String TTC_PROP = "ttc";
+    /**
+     * Protocol used for enabling fault-tolerance.
+     * Could be "cic" or "pml".
+     */
     public static final String PROTOCOL_PROP = "protocol";
 
     // protocol Type
@@ -75,30 +100,37 @@ public class FaultToleranceTechnicalService implements TechnicalService {
     // attached resource server
     private String attachedResourceServer; // null if not registered has a resource node
 
+    // true if the configuration is not correct
+    // FT is then disabled
+    private boolean cancelled = false;
+
     public void apply(Node node) {
         try {
-            node.setProperty(FT_ENABLED_PROP, "true");
-            if (this.globalServerURL != null) {
-                node.setProperty(GLOBAL_SERVER_PROP, this.globalServerURL);
-            } else {
-                node.setProperty(CKPT_SERVER_PROP, this.checkpointServerURL);
-                node.setProperty(LOCATION_SERVER_PROP, this.locationServerURL);
-                node.setProperty(RECOVERY_SERVER_PROP, this.recoveryProcessURL);
-            }
+            if (!cancelled) {
+                node.setProperty(FT_ENABLED_PROP, "true");
+                if (this.globalServerURL != null) {
+                    node.setProperty(GLOBAL_SERVER_PROP, this.globalServerURL);
+                } else {
+                    node.setProperty(CKPT_SERVER_PROP, this.checkpointServerURL);
+                    node.setProperty(LOCATION_SERVER_PROP, this.locationServerURL);
+                    node.setProperty(RECOVERY_SERVER_PROP, this.recoveryProcessURL);
+                }
 
-            if (this.ttcValue != null) {
-                node.setProperty(TTC_PROP, this.ttcValue);
-            }
+                if (this.ttcValue != null) {
+                    node.setProperty(TTC_PROP, this.ttcValue);
+                }
 
-            if (this.protocolType != null) {
-                node.setProperty(PROTOCOL_PROP, this.protocolType);
-            }
+                if (this.protocolType != null) {
+                    node.setProperty(PROTOCOL_PROP, this.protocolType);
+                }
 
-            if (this.attachedResourceServer != null) {
-                this.registerResource(node);
+                if (this.attachedResourceServer != null) {
+                    this.registerResource(node);
+                }
             }
         } catch (ProActiveException e) {
-            e.printStackTrace();
+            logger.warn("Fault-tolerance cannot be initialized : " + e.getMessage());
+            logger.warn("Fault-tolerance settings might not be consistent");
         }
     }
 
@@ -109,15 +141,25 @@ public class FaultToleranceTechnicalService implements TechnicalService {
         this.recoveryProcessURL = argValues.get(RECOVERY_SERVER_PROP);
         this.locationServerURL = argValues.get(LOCATION_SERVER_PROP);
 
-        if (this.globalServerURL != null &&
-            (this.checkpointServerURL != null || this.recoveryProcessURL != null || this.locationServerURL != null)) {
-            logger.warn("A global server is set : other servers are ignored !!");
-            this.checkpointServerURL = null;
-            this.recoveryProcessURL = null;
-            this.locationServerURL = null;
+        if (this.globalServerURL != null) {
+            if (this.checkpointServerURL != null || this.recoveryProcessURL != null ||
+                this.locationServerURL != null) {
+                logger.warn("A global server is set : other servers are ignored !!");
+                this.checkpointServerURL = null;
+                this.recoveryProcessURL = null;
+                this.locationServerURL = null;
+            }
+        } else {
+            if (this.checkpointServerURL != null || this.recoveryProcessURL != null ||
+                this.locationServerURL != null) {
+                logger.warn("Fault-tolerance settings are not correct : one or more URLs are missing : ");
+                logger.warn("Checkpoint server : " + checkpointServerURL);
+                logger.warn("RecoveryProcess : " + recoveryProcessURL);
+                logger.warn("LocationServer : " + locationServerURL);
+                logger.warn("Fault-tolerance is disabled !");
+                this.cancelled = true;
+            }
         }
-
-        // TODO : CHECK VALUES
 
         this.ttcValue = argValues.get(TTC_PROP);
         this.attachedResourceServer = argValues.get(RESOURCE_SERVER_PROP);

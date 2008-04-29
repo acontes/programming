@@ -62,26 +62,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class HalfBody extends AbstractBody {
 
-    /**
-     *
-     */
-
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
     private static final String NAME = "Other thread";
-
-    //    public static String HOSTING_NODE_URL;
-    //    
-    //    static {
-    //    	try {
-    //			HOSTING_NODE_URL = NodeFactory.getHalfBodiesNode().getNodeInformation().getURL();
-    //			System.out.println("HalfBody NODE URL is " + HOSTING_NODE_URL);
-    //		} catch (NodeException e) {
-    //			HOSTING_NODE_URL = "RHAAAAAAAAAAAAAAAAAAA";
-    //			e.printStackTrace();
-    //		}
-    //    }
 
     /** The component in charge of receiving reply */
     private ReplyReceiver replyReceiver;
@@ -90,7 +74,8 @@ public class HalfBody extends AbstractBody {
         try {
             return new HalfBody(factory);
         } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NodeException e) {
             e.printStackTrace();
         }
         return null;
@@ -99,8 +84,7 @@ public class HalfBody extends AbstractBody {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    private HalfBody(MetaObjectFactory factory) throws ActiveObjectCreationException {
-        //super(null, NodeFactory.getDefaultNode().getNodeInformation().getURL(), factory, Job.DEFAULT_JOBID);
+    private HalfBody(MetaObjectFactory factory) throws ActiveObjectCreationException, NodeException {
         super(null, NodeFactory.getHalfBodiesNode().getNodeInformation().getURL(), factory, Job.DEFAULT_JOBID);
 
         //SECURITY

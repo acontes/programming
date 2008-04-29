@@ -30,6 +30,21 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
@@ -52,29 +67,20 @@ import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.gc.GarbageCollector;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapper;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
-
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 
 
 /**
@@ -201,6 +207,26 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         this.gc = new GarbageCollector(this);
+
+        // JMX registration
+        isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
+        if (!isProActiveInternalObject) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName oname = FactoryName.createActiveObjectName(getID());
+            if (!mbs.isRegistered(oname)) {
+                mbean = new BodyWrapper(oname, this, getID());
+                try {
+                    mbs.registerMBean(mbean, oname);
+                } catch (InstanceAlreadyExistsException e) {
+                    bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
+                } catch (MBeanRegistrationException e) {
+                    bodyLogger.error("Can't register the MBean of the body", e);
+                } catch (NotCompliantMBeanException e) {
+                    bodyLogger.error("The MBean of the body is not JMX compliant", e);
+                }
+            }
+        }
+
     }
 
     //
@@ -219,8 +245,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
             // If the node is not a HalfBody
-            if (!(request.getSender().getNodeURL().equals(NodeFactory.getHalfBodiesNode()
-                    .getNodeInformation().getURL()))) {
+            if (!NodeFactory.isHalfBodiesNode(request.getSender().getNodeURL())) {
                 RequestNotificationData requestNotificationData = new RequestNotificationData(request
                         .getSourceBodyID(), request.getSender().getNodeURL(), this.bodyID, this.nodeURL,
                     request.getMethodName(), getRequestQueue().size() + 1);

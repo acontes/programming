@@ -17,7 +17,7 @@ import functionalTests.FunctionalTest;
 /**
  * Common methods for FT non functional tests
  */
-public class AbstractFTTest extends FunctionalTest {
+public class AbstractFTTezt extends FunctionalTest {
 
     protected JVMProcessImpl server;
     public static int AWAITED_RESULT = 1771014405;

@@ -247,29 +247,29 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
         }
 
-        // JMX registration
-        isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
-
-        // if (PAProperties.PA_JMX_MBEAN.isTrue()) {
-        if (!isProActiveInternalObject) {
-            // If the node is not a HalfBody
-            if (!nodeURL.equals(NodeFactory.getHalfBodiesNode().getNodeInformation().getURL())) {
-                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-                ObjectName oname = FactoryName.createActiveObjectName(getID());
-                if (!mbs.isRegistered(oname)) {
-                    mbean = new BodyWrapper(oname, this, getID());
-                    try {
-                        mbs.registerMBean(mbean, oname);
-                    } catch (InstanceAlreadyExistsException e) {
-                        logger.error("A MBean with the object name " + oname + " already exists", e);
-                    } catch (MBeanRegistrationException e) {
-                        logger.error("Can't register the MBean of the body", e);
-                    } catch (NotCompliantMBeanException e) {
-                        logger.error("The MBean of the body is not JMX compliant", e);
-                    }
-                }
-            }
-        }
+        //        // JMX registration
+        //        isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
+        //
+        //        // if (PAProperties.PA_JMX_MBEAN.isTrue()) {
+        //        if (!isProActiveInternalObject) {
+        //            // If the node is not a HalfBody
+        //            if (!NodeFactory.isHalfBodiesNode(nodeURL)) { // SHOULD BE IN BODYIMPL !!
+        //                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        //                ObjectName oname = FactoryName.createActiveObjectName(getID());
+        //                if (!mbs.isRegistered(oname)) {
+        //                    mbean = new BodyWrapper(oname, this, getID());
+        //                    try {
+        //                        mbs.registerMBean(mbean, oname);
+        //                    } catch (InstanceAlreadyExistsException e) {
+        //                        logger.error("A MBean with the object name " + oname + " already exists", e);
+        //                    } catch (MBeanRegistrationException e) {
+        //                        logger.error("Can't register the MBean of the body", e);
+        //                    } catch (NotCompliantMBeanException e) {
+        //                        logger.error("The MBean of the body is not JMX compliant", e);
+        //                    }
+        //                }
+        //            }
+        //        }
 
         // }
 

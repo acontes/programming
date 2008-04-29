@@ -31,14 +31,14 @@
 package functionalTests.ft.pml;
 
 import static junit.framework.Assert.assertTrue;
-import functionalTests.ft.AbstractFTTest;
+import functionalTests.ft.AbstractFTTezt;
 
 
 /**
  * AO fails during the computation, and is restarted.
  * Communications between passive object, non-ft active object and ft active object.
  */
-public class TestPML extends AbstractFTTest {
+public class TestPML extends AbstractFTTezt {
 
     @org.junit.Test
     public void action() throws Exception {
@@ -46,6 +46,6 @@ public class TestPML extends AbstractFTTest {
         int res = this.deployAndStartAgents(TestPML.class.getResource(
                 "/functionalTests/ft/pml/testFT_PML.xml").getPath());
         this.stopFTServer();
-        assertTrue(res == AbstractFTTest.AWAITED_RESULT);
+        assertTrue(res == AbstractFTTezt.AWAITED_RESULT);
     }
 }

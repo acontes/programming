@@ -34,6 +34,7 @@ import java.net.URISyntaxException;
 import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -85,27 +86,34 @@ public class NodeFactory {
     private static final String DEFAULT_NODE_NAME;
     private static Node defaultNode = null;
 
-    private static final String DEFAULT_HALFBODIES_NAME;
+    private static final String HALFBODIES_NODE_URL;
+    private static final String HALFBODIES_NODE_NAME = "__PA__HalfbodiesNode";
     private static Node halfBodiesNode = null;
 
     static {
         ProActiveConfiguration.load();
         DEFAULT_NODE_NAME = URIBuilder.buildURI("localhost", "Node").toString();
-        DEFAULT_HALFBODIES_NAME = URIBuilder.buildURI("localhost", "HalfbodiesNode").toString();
+        // mmm, this name is supposed to be unique :(
+        HALFBODIES_NODE_URL = URIBuilder.buildURI("localhost", HALFBODIES_NODE_NAME).toString();
     }
 
-    // test with class loader
+    //test with class loader
     //private static final ClassLoader myClassLoader = new NodeClassLoader();
+
     //
     // -- PUBLIC METHODS - STATIC -----------------------------------------------
     //
+
+    /**
+     * 
+     * @return
+     * @throws NodeException
+     */
     public static synchronized Node getDefaultNode() throws NodeException {
         String nodeURL = null;
-
         ProActiveRuntime defaultRuntime = null;
         String jobID = PAActiveObject.getJobId();
         ProActiveSecurityManager securityManager = null;
-
         if (defaultNode == null) {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
@@ -121,35 +129,59 @@ public class NodeFactory {
             defaultNode = new NodeImpl(defaultRuntime, nodeURL, PAProperties.PA_COMMUNICATION_PROTOCOL
                     .getValue(), jobID);
         }
-
         return defaultNode;
     }
 
-    public static synchronized Node getHalfBodiesNode() { //throws NodeException {
+    /**
+     * 
+     * @return
+     * @throws NodeException
+     */
+    public static synchronized Node getHalfBodiesNode() throws NodeException {
         String nodeURL = null;
-
         ProActiveRuntime defaultRuntime = null;
-        //String jobID = PAActiveObject.getJobId();
         ProActiveSecurityManager securityManager = null;
-
         if (halfBodiesNode == null) {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
-                nodeURL = defaultRuntime.createLocalNode(DEFAULT_HALFBODIES_NAME, false, securityManager,
-                        DEFAULT_VIRTUAL_NODE_NAME, "JOBID FOR HB");//jobID); // TODO : RANDOM NAME ???? How can I check as with local ??
+                nodeURL = defaultRuntime.createLocalNode(HALFBODIES_NODE_URL +
+                    Integer.toString(ProActiveRandom.nextPosInt()), false, securityManager,
+                        DEFAULT_VIRTUAL_NODE_NAME, Job.DEFAULT_JOBID);
             } catch (ProActiveException e) {
-                //throw new NodeException("Cannot create the halfbodies hosting Node", e);
-                e.printStackTrace();
-            } catch (AlreadyBoundException e) { //if this exception is risen, we generate another random name for the node
-                // getDefaultNode(); ????
-                e.printStackTrace();
+                throw new NodeException("Cannot create the halfbodies hosting Node", e);
+            } catch (AlreadyBoundException e) {
+                // try another name
+                getHalfBodiesNode();
             }
-
             halfBodiesNode = new NodeImpl(defaultRuntime, nodeURL, PAProperties.PA_COMMUNICATION_PROTOCOL
-                    .getValue(), "JOBID FOR HB");
+                    .getValue(), Job.DEFAULT_JOBID);
         }
-
         return halfBodiesNode;
+    }
+
+    /**
+     * Return true if the given node is a halfbodies hosting node, false otherwise.
+     * @param node the node to be tested.
+     * @return true if the given node is a halfbodies hosting node, false otherwise.
+     */
+    public static boolean isHalfBodiesNode(Node node) {
+        return isHalfBodiesNode(node.getNodeInformation().getURL());
+    }
+
+    /**
+     * Return true if the given node is a halfbodies hosting node, false otherwise.
+     * @param nodeUrl the url of the node to be tested.
+     * @return true if the given node is a halfbodies hosting node, false otherwise.
+     */
+    public static boolean isHalfBodiesNode(String nodeUrl) {
+        return nodeUrl.contains(HALFBODIES_NODE_NAME);
+    }
+
+    /*
+     * check if the node name does not conflict with halfbodiesnode name.
+     */
+    private static boolean checkNodeName(String nodeUrl) {
+        return !nodeUrl.contains(HALFBODIES_NODE_NAME);
     }
 
     /**
@@ -197,6 +229,11 @@ public class NodeFactory {
             String vnname, String jobId) throws NodeException, AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
+
+        if (!checkNodeName(url)) {
+            throw new NodeException(url + " is not a valid url for a node. A node URL cannot contain " +
+                HALFBODIES_NODE_NAME);
+        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("NodeFactory: createNode(" + url + ")");

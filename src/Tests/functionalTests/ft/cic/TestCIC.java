@@ -31,15 +31,14 @@
 package functionalTests.ft.cic;
 
 import static junit.framework.Assert.assertTrue;
-import functionalTests.ft.AbstractFTTest;
-import functionalTests.ft.pml.TestPML;
+import functionalTests.ft.AbstractFTTezt;
 
 
 /**
  * AO fails during the computation, and is restarted.
  * Communications between passive object, non-ft active object and ft active object.
  */
-public class TestCIC extends AbstractFTTest {
+public class TestCIC extends AbstractFTTezt {
 
     @org.junit.Test
     public void action() throws Exception {
@@ -48,6 +47,6 @@ public class TestCIC extends AbstractFTTest {
         int res = this.deployAndStartAgents(TestCIC.class.getResource(
                 "/functionalTests/ft/cic/testFT_CIC.xml").getPath());
         this.stopFTServer();
-        assertTrue(res == AbstractFTTest.AWAITED_RESULT);
+        assertTrue(res == AbstractFTTezt.AWAITED_RESULT);
     }
 }

@@ -32,18 +32,24 @@ package functionalTests.activeobject.request.forgetonsend;
 
 import static junit.framework.Assert.assertTrue;
 
+import java.io.File;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
+import functionalTests.ft.AbstractFTTezt;
 import functionalTests.ft.cic.TestCIC;
 
 
-public class TestFaultTolerance extends FunctionalTest {
+public class TestFaultTolerance extends AbstractFTTezt {
 
     private JVMProcessImpl server;
     private static String FT_XML_LOCATION_UNIX = TestCIC.class.getResource(
@@ -57,26 +63,19 @@ public class TestFaultTolerance extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        // deployer le FTServer !
-        this.server = new JVMProcessImpl(
-            new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
 
-        this.server.setJvmOptions(FunctionalTest.JVM_PARAMETERS +
-            " -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8005 ");
+        this.startFTServer("cic");
 
-        this.server.setClassname("org.objectweb.proactive.core.body.ft.servers.StartFTServer");
-        this.server.startProcess();
-        Thread.sleep(3000);
+        GCMApplication gcma;
+        GCMVirtualNode vnode;
 
-        // ProActive descriptor
-        ProActiveDescriptor pad;
-        VirtualNode vnode;
-
-        // create nodes
-        pad = PADeployment.getProactiveDescriptor(TestFaultTolerance.FT_XML_LOCATION_UNIX);
-        pad.activateMappings();
-        vnode = pad.getVirtualNode("Workers");
-        Node[] nodes = vnode.getNodes();
+        //	create nodes
+        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(FT_XML_LOCATION_UNIX));
+        gcma.startDeployment();
+        vnode = gcma.getVirtualNode("Workers");
+        Node[] nodes = new Node[2];
+        nodes[0] = vnode.getANode();
+        nodes[1] = vnode.getANode();
 
         FTObject a = (FTObject) PAActiveObject.newActive(FTObject.class.getName(), new Object[] { "a" },
                 nodes[0]);
@@ -98,8 +97,7 @@ public class TestFaultTolerance extends FunctionalTest {
         boolean result = b.getServices().equals("abc");
 
         // cleaning
-        this.server.stopProcess();
-        pad.killall(false);
+        this.stopFTServer();
 
         assertTrue(result);
     }
