@@ -125,14 +125,18 @@ public class ProActiveTaskLauncher extends TaskLauncher {
                     this.executePreScript(node);
                 }
             }
-
+            
             //init task
             executableTask.init();
-
+            
+            scheduleTimer();
+            
             //launch task
             TaskResult result = new TaskResultImpl(taskId, executableTask.execute(nodes), new Log4JTaskLogs(
                 this.logBuffer.getBuffer()));
 
+            cancelTimer();
+            
             //return result
             return result;
         } catch (Throwable ex) {

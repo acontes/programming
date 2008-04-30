@@ -164,6 +164,7 @@
             <xs:element minOccurs="0" ref="jd:post"/>
           </xs:sequence>
           <xs:attributeGroup ref="jd:taskName"/>
+          <xs:attribute name="walltime" type="jd:TimeType" use="optional"/>
           <xs:attribute name="retries" type="xs:nonNegativeInteger">
             <xs:annotation>
               <xs:documentation>how many times will this task be rescheduled if there is a failure </xs:documentation>
@@ -514,4 +515,9 @@
       <xs:pattern value="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*"/>
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="TimeType"> <!-- hh:mm:ss│mm:ss│ss -->
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d\d?(:\d\d)?(:\d\d)?" />
+        </xs:restriction>
+  </xs:simpleType>  
 </xs:schema>

@@ -68,10 +68,14 @@ public class JavaTaskLauncher extends TaskLauncher {
             currentExecutable = executableTask;
             //init task
             executableTask.init();
-
-            //launch task
+            
+            scheduleTimer();
+            
+            //launch task            
             Object userResult = executableTask.execute(results);
-
+            
+            cancelTimer();
+            
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
             TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);

@@ -370,6 +370,12 @@ public class JobFactory {
             System.out.println("Preview className = " + previewClassName);
             task.setResultPreview(previewClassName);
         }
+        // TASK WALLTIME
+        String wallTime = (String) xpath.evaluate("@walltime", taskNode, XPathConstants.STRING);
+        if (wallTime != null && !wallTime.equals("")) {
+            task.setWallTime(wallTime);
+            System.out.println("wallTime = " + task.getWallTime());
+        }
 
         // TASK PRECIOUS RESULT
         task.setPreciousResult(((String) xpath.evaluate("@preciousResult", taskNode, XPathConstants.STRING))

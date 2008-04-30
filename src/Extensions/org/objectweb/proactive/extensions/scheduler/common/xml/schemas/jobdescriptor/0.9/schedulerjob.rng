@@ -126,6 +126,9 @@
         <ref name="retries"/>
       </optional>
       <optional>
+      	<ref name="walltime"/>
+      </optional>
+      <optional>
         <ref name="preciousResult"/>
       </optional>
       <optional>
@@ -189,6 +192,12 @@
       <data type="nonNegativeInteger"/>
     </attribute>
   </define>
+  <define name="walltime">
+    <attribute name="walltime">
+      <doc:documentation> defines walltime - maximum execution time of the task, format "[[hh]:mm]:ss" </doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>  
   <define name="preciousResult">
     <attribute name="preciousResult">
       <doc:documentation>do we keep the result among the job results  </doc:documentation>

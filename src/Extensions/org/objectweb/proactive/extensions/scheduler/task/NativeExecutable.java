@@ -31,15 +31,13 @@
 package org.objectweb.proactive.extensions.scheduler.task;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.Map;
 
 import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.common.task.ThreadReader;
+import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 
 /**
  * This is the execution entry point for the native task.
@@ -162,7 +160,11 @@ public class NativeExecutable extends Executable {
     public void kill() {
         super.kill();
         if (process != null) {
-            process.destroy();
+        	try {
+        		process.exitValue();
+        	}catch (IllegalThreadStateException e) {
+        		process.destroy();	
+        	}
         }
     }
 }

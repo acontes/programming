@@ -128,6 +128,8 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
             }            	
     	}
     	setExecuterInformations(new ExecuterInformations(launcher, node));
+    	setKillTaskTimer(launcher);
+    	
         return launcher;
     }
 

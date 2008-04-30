@@ -105,6 +105,11 @@ public abstract class TaskLauncher implements InitActive {
     // not null if an executable is currently executed
     protected Executable currentExecutable;
 
+    /** the timer that will terminate the launcher if the task doesnt finish before the walltime */
+    protected long wallTime = -1;
+    protected KillTask killTaskTimer = null;
+    
+    
     /**
      * ProActive empty constructor.
      */
@@ -308,4 +313,21 @@ public abstract class TaskLauncher implements InitActive {
         }
         PAActiveObject.terminateActiveObject(true);
     }
+    
+    public void setWallTime(Long wallTime) {
+    	this.wallTime = wallTime.longValue(); 
+    }
+    
+    protected void scheduleTimer() {
+    	if (wallTime > 0) {
+        	killTaskTimer = new KillTask(currentExecutable, wallTime);
+        	killTaskTimer.schedule();
+        }
+    }
+    protected void cancelTimer() {
+    	if (killTaskTimer != null) {
+        	killTaskTimer.cancel();
+        }
+    }
+    
 }

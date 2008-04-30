@@ -20,6 +20,7 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
@@ -70,7 +71,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 			command.append(" java ");
 			String classPath = System.getProperty("java.class.path",".");
 			command.append(" -cp " + classPath + " ");
-			command.append(" org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime ");
+			command.append(" " + StartRuntime.class.getName() + " ");
 			
 			String nodeURL = RuntimeFactory.getDefaultRuntime().getURL(); 			
 			command.append(" -p " + nodeURL + " ");
@@ -99,6 +100,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 	        	newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(), 
 	        			new Object[] { taskId, pre }, nodeUrl);
 	        }
+			newLauncher.setWallTime(wallTime);
 			
 			TaskResult result = newLauncher.doTask(null, executableTask, results);
 			PAFuture.waitFor(result);
