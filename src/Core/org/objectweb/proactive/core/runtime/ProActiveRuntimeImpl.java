@@ -445,6 +445,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         // check if nodeName is an URI or not
         String nodeName = URIBuilder.getNameFromURI(nodeURL);
 
+        // check if node name conflicts with reserved name
+        if (!NodeFactory.checkNodeUrl(nodeURL)) {
+            throw new NodeException(nodeURL +
+                " is not a valid url for a node : this url conflicts with reserved node names.");
+        }
+
         if (!replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
             throw new AlreadyBoundException("Node " + nodeName +
                 " already created on this ProActiveRuntime. To overwrite this node, use true for replacePreviousBinding");

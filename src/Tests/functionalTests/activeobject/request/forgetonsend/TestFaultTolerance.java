@@ -51,7 +51,6 @@ import functionalTests.ft.cic.TestCIC;
 
 public class TestFaultTolerance extends AbstractFTTezt {
 
-    private JVMProcessImpl server;
     private static String FT_XML_LOCATION_UNIX = TestCIC.class.getResource(
             "/functionalTests/ft/cic/testFT_CIC.xml").getPath();
 
@@ -84,8 +83,8 @@ public class TestFaultTolerance extends AbstractFTTezt {
 
         a.init(b); // Will produce b.a(), b.b() and b.c()
 
-        // failure in 11 sec...
-        Thread.sleep(7000);
+        // failure in 13 sec...
+        Thread.sleep(13000);
         try {
             nodes[0].getProActiveRuntime().killRT(false);
         } catch (Exception e) {

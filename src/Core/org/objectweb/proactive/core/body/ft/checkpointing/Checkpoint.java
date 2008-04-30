@@ -75,6 +75,7 @@ public class Checkpoint implements java.io.Serializable {
      * @param additionalCodebase the URL of the CheckpointServer classserver
      */
     public Checkpoint(Body bodyToCheckpoint, String additionalCodebase) {
+    	System.out.println("=====================> Checkpoint.Checkpoint(" + additionalCodebase +")");
         try {
             // put futures in copy mode
             bodyToCheckpoint.getFuturePool().setCopyMode(true);
@@ -117,6 +118,7 @@ public class Checkpoint implements java.io.Serializable {
      * @return the new instance of the checkpointed body.
      */
     public Body recover() {
+    	System.out.println("Checkpoint.recover() =======================================================<>");
         try {
             Body recoveredBody = (Body) ByteToObjectConverter.MarshallStream.convert(this.checkpointedBody);
             // Communcations are blocked until the activity is restarted

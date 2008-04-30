@@ -247,7 +247,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // If the node is not a HalfBody
             if (!NodeFactory.isHalfBodiesNode(request.getSender().getNodeURL())) {
                 RequestNotificationData requestNotificationData = new RequestNotificationData(request
-                        .getSourceBodyID(), request.getSender().getNodeURL(), this.bodyID, this.nodeURL,
+                        .getSourceBodyID(), request.getSenderNodeURI().toString(), this.bodyID, this.nodeURL,
                     request.getMethodName(), getRequestQueue().size() + 1);
                 this.mbean.sendNotification(NotificationType.requestReceived, requestNotificationData);
             }
@@ -260,7 +260,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         try {
             return this.requestReceiver.receiveRequest(request, this);
         } catch (CommunicationForbiddenException e) {
-            System.out.println("Weird shit is happening.");
             e.printStackTrace();
         }
 
@@ -315,7 +314,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     public void setImmediateService(String methodName) {
-        // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved
+        // FIXME uncomment this code after PROACTIVE-309 issue has been resolved
         //    	if (!checkMethod(methodName)) {
         //            throw new NoSuchMethodError(methodName + " is not defined in " +
         //                getReifiedObject().getClass().getName());
@@ -324,7 +323,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
-        // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved
+        // FIXME uncomment this code after PROACTIVE-309 issue has been resolved
         //    	if (!checkMethod(methodName, parametersTypes)) {
         //    		String signature = methodName+"(";
         //    		for (int i = 0 ; i < parametersTypes.length; i++) {

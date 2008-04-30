@@ -89,13 +89,6 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
         }
-
-        try {
-            NodeFactory.getDefaultNode();
-        } catch (NodeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     /**

@@ -83,7 +83,8 @@ public class NodeFactory {
 
     public static final String DEFAULT_VIRTUAL_NODE_NAME = "DefaultVN";
 
-    private static final String DEFAULT_NODE_NAME;
+    private static final String DEFAULT_NODE_URL;
+    private static final String DEFAULT_NODE_NAME = "Node";
     private static Node defaultNode = null;
 
     private static final String HALFBODIES_NODE_URL;
@@ -92,8 +93,7 @@ public class NodeFactory {
 
     static {
         ProActiveConfiguration.load();
-        DEFAULT_NODE_NAME = URIBuilder.buildURI("localhost", "Node").toString();
-        // mmm, this name is supposed to be unique :(
+        DEFAULT_NODE_URL = URIBuilder.buildURI("localhost", DEFAULT_NODE_NAME).toString();
         HALFBODIES_NODE_URL = URIBuilder.buildURI("localhost", HALFBODIES_NODE_NAME).toString();
     }
 
@@ -105,9 +105,10 @@ public class NodeFactory {
     //
 
     /**
-     * 
-     * @return
-     * @throws NodeException
+     * Returns the default node for this runtime. This node hosts active objects
+     * that are created without explicit hosting node.
+     * @return the default node for this runtime.
+     * @throws NodeException if the default node cannot be created.
      */
     public static synchronized Node getDefaultNode() throws NodeException {
         String nodeURL = null;
@@ -117,7 +118,7 @@ public class NodeFactory {
         if (defaultNode == null) {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
-                nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
+                nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_URL +
                     Integer.toString(ProActiveRandom.nextPosInt()), false, securityManager,
                         DEFAULT_VIRTUAL_NODE_NAME, jobID);
             } catch (ProActiveException e) {
@@ -133,9 +134,10 @@ public class NodeFactory {
     }
 
     /**
-     * 
-     * @return
-     * @throws NodeException
+     * Returns the node responsible for hosting halfbodies for this runtime.
+     * Note that no active objects can be created in this node.
+     * @return the node responsible for hosting halfbodies for this runtime.
+     * @throws NodeException if the HalfbodiesNode cannot be created.
      */
     public static synchronized Node getHalfBodiesNode() throws NodeException {
         String nodeURL = null;
@@ -148,9 +150,9 @@ public class NodeFactory {
                     Integer.toString(ProActiveRandom.nextPosInt()), false, securityManager,
                         DEFAULT_VIRTUAL_NODE_NAME, Job.DEFAULT_JOBID);
             } catch (ProActiveException e) {
-                throw new NodeException("Cannot create the halfbodies hosting Node", e);
+                throw new NodeException("Cannot create the halfbodies hosting Node : ", e);
             } catch (AlreadyBoundException e) {
-                // try another name
+                // try another name based on HALFBODIES_NODE_NAME
                 getHalfBodiesNode();
             }
             halfBodiesNode = new NodeImpl(defaultRuntime, nodeURL, PAProperties.PA_COMMUNICATION_PROTOCOL
@@ -177,11 +179,11 @@ public class NodeFactory {
         return nodeUrl.contains(HALFBODIES_NODE_NAME);
     }
 
-    /*
-     * check if the node name does not conflict with halfbodiesnode name.
+    /**
+     * check if the node name does not conflict with reserved node names.
      */
-    private static boolean checkNodeName(String nodeUrl) {
-        return !nodeUrl.contains(HALFBODIES_NODE_NAME);
+    public static boolean checkNodeUrl(String nodeUrl) {
+        return !(nodeUrl.contains(HALFBODIES_NODE_NAME) && halfBodiesNode != null);
     }
 
     /**
@@ -229,11 +231,6 @@ public class NodeFactory {
             String vnname, String jobId) throws NodeException, AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
-
-        if (!checkNodeName(url)) {
-            throw new NodeException(url + " is not a valid url for a node. A node URL cannot contain " +
-                HALFBODIES_NODE_NAME);
-        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("NodeFactory: createNode(" + url + ")");
