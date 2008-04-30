@@ -242,6 +242,7 @@ public class InternalJobFactory implements Serializable {
         }
 
         javaTask.setArgs(task.getArguments());
+        javaTask.setFork(task.isFork());
         setProperties(task, javaTask);
 
         return javaTask;

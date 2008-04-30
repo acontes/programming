@@ -374,6 +374,11 @@
     <element name="javaExecutable">
       <doc:documentation>a Java class implementing the Executable interface </doc:documentation>
       <ref name="class"/>
+	  <optional>
+      	<attribute name="fork">
+        	<data type="boolean"/>
+      	</attribute>
+      </optional>
       <optional>
         <ref name="javaParameters"/>
       </optional>

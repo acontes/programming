@@ -39,7 +39,7 @@ import java.util.Map;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
-
+import org.objectweb.proactive.extensions.scheduler.common.task.ThreadReader;
 
 /**
  * This is the execution entry point for the native task.
@@ -128,8 +128,8 @@ public class NativeExecutable extends Executable {
             // redirect streams
             BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            Thread tsout = new Thread(new ThreadReader(sout, System.out));
-            Thread tserr = new Thread(new ThreadReader(serr, System.err));
+            Thread tsout = new Thread(new ThreadReader(sout, System.out, this));
+            Thread tserr = new Thread(new ThreadReader(serr, System.err, this));
             tsout.start();
             tserr.start();
             // wait for process completion
@@ -163,30 +163,6 @@ public class NativeExecutable extends Executable {
         super.kill();
         if (process != null) {
             process.destroy();
-        }
-    }
-
-    /** Pipe between two streams */
-    protected class ThreadReader implements Runnable {
-        private BufferedReader in;
-        private PrintStream out;
-
-        public ThreadReader(BufferedReader in, PrintStream out) {
-            this.in = in;
-            this.out = out;
-        }
-
-        public void run() {
-            String str = null;
-
-            try {
-                while ((str = in.readLine()) != null && !isKilled()) {
-                    out.println(str);
-                }
-            } catch (IOException e) {
-                //FIXME cdelbe gros vilain tu dois throw exception
-                e.printStackTrace();
-            }
         }
     }
 }

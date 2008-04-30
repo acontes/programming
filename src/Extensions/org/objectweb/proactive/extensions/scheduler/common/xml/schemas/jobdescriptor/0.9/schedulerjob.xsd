@@ -473,6 +473,11 @@
         <xs:documentation>the fully qualified class name </xs:documentation>
       </xs:annotation>
     </xs:attribute>
+    <xs:attribute name="fork" use="optional" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>whether to execute a task in a separate JVM </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:attributeGroup>
   <xs:element name="proActiveExecutable">
     <xs:annotation>

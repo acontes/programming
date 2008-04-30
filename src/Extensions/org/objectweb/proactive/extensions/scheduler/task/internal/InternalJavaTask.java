@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.Execu
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.task.JavaTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
-
+import org.objectweb.proactive.extensions.scheduler.task.ForkedJavaTaskLauncher;
 
 /**
  * Description of a java task.
@@ -50,7 +50,9 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  * @since ProActive 3.9
  */
 public class InternalJavaTask extends InternalAbstractJavaTask {
-
+	
+	private boolean fork = false;
+	
     /** the java task to launch */
     private JavaExecutable task;
 
@@ -106,16 +108,26 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      * @return the created launcher as an activeObject.
      */
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
-        JavaTaskLauncher launcher;
-        if (getPreScript() == null) {
-            launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { getId() }, node);
-        } else {
-            launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreScript() }, node);
-        }
-        setExecuterInformations(new ExecuterInformations(launcher, node));
-
+    	JavaTaskLauncher launcher = null;
+    	if (!fork) {    		
+            if (getPreScript() == null) {
+                launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                        new Object[] { getId() }, node);
+            } else {
+                launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(), new Object[] {
+                        getId(), getPreScript() }, node);
+            }            	
+    	}
+    	else {    		
+            if (getPreScript() == null) {
+                launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class.getName(),
+                        new Object[] { getId() }, node);
+            } else {
+                launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class.getName(), new Object[] {
+                        getId(), getPreScript() }, node);
+            }            	
+    	}
+    	setExecuterInformations(new ExecuterInformations(launcher, node));
         return launcher;
     }
 
@@ -127,4 +139,19 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     public void setTask(JavaExecutable task) {
         this.task = task;
     }
+    
+
+	/**
+	 * @return the fork
+	 */
+	public boolean isFork() {
+		return fork;
+	}
+
+	/**
+	 * @param fork the fork to set
+	 */
+	public void setFork(boolean fork) {
+		this.fork = fork;
+	}
 }

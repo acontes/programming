@@ -83,8 +83,8 @@ public class JavaTaskLauncher extends TaskLauncher {
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // This call should be conditioned by the isKilled ... ? 
-            this.finalizeTask(core);
+            if (core!=null) this.finalizeTask(core);
+            else this.finalizeLoggers();
         }
-    }
-
+    }    
 }
