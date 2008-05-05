@@ -39,6 +39,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.ThreadReader;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 
+
 /**
  * This is the execution entry point for the native task.
  * The execute(TaskResult...) method will be override by the scheduler to launch the native process.
@@ -160,11 +161,11 @@ public class NativeExecutable extends Executable {
     public void kill() {
         super.kill();
         if (process != null) {
-        	try {
-        		process.exitValue();
-        	}catch (IllegalThreadStateException e) {
-        		process.destroy();	
-        	}
+            try {
+                process.exitValue();
+            } catch (IllegalThreadStateException e) {
+                process.destroy();
+            }
         }
     }
 }

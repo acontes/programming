@@ -119,12 +119,12 @@ public class NativeTaskLauncher extends TaskLauncher {
             toBeLaunched.setEnvp(this.convertJavaenvToSysenv());
 
             scheduleTimer();
-            
+
             //launch task
             Object userResult = toBeLaunched.execute(results);
 
             cancelTimer();
-            
+
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
             TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);

@@ -68,14 +68,14 @@ public class JavaTaskLauncher extends TaskLauncher {
             currentExecutable = executableTask;
             //init task
             executableTask.init();
-            
+
             scheduleTimer();
-            
+
             //launch task            
             Object userResult = executableTask.execute(results);
-            
+
             cancelTimer();
-            
+
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
             TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);
@@ -87,8 +87,10 @@ public class JavaTaskLauncher extends TaskLauncher {
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // This call should be conditioned by the isKilled ... ? 
-            if (core!=null) this.finalizeTask(core);
-            else this.finalizeLoggers();
+            if (core != null)
+                this.finalizeTask(core);
+            else
+                this.finalizeLoggers();
         }
-    }    
+    }
 }
