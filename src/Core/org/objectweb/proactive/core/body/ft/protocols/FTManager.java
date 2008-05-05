@@ -133,21 +133,21 @@ public abstract class FTManager implements java.io.Serializable {
         Node node = NodeFactory.getNode(this.owner.getNodeURL());
 
         try {
-            String ttcValue = node.getProperty(FaultToleranceTechnicalService.TTC_PROP);
+            String ttcValue = node.getProperty(FaultToleranceTechnicalService.TTC);
             if (ttcValue != null) {
                 this.ttc = Integer.parseInt(ttcValue) * 1000;
             } else {
                 this.ttc = FTManager.DEFAULT_TTC_VALUE;
             }
-            String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER_PROP);
+            String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER);
             if (urlGlobal != null) {
                 this.storage = (CheckpointServer) (Naming.lookup(urlGlobal));
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
                 this.recovery = (RecoveryProcess) (Naming.lookup(urlGlobal));
             } else {
-                String urlCheckpoint = node.getProperty(FaultToleranceTechnicalService.CKPT_SERVER_PROP);
-                String urlRecovery = node.getProperty(FaultToleranceTechnicalService.RECOVERY_SERVER_PROP);
-                String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER_PROP);
+                String urlCheckpoint = node.getProperty(FaultToleranceTechnicalService.CKPT_SERVER);
+                String urlRecovery = node.getProperty(FaultToleranceTechnicalService.RECOVERY_SERVER);
+                String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER);
                 if ((urlCheckpoint != null) && (urlRecovery != null) && (urlLocation != null)) {
                     this.storage = (CheckpointServer) (Naming.lookup(urlCheckpoint));
                     this.location = (LocationServer) (Naming.lookup(urlLocation));

@@ -82,11 +82,11 @@ public class HalfFTManagerCIC extends FTManager {
         // a half body need only a location server...
         Node node = NodeFactory.getNode(owner.getNodeURL());
         try {
-            String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER_PROP);
+            String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER);
             if (urlGlobal != null) {
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
             } else {
-                String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER_PROP);
+                String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER);
                 if (urlLocation != null) {
                     this.location = (LocationServer) (Naming.lookup(urlLocation));
                 } else {

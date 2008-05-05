@@ -228,7 +228,7 @@ public class FutureMonitoring implements Runnable {
             if (nodes.size() != lastNumberOfNodes) {
                 lastNumberOfNodes = nodes.size();
                 for (LocalNode node : nodes) {
-                    if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED_PROP))) {
+                    if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED))) {
                         FTEnabled = true;
                         break;
                     }

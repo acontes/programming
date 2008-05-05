@@ -109,11 +109,11 @@ public class HalfBody extends AbstractBody {
         // FAULT TOLERANCE
         try {
             Node node = NodeFactory.getNode(this.getNodeURL());
-            if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED_PROP))) {
+            if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED))) {
                 try {
                     // create the fault-tolerance manager
                     int protocolSelector = FTManager.getProtoSelector(node
-                            .getProperty(FaultToleranceTechnicalService.PROTOCOL_PROP));
+                            .getProperty(FaultToleranceTechnicalService.PROTOCOL));
                     this.ftmanager = factory.newFTManagerFactory().newHalfFTManager(protocolSelector);
                     this.ftmanager.init(this);
                     if (bodyLogger.isDebugEnabled()) {

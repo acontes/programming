@@ -171,7 +171,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // FAULT TOLERANCE
         try {
             Node node = NodeFactory.getNode(this.getNodeURL());
-            if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED_PROP))) {
+            if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED))) {
                 // if the object is a ProActive internal object, FT is disabled
                 if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
                     // if the object is not serilizable, FT is disabled
@@ -179,7 +179,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         try {
                             // create the fault tolerance manager
                             int protocolSelector = FTManager.getProtoSelector(node
-                                    .getProperty(FaultToleranceTechnicalService.PROTOCOL_PROP));
+                                    .getProperty(FaultToleranceTechnicalService.PROTOCOL));
                             this.ftmanager = factory.newFTManagerFactory().newFTManager(protocolSelector);
                             this.ftmanager.init(this);
                             if (bodyLogger.isDebugEnabled()) {

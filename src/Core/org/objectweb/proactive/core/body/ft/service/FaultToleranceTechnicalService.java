@@ -54,36 +54,36 @@ public class FaultToleranceTechnicalService implements TechnicalService {
     /**
      * "true" if fault-tolerance is enabled for this node.
      */
-    public static final String FT_ENABLED_PROP = "ftenabled";
+    public static final String FT_ENABLED = "ftenabled";
     /**
      * URL of the global fault-tolerance server.
      */
-    public static final String GLOBAL_SERVER_PROP = "global";
+    public static final String GLOBAL_SERVER = "global";
     /**
      * URL of the fault-tolerance checkpoint server.
      */
-    public static final String CKPT_SERVER_PROP = "checkpoint";
+    public static final String CKPT_SERVER = "checkpoint";
     /**
      * URL of the fault-tolerance location server.
      */
-    public static final String LOCATION_SERVER_PROP = "location";
+    public static final String LOCATION_SERVER = "location";
     /**
      * URL of the fault-tolerance resource server.
      */
-    public static final String RESOURCE_SERVER_PROP = "resource";
+    public static final String RESOURCE_SERVER = "resource";
     /**
      * URL of the fault-tolerance recovery server.
      */
-    public static final String RECOVERY_SERVER_PROP = "recovery";
+    public static final String RECOVERY_SERVER = "recovery";
     /**
      * Value of the TimeToCheckpoint, in second.
      */
-    public static final String TTC_PROP = "ttc";
+    public static final String TTC = "ttc";
     /**
      * Protocol used for enabling fault-tolerance.
      * Could be "cic" or "pml".
      */
-    public static final String PROTOCOL_PROP = "protocol";
+    public static final String PROTOCOL = "protocol";
 
     // protocol Type
     private String protocolType;
@@ -107,21 +107,21 @@ public class FaultToleranceTechnicalService implements TechnicalService {
     public void apply(Node node) {
         try {
             if (!cancelled) {
-                node.setProperty(FT_ENABLED_PROP, "true");
+                node.setProperty(FT_ENABLED, "true");
                 if (this.globalServerURL != null) {
-                    node.setProperty(GLOBAL_SERVER_PROP, this.globalServerURL);
+                    node.setProperty(GLOBAL_SERVER, this.globalServerURL);
                 } else {
-                    node.setProperty(CKPT_SERVER_PROP, this.checkpointServerURL);
-                    node.setProperty(LOCATION_SERVER_PROP, this.locationServerURL);
-                    node.setProperty(RECOVERY_SERVER_PROP, this.recoveryProcessURL);
+                    node.setProperty(CKPT_SERVER, this.checkpointServerURL);
+                    node.setProperty(LOCATION_SERVER, this.locationServerURL);
+                    node.setProperty(RECOVERY_SERVER, this.recoveryProcessURL);
                 }
 
                 if (this.ttcValue != null) {
-                    node.setProperty(TTC_PROP, this.ttcValue);
+                    node.setProperty(TTC, this.ttcValue);
                 }
 
                 if (this.protocolType != null) {
-                    node.setProperty(PROTOCOL_PROP, this.protocolType);
+                    node.setProperty(PROTOCOL, this.protocolType);
                 }
 
                 if (this.attachedResourceServer != null) {
@@ -136,10 +136,10 @@ public class FaultToleranceTechnicalService implements TechnicalService {
 
     public void init(Map<String, String> argValues) {
 
-        this.globalServerURL = argValues.get(GLOBAL_SERVER_PROP);
-        this.checkpointServerURL = argValues.get(CKPT_SERVER_PROP);
-        this.recoveryProcessURL = argValues.get(RECOVERY_SERVER_PROP);
-        this.locationServerURL = argValues.get(LOCATION_SERVER_PROP);
+        this.globalServerURL = argValues.get(GLOBAL_SERVER);
+        this.checkpointServerURL = argValues.get(CKPT_SERVER);
+        this.recoveryProcessURL = argValues.get(RECOVERY_SERVER);
+        this.locationServerURL = argValues.get(LOCATION_SERVER);
 
         if (this.globalServerURL != null) {
             if (this.checkpointServerURL != null || this.recoveryProcessURL != null ||
@@ -161,9 +161,9 @@ public class FaultToleranceTechnicalService implements TechnicalService {
             }
         }
 
-        this.ttcValue = argValues.get(TTC_PROP);
-        this.attachedResourceServer = argValues.get(RESOURCE_SERVER_PROP);
-        this.protocolType = argValues.get(PROTOCOL_PROP);
+        this.ttcValue = argValues.get(TTC);
+        this.attachedResourceServer = argValues.get(RESOURCE_SERVER);
+        this.protocolType = argValues.get(PROTOCOL);
     }
 
     public boolean registerResource(Node node) {
