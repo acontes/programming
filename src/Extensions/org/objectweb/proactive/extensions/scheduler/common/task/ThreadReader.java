@@ -6,12 +6,13 @@ import java.io.PrintStream;
 
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 
+
 /** Pipe between two streams */
 public class ThreadReader implements Runnable {
     private BufferedReader in;
     private PrintStream out;
     private Executable executable;
-    
+
     public ThreadReader(BufferedReader in, PrintStream out, Executable executable) {
         this.in = in;
         this.out = out;

@@ -108,7 +108,7 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
 
     /** maximum execution time of the task (in miliseconds) */
     protected long wallTime = -1;
-    
+
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
      * important.</font><br>
@@ -327,40 +327,51 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
         this.genericInformations.put(key, genericInformation);
     }
 
-	/**
-	 * @return the walltime
-	 */
-	public long getWallTime() {
-		return wallTime;
-	}
+    /**
+     * @return the walltime
+     */
+    public long getWallTime() {
+        return wallTime;
+    }
 
-	/**
-	 * @param walltime the walltime to set
-	 */
-	public void setWallTime(long walltime) {
-		this.wallTime = walltime;		
-	}
+    /**
+     * @param walltime the walltime to set
+     */
+    public void setWallTime(long walltime) {
+        this.wallTime = walltime;
+    }
 
-	/**
-	 * @param walltime the walltime to set
-	 */
-	public void setWallTime(String strWallTime) {
-		if (strWallTime == null || "".equals(strWallTime)) {
+    /**
+     * @param walltime the walltime to set
+     */
+    public void setWallTime(String strWallTime) {
+        if (strWallTime == null || "".equals(strWallTime)) {
             this.wallTime = -1;
-		} else if (strWallTime.length() <= 2) { // length == 1 || length == 2
-            // seconds
-        	this.wallTime = (new Long(Integer.parseInt(strWallTime) * 1000)).longValue();            
+        } else if (strWallTime.length() <= 2) { // length == 1 || length == 2
+            // format: ss or s 
+            this.wallTime = (new Long(Integer.parseInt(strWallTime) * 1000)).longValue();
         } else if (strWallTime.length() == 4) {
-            // minutes:seconds
+            // format: m:ss
+            int seconds = Integer.parseInt(strWallTime.substring(2, 4));
+            int minutes = Integer.parseInt(strWallTime.substring(0, 1));
+            this.wallTime = new Long((minutes * 60 + seconds) * 1000);
+        } else if (strWallTime.length() == 5) {
+            // format: mm:ss
             int seconds = Integer.parseInt(strWallTime.substring(3, 5));
             int minutes = Integer.parseInt(strWallTime.substring(0, 2));
             this.wallTime = new Long((minutes * 60 + seconds) * 1000);
-        } else {
-            // hours:minutes:seconds
+        } else if (strWallTime.length() == 7) {
+            // format: h:mm:ss
+            int seconds = Integer.parseInt(strWallTime.substring(5, 7));
+            int minutes = Integer.parseInt(strWallTime.substring(2, 4));
+            int hours = Integer.parseInt(strWallTime.substring(0, 1));
+            this.wallTime = new Long((hours * 3600 + minutes * 60 + seconds) * 1000);
+        } else if (strWallTime.length() == 8) {
+        	// format: hh:mm:ss
             int seconds = Integer.parseInt(strWallTime.substring(6, 8));
             int minutes = Integer.parseInt(strWallTime.substring(3, 5));
-            int hours = Integer.parseInt(strWallTime.substring(0, 2));            
+            int hours = Integer.parseInt(strWallTime.substring(0, 2));
             this.wallTime = new Long((hours * 3600 + minutes * 60 + seconds) * 1000);
         }
-	}
+    }
 }

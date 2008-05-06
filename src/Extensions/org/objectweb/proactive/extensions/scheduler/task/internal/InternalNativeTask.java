@@ -106,9 +106,9 @@ public class InternalNativeTask extends InternalTask {
                     new Object[] { getId(), getPreScript() }, node);
         }
 
-        setExecuterInformations(new ExecuterInformations(launcher, node));        
+        setExecuterInformations(new ExecuterInformations(launcher, node));
         setKillTaskTimer(launcher);
-        
+
         return launcher;
     }
 }

@@ -60,7 +60,7 @@ public class JavaTask extends Task {
     private Map<String, Object> args = new HashMap<String, Object>();
 
     private boolean fork;
-    
+
     /**
      * Empty constructor.
      */
@@ -133,17 +133,18 @@ public class JavaTask extends Task {
     public void addArgument(String name, String value) {
         args.put(name, value);
     }
-    /**
-	 * @return the fork
-	 */
-	public boolean isFork() {
-		return fork;
-	}
 
-	/**
-	 * @param fork the fork to set
-	 */
-	public void setFork(boolean fork) {
-		this.fork = fork;
-	}
+    /**
+     * @return the fork
+     */
+    public boolean isFork() {
+        return fork;
+    }
+
+    /**
+     * @param fork the fork to set
+     */
+    public void setFork(boolean fork) {
+        this.fork = fork;
+    }
 }

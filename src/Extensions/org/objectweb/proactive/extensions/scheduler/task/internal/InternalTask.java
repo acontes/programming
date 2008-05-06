@@ -438,10 +438,10 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     public String toString() {
         return "TaskDescriptor(" + getId() + ")";
     }
-    
+
     protected void setKillTaskTimer(TaskLauncher launcher) {
-    	if (wallTime > 0) {
-        	launcher.setWallTime( new Long(wallTime) );
+        if (wallTime > 0) {
+            launcher.setWallTime(new Long(wallTime));
         }
     }
 }

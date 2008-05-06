@@ -318,7 +318,7 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     protected void scheduleTimer() {
-    	scheduleTimer(currentExecutable);        
+        scheduleTimer(currentExecutable);
     }
 
     protected void scheduleTimer(Executable executable) {

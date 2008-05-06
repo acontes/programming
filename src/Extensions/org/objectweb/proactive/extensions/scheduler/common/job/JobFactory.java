@@ -461,10 +461,10 @@ public class JobFactory {
 
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
-                
-        boolean fork = "true".equals( (String) xpath.evaluate("@fork", process, XPathConstants.STRING) );
+
+        boolean fork = "true".equals((String) xpath.evaluate("@fork", process, XPathConstants.STRING));
         desc.setFork(fork);
-                
+
         NodeList args = (NodeList) xpath.evaluate(addPrefixes("parameters/parameter"), process,
                 XPathConstants.NODESET);
 
