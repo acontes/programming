@@ -151,7 +151,7 @@ public class LocalSchedulerExample {
                         }
 
                         ProActiveDescriptor pad = PADeployment
-                                .getProactiveDescriptor("/user/jkrzemin/home/workspace/SHORT_fork_javatask/descriptors/scheduler/deployment/Local4JVM.xml");
+                                .getProactiveDescriptor("../../../descriptors/scheduler/deployment/Local4JVM.xml");
                         admin.addNodes(pad);
 
                         //                Runtime.getRuntime().addShutdownHook(new Thread() {
