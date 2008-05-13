@@ -2,9 +2,11 @@ package org.objectweb.proactive.extensions.gcmdeployment.environment;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -12,10 +14,12 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -24,6 +28,8 @@ import org.xml.sax.SAXException;
 
 
 class EnvironmentParser {
+    private static final String INCLUDE_PROPERTY_FILE = "includePropertyFile";
+    private static final String INCLUDE_XML_FILE = "includeXMLFile";
     private Document document;
     private XPath xpath;
 
@@ -58,7 +64,8 @@ class EnvironmentParser {
         }
     }
 
-    protected VariableContractImpl getVariableContract() throws XPathExpressionException, SAXException {
+    protected VariableContractImpl getVariableContract() throws XPathExpressionException, SAXException,
+            DOMException, IOException {
         if (!alreadyParsed) {
             parseEnvironment();
         }
@@ -66,11 +73,12 @@ class EnvironmentParser {
         return variableContract;
     }
 
-    protected Map<String, String> getVariableMap() throws XPathExpressionException, SAXException {
+    protected Map<String, String> getVariableMap() throws XPathExpressionException, SAXException,
+            DOMException, IOException {
         return getVariableContract().toMap();
     }
 
-    private void parseEnvironment() throws XPathExpressionException, SAXException {
+    private void parseEnvironment() throws XPathExpressionException, SAXException, DOMException, IOException {
         alreadyParsed = true;
 
         NodeList environmentNodes = (NodeList) xpath.evaluate("/*/" +
@@ -89,21 +97,44 @@ class EnvironmentParser {
                     continue;
 
                 String varContractTypeName = varDeclNode.getNodeName();
-                VariableContractType varContractType = VariableContractType.getType(varContractTypeName);
-                if (varContractType == null) {
-                    GCMDeploymentLoggers.GCMD_LOGGER.warn("unknown variable declaration type : " +
-                        varContractTypeName);
-                    continue;
-                }
 
-                String varName = GCMParserHelper.getAttributeValue(varDeclNode, "name");
+                if (varContractTypeName.equals(INCLUDE_PROPERTY_FILE)) {
+                    Node fileLocation = varDeclNode.getAttributes().getNamedItem("location");
+                    FileReader fileReader = new FileReader(fileLocation.getNodeValue());
+                    Properties properties = new Properties();
+                    properties.load(fileReader);
+                    VariableContractType varContractType = VariableContractType
+                            .getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG);
 
-                String varValue = variableContract.transform(GCMParserHelper.getAttributeValue(varDeclNode,
-                        "value"));
-                if (varValue == null) {
-                    varValue = "";
+                    for (String propertyName : properties.stringPropertyNames()) {
+
+                        String propertyValue = variableContract.transform(properties
+                                .getProperty(propertyName));
+                        if (propertyValue == null) {
+                            propertyValue = "";
+                        }
+                        variableContract.setDescriptorVariable(propertyName.toString(), propertyValue,
+                                varContractType);
+                    }
+
+                } else { // normal variable declaration
+
+                    VariableContractType varContractType = VariableContractType.getType(varContractTypeName);
+                    if (varContractType == null) {
+                        GCMDeploymentLoggers.GCMD_LOGGER.warn("unknown variable declaration type : " +
+                            varContractTypeName);
+                        continue;
+                    }
+
+                    String varName = GCMParserHelper.getAttributeValue(varDeclNode, "name");
+
+                    String varValue = variableContract.transform(GCMParserHelper.getAttributeValue(
+                            varDeclNode, "value"));
+                    if (varValue == null) {
+                        varValue = "";
+                    }
+                    variableContract.setDescriptorVariable(varName, varValue, varContractType);
                 }
-                variableContract.setDescriptorVariable(varName, varValue, varContractType);
 
             }
         }
