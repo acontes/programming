@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Class-Path: proactiveClient.jar 
+ ProActive.jar 
+ bouncycastle.jar 
+ javassist.jar 
+ xercesImpl.jar 
+ fractal.jar
+

@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ProActive Loader</title>
+</head>
+<body>
+
+<p>Enter the parameters needed to start the ProActive Runtime.</p> 
+
+<form method="POST" action="create.jsp">
+<table border="1" cellspacing="5">
+	<tr>
+		<th align="right">ProActive Runtime VM Name*</th>
+		<td align="left"><input type="text" name="vmName" size=20 value="jbossVM" /></td>
+	</tr>
+	<tr>
+		<th align="right">Log4j configuration file</th>
+		<td align="left"><input type="text" name="log4jConfig" size=50 
+			value="{jboss.home}/server/default/conf/jboss-log4j.xml" /> </td>
+	</tr>
+	<tr>
+		<td align="right"><input type="submit" name="Create" value="Create"/></td>
+	</tr>	
+<!--	<tr>-->
+<!--		<th align="right"></th>-->
+<!--		<td align="left"></td>-->
+<!--	</tr>-->
+<!--	<tr>-->
+<!--		<th align="right">Codebase ClassServer URL</th>-->
+<!--		<td align="left"></td>-->
+<!--	</tr>	-->
+</table>
+</form>
+
+<p>* The ProActive Runtime VM Name is used by the RMI lookup service in order to acquire this virtual machine. 
+Basically, you will need this value when you specify in the deployment descriptor the PART that the RMI lookup service has to acquire.</p>
+</body>
+</html>
