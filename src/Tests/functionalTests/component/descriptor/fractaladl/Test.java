@@ -69,7 +69,7 @@ public class Test extends ComponentTest {
      *
      */
     public static String MESSAGE = "-->m";
-    private List<Message> messages;
+    private List<Message> messages = null;
 
     //ComponentsCache componentsCache;
     ProActiveDescriptor deploymentDescriptor;
@@ -120,12 +120,25 @@ public class Test extends ComponentTest {
                 break;
             }
         }
-        StringBuffer resulting_msg = new StringBuffer();
-        Object futureValue = PAFuture.getFutureValue(messages);
-        Message m = (Message) ((Group) futureValue).getGroupByType();
+        String resulting_msg = "";
+        //        Object futureValue = ProActive.getFutureValue(messages);
+        // we get a list of groups of messages
+        // parse it
+        Group<Message> resultGroup = PAGroup.getGroup(messages);
+        for (Iterator iterator = resultGroup.iterator(); iterator.hasNext();) {
+            Message msg = (Message) iterator.next();
+            // why transparency is bad :
+            // (multiple VNs lead to multiple component instances (PrimitiveComponentA), and a group proxy link to them)
+            Group<Message> otherGroup = PAGroup.getGroup(msg);
+            for (Message tmp : otherGroup) {
+                resulting_msg += tmp.getMessage();
+
+            }
+
+        }
 
         //        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
-        int nb_messages = append(resulting_msg, m);
+        //        int nb_messages = append(resulting_msg, m);
 
         //        System.out.println("*** received " + nb_messages + "  : " +
         //            resulting_msg.toString());

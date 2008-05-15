@@ -57,7 +57,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
      * 
      */
     private static final long serialVersionUID = 390L;
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
     public final static int SHORTCUT = 1;
 
     public SynchronousComponentRequestReceiver() {

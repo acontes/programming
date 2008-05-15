@@ -61,7 +61,7 @@ public class ComponentActivity implements RunActive, InitActive, EndActive, Seri
      * 
      */
     private static final long serialVersionUID = 390L;
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ACTIVITY);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ACTIVITY);
     private transient InitActive componentInitActive; // used only once
     protected RunActive componentRunActive;
     protected EndActive componentEndActive;

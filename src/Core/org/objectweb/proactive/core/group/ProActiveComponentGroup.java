@@ -61,8 +61,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  *
- *
- *
  * A class for creating groups of interfaces
  * Indeed, the standard mechanism cannot be used here, as we are referencing components
  * through interfaces of component representatives.

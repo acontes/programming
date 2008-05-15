@@ -54,7 +54,6 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLogg
 public class JobLauncher {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
-    
     /**
      * @param args
      * [0] username
@@ -76,7 +75,7 @@ public class JobLauncher {
                 logIt = true;
                 pos++;
             }
-            
+
             pos += 2;
             if (args.length > 4) {
                 jobUrl = args[pos];
@@ -94,7 +93,7 @@ public class JobLauncher {
                 System.exit(0);
             }
 
-            UserSchedulerInterface scheduler = auth.logAsUser(args[pos-2], args[pos-1]);
+            UserSchedulerInterface scheduler = auth.logAsUser(args[pos - 2], args[pos - 1]);
 
             //CREATE JOB
             Job j = JobFactory.getFactory().createJob(jobUrl);
