@@ -440,8 +440,9 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     protected void setKillTaskTimer(TaskLauncher launcher) {
-        if (wallTime > 0) {
-            launcher.setWallTime(new Long(wallTime));
+        if (isWallTime) {
+            launcher.setWallTime(true);
+            launcher.setWallTime(wallTime);
         }
     }
 }

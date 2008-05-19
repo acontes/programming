@@ -373,6 +373,7 @@ public class JobFactory {
         // TASK WALLTIME
         String wallTime = (String) xpath.evaluate("@walltime", taskNode, XPathConstants.STRING);
         if (wallTime != null && !wallTime.equals("")) {
+            task.setWallTime(true);
             task.setWallTime(wallTime);
             System.out.println("wallTime = " + task.getWallTime());
         }
@@ -464,6 +465,25 @@ public class JobFactory {
 
         boolean fork = "true".equals((String) xpath.evaluate("@fork", process, XPathConstants.STRING));
         desc.setFork(fork);
+        System.out.println("fork = " + fork);
+
+        String javaHome = (String) xpath.evaluate("@javaHome", process, XPathConstants.STRING);
+        if (javaHome != null && !"".equals(javaHome)) {
+            desc.setJavaHome(javaHome);
+            if (fork)
+                System.out.println("javaHome = " + javaHome);
+            else
+                System.out.println("javaHome = " + javaHome + ", IGNORED beacause fork = false");
+        }
+
+        String javaOptions = (String) xpath.evaluate("@javaOptions", process, XPathConstants.STRING);
+        if (javaOptions != null && !"".equals(javaOptions)) {
+            desc.setJavaOptions(javaOptions);
+            if (fork)
+                System.out.println("javaOptions = " + javaOptions);
+            else
+                System.out.println("javaOptions = " + javaOptions + ", IGNORED beacause fork = false");
+        }
 
         NodeList args = (NodeList) xpath.evaluate(addPrefixes("parameters/parameter"), process,
                 XPathConstants.NODESET);

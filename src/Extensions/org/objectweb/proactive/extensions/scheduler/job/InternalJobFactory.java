@@ -243,6 +243,9 @@ public class InternalJobFactory implements Serializable {
 
         javaTask.setArgs(task.getArguments());
         javaTask.setFork(task.isFork());
+        javaTask.setJavaHome(task.getJavaHome());
+        javaTask.setJavaOptions(task.getJavaOptions());
+
         setProperties(task, javaTask);
 
         return javaTask;
@@ -283,7 +286,10 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setRerunnable(task.getRerunnable());
         taskToSet.setSelectionScript(task.getSelectionScript());
         taskToSet.setResultPreview(task.getResultPreview());
-        taskToSet.setWallTime(task.getWallTime());
+        if (task.isWallTime()) {
+            taskToSet.setWallTime(task.getWallTime());
+            taskToSet.setWallTime(task.isWallTime());
+        }
         for (Entry<String, Object> e : task.getGenericInformations().entrySet()) {
             taskToSet.addGenericInformation(e.getKey(), e.getValue());
         }

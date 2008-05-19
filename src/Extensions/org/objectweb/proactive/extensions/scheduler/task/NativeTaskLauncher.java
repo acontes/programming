@@ -118,12 +118,11 @@ public class NativeTaskLauncher extends TaskLauncher {
             // set envp
             toBeLaunched.setEnvp(this.convertJavaenvToSysenv());
 
-            scheduleTimer();
+            if (isWallTime)
+                scheduleTimer();
 
             //launch task
             Object userResult = toBeLaunched.execute(results);
-
-            cancelTimer();
 
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
@@ -135,6 +134,8 @@ public class NativeTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
+            if (isWallTime)
+                cancelTimer();
             this.finalizeTask(core);
         }
     }

@@ -1,42 +1,64 @@
 package org.objectweb.proactive.extensions.scheduler.common.task.executable;
 
-import java.util.Map;
-
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 
 
+/**
+ * Executable responsible for executing another executable in a separate JVM. 
+ * It receives a reference to a remote taskLauncher object, and delegates execution to this object.
+ * 
+ * @author ProActive
+ *
+ */
 public class ForkedJavaExecutable extends JavaExecutable {
 
     private JavaExecutable executable = null;
     private TaskLauncher taskLauncher = null;
 
+    private final static int TIMEOUT = 1000;
+
+    /**
+     * Constructor 
+     * @param ex executable object that should run user java task
+     * @param tl remote object residing in a dedicated JVM 
+     */
+    public ForkedJavaExecutable(JavaExecutable ex, TaskLauncher tl) {
+        this.executable = ex;
+        this.taskLauncher = tl;
+    }
+
+    /**
+     * Task execution, in fact this method delegates execution to a remote taskLauncher object
+     */
     @Override
     public Object execute(TaskResult... results) throws Throwable {
-        TaskResult result = taskLauncher.doTask(null, executable, results);
+        TaskResult result = taskLauncher.doTask(null /* no need here to pass schedulerCore object */,
+                executable, results);
         while (!isKilled()) {
             try {
-                PAFuture.waitFor(result, 1000);
+                /* the below method throws an exception if timeout expires */
+                PAFuture.waitFor(result, TIMEOUT);
                 break;
             } catch (ProActiveTimeoutException e) {
             }
         }
         if (isKilled()) {
             FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
-            return null;
+            throw new SchedulerException("Walltime exceeded");
         }
         return result;
     }
 
-    @Override
-    public void init(Map<String, Object> args) throws Exception {
-    }
-
+    /**
+     * The kill method should result in killing the executable, and cleaning after launching the separate JVM
+     */
     @Override
     public void kill() {
         executable.kill();
@@ -44,30 +66,17 @@ public class ForkedJavaExecutable extends JavaExecutable {
     }
 
     /**
-     * @return the executable
+     * @return the executable which will be executed in a separate JVM
      */
     public JavaExecutable getExecutable() {
         return executable;
     }
 
     /**
-     * @param executable the executable to set
-     */
-    public void setExecutable(JavaExecutable executable) {
-        this.executable = executable;
-    }
-
-    /**
-     * @return the taskLauncher
+     * @return the taskLauncher will is responsible for execution of executable
      */
     public TaskLauncher getTaskLauncher() {
         return taskLauncher;
     }
 
-    /**
-     * @param taskLauncher the taskLauncher to set
-     */
-    public void setTaskLauncher(TaskLauncher taskLauncher) {
-        this.taskLauncher = taskLauncher;
-    }
 }

@@ -59,7 +59,16 @@ public class JavaTask extends Task {
     /** Arguments of the task as a map */
     private Map<String, Object> args = new HashMap<String, Object>();
 
+    /** if the task will be executed in a separate JVM */
     private boolean fork;
+
+    /* Path to directory with Java installed, to this path '/bin/java' will be added. 
+     * If the path is null only 'java' command will be called
+     */
+    private String javaHome = null;
+
+    /* options passed to Java (not an application) (example: memory settings or properties) */
+    private String javaOptions = null;
 
     /**
      * Empty constructor.
@@ -135,16 +144,44 @@ public class JavaTask extends Task {
     }
 
     /**
-     * @return the fork
+     * @return the fork if the task will be executed in a separate JVM 
      */
     public boolean isFork() {
         return fork;
     }
 
     /**
-     * @param fork the fork to set
+     * @param fork the fork to set - if the task will be executed in a separate JVM 
      */
     public void setFork(boolean fork) {
         this.fork = fork;
+    }
+
+    /**
+     * @return the javaHome
+     */
+    public String getJavaHome() {
+        return javaHome;
+    }
+
+    /**
+     * @param javaHome the javaHome to set
+     */
+    public void setJavaHome(String javaHome) {
+        this.javaHome = javaHome;
+    }
+
+    /**
+     * @return the javaOptions
+     */
+    public String getJavaOptions() {
+        return javaOptions;
+    }
+
+    /**
+     * @param javaOptions the javaOptions to set
+     */
+    public void setJavaOptions(String javaOptions) {
+        this.javaOptions = javaOptions;
     }
 }

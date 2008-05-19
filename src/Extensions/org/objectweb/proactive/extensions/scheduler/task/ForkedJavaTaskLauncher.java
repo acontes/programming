@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
@@ -20,6 +21,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
@@ -32,16 +34,42 @@ import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
 
 
 /**
+ * ForkedJavaTaskLauncher is a task launcher which will create a dedicated JVM for task execution.
+ * It creates a JVM, creates a ProActive Node on that JVM, and in the end creates a JavaTaskLauncher active object
+ * on that node. This JavaTaskLauncher will be responsible for task execution. 
+ * 
  * @author The ProActive Team
- *
  */
 public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
+
+    /**
+     * When creating a ProActive node on a dedicated JVM assign a default name of VN
+     */
+    public static final String DEFAULT_VN_NAME = "ForkedTasksVN";
+
+    /**
+     * When creating a ProActive node on a dedicated JVM assign a default JobID
+     */
+    public static final String DEFAULT_JOB_ID = "ForkedTasksJobID";
+
+    /* Path to directory with Java installed, to this path '/bin/java' will be added. 
+     * If the path is null only 'java' command will be called
+     */
+    private String javaHome = null;
+
+    /* options passed to Java (not an application) (f.e. memory settings or properties) */
+    private String javaOptions = null;
+
+    /* for tryAcquire primitive */
+    private static final long SEMAPHORE_TIMEOUT = 2;
+    /* for tryAcquire primitive */
+    private static final int RETRY_ACQUIRE = 5;
 
     private Process process = null;
     private ProActiveRuntime childRuntime = null;
     private Semaphore semaphore = new Semaphore(0);
-    private long deploymentID = -1;
     private String forkedNodeName = null;
+    private long deploymentID;
     private Thread tsout = null;
     private Thread tserr = null;
 
@@ -56,8 +84,13 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         super(taskId, pre);
     }
 
+    /**
+     * We need to set deployment ID. The new JVM will register itself in the current JVM. 
+     * The current JVM will recognize it by this deployment ID. 
+     */
     private void init() {
         Random random = new Random((new Date()).getTime());
+        // TODO cdelbe cmathieu : use current DepId or a random one ?
         deploymentID = random.nextInt(1000000);
 
         forkedNodeName = "//localhost/" + this.getClass().getName() + getDeploymentId();
@@ -68,8 +101,19 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             init();
             currentExecutable = executableTask;
 
+            /* building command for executing java command */
             StringBuffer command = new StringBuffer();
-            command.append(" java ");
+            if (javaHome != null && !"".equals(javaHome)) {
+                command.append(javaHome + "\\bin\\java ");
+            } else {
+                command.append(" java ");
+            }
+
+            if (javaOptions != null && !"".equals(javaOptions)) {
+                command.append(" " + javaOptions + " ");
+            }
+
+            // option for properties string 
             String classPath = System.getProperty("java.class.path", ".");
             command.append(" -cp " + classPath + " ");
             command.append(" " + StartRuntime.class.getName() + " ");
@@ -79,6 +123,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             command.append(" -c 1 ");
             command.append(" -d " + getDeploymentId() + " ");
 
+            /* creating registration listener for collecting a registration notice from a created JVM */
             RegistrationListener registrationListener = new RegistrationListener();
             registrationListener.subscribeJMXRuntimeEvent();
 
@@ -90,10 +135,28 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             tsout.start();
             tserr.start();
 
-            semaphore.acquire();
-            String nodeUrl = childRuntime.createLocalNode(forkedNodeName, true, null, this.getClass()
-                    .getName(), null);
+            // detecting if process failed or did not register 
+            int numberOfTrials = 0;
+            for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
+                boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
+                if (permit)
+                    break;
 
+                try {
+                    process.exitValue();
+                    // process terminated abnormally:
+                    throw new SchedulerException("Unable to create a separate java process");
+                } catch (IllegalThreadStateException e) {
+                }
+            }
+            if (numberOfTrials == RETRY_ACQUIRE)
+                throw new SchedulerException("Unable to create a separate java process");
+
+            /* creating a ProActive node on a newly created JVM */
+            String nodeUrl = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME,
+                    DEFAULT_JOB_ID);
+
+            /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
             JavaTaskLauncher newLauncher = null;
             if (pre == null) {
                 newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
@@ -102,40 +165,42 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
                 newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
                         new Object[] { taskId, pre }, nodeUrl);
             }
-            newLauncher.setWallTime(wallTime);
+            if (isWallTime)
+                newLauncher.setWallTime(wallTime);
 
-            ForkedJavaExecutable forkedJavaExecutable = new ForkedJavaExecutable();
-            forkedJavaExecutable.setExecutable((JavaExecutable) executableTask);
-            forkedJavaExecutable.setTaskLauncher(newLauncher);
+            ForkedJavaExecutable forkedJavaExecutable = new ForkedJavaExecutable(
+                (JavaExecutable) executableTask, newLauncher);
 
-            scheduleTimer(forkedJavaExecutable);
+            if (isWallTime)
+                scheduleTimer(forkedJavaExecutable);
             TaskResult result = (TaskResult) forkedJavaExecutable.execute(results);
-            cancelTimer();
-
-            if (result == null) {
-                return new TaskResultImpl(taskId, new Exception("Walltime exceeded"), new Log4JTaskLogs(
-                    this.logBuffer.getBuffer()));
-            }
 
             return result;
 
         } catch (Throwable ex) {
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
+            if (isWallTime)
+                cancelTimer();
             finalizeTask(core);
         }
     }
 
+    /**
+     * Finalizing task does cleaning after creating a separate JVM and informing the schedulerCore about finished task
+     */
     protected void finalizeTask(SchedulerCore core) {
         clean();
         super.finalizeTask(core);
     }
 
+    /**
+     * Cleaning method kills all nodes on the dedicated JVM, destroy java process, and closes threads responsible for process output 
+     */
     protected void clean() {
         try {
             childRuntime.killAllNodes();
             process.destroy();
-            process.waitFor();
             tsout.join();
             tserr.join();
         } catch (Exception e) {
@@ -147,6 +212,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         return deploymentID;
     }
 
+    /**
+     * Registration Listener is responsible for collecting notifications from other JVMs.
+     * We need it specifically for collecting registration from a task dedicated JVM.
+     * This dedicated JVM is recognized by a specific deployment ID.
+     * Once the dedicated JVM registers itself, the semaphore is released and ForkedJavaTaskLauncher can proceed.
+     *  
+     * @author ProActive
+     *
+     */
     class RegistrationListener implements NotificationListener {
 
         public void subscribeJMXRuntimeEvent() {
@@ -169,5 +243,33 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             }
         }
 
+    }
+
+    /**
+     * @return the javaHome
+     */
+    public String getJavaHome() {
+        return javaHome;
+    }
+
+    /**
+     * @param javaHome the javaHome to set
+     */
+    public void setJavaHome(String javaHome) {
+        this.javaHome = javaHome;
+    }
+
+    /**
+     * @return the javaOptions
+     */
+    public String getJavaOptions() {
+        return javaOptions;
+    }
+
+    /**
+     * @param javaOptions the javaOptions to set
+     */
+    public void setJavaOptions(String javaOptions) {
+        this.javaOptions = javaOptions;
     }
 }
