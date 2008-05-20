@@ -11,10 +11,10 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 
 
 /**
- * Executable responsible for executing another executable in a separate JVM. 
+ * This Executable is responsible for executing another executable in a separate JVM. 
  * It receives a reference to a remote taskLauncher object, and delegates execution to this object.
  * 
- * @author ProActive
+ * @author The ProActive Team
  *
  */
 public class ForkedJavaExecutable extends JavaExecutable {

@@ -43,12 +43,12 @@ import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
 public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
     /**
-     * When creating a ProActive node on a dedicated JVM assign a default name of VN
+     * When creating a ProActive node on a dedicated JVM, assign a default name of VN
      */
     public static final String DEFAULT_VN_NAME = "ForkedTasksVN";
 
     /**
-     * When creating a ProActive node on a dedicated JVM assign a default JobID
+     * When creating a ProActive node on a dedicated JVM, assign a default JobID
      */
     public static final String DEFAULT_JOB_ID = "ForkedTasksJobID";
 
@@ -61,7 +61,8 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     private String javaOptions = null;
 
     /* for tryAcquire primitive */
-    private static final long SEMAPHORE_TIMEOUT = 2;
+    private static final long SEMAPHORE_TIMEOUT = 1;
+
     /* for tryAcquire primitive */
     private static final int RETRY_ACQUIRE = 5;
 
@@ -96,15 +97,18 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         forkedNodeName = "//localhost/" + this.getClass().getName() + getDeploymentId();
     }
 
+    /**
+     * Method responsible for creating a a dedicated JVM, execution of the task on this JVM and collecting result
+     */
     public TaskResult doTask(SchedulerCore core, Executable executableTask, TaskResult... results) {
         try {
             init();
             currentExecutable = executableTask;
 
-            /* building command for executing java command */
+            /* building command for executing java */
             StringBuffer command = new StringBuffer();
             if (javaHome != null && !"".equals(javaHome)) {
-                command.append(javaHome + "\\bin\\java ");
+                command.append(javaHome + "/bin/java ");
             } else {
                 command.append(" java ");
             }
@@ -173,6 +177,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
             if (isWallTime)
                 scheduleTimer(forkedJavaExecutable);
+
             TaskResult result = (TaskResult) forkedJavaExecutable.execute(results);
 
             return result;
@@ -187,7 +192,9 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     /**
-     * Finalizing task does cleaning after creating a separate JVM and informing the schedulerCore about finished task
+     * Finalizing task does: 
+     * - cleaning after creating a separate JVM 
+     * - informing the schedulerCore about finished task
      */
     protected void finalizeTask(SchedulerCore core) {
         clean();
@@ -195,7 +202,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     /**
-     * Cleaning method kills all nodes on the dedicated JVM, destroy java process, and closes threads responsible for process output 
+     * Cleaning method kills all nodes on the dedicated JVM, destroys java process, and closes threads responsible for process output 
      */
     protected void clean() {
         try {
@@ -210,6 +217,34 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
     private long getDeploymentId() {
         return deploymentID;
+    }
+
+    /**
+     * @return the javaHome
+     */
+    public String getJavaHome() {
+        return javaHome;
+    }
+
+    /**
+     * @param javaHome the javaHome to set
+     */
+    public void setJavaHome(String javaHome) {
+        this.javaHome = javaHome;
+    }
+
+    /**
+     * @return the javaOptions
+     */
+    public String getJavaOptions() {
+        return javaOptions;
+    }
+
+    /**
+     * @param javaOptions the javaOptions to set
+     */
+    public void setJavaOptions(String javaOptions) {
+        this.javaOptions = javaOptions;
     }
 
     /**
@@ -245,31 +280,4 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
     }
 
-    /**
-     * @return the javaHome
-     */
-    public String getJavaHome() {
-        return javaHome;
-    }
-
-    /**
-     * @param javaHome the javaHome to set
-     */
-    public void setJavaHome(String javaHome) {
-        this.javaHome = javaHome;
-    }
-
-    /**
-     * @return the javaOptions
-     */
-    public String getJavaOptions() {
-        return javaOptions;
-    }
-
-    /**
-     * @param javaOptions the javaOptions to set
-     */
-    public void setJavaOptions(String javaOptions) {
-        this.javaOptions = javaOptions;
-    }
 }

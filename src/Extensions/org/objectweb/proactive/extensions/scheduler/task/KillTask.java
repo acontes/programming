@@ -10,8 +10,8 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.Execu
  * Class responsible for killing an executable if it does not finish before the walltime.
  * It accepts in constructor an executable and walltime, then we can start it by calling schedule method
  * If the executable finishes before the walltime we should call cancel method to cancel the killing function scheduled for future invocation.
- * @author ProActive
- *
+
+ * @author The ProActive Team
  */
 public class KillTask {
 
