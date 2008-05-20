@@ -267,7 +267,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         this.roe.activateProtocol(URI.create(url));
 
         // logging info
-//        MDC.remove("runtime");
+        //        MDC.remove("runtime");
         MDC.put("runtime", getURL());
     }
 

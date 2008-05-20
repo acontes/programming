@@ -108,5 +108,5 @@ log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 # %X{hostname} adds the hostname
 # %X{runtime} adds the runtime url
-#log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{runtime} - [%20.20c{2}] %m
+# log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{runtime} - [%20.20c{2}] %m
 log4j.appender.CONSOLE.layout.ConversionPattern=%m %n

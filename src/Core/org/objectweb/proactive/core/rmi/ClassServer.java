@@ -141,8 +141,8 @@ public class ClassServer implements Runnable {
 
     private void printMessage() {
         if (logger.isDebugEnabled()) {
-        	
-        	ProActiveRuntimeImpl.getProActiveRuntime();
+
+            ProActiveRuntimeImpl.getProActiveRuntime();
             logger.info("To use this ClassFileServer set the property java.rmi.server.codebase to http://" +
                 hostname + ":" + port + "/");
         }

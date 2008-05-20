@@ -75,9 +75,9 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
      *
      */
     public CheckpointServerImpl(FTServer server) {
-    	
-    	 //ProActiveRuntimeImpl.getProActiveRuntime();
-    	
+
+        //ProActiveRuntimeImpl.getProActiveRuntime();
+
         this.server = server;
 
         this.checkpointStorage = new Hashtable<UniqueID, List<Checkpoint>>();
@@ -93,10 +93,9 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
         }
-        
+
         //
-        
-       
+
     }
 
     /**

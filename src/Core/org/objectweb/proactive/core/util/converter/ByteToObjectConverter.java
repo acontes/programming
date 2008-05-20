@@ -124,7 +124,8 @@ public class ByteToObjectConverter {
         try {
             // we use enum and static calls to avoid object instanciation
             if (conversionMode == MakeDeepCopy.ConversionMode.MARSHALL) {
-            	System.out.println("ByteToObjectConverter.standardConvert() llllllllllllllllllllllllllllllllllllllllllllll");
+                System.out
+                        .println("ByteToObjectConverter.standardConvert() llllllllllllllllllllllllllllllllllllllllllllll");
                 objectInputStream = new SunMarshalInputStream(byteArrayInputStream);
             } else if (conversionMode == MakeDeepCopy.ConversionMode.PAOBJECT) {
                 objectInputStream = new PAObjectInputStream(byteArrayInputStream);

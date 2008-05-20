@@ -51,9 +51,9 @@ public class FTObject implements Serializable {
     }
 
     public void init(FTObject b) {
-//        PAActiveObject.setForgetOnSend(b, "a");
-//        PAActiveObject.setForgetOnSend(b, "b");
-//        PAActiveObject.setForgetOnSend(b, "c");
+        //        PAActiveObject.setForgetOnSend(b, "a");
+        //        PAActiveObject.setForgetOnSend(b, "b");
+        //        PAActiveObject.setForgetOnSend(b, "c");
 
         this.b = b;
 
