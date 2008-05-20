@@ -39,6 +39,7 @@ import java.rmi.server.RemoteStub;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.protocols.cic.infos.CheckpointInfoCIC;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 
@@ -118,7 +119,8 @@ public class Checkpoint implements java.io.Serializable {
      */
     public Body recover() {
         try {
-            Body recoveredBody = (Body) ByteToObjectConverter.MarshallStream.convert(this.checkpointedBody);
+            ///Body recoveredBody = (Body) ByteToObjectConverter.MarshallStream.convert(this.checkpointedBody);
+            Body recoveredBody = (Body) ByteToObjectConverter.ProActiveObjectStream.convert(this.checkpointedBody);
             // Communcations are blocked until the activity is restarted
             recoveredBody.blockCommunication();
             return recoveredBody;
@@ -155,6 +157,7 @@ public class Checkpoint implements java.io.Serializable {
             super(out);
             this.enableReplaceObject(true);
             this.codebase = codebase;
+            System.out.println("*********** CheckpointingOutputStream with codebase " + this.codebase);
         }
 
         /*
@@ -171,6 +174,10 @@ public class Checkpoint implements java.io.Serializable {
          */
         @Override
         protected final Object replaceObject(Object obj) throws IOException {
+        	if (obj.getClass().getCanonicalName().contains("_StubFTObject")){
+        		System.out.println("*********** CheckpointingOutputStream.replaceObject() : FOUND A STUB_FT_OBJECT !!!" );
+        	}
+        	
             if ((obj instanceof RemoteObject) && !(obj instanceof RemoteStub)) {
                 return RemoteObject.toStub((RemoteObject) obj);
             } else {

@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -74,6 +75,9 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
      *
      */
     public CheckpointServerImpl(FTServer server) {
+    	
+    	 //ProActiveRuntimeImpl.getProActiveRuntime();
+    	
         this.server = server;
 
         this.checkpointStorage = new Hashtable<UniqueID, List<Checkpoint>>();
@@ -83,12 +87,16 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
             CheckpointServerImpl.classServerHelper.setShouldCreateClassServer(true);
             this.codebase = CheckpointServerImpl.classServerHelper.initializeClassServer();
             System.setProperty("java.rmi.server.codebase", this.codebase);
-            logger.info("ClassServer is bound on " + this.codebase);
+            logger.info("ClassServer for the fault-tolerance server is bound on " + this.codebase);
         } catch (IOException e) {
             this.codebase = "NO CODEBASE";
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
         }
+        
+        //
+        
+       
     }
 
     /**

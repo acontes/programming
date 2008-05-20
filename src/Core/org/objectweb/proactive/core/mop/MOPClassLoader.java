@@ -220,7 +220,13 @@ public class MOPClassLoader extends URLClassLoader {
                     effectiveArguments[2] = new Integer(0);
                     effectiveArguments[3] = new Integer(data.length);
                     effectiveArguments[4] = this.getClass().getProtectionDomain();
-
+                    
+                    
+                    
+                    logger.info("--------------------------------------------------------------------------- 0 Stub GENERATION "+ name);
+                    Thread.dumpStack();
+                    logger.info("--------------------------------------------------------------------------- 1 Stub GENERATION "+ name);
+                    
                     //  we have been loaded through the bootclasspath
                     // so we use the context classloader
                     if (this.getParent() == null) {

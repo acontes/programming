@@ -513,7 +513,13 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+//    	try {
         this.readTheObject(in);
+//    	} catch (ClassNotFoundException e) {
+//    		MOP.forName("pa.stub.functionalTests.activeobject.request.forgetonsend._StubFTObject");
+//    		this.readObject(in);
+//    		
+//    	}
     }
 
     protected void readTheObject(java.io.ObjectInputStream in) throws java.io.IOException,

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.rmi;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -140,6 +141,8 @@ public class ClassServer implements Runnable {
 
     private void printMessage() {
         if (logger.isDebugEnabled()) {
+        	
+        	ProActiveRuntimeImpl.getProActiveRuntime();
             logger.info("To use this ClassFileServer set the property java.rmi.server.codebase to http://" +
                 hostname + ":" + port + "/");
         }
