@@ -8,6 +8,7 @@
 		<descriptorDefaultVariable name="test_var0" value="value0"/>
 	 	<!-- <includeXMLFile location="${RPATH}/Test2.xml"/>  -->
 	 	<includePropertyFile location="${RPATH}/Test.properties"/>
+	 	<descriptorVariable name="test_varLast" value="valueLast"/>
 	</environment>
 	
 	<application>	
