@@ -99,9 +99,12 @@ public class Test extends FunctionalTest {
         assertTrue(variableContract.getValue("test_var1").equals("value1"));
         assertTrue(variableContract.getValue("test_var2").equals("value2"));
         assertTrue(variableContract.getValue("test_var3").equals("value3"));
-        assertTrue(variableContract.getValue("test_var4").equals("value4"));
-        assertTrue(variableContract.getValue("test_var5").equals("value5"));
-        assertTrue(variableContract.getValue("test_var6").equals("value6"));
+        
+        // these are variable from the xml file, which we no longer support
+        //
+//        assertTrue(variableContract.getValue("test_var4").equals("value4"));
+//        assertTrue(variableContract.getValue("test_var5").equals("value5"));
+//        assertTrue(variableContract.getValue("test_var6").equals("value6"));
         assertTrue(variableContract.isClosed());
         assertTrue(variableContract.checkContract());
     }

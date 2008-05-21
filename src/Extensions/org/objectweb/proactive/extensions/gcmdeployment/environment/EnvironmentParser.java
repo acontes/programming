@@ -99,12 +99,13 @@ class EnvironmentParser {
                 String varContractTypeName = varDeclNode.getNodeName();
 
                 if (varContractTypeName.equals(INCLUDE_PROPERTY_FILE)) {
-                    Node fileLocation = varDeclNode.getAttributes().getNamedItem("location");
-                    FileReader fileReader = new FileReader(fileLocation.getNodeValue());
+                    String fileLocation = varDeclNode.getAttributes().getNamedItem("location").getNodeValue();
+                    fileLocation = variableContract.transform(fileLocation);
+                    FileReader fileReader = new FileReader(fileLocation);
                     Properties properties = new Properties();
                     properties.load(fileReader);
                     VariableContractType varContractType = VariableContractType
-                            .getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG);
+                            .getType(ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_TAG);
 
                     for (String propertyName : properties.stringPropertyNames()) {
 
