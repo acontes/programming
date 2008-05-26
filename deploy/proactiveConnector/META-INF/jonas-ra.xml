@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<jonas-connector xmlns="http://www.objectweb.org/jonas/ns"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.objectweb.org/jonas/ns
+                 http://www.objectweb.org/jonas/ns/jonas-connector_4_4.xsd">
+  <rarlink></rarlink>
+  <native-lib></native-lib>
+  <log-enabled>false</log-enabled>
+  <log-topic></log-topic>
+  <pool-params>
+    <pool-init>0</pool-init>
+    <pool-min>0</pool-min>
+    <pool-max>-1</pool-max>
+    <pool-max-age-minutes>0</pool-max-age-minutes>
+    <pstmt-max>10</pstmt-max>
+    <pool-max-opentime>0</pool-max-opentime>
+    <pool-max-waiters>0</pool-max-waiters>
+    <pool-max-waittime>0</pool-max-waittime>
+    <pool-sampling-period>30</pool-sampling-period>
+  </pool-params>
+  <jdbc-conn-params>
+    <jdbc-check-level>0</jdbc-check-level>
+  </jdbc-conn-params>
+  <jonas-config-property>
+    <jonas-config-property-name>vmName</jonas-config-property-name>
+    <jonas-config-property-value>jbossVM</jonas-config-property-value>
+  </jonas-config-property>
+  <jonas-config-property>
+    <jonas-config-property-name>Log4jConfigFile</jonas-config-property-name>
+    <jonas-config-property-value>{jonas.home}/conf/log4j.properties</jonas-config-property-value>
+  </jonas-config-property>
+</jonas-connector>

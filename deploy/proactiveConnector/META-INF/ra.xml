@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connector id="Connector_ID" version="1.5" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/connector_1_5.xsd"> 
+	
+	<description>Connector Adapter for the ProActive library</description>
+	<display-name>Proactive Resource Adapter</display-name>
+ 	<vendor-name>ProActive</vendor-name>
+  	<eis-type>ProActive adapter</eis-type>
+  	<resourceadapter-version>5.0</resourceadapter-version>                                  
+  	
+  	<resourceadapter>
+  		<resourceadapter-class>org.objectweb.proactive.extensions.jee.ProActiveResourceAdapter</resourceadapter-class>
+  		<config-property>
+            <config-property-name>vmName</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value>jbossVM</config-property-value>
+        </config-property>
+        <config-property>
+            <config-property-name>Log4jConfigFile</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value>{jboss.home}/server/default/conf/jboss-log4j.xml</config-property-value>
+        </config-property>
+  	</resourceadapter>
+  	
+</connector>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ProActiveConnector" default="compile" basedir=".">
+<!-- 
+    Ant build file for the ProActive Connector
+    TODO integrate with main ProActive build system, I've created this just because I needed to automate the process of building .rar archive
+    Right now, this script should be run only after ./build deploy has been executed in the ProActive trunk's compile dir
+-->
+
+    <property file="build.properties"/>
+    <property name="connector.base"		     value="${basedir}" />
+    <property name="proactive.base.dir"           value="${basedir}/../../" />
+    <property name="proactive.lib.dir"            value="${proactive.base.dir}/dist/lib" />
+    <property name="jee.lib.dir"  value="${proactive.lib.dir}/jee" />
+
+    <property name="src.connector.dir"	value="${connector.base}/src" />
+    <property name="cl.connector.dir"	value="${connector.base}/classes" />
+    <property name="deploy.connector.dir"   value="${connector.base}/dist" />
+
+    <path id="compile.libs">
+	<fileset dir="${proactive.lib.dir}">
+	    <include name="*.jar" />
+	</fileset>
+	<!-- the jee libraries -->
+	<fileset dir="${jee.lib.dir}">
+	    <include name="*.jar" />
+	</fileset>
+    </path>
+
+    <path id="connector.classpath">
+	<pathelement location="${cl.connector.dir}" />
+	<path refid="compile.libs"/>
+    </path>
+
+    <target name="init">
+	<mkdir dir="${cl.connector.dir}" />
+	<mkdir dir="${deploy.connector.dir}" />
+    </target>
+
+    <target name="compile" depends="init" description="Compiles the proActive connector">
+	<javac srcdir="${src.connector.dir}" destdir="${cl.connector.dir}"> 
+	    <classpath refid="connector.classpath" />
+	    <!--include name="**/*.java" /-->
+	</javac>
+    </target>
+
+    <target name="jar" depends="compile" description="Packs the connector classes into a jar file">
+	<jar destfile="${deploy.connector.dir}/proactiveConnector.jar" >
+	    <fileset dir="${cl.connector.dir}" includes="**" />
+	</jar>
+    </target> 
+
+    <target name="rar" depends="jar" description="Creates the RAR archive for deployment into the application server">
+	<jar destfile="${deploy.connector.dir}/${rar.name}.rar" >
+	    <fileset dir="${deploy.connector.dir}" includes="proactiveConnector.jar" />
+	    <!-- META-INF -->
+	    <fileset dir="${connector.base}" includes="META-INF/MANIFEST.MF" />
+	    <fileset dir="${connector.base}" includes="META-INF/ra.xml" />
+	    <!-- ProActive libs -->
+	    <fileset dir="${proactive.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar log4j.jar" />
+	</jar>
+    </target>
+
+    <target name="clean">
+	<delete dir="${cl.connector.dir}"/>	
+	<delete dir="${deploy.connector.dir}" />
+    </target>
+
+
+</project>
