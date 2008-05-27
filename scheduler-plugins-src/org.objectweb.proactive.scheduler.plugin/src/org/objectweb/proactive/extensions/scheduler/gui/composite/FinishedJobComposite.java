@@ -34,20 +34,8 @@ import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighestJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityIdleJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.FinishedJobsListener;
-import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 /**
@@ -90,33 +78,6 @@ public class FinishedJobComposite extends AbstractJobComposite implements Finish
     @Override
     public void sortJobs() {
         JobsController.getLocalView().sortFinishedJobs();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
-     */
-    @Override
-    public void jobSelected(InternalJob job) {
-        boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
-
-        // enabling/disabling button permitted with this job
-        ObtainJobOutputAction.getInstance().setEnabled(enabled);
-
-        PriorityJobAction.getInstance().setEnabled(false);
-        PriorityIdleJobAction.getInstance().setEnabled(false);
-        PriorityLowestJobAction.getInstance().setEnabled(false);
-        PriorityLowJobAction.getInstance().setEnabled(false);
-        PriorityNormalJobAction.getInstance().setEnabled(false);
-        PriorityHighJobAction.getInstance().setEnabled(false);
-        PriorityHighestJobAction.getInstance().setEnabled(false);
-
-        PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
-        pauseResumeJobAction.setEnabled(false);
-        pauseResumeJobAction.setPauseResumeMode();
-
-        KillRemoveJobAction killRemoveJobAction = KillRemoveJobAction.getInstance();
-        killRemoveJobAction.setRemoveMode();
-        killRemoveJobAction.setEnabled(enabled);
     }
 
     /**

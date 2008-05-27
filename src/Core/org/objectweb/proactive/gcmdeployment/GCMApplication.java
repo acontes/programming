@@ -32,6 +32,9 @@ package org.objectweb.proactive.gcmdeployment;
 
 import java.util.List;
 import java.util.Map;
+import java.net.URL;
+import java.util.Set;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -54,6 +57,7 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
  */
 @PublicAPI
 public interface GCMApplication {
+    public long getDeploymentId();
 
     /**
      * Starts the deployment process
@@ -86,6 +90,8 @@ public interface GCMApplication {
      */
     public GCMVirtualNode getVirtualNode(String vnName);
 
+    public Set<String> getVirtualNodeNames();
+
     /**
      * Returns all the Virtual Nodes known by this application
      * 
@@ -93,7 +99,7 @@ public interface GCMApplication {
      * 
      * @return All the Virtual Nodes known by this application
      */
-    public Map<String, ? extends GCMVirtualNode> getVirtualNodes();
+    public Map<String, GCMVirtualNode> getVirtualNodes();
 
     /**
      * Returns all the Nodes created by this application
@@ -152,4 +158,10 @@ public interface GCMApplication {
      * @return The variable contract associated to this application
      */
     public VariableContractImpl getVariableContract();
+
+    /**
+     * Returns the descriptor url associated to this Application
+     * @return descriptor url
+     */
+    public URL getDescriptorURL();
 }

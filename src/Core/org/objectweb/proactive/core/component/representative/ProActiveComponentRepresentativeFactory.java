@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component.representative;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -81,6 +82,13 @@ public class ProActiveComponentRepresentativeFactory {
         return representative;
     }
 
+    public ProActiveComponentRepresentative createComponentRepresentative(ComponentParameters params,
+            Proxy proxy) {
+        ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(params);
+        representative.setProxy(proxy);
+        return representative;
+    }
+
     /**
      * Creates a component representative according to the type of the non-functional component
      * (it also generates the required functional interfaces), and connects the representative to
@@ -108,19 +116,19 @@ public class ProActiveComponentRepresentativeFactory {
      */
     public ProActiveComponentRepresentative createComponentRepresentative(Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
-        proxy.reify(MethodCall.getComponentMethodCall(ComponentParametersControllerImpl.class
-                .getDeclaredMethod("setImmediateServices", new Class[] {}), new Object[] {}, null,
+        proxy.reify(MethodCall.getComponentMethodCall(ComponentParametersController.class.getDeclaredMethod(
+                "setImmediateServices", new Class[] {}), new Object[] {}, null,
                 Constants.COMPONENT_PARAMETERS_CONTROLLER, null, ComponentRequest.STRICT_FIFO_PRIORITY));
 
         ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall
-                .getComponentMethodCall(ComponentParametersControllerImpl.class.getDeclaredMethod(
+                .getComponentMethodCall(ComponentParametersController.class.getDeclaredMethod(
                         "getComponentParameters", new Class[] {}), new Object[] {}, null,
                         Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
                         ComponentRequest.STRICT_FIFO_PRIORITY));
 
         //remove immediate service for getComponentParameters
-        proxy.reify(MethodCall.getComponentMethodCall(ComponentParametersControllerImpl.class
-                .getDeclaredMethod("removeImmediateServices", new Class[] {}), new Object[] {}, null,
+        proxy.reify(MethodCall.getComponentMethodCall(ComponentParametersController.class.getDeclaredMethod(
+                "removeImmediateServices", new Class[] {}), new Object[] {}, null,
                 Constants.COMPONENT_PARAMETERS_CONTROLLER, null, ComponentRequest.STRICT_FIFO_PRIORITY));
 
         return ProActiveComponentRepresentativeFactory.instance().createComponentRepresentative(

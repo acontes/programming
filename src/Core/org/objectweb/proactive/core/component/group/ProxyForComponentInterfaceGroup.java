@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
 import org.objectweb.proactive.core.group.ExceptionListException;
-import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProcessForAsyncCall;
 import org.objectweb.proactive.core.group.ProcessForOneWayCall;
 import org.objectweb.proactive.core.group.ProxyForGroup;
@@ -215,7 +214,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
 
                 for (MethodCall currentMc : generatedMethodCalls.keySet()) {
                     // delegate invocations
-                    this.threadpool.addAJob(new ProcessForAsyncCall(delegatee, delegatee.memberList,
+                    this.threadpool.addAJob(new ComponentProcessForAsyncCall(delegatee, delegatee.memberList,
                         memberListOfResultGroup, generatedMethodCalls.get(currentMc), currentMc, body));
                 }
 
@@ -254,7 +253,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
 
             for (MethodCall currentMc : generatedMethodCalls.keySet()) {
                 // delegate invocations
-                this.threadpool.addAJob(new ProcessForOneWayCall(delegatee, delegatee.memberList,
+                this.threadpool.addAJob(new ComponentProcessForOneWayCall(delegatee, delegatee.memberList,
                     generatedMethodCalls.get(currentMc), currentMc, body, exceptionList));
             }
 
@@ -268,7 +267,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
      * The delegatee introduces an indirection which can be used for altering the reified invocation
      *
      */
-    public void setDelegatee(ProxyForComponentInterfaceGroup delegatee) {
+    public void setDelegatee(ProxyForComponentInterfaceGroup<E> delegatee) {
         this.delegatee = delegatee;
     }
 
@@ -276,7 +275,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
      * The delegatee introduces an indirection which can be used for altering the reified invocation
      *
      */
-    public ProxyForComponentInterfaceGroup getDelegatee() {
+    public ProxyForComponentInterfaceGroup<E> getDelegatee() {
         return delegatee;
     }
 

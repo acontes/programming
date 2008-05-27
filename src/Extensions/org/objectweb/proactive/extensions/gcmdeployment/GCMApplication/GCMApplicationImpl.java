@@ -32,8 +32,9 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 
-import java.io.File;
-import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,11 +47,12 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
@@ -60,19 +62,22 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Grou
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeRemoteObjectAdapter;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.gcmdeployment.Topology;
 
 
 public class GCMApplicationImpl implements GCMApplicationInternal {
+    static private Map<Long, GCMApplication> localDeployments = new HashMap<Long, GCMApplication>();
 
     /** An unique identifier for this deployment */
     private long deploymentId;
 
     /** descriptor file */
-    private File descriptor = null;
+    private URL descriptor = null;
 
     /** GCM Application parser (statefull) */
     private GCMApplicationParser parser = null;
@@ -101,21 +106,27 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     private VariableContractImpl vContract;
 
-    public GCMApplicationImpl(String filename) throws ProActiveException {
-        this(new File(filename), null);
+    static public GCMApplication getLocal(long deploymentId) {
+        return localDeployments.get(deploymentId);
     }
 
-    public GCMApplicationImpl(String filename, VariableContractImpl vContract) throws ProActiveException {
-        this(new File(filename), vContract);
+    public GCMApplicationImpl(String filename) throws ProActiveException, MalformedURLException {
+        this(new URL("file", null, filename), null);
     }
 
-    public GCMApplicationImpl(File file) throws ProActiveException {
+    public GCMApplicationImpl(String filename, VariableContractImpl vContract) throws ProActiveException,
+            MalformedURLException {
+        this(new URL("file", null, filename), vContract);
+    }
+
+    public GCMApplicationImpl(URL file) throws ProActiveException {
         this(file, null);
     }
 
-    public GCMApplicationImpl(File file, VariableContractImpl vContract) throws ProActiveException {
+    public GCMApplicationImpl(URL file, VariableContractImpl vContract) throws ProActiveException {
         try {
             deploymentId = ProActiveRandom.nextPosLong();
+            localDeployments.put(deploymentId, this);
 
             currentDeploymentPath = new ArrayList<String>();
             topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
@@ -127,13 +138,15 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             }
             this.vContract = vContract;
 
-            descriptor = Helpers.checkDescriptorFileExist(file);
+            descriptor = file;
             // vContract will be modified by the Parser to include variable defined in the descriptor
             parser = new GCMApplicationParserImpl(descriptor, this.vContract);
             nodeProviders = parser.getNodeProviders();
             virtualNodes = parser.getVirtualNodes();
             commandBuilder = parser.getCommandBuilder();
             nodeMapper = new NodeMapper(this, virtualNodes.values());
+
+            this.vContract.close();
 
             // apply Application-wide tech services on local node
             //
@@ -150,6 +163,19 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 }
             }
 
+            // Export this GCMApplication as a remote object
+            RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
+                GCMApplication.class.getName(), this, GCMApplicationRemoteObjectAdapter.class);
+            URI uri = RemoteObjectHelper.generateUrl(deploymentId + "/GCMApplication");
+            roe.activateProtocol(uri);
+
+            // Export all VirtualNodes as remote objects
+            for (GCMVirtualNode vn : virtualNodes.values()) {
+                RemoteObjectExposer<GCMVirtualNode> vnroe = new RemoteObjectExposer<GCMVirtualNode>(
+                    GCMVirtualNode.class.getName(), vn, GCMVirtualNodeRemoteObjectAdapter.class);
+                uri = RemoteObjectHelper.generateUrl(deploymentId + "/VirtualNode/" + vn.getName());
+                vnroe.activateProtocol(uri);
+            }
         } catch (Exception e) {
             GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
             throw new ProActiveException(e);
@@ -188,8 +214,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return virtualNodes.get(vnName);
     }
 
-    public Map<String, ? extends GCMVirtualNode> getVirtualNodes() {
-        return virtualNodes;
+    public Map<String, GCMVirtualNode> getVirtualNodes() {
+        return new HashMap<String, GCMVirtualNode>(virtualNodes);
     }
 
     public void kill() {
@@ -270,6 +296,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return this.vContract;
     }
 
+    public URL getDescriptorURL() {
+        return descriptor;
+    }
+
     /*
      * ----------------------------- GCMApplicationDescriptorInternal interface
      */
@@ -300,11 +330,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
         rootNode.setDeploymentDescriptorPath("none"); // no deployment descriptor here
 
-        try {
-            rootNode.setApplicationDescriptorPath(descriptor.getCanonicalPath());
-        } catch (IOException e) {
-            rootNode.setApplicationDescriptorPath("");
-        }
+        rootNode.setApplicationDescriptorPath(descriptor.toExternalForm());
+
         rootNode.setDeploymentPath(getCurrentdDeploymentPath());
         popDeploymentPath();
 
@@ -345,7 +372,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             HostInfo hostInfo, NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
         pushDeploymentPath(hostInfo.getId());
         TopologyImpl node = new TopologyImpl();
-        node.setDeploymentDescriptorPath(gcmd.getDescriptorFilePath());
+        node.setDeploymentDescriptorPath(gcmd.getDescriptorURL().toExternalForm());
         node.setApplicationDescriptorPath(rootNode.getApplicationDescriptorPath());
         node.setDeploymentPath(getCurrentdDeploymentPath());
         node.setNodeProvider(nodeProvider.getId());
@@ -406,6 +433,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         for (GCMVirtualNode vn : virtualNodes.values()) {
             vn.waitReady();
         }
+    }
+
+    public Set<String> getVirtualNodeNames() {
+        return new HashSet<String>(virtualNodes.keySet());
     }
 
 }

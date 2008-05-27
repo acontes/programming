@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
@@ -45,7 +46,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * @author The ProActive Team
  *
  */
-public interface WorkerManager {
+public interface WorkerManager extends WorkerDeadListener {
 
     /**
      * Asks the worker manager to activate every virtual nodes inside the given descriptor
@@ -76,12 +77,6 @@ public interface WorkerManager {
      * @throws ProActiveException if the scheduler cannot be found or if the login fails
      */
     void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
-
-    /**
-     * Adds the given virtual node to the worker manager
-     * @param virtualnode a virtual node object
-     */
-    void addResources(VirtualNode virtualnode);
 
     /**
      * Terminates the worker manager and free every resources (if asked)

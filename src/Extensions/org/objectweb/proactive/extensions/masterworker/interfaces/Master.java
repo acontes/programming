@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
@@ -87,6 +88,9 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      */
     public final int MAX_TASK_FLOODING = Integer.MAX_VALUE;
 
+    // please keep the resource adding methods inside the tags
+    // they are used in the documentation
+    //@snippet-start masterworker_addresources
     /**
      * Adds the given Collection of nodes to the master <br/>
      * @param nodes a collection of nodes
@@ -119,29 +123,30 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      */
     void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
 
-    /**
-     * Adds every resource inside the given virtual node to the master <br/>
-     * @param virtualnode a virtual node object
-     */
-    void addResources(VirtualNode virtualnode);
+    //@snippet-end masterworker_addresources
 
     /**
      * This method returns the number of workers currently in the worker pool
      * @return number of workers
      */
+
     int workerpoolSize();
 
+    //@snippet-start masterworker_terminate
     /**
      * Terminates the worker manager and (eventually free every resources) <br/>
      * @param freeResources tells if the Worker Manager should as well free the node resources
      */
     void terminate(boolean freeResources);
 
+    //@snippet-end masterworker_terminate
+
     /**
      * Tells the master to stop its current activity, and ignore all results of previously submitted tasks
      */
     void clear();
 
+    //@snippet-start masterworker_solve
     /**
      * Adds a list of tasks to be solved by the master <br/>
      * <b>Warning</b>: the master keeps a track of task objects that have been submitted to it and which are currently computing.<br>
@@ -151,6 +156,8 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      */
     void solve(List<T> tasks) throws TaskAlreadySubmittedException;
 
+    //@snippet-end masterworker_solve
+    //@snippet-start masterworker_collection
     /**
      * Wait for all results, will block until all results are computed <br>
      * The ordering of the results depends on the result reception mode in use <br>
@@ -190,6 +197,8 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      */
     int countAvailableResults();
 
+    //@snippet-end masterworker_collection
+    //@snippet-start masterworker_order
     /**
      * Sets the current ordering mode <br/>
      * If reception mode is switched while computations are in progress,<br/>
@@ -198,6 +207,8 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      */
     void setResultReceptionOrder(OrderingMode mode);
 
+    //@snippet-end masterworker_order
+    //@snippet-start masterworker_flood
     /**
      * Sets the number of tasks initially sent to each worker
      * default is 2 tasks
@@ -205,9 +216,12 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      */
     void setInitialTaskFlooding(final int number_of_tasks);
 
+    //@snippet-end masterworker_flood
+    //@snippet-start masterworker_ping
     /**
      * Sets the period at which ping messages are sent to the workers <br/>
      * @param periodMillis the new ping period
      */
     void setPingPeriod(long periodMillis);
+    //@snippet-end masterworker_ping
 }

@@ -106,8 +106,6 @@
 	<classpathentry kind="lib" path="lib/saxon8-dom.jar"/>
 	<classpathentry kind="lib" path="lib/sunxacml.jar"/>
 	<classpathentry kind="lib" path="lib/xsdlib.jar"/>
-	<classpathentry kind="lib" path="lib/js.jar"/>
-	<classpathentry kind="lib" path="lib/script-api.jar"/>
-	<classpathentry kind="lib" path="lib/script-js.jar"/>
+	<classpathentry kind="lib" path="lib/winp.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

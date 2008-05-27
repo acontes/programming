@@ -1,7 +1,10 @@
 package functionalTests.gcmdeployment.virtualnode;
 
+import java.util.concurrent.Semaphore;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -9,14 +12,17 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 public class TestVirtualNodeSubscribeWithHistory extends GCMFunctionalTestDefaultNodes {
+    static DeploymentType deployment = DeploymentType._2x2;
+
     int counter = 0;
+    Semaphore sem = new Semaphore(deployment.size);
 
     public TestVirtualNodeSubscribeWithHistory() {
-        super(DeploymentType._2x2);
+        super(deployment);
     }
 
     @Test
-    public void test() throws InterruptedException {
+    public void test() throws InterruptedException, ProActiveException {
         // Block until a node register, so history will be used at least for one node
         super.getANode();
 
@@ -24,18 +30,11 @@ public class TestVirtualNodeSubscribeWithHistory extends GCMFunctionalTestDefaul
         Assert.assertNotNull(vn);
         vn.subscribeNodeAttachment(this, "callback", true);
 
-        // ensure that all nodes registered
-        super.getANode();
-        super.getANode();
-        super.getANode();
-
-        // Wait for the notification
-        Thread.sleep(500);
-
-        Assert.assertEquals(4, counter);
+        sem.acquire();
+        // Test passed ! (callback has been invoked deployment.size times)
     }
 
     public void callback(Node node, String vn) {
-        counter++; // atomic on it
+        sem.release();
     }
 }

@@ -31,8 +31,11 @@
 package org.objectweb.proactive.gcmdeployment;
 
 import java.util.List;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.LocalNode;
 
@@ -119,7 +122,7 @@ public interface GCMVirtualNode {
      * Returns all the Nodes attached to the Virtual Node
      * 
      * A snapshot is performed. The returned Set will not be updated to reflect new Node arrivals.
-     * This method a to be invoked again to get a larger set.
+     * This method need to be invoked again to get a larger set.
      * 
      * @return The set of all Nodes attached to the Virtual Node
      */
@@ -153,7 +156,8 @@ public interface GCMVirtualNode {
      * @return true is returned if a method named methodName with the right signature exists, false
      *         otherwise
      */
-    public boolean subscribeNodeAttachment(Object client, String methodName, boolean withHistory);
+    public void subscribeNodeAttachment(Object client, String methodName, boolean withHistory)
+            throws ProActiveException;
 
     /**
      * Unsubscribes to Node Attachment notifications
@@ -163,7 +167,7 @@ public interface GCMVirtualNode {
      * @param methodName
      *            the method name to be called
      */
-    public void unsubscribeNodeAttachment(Object client, String methodName);
+    public void unsubscribeNodeAttachment(Object client, String methodName) throws ProActiveException;
 
     /**
      * Subscribe to isReady notification
@@ -183,7 +187,7 @@ public interface GCMVirtualNode {
      * @return true is returned if a method named methodName with the right signature exists and the
      *         Virtual Node is not Greedy, false otherwise
      */
-    public boolean subscribeIsReady(Object client, String methodName);
+    public void subscribeIsReady(Object client, String methodName) throws ProActiveException;
 
     /**
      * Unsubscribes to isReady notifications
@@ -193,7 +197,7 @@ public interface GCMVirtualNode {
      * @param methodName
      *            the method name to be called
      */
-    public void unsubscribeIsReady(Object client, String methodName);
+    public void unsubscribeIsReady(Object client, String methodName) throws ProActiveException;
 
     /**
      * Returns the topology of all the Nodes currently available in the Virtual Node
@@ -232,4 +236,6 @@ public interface GCMVirtualNode {
      * @return A node from this virtual node or null if the timeout is reached
      */
     public Node getANode(int timeout);
+
+    public UniqueID getUniqueID();
 }
