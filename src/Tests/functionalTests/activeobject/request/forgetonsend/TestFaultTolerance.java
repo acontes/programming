@@ -81,6 +81,10 @@ public class TestFaultTolerance extends AbstractFTTezt {
         FTObject b = (FTObject) PAActiveObject.newActive(FTObject.class.getName(), new Object[] { "b" },
                 nodes[1]);
 
+        // Fault tolerance issue: checkpoint is triggered communication
+        // A non communicating appli cannot be correctly checkpointed -> add some pings to
+        // trigger minimal activity
+        
         a.ping();
         b.ping();
 
@@ -88,6 +92,7 @@ public class TestFaultTolerance extends AbstractFTTezt {
 
         Thread.sleep(10000);
 
+        // second checkpoint ...
         a.ping();
         b.ping();
 
@@ -98,7 +103,7 @@ public class TestFaultTolerance extends AbstractFTTezt {
         } catch (Exception e) {
             //e.printStackTrace();
         }
-        Thread.sleep(10000);
+        Thread.sleep(3000);
         boolean result = b.getServices().equals("abc");
 
         // cleaning
