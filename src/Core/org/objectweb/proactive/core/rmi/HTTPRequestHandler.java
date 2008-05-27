@@ -154,8 +154,6 @@ public class HTTPRequestHandler extends Thread {
                     contentType = HttpUtils.SERVICE_REQUEST_CONTENT_TYPE;
                 } else {
                     // ClassServer request
-                    logger.info("========================> ClassServer is requested for class " +
-                        this.reqInfo.getClassFileName());
                     FileProcess fp = new FileProcess(paths, this.reqInfo);
                     bytes = fp.getBytes();
                     statusLine = "HTTP/1.1 200 OK";

@@ -158,7 +158,6 @@ public class Checkpoint implements java.io.Serializable {
             super(out);
             this.enableReplaceObject(true);
             this.codebase = codebase;
-            System.out.println("*********** CheckpointingOutputStream with codebase " + this.codebase);
         }
 
         /*
@@ -175,11 +174,6 @@ public class Checkpoint implements java.io.Serializable {
          */
         @Override
         protected final Object replaceObject(Object obj) throws IOException {
-            if (obj.getClass().getCanonicalName().contains("_StubFTObject")) {
-                System.out
-                        .println("*********** CheckpointingOutputStream.replaceObject() : FOUND A STUB_FT_OBJECT !!!");
-            }
-
             if ((obj instanceof RemoteObject) && !(obj instanceof RemoteStub)) {
                 return RemoteObject.toStub((RemoteObject) obj);
             } else {

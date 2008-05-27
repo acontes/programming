@@ -94,8 +94,6 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
             e.printStackTrace();
         }
 
-        //
-
     }
 
     /**
