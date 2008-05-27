@@ -29,11 +29,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-<<<<<<< .working
-		<task name="task3">
-=======
 		<task id="task3">
->>>>>>> .merge-right.r8934
 			<!-- Task human description -->
 			<description>This task will sleep 4s</description>
 			<depends>
