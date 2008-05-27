@@ -81,18 +81,24 @@ public class TestFaultTolerance extends AbstractFTTezt {
         FTObject b = (FTObject) PAActiveObject.newActive(FTObject.class.getName(), new Object[] { "b" },
                 nodes[1]);
 
+        a.ping();
+        b.ping();
+
         a.init(b); // Will produce b.a(), b.b() and b.c()
 
-        // failure in 13 sec...
-        Thread.sleep(13000);
+        Thread.sleep(10000);
+
+        a.ping();
+        b.ping();
+
+        Thread.sleep(10000);
+
         try {
             nodes[0].getProActiveRuntime().killRT(false);
         } catch (Exception e) {
-            // e.printStackTrace();
+            //e.printStackTrace();
         }
-
-        Thread.sleep(20000);
-
+        Thread.sleep(10000);
         boolean result = b.getServices().equals("abc");
 
         // cleaning
