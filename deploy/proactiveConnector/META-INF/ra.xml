@@ -8,17 +8,12 @@
   	<resourceadapter-version>5.0</resourceadapter-version>                                  
   	
   	<resourceadapter>
-  		<resourceadapter-class>org.objectweb.proactive.extensions.jee.ProActiveResourceAdapter</resourceadapter-class>
-  		<config-property>
-            <config-property-name>VmName</config-property-name>
-            <config-property-type>java.lang.String</config-property-type>
-            <config-property-value>jbossVM</config-property-value>
-        </config-property>
-        <config-property>
-            <config-property-name>Log4jConfigFile</config-property-name>
-            <config-property-type>java.lang.String</config-property-type>
-            <config-property-value>{jboss.home}/server/default/conf/jboss-log4j.xml</config-property-value>
-        </config-property>
+  	    <resourceadapter-class>org.objectweb.proactive.extensions.jee.ProActiveResourceAdapter</resourceadapter-class>
+  	    <config-property>
+		<config-property-name>VmName</config-property-name>
+		<config-property-type>java.lang.String</config-property-type>
+		<config-property-value>asVM</config-property-value>
+	    </config-property>
   	</resourceadapter>
   	
 </connector>

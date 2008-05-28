@@ -4,7 +4,7 @@
 # The default logging level is INFO
 # The root logger logs in the test.log file
 
-log4j.rootLogger=INFO,FILE
+log4j.rootLogger=DEBUG,FILE
 #log4j.logger.testsuite=INFO,FILE
 
 #log4j.logger.testsuite = TRACE
@@ -87,7 +87,17 @@ log4j.rootLogger=INFO,FILE
 
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender
-log4j.appender.FILE.File=logs/proactive.log
+# by default, log into a file in the ~/.proactive directory
+log4j.appender.FILE.File=${user.home}/.proactive/proactive.log
+# the following is for JBoss
+# log4j.appender.FILE.File=${jboss.home}/server/{jboss.domain}/log/proactive.log
+# the following is for GlassFish
+# log4j.appender.FILE.File=${glassfish.home}/domains/{glassfish.domain}/logs/proactive.log
+# the following is for Geronimo AS
+# log4j.appender.FILE.File=${geronimo.home}/var/log/proactive.log
+# the following is for JOnAs AS
+# log4j.appender.FILE.File=${jonas.base}/logs/proactive.log
+
 # the following recreates a file for each run
 log4j.appender.FILE.Append=false
 log4j.appender.FILE.threshold=DEBUG

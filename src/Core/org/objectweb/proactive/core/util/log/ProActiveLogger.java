@@ -54,53 +54,59 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 public class ProActiveLogger extends Logger {
 
     static {
+    	
+    	// there should be a way to avoid this behavior.
+    	// maybe log4j config really needs to be done outside ProActive...
+    	if(System.getProperty("proactive.log4j.config.overrride") == null) {
 
-        if (System.getProperty("log4j.configuration") == null) {
-            // if logger is not defined create default logger with level info that logs
-            // on the console
+    		if (System.getProperty("log4j.configuration") == null) {
+    			// if logger is not defined create default logger with level info that logs
+    			// on the console
 
-            File f = new File(System.getProperty("user.home") + File.separator + Constants.USER_CONFIG_DIR +
-                File.separator + ProActiveConfiguration.PROACTIVE_LOG_PROPERTIES_FILE);
+    			File f = new File(System.getProperty("user.home") + File.separator + Constants.USER_CONFIG_DIR +
+    					File.separator + ProActiveConfiguration.PROACTIVE_LOG_PROPERTIES_FILE);
 
-            if (f.exists()) {
+    			if (f.exists()) {
 
-                try {
-                    InputStream in = new FileInputStream(f);
-                    // testing the availability of the file
-                    Properties p = new Properties();
-                    p.load(in);
-                    PropertyConfigurator.configure(p);
-                    System.setProperty("log4j.configuration", f.toURI().toString());
+    				try {
+    					InputStream in = new FileInputStream(f);
+    					// testing the availability of the file
+    					Properties p = new Properties();
+    					p.load(in);
+    					PropertyConfigurator.configure(p);
+    					System.setProperty("log4j.configuration", f.toURI().toString());
 
-                } catch (Exception e) {
-                    System.err.println("the user's log4j configuration file (" + f.getAbsolutePath() +
-                        ") exits but is not accessible, fallbacking on the default configuration");
-                    InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
-                    // testing the availability of the file
-                    Properties p = new Properties();
+    				} catch (Exception e) {
+    					System.err.println("the user's log4j configuration file (" + f.getAbsolutePath() +
+    					") exits but is not accessible, fallbacking on the default configuration");
+    					InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
+    					// testing the availability of the file
+    					Properties p = new Properties();
 
-                    try {
-                        p.load(in);
-                        PropertyConfigurator.configure(p);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+    					try {
+    						p.load(in);
+    						PropertyConfigurator.configure(p);
+    					} catch (IOException e1) {
+    						e1.printStackTrace();
+    					}
 
-                }
+    				}
 
-            } else {
+    			} else {
 
-                InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
-                // testing the availability of the file
-                Properties p = new Properties();
 
-                try {
-                    p.load(in);
-                    PropertyConfigurator.configure(p);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
+    				InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
+    				// testing the availability of the file
+    				Properties p = new Properties();
+
+    				try {
+    					p.load(in);
+    					PropertyConfigurator.configure(p);
+    				} catch (IOException e1) {
+    					e1.printStackTrace();
+    				}
+    			}
+    		}
 
         }
 

@@ -9,26 +9,16 @@
       	<dep:type>rar</dep:type>
     </dep:moduleId>
     <dep:dependencies/>
-    <!--
-    	<dep:dependency>
-    		<dep:moduleId>log4j</dep:moduleId>
-      		<dep:groupId>log4j</dep:groupId>
-      		<dep:artifactId>log4j</dep:artifactId>
-      		<dep:version>1.2.14</dep:version>
-    	</dep:dependency>
-    </dep:dependencies>
-    -->
     <dep:hidden-classes/>
     <dep:non-overridable-classes/>
   </dep:environment>
       <resourceadapter>
         <resourceadapter-instance>
             <resourceadapter-name>ProActiveResourceAdapter</resourceadapter-name>
-            <config-property-setting name="VmName">jbossVM</config-property-setting>
-            <config-property-setting name="Log4jConfigFile">var/log/server-log4j.properties</config-property-setting>
-                <nam:workmanager xmlns:nam="http://geronimo.apache.org/xml/ns/naming-1.1">
-        			<nam:gbean-link>DefaultWorkManager</nam:gbean-link>
-    			</nam:workmanager>
+            <config-property-setting name="VmName">asVM</config-property-setting>
+            <nam:workmanager xmlns:nam="http://geronimo.apache.org/xml/ns/naming-1.1">
+		<nam:gbean-link>DefaultWorkManager</nam:gbean-link>
+	    </nam:workmanager>
         </resourceadapter-instance>
        </resourceadapter>
 </connector>

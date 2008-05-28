@@ -24,10 +24,6 @@
   </jdbc-conn-params>
   <jonas-config-property>
     <jonas-config-property-name>vmName</jonas-config-property-name>
-    <jonas-config-property-value>jbossVM</jonas-config-property-value>
-  </jonas-config-property>
-  <jonas-config-property>
-    <jonas-config-property-name>Log4jConfigFile</jonas-config-property-name>
-    <jonas-config-property-value>{jonas.home}/conf/log4j.properties</jonas-config-property-value>
+    <jonas-config-property-value>asVM</jonas-config-property-value>
   </jonas-config-property>
 </jonas-connector>

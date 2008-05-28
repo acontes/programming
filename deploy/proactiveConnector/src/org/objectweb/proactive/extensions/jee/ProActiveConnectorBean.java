@@ -126,21 +126,11 @@ public abstract class ProActiveConnectorBean {
 	
 	////////// 	according to JSR the RA must be a JavaBean
 	protected String _vmName;  //RW
-	protected String _log4jConfigFile; //RW
 	protected String _hostName;  //RO
 	protected String _codeBaseUrl;  //RO
 	
-	public String getLog4jConfigFile() {
-		return _log4jConfigFile;
-	}
-
-
 	public String getVmName() {
 		return _vmName;
-	}
-
-	public void setLog4jConfigFile(String configFile) {
-		_log4jConfigFile = configFile;
 	}
 
 	public void setVmName(String vmName) {
