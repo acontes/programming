@@ -5,7 +5,7 @@
   	<dep:moduleId>
       	<dep:groupId>proactive</dep:groupId>
       	<dep:artifactId>proactive</dep:artifactId>
-      	<dep:version>1.0</dep:version>
+      	<dep:version>1.1</dep:version>
       	<dep:type>rar</dep:type>
     </dep:moduleId>
     <dep:dependencies/>
@@ -24,7 +24,7 @@
       <resourceadapter>
         <resourceadapter-instance>
             <resourceadapter-name>ProActiveResourceAdapter</resourceadapter-name>
-            <config-property-setting name="vmName">jbossVM</config-property-setting>
+            <config-property-setting name="VmName">jbossVM</config-property-setting>
             <config-property-setting name="Log4jConfigFile">var/log/server-log4j.properties</config-property-setting>
                 <nam:workmanager xmlns:nam="http://geronimo.apache.org/xml/ns/naming-1.1">
         			<nam:gbean-link>DefaultWorkManager</nam:gbean-link>

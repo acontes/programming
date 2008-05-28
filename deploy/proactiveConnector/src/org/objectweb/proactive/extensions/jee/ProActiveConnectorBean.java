@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
  */
 public abstract class ProActiveConnectorBean {
 	protected static final int DEFAULT_CODEBASE_PORT = 20260;
-	protected static final Logger _raLogger = Logger.getLogger(Loggers.JBOSS);
+	protected Logger _raLogger;
 	
 	protected void configureRA(){
 		// configure ProActive separate logging
@@ -59,9 +59,21 @@ public abstract class ProActiveConnectorBean {
 	 */
 	private void configureLogging() {
 		// override the default log4j initialization phase	
-		// we know that there is a root logger
-		System.setProperty("log4j.defaultInitOverride", "true");
-		System.setProperty("log4j.configuration", _log4jConfigFile );
+		// we know that there is a root logger(do we?!)
+//		System.setProperty("log4j.defaultInitOverride", "true");
+//		System.setProperty("log4j.configuration", _log4jConfigFile );
+		try {
+			ContextRepositorySelector.init(this);
+			_raLogger = Logger.getLogger(Loggers.JBOSS);
+			_raLogger.debug("log4j initialised succesfully!");
+		} catch (Exception e) {
+			System.err.println("ERROR - Could not init log4j system. " +
+					"Try to review your log4j configuration - in your AS, and also in " 
+						+ ContextRepositorySelector.LOG4J_CONFIG_FILE);
+			System.err.println("the error message is:" + e.getMessage());
+			System.err.println("the stacktrace is:");
+			e.printStackTrace();
+		}
 	}
 	
 	/**

@@ -63,6 +63,8 @@ ant clean	-> cleanup the mess
 	    <case value="geronimo">
 		<jar destfile="${deploy.connector.dir}/${rar.name}.rar" >
 		    <fileset dir="${deploy.connector.dir}" includes="proactiveConnector.jar" />
+		    <!-- log4j.xml -->
+		    <fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
 		    <!-- META-INF -->
 		    <fileset dir="${connector.base}" includes="META-INF/MANIFEST.MF" />
 		    <fileset dir="${connector.base}" includes="META-INF/ra.xml" />
@@ -75,6 +77,8 @@ ant clean	-> cleanup the mess
 	    <case value="jonas">
 		<jar destfile="${deploy.connector.dir}/${rar.name}.rar" >
 		    <fileset dir="${deploy.connector.dir}" includes="proactiveConnector.jar" />
+		    <!-- log4j.xml -->
+		    <fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
 		    <!-- META-INF -->
 		    <fileset dir="${connector.base}" includes="META-INF/MANIFEST.MF" />
 		    <fileset dir="${connector.base}" includes="META-INF/ra.xml" />
@@ -87,6 +91,8 @@ ant clean	-> cleanup the mess
 	    <default>
 		<jar destfile="${deploy.connector.dir}/${rar.name}.rar" >
 		    <fileset dir="${deploy.connector.dir}" includes="proactiveConnector.jar" />
+		    <!-- log4j.xml -->
+		    <fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
 		    <!-- META-INF -->
 		    <fileset dir="${connector.base}" includes="META-INF/MANIFEST.MF" />
 		    <fileset dir="${connector.base}" includes="META-INF/ra.xml" />
