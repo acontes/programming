@@ -120,9 +120,13 @@ public class GCMNodeSource extends NodeSource {
             throw new AddingNodesException(e);
         }
 
-        Map<String, ? extends GCMVirtualNode> virtualNodes = desc.getVirtualNodes();
-        for (Entry<String, ? extends GCMVirtualNode> entry : virtualNodes.entrySet()) {
-            entry.getValue().subscribeNodeAttachment(this, "receiveDeployedNode", true);
+        Map<String, GCMVirtualNode> virtualNodes = desc.getVirtualNodes();
+        for (Entry<String, GCMVirtualNode> entry : virtualNodes.entrySet()) {
+            try {
+                entry.getValue().subscribeNodeAttachment(this, "receiveDeployedNode", true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         desc.startDeployment();
@@ -134,8 +138,8 @@ public class GCMNodeSource extends NodeSource {
      * A new node has been acquired by the deployment mechanism.
      * Register it in the PADNodeSource.
      */
-    public synchronized void receiveDeployedNode(Node node, GCMVirtualNode vnode) {
-        this.myStub.addNewAvailableNode(node, vnode.getName(), vnode.getName());
+    public synchronized void receiveDeployedNode(Node node, String vnodeName) {
+        this.myStub.addNewAvailableNode(node, vnodeName, vnodeName);
     }
 
     /**

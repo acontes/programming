@@ -41,9 +41,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
@@ -55,22 +57,35 @@ import org.objectweb.proactive.gcmdeployment.Topology;
 
 
 public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
+    static final private Map<UniqueID, GCMVirtualNodeInternal> localVirtualNodes = new ConcurrentHashMap<UniqueID, GCMVirtualNodeInternal>();
+
     static final public GCMVirtualNodeImpl DEFAULT_VN;
+
     static {
         DEFAULT_VN = new GCMVirtualNodeImpl();
         DEFAULT_VN.setName("DefaultVN");
     }
 
-    /** unique name (declared by GCMA) */
+    /**
+     * unique name (declared by GCMA)
+     */
     private String id;
 
-    /** capacity (declared by GCMA) */
+    private UniqueID uniqueID;
+
+    /**
+     * capacity (declared by GCMA)
+     */
     private long capacity;
 
-    /** All Node Provider Contracts (declared by GCMA) */
+    /**
+     * All Node Provider Contracts (declared by GCMA)
+     */
     final private Set<NodeProviderContract> nodeProvidersContracts;
 
-    /** All the Nodes attached to this VN */
+    /**
+     * All the Nodes attached to this VN
+     */
     final private List<Node> nodes;
 
     final private Object isReadyMonitor = new Object();
@@ -86,11 +101,18 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
     private boolean readyNotifSent = false;
 
+    static public GCMVirtualNodeInternal getLocal(UniqueID uniqueID) {
+        return localVirtualNodes.get(uniqueID);
+    }
+
     public GCMVirtualNodeImpl() {
         this(TechnicalServicesProperties.EMPTY);
     }
 
     public GCMVirtualNodeImpl(TechnicalServicesProperties applicationTechnicalServicesProperties) {
+        this.uniqueID = new UniqueID();
+        GCMVirtualNodeImpl.localVirtualNodes.put(uniqueID, this);
+
         this.applicationTechnicalServicesProperties = applicationTechnicalServicesProperties;
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
         nodes = new LinkedList<Node>();
@@ -125,7 +147,9 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             }
         }
 
-        return Math.max(Math.max(capacity, acc), 0);
+        long ret = Math.max(Math.max(capacity, acc), 0);
+        System.out.println("getNbRequiredNodes " + id + " " + ret);
+        return ret;
     }
 
     public long getNbCurrentNodes() {
@@ -228,9 +252,10 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         return nodesCopied;
     }
 
-    public boolean subscribeNodeAttachment(Object client, String methodeName, boolean withHistory) {
+    public void subscribeNodeAttachment(Object client, String methodeName, boolean withHistory)
+            throws ProActiveException {
         if ((client == null) || (methodeName == null)) {
-            return false;
+            throw new ProActiveException("Client and MethodName cannot be null");
         }
 
         Class<?> cl = client.getClass();
@@ -259,23 +284,32 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 }
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName +
-                "(Node, GCMVirtualNode) cannot be found on " + cl.getSimpleName());
-            return false;
+            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName + "(Node, String) cannot be found on " +
+                cl.getSimpleName());
+            throw new ProActiveException("Method " + methodeName + "(Node, String) cannot be found on " +
+                cl.getSimpleName(), e);
         }
-
-        return true;
     }
 
-    public void unsubscribeNodeAttachment(Object client, String methodeName) {
+    public void unsubscribeNodeAttachment(Object client, String methodeName) throws ProActiveException {
+        boolean success;
+
         synchronized (nodeAttachmentSubscribers) {
-            nodeAttachmentSubscribers.remove(new Subscriber(client, methodeName));
+            success = nodeAttachmentSubscribers.remove(new Subscriber(client, methodeName));
+        }
+
+        if (!success) {
+            throw new ProActiveException("No such listener found");
         }
     }
 
-    public boolean subscribeIsReady(Object client, String methodeName) {
-        if (isGreedy() || (client == null) || (methodeName == null)) {
-            return false;
+    public void subscribeIsReady(Object client, String methodeName) throws ProActiveException {
+        if (isGreedy()) {
+            throw new ProActiveException("subscribeIsReady is not applicable with greedy Virtual Node");
+        }
+
+        if ((client == null) || (methodeName == null)) {
+            throw new ProActiveException("Client and MethodName cannot be null");
         }
 
         Class<?> cl = client.getClass();
@@ -285,17 +319,19 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 isReadySubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName + "(GCMVirtualNode) cannot be found on " +
-                cl.getSimpleName());
-            return false;
+            throw new ProActiveException("Method " + methodeName + "(GCMVirtualNode) cannot be found on " +
+                cl.getSimpleName(), e);
         }
-
-        return true;
     }
 
-    public void unsubscribeIsReady(Object client, String methodeName) {
+    public void unsubscribeIsReady(Object client, String methodeName) throws ProActiveException {
+        boolean success;
         synchronized (isReadySubscribers) {
-            isReadySubscribers.remove(new Subscriber(client, methodeName));
+            success = isReadySubscribers.remove(new Subscriber(client, methodeName));
+        }
+
+        if (!success) {
+            throw new ProActiveException("No such listener found");
         }
     }
 
@@ -615,5 +651,9 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
     public void setTechnicalServicesProperties(TechnicalServicesProperties technicalServices) {
         this.nodeTechnicalServicesProperties = technicalServices;
+    }
+
+    public UniqueID getUniqueID() {
+        return uniqueID;
     }
 }

@@ -152,6 +152,7 @@ public abstract class Conformtest extends ComponentTest {
         Set extItfs = getExternalItfs(c);
         //System.err.println("containAll: " + containsAll(itfs, extItfs));
         assertEquals("Wrong external interface list", itfs, extItfs);
+        @SuppressWarnings("unchecked")
         Iterator i = itfs.iterator();
         while (i.hasNext()) {
             String itf = (String) i.next();
@@ -199,8 +200,8 @@ public abstract class Conformtest extends ComponentTest {
         //        }
     }
 
-    protected Set getExternalItfs(Component c) {
-        HashSet result = new HashSet();
+    protected Set<String> getExternalItfs(Component c) {
+        HashSet<String> result = new HashSet<String>();
         Object[] extItfs = c.getFcInterfaces();
         for (int i = 0; i < extItfs.length; ++i) {
             String itf = getItf((Interface) extItfs[i], false);
@@ -211,8 +212,8 @@ public abstract class Conformtest extends ComponentTest {
         return result;
     }
 
-    private Set getInternalItfs(ContentController cc) {
-        HashSet result = new HashSet();
+    private Set<String> getInternalItfs(ContentController cc) {
+        HashSet<String> result = new HashSet<String>();
         Object[] extItfs = cc.getFcInternalInterfaces();
         for (int i = 0; i < extItfs.length; ++i) {
             String itf = getItf((Interface) extItfs[i], true);

@@ -90,9 +90,9 @@ import org.xml.sax.SAXParseException;
 
 
 public class JobFactory {
-    public static final String SCHEMA_LOCATION = "/org/objectweb/proactive/extensions/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng";
+    public static final String SCHEMA_LOCATION = "/org/objectweb/proactive/extensions/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rng";
     public static final String STYLESHEET_LOCATION = "/org/objectweb/proactive/extensions/scheduler/common/xml/stylesheets/variables.xsl";
-    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:0.9";
+    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:0.91";
     public static final String JOB_PREFIX = "js";
     private static XPath xpath;
 
@@ -236,7 +236,7 @@ public class JobFactory {
                 job = new TaskFlowJob();
         }
         // JOB NAME
-        job.setName((String) xpath.evaluate("@name", jobNode, XPathConstants.STRING));
+        job.setName((String) xpath.evaluate("@id", jobNode, XPathConstants.STRING));
         System.out.println("Job : " + job.getName());
         // JOB PRIORITY
         String prio = xpath.evaluate("@priority", jobNode);
@@ -254,6 +254,13 @@ public class JobFactory {
             job.setCancelOnException(false);
         }
 
+        // JOB PROJECT NAME
+        String projectName = (String) xpath.evaluate("@projectName", jobNode, XPathConstants.STRING);
+        if (!"".equals(projectName)) {
+            job.setProjectName(projectName);
+        }
+        System.out.println("---->" + projectName);
+
         // JOB LOG FILE
         String logFile = xpath.evaluate("@logFile", jobNode);
         if (!"".equals(logFile)) {
@@ -267,6 +274,24 @@ public class JobFactory {
             System.out.println("Job description = " + description);
             job.setDescription((String) description);
         }
+
+        //JOB GENERIC INFORMATION
+        NodeList list = (NodeList) xpath.evaluate(addPrefixes("genericInformation/info"), jobNode,
+                XPathConstants.NODESET);
+        if (list != null) {
+            for (int i = 0; i < list.getLength(); i++) {
+                Node n = list.item(i);
+                String name = (String) xpath.evaluate("@name", n, XPathConstants.STRING);
+                String value = (String) xpath.evaluate("@value", n, XPathConstants.STRING);
+
+                System.out.println(name + "->" + value);
+
+                if ((name != null) && (value != null)) {
+                    job.addGenericInformation(name, value);
+                }
+            }
+        }
+
         return createTasks(jobNode, job, xpath);
     }
 
@@ -355,8 +380,8 @@ public class JobFactory {
     private Task createTask(Node taskNode, Task task) throws XPathExpressionException,
             ClassNotFoundException, InvalidScriptException, MalformedURLException {
         // TASK NAME
-        task.setName((String) xpath.evaluate("@name", taskNode, XPathConstants.STRING));
-        System.out.println("name = " + task.getName());
+        task.setName((String) xpath.evaluate("@id", taskNode, XPathConstants.STRING));
+        System.out.println("id = " + task.getName());
 
         // TASK DESCRIPTION
         task.setDescription((String) xpath.evaluate(addPrefixes("description"), taskNode,

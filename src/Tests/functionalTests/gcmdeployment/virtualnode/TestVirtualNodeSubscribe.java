@@ -31,8 +31,10 @@
 package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.FileNotFoundException;
+import java.util.concurrent.Semaphore;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -40,56 +42,93 @@ import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
+import functionalTests.FunctionalTest;
 import functionalTests.gcmdeployment.LocalHelpers;
 
 
-public class TestVirtualNodeSubscribe {
+public class TestVirtualNodeSubscribe extends FunctionalTest {
     static GCMApplication gcma;
+    GCMVirtualNode vnGreedy;
+    GCMVirtualNode vnMaster;
+
+    Semaphore semIsReady = new Semaphore(0);
+    Semaphore semNodeAttached = new Semaphore(-1);
+
     boolean isReady = false;
     long nodes = 0;
 
+    @Before
+    public void before() throws ProActiveException, FileNotFoundException {
+        gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this));
+        vnGreedy = gcma.getVirtualNode("greedy");
+        vnMaster = gcma.getVirtualNode("master");
+    }
+
+    @Test(expected = ProActiveException.class)
+    public void testIsReadyWithGreedyVN() throws ProActiveException {
+        vnGreedy.subscribeIsReady(this, "isReady");
+    }
+
+    @Test(expected = ProActiveException.class)
+    public void testNoSuchMethod() throws ProActiveException {
+        vnMaster.subscribeNodeAttachment(this, "LOL", false);
+    }
+
+    @Test(expected = ProActiveException.class)
+    public void testInvalidSignature() throws ProActiveException {
+        vnMaster.subscribeNodeAttachment(this, "brokenNodeAttached", false);
+    }
+
+    @Test(expected = ProActiveException.class)
+    public void testInvalidSignatureIsReady() throws ProActiveException {
+        vnMaster.subscribeNodeAttachment(this, "brokenIsReady", false);
+    }
+
+    @Test(expected = ProActiveException.class)
+    public void testCrashIt1() throws ProActiveException {
+        vnMaster.subscribeIsReady(this, "null");
+    }
+
+    @Test(expected = ProActiveException.class)
+    public void testCrashIt2() throws ProActiveException {
+        vnMaster.subscribeIsReady(null, null);
+    }
+
+    @Test(expected = ProActiveException.class)
+    public void testCrashIt3() throws ProActiveException {
+        vnMaster.unsubscribeIsReady(this, "null");
+    }
+
+    @Test(expected = ProActiveException.class)
+    public void testCrashIt4() throws ProActiveException {
+        vnMaster.unsubscribeIsReady(null, null);
+    }
+
     @Test
     public void test() throws FileNotFoundException, ProActiveException, InterruptedException {
+        // Failure <=> Timeout
 
-        gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this));
-        GCMVirtualNode vnGreedy = gcma.getVirtualNode("greedy");
-        GCMVirtualNode vnMaster = gcma.getVirtualNode("master");
-
-        Assert.assertFalse(vnGreedy.subscribeIsReady(this, "isReady"));
-
-        Assert.assertFalse(vnMaster.subscribeNodeAttachment(this, "LOL", false));
-        Assert.assertFalse(vnMaster.subscribeNodeAttachment(this, "brokenNodeAttached", false));
-        Assert.assertFalse(vnMaster.subscribeIsReady(this, "brokenIsReady"));
-
-        Assert.assertTrue(vnMaster.subscribeNodeAttachment(this, "nodeAttached", false));
-        Assert.assertTrue(vnMaster.subscribeIsReady(this, "isReady"));
-
-        // Crash it !
-        vnMaster.subscribeIsReady(this, "null");
-        vnMaster.subscribeIsReady(null, null);
-        vnMaster.unsubscribeIsReady(this, "null");
-        vnMaster.unsubscribeIsReady(null, null);
+        vnMaster.subscribeNodeAttachment(this, "nodeAttached", false);
+        vnMaster.subscribeIsReady(this, "isReady");
 
         gcma.startDeployment();
         gcma.waitReady();
 
         // wait for the notification
-        Thread.sleep(1000);
-        Assert.assertTrue(isReady);
-        Assert.assertEquals(2, nodes);
+
+        semIsReady.acquire();
+        semNodeAttached.acquire();
+
+        vnMaster.unsubscribeNodeAttachment(this, "nodeAttached");
     }
 
     public void isReady(String vnName) {
         Assert.assertNotNull(gcma.getVirtualNode(vnName));
-        isReady = true;
+        semIsReady.release();
     }
 
     public void nodeAttached(Node node, String vnName) {
-        nodes++;
-        if (nodes == 2) {
-            GCMVirtualNode vn = gcma.getVirtualNode(vnName);
-            vn.unsubscribeNodeAttachment(this, "nodeAttached");
-        }
+        semNodeAttached.release();
     }
 
     public void brokenIsReady(long l) {

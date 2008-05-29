@@ -60,13 +60,17 @@ public class TestOneSerialization extends GCMFunctionalTestDefaultNodes {
 
     @org.junit.Test
     public void action() throws Exception {
+        //### Keep the surrounding comments when  ###
+        //### changing the code (used by the doc) ###
+        //@snippet-start group_unique_serialization
         PAGroup.setUniqueSerialization(this.typedGroup);
         this.typedGroup.onewayCall();
         PAGroup.unsetUniqueSerialization(this.typedGroup);
+        //@snippet-end group_unique_serialization
 
         boolean allOnewayCallDone = true;
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Iterator<A> it = group.iterator();
         while (it.hasNext()) {
             allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
         }
@@ -81,8 +85,8 @@ public class TestOneSerialization extends GCMFunctionalTestDefaultNodes {
         PAGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 
         boolean NoOnewayCallDone = true;
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Iterator<A> it = group.iterator();
         while (it.hasNext()) {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
         }

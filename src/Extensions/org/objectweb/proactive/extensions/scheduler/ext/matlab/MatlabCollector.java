@@ -45,10 +45,11 @@ public class MatlabCollector extends SimpleMatlab {
 
     @Override
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
-        if (logger.isDebugEnabled()) {
-            System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabCollector)");
-        }
+
         if (collectorWorker == null) {
+            if (logger.isDebugEnabled()) {
+                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabCollector)");
+            }
             collectorWorker = (AOMatlabCollector) deploy(uri, AOMatlabCollector.class.getName(), matlabConfig
                     .getMatlabCommandName());
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -65,7 +66,8 @@ public class MatlabCollector extends SimpleMatlab {
 
         Object res = collectorWorker.execute(results);
         res = PAFuture.getFutureValue(res);
-        collectorWorker.terminate();
+        // We don't terminate the worker for subsequent calculations
+        // collectorWorker.terminate();
 
         return res;
     }

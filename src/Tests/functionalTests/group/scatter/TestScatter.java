@@ -60,29 +60,36 @@ public class TestScatter extends GCMFunctionalTestDefaultNodes {
 
     @org.junit.Test
     public void action() throws Exception {
-
+        //### Keep the surrounding comments when  ###
+        //### changing the code (used by the doc) ###
+        //@snippet-start group_scatter_creation
         Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
         Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
         Object[][] paramsParameter = { { "AgentA" }, { "AgentB" }, { "AgentC" } };
         Node[] nodesParameter = { super.getANode(), NodeFactory.getDefaultNode(), super.getANode() };
         this.parameterGroup = (A) PAGroup.newGroup(A.class.getName(), paramsParameter, nodesParameter);
+        //@snippet-end group_scatter_creation
 
+        //### Keep the surrounding comments when  ###
+        //### changing the code (used by the doc) ###
+        //@snippet-start group_scatter_example
         PAGroup.setScatterGroup(this.parameterGroup);
         this.resultTypedGroup = this.typedGroup.asynchronousCall(this.parameterGroup);
         PAGroup.unsetScatterGroup(this.parameterGroup);
+        //@snippet-end group_scatter_example
 
         // was the result group created ?
         assertTrue(this.resultTypedGroup != null);
 
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Group groupResult = PAGroup.getGroup(this.resultTypedGroup);
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Group<A> groupResult = PAGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
         assertTrue(groupResult.size() == group.size());
 
-        Group groupParameter = PAGroup.getGroup(this.parameterGroup);
-        boolean rightRankingAndCorrectnessOfResults = true;
+        Group<A> groupParameter = PAGroup.getGroup(this.parameterGroup);
+
         for (int i = 0; i < group.size(); i++) {
             // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
             assertEquals(((A) groupResult.get(i)).getName(), (((A) group.get(i))

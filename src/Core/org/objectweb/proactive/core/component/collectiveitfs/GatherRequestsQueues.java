@@ -182,8 +182,8 @@ public class GatherRequestsQueues implements Serializable {
             map.get(new SerializableMethod(itfTypeMethod)).add(queue);
         }
 
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
-            GatherRequestsQueue queue = (GatherRequestsQueue) iter.next();
+        for (Iterator<GatherRequestsQueue> iter = list.iterator(); iter.hasNext();) {
+            GatherRequestsQueue queue = iter.next();
             if (queue.containsRequestFrom(senderItfID)) {
                 // there is already a request from this comp/itf
                 if (!iter.hasNext()) {
@@ -250,7 +250,7 @@ public class GatherRequestsQueues implements Serializable {
                     List<Object> l;
                     if (waitForAll) {
                         l = new ArrayList<Object>(connectedClientItfs.size());
-                        for (Iterator iter = connectedClientItfs.iterator(); iter.hasNext();) {
+                        for (Iterator<ItfID> iter = connectedClientItfs.iterator(); iter.hasNext();) {
                             ItfID id = (ItfID) iter.next();
                             // keep same ordering as connected client itfs
                             l.add(firstRequestsInLine.get(id).getMethodCall().getEffectiveArguments()[i]);

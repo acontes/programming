@@ -48,6 +48,7 @@ public class Benchmark extends Tag {
     public Benchmark(Element eBench) {
         super(eBench);
         this.variables = new HashMap<String, String>();
+        @SuppressWarnings("unchecked")
         Iterator it = eBench.getChildren("descriptorVariable").iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
@@ -91,6 +92,7 @@ public class Benchmark extends Tag {
         return this.variables;
     }
 
+    @SuppressWarnings("unchecked")
     public static Benchmark[] toArray(List benchmarkList) {
         ArrayList<String> seqList;
         int quantity = benchmarkList.size();
@@ -106,6 +108,7 @@ public class Benchmark extends Tag {
 
             // 1 : searching sequences in attributes, then in descVariables
             searchSequences(eBench, p, seqList);
+            @SuppressWarnings("unchecked")
             Iterator itVars = eBench.getChildren().iterator();
             while (itVars.hasNext()) {
                 searchSequences((Element) itVars.next(), p, seqList);
@@ -123,7 +126,8 @@ public class Benchmark extends Tag {
     }
 
     private static void searchSequences(Element elt, Pattern p, ArrayList<String> seqList) {
-        Iterator itAttr = elt.getAttributes().iterator();
+        @SuppressWarnings("unchecked")
+        Iterator<Attribute> itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();
             Matcher m = p.matcher(attr.getValue());
@@ -144,6 +148,7 @@ public class Benchmark extends Tag {
             Element eBenchClone = (Element) eBench.clone();
             XMLHelper.replaceAll(eBenchClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
                     value);
+            @SuppressWarnings("unchecked")
             Iterator itDesc = eBenchClone.getDescendants();
             while (itDesc.hasNext()) {
                 Object eDesc = itDesc.next();

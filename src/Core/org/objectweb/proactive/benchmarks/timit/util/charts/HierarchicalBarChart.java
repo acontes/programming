@@ -61,8 +61,9 @@ public class HierarchicalBarChart implements Chart {
      */
     private static double CATEGORY_MARGIN = 0.0;
     private Element[] timers;
-    private Comparable[] categories;
+    private Comparable<String>[] categories;
 
+    @SuppressWarnings("unchecked")
     public void generateChart(Element eTimit, BenchmarkStatistics bstats, ConfigChart cChart) {
         Element eTimitClone = (Element) eTimit.clone();
 
@@ -74,7 +75,7 @@ public class HierarchicalBarChart implements Chart {
         }
 
         // Get values from XML tree (Element)
-        List fstats = eTimitClone.getChildren();
+        List<Element> fstats = eTimitClone.getChildren();
         this.timers = new Element[fstats.size()];
         this.categories = new Comparable[fstats.size()];
 
@@ -107,13 +108,15 @@ public class HierarchicalBarChart implements Chart {
     private void buildFinalChart(String title, String subTitle, String xAxisLabel, String yAxisLabel,
             int height, int width, String filename, Chart.Scale scaleMode,
             Chart.LegendFormat legendFormatMode, int alpha) {
-        Vector[] vec = new Vector[this.timers.length];
+        @SuppressWarnings("unchecked")
+        Vector<Counter>[] vec = new Vector[this.timers.length];
         boolean exist;
 
         // create the dataset...
         for (int i = 0; i < this.timers.length; i++) {
-            vec[i] = new Vector();
-            Iterator it = this.timers[i].getDescendants();
+            vec[i] = new Vector<Counter>();
+            @SuppressWarnings("unchecked")
+            Iterator<Element> it = this.timers[i].getDescendants();
             while (it.hasNext()) {
                 try {
                     Element elt = (Element) it.next();
@@ -189,13 +192,13 @@ public class HierarchicalBarChart implements Chart {
         }
     }
 
-    private static double[][] toDataset(Vector[] counter) {
+    private static double[][] toDataset(Vector<Counter>[] counter) {
         try {
             double[][] result = new double[counter[0].size()][counter.length];
 
             for (int i = 0; i < counter.length; i++) {
                 for (int j = 0; j < counter[i].size(); j++) {
-                    result[j][i] = ((Counter) counter[i].get(j)).getValue();
+                    result[j][i] = counter[i].get(j).getValue();
                 }
             }
             return result;
@@ -204,7 +207,8 @@ public class HierarchicalBarChart implements Chart {
         }
     }
 
-    private static Comparable[] toSeries(Vector counter) {
+    @SuppressWarnings("unchecked")
+    private static Comparable[] toSeries(Vector<Counter> counter) {
         Comparable[] result = new Comparable[counter.size()];
         for (int i = 0; i < counter.size(); i++) {
             result[i] = ((Counter) counter.get(i)).getName();

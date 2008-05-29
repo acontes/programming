@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.util;
 
 import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -48,12 +49,6 @@ import java.util.Properties;
  */
 public class DatabaseManager {
 
-    /**
-     * the property file name. If the name start with a "/", so the file will be
-     * search relative to the classpath, otherwise it will be search relative to
-     * the directory containing the ConfigConnection.class
-     */
-    public static final String PROPERTY_FILE_NAME = "db.cfg";
     private static DatabaseManager instance = null;
     private String driver = null;
     private String protocol = null;
@@ -67,19 +62,37 @@ public class DatabaseManager {
      *
      * @throws IOException
      */
-    private DatabaseManager() throws IOException {
+    private DatabaseManager(String configFile) throws IOException {
         Properties props = new Properties();
-        URL urlPropertyFile = DatabaseManager.class.getResource(PROPERTY_FILE_NAME);
         BufferedInputStream bis = null;
 
         try {
-            bis = new BufferedInputStream(urlPropertyFile.openStream());
+            bis = new BufferedInputStream(new FileInputStream(configFile));
             props.load(bis);
-            driver = props.getProperty("driver");
-            protocol = props.getProperty("protocol");
+            if (!props.containsKey("driver") || "".equals((driver = props.getProperty("driver")))) {
+                throw new RuntimeException("Driver property is not defined in " + configFile +
+                    " ('driver=...'");
+            }
+            if (!props.containsKey("protocol") || "".equals((protocol = props.getProperty("protocol")))) {
+                throw new RuntimeException("Protocol property is not defined in " + configFile +
+                    " ('protocol=...'");
+            }
+            if (!props.containsKey("db_path")) {
+                throw new RuntimeException("Driver property is not defined in " + configFile +
+                    " ('db_path=...'");
+            }
             databasePath = props.getProperty("db_path");
-            databaseName = props.getProperty("db_name");
-            user = props.getProperty("user");
+            if (!props.containsKey("db_name") || "".equals((databaseName = props.getProperty("db_name")))) {
+                throw new RuntimeException("Database name property is not defined in " + configFile +
+                    " ('db_name=...'");
+            }
+            if (!props.containsKey("user") || "".equals((user = props.getProperty("user")))) {
+                throw new RuntimeException("User property is not defined in " + configFile + " ('user=...'");
+            }
+            if (!props.containsKey("password")) {
+                throw new RuntimeException("Password property is not defined in " + configFile +
+                    " ('password=...'");
+            }
             password = props.getProperty("password");
         } finally {
             if (bis != null) {
@@ -100,6 +113,9 @@ public class DatabaseManager {
      * @return a connection to the database
      */
     public Connection connect(boolean create) throws SQLException {
+        if (!"".equals(databasePath)) {
+            databasePath += "/";
+        }
         String url = protocol + databasePath + databaseName + ((create) ? ";create=true" : ";");
 
         System.out.println("[SCHEDULER-DATABASE] url=" + url);
@@ -140,12 +156,12 @@ public class DatabaseManager {
      *
      * @return the instance
      */
-    public static DatabaseManager getInstance() {
+    public static DatabaseManager getInstance(String configFile) {
         try {
-            instance = new DatabaseManager();
+            instance = new DatabaseManager(configFile);
 
             return instance;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

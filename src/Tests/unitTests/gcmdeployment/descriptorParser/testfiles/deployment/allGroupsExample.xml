@@ -104,7 +104,7 @@
 				<maxTime>15000000</maxTime>
 			</furaGroup>
 
-			<loadLevelerGroup id="loadlevelergroup" bookedNodesAccess="rsh">
+			<loadLevelerGroup id="loadlevelergroup3" bookedNodesAccess="rsh">
 				<scriptPath base="root" relpath="/usr/local/loadleveler/scripts/jobscript.sh" />
 				<directory>datadir/jobdata1</directory>
 				<stdout>trace/results.log</stdout>
@@ -115,10 +115,73 @@
 					<arg>25</arg>
 					<arg>foo bar</arg>
 				</arguments>
-				<nbTasks>10</nbTasks>
-				<tasksPerHost>1</tasksPerHost>
+			   <taskRepartition>
+					<modeBlock>
+						<totalTasks> 1 </totalTasks>
+						<blocking> 2 </blocking>
+					</modeBlock>
+				</taskRepartition>
 			</loadLevelerGroup>
 
+
+			<loadLevelerGroup id="loadlevelergroup4" bookedNodesAccess="rsh">
+				<scriptPath base="root" relpath="/usr/local/loadleveler/scripts/jobscript.sh" />
+				<directory>datadir/jobdata1</directory>
+				<stdout>trace/results.log</stdout>
+				<stderr>trace/err.log</stderr>
+				<maxTime>15000000</maxTime>
+				<arguments>
+					<arg>arg1</arg>
+					<arg>25</arg>
+					<arg>foo bar</arg>
+				</arguments>
+			   <taskRepartition>
+					<modeTasksPerNode>
+						<tasksPerNode> 1 </tasksPerNode>
+						<node> 2 </node>
+					</modeTasksPerNode>
+				</taskRepartition>
+			</loadLevelerGroup>
+			
+
+			<loadLevelerGroup id="loadlevelergroup5" bookedNodesAccess="rsh">
+				<scriptPath base="root" relpath="/usr/local/loadleveler/scripts/jobscript.sh" />
+				<directory>datadir/jobdata1</directory>
+				<stdout>trace/results.log</stdout>
+				<stderr>trace/err.log</stderr>
+				<maxTime>15000000</maxTime>
+				<arguments>
+					<arg>arg1</arg>
+					<arg>25</arg>
+					<arg>foo bar</arg>
+				</arguments>
+			   <taskRepartition>
+					<modeTotalTasks>
+						<totalTasks> 1 </totalTasks>
+						<node> 2 </node>
+					</modeTotalTasks>
+				</taskRepartition>
+			</loadLevelerGroup>
+						
+			<loadLevelerGroup id="loadlevelergroup6" bookedNodesAccess="rsh">
+				<scriptPath base="root" relpath="/usr/local/loadleveler/scripts/jobscript.sh" />
+				<directory>datadir/jobdata1</directory>
+				<stdout>trace/results.log</stdout>
+				<stderr>trace/err.log</stderr>
+				<maxTime>15000000</maxTime>
+				<arguments>
+					<arg>arg1</arg>
+					<arg>25</arg>
+					<arg>foo bar</arg>
+				</arguments>
+			   <taskRepartition>
+					<modeGeometry>
+						<taskGeometry> {(0)(1,2)(3)} </taskGeometry>
+					</modeGeometry>
+				</taskRepartition>
+			</loadLevelerGroup>	
+			
+			
 			<gridbusGroup id="gridbusgroup" bookedNodesAccess="rsh">
 				<scriptPath base="root" relpath="./calc" />
 				<arguments>

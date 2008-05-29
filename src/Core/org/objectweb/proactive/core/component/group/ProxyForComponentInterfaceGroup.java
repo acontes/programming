@@ -47,9 +47,6 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
 import org.objectweb.proactive.core.group.ExceptionListException;
-import org.objectweb.proactive.core.group.ProActiveComponentGroup;
-import org.objectweb.proactive.core.group.ProcessForAsyncCall;
-import org.objectweb.proactive.core.group.ProcessForOneWayCall;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -65,11 +62,11 @@ import org.objectweb.proactive.core.mop.StubObject;
  * @author The ProActive Team
  *
  */
-public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
+public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
     protected ProActiveInterfaceType interfaceType;
     protected Class<?> itfSignatureClass = null;
     protected ProActiveComponent owner;
-    protected ProxyForComponentInterfaceGroup delegatee = null;
+    protected ProxyForComponentInterfaceGroup<E> delegatee = null;
 
     public ProxyForComponentInterfaceGroup() throws ConstructionOfReifiedObjectFailedException {
         super();
@@ -141,7 +138,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
         try {
             Interface result = ProActiveComponentGroup.newComponentInterfaceGroup(interfaceType, owner);
 
-            ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result)
+            @SuppressWarnings("unchecked")
+            ProxyForComponentInterfaceGroup<E> proxy = (ProxyForComponentInterfaceGroup<E>) ((StubObject) result)
                     .getProxy();
             proxy.memberList = this.memberList;
             proxy.className = this.className;
@@ -214,7 +212,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
 
                 for (MethodCall currentMc : generatedMethodCalls.keySet()) {
                     // delegate invocations
-                    this.threadpool.addAJob(new ProcessForAsyncCall(delegatee, delegatee.memberList,
+                    this.threadpool.addAJob(new ComponentProcessForAsyncCall(delegatee, delegatee.memberList,
                         memberListOfResultGroup, generatedMethodCalls.get(currentMc), currentMc, body));
                 }
 
@@ -253,7 +251,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
 
             for (MethodCall currentMc : generatedMethodCalls.keySet()) {
                 // delegate invocations
-                this.threadpool.addAJob(new ProcessForOneWayCall(delegatee, delegatee.memberList,
+                this.threadpool.addAJob(new ComponentProcessForOneWayCall(delegatee, delegatee.memberList,
                     generatedMethodCalls.get(currentMc), currentMc, body, exceptionList));
             }
 
@@ -267,7 +265,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
      * The delegatee introduces an indirection which can be used for altering the reified invocation
      *
      */
-    public void setDelegatee(ProxyForComponentInterfaceGroup delegatee) {
+    public void setDelegatee(ProxyForComponentInterfaceGroup<E> delegatee) {
         this.delegatee = delegatee;
     }
 
@@ -275,7 +273,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
      * The delegatee introduces an indirection which can be used for altering the reified invocation
      *
      */
-    public ProxyForComponentInterfaceGroup getDelegatee() {
+    public ProxyForComponentInterfaceGroup<E> getDelegatee() {
         return delegatee;
     }
 

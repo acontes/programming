@@ -41,11 +41,9 @@ import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.ShowConnectionsAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.WorldEditPart;
-import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.WorldEditPart.RefreshMode;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
@@ -75,6 +73,7 @@ public class AOListener implements MouseListener, MouseMotionListener {
             figure.setHighlight(ColorConstants.green);
             // All actions that implements IActionExtPoint selects the current
             // active object
+            @SuppressWarnings("unchecked")
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
                 final IAction act = (IAction) it.next();
@@ -83,6 +82,7 @@ public class AOListener implements MouseListener, MouseMotionListener {
                 }
             }
         } else if (me.button == 3) {
+            @SuppressWarnings("unchecked")
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
                 final IAction act = (IAction) it.next();

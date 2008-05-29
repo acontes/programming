@@ -30,12 +30,13 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
+import java.util.List;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 
@@ -43,18 +44,16 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 /**
  * @author The ProActive Team
  */
-public class KillRemoveJobAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static KillRemoveJobAction instance = null;
+public class KillRemoveJobAction extends SchedulerGUIAction {
     private boolean killMode = false;
     private Shell shell = null;
 
-    private KillRemoveJobAction(Shell shell) {
+    public KillRemoveJobAction(Shell shell) {
         this.shell = shell;
         this.setText("Kill job");
         this.setToolTipText("To kill a job (this will remove this job from the scheduler)");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_kill.gif"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -62,20 +61,16 @@ public class KillRemoveJobAction extends Action {
         if (killMode) {
             if (MessageDialog
                     .openConfirm(shell, "Confirm please", "Are you sure you want to Kill this job ?")) {
-                TableItem item = TableManager.getInstance().getLastSelectedItem();
-                if (item != null) {
-                    JobId jobId = (JobId) item.getData();
+                List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                for (JobId jobId : jobsId)
                     SchedulerProxy.getInstance().kill(jobId);
-                }
             }
         } else {
             if (MessageDialog.openConfirm(shell, "Confirm please",
                     "Are you sure you want to Remove this job ?")) {
-                TableItem item = TableManager.getInstance().getLastSelectedItem();
-                if (item != null) {
-                    JobId jobId = (JobId) item.getData();
+                List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                for (JobId jobId : jobsId)
                     SchedulerProxy.getInstance().getJobResult(jobId);
-                }
             }
         }
     }
@@ -94,12 +89,17 @@ public class KillRemoveJobAction extends Action {
         this.setToolTipText("To kill a job (this will remove this job from the scheduler)");
     }
 
-    public static KillRemoveJobAction newInstance(Shell shell) {
-        instance = new KillRemoveJobAction(shell);
-        return instance;
-    }
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && jobSelected && (owner || admin))
+            setEnabled(true);
+        else
+            setEnabled(false);
 
-    public static KillRemoveJobAction getInstance() {
-        return instance;
+        if (jobInFinishQueue)
+            setRemoveMode();
+        else
+            setKillMode();
     }
 }

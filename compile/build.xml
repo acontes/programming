@@ -71,7 +71,7 @@
 			<fileset dir="${cl.test.dir}" id="testsuite">
 				<include name="unitTests/**/*Test*.class" />
 				<include name="functionalTests/**/**/*Test*.class" />
-
+				
 				<exclude name="**/*$*.class" />
 				<!-- <exclude name="functionalTests/security/*/*.class" /> -->
 				<exclude name="functionalTests/*.class" />
@@ -197,7 +197,7 @@
 
 			<!-- Generate library -->
 			<exec dir="${cl.proactive.dir}" executable="mpicc" os="Linux">
-				<arg line=" -I${java.home}/../include -I${java.home}/../include/linux ${src.proactive.dir}/org/objectweb/proactive/mpi/control/ProActiveMPIComm.c -o ${cl.proactive.dir}/${proactive.path}/mpi/control/libProActiveMPIComm.so -shared" />
+				<arg line=" -I${java.home}/../include -I${java.home}/../include/linux ${src.proactive.dir}/org/objectweb/proactive/mpi/control/ProActiveMPIComm.c ${src.proactive.dir}/org/objectweb/proactive/mpi/control/config/src/CommonInternalApi.c -o ${cl.proactive.dir}/${proactive.path}/mpi/control/libProActiveMPIComm.so -shared -fPIC" />
 			</exec>
 
 			<!-- Delete object file generated in classes repository -->
@@ -242,10 +242,13 @@
 
 
 	<target name="compile.tests" depends="compile.core, compile.extensions, compile.extra" description="Compile functional and unit tests classes">
+        <available property="jsr_scripting_ok" classname="javax.script.Bindings" classpathref="compile.libs"/>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<exclude name="functionalTests/resourcemanager/**" unless="jsr_scripting_ok"/>
+			<exclude name="functionalTests/scheduler/**" unless="jsr_scripting_ok"/>
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="performanceTests/**" deprecation="on" source="${source}" debug="${debug}">
@@ -271,6 +274,13 @@
 		<move file="${daemon.dir}/src/common/p2pctl" todir="${daemon.dir}/build" />
 	</target>
 
+	
+	<target name="compile.benchmarks" depends="compile.core, compile.extra" description="Compile the benchmarks">
+		<javac srcdir="${src.benchmarks.dir}" destdir="${cl.benchmarks.dir}" includes="**/*.java" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+	
 
 	<target name="compile.examples" depends="compile.core, compile.extensions, compile.extra" description="Compile all examples classes">
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
@@ -805,6 +815,7 @@
 		<mkdir dir="${cl.proactive.dir}" />
 		<mkdir dir="${cl.test.dir}" />
 		<mkdir dir="${cl.utils.dir}" />
+		<mkdir dir="${cl.benchmarks.dir}" />
 
 		<echo message="--- Debugging is ${debug} ---" />
 	</target>
@@ -992,18 +1003,18 @@
 			</classpath>
 		</taskdef>
 		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
-		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng" />
+		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rng" />
 
 		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
-		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd" />
-		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd" out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd" />
+		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.xsd" />
+		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.xsd" out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" />
 		<delete>
-			<fileset dir="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/">
+			<fileset dir="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/">
 				<include name="xsi.xsd" />
 				<include name="schedulerjob.xsd" />
 			</fileset>
 		</delete>
-		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd" tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd" />
+		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.xsd" />
 	</target>
 
 

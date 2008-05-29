@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab.exception;
 
-public class MatlabInitException extends Exception {
+public class MatlabInitException extends RuntimeException {
     public MatlabInitException(String string) {
         super(string);
     }

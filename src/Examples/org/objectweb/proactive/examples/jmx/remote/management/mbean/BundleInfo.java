@@ -146,7 +146,8 @@ public class BundleInfo extends NotificationBroadcasterSupport implements Bundle
         this.state = bundle.getState();
 
         /* headers copy ... */
-        Dictionary hTmp = bundle.getHeaders();
+        @SuppressWarnings("unchecked")
+        Dictionary<String, Object> hTmp = bundle.getHeaders();
         Enumeration<String> e = hTmp.keys();
         while (e.hasMoreElements()) {
             String key = e.nextElement();
@@ -254,7 +255,7 @@ public class BundleInfo extends NotificationBroadcasterSupport implements Bundle
 
     private MBeanAttributeInfo[] getAttributesInfos() {
         MBeanAttributeInfo[] attInfos = new MBeanAttributeInfo[this.headers.size()];
-        Iterator i = this.headers.keySet().iterator();
+        Iterator<String> i = this.headers.keySet().iterator();
         int j = 0;
         while (i.hasNext()) {
             String attribute = (String) i.next();

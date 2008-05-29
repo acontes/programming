@@ -31,29 +31,43 @@
 package org.objectweb.proactive.extensions.gcmdeployment;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
+/**
+ * 
+ * This class provides entry points to deploy application by using the GCM Deployment framework.
+ * 
+ * It allows to create a GCMApplication from an GCM Application descriptor XML file.
+ * 
+ * @author The ProActive Team
+ * @since ProActive 4.0
+ * 
+ */
 @PublicAPI
 public class PAGCMDeployment {
 
     /**
-     * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
-     * Application Descriptor XML file
+     * Returns a {@link GCMApplication} described by the given GCM Application XML Descriptor file
      * 
-     * @param file
-     *            The GCM Application Descriptor file
-     * @return A GCM Application
+     * @param url
+     *            URL to the GCM Application Descriptor file
+     * @return The GCM Application described by the XML Descriptor
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
-    public static GCMApplication loadApplicationDescriptor(File file) throws ProActiveException {
-        return loadApplicationDescriptor(file, null);
+    public static GCMApplication loadApplicationDescriptor(URL url) throws ProActiveException {
+        return loadApplicationDescriptor(url, null);
     }
 
     /**
@@ -61,7 +75,39 @@ public class PAGCMDeployment {
      * Application Descriptor XML file
      * 
      * @param file
-     *            The GCM Application Descriptor file
+     *            abstract file to the GCM Application Descriptor file
+     * @return A GCM Application
+     * @throws ProActiveException
+     *             If the GCM Application Descriptor cannot be loaded
+     */
+    public static GCMApplication loadApplicationDescriptor(File file) throws ProActiveException {
+        return loadApplicationDescriptor(Helpers.fileToURL(file), null);
+    }
+
+    /**
+     * Returns a {@link GCMApplication} described by the given GCM Application XML Descriptor file
+     * 
+     * 
+     * @param url
+     *            URL to The GCM Application Descriptor file
+     * @param vContract
+     *            A Variable Contract between GCM Application and Deployment XML descriptors and the
+     *            program.
+     * @return The GCM Application described by the XML Descriptor
+     * @throws ProActiveException
+     *             If the GCM Application Descriptor cannot be loaded
+     */
+    public static GCMApplication loadApplicationDescriptor(URL url, VariableContractImpl vContract)
+            throws ProActiveException {
+        return new GCMApplicationImpl(url, vContract);
+    }
+
+    /**
+     * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
+     * Application Descriptor XML file
+     * 
+     * @param file
+     *            abstract file to the GCM Application Descriptor file
      * @param vContract
      *            A Variable Contract between the descriptors and the application program
      * @return A GCM Application
@@ -70,7 +116,14 @@ public class PAGCMDeployment {
      */
     public static GCMApplication loadApplicationDescriptor(File file, VariableContractImpl vContract)
             throws ProActiveException {
-        return new GCMApplicationImpl(file, vContract);
-    }
+        GCMApplication gcma = new GCMApplicationImpl(Helpers.fileToURL(file), vContract);
 
+        String name = gcma.getDeploymentId() + "/GCMApplication";
+
+        URI uri = URIBuilder.buildURI("localhost", name);
+        RemoteObject ro = RemoteObjectHelper.lookup(uri);
+        gcma = (GCMApplication) RemoteObjectHelper.generatedObjectStub(ro);
+
+        return gcma;
+    }
 }

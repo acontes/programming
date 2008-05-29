@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.util.Map;
-
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+
+import java.util.Map;
 
 
 public class MatlabSplitter extends SimpleMatlab {
@@ -60,10 +60,11 @@ public class MatlabSplitter extends SimpleMatlab {
 
     @Override
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
-        if (logger.isDebugEnabled()) {
-            System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabSplitter)");
-        }
+
         if (splitterWorker == null) {
+            if (logger.isDebugEnabled()) {
+                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabSplitter)");
+            }
             splitterWorker = (AOMatlabSplitter) deploy(uri, AOMatlabSplitter.class.getName(), matlabConfig
                     .getMatlabCommandName());
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -79,7 +80,8 @@ public class MatlabSplitter extends SimpleMatlab {
 
         Object res = splitterWorker.execute(results);
         res = PAFuture.getFutureValue(res);
-        splitterWorker.terminate();
+        // We don't terminate the worker for subsequent calculations
+        //splitterWorker.terminate();
 
         return res;
     }

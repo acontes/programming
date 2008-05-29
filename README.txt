@@ -1,6 +1,6 @@
 Thanks for your interest in ProActive.
 
-ProActive 2008-04-23 10:59:42
+ProActive 2008-05-27 14:04:11
 
 You can find the documentation of ProActive in the docs directory:
 

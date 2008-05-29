@@ -30,29 +30,25 @@
  */
 package org.objectweb.proactive.mpi.control;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.mpi.MPISpmd;
 
 
 public class ProActiveMPI {
     private static ProActiveMPIManager manager;
 
-    public static Vector deploy(ArrayList spmdList) {
+    public static Vector<?> deploy(List<MPISpmd> spmdList) {
         if (manager == null) {
             // create manager
             try {
                 manager = (ProActiveMPIManager) PAActiveObject.newActive(ProActiveMPIManager.class.getName(),
                         new Object[] {});
-                //  VectorResult vres = 
                 manager.deploy(spmdList);
-                return null;
-                // get a future and wait on future
-                // System.out.println("[PROACTIVEMPI] RETURNS VECTOR OF FUTURES ");
-                //  return vres.getVectorResult();
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {
@@ -61,7 +57,10 @@ public class ProActiveMPI {
         } else {
             throw new IllegalStateException(" ERROR: Application has already been deployed once !!!!!!!");
         }
-
         return null;
+    }
+
+    public static ProActiveMPIManager getManager() {
+        return manager;
     }
 }

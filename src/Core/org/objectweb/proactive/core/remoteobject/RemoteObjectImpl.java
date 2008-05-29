@@ -32,9 +32,11 @@ package org.objectweb.proactive.core.remoteobject;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
+import java.util.Arrays;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
@@ -63,26 +65,32 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  *
  *
  */
-public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
+public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
     protected Object target;
     protected String className;
     protected String proxyClassName;
-    protected Adapter<T> adapter;
+    protected Class<Adapter<T>> adapterClass;
     protected ProActiveSecurityManager psm;
 
-    public RemoteObjectImpl(String className, T target) {
+    public RemoteObjectImpl(String className, T target) throws IllegalArgumentException, SecurityException,
+            InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         this(className, target, null);
     }
 
-    public RemoteObjectImpl(String className, T target, Adapter<T> adapter) {
+    public RemoteObjectImpl(String className, T target, Class<Adapter<T>> adapter)
+            throws IllegalArgumentException, SecurityException, InstantiationException,
+            IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         this(className, target, adapter, null);
     }
 
-    public RemoteObjectImpl(String className, T target, Adapter<T> adapter, ProActiveSecurityManager psm) {
+    public RemoteObjectImpl(String className, T target, Class<Adapter<T>> adapter,
+            ProActiveSecurityManager psm) throws IllegalArgumentException, SecurityException,
+            InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         this.target = target;
         this.className = className;
         this.proxyClassName = SynchronousProxy.class.getName();
-        this.adapter = adapter;
+        //        this.adapter =  adapter.getConstructor(Object.class).newInstance(target);
+        this.adapterClass = adapter;
         this.psm = psm;
     }
 
@@ -116,13 +124,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    //    public byte[] getCertificateEncoded()
-    //        throws SecurityNotAvailableException, IOException {
-    //        if (this.psm != null) {
-    //            return this.psm.getCertificateEncoded();
-    //        }
-    //        throw new SecurityNotAvailableException();
-    //    }
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#getEntities()
+     */
     public Entities getEntities() throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getEntities();
@@ -130,6 +134,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#getPolicy(org.objectweb.proactive.core.security.securityentity.Entities, org.objectweb.proactive.core.security.securityentity.Entities)
+     */
     public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException {
         if (this.psm == null) {
             throw new SecurityNotAvailableException();
@@ -137,6 +144,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         return this.psm.getPolicy(local, distant);
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#getPublicKey()
+     */
     public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getPublicKey();
@@ -144,6 +154,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#publicKeyExchange(long, byte[])
+     */
     public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
             RenegotiateSessionException, KeyExchangeException, IOException {
         if (this.psm != null) {
@@ -152,6 +165,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#randomValue(long, byte[])
+     */
     public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
             RenegotiateSessionException, IOException {
         if (this.psm != null) {
@@ -160,6 +176,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[])
+     */
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
             byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
             throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
@@ -170,6 +189,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#startNewSession(long, org.objectweb.proactive.core.security.SecurityContext, org.objectweb.proactive.core.security.TypedCertificate)
+     */
     public long startNewSession(long distantSessionID, SecurityContext policy,
             TypedCertificate distantCertificate) throws SecurityNotAvailableException, SessionException {
         if (this.psm != null) {
@@ -178,6 +200,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#terminateSession(long)
+     */
     public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             this.psm.terminateSession(sessionID);
@@ -185,17 +210,18 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    public Object getObjectProxy() throws ProActiveException {
-        //        Thread.dumpStack();
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getObjectProxy()
+     */
+    @SuppressWarnings("unchecked")
+    public T getObjectProxy() throws ProActiveException {
         try {
-            Object reifiedObjectStub = MOP
-                    .createStubObject(this.className, target.getClass(), new Class[] {});
-            if (adapter != null) {
-                //            	Constructor myConstructor =   adapter.getClass().getConstructor(new Class[] {Class.forName(this.className)});
-                //            	Adapter ad = (Adapter) myConstructor.newInstance(new Object[] { MOP.createStubObject(this.className, target.getClass(), new Class[] {})});
-                Adapter<Object> ad = adapter.getClass().newInstance();
-                ad.setAdapter(reifiedObjectStub);
-                return ad;
+            T reifiedObjectStub = (T) MOP.createStubObject(this.className, target.getClass(), new Class[] {});
+            if (adapterClass != null) {
+                Constructor<Adapter<T>> myConstructor = adapterClass.getConstructor(new Class[] { Class
+                        .forName(this.className) });
+                Adapter<T> ad = myConstructor.newInstance(reifiedObjectStub);
+                return ad.getAs();
             } else {
                 return reifiedObjectStub;
             }
@@ -205,33 +231,42 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (SecurityException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return null;
     }
 
-    public Object getObjectProxy(RemoteRemoteObject rro) throws ProActiveException {
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getObjectProxy(org.objectweb.proactive.core.remoteobject.RemoteRemoteObject)
+     */
+    @SuppressWarnings("unchecked")
+    public T getObjectProxy(RemoteRemoteObject rro) throws ProActiveException {
         try {
-            Object reifiedObjectStub = MOP
-                    .createStubObject(this.className, target.getClass(), new Class[] {});
+            T reifiedObjectStub = (T) MOP.createStubObject(this.className, target.getClass(), new Class[] {});
             ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(null, new Object[] { rro }));
-            if (adapter != null) {
-                //            	Constructor myConstructor =   adapter.getClass().getConstructor(new Class[] {Class.forName(this.className)});
-                //            	Adapter ad = (Adapter) myConstructor.newInstance(new Object[] { MOP.createStubObject(this.className, target.getClass(), new Class[] {})});
-                Adapter<Object> ad = adapter.getClass().newInstance();
-                ad.setAdapter(reifiedObjectStub);
-                return ad;
+            if (adapterClass != null) {
+
+                Class<?>[] classArray = new Class[] { Class.forName(this.className) };
+                Constructor<Adapter<T>> myConstructor = adapterClass.getConstructor(classArray);
+                Adapter<T> ad = myConstructor.newInstance(reifiedObjectStub);
+                return ad.getAs();
             } else {
                 return reifiedObjectStub;
             }
@@ -241,26 +276,38 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (SecurityException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getClassName()
+     */
     public String getClassName() {
         return this.className;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getProxyName()
+     */
     public String getProxyName() {
         return this.proxyClassName;
     }
@@ -273,6 +320,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         this.target = target;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getTargetClass()
+     */
     public Class<?> getTargetClass() {
         try {
             return Class.forName(className);
@@ -283,13 +333,19 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         }
     }
 
-    public Class<?> getAdapterClass() {
-        if (adapter != null) {
-            return adapter.getClass();
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getAdapterClass()
+     */
+    public Class<Adapter<T>> getAdapterClass() {
+        if (adapterClass != null) {
+            return adapterClass;
         }
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#getProActiveSecurityManager(org.objectweb.proactive.core.security.securityentity.Entity)
+     */
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
             throws SecurityNotAvailableException, AccessControlException {
         if (this.psm == null) {
@@ -298,6 +354,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         return this.psm.getProActiveSecurityManager(user);
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#setProActiveSecurityManager(org.objectweb.proactive.core.security.securityentity.Entity, org.objectweb.proactive.core.security.PolicyServer)
+     */
     public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
             throws SecurityNotAvailableException, AccessControlException {
         if (this.psm == null) {
@@ -305,4 +364,52 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         }
         this.psm.setProActiveSecurityManager(user, policyServer);
     }
+
+    @SuppressWarnings("unchecked")
+    public Adapter<T> getAdapter() {
+
+        if (adapterClass != null) {
+            Constructor myConstructor;
+            try {
+
+                T reifiedObjectStub = (T) MOP.createStubObject(this.className, target.getClass(),
+                        new Class[] {});
+                myConstructor = adapterClass.getClass().getConstructor(
+                        new Class[] { Class.forName(this.className) });
+                Adapter<T> ad = (Adapter<T>) myConstructor.newInstance(reifiedObjectStub);
+                //            adapter.setAdapterAndCallConstruct(reifiedObjectStub);
+                return ad;
+
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ReifiedCastException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ClassNotReifiableException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 }

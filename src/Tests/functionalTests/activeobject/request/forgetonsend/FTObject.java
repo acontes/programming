@@ -81,4 +81,8 @@ public class FTObject implements Serializable {
     public String getServices() {
         return services;
     }
+
+    public void ping() {
+    }
+
 }

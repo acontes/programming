@@ -30,20 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -62,6 +48,16 @@ import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools.Logg
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.MatlabInitException;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.util.MatlabConfiguration;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.util.MatlabFinder;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.*;
 
 
 public class SimpleMatlab extends JavaExecutable {
@@ -99,11 +95,11 @@ public class SimpleMatlab extends JavaExecutable {
     /**
      *  Thread which collects the JVM's stdout
      */
-    private LoggingThread isLogger = null;
+    protected static LoggingThread isLogger = null;
     /**
      *  Thread which collects the JVM's stderr
      */
-    private LoggingThread esLogger = null;
+    protected static LoggingThread esLogger = null;
 
     /**
      *  tool to build the JavaCommand
@@ -118,7 +114,7 @@ public class SimpleMatlab extends JavaExecutable {
     /**
      *  the Active Object worker located in the spawned JVM
      */
-    private static AOSimpleMatlab matlabWorker = null;
+    protected static AOSimpleMatlab matlabWorker = null;
 
     /**
      *  the OS where this JVM is running
@@ -126,9 +122,9 @@ public class SimpleMatlab extends JavaExecutable {
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     /**
-     *  The process holding the spanwned JVM
+     *  The process holding the spawned JVM
      */
-    private static Process process = null;
+    protected static Process process = null;
 
     static {
         if (host == null) {
@@ -192,16 +188,21 @@ public class SimpleMatlab extends JavaExecutable {
             }));
 
             // We define the loggers which will write on standard output what comes from the java process
-            isLogger = new LoggingThread(process.getInputStream(), "[" + host +
-                " MATLAB TASK: SUBPROCESS OUT]");
-            esLogger = new LoggingThread(process.getErrorStream(), "[" + host +
-                " MATLAB TASK: SUBPROCESS ERR]");
+            if (isLogger == null) {
+                isLogger = new LoggingThread(process.getInputStream(), "[" + host + "] ", false);
+            }
+            if (esLogger == null) {
+                esLogger = new LoggingThread(process.getErrorStream(), "[" + host + "] ", true);
+            }
 
             // We start the loggers thread
-            Thread t1 = new Thread(isLogger);
+
+            Thread t1 = new Thread(isLogger, "OUT Matlab");
+            t1.setDaemon(true);
             t1.start();
 
-            Thread t2 = new Thread(esLogger);
+            Thread t2 = new Thread(esLogger, "ERR Matlab");
+            t2.setDaemon(true);
             t2.start();
 
         }
@@ -212,6 +213,10 @@ public class SimpleMatlab extends JavaExecutable {
 
         // finally we call the internal version of the execute method
         Object res = executeInternal(uri, results);
+
+        if (logger.isDebugEnabled()) {
+            System.out.println("[" + host + " MATLAB TASK] Task completed successfully");
+        }
 
         return res;
     }
@@ -276,9 +281,6 @@ public class SimpleMatlab extends JavaExecutable {
     protected AOSimpleMatlab deploy(String uri, String workerClassName, Object... params) throws Throwable {
         ProActiveException ex = null;
         AOSimpleMatlab worker = null;
-        if (logger.isDebugEnabled()) {
-            System.out.println("[" + host + " MATLAB TASK] Deploying the Worker");
-        }
 
         // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
         // so we retry for 30 seconds until the JVM has started and we can create the Active Object
@@ -286,6 +288,7 @@ public class SimpleMatlab extends JavaExecutable {
             try {
                 try {
                     worker = (AOSimpleMatlab) PAActiveObject.newActive(workerClassName, params, uri);
+                    break;
                 } catch (ProActiveException e) {
                     ex = e;
                 }
@@ -312,10 +315,11 @@ public class SimpleMatlab extends JavaExecutable {
      * @throws Throwable
      */
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
-        if (logger.isDebugEnabled()) {
-            System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
-        }
+
         if (matlabWorker == null) {
+            if (logger.isDebugEnabled()) {
+                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
+            }
             matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig.getMatlabCommandName());
 
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -333,7 +337,7 @@ public class SimpleMatlab extends JavaExecutable {
         Object res = matlabWorker.execute(index, results);
         // We wait for the result
         res = PAFuture.getFutureValue(res);
-        // We make a synchronous call to terminate
+        // We don't terminate the worker for subsequent calculations
         //matlabWorker.terminate();
 
         return res;

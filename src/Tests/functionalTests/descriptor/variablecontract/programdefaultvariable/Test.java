@@ -30,18 +30,19 @@
  */
 package functionalTests.descriptor.variablecontract.programdefaultvariable;
 
+import static junit.framework.Assert.assertTrue;
+
+import java.io.File;
 import java.util.HashMap;
 
-import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -50,7 +51,7 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/variablecontract/programdefaultvariable/Test.xml").getPath();
-    ProActiveDescriptor pad;
+    GCMApplication gcma;
     boolean bogusFromDescriptor;
     boolean bogusFromProgram;
 
@@ -60,19 +61,12 @@ public class Test extends FunctionalTest {
         bogusFromProgram = true;
     }
 
-    @After
-    public void endTest() throws Exception {
-        if (pad != null) {
-            pad.killall(false);
-        }
-    }
-
     @org.junit.Test
     public void action() throws Exception {
         VariableContractImpl variableContract = new VariableContractImpl();
 
         //Setting from Program
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("test_var1", "value1");
         variableContract.setVariableFromProgram(map, VariableContractType
                 .getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG));
@@ -101,9 +95,9 @@ public class Test extends FunctionalTest {
         }
 
         //test_var3=value3
-        pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
+        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(XML_LOCATION), variableContract);
 
-        variableContract = (VariableContractImpl) pad.getVariableContract();
+        variableContract = (VariableContractImpl) gcma.getVariableContract();
 
         //System.out.println(variableContract);
         assertTrue(!bogusFromDescriptor);
@@ -113,24 +107,5 @@ public class Test extends FunctionalTest {
         assertTrue(variableContract.getValue("test_var3").equals("value3"));
         assertTrue(variableContract.isClosed());
         assertTrue(variableContract.checkContract());
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            System.out.println("InitTest");
-            test.initTest();
-            System.out.println("Action");
-            test.action();
-            System.out.println("postConditions");
-            System.out.println("endTest");
-            test.endTest();
-            System.out.println("The end");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -105,6 +105,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     /** Full name of the policy class */
     private String policyFullName;
 
+    /** Path to the database configuration file */
+    private String dataBaseConfigFile;
+
     /** Implementation of scheduler main structure */
     private transient SchedulerCore scheduler;
 
@@ -132,14 +135,16 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     /**
      * Scheduler Proxy constructor.
      *
+     * @param configFile the file that contains the description of the database.
      * @param imp a resource manager which
      *                                 be able to managed the resource used by scheduler.
      * @throws NodeException
      * @throws ActiveObjectCreationException
      */
-    public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName)
+    public SchedulerFrontend(String configFile, ResourceManagerProxy imp, String policyFullClassName)
             throws ActiveObjectCreationException, NodeException {
         logger.info("Creating scheduler core...");
+        dataBaseConfigFile = configFile;
         resourceManager = imp;
         policyFullName = policyFullClassName;
         jobs = new HashMap<JobId, IdentifiedJob>();
@@ -151,7 +156,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public void initActivity(Body body) {
         try {
             scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
-                    resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
+                    dataBaseConfigFile, resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
             logger.info("Scheduler successfully created on " +
                 PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
         } catch (ActiveObjectCreationException e) {
@@ -487,9 +492,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#freeze()
      */
-    public BooleanWrapper pauseImmediate() throws SchedulerException {
+    public BooleanWrapper freeze() throws SchedulerException {
         if (!ssprsc("You do not have permission to pause the scheduler !")) {
             return new BooleanWrapper(false);
         }
@@ -497,7 +502,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //stats
         stats.pauseTime();
 
-        return scheduler.pauseImmediate();
+        return scheduler.freeze();
     }
 
     /**
@@ -638,7 +643,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         if (!ui.isAdmin()) {
             throw new SchedulerException("You do not have permission to change the policy of the scheduler !");
         }
-
+        policyFullName = newPolicyFile.getClass().getName();
         return scheduler.changePolicy(newPolicyFile);
     }
 
@@ -706,8 +711,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                     ident.setToRemove();
                     connectedUsers.update(ident);
                     usersUpdate(ident);
-                    logger
-                            .error("!!!!!!!!!!!!!! Scheduler has detected that a listener is not connected anymore !");
+                    logger.error("!! Scheduler has detected that a listener is not connected anymore !!");
                 }
             }
         } catch (SecurityException e) {
@@ -718,56 +722,56 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerImmediatePausedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerFrozenEvent()
      */
-    public void schedulerImmediatePausedEvent() {
-        dispatch(SchedulerEvent.IMMEDIATE_PAUSED, null);
+    public void schedulerFrozenEvent() {
+        dispatch(SchedulerEvent.FROZEN, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerPausedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerPausedEvent()
      */
     public void schedulerPausedEvent() {
         dispatch(SchedulerEvent.PAUSED, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerResumedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerResumedEvent()
      */
     public void schedulerResumedEvent() {
         dispatch(SchedulerEvent.RESUMED, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerShutDownEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerShutDownEvent()
      */
     public void schedulerShutDownEvent() {
         dispatch(SchedulerEvent.SHUTDOWN, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerShuttingDownEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerShuttingDownEvent()
      */
     public void schedulerShuttingDownEvent() {
         dispatch(SchedulerEvent.SHUTTING_DOWN, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerStartedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerStartedEvent()
      */
     public void schedulerStartedEvent() {
         dispatch(SchedulerEvent.STARTED, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerStoppedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerStoppedEvent()
      */
     public void schedulerStoppedEvent() {
         dispatch(SchedulerEvent.STOPPED, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerkilledEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerkilledEvent()
      */
     public void schedulerKilledEvent() {
         dispatch(SchedulerEvent.KILLED, null);

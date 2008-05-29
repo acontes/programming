@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
@@ -53,6 +55,7 @@ import org.objectweb.proactive.extensions.masterworker.core.AOTaskRepository;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 
 
 /**
@@ -95,7 +98,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      *
      */
     protected AOMaster aomaster = null;
-    protected AOTaskRepository aorepository = null;
 
     /**
      * Creates a local master (you can add resources afterwards)
@@ -104,27 +106,30 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         this(new HashMap<String, Object>());
     }
 
+    //@snippet-start masterworker_constructor
     /**
      * Creates a remote master that will be created on top of the given Node <br>
      * Resources can be added to the master afterwards
      * @param remoteNodeToUse this Node will be used to create the remote master
      */
-    public ProActiveMaster(Node remoteNodeToUse) {
+    public ProActiveMaster(Node remoteNodeToUse)
+    //@snippet-end masterworker_constructor
+    {
         this(remoteNodeToUse, new HashMap<String, Object>());
     }
 
+    //@snippet-start masterworker_constructor_remote
     /**
      * Creates an empty remote master that will be created on top of the given Node with an initial worker memory
      * @param remoteNodeToUse this Node will be used to create the remote master
      * @param initialMemory initial memory that every workers deployed by the master will have
      */
-    public ProActiveMaster(Node remoteNodeToUse, Map<String, Object> initialMemory) {
+    public ProActiveMaster(Node remoteNodeToUse, Map<String, Object> initialMemory)
+    //@snippet-end masterworker_constructor_remote
+    {
         try {
-            aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {}, remoteNodeToUse);
-
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    aorepository, initialMemory }, remoteNodeToUse);
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
+                    new Object[] { initialMemory }, remoteNodeToUse);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -138,11 +143,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     public ProActiveMaster(Map<String, Object> initialMemory) {
         try {
-            aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {});
-
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    aorepository, initialMemory });
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
+                    new Object[] { initialMemory });
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -169,16 +171,15 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     public ProActiveMaster(URL descriptorURL, String masterVNName, Map<String, Object> initialMemory) {
         try {
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
-            VirtualNode masterVN = pad.getVirtualNode(masterVNName);
-            masterVN.activate();
+            GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
+            GCMVirtualNode masterVN = pad.getVirtualNode(masterVNName);
+            pad.startDeployment();
+            masterVN.waitReady();
 
-            Node masterNode = masterVN.getNode();
-            aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {}, masterNode);
+            Node masterNode = masterVN.getANode();
 
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    aorepository, initialMemory }, masterNode);
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
+                    new Object[] { initialMemory }, masterNode);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -209,23 +210,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     public void addResources(URL descriptorURL, String virtualNodeName) throws ProActiveException {
         aomaster.addResources(descriptorURL, virtualNodeName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addResources(VirtualNode virtualnode) {
-        // because of commit 6344, Nodes Creations are not waited anymore before the VirtualNode object is serialized.
-        // as a quick dirty fix, we wait manually for Nodes creation if the VirtualNode is activated.
-        if (virtualnode.isActivated()) {
-            try {
-                virtualnode.getNodes();
-            } catch (NodeException e) {
-                e.printStackTrace();
-            }
-        }
-
-        aomaster.addResources(virtualnode);
     }
 
     /**
@@ -292,7 +276,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     public void terminate(boolean freeResources) {
         // we use here the synchronous version
         aomaster.terminateIntern(freeResources);
-        aorepository.terminate();
+
     }
 
     /**

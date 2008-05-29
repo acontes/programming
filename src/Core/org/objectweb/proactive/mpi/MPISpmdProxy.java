@@ -30,8 +30,7 @@
  */
 package org.objectweb.proactive.mpi;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -41,6 +40,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.mpi.MPISpmdImpl.LateDeploymentHelper;
 
 
 public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
@@ -82,6 +82,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         // UNSTARTED/DEFAULT status
         if (status.equals(MPIConstants.MPI_UNSTARTED)) {
             setStatus(MPIConstants.MPI_RUNNING);
+            MPI_PROXY_LOGGER.debug("[MPI Proxy] status : " + status);
             return target.startMPI();
         } else {
             PAActiveObject.terminateActiveObject(target, true);
@@ -196,14 +197,6 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
     //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
     //  --+----+---- methods for the future wrapping with control ----+----+----
     //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
-    public void newActiveSpmd(String cl) {
-        this.target.newActiveSpmd(cl);
-    }
-
-    public void newActiveSpmd(String cl, Object[] params) {
-        this.target.newActiveSpmd(cl, params);
-    }
-
     public void newActiveSpmd(String cl, Object[][] params) {
         this.target.newActiveSpmd(cl, params);
     }
@@ -212,20 +205,8 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         this.target.newActive(cl, params, rank);
     }
 
-    public ArrayList getClasses() {
-        return this.target.getClasses();
-    }
-
-    public ArrayList getSpmdClasses() {
-        return this.target.getSpmdClasses();
-    }
-
-    public Hashtable getClassesParams() {
-        return this.target.getClassesParams();
-    }
-
-    public Hashtable getSpmdClassesParams() {
-        return this.target.getSpmdClassesParams();
+    public Map<String, LateDeploymentHelper> getUserClassToDeploy() {
+        return this.target.getUserClassToDeploy();
     }
 
     public String getRemoteLibraryPath() {

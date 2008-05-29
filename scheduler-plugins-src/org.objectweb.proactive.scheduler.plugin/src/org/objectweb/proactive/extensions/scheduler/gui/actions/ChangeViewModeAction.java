@@ -30,50 +30,49 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
-import org.objectweb.proactive.extensions.scheduler.gui.composite.JobComposite;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
+import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 
 
 /**
  * @author The ProActive Team
  */
-public class ChangeViewModeAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static ChangeViewModeAction instance = null;
-    private JobComposite jobComposite = null;
+public class ChangeViewModeAction extends SchedulerGUIAction {
 
-    private ChangeViewModeAction(JobComposite jobComposite) {
-        this.jobComposite = jobComposite;
+    public ChangeViewModeAction() {
         this.setText("Switch view mode");
         this.setToolTipText("Switch view to horizontal mode");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/horizontal.png"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
     public void run() {
-        FillLayout layout = (FillLayout) (jobComposite.getLayout());
-        boolean isVertical = layout.type == SWT.VERTICAL;
-        layout.type = isVertical ? SWT.HORIZONTAL : SWT.VERTICAL;
-        if (isVertical) {
-            this.setToolTipText("Switch view to horizontal mode");
-            this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/horizontal.png"));
-        } else {
-            this.setToolTipText("Switch view to vertical mode");
-            this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/vertical.png"));
+        switch (SeparatedJobView.getSashForm().getOrientation()) {
+            case SWT.HORIZONTAL:
+                SeparatedJobView.getSashForm().setOrientation(SWT.VERTICAL);
+                this.setToolTipText("Switch view to vertical mode");
+                this
+                        .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
+                                "icons/vertical.png"));
+                break;
+            case SWT.VERTICAL:
+                SeparatedJobView.getSashForm().setOrientation(SWT.HORIZONTAL);
+                this.setToolTipText("Switch view to horizontal mode");
+                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
+                        "icons/horizontal.png"));
+                break;
         }
-        jobComposite.layout();
     }
 
-    public static ChangeViewModeAction newInstance(JobComposite jobComposite) {
-        instance = new ChangeViewModeAction(jobComposite);
-        return instance;
-    }
-
-    public static ChangeViewModeAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected)
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

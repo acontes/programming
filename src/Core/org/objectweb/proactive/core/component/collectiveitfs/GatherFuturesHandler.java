@@ -144,7 +144,7 @@ public class GatherFuturesHandler implements RunActive, Serializable {
 
             service.blockingServeOldest("setFutureOfGatheredInvocation");
             if (senders != null) {
-                for (ItfID senderID : senders) {
+                for (int i = 0; i < senders.size(); i++) {
                     service.blockingServeOldest("distribute");
                 }
             }
