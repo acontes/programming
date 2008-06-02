@@ -32,10 +32,12 @@ package org.objectweb.proactive.extensions.scheduler.common.task;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.common.task.util.TaskConstructorTools;
+import org.objectweb.proactive.extensions.scheduler.task.ForkEnvironment;
 
 
 /**
@@ -62,13 +64,8 @@ public class JavaTask extends Task {
     /** if the task will be executed in a separate JVM */
     private boolean fork;
 
-    /* Path to directory with Java installed, to this path '/bin/java' will be added. 
-     * If the path is null only 'java' command will be called
-     */
-    private String javaHome = null;
-
-    /* options passed to Java (not an application) (example: memory settings or properties) */
-    private String javaOptions = null;
+    /** environment of a new dedicated JVM */
+    private ForkEnvironment forkEnvironment = null;
 
     /**
      * Empty constructor.
@@ -158,30 +155,16 @@ public class JavaTask extends Task {
     }
 
     /**
-     * @return the javaHome
+     * @return the forkedEnvironment
      */
-    public String getJavaHome() {
-        return javaHome;
+    public ForkEnvironment getForkedEnvironment() {
+        return forkEnvironment;
     }
 
     /**
-     * @param javaHome the javaHome to set
+     * @param forkedEnvironment the forkedEnvironment to set
      */
-    public void setJavaHome(String javaHome) {
-        this.javaHome = javaHome;
-    }
-
-    /**
-     * @return the javaOptions
-     */
-    public String getJavaOptions() {
-        return javaOptions;
-    }
-
-    /**
-     * @param javaOptions the javaOptions to set
-     */
-    public void setJavaOptions(String javaOptions) {
-        this.javaOptions = javaOptions;
+    public void setForkedEnvironment(ForkEnvironment forkedEnvironment) {
+        this.forkEnvironment = forkedEnvironment;
     }
 }

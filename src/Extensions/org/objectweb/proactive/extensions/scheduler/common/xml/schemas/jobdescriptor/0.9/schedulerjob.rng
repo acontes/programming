@@ -389,16 +389,7 @@
       	</attribute>
       </optional>
       <optional>
-      	<attribute name="javaHome">
-      		<doc:documentation> path to directory with Java installed, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called </doc:documentation>
-        	<data type="string"/>
-      	</attribute>
-      </optional>
-      <optional>
-      	<attribute name="javaOptions">
-      		<doc:documentation> options passed to Java (not an application) (example: memory settings or properties) </doc:documentation>
-        	<data type="string"/>
-      	</attribute>
+      	<ref name="forkEnvironment"/>
       </optional>
       <optional>
         <ref name="javaParameters"/>
@@ -419,6 +410,23 @@
         <ref name="javaParameters"/>
       </optional>
     </element>
+  </define>
+  <define name="forkEnvironment">
+  	<element name="forkEnvironment">
+  		<doc:documentation>a fork environment of a Java Task executed in a dedicated JVM </doc:documentation>
+  	   <optional>
+      	<attribute name="javaHome">
+      		<doc:documentation> path to directory with Java installed, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called </doc:documentation>
+        	<data type="string"/>
+      	</attribute>
+      </optional>
+      <optional>
+      	<attribute name="javaOptions">
+      		<doc:documentation> options passed to Java (not an application) (example: memory settings or properties) </doc:documentation>
+        	<data type="string"/>
+      	</attribute>
+      </optional>
+  	</element>
   </define>
   <define name="javaParameters">
     <element name="parameters">

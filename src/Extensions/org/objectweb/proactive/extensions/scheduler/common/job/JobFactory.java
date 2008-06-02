@@ -81,6 +81,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.ProActiveTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.Task;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
+import org.objectweb.proactive.extensions.scheduler.task.ForkEnvironment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -463,27 +464,17 @@ public class JobFactory {
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
 
+        // handling fork environment by either a fork attribute or a forkEnvironment element
         boolean fork = "true".equals((String) xpath.evaluate("@fork", process, XPathConstants.STRING));
+        Node forkEnvNode = (Node) xpath
+                .evaluate(addPrefixes("forkEnvironment"), process, XPathConstants.NODE);
+        if (forkEnvNode != null) {
+            ForkEnvironment forkEnv = createForkEnvironment(forkEnvNode);
+            desc.setForkedEnvironment(forkEnv);
+            fork = true;
+        }
         desc.setFork(fork);
         System.out.println("fork = " + fork);
-
-        String javaHome = (String) xpath.evaluate("@javaHome", process, XPathConstants.STRING);
-        if (javaHome != null && !"".equals(javaHome)) {
-            desc.setJavaHome(javaHome);
-            if (fork)
-                System.out.println("javaHome = " + javaHome);
-            else
-                System.out.println("javaHome = " + javaHome + ", IGNORED beacause fork = false");
-        }
-
-        String javaOptions = (String) xpath.evaluate("@javaOptions", process, XPathConstants.STRING);
-        if (javaOptions != null && !"".equals(javaOptions)) {
-            desc.setJavaOptions(javaOptions);
-            if (fork)
-                System.out.println("javaOptions = " + javaOptions);
-            else
-                System.out.println("javaOptions = " + javaOptions + ", IGNORED beacause fork = false");
-        }
 
         NodeList args = (NodeList) xpath.evaluate(addPrefixes("parameters/parameter"), process,
                 XPathConstants.NODESET);
@@ -504,6 +495,30 @@ public class JobFactory {
             System.out.println("arg: " + entry.getKey() + " = " + entry.getValue());
 
         return desc;
+    }
+
+    /**
+     * Method parses the node content and creates a class equivalent of a node
+     * @param forkEnvNode node in XML file, representing fork environment
+     * @return forkEnvironment
+     * @throws XPathExpressionException
+     */
+    private ForkEnvironment createForkEnvironment(Node forkEnvNode) throws XPathExpressionException {
+        ForkEnvironment forkEnv = new ForkEnvironment();
+
+        String javaHome = (String) xpath.evaluate("@javaHome", forkEnvNode, XPathConstants.STRING);
+        if (javaHome != null && !"".equals(javaHome)) {
+            forkEnv.setJavaHome(javaHome);
+            System.out.println("javaHome = " + javaHome);
+        }
+
+        String javaOptions = (String) xpath.evaluate("@javaOptions", forkEnvNode, XPathConstants.STRING);
+        if (javaOptions != null && !"".equals(javaOptions)) {
+            forkEnv.setJavaOptions(javaOptions);
+            System.out.println("javaOptions = " + javaOptions);
+        }
+
+        return forkEnv;
     }
 
     @SuppressWarnings("unchecked")

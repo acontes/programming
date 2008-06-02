@@ -464,6 +464,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" ref="jd:parameters"/>
+        <xs:element minOccurs="0" ref="jd:forkEnvironment"/>        
       </xs:sequence>
       <xs:attributeGroup ref="jd:class"/>
     </xs:complexType>
@@ -478,18 +479,25 @@
       <xs:annotation>
         <xs:documentation>whether to execute a task in a separate JVM </xs:documentation>
       </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="javaHome" use="optional" type="xs:string">
-      <xs:annotation>
-        <xs:documentation> path to directory with Java installed, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="javaOptions" use="optional" type="xs:string">
-      <xs:annotation>
-        <xs:documentation> options passed to Java (not an application) (example: memory settings or properties) </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
+    </xs:attribute>    
   </xs:attributeGroup>
+  <xs:element name="forkEnvironment">
+  	<xs:annotation>  
+  		<xs:documentation>a fork environment of a Java Task executed in a dedicated JVM </xs:documentation>
+  	<xs:annotation>
+  	<xs:complexType>
+  		<xs:attribute name="javaHome" use="optional" type="xs:string">
+      		<xs:annotation>
+        		<xs:documentation> path to directory with Java installed, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called </xs:documentation>
+      		</xs:annotation>
+    	</xs:attribute>
+    	<xs:attribute name="javaOptions" use="optional" type="xs:string">
+      		<xs:annotation>
+        		<xs:documentation> options passed to Java (not an application) (example: memory settings or properties) </xs:documentation>
+      		</xs:annotation>
+    	</xs:attribute>
+  	</xs:complexType>
+  </xs:element>
   <xs:element name="proActiveExecutable">
     <xs:annotation>
       <xs:documentation>a ProActive application (java class) </xs:documentation>
