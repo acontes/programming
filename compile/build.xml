@@ -369,6 +369,8 @@
 					<fileset dir="${cl.extra.dir}" includes="**" />
 					<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
 					<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+					<!-- annotations info -->
+					<fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />
 				</jar>
 			</else>
 		</if>
