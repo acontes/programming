@@ -41,7 +41,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
     public Object execute(TaskResult... results) throws Throwable {
         TaskResult result = taskLauncher.doTask(null /* no need here to pass schedulerCore object */,
                 executable, results);
-        while (!isKilled()) {
+        while (!isKilled() || executable.isKilled()) {
             try {
                 /* the below method throws an exception if timeout expires */
                 PAFuture.waitFor(result, TIMEOUT);

@@ -70,6 +70,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     private long deploymentID;
     private Thread tsout = null;
     private Thread tserr = null;
+    private ForkedJavaExecutable forkedJavaExecutable = null;
 
     public ForkedJavaTaskLauncher() {
     }
@@ -119,8 +120,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
             JavaTaskLauncher newLauncher = createRemoteTaskLauncher();
 
-            ForkedJavaExecutable forkedJavaExecutable = new ForkedJavaExecutable(
-                (JavaExecutable) executableTask, newLauncher);
+            forkedJavaExecutable = new ForkedJavaExecutable((JavaExecutable) executableTask, newLauncher);
 
             if (isWallTime)
                 scheduleTimer(forkedJavaExecutable);
@@ -222,6 +222,13 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         return newLauncher;
     }
 
+    public void terminate() {
+        super.terminate();
+        if (forkedJavaExecutable != null)
+            forkedJavaExecutable.kill();
+        clean();
+    }
+
     /**
      * Finalizing task does: 
      * - cleaning after creating a separate JVM 
@@ -237,10 +244,23 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      */
     protected void clean() {
         try {
-            childRuntime.killAllNodes();
-            process.destroy();
-            tsout.join();
-            tserr.join();
+            // if the process did not register then childRuntime will be null and/or process will be null
+            if (childRuntime != null) {
+                childRuntime.killAllNodes();
+                childRuntime = null;
+            }
+            if (process != null) {
+                process.destroy();
+                process = null;
+            }
+            if (tsout != null) {
+                tsout.join();
+                tsout = null;
+            }
+            if (tserr != null) {
+                tserr.join();
+                tserr = null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
