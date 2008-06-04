@@ -40,24 +40,37 @@ import com.sun.mirror.declaration.Declaration;
 import com.sun.mirror.declaration.FieldDeclaration;
 import com.sun.mirror.declaration.MethodDeclaration;
 import com.sun.mirror.declaration.Modifier;
+import com.sun.mirror.type.ArrayType;
+import com.sun.mirror.type.ClassType;
+import com.sun.mirror.type.EnumType;
 import com.sun.mirror.type.InterfaceType;
+import com.sun.mirror.type.PrimitiveType;
+import com.sun.mirror.type.TypeMirror;
+import com.sun.mirror.type.VoidType;
 import com.sun.mirror.util.SimpleDeclarationVisitor;
 import com.sun.mirror.util.SourcePosition;
 
 /**
- * TODO javadoc format
- * This class implements the Visitor Pattern
- * It verifies whether a class declaration annotated with @ActiveObject respects the following rules:
- * 		- must have a no-arg constructor
- * 		- must implement the Serializable interface
- * 		- must be subclassable :
- * 			- must not be final, 
- * 			- must not have final fields/methods
- * 			- must be public
- * 		- should not use standard Java synchronization primitives, eg volatile/synchronized keywords
- * TODO
- * 		- must not use non-reifiable types, eg instead of primitive types, just use ProActive primitive wrappers
- * 		- must not use return values that can't have a meaning as a ProActive Future. ex: don't return null from a method!
+ * <p> This class implements the Visitor Pattern</p>
+ * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.annotation.activeobject.ActiveObject} 
+ * respects the following rules:</p>
+ * <ul>
+ * 		<li>must have a no-arg constructor</li>
+ * 		<li>must implement the Serializable interface</li>
+ * 		<li>must be subclassable
+ * 			<ul>
+ * 				<li>must not be final</li> 
+ * 				<li>must not have final methods</li>
+ * 				<li>must be public</li>
+ * 			</ul>
+ * 		</li>
+ * 		<li>should not use standard Java synchronization primitives, eg volatile/synchronized keywords</li>
+ * 		<li>must not use non-reifiable types for return values, eg instead of primitive types, just use ProActive primitive wrappers
+ * 				this is because the return type also needs to be subclassed(a PAFuture will be created)</li>
+ * 		<li>must use getters/setters in order to access fields of Active Objects</li>
+ * </ul>
+ * 		- must not use return values that can't have a meaning as a ProActive Future. 
+ * 				ex: don't return null from a method! - TODO this can't actually be checked using apt 
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
@@ -75,6 +88,9 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	private static final String HAS_FINAL_MEMBER_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot have final members.\n";
 	private static final String HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE = "An active object already has an implicit synchronisation mechanism, wait-by-necessity. The synchronized/volatile keywords are therefore useless for a member of an active object.\n";
 	private static final String IS_NOT_PUBLIC_ERROR_MESSAGE = "An active object must be public.\n";
+	private static final String RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE = " is not a reifiable type. The return type must be reifiable in order to have asynchronous method calls.\n";
+	private static final String NO_GETTERS_SETTERS_ERROR_MESSAGE = "A field of an active object cannot be accessed directly, but only through getter/setter methods.\n";
+	
 	private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
 	
 	private String ERROR_PREFIX;
@@ -84,14 +100,20 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	public ActiveObjectVisitor(Messager messager) {
 		_compilerOutput = messager;
 	}
+	
+	private ClassDeclaration _containingClass;
 
 
 	@Override
 	public void visitClassDeclaration(ClassDeclaration classDeclaration) {
+
+		_containingClass = classDeclaration;
 		
 		ERROR_PREFIX = classDeclaration.getSimpleName() + ERROR_PREFIX_STATIC;
 
 		testModifiers(classDeclaration);
+		
+		testTypes(classDeclaration);
 		
 		if (!hasNoArgConstructor(classDeclaration)) {
 			reportError(classDeclaration, NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE);
@@ -104,9 +126,80 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		super.visitClassDeclaration(classDeclaration);
 		
 	}
-	
+
 	/*
-	 * test whether a class can be subclassed
+	 * test whether the types for the members of the class are reifiable - 
+	 * return and parameter types for methods, types for fields 
+	 */
+	private void testTypes(ClassDeclaration classDeclaration) {
+
+		// test the fields
+		Collection<FieldDeclaration> fields = classDeclaration.getFields();
+		for (FieldDeclaration fieldDeclaration : fields) {
+			testFieldType(fieldDeclaration);
+		}
+		
+		// test the methods
+		Collection<MethodDeclaration> methods = classDeclaration.getMethods();
+		for (MethodDeclaration methodDeclaration : methods) {
+			testMethodTypes(methodDeclaration);
+		}
+		
+	}
+
+
+	private void testMethodTypes(MethodDeclaration methodDeclaration) {
+		TypeMirror returnType = methodDeclaration.getReturnType();
+		if( !isReifiable(returnType) ){
+			reportError( methodDeclaration, returnType + RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE );
+		}
+	}
+
+
+	/*
+	 * test whether the type of the field specified is reifiable ?
+	 */
+	private void testFieldType(FieldDeclaration fieldDeclaration) {
+		// TODO
+		/*
+		TypeMirror fieldType = fieldDeclaration.getType(); 
+		if( !isReifiable(fieldType) ) {
+			reportError( fieldDeclaration, fieldType + TYPE_NOT_REIFIABLE_ERROR_MESSAGE );
+		}
+		*/
+	}
+
+
+	/*
+	 * Tests whether a given type is reifiable or not.
+	 * The notion of "reifiable type" is given in the ProActive manual
+	 */
+	private boolean isReifiable(TypeMirror type) {
+		if( type instanceof VoidType ) {
+			// is ok
+			return true;
+		} else if( type instanceof PrimitiveType ) {
+			// primitive types not reifiable
+			return false;
+		} else if( type instanceof EnumType ) {
+			// enums not reifiable
+			return false;
+		} else if( type instanceof ArrayType ) {
+			// TODO arrays not reifiable. right?
+			return false;
+		} else if( type instanceof ClassType ) {
+			// must check whether it is reifiable or not
+			ClassType classType = (ClassType)type;
+			// must fulfill the same prereqs as an Active Object
+			testModifiers(classType.getDeclaration());
+		}
+		return true;
+	}
+
+
+	/*
+	 * test errors related to the modifiers applied 
+	 * to the class and its members
 	 */
 	private void testModifiers(ClassDeclaration classDeclaration) {
 		// class definition modifiers
@@ -171,17 +264,59 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		Collection<Modifier> modifiers = fieldDeclaration.getModifiers();
 		
 		for (Modifier modifier : modifiers) {
-			if (modifier.equals(Modifier.FINAL)) {
-				reportError(fieldDeclaration, " The class declares the final field " 
-						+ fieldDeclaration.getSimpleName() + ".\n" + HAS_FINAL_MEMBER_ERROR_MESSAGE );
-			}
 			if(modifier.equals(Modifier.VOLATILE)){
 				reportError(fieldDeclaration, "The class declares the volatile field " 
 						+ fieldDeclaration.getSimpleName() + ".\n" + HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
 			}
+			if (modifier.equals(Modifier.PUBLIC)) {
+				if( !checkGettersSetters(fieldDeclaration.getSimpleName()) ) {
+					reportWarning( fieldDeclaration , "The class declares the public field"
+							+ fieldDeclaration.getSimpleName() + ".\n" + NO_GETTERS_SETTERS_ERROR_MESSAGE );
+				}
+			}
 		}
 	}
 	
+	/*
+	 * Test whether there are getters/setters defined for the given public field 
+	 * @param fieldName -> the name of the public field  
+	 */
+	private boolean checkGettersSetters(String fieldName) {
+		
+		// remove eventual coding conventions
+		// TODO more precise?
+		String name;
+		if (fieldName.startsWith("_")) {
+			name = fieldName.substring(1).toLowerCase();
+		}
+		else {
+			name = fieldName.toLowerCase();
+		}
+		
+		reportWarning( _containingClass , "Checking the field:" + name);
+		
+		String getField = "get" + name;
+		boolean foundGet = false;
+		String setField = "set" + name;
+		boolean foundSet = false;
+		
+		Collection<MethodDeclaration> methods = _containingClass.getMethods();
+		for (MethodDeclaration methodDeclaration : methods) {
+			if( !foundGet && methodDeclaration.getSimpleName().toLowerCase().equals(getField) ) {
+				foundGet = true;
+			}
+			if ( !foundSet && methodDeclaration.getSimpleName().toLowerCase().equals(setField) ) {
+				foundSet = true;
+			}
+			if( foundGet && foundSet )
+				return true;
+		}
+		
+		return false;
+		
+	}
+
+
 	/*
 	 * test the modifiers of a MethodDeclaration
 	 * 		- must not be final

@@ -165,8 +165,17 @@ public interface Loggers {
     static final public String JMX = CORE + ".jmx";
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
+   
+    public static final String JEE = CORE + ".jee";
     // JBOSS
-    public static final String JBOSS = JMX + ".jboss";
+    public static final String JBOSS = JEE + ".jboss";
+    // EJB
+    public static final String EJB = JEE + ".ejb";
+    // Connector
+    public static final String CONNECOR = JEE + ".connector";
+    
+    // annotations
+    public static final String ANNOTATIONS = CORE + ".annotations";
 
     // Exceptions
     public static final String EXCEPTIONS = CORE + ".exceptions";
