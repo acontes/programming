@@ -28,7 +28,7 @@ public class GeometryBasket {
 		 * Contains an application wide value for the size of the figures.
 		 * It is needed for placing and scaling the figures. 
 		 */
-		public static float FIGURE_SCALE = 1f;
+		public static final float FIGURE_SCALE = 1f;
       	//default geometries
         private static Geometry nodeGeometry = nodeGeometry();
         private static Geometry activeObjectGeometry = activeObjectGeometry();
