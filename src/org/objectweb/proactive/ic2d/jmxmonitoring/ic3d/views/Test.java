@@ -16,6 +16,7 @@ import javax.media.j3d.Canvas3D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
@@ -24,7 +25,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
  *
  */
 public class Test extends JFrame {
-AbstractGrid3D grid;
+AbstractFigure3D grid;
     /**
      *
      */
@@ -55,8 +56,8 @@ AbstractGrid3D grid;
         setUpWindow();
 
         for (int i = 1; i < 30; i++)
-            grid.addSubFigure("Host : " + new Integer(i).toString(),
-                new Host3D("Host : " + new Integer(i).toString()));
+            grid.addSubFigure("Host : " + Integer.valueOf(i),
+                new Host3D("Host : " + Integer.valueOf(i)));
         int size = grid.getSubFigures().size();
         int pick;
         double chance;
@@ -109,10 +110,10 @@ AbstractGrid3D grid;
                         a = (int) Math.round(Math.random() * (aoNumber - 1));
                         b = (int) Math.round(Math.random() * (aoNumber - 1));
 
-                        grid.drawCommunication(UUID.randomUUID().toString(),
-                            new Double(a).toString(),
-                           Math.round(Math.random()*100), obiecte.get(a),
-                            obiecte.get(b));
+//                        grid.drawCommunication(UUID.randomUUID().toString(),
+//                            new Double(a).toString(),
+//                           Math.round(Math.random()*5), obiecte.get(a),
+//                            obiecte.get(b));
 
 //                      grid.drawSphereArrow(new Double(Math.random()).toString(),
 //                      new Double(a).toString(),
@@ -122,7 +123,7 @@ AbstractGrid3D grid;
                     }
                 }).start();
             try {
-				Thread.sleep(5);
+				Thread.sleep(15);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -139,12 +140,12 @@ AbstractGrid3D grid;
         setUpWindow();
 
         for (int i = 1; i < 50; i++) {
-            grid.addSubFigure("Host :" + new Integer(i).toString(),
+        	grid.addSubFigure("Host :" + Integer.valueOf(i),
                 new Host3D("rmi://puravida.inria.fr"));
             for (int k = 1; k < 3; k++) {
-                grid.getSubFigure("Host :" + new Integer(i).toString())
-                    .addSubFigure("cheie" + new Integer(k).toString(),
-                    new Runtime3D(new Integer(k).toString()));
+                grid.getSubFigure("Host :" + Integer.valueOf(i))
+                    .addSubFigure("cheie" + Integer.valueOf(k),
+                    new Runtime3D(Integer.valueOf(k).toString()));
                 for (int j = 1; j < 3; j++) {
                     grid.getSubFigure("Host :" + new Integer(i).toString())
                         .getSubFigure("cheie" + new Integer(k).toString())
@@ -156,9 +157,9 @@ AbstractGrid3D grid;
 
     private void setUpWindow() {
         GridUniverse universe = new GridUniverse();
-        //grid = new EarthGrid3D("");
-        grid = new Grid3D();
-        universe.addGrid(grid);
+        grid = new EarthGrid3D("");
+     //   grid = new Grid3D();
+        universe.addGrid((AbstractGrid3D)grid);
         //three views
         Canvas3D viewOne = universe.newView();
         Canvas3D viewTwo = universe.newView();
@@ -364,15 +365,15 @@ AbstractGrid3D grid;
 
                                 UUID cheie  = UUID.randomUUID();
                                 grid.drawCommunication(cheie.toString(),"",                                    
-                                    50, start, stop);
+                                    2, start, stop);
                             }
                         }).start();
-                    try {
-						Thread.sleep(70);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+//                    try {
+//						Thread.sleep(3);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
 
                     
                     	o1.setQueueSize((int)Math.round(Math.random()*20+1));
