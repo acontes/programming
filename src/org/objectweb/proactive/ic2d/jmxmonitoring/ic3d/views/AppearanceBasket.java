@@ -19,24 +19,24 @@ import com.sun.j3d.utils.image.TextureLoader;
  *
  */
 public class AppearanceBasket {
-	public static Appearance defaultNodeAppearance = getDefaultNodeAppearance();
-	public static Appearance defaultRuntimeAppearance = getDefaultRuntimeAppearance();
-	public static Appearance defaultHostAppearance = getDefaultHostAppearance();
-	public static Appearance defaultLineAppearance = getDefaultLineAppearance();
-	public static Appearance coordinatesAppearance = getDefaultCoordinatesAppearance();
-	public static Appearance queueAppearance = getDefaultQueueAppearance();
+	public static final Appearance defaultNodeAppearance = getDefaultNodeAppearance();
+	public static final Appearance defaultRuntimeAppearance = getDefaultRuntimeAppearance();
+	public static final Appearance defaultHostAppearance = getDefaultHostAppearance();
+	public static final Appearance defaultLineAppearance = getDefaultLineAppearance();
+	public static final Appearance coordinatesAppearance = getDefaultCoordinatesAppearance();
+	public static final Appearance queueAppearance = getDefaultQueueAppearance();
 
 	// generic unknown appearance
-	public static Appearance defaultUnkownStateAppearance = getDefaultUnknownStateAppearance();
+	public static final Appearance defaultUnkownStateAppearance = getDefaultUnknownStateAppearance();
 
 	// active objects states
-	public static Appearance objectMigratingAppearance = getActiveObjectMigrating();
-	public static Appearance defaultActiveObjectAppearance = getDefaultActiveObjectAppearance();
-	public static Appearance servingRequestAppearance = getServingRequestAppearance();
-	public static Appearance waitingForRequestAppearance = getWaitingForRequestAppearance();
+	public static final Appearance objectMigratingAppearance = getActiveObjectMigrating();
+	public static final Appearance defaultActiveObjectAppearance = getDefaultActiveObjectAppearance();
+	public static final Appearance servingRequestAppearance = getServingRequestAppearance();
+	public static final Appearance waitingForRequestAppearance = getWaitingForRequestAppearance();
 
 	//Earth grid appearances
-	public static Appearance earthGridAppearance = getEarthGridAppearance();
+	public static final Appearance earthGridAppearance = getEarthGridAppearance();
 
 	//make this class non instantiable
 	private AppearanceBasket() {
