@@ -23,7 +23,9 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
+import com.sun.j3d.utils.behaviors.picking.PickRotateBehavior;
 import com.sun.j3d.utils.behaviors.vp.OrbitBehavior;
+import com.sun.j3d.utils.pickfast.behaviors.PickTranslateBehavior;
 import com.sun.j3d.utils.universe.ConfiguredUniverse;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 import com.sun.j3d.utils.universe.Viewer;
@@ -45,7 +47,7 @@ import com.sun.j3d.utils.universe.ViewingPlatform;
  */
 public class GridUniverse {
 	private ConfiguredUniverse universe = new ConfiguredUniverse();
-
+	private BranchGroup objGrp;
 	public GridUniverse() {
 		// TODO maybe remove the default view branch since it is unused
 		universe.setVisible(false);// makes the default view invisible
@@ -90,6 +92,33 @@ public class GridUniverse {
 		// vp.setPlatformGeometry(new PlatformGeometry());
 
 		viewer.getCanvas3D().getView().setBackClipDistance(200);
+		
+		
+		
+		//add interaction for this view
+		BranchGroup bpick = new BranchGroup();
+		bpick.setCapability(BranchGroup.ENABLE_PICK_REPORTING);
+		 //TODO make class
+		 PickTranslateBehavior pickRotate = new PickTranslateBehavior(bpick,viewer.getCanvas3D(),
+				 					new BoundingSphere());
+		 pickRotate.setSchedulingBounds(new BoundingSphere(new Point3d(0,0,0),1000));
+		 
+		 bpick.addChild(pickRotate);
+		 objGrp.addChild(bpick);
+//		 com.sun.j3d.utils.pickfast.behaviors.PickTranslateBehavior
+//		 pickTranslate = new
+//		 com.sun.j3d.utils.pickfast.behaviors.PickTranslateBehavior(objGrp,viewer.getCanvas3D(),
+//		 new BoundingSphere());
+//		 pickTranslate.setSchedulingBounds(new BoundingSphere());
+//		 objGrp.addChild(pickTranslate);
+		 // PickZoomBehavior pickZoom = new PickZoomBehavior(objGrp,canvas3D,
+		 //new BoundingSphere());
+		// objGrp.addChild(pickZoom);
+
+		
+		
+	        viewer.getCanvas3D().getView().setSceneAntialiasingEnable(true);
+		
 		return viewer.getCanvas3D();
 	}
 
@@ -184,7 +213,7 @@ public class GridUniverse {
 	 * @return an BranchGroup to which a grid is connected
 	 */
 	private BranchGroup createObjectBranch() {
-		BranchGroup objGrp = new BranchGroup();
+		objGrp = new BranchGroup();
 		objGrp.setCapability(Group.ALLOW_CHILDREN_EXTEND);
 		objGrp.setCapability(BranchGroup.ALLOW_DETACH);
 		objGrp.setCapability(Group.ALLOW_CHILDREN_READ);
@@ -243,24 +272,6 @@ public class GridUniverse {
 		// HoverInfo tooltip = new HoverInfo(universe.getCanvas(),objGrp, new
 		// BoundingSphere(new Point3d(0,0,0),10000));
 		// objGrp.addChild(tooltip);
-
-		// //TODO make class
-		// com.sun.j3d.utils.pickfast.behaviors.PickTranslateBehavior pickRotate
-		// = new
-		// com.sun.j3d.utils.pickfast.behaviors.PickTranslateBehavior(objGrp,universe.getCanvas(),
-		// new BoundingSphere());
-		// pickRotate.setSchedulingBounds(new BoundingSphere());
-		// objGrp.addChild(pickRotate);
-		// com.sun.j3d.utils.pickfast.behaviors.PickTranslateBehavior
-		// pickTranslate = new
-		// com.sun.j3d.utils.pickfast.behaviors.PickTranslateBehavior(objGrp,universe.getCanvas(),
-		// new BoundingSphere());
-		// pickTranslate.setSchedulingBounds(new BoundingSphere());
-		// objGrp.addChild(pickTranslate);
-		// // PickZoomBehavior pickZoom = new PickZoomBehavior(objGrp,canvas3D,
-		// new BoundingSphere());
-		// objGrp.addChild(pickZoom);
-
 		// add the axes
 		// CoordinateSystem3D coord = new CoordinateSystem3D(0.07f);
 		TransformGroup coordTrans = new TransformGroup();
