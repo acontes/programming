@@ -59,7 +59,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
 		Vector3d oldScale = new Vector3d();
 		resize.getScale(oldScale);
 		//TODO remove constant
-		resize.setScale(new Vector3d(size / 2, oldScale.y, oldScale.z));
+		resize.setScale(new Vector3d((double)size / 2, oldScale.y, oldScale.z));
 		trans.setTransform(resize);
 	}
 
