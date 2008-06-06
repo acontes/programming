@@ -53,7 +53,7 @@ import com.sun.mirror.util.SimpleDeclarationVisitor;
 import com.sun.mirror.util.SourcePosition;
 
 /**
- * <p> This class implements the Visitor Pattern</p>
+ * <p> This class implements a visitor for the ActiveObjectAnnotationProcessor, conforming to the Mirror API(jsr199)</p>
  * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.annotation.activeobject.ActiveObject} 
  * respects the following rules:</p>
  * <ul>
