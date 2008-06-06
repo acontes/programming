@@ -11,18 +11,17 @@ import javax.imageio.ImageIO;
 
 
 public class TextureBasket {
-    public static String path = new String(
-            "org/objectweb/proactive/ic2d/jmxmonitoring/ic3d/resources/");
-    public static BufferedImage pebbles = loadImage(path + "light_pebbles.jpg");
-    public static BufferedImage white_sand = loadImage(path + "white_sand.jpg");
-    public static BufferedImage metal_walk = loadImage(path + "metal_walk.jpg");
-    public static BufferedImage fedora = loadImage(path + "fedoraTexture.jpg");
-    public static BufferedImage kde = loadImage(path + "kde.png");
-    public static BufferedImage ao = loadImage(path + "ActiveObject.jpg");
-    public static BufferedImage node_border = loadImage(path + "node_skin.jpg");
-    public static BufferedImage round_corners = loadImage(path +
+    public static final String path = "org/objectweb/proactive/ic2d/jmxmonitoring/ic3d/resources/";
+    public static final BufferedImage pebbles = loadImage(path + "light_pebbles.jpg");
+    public static final BufferedImage white_sand = loadImage(path + "white_sand.jpg");
+    public static final BufferedImage metal_walk = loadImage(path + "metal_walk.jpg");
+    public static final BufferedImage fedora = loadImage(path + "fedoraTexture.jpg");
+    public static final BufferedImage kde = loadImage(path + "kde.png");
+    public static final BufferedImage ao = loadImage(path + "ActiveObject.jpg");
+    public static final BufferedImage node_border = loadImage(path + "node_skin.jpg");
+    public static final BufferedImage round_corners = loadImage(path +
             "round_corners.png");
-    public static BufferedImage earth = loadImage(path + "EarthMap.jpg");
+    public static final BufferedImage earth = loadImage(path + "EarthMap.jpg");
 
     private static BufferedImage loadImage(String fname) {
         // Level logLevel = Level.FINE;
