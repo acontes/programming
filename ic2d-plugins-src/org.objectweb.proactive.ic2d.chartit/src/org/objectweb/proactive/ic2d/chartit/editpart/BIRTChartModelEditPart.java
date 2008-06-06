@@ -9,8 +9,7 @@ import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
  * Series based edit part. Graphical representation is based on various BIRT
  * charts
  * 
- * @author vbodnart
- * 
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>. 
  */
 public final class BIRTChartModelEditPart extends AbstractChartItEditPart<BIRTChartCanvas> {
 
@@ -27,7 +26,7 @@ public final class BIRTChartModelEditPart extends AbstractChartItEditPart<BIRTCh
     }
 
     public void run() {
-        if (this.canvas.isDisposed())
+        if (!super.canvas.isVisible())
             return;
         // Redraw the canvas
         this.canvas.refreshChartAndRedrawCanvas();

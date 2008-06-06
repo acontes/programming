@@ -200,7 +200,7 @@ public class Patch {
 	" lib/dtdparser.jar,\n"+
 	" lib/fractal.jar,\n"+
 	" lib/fractal-adl.jar,\n"+
-	" lib/ganymed-ssh2-build210.jar,\n"+
+	" lib/trilead-ssh2.jar,\n"+
 	" lib/glite-wms-jdlj.jar,\n"+
 	" lib/http.jar,\n"+
 	" lib/ibis-1.4.jar,\n"+
@@ -1491,20 +1491,20 @@ public class Patch {
 	" org.objectweb.proactive.mpi,\n"+
 	" org.objectweb.proactive.mpi.control,\n"+
 	" org.objectweb.proactive.mpi.control.util,\n"+
-	" org.objectweb.proactive.p2p.daemon,\n"+
-	" org.objectweb.proactive.p2p.loadbalancer,\n"+
-	" org.objectweb.proactive.p2p.service,\n"+
-	" org.objectweb.proactive.p2p.service.exception,\n"+
-	" org.objectweb.proactive.p2p.service.node,\n"+
-	" org.objectweb.proactive.p2p.service.util,\n"+
-	" org.objectweb.proactive.p2p.v2.dynamicnoa,\n"+
-	" org.objectweb.proactive.p2p.v2.monitoring,\n"+
-	" org.objectweb.proactive.p2p.v2.monitoring.event,\n"+
-	" org.objectweb.proactive.p2p.v2.service,\n"+
-	" org.objectweb.proactive.p2p.v2.service.exception,\n"+
-	" org.objectweb.proactive.p2p.v2.service.messages,\n"+
-	" org.objectweb.proactive.p2p.v2.service.node,\n"+
-	" org.objectweb.proactive.p2p.v2.service.util,\n"+
+	" org.objectweb.proactive.extra.p2p.daemon,\n"+
+	" org.objectweb.proactive.extra.p2p.loadbalancer,\n"+
+	" org.objectweb.proactive.extra.p2p.service,\n"+
+	" org.objectweb.proactive.extra.p2p.service.exception,\n"+
+	" org.objectweb.proactive.extra.p2p.service.node,\n"+
+	" org.objectweb.proactive.extra.p2p.service.util,\n"+
+	" org.objectweb.proactive.extra.p2p.v2.dynamicnoa,\n"+
+	" org.objectweb.proactive.extra.p2p.v2.monitoring,\n"+
+	" org.objectweb.proactive.extra.p2p.v2.monitoring.event,\n"+
+	" org.objectweb.proactive.extra.p2p.v2.service,\n"+
+	" org.objectweb.proactive.extra.p2p.v2.service.exception,\n"+
+	" org.objectweb.proactive.extra.p2p.v2.service.messages,\n"+
+	" org.objectweb.proactive.extra.p2p.v2.service.node,\n"+
+	" org.objectweb.proactive.extra.p2p.v2.service.util,\n"+
 	" org.osgi.framework,\n"+
 	" org.osgi.service.http,\n"+
 	" org.osgi.service.packageadmin,\n"+

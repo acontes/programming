@@ -148,8 +148,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             throws ActiveObjectCreationException {
         super(reifiedObject, nodeURL, factory, jobId);
 
+        super.isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
+
         // TIMING
-        if (!(reifiedObject instanceof ProActiveInternalObject)) {
+        if (!super.isProActiveInternalObject) {
             super.timersContainer = CoreTimersContainer.create(super.bodyID, reifiedObject, factory, nodeURL);
 
             if (super.timersContainer != null) {
@@ -173,7 +175,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             Node node = NodeFactory.getNode(this.getNodeURL());
             if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED))) {
                 // if the object is a ProActive internal object, FT is disabled
-                if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
+                if (!super.isProActiveInternalObject) {
                     // if the object is not serilizable, FT is disabled
                     if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
                         try {
@@ -208,13 +210,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         this.gc = new GarbageCollector(this);
 
-        // JMX registration
-        isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
-        if (!isProActiveInternalObject) {
+        // JMX registration        
+        if (!super.isProActiveInternalObject) {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName oname = FactoryName.createActiveObjectName(getID());
+            ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
             if (!mbs.isRegistered(oname)) {
-                mbean = new BodyWrapper(oname, this, getID());
+                super.mbean = new BodyWrapper(oname, this);
                 try {
                     mbs.registerMBean(mbean, oname);
                 } catch (InstanceAlreadyExistsException e) {
@@ -245,10 +246,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
             // If the node is not a HalfBody
-            if (!NodeFactory.isHalfBodiesNode(request.getSender().getNodeURL())) {
+            if (!NodeFactory.isHalfBodiesNode(request.getSenderNodeURL())) {
                 RequestNotificationData requestNotificationData = new RequestNotificationData(request
-                        .getSourceBodyID(), request.getSenderNodeURI().toString(), this.bodyID, this.nodeURL,
-                    request.getMethodName(), getRequestQueue().size() + 1);
+                        .getSourceBodyID(), request.getSenderNodeURL(), this.bodyID, this.nodeURL, request
+                        .getMethodName(), getRequestQueue().size() + 1);
                 this.mbean.sendNotification(NotificationType.requestReceived, requestNotificationData);
             }
         }

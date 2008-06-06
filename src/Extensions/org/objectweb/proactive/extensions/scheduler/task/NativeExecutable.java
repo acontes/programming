@@ -120,12 +120,18 @@ public class NativeExecutable extends Executable {
      */
     @Override
     public Object execute(TaskResult... results) {
+
+        //WARNING : if this.command is unknown, it will create a defunct process
+        //it's due to a known java bug
         try {
-
-            //WARNING : if this.command is unknown, it will create a defunct process
-            //it's due to a known java bug
             process = Runtime.getRuntime().exec(this.command, this.envp);
+        } catch (Exception e) {
+            //in this case, the error is certainly due to the user (ie : command not found)
+            //we have to inform him about the cause.
+            throw new RuntimeException(e);
+        }
 
+        try {
             // redirect streams
             BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -140,9 +146,10 @@ public class NativeExecutable extends Executable {
             tserr.join();
             return process.exitValue();
         } catch (Exception e) {
-            //TODO send the exception or error to the user ?
+            //return an error code that is not 0-255
+            //It means that if we are here user is not responsible
             e.printStackTrace();
-            return 255;
+            return -1;
         }
     }
 
@@ -150,7 +157,7 @@ public class NativeExecutable extends Executable {
      * @see org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable#init(java.util.Map)
      */
     @Override
-    public final void init(Map<String, Object> args) throws Exception {
+    public final void init(Map<String, String> args) throws Exception {
         throw new RuntimeException("This method should have NEVER been called in this context !!");
     }
 

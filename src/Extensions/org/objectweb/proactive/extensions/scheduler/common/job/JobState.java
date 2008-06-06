@@ -64,11 +64,11 @@ public enum JobState implements java.io.Serializable {
      */
     PAUSED("Paused"),
     /**
-     * The job has been cancelled due to user exception and order.
+     * The job has been canceled due to user exception and order.
      * This state runs when a user exception occurs in a task
      * and when the user has asked to cancel on exception.
      */
-    CANCELLED("Cancelled"),
+    CANCELLED("Canceled"),
     /**
      * The job has failed. One or more tasks have failed.
      * There is no more rerun left for a task.

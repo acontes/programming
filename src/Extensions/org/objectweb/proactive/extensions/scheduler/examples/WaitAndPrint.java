@@ -77,13 +77,13 @@ public class WaitAndPrint extends JavaExecutable {
 
         //        return ("No." + this.number + " hi from " + message + "\t slept for " +
         //        sleepTime + "Seconds");
-        return "Returned value";
+        return "Returned value : " + number;
     }
 
     @Override
-    public void init(Map<String, Object> args) {
-        sleepTime = Integer.parseInt((String) args.get("sleepTime"));
-        number = Integer.parseInt((String) args.get("number"));
+    public void init(Map<String, String> args) {
+        sleepTime = Integer.parseInt(args.get("sleepTime"));
+        number = Integer.parseInt(args.get("number"));
 
         //        for (Entry<String, Object> e : args.entrySet()) {
         //            System.out.println("INIT(" + number + ") : " + e.getKey() + "=" +

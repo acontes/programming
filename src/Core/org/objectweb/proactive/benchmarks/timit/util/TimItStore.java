@@ -50,6 +50,7 @@ public class TimItStore {
     private static TimItStore vmInstance;
     private static HashMap<Body, TimItStore> timerStoreMap = new HashMap<Body, TimItStore>();
     private String[] activation;
+    public boolean allActivated;
     private Timed timed;
     private ArrayList<TimerCounter> tcList;
 
@@ -59,6 +60,9 @@ public class TimItStore {
     private TimItStore(Timed timed) {
         String prop = PAProperties.PA_TIMIT_ACTIVATION.getValue();
         if (prop == null) {
+            this.activation = new String[0];
+        } else if (prop.equals("all")) {
+            this.allActivated = true;
             this.activation = new String[0];
         } else {
             this.activation = prop.split(",");
@@ -93,14 +97,14 @@ public class TimItStore {
     }
 
     public TimerCounter addTimerCounter(TimerCounter tc) {
-        if (Arrays.binarySearch(this.activation, tc.getName()) >= 0) {
+        if (this.allActivated || Arrays.binarySearch(this.activation, tc.getName()) >= 0) {
             this.tcList.add(tc);
         }
         return tc;
     }
 
     public EventObserver addEventObserver(EventObserver eo) {
-        if (Arrays.binarySearch(this.activation, eo.getName()) > 0) {
+        if (this.allActivated || Arrays.binarySearch(this.activation, eo.getName()) > 0) {
             this.timed.getEventObservable().addObserver(eo);
         }
         return eo;

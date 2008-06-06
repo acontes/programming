@@ -14,8 +14,8 @@
 		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java"/>
-				<jvmarg value="-Dproactive.test=true -Dproactive.home=/home/fviale/eclipse_workspace/ProActive_Clean"/>
-				<proactiveClasspath type="append">
+				<jvmarg value="-Dproactive.test=true" />
+                <proactiveClasspath type="append">
                     <pathElement base="proactive" relpath="classes/Tests"/>
                     <pathElement base="proactive" relpath="dist/lib/clover.jar"/>
 				</proactiveClasspath>

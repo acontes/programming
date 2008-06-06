@@ -44,7 +44,6 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
@@ -166,17 +165,21 @@ public interface RMCoreInterface {
      * node left.<BR>
      * - If the script is a static script, it will return in priority the
      * nodes on which the given script has already been verified.<BR>
+     * - This will not returns node that are specified in the exclusion list.
      *
      * @param nb number of node to provide
      * @param selectionScript that nodes must verify
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript);
+    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion);
 
     /**
      * Returns an exactly number of nodes
      * not yet implemented.
      * @param nb exactly number of nodes to provide.
      * @param selectionScript  that nodes must verify.
+     * @return an array list of nodes.
      */
     public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript);
 
