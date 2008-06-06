@@ -33,6 +33,8 @@ package org.objectweb.proactive.annotation.activeobject;
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.objectweb.proactive.annotation.ErrorMessages;
+
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.ClassDeclaration;
 import com.sun.mirror.declaration.ConstructorDeclaration;
@@ -81,15 +83,6 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	// TODO read from some config file outside the code
 	private static final String ERROR_PREFIX_STATIC = " is annotated using the " 
 		+ ActiveObject.class.getSimpleName() + " annotation.\n";
-	private static final String NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE = "This object does not define a no-arg constructor. " +
-			"An active object must have a no-arg constructor.\n";
-	private static final String NO_SERIALIZABLE_ERROR_MESSAGE = "An active object should implement the Serializable interface.\n";
-	private static final String IS_FINAL_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot be final.\n";
-	private static final String HAS_FINAL_MEMBER_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot have final members.\n";
-	private static final String HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE = "An active object already has an implicit synchronisation mechanism, wait-by-necessity. The synchronized/volatile keywords are therefore useless for a member of an active object.\n";
-	private static final String IS_NOT_PUBLIC_ERROR_MESSAGE = "An active object must be public.\n";
-	private static final String RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE = " is not a reifiable type. The return type must be reifiable in order to have asynchronous method calls.\n";
-	private static final String NO_GETTERS_SETTERS_ERROR_MESSAGE = "A field of an active object cannot be accessed directly, but only through getter/setter methods.\n";
 	
 	private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
 	
@@ -110,17 +103,17 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		_containingClass = classDeclaration;
 		
 		ERROR_PREFIX = classDeclaration.getSimpleName() + ERROR_PREFIX_STATIC;
-
+		
 		testModifiers(classDeclaration);
 		
 		testTypes(classDeclaration);
 		
 		if (!hasNoArgConstructor(classDeclaration)) {
-			reportError(classDeclaration, NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE);
+			reportError(classDeclaration, ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE);
 		}
 
 		if (!implementsSerializable(classDeclaration)) {
-			reportWarning(classDeclaration, NO_SERIALIZABLE_ERROR_MESSAGE);
+			reportWarning(classDeclaration, ErrorMessages.NO_SERIALIZABLE_ERROR_MESSAGE);
 		}
 		
 		super.visitClassDeclaration(classDeclaration);
@@ -138,8 +131,8 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		for (FieldDeclaration fieldDeclaration : fields) {
 			testFieldType(fieldDeclaration);
 		}
-		
 		// test the methods
+		
 		Collection<MethodDeclaration> methods = classDeclaration.getMethods();
 		for (MethodDeclaration methodDeclaration : methods) {
 			testMethodTypes(methodDeclaration);
@@ -151,7 +144,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	private void testMethodTypes(MethodDeclaration methodDeclaration) {
 		TypeMirror returnType = methodDeclaration.getReturnType();
 		if( !isReifiable(returnType) ){
-			reportError( methodDeclaration, returnType + RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE );
+			reportError( methodDeclaration, returnType + ErrorMessages.RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE );
 		}
 	}
 
@@ -245,10 +238,10 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		
 		for (Modifier modifier : modifiers) {
 			if (modifier.equals(Modifier.FINAL)) {
-				reportError(classDeclaration, IS_FINAL_ERROR_MESSAGE);
+				reportError(classDeclaration, ErrorMessages.IS_FINAL_ERROR_MESSAGE);
 			}
 			if(modifier.equals(Modifier.PRIVATE) || modifier.equals(Modifier.PROTECTED)){
-				reportError(classDeclaration, IS_NOT_PUBLIC_ERROR_MESSAGE);
+				reportError(classDeclaration, ErrorMessages.IS_NOT_PUBLIC_ERROR_MESSAGE);
 			}
 		}
 	}
@@ -266,12 +259,14 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		for (Modifier modifier : modifiers) {
 			if(modifier.equals(Modifier.VOLATILE)){
 				reportError(fieldDeclaration, "The class declares the volatile field " 
-						+ fieldDeclaration.getSimpleName() + ".\n" + HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
+						+ fieldDeclaration.getSimpleName() + ".\n" 
+							+ ErrorMessages.HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
 			}
 			if (modifier.equals(Modifier.PUBLIC)) {
 				if( !checkGettersSetters(fieldDeclaration.getSimpleName()) ) {
 					reportWarning( fieldDeclaration , "The class declares the public field"
-							+ fieldDeclaration.getSimpleName() + ".\n" + NO_GETTERS_SETTERS_ERROR_MESSAGE );
+							+ fieldDeclaration.getSimpleName() + ".\n" 
+								+ ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE );
 				}
 			}
 		}
@@ -330,11 +325,13 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		for (Modifier modifier : modifiers) {
 			if (modifier.equals(Modifier.FINAL)) {
 				reportError(methodDeclaration, " The class declares the final method " 
-						+ methodDeclaration.getSimpleName() + ".\n" + HAS_FINAL_MEMBER_ERROR_MESSAGE );
+						+ methodDeclaration.getSimpleName() + ".\n" 
+							+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE );
 			}
 			if(modifier.equals(Modifier.SYNCHRONIZED)){
 				reportError(methodDeclaration, "The class declares the synchronized method " 
-						+ methodDeclaration.getSimpleName() + ".\n" + HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
+						+ methodDeclaration.getSimpleName() + ".\n" 
+							+ ErrorMessages.HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
 			}
 		}
 	}
