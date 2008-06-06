@@ -29,6 +29,9 @@ public class Node3D extends AbstractNode3D {
 	@Override
 	public void arrangeSubFigures() {
 		int i = 1; // to count the nodes
+		//TODO remove constants
+		//iterate through all the ao of the node
+		//and place them vertically
 		for (AbstractFigure3D ao : this.getSubFigures().values()) {
 			PlacementBasket.sphericalAOVerticalArrangement(0.05, 1.5, i, this
 					.getSubFigures().size(), ao, this);
