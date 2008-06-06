@@ -70,17 +70,14 @@ import com.sun.mirror.util.SourcePosition;
  * 		<li>must not use non-reifiable types for return values, eg instead of primitive types, just use ProActive primitive wrappers
  * 				this is because the return type also needs to be subclassed(a PAFuture will be created)</li>
  * 		<li>must use getters/setters in order to access fields of Active Objects</li>
- * </ul>
- * 		- must not use return values that can't have a meaning as a ProActive Future. 
- * 				ex: don't return null from a method! - TODO this can't actually be checked using apt 
+ * </ul> 
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
  */
 public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
-
+	
 	// error messages
-	// TODO read from some config file outside the code
 	private static final String ERROR_PREFIX_STATIC = " is annotated using the " 
 		+ ActiveObject.class.getSimpleName() + " annotation.\n";
 	
@@ -104,9 +101,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		
 		ERROR_PREFIX = classDeclaration.getSimpleName() + ERROR_PREFIX_STATIC;
 		
-		testModifiers(classDeclaration);
-		
-		testTypes(classDeclaration);
+		testClassModifiers(classDeclaration);
 		
 		if (!hasNoArgConstructor(classDeclaration)) {
 			reportError(classDeclaration, ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE);
@@ -116,56 +111,58 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 			reportWarning(classDeclaration, ErrorMessages.NO_SERIALIZABLE_ERROR_MESSAGE);
 		}
 		
-		super.visitClassDeclaration(classDeclaration);
-		
-	}
-
-	/*
-	 * test whether the types for the members of the class are reifiable - 
-	 * return and parameter types for methods, types for fields 
-	 */
-	private void testTypes(ClassDeclaration classDeclaration) {
-
-		// test the fields
-		Collection<FieldDeclaration> fields = classDeclaration.getFields();
-		for (FieldDeclaration fieldDeclaration : fields) {
-			testFieldType(fieldDeclaration);
-		}
-		// test the methods
-		
+		// super.visitClassDeclaration(classDeclaration);
+		// visit the subcomponents of this class
+		// this should have been already provided by the MirrorAPI. bad API, bad! :P
 		Collection<MethodDeclaration> methods = classDeclaration.getMethods();
 		for (MethodDeclaration methodDeclaration : methods) {
-			testMethodTypes(methodDeclaration);
+			methodDeclaration.accept(this);
+		}
+		
+		Collection<FieldDeclaration> fields = classDeclaration.getFields();
+		for (FieldDeclaration fieldDeclaration : fields) {
+			fieldDeclaration.accept(this);
 		}
 		
 	}
-
-
-	private void testMethodTypes(MethodDeclaration methodDeclaration) {
+	
+	@Override
+	public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
+		
+		testMethodModifiers(methodDeclaration);
+		
+		checkReturnType(methodDeclaration);
+		
+		super.visitMethodDeclaration(methodDeclaration);
+	}
+	
+	@Override
+	public void visitFieldDeclaration(FieldDeclaration fieldDeclaration) {
+		
+		testFieldModifiers(fieldDeclaration);
+		
+		super.visitFieldDeclaration(fieldDeclaration);
+	}
+	
+	/*
+	 * Test if the return type of the method can be made a Future Object
+	 * @return: true , is the class cannot be an active object
+	 * 			false, if the object can be an active object
+	 */
+	private boolean checkReturnType( MethodDeclaration methodDeclaration ) {
+		// check the return type
 		TypeMirror returnType = methodDeclaration.getReturnType();
 		if( !isReifiable(returnType) ){
 			reportError( methodDeclaration, returnType + ErrorMessages.RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE );
+			return false;
 		}
+		return true;
 	}
-
-
-	/*
-	 * test whether the type of the field specified is reifiable ?
-	 */
-	private void testFieldType(FieldDeclaration fieldDeclaration) {
-		// TODO
-		/*
-		TypeMirror fieldType = fieldDeclaration.getType(); 
-		if( !isReifiable(fieldType) ) {
-			reportError( fieldDeclaration, fieldType + TYPE_NOT_REIFIABLE_ERROR_MESSAGE );
-		}
-		*/
-	}
-
 
 	/*
 	 * Tests whether a given type is reifiable or not.
 	 * The notion of "reifiable type" is given in the ProActive manual
+	 * @return : true if reifiable, false else
 	 */
 	private boolean isReifiable(TypeMirror type) {
 		if( type instanceof VoidType ) {
@@ -184,46 +181,25 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 			// must check whether it is reifiable or not
 			ClassType classType = (ClassType)type;
 			// must fulfill the same prereqs as an Active Object
-			testModifiers(classType.getDeclaration());
+			testFutureObject(classType.getDeclaration());
 		}
 		return true;
 	}
-
-
+	
 	/*
-	 * test errors related to the modifiers applied 
-	 * to the class and its members
-	 */
-	private void testModifiers(ClassDeclaration classDeclaration) {
-		// class definition modifiers
-		testClassModifiers(classDeclaration);
-		// test the modifiers of all members of the class
-		testMemberModifiers(classDeclaration);
-	}
-
-	/*
-	 * test the modifiers of the members(fields or methods)
-	 * of the class represented by the given ClassDeclaration
-	 * the modifiers:
-	 * 		- must not be final
-	 * 		- must not be synchronized
+	 * Test whether the object defined by the given class declaration 
+	 * can be the type of a ProActive Future
+	 * TODO what are the prereqs?
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
-	private void testMemberModifiers(ClassDeclaration classDeclaration) {
-
-		// test the fields
-		Collection<FieldDeclaration> fields = classDeclaration.getFields();
-		for (FieldDeclaration fieldDeclaration : fields) {
-			testFieldModifiers(fieldDeclaration);
-		}
+	private boolean testFutureObject(ClassDeclaration classDeclaration) {
+		// test the modifiers
+		boolean ret = testClassModifiers(classDeclaration);
+		// test the contained fields and methods
+		super.visitClassDeclaration(classDeclaration);
 		
-		// test the methods
-		Collection<MethodDeclaration> methods = classDeclaration.getMethods();
-		for (MethodDeclaration methodDeclaration : methods) {
-			testMethodModifiers(methodDeclaration);
-		}
-		
+		return ret;
 	}
 
 	/*
@@ -233,27 +209,30 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
-	private void testClassModifiers(ClassDeclaration classDeclaration) {
+	private boolean testClassModifiers(ClassDeclaration classDeclaration) {
 		Collection<Modifier> modifiers = classDeclaration.getModifiers();
 		
 		for (Modifier modifier : modifiers) {
 			if (modifier.equals(Modifier.FINAL)) {
 				reportError(classDeclaration, ErrorMessages.IS_FINAL_ERROR_MESSAGE);
+				return false;
 			}
 			if(modifier.equals(Modifier.PRIVATE) || modifier.equals(Modifier.PROTECTED)){
 				reportError(classDeclaration, ErrorMessages.IS_NOT_PUBLIC_ERROR_MESSAGE);
+				return false;
 			}
 		}
+		return true;
 	}
 	
 	/*
 	 * test the modifiers of a FieldDeclaration
-	 * 		- must not be final
 	 * 		- should not be volatile
+	 * 		- if public, should have getters/setters for accessing the value
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
-	private void testFieldModifiers(FieldDeclaration fieldDeclaration) {
+	private boolean testFieldModifiers(FieldDeclaration fieldDeclaration) {
 		Collection<Modifier> modifiers = fieldDeclaration.getModifiers();
 		
 		for (Modifier modifier : modifiers) {
@@ -261,6 +240,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 				reportError(fieldDeclaration, "The class declares the volatile field " 
 						+ fieldDeclaration.getSimpleName() + ".\n" 
 							+ ErrorMessages.HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
+				return false;
 			}
 			if (modifier.equals(Modifier.PUBLIC)) {
 				if( !checkGettersSetters(fieldDeclaration.getSimpleName()) ) {
@@ -268,13 +248,17 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 							+ fieldDeclaration.getSimpleName() + ".\n" 
 								+ ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE );
 				}
+				return false;
 			}
 		}
+		
+		return true;
 	}
 	
 	/*
 	 * Test whether there are getters/setters defined for the given public field 
-	 * @param fieldName -> the name of the public field  
+	 * @return: true , is the class cannot be an active object
+	 * 			false, if the object can be an active object
 	 */
 	private boolean checkGettersSetters(String fieldName) {
 		
@@ -319,7 +303,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
-	private void testMethodModifiers(MethodDeclaration methodDeclaration) {
+	private boolean testMethodModifiers(MethodDeclaration methodDeclaration) {
 		Collection<Modifier> modifiers = methodDeclaration.getModifiers();
 		
 		for (Modifier modifier : modifiers) {
@@ -327,17 +311,23 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 				reportError(methodDeclaration, " The class declares the final method " 
 						+ methodDeclaration.getSimpleName() + ".\n" 
 							+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE );
+				return false;
 			}
 			if(modifier.equals(Modifier.SYNCHRONIZED)){
 				reportError(methodDeclaration, "The class declares the synchronized method " 
 						+ methodDeclaration.getSimpleName() + ".\n" 
 							+ ErrorMessages.HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
+				return false;
 			}
 		}
+		
+		return true;
 	}
 	
-	/**
+	/*
 	 * test whether a class implements the serializable interface
+	 * @return: true , is the class cannot be an active object
+	 * 			false, if the object can be an active object
 	 */
 	private boolean implementsSerializable(ClassDeclaration classDeclaration) {
 		
@@ -355,8 +345,10 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	}
 
 
-	/**
+	/*
 	 * test whether a class has a no-arg constructor
+	 * @return: true , is the class cannot be an active object
+	 * 			false, if the object can be an active object
 	 */
 	private boolean hasNoArgConstructor(ClassDeclaration classDeclaration) {
 		
