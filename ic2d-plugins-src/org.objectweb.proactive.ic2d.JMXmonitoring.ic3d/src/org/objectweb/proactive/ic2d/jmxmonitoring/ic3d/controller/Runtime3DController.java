@@ -16,19 +16,19 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Runtime3D;
  *
  */
 public class Runtime3DController extends AbstractRuntime3DController {
-    public Runtime3DController(AbstractData modelObject,
-        AbstractFigure3D figure3D, AbstractFigure3DController parent) {
+    public Runtime3DController(AbstractData modelObject, AbstractFigure3D figure3D,
+            AbstractFigure3DController parent) {
         super(modelObject, figure3D, parent);
         // TODO Auto-generated constructor stub
     }
+
     /*
      * (non-Javadoc)
      *
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createChildController(org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData)
      */
     @Override
-    protected AbstractFigure3DController createChildController(
-        AbstractData modelObject) {
+    protected AbstractFigure3DController createChildController(AbstractData modelObject) {
         return new Node3DController(modelObject, getFigure(), this);
     }
 

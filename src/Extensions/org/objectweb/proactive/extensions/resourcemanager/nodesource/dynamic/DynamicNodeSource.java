@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -51,6 +50,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
@@ -392,7 +392,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
      * @throws AddingNodesException always.
      */
     @Override
-    public void addNodes(ProActiveDescriptor pad) throws AddingNodesException {
+    public void addNodes(GCMApplication app) throws AddingNodesException {
         throw new AddingNodesException("Node source : " + this.SourceId +
             " Node cannot be added to a dynamic source");
     }

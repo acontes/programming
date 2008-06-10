@@ -14,8 +14,7 @@ import com.sun.j3d.utils.behaviors.mouse.MouseBehaviorCallback;
  * @author vjuresch
  *
  */
-public abstract class AbstractWidget extends Shape3D
-    implements MouseBehaviorCallback {
+public abstract class AbstractWidget extends Shape3D implements MouseBehaviorCallback {
     // beh
     /*
      * (non-Javadoc)

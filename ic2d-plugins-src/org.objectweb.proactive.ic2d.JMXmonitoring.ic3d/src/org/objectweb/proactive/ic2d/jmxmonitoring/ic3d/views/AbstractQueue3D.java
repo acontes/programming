@@ -10,11 +10,11 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
  */
 public abstract class AbstractQueue3D extends AbstractFigure3D {
 
-	/**
-	 * @param name
-	 */
-	public AbstractQueue3D(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * @param name
+     */
+    public AbstractQueue3D(String name) {
+        super(name);
+        // TODO Auto-generated constructor stub
+    }
 }

@@ -19,8 +19,7 @@ public class TextureBasket {
     public static final BufferedImage kde = loadImage(path + "kde.png");
     public static final BufferedImage ao = loadImage(path + "ActiveObject.jpg");
     public static final BufferedImage node_border = loadImage(path + "node_skin.jpg");
-    public static final BufferedImage round_corners = loadImage(path +
-            "round_corners.png");
+    public static final BufferedImage round_corners = loadImage(path + "round_corners.png");
     public static final BufferedImage earth = loadImage(path + "EarthMap.jpg");
 
     private static BufferedImage loadImage(String fname) {
@@ -35,8 +34,7 @@ public class TextureBasket {
         // logger.setLevel(logLevel);
         // handler.setLevel(logLevel);
         // logger.addHandler(handler);
-        InputStream res = TextureBasket.class.getClassLoader()
-                                             .getResourceAsStream(fname);
+        InputStream res = TextureBasket.class.getClassLoader().getResourceAsStream(fname);
 
         BufferedImage bufferedImage;
         try {
@@ -44,8 +42,7 @@ public class TextureBasket {
             bufferedImage = (BufferedImage) ImageIO.read(res);
             return bufferedImage;
         } catch (Exception e) {
-            bufferedImage = new BufferedImage(100, 100,
-                    BufferedImage.TYPE_INT_RGB);
+            bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 
             System.out.println("Could not load resource from " + fname);
 

@@ -9,11 +9,11 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
  *
  */
 public abstract class AbstractGrid3D extends AbstractFigure3D {
-	/**
-	 * @param name - name of the figure, for a grid is usually empty 
-	 */
-	public AbstractGrid3D(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * @param name - name of the figure, for a grid is usually empty 
+     */
+    public AbstractGrid3D(String name) {
+        super(name);
+        // TODO Auto-generated constructor stub
+    }
 }

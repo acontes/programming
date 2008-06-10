@@ -177,8 +177,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 vnroe.activateProtocol(uri);
             }
         } catch (Exception e) {
-            GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
-            throw new ProActiveException(e);
+            throw new ProActiveException("Failed to create GCMApplication: " + e.getMessage() +
+                ", see embded message for more details", e);
         }
     }
 
@@ -239,9 +239,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
     }
 
-    public Topology getTopology() {
+    public Topology getTopology() throws ProActiveException {
         if (!virtualNodes.isEmpty())
-            throw new IllegalStateException("getTopology cannot be called if a VirtualNode is defined");
+            throw new ProActiveException("getTopology cannot be called if a VirtualNode is defined");
 
         // To not block other threads too long we make a snapshot of the node set
         Set<Node> nodesCopied;
@@ -275,9 +275,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return sb.toString();
     }
 
-    public void updateTopology(Topology topology) {
+    public void updateTopology(Topology topology) throws ProActiveException {
         if (!virtualNodes.isEmpty())
-            throw new IllegalStateException("updateTopology cannot be called if a VirtualNode is defined");
+            throw new ProActiveException("updateTopology cannot be called if a VirtualNode is defined");
 
         // To not block other threads too long we make a snapshot of the node set
         Set<Node> nodesCopied;

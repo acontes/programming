@@ -37,6 +37,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -103,8 +104,11 @@ public class RMUserImpl implements RMUser, InitActive {
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//localhost/" +
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
+                PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
                 RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
+        } catch (NodeException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -140,7 +144,20 @@ public class RMUserImpl implements RMUser, InitActive {
      * @return an array list of nodes.
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
-        return rmcore.getAtMostNodes(nbNodes, selectionScript);
+        return rmcore.getAtMostNodes(nbNodes, selectionScript, null);
+    }
+
+    /**
+     * Provides nbNodes nodes verifying a selection script AND an exclusion list of nodes.
+     * If the Resource manager (RM) don't have nb free nodes
+     * it returns the max of valid free nodes
+     * @param nbNodes the number of nodes.
+     * @param selectionScript : script to be verified by the returned nodes.
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
+     */
+    public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
+        return rmcore.getAtMostNodes(nbNodes, selectionScript, exclusion);
     }
 
     /**

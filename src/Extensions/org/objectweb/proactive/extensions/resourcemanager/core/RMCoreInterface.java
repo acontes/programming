@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.core;
 
-import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
@@ -47,6 +46,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
@@ -77,7 +77,7 @@ public interface RMCoreInterface {
     public void createStaticNodesource(List<ProActiveDescriptor> padList, String sourceName)
             throws RMException;
 
-    public void createGCMNodesource(File descriptorPad, String sourceName) throws RMException;
+    public void createGCMNodesource(GCMApplication GCMApp, String sourceName) throws RMException;
 
     /**
      * Creates a Dynamic Node source Active Object.
@@ -100,7 +100,7 @@ public interface RMCoreInterface {
      * @param sourceName name of an existing PADNodesource
      * @throws AddingNodesException if the NodeSource
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName) throws RMException;
+    public void addNodes(GCMApplication GCMApp, String sourceName) throws RMException;
 
     /**
      * Add nodes to the default static Node Source.
@@ -108,7 +108,7 @@ public interface RMCoreInterface {
      * nodes deployed will be added after to RMCore, by the NodeSource itself.
      * @param pad ProActiveDescriptor to deploy
      */
-    public void addNodes(ProActiveDescriptor pad);
+    public void addNodes(GCMApplication GCMApp);
 
     /**
      * Add a deployed node to the default static nodes source of the RM
@@ -165,17 +165,21 @@ public interface RMCoreInterface {
      * node left.<BR>
      * - If the script is a static script, it will return in priority the
      * nodes on which the given script has already been verified.<BR>
+     * - This will not returns node that are specified in the exclusion list.
      *
      * @param nb number of node to provide
      * @param selectionScript that nodes must verify
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript);
+    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion);
 
     /**
      * Returns an exactly number of nodes
      * not yet implemented.
      * @param nb exactly number of nodes to provide.
      * @param selectionScript  that nodes must verify.
+     * @return an array list of nodes.
      */
     public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript);
 

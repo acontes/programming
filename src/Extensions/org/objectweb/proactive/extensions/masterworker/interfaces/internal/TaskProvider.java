@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
+import org.objectweb.proactive.extensions.masterworker.core.IsClearingException;
+
 import java.io.Serializable;
 import java.util.Queue;
 
@@ -48,14 +50,28 @@ public interface TaskProvider<R extends Serializable> {
      * @param workerName the name of the worker which asks the tasks
      * @return a list of new tasks to compute
      */
-    Queue<TaskIntern<R>> getTasks(Worker worker, String workerName);
+    Queue<TaskIntern<R>> getTasks(Worker worker, String workerName, boolean reflooding);
 
     /**
-     * Returns the result of a task to the provider
+     * Returns the result of a task to the provider and ask for new ones
      * @param result the result of the completed task
      * @param workerName the name of the worker sending the result
      * @param reflooding that means the worker's stack is empty and it asks for a set a tasks bigger than one
      * @return a list of new tasks to compute
      */
     Queue<TaskIntern<R>> sendResultAndGetTasks(ResultIntern<R> result, String workerName, boolean reflooding);
+
+    /**
+     * Returns the result of a task to the provider
+     * @param result the result of the completed task
+     * @param workerName the name of the worker sending the result
+     */
+    boolean sendResult(ResultIntern<R> result, String workerName);
+
+    /**
+     * Callback function sent from the workers to the master to acknowledge
+     * That their activity is cleared
+     * @param worker worker sending the message
+     */
+    void isCleared(Worker worker);
 }

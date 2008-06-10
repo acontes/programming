@@ -25,7 +25,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
  *
  */
 public class Test extends JFrame {
-AbstractFigure3D grid;
+    AbstractFigure3D grid;
     /**
      *
      */
@@ -35,13 +35,14 @@ AbstractFigure3D grid;
      * @param args
      */
     public Test() {
-       // testMany();
-      // testFew();
-      testRandom();
-    	//testPicking();
+        // testMany();
+        // testFew();
+        testRandom();
+        //testPicking();
     }
-    private void testPicking(){
-    	setUpWindow();
+
+    private void testPicking() {
+        setUpWindow();
         Host3D pr = new Host3D("rmi://predadab.inria.fr");
         Host3D pu = new Host3D("rmi://puravida.inria.fr");
         Host3D ch = new Host3D("rmi://cheypa.inria.fr");
@@ -49,15 +50,15 @@ AbstractFigure3D grid;
         grid.addSubFigure("predadab", pr);
         grid.addSubFigure("puravida", pu);
         grid.addSubFigure("cheypa", ch);
-    
+
     }
+
     private void testRandom() {
         ArrayList<AbstractActiveObject3D> aos = new ArrayList<AbstractActiveObject3D>();
         setUpWindow();
 
         for (int i = 1; i < 30; i++)
-            grid.addSubFigure("Host : " + Integer.valueOf(i),
-                new Host3D("Host : " + Integer.valueOf(i)));
+            grid.addSubFigure("Host : " + Integer.valueOf(i), new Host3D("Host : " + Integer.valueOf(i)));
         int size = grid.getSubFigures().size();
         int pick;
         double chance;
@@ -70,25 +71,22 @@ AbstractFigure3D grid;
             chance = Math.random();
             //add a runtime with a probability
             if (chance > 0.351) {
-                picked.addSubFigure(new Double(chance).toString(),
-                    new Runtime3D(new Double(chance).toString()));
+                picked.addSubFigure(new Double(chance).toString(), new Runtime3D(new Double(chance)
+                        .toString()));
                 chance = Math.random();
                 //iterate over runtiems and add a node with a probability
                 for (String key : picked.getSubFigures().keySet())
                     if (chance > 0.01) {
                         Runtime3D run = (Runtime3D) picked.getSubFigure(key);
-                        run.addSubFigure(new Double(chance).toString(),
-                            new Node3D(new Double(chance).toString()));
+                        run.addSubFigure(new Double(chance).toString(), new Node3D(new Double(chance)
+                                .toString()));
                         chance = Math.random();
                         //iterate over nodes and  add a ao with a probability
                         for (String keyNode : run.getSubFigures().keySet()) {
                             if (chance > 0.01) {
-                                ActiveObject3D obiect = new ActiveObject3D(new Double(
-                                            chance).toString());
-                                Node3D nod = (Node3D) run.getSubFigures()
-                                                         .get(keyNode);
-                                nod.addSubFigure(new Double(chance).toString(),
-                                    obiect);
+                                ActiveObject3D obiect = new ActiveObject3D(new Double(chance).toString());
+                                Node3D nod = (Node3D) run.getSubFigures().get(keyNode);
+                                nod.addSubFigure(new Double(chance).toString(), obiect);
                                 aos.add(obiect);
                             }
                         }
@@ -104,52 +102,50 @@ AbstractFigure3D grid;
         final ArrayList<AbstractActiveObject3D> obiecte = new ArrayList<AbstractActiveObject3D>(aos);
         while (true) {
             new Thread(new Runnable() {
-                    public void run() {
-                        int a;
-                        int b;
-                        a = (int) Math.round(Math.random() * (aoNumber - 1));
-                        b = (int) Math.round(Math.random() * (aoNumber - 1));
+                public void run() {
+                    int a;
+                    int b;
+                    a = (int) Math.round(Math.random() * (aoNumber - 1));
+                    b = (int) Math.round(Math.random() * (aoNumber - 1));
 
-//                        grid.drawCommunication(UUID.randomUUID().toString(),
-//                            new Double(a).toString(),
-//                           Math.round(Math.random()*5), obiecte.get(a),
-//                            obiecte.get(b));
+                    //                        grid.drawCommunication(UUID.randomUUID().toString(),
+                    //                            new Double(a).toString(),
+                    //                           Math.round(Math.random()*5), obiecte.get(a),
+                    //                            obiecte.get(b));
 
-//                      grid.drawSphereArrow(new Double(Math.random()).toString(),
-//                      new Double(a).toString(),
-//                       5000, new Vector2d(Math.random()*2*Math.PI,Math.random()*Math.PI -Math.PI/2),
-//                       new Vector2d(Math.random()*2*Math.PI,Math.random()*Math.PI - Math.PI/2 ));
-//                        
-                    }
-                }).start();
+                    //                      grid.drawSphereArrow(new Double(Math.random()).toString(),
+                    //                      new Double(a).toString(),
+                    //                       5000, new Vector2d(Math.random()*2*Math.PI,Math.random()*Math.PI -Math.PI/2),
+                    //                       new Vector2d(Math.random()*2*Math.PI,Math.random()*Math.PI - Math.PI/2 ));
+                    //                        
+                }
+            }).start();
             try {
-				Thread.sleep(15);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
-//            grid.drawSphereArrow(new Double(Math.random()).toString(),
-//                    new Double(10000).toString(),
-//                     50000, new Vector2d(0,0),
-//                     new Vector2d(Math.PI,Math.PI/2));
-            
-        }  
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            //            grid.drawSphereArrow(new Double(Math.random()).toString(),
+            //                    new Double(10000).toString(),
+            //                     50000, new Vector2d(0,0),
+            //                     new Vector2d(Math.PI,Math.PI/2));
+
+        }
     }
 
     private void testMany() {
         setUpWindow();
 
         for (int i = 1; i < 50; i++) {
-        	grid.addSubFigure("Host :" + Integer.valueOf(i),
-                new Host3D("rmi://puravida.inria.fr"));
+            grid.addSubFigure("Host :" + Integer.valueOf(i), new Host3D("rmi://puravida.inria.fr"));
             for (int k = 1; k < 3; k++) {
-                grid.getSubFigure("Host :" + Integer.valueOf(i))
-                    .addSubFigure("cheie" + Integer.valueOf(k),
-                    new Runtime3D(Integer.valueOf(k).toString()));
+                grid.getSubFigure("Host :" + Integer.valueOf(i)).addSubFigure("cheie" + Integer.valueOf(k),
+                        new Runtime3D(Integer.valueOf(k).toString()));
                 for (int j = 1; j < 3; j++) {
-                    grid.getSubFigure("Host :" + new Integer(i).toString())
-                        .getSubFigure("cheie" + new Integer(k).toString())
-                        .addSubFigure("node:" + j, new Node3D("nodul"));
+                    grid.getSubFigure("Host :" + new Integer(i).toString()).getSubFigure(
+                            "cheie" + new Integer(k).toString()).addSubFigure("node:" + j,
+                            new Node3D("nodul"));
                 }
             }
         }
@@ -158,8 +154,8 @@ AbstractFigure3D grid;
     private void setUpWindow() {
         GridUniverse universe = new GridUniverse();
         grid = new EarthGrid3D("");
-     //   grid = new Grid3D();
-        universe.addGrid((AbstractGrid3D)grid);
+        //   grid = new Grid3D();
+        universe.addGrid((AbstractGrid3D) grid);
         //three views
         Canvas3D viewOne = universe.newView();
         Canvas3D viewTwo = universe.newView();
@@ -243,13 +239,10 @@ AbstractFigure3D grid;
         final ActiveObject3D o3 = new ActiveObject3D("032345678");
         final ActiveObject3D o4 = new ActiveObject3D("042345678");
         final ActiveObject3D o5 = new ActiveObject3D("o5234567823456789");
-        final ActiveObject3D o6 = new ActiveObject3D(
-                "o6234567892345678923456789");
+        final ActiveObject3D o6 = new ActiveObject3D("o6234567892345678923456789");
         final ActiveObject3D o7 = new ActiveObject3D("o72345678923456789");
-        final ActiveObject3D o8 = new ActiveObject3D(
-                "o8234567892345678923456789");
-        final ActiveObject3D o9 = new ActiveObject3D(
-                "o2345678923456789234567899");
+        final ActiveObject3D o8 = new ActiveObject3D("o8234567892345678923456789");
+        final ActiveObject3D o9 = new ActiveObject3D("o2345678923456789234567899");
         final ActiveObject3D o10 = new ActiveObject3D("o102345678923456789");
 
         //add runtimes
@@ -286,109 +279,106 @@ AbstractFigure3D grid;
         n1.addSubFigure("o9", o9);
         n1.addSubFigure("o10", o10);
 
-  //     n1.removeSubFigure("o10");
+        //     n1.removeSubFigure("o10");
         o1.setState(State.SERVING_REQUEST);
         o2.setState(State.MIGRATING);
         o3.setState(State.WAITING_FOR_REQUEST);
-        	o4.setState(State.UNKNOWN);
-        	try {
-				System.in.read();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        o4.setState(State.UNKNOWN);
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-        	while (true) {
-                    new Thread(new Runnable() {
-                            public void run() {
-                                int a;
-                                int b;
-                                ActiveObject3D start;
-                                ActiveObject3D stop;
-                                a = (int) Math.round(Math.random() * 7);
-                                b = (int) Math.round(Math.random() * 7);
-        
-                                switch (a) {
-                                case 1:
-                                    start = o1;
-                                    break;
-                                case 2:
-                                    start = o2;
-                                    break;
-                                case 3:
-                                    start = o3;
-                                    break;
-                                case 4:
-                                    start = o4;
-                                    break;
-                                case 5:
-                                    start = o5;
-                                    break;
-                                case 6:
-                                    start = o6;
-                                    break;
-                                case 7:
-                                    start = o7;
-                                    break;
-                                default:
-                                    start = o1;
-                                    break;
-                                }
-        
-                                switch (b) {
-                                case 1:
-                                    stop = o1;
-                                    break;
-                                case 2:
-                                    stop = o2;
-                                    break;
-                                case 3:
-                                    stop = o3;
-                                    break;
-                                case 4:
-                                    stop = o4;
-                                    break;
-                                case 5:
-                                    stop = o5;
-                                    break;
-                                case 6:
-                                    stop = o6;
-                                    break;
-                                case 7:
-                                    stop = o7;
-                                    break;
-                                default:
-                                    stop = o2;
-                                    break;
-                                }
-                                
+        while (true) {
+            new Thread(new Runnable() {
+                public void run() {
+                    int a;
+                    int b;
+                    ActiveObject3D start;
+                    ActiveObject3D stop;
+                    a = (int) Math.round(Math.random() * 7);
+                    b = (int) Math.round(Math.random() * 7);
 
-                                UUID cheie  = UUID.randomUUID();
-                                grid.drawCommunication(cheie.toString(),"",                                    
-                                    2, start, stop);
-                            }
-                        }).start();
-//                    try {
-//						Thread.sleep(3);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+                    switch (a) {
+                        case 1:
+                            start = o1;
+                            break;
+                        case 2:
+                            start = o2;
+                            break;
+                        case 3:
+                            start = o3;
+                            break;
+                        case 4:
+                            start = o4;
+                            break;
+                        case 5:
+                            start = o5;
+                            break;
+                        case 6:
+                            start = o6;
+                            break;
+                        case 7:
+                            start = o7;
+                            break;
+                        default:
+                            start = o1;
+                            break;
+                    }
 
-                    
-                    	o1.setQueueSize((int)Math.round(Math.random()*20+1));
-                    	o2.setQueueSize((int)Math.round(Math.random()*20+1));
-                    	o3.setQueueSize((int)Math.round(Math.random()*20+1));
-                    	o4.setQueueSize((int)Math.round(Math.random()*20+1));
-                    	o5.setQueueSize((int)Math.round(Math.random()*20+1));
-                    	o6.setQueueSize((int)Math.round(Math.random()*20+1));
-                    try {
-						Thread.sleep(10);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}	
+                    switch (b) {
+                        case 1:
+                            stop = o1;
+                            break;
+                        case 2:
+                            stop = o2;
+                            break;
+                        case 3:
+                            stop = o3;
+                            break;
+                        case 4:
+                            stop = o4;
+                            break;
+                        case 5:
+                            stop = o5;
+                            break;
+                        case 6:
+                            stop = o6;
+                            break;
+                        case 7:
+                            stop = o7;
+                            break;
+                        default:
+                            stop = o2;
+                            break;
+                    }
+
+                    UUID cheie = UUID.randomUUID();
+                    grid.drawCommunication(cheie.toString(), "", 2, start, stop);
                 }
+            }).start();
+            //                    try {
+            //						Thread.sleep(3);
+            //					} catch (InterruptedException e) {
+            //						// TODO Auto-generated catch block
+            //						e.printStackTrace();
+            //					}
+
+            o1.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o2.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o3.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o4.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o5.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o6.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
         //		grid.drawArrow("puravida",
         //					"runtime2", "nod9",
@@ -399,6 +389,6 @@ AbstractFigure3D grid;
 
     public static void main(String[] args) {
         Test test = new Test();
-        System.out.println("running test...");}
+        System.out.println("running test...");
     }
-
+}

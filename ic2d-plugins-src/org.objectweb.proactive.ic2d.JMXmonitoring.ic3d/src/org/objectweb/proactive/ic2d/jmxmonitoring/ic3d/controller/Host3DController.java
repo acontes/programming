@@ -18,11 +18,12 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Host3D;
  *
  */
 public class Host3DController extends AbstractHost3DController {
-    public Host3DController(AbstractData modelObject,
-        AbstractFigure3D figure3D, AbstractFigure3DController parent) {
+    public Host3DController(AbstractData modelObject, AbstractFigure3D figure3D,
+            AbstractFigure3DController parent) {
         super(modelObject, figure3D, parent);
         // TODO Auto-generated constructor stub
     }
+
     /*
      * (non-Javadoc)
      *
@@ -31,8 +32,8 @@ public class Host3DController extends AbstractHost3DController {
      */
     @Override
     protected AbstractFigure3D createFigure(String name) {
-//    	Logger.getRootLogger().log(Priority.INFO_INT, "Creating figure for host controller:"+name);
-    	return new Host3D(name);
+        //    	Logger.getRootLogger().log(Priority.INFO_INT, "Creating figure for host controller:"+name);
+        return new Host3D(name);
     }
 
     /*
@@ -46,8 +47,7 @@ public class Host3DController extends AbstractHost3DController {
     }
 
     @Override
-    protected AbstractFigure3DController createChildController(
-        AbstractData modelObject) {
+    protected AbstractFigure3DController createChildController(AbstractData modelObject) {
         return new Runtime3DController(modelObject, getFigure(), this);
     }
 }

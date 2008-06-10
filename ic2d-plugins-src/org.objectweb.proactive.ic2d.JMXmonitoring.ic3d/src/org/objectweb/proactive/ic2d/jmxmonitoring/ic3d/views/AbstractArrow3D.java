@@ -16,11 +16,12 @@ public abstract class AbstractArrow3D extends AbstractFigure3D {
         super(name);
         // TODO Auto-generated constructor stub
     }
+
     /**
      * Constructor that doesn't take any name for the arrow.
      * The name is an empty string.
      */
-    public AbstractArrow3D(){
-    	super("");
+    public AbstractArrow3D() {
+        super("");
     }
 }

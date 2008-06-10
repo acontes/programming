@@ -32,8 +32,6 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
 import java.io.IOException;
 import java.util.Map;
-import java.net.URISyntaxException;
-
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserConstants;
@@ -58,7 +56,7 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * @throws IOException
      * @throws SAXException
      */
-    public Map<String, NodeProvider> getNodeProviders() throws SAXException, IOException;
+    public Map<String, NodeProvider> getNodeProviders() throws Exception;
 
     /**
      * Returns all the Virtual Node
@@ -67,7 +65,7 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * @throws IOException
      * @throws SAXException
      */
-    public Map<String, GCMVirtualNodeInternal> getVirtualNodes() throws SAXException, IOException;
+    public Map<String, GCMVirtualNodeInternal> getVirtualNodes() throws Exception;
 
     /**
      * Returns the Command Builder
@@ -77,7 +75,7 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * @throws SAXException
      * @throws XPathExpressionException
      */
-    public CommandBuilder getCommandBuilder() throws XPathExpressionException, SAXException, IOException;
+    public CommandBuilder getCommandBuilder() throws Exception;
 
     /**
      * 

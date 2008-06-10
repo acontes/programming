@@ -10,8 +10,7 @@ public abstract class AbstractHost3D extends AbstractFigure3D {
     /**
      * @param name figure name to be displayed
      */
-	public AbstractHost3D(String name) {
+    public AbstractHost3D(String name) {
         super(name);
     }
 }
-

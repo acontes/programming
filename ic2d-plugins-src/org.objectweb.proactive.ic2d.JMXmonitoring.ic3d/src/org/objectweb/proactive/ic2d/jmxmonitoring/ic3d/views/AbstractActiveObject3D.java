@@ -2,6 +2,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
+
 /**
  * All representation of active objects should extend this
  * class.
@@ -49,23 +50,23 @@ public abstract class AbstractActiveObject3D extends AbstractFigure3D {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State)
      */
     @Override
-	public void setState(State state) {
+    public void setState(State state) {
         switch (state) {
-        case SERVING_REQUEST:
-            setStateServingRequest();
-            break;
-        case MIGRATING:
-            setStateMigrating();
-            break;
-        case ACTIVE:
-            setStateActive();
-            break;
-        case WAITING_FOR_REQUEST:
-            setStateWaitingForRequest();
-            break;
-        default:
-            this.setStateUnkown();
-            break;
+            case SERVING_REQUEST:
+                setStateServingRequest();
+                break;
+            case MIGRATING:
+                setStateMigrating();
+                break;
+            case ACTIVE:
+                setStateActive();
+                break;
+            case WAITING_FOR_REQUEST:
+                setStateWaitingForRequest();
+                break;
+            default:
+                this.setStateUnkown();
+                break;
         }
     }
 }

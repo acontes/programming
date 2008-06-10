@@ -1,6 +1,5 @@
 package org.objectweb.proactive.extensions.resourcemanager.nodesource.gcm;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,12 +7,9 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
@@ -26,7 +22,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 public class GCMNodeSource extends NodeSource {
 
     /** PADs list of pad handled by the source */
-    private HashMap<String, GCMApplication> listPad;
+    private HashMap<String, GCMApplication> listGCMApp;
 
     /** Stub of GCMNOde source AO 
      * bugFix GCMVirtualNode.subscribeNodeAttachment doesn't support AO stub */
@@ -41,7 +37,7 @@ public class GCMNodeSource extends NodeSource {
 
     public GCMNodeSource(String id, RMCoreSourceInterface rmCore) {
         super(id, rmCore);
-        listPad = new HashMap<String, GCMApplication>();
+        listGCMApp = new HashMap<String, GCMApplication>();
     }
 
     public void initActivity(Body body) {
@@ -106,21 +102,8 @@ public class GCMNodeSource extends NodeSource {
         }
     }
 
-    @Override
-    public void addNodes(ProActiveDescriptor descriptorPad) throws AddingNodesException {
-        throw new AddingNodesException("Node source : " + this.SourceId + " Cannot add PAD to GCMNodeSource");
-    }
-
-    public void addNodes(File descriptorPad) throws AddingNodesException {
-        GCMApplication desc;
-        try {
-            desc = PAGCMDeployment.loadApplicationDescriptor(descriptorPad);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-            throw new AddingNodesException(e);
-        }
-
-        Map<String, GCMVirtualNode> virtualNodes = desc.getVirtualNodes();
+    public void addNodes(GCMApplication app) throws AddingNodesException {
+        Map<String, GCMVirtualNode> virtualNodes = app.getVirtualNodes();
         for (Entry<String, GCMVirtualNode> entry : virtualNodes.entrySet()) {
             try {
                 entry.getValue().subscribeNodeAttachment(this, "receiveDeployedNode", true);
@@ -128,9 +111,8 @@ public class GCMNodeSource extends NodeSource {
                 e.printStackTrace();
             }
         }
-
-        desc.startDeployment();
-        this.listPad.put(desc.toString(), desc);
+        app.startDeployment();
+        this.listGCMApp.put(app.toString(), app);
     }
 
     /**

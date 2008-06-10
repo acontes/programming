@@ -20,8 +20,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Grid3D;
  *
  */
 public class Grid3DController extends AbstractGrid3DController {
-    public Grid3DController(AbstractData modelObject,
-        AbstractFigure3D figure3D, AbstractFigure3DController parent) {
+    public Grid3DController(AbstractData modelObject, AbstractFigure3D figure3D,
+            AbstractFigure3DController parent) {
         super(modelObject, figure3D, parent);
         // TODO Auto-generated constructor stub
     }

@@ -32,17 +32,11 @@ package unitTests.gcmdeployment.descriptorParser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
@@ -54,7 +48,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbu
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderScript;
 import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 
 public class TestApplicationDescriptorParser {
@@ -65,8 +58,7 @@ public class TestApplicationDescriptorParser {
             "script6.xml" };
 
     @Test
-    public void test() throws IOException, XPathExpressionException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void test() throws Exception {
         descloop: for (File descriptor : getApplicationDescriptors()) {
             for (String skipIt : skipDescriptors) {
                 if (descriptor.toString().contains(skipIt))
@@ -100,7 +92,7 @@ public class TestApplicationDescriptorParser {
 
         @Override
         public void parseApplicationNode(Node paNode, GCMApplicationParser applicationParser, XPath xpath)
-                throws XPathExpressionException, SAXException, IOException {
+                throws Exception {
             super.parseApplicationNode(paNode, applicationParser, xpath);
 
             System.out.println("User Application Parser - someattr value = " +
@@ -114,8 +106,7 @@ public class TestApplicationDescriptorParser {
     }
 
     //    @Test
-    public void userSchemaTest() throws IOException, XPathExpressionException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void userSchemaTest() throws Exception {
         for (File file : getApplicationDescriptors()) {
             if (!file.toString().contains("script_ext")) {
                 continue;
@@ -165,37 +156,27 @@ public class TestApplicationDescriptorParser {
         return ret;
     }
 
-    @Test(expected = SAXException.class)
-    public void validationTest() throws XPathExpressionException, TransformerException,
-            ParserConfigurationException, SAXException {
+    @Test(expected = Exception.class)
+    public void validationTest() throws Exception {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/scriptInvalid.xml");
     }
 
-    @Test(expected = SAXException.class)
-    public void validationOldSchemaTest() throws XPathExpressionException, TransformerException,
-            ParserConfigurationException, SAXException {
+    @Test(expected = Exception.class)
+    public void validationOldSchemaTest() throws Exception {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/oldDescriptor.xml");
     }
 
-    @Test(expected = SAXException.class)
-    public void validationBrokenXMLTest() throws XPathExpressionException, TransformerException,
-            ParserConfigurationException, SAXException {
+    @Test(expected = Exception.class)
+    public void validationBrokenXMLTest() throws Exception {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/script6.xml");
     }
 
-    protected void validationGenericTest(String desc) throws XPathExpressionException, TransformerException,
-            ParserConfigurationException, SAXException {
+    protected void validationGenericTest(String desc) throws Exception {
         File descriptor = new File(this.getClass().getResource(desc).getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
 
-        try {
-            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(descriptor),
-                null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        }
+        GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(descriptor), null);
     }
 
 }

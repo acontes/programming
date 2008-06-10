@@ -4,10 +4,10 @@ import java.io.File;
 
 import org.junit.Before;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
+import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
-
 import functionalTests.FunctionalTest;
 import functionalTests.descriptor.variablecontract.javapropertiesDescriptor.Test;
 
@@ -19,7 +19,7 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     protected RMMonitoring monitor;
 
     private static String defaultDescriptor = Test.class.getResource(
-            "/functionalTests/resourcemanager/GCMNodeSourceApplication.xml").getPath();
+            "/functionalTests/resourcemanager/GCMNodeSourceDeployment.xml").getPath();
     public int defaultDescriptorNodesNb = 5;
 
     @Before
@@ -31,6 +31,8 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     }
 
     public void deployDefault() throws Exception {
-        admin.createGCMNodesource(new File(defaultDescriptor), "GCM_Node_Source");
+        //admin.createGCMNodesource(new File(defaultDescriptor), "GCM_Node_Source");
+        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
+        admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
     }
 }
