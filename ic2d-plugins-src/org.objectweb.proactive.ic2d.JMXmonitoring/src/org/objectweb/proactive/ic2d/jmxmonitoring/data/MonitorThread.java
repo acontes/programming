@@ -204,7 +204,7 @@ public class MonitorThread implements Observer {
                     Console
                             .getInstance(Activator.CONSOLE_NAME)
                             .err(
-                                    "Refresh could not be performed. See logged errors for more details. Make shure the same ProActive version is used for IC2D and all monitored ressources.");
+                                    "Refresh could not be performed. See logged errors for more details. Make sure the same ProActive version is used for IC2D and all monitored ressources.");
                 }
 
                 try {
