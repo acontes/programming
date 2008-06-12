@@ -3,7 +3,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
 import javax.media.j3d.Appearance;
@@ -17,7 +16,6 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
@@ -32,7 +30,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
  */
 public abstract class AbstractFigure3D extends Shape3D {
 
-    static Logger logger = Logger.getLogger(AbstractFigure3D.class.getName());
+    private final static Logger logger = Logger.getLogger(AbstractFigure3D.class.getName());
 
     /**
      * Contains the list of subFigures for this figure.
@@ -43,10 +41,9 @@ public abstract class AbstractFigure3D extends Shape3D {
      */
     private Hashtable<String, AbstractFigure3D> arrows = new Hashtable<String, AbstractFigure3D>();
     /**
-     * Timer for the threads specified to run as a daemon so as not to keep the
-     * application running.
+     * Timer for the threads specified to run as a daemon so as not to block the application
      */
-    private Timer arrowTimer = new Timer(true);
+    private Timer arrowTimer = new Timer();
     /**
      * This name will be displayed according to the formatting chosen through
      * createTextBranch() from the TextStyleBasket class
@@ -54,16 +51,13 @@ public abstract class AbstractFigure3D extends Shape3D {
     private String name = "";
     private Geometry voGeometry; // geometry of the figure
     private Appearance voAppearance; // appearance of the figure
-    private Level logLevel = Level.OFF;
-    // private Logger logger = Logger.getLogger(
-    // "org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.views");
-    // private static ConsoleHandler handler = new ConsoleHandler();
     /**
      * The figureBranch and the subFiguresBranch connect to the rootBranch.
      */
     private BranchGroup rootBranch;
     /**
-     * The figureBranch contains the actual Shape3D for this figure.
+     * The figureBranch connects to the rootBranch
+     * and has the translation and scale transform group connected to it.
      */
     private BranchGroup figureBranch;
     /**
@@ -71,7 +65,7 @@ public abstract class AbstractFigure3D extends Shape3D {
      */
     private BranchGroup subFiguresBranch;
 
-    private TransformGroup rootTrans;
+    private TransformGroup translateScaleTrans;
 
     private TransformGroup rotTrans;
 
@@ -173,7 +167,7 @@ public abstract class AbstractFigure3D extends Shape3D {
      *            The figure name to be displayed.
      */
     public AbstractFigure3D(String name) {
-        logger.info("Starting figure creation...");
+        logger.debug("Starting figure creation...");
         // logger.log(Level.FINE, "Setting appearance and geometry...");
         // initialize logger
         // loggersetLevel(logLevel);
@@ -226,10 +220,10 @@ public abstract class AbstractFigure3D extends Shape3D {
         // rootBranch.addChild(subFiguresBranch);
 
         rootBranch.addChild(figureBranch);
-        rootTrans = createTransform();
+        translateScaleTrans = createTransform();
         rotTrans = createTransform();
         // connect the rotation transform to the translation transform
-        rootTrans.addChild(rotTrans);
+        translateScaleTrans.addChild(rotTrans);
         // add the text to the rotation Transform
         rotTrans.addChild(createTextBranch());
         // add this figure to the rotation transform
@@ -239,10 +233,10 @@ public abstract class AbstractFigure3D extends Shape3D {
         rotTrans.addChild(subFiguresBranch);
 
         // connect the transforms to the figure branch
-        figureBranch.addChild(rootTrans);
+        figureBranch.addChild(translateScaleTrans);
         // optimize
         rootBranch.compile();
-        logger.info("Figure created");
+        logger.debug("Figure created");
     }
 
     /**
@@ -257,7 +251,7 @@ public abstract class AbstractFigure3D extends Shape3D {
      * removeSubFigure(AbstractFigure3D figure) for each subfigure.
      */
     public void removeAllSubFigures() {
-        // loggerlog(Level.FINE, "Removing all subfigures...");
+        logger.debug("Removing all subfigures...");
         while (!figures.isEmpty())
             removeSubFigure(figures.keys().nextElement());
     }
@@ -420,7 +414,12 @@ public abstract class AbstractFigure3D extends Shape3D {
         // tell the subfigure to remove all the subsubfigures
         figure.removeAllSubFigures();
         generalBranch.detach();
-        superBranch.removeChild(generalBranch);
+        //superBranch.removeAllChildren();
+        System.out.println(superBranch);
+        //FIXME  - superBranch should never be null !!!!
+        if (superBranch!=null){
+        	superBranch.removeChild(generalBranch);
+        }
         // remove from the hashtable
         figures.values().remove(figure);
         arrangeSubFigures();
@@ -434,10 +433,9 @@ public abstract class AbstractFigure3D extends Shape3D {
     }
 
     /**
-     * @return the BranchGroup immediate bellow the root branch (the BranchGroup
-     *         to which the actual shape is connected).
+     * @return the BranchGroup  to which the actual shape is connected
      */
-    public BranchGroup getParticularBranch() {
+    public BranchGroup getFigureBranch() {
         return figureBranch;
     }
 
@@ -493,7 +491,7 @@ public abstract class AbstractFigure3D extends Shape3D {
             }
         };
         // start the timer
-        arrowTimer.schedule(arrowDestruction, timeToLive);
+        arrowTimer.schedule(arrowDestruction, 0);
     }
 
     /**
@@ -519,8 +517,8 @@ public abstract class AbstractFigure3D extends Shape3D {
         arrows.remove(key);
     }
 
-    public TransformGroup getRootTransform() {
-        return rootTrans;
+    public TransformGroup getTranslateScaleTransform() {
+        return translateScaleTrans;
     }
 
     public TransformGroup getRotationTransform() {
