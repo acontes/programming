@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.annotation;
 
+import org.objectweb.proactive.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.annotation.migration.MigrationSignal;
+
 /**
  * This interface centralizes all the error messages reported by the annotation processors
  * @author fabratu
@@ -43,6 +46,7 @@ public abstract interface ErrorMessages {
 	 * errors related to ActiveObject conforming rules
 	 */ 
 	
+	// @ActiveObject
 	// the class doesn't have a no-arg constructor
 	public static final String NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE = "This object does not define a no-arg constructor. " +
 	"An active object must have a no-arg constructor.\n";
@@ -63,5 +67,15 @@ public abstract interface ErrorMessages {
 	// a method of the class returns null
 	public static final String NO_NULL_RETURN_ERROR_MSG = "A method of an active object should not return null," +
 	" as the caller cannot check the future value against the null literal";
-
+	
+	// @MigrationSignal
+	// the annotation is not used inside an Active Object class declaration
+	public static final String NOT_IN_ACTIVE_OBJECT_ERROR_MESSAGE = "The " + MigrationSignal.class.getName() + " annotation has no sense outside an active object.\n" +
+			"If you think about using the enclosing class as an active object, maybe you should annotate it with " + ActiveObject.class.getName() + "\n";
+	// the migration method is not public
+	public static final String NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE = " The method is not public. It does not make sense to have a migration signal that cannot be used from outside the class definition.\n";
+	// the migrateTo call is not the last one in the method
+	public static final String MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE = " The migrateTo call is not the last statement in the body of the method.\nThis can cause undefined behaviour. You should put your migrateTo call at the end of the method.\n";
+	// the migrateTo call can not be found in the migrateTo method
+	public static final String MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE = " The migrateTo call could not be found inside the body of the method.\n ";
 }

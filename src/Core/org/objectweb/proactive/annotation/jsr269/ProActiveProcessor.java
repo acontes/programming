@@ -39,8 +39,13 @@ import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
+
+import org.objectweb.proactive.annotation.migration.MigrationSignalVisitor;
+
 
 import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
@@ -54,12 +59,20 @@ import com.sun.source.util.Trees;
  * @since ProActive 3.90
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-//cannot use ActiveObject.class.getName() the value must be a constant expression BLEAH!
-@SupportedAnnotationTypes("org.objectweb.proactive.annotation.activeobject.ActiveObject") 
+//cannot use ${Annotation}.class.getName() the value must be a constant expression BLEAH!
+@SupportedAnnotationTypes(
+		{
+			"org.objectweb.proactive.annotation.activeobject.ActiveObject",
+			"org.objectweb.proactive.annotation.migration.MigrationSignal"
+		}
+	) 
 @SupportedOptions("enableTypeGenerationInEditor")
 public class ProActiveProcessor extends AbstractProcessor {
+
 	
-	private boolean claimedMyAnnotations = false;
+	// because of BLEAH, absurdities continue...
+	private static final String ACTIVE_OBJECT_ANNOTATION = "org.objectweb.proactive.annotation.activeobject.ActiveObject";
+	private static final String MIGRATION_SIGNAL_ANNOTATION = "org.objectweb.proactive.annotation.migration.MigrationSignal"; 
 	
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations,
@@ -70,33 +83,60 @@ public class ProActiveProcessor extends AbstractProcessor {
 			return true;
 		}
 		
-		// if the prevoius round we processed our annotations, then return true
-		if(claimedMyAnnotations)
-			return true;
-		else 
-			claimedMyAnnotations = true;
-
-		
-		TypeElement proActiveAnotElement = annotations.iterator().next();
-		// this hack is needed if cannot use the @SupportedAnnotation; 
-		// just put * and check what is our annotation
-		/*for (TypeElement typeElement : annotations) {
-			if( typeElement.getQualifiedName().toString().equals("ActiveObject") ){
-				proActiveAnotElement = typeElement;
-				break;
+		for (TypeElement annotationElement : annotations) {
+			if ( annotationElement.getQualifiedName().toString().equals(ACTIVE_OBJECT_ANNOTATION) ) {
+				processActiveObjectAnnotation(roundEnv, annotationElement);
+			} else
+			if ( annotationElement.getQualifiedName().toString().equals(MIGRATION_SIGNAL_ANNOTATION) ) {
+				processMigrationSignalAnnotation(roundEnv, annotationElement);
 			}
-		}*/
-
+		}
+		
+		return true;
+	}
+	
+	private void processMigrationSignalAnnotation(RoundEnvironment roundEnv,
+			TypeElement migrartionSignalAnnotationElem) {
+		
 		// initialisation stuff		
 		Trees trees = Trees.instance(processingEnv);
 		Messager messager = processingEnv.getMessager();
-		ProActiveVisitor visitor = new ProActiveVisitor(messager);
+		MigrationSignalVisitor visitor = new MigrationSignalVisitor(messager);
+		
+		Set<? extends Element> annotatedElements = 
+			roundEnv.getElementsAnnotatedWith(migrartionSignalAnnotationElem);
+		for( Element element : annotatedElements ) {
+			
+			if ( !((element instanceof ExecutableElement) && (element.getKind().equals(ElementKind.METHOD)) ) ) {
+				messager.printMessage(Diagnostic.Kind.ERROR	, 
+						"The @MigrationSignal annotation can only be used on method definitions" , 
+							element );
+				// carry on with the next annotated element
+				continue;
+			}
+			
+			ExecutableElement methodElement = (ExecutableElement)element;
+			TreePath methodTree = trees.getPath(methodElement);
+			
+			// let's visit this tree!
+			visitor.scan( methodTree , trees);
+		}
+		
+	}
+
+	private void processActiveObjectAnnotation(RoundEnvironment roundEnv,
+			TypeElement proActiveAnotElement) {
+		
+		// initialisation stuff		
+		Trees trees = Trees.instance(processingEnv);
+		Messager messager = processingEnv.getMessager();
+		ActiveObjectVisitor visitor = new ActiveObjectVisitor(messager);
 		
 		Set<? extends Element> annotatedElements = 
 			roundEnv.getElementsAnnotatedWith(proActiveAnotElement);
 		for( Element element : annotatedElements ) {
-			// scan the nodes on the tree recursively
-			if ( !(element instanceof TypeElement) ) {
+			
+			if ( !((element instanceof TypeElement) && (element.getKind().isClass()) ) ) {
 				messager.printMessage(Diagnostic.Kind.ERROR	, 
 						"The @ActiveObject annotation can only be used on class definitions" , 
 							element );
@@ -110,8 +150,6 @@ public class ProActiveProcessor extends AbstractProcessor {
 			// let's visit this tree!
 			visitor.scan( clazzTree , trees);
 		}
-		
-		return false;
 	}
 	
 }
