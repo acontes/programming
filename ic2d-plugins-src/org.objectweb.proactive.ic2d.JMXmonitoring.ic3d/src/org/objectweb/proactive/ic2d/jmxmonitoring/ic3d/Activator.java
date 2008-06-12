@@ -2,6 +2,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d;
 
 import java.util.Set;
 
+import org.apache.log4j.BasicConfigurator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ModelRecorder;
 import org.osgi.framework.BundleContext;
@@ -32,6 +33,7 @@ public class Activator extends AbstractUIPlugin {
 
         super.start(context);
         plugin = this;
+        BasicConfigurator.configure();
     }
 
     /*
