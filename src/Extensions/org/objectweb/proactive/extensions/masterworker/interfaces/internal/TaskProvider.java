@@ -30,10 +30,11 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
-import org.objectweb.proactive.extensions.masterworker.core.IsClearingException;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import java.io.Serializable;
 import java.util.Queue;
+import java.util.List;
 
 
 /**
@@ -65,8 +66,33 @@ public interface TaskProvider<R extends Serializable> {
      * Returns the result of a task to the provider
      * @param result the result of the completed task
      * @param workerName the name of the worker sending the result
+     * @return an aknowledgement (for synchronization)
      */
-    boolean sendResult(ResultIntern<R> result, String workerName);
+    BooleanWrapper sendResult(ResultIntern<R> result, String workerName);
+
+    /**
+    * Returns the results of several tasks at once to the provider
+    * @param results the results of the completed tasks
+    * @param workerName the name of the worker sending the result
+    * @return an aknowledgement (for synchronization)
+    */
+    BooleanWrapper sendResults(List<ResultIntern<R>> results, String workerName);
+
+    /**
+     * Returns the results of several tasks at once to the provider
+     * @param results the results of the completed tasks
+     * @param workerName the name of the worker sending the result
+     * @return an aknowledgement (for synchronization)
+     */
+    Queue<TaskIntern<R>> sendResultsAndGetTasks(List<ResultIntern<R>> results, String workerName,
+            boolean reflooding);
+
+    /**
+     * Happens when a worker has forwarded a task to another worker (to handle DivisibleTask)
+     * @param taskId id of the forwarded task
+     * @param newWorkerName name of the worker which now handles it
+     */
+    BooleanWrapper forwardedTask(Long taskId, String oldWorkerName, String newWorkerName);
 
     /**
      * Callback function sent from the workers to the master to acknowledge

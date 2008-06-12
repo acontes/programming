@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.chartit.editor;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
@@ -40,8 +43,9 @@ import org.objectweb.proactive.ic2d.chartit.Activator;
 import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceData;
 import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceDataBuilder;
-import org.objectweb.proactive.ic2d.chartit.editors.page.ChartsPage;
-import org.objectweb.proactive.ic2d.chartit.editors.page.OverviewPage;
+import org.objectweb.proactive.ic2d.chartit.editor.page.ChartsPage;
+import org.objectweb.proactive.ic2d.chartit.editor.page.OverviewPage;
+import org.objectweb.proactive.ic2d.console.Console;
 
 
 /**
@@ -134,13 +138,41 @@ public final class ChartItDataEditor extends FormEditor {
      * @param resourceDescriptor The descriptor of the resource
      * @throws PartInitException Thrown if the part can not be activated
      */
-    public static void openNewFromResourceData(final IResourceDescriptor resourceDescriptor)
+    public static ChartItDataEditor openNewFromResourceDescriptor(final IResourceDescriptor resourceDescriptor)
             throws PartInitException {
         // First create a resource data from descriptor
         final ResourceData resourceData = ResourceDataBuilder
                 .buildResourceDataFromDescriptor(resourceDescriptor);
         // Open an editor from
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-                new ChartItDataEditorInput(resourceData), ChartItDataEditor.ID, true);
+        return (ChartItDataEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                .openEditor(new ChartItDataEditorInput(resourceData), ChartItDataEditor.ID, true);
+    }
+
+    /**
+     * Opens a new ChartItEditor associated with a resourceDescriptor.
+     * And loads a configuration from a specified file.
+     * 
+     * @param resourceDescriptor The descriptor of the resource
+     * @param configFilename The name of the file containing the configuration
+     * @throws PartInitException Thrown if the part can not be activated
+     */
+    public static ChartItDataEditor openNewFromResourceDescriptor(
+            final IResourceDescriptor resourceDescriptor, final String configFilename)
+            throws PartInitException {
+
+        // Locate default config file in 'config' directory of chartit plugin
+        final URL configURL = Activator.getDefault().getBundle().getEntry("config/" + configFilename);
+        final ChartItDataEditor editor = ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor);
+        // Get the overview page
+        final OverviewPage overviewPage = (OverviewPage) editor.getActivePageInstance();
+        try {
+            overviewPage.getChartsSW().loadConfigFromXML(FileLocator.toFileURL(configURL).getPath());
+        } catch (Exception e) {
+            Console.getInstance(Activator.CONSOLE_NAME).log(
+                    "Cannot locate the config file : " + configFilename +
+                        " in the config directory of ChartIt plugin !");
+        }
+
+        return editor;
     }
 }

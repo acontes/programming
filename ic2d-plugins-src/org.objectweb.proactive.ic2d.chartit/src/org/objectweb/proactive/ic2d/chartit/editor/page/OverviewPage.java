@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.editors.page;
+package org.objectweb.proactive.ic2d.chartit.editor.page;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -233,5 +233,13 @@ public final class OverviewPage extends FormPage {
      */
     public ChartItDataEditorInput getChartItDataEditorInput() {
         return (ChartItDataEditorInput) this.getEditorInput();
+    }
+
+    /**
+     * Returns an instance of the charts section wrapper. 
+     * @return An instance of the charts section wrapper
+     */
+    public ChartsSectionWrapper getChartsSW() {
+        return this.chartsSW;
     }
 }

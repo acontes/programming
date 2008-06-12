@@ -30,26 +30,15 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
-import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParser;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserExecutable;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserProactive;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
-import org.objectweb.proactive.extensions.gcmdeployment.environment.Environment;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -64,15 +53,27 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.IOException;
-import java.net.JarURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserExecutable;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserProactive;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
+import org.objectweb.proactive.extensions.gcmdeployment.environment.Environment;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 
 /*
@@ -92,7 +93,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_TECHNICAL_SERVICES = "app:technicalServices";
     private static final String XPATH_FILE = "app:file";
 
-    private static final String[] SUPPORTED_PROTOCOLS = { "file:", "http:", "http:", "https:", "jar:", "ftp:" };
+    private static final String[] SUPPORTED_PROTOCOLS = { "file", "http", "http", "https", "jar", "ftp" };
     public static final String ATTR_RP_CAPACITY = "capacity";
     protected URL descriptor;
     protected VariableContractImpl vContract;
@@ -223,15 +224,17 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 // We determine wether we have a Path or a URL
                 boolean schemeFound = false;
                 String protocolFound = null;
-                for (String scheme : SUPPORTED_PROTOCOLS) {
-                    if (path.startsWith(scheme)) {
-                        schemeFound = true;
-                        protocolFound = scheme;
-                        break;
+                if (path.indexOf(':') >= 0) {
+                    for (String scheme : SUPPORTED_PROTOCOLS) {
+                        if (path.toLowerCase().startsWith(scheme + ":")) {
+                            schemeFound = true;
+                            protocolFound = scheme;
+                            break;
+                        }
                     }
                 }
 
-                if (schemeFound && !protocolFound.equals("file:")) {
+                if (schemeFound && !protocolFound.equals("file")) {
                     // In case we have an url other than file:
                     fullURL = new URL(path);
                 } else {
@@ -271,7 +274,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 gcmdParams.setGCMDescriptor(fullURL);
                 gcmdParams.setVContract(vContract);
 
-                GCMDeploymentDescriptor gcmd = GCMDeploymentDescriptorFactory.createDescriptor(gcmdParams);
+                GCMDeploymentDescriptor gcmd = new GCMDeploymentDescriptorImpl(fullURL, vContract);
                 nodeProvider.addGCMDeploymentDescriptor(gcmd);
             }
 
