@@ -1,5 +1,7 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
+import java.util.UUID;
+
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
 import javax.media.j3d.RotationInterpolator;
@@ -49,7 +51,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
     public void setQueueSize(int size) {
         //TODO hacky, change
         if (noQueue) {
-            addSubFigure(new Double(Math.random()).toString(), queue);
+            addSubFigure(UUID.randomUUID().toString(), queue);
             noQueue = false;
 
         }
