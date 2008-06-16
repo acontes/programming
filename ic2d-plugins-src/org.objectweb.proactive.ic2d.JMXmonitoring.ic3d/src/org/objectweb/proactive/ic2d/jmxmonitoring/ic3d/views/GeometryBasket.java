@@ -2,6 +2,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import javax.media.j3d.Geometry;
 import javax.media.j3d.LineArray;
+import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import javax.vecmath.Tuple2d;
@@ -35,6 +36,9 @@ public class GeometryBasket {
     private static Geometry activeObjectGeometry = activeObjectGeometry();
     private static Geometry gridGeometry = gridGeometry();
     private static Geometry hostGeometry = hostGeometry();
+    private static Geometry alternateHostGeometry = alternateHostGeometry();
+    private static Geometry barMonitorGeometry = barMonitorGeometry();
+
     private static Geometry runtimeGeometry = runtimeGeometry();
     private static Geometry coordinatesGeometry = coordinatesGeometry();
     private static Geometry queueGeometry = queueGeometry();
@@ -45,14 +49,14 @@ public class GeometryBasket {
     private static Geometry nodeGeometry() {
         //-------------GEOMETRY POINTS--------------
         Point3f a = new Point3f(0f, 0f, 0f);
-        Point3f b = new Point3f(0f, 0f, FIGURE_SCALE);
-        Point3f c = new Point3f(FIGURE_SCALE, 0f, FIGURE_SCALE);
+        Point3f b = new Point3f(0f, FIGURE_SCALE, 0f);
+        Point3f c = new Point3f(FIGURE_SCALE, FIGURE_SCALE, 0f);
         Point3f d = new Point3f(FIGURE_SCALE, 0f, 0f);
 
-        Point3f a1 = new Point3f(0f, FIGURE_SCALE, 0f);
+        Point3f a1 = new Point3f(0f, 0f, FIGURE_SCALE);
         Point3f b1 = new Point3f(0f, FIGURE_SCALE, FIGURE_SCALE);
         Point3f c1 = new Point3f(FIGURE_SCALE, FIGURE_SCALE, FIGURE_SCALE);
-        Point3f d1 = new Point3f(FIGURE_SCALE, FIGURE_SCALE, 0f);
+        Point3f d1 = new Point3f(FIGURE_SCALE, 0f, FIGURE_SCALE);
 
         //------------------------------------------
         Point3f[] pts = new Point3f[24];
@@ -130,14 +134,14 @@ public class GeometryBasket {
     private static Geometry queueGeometry() {
         //-------------GEOMETRY POINTS--------------
         Point3f a = new Point3f(0f, 0f, 0f);
-        Point3f b = new Point3f(0f, 0f, FIGURE_SCALE);
-        Point3f c = new Point3f(-FIGURE_SCALE, 0f, FIGURE_SCALE);
+        Point3f b = new Point3f(0f, FIGURE_SCALE, 0f);
+        Point3f c = new Point3f(-FIGURE_SCALE, FIGURE_SCALE, 0f);
         Point3f d = new Point3f(-FIGURE_SCALE, 0f, 0f);
 
-        Point3f a1 = new Point3f(0f, FIGURE_SCALE, 0f);
+        Point3f a1 = new Point3f(0f, 0f, FIGURE_SCALE);
         Point3f b1 = new Point3f(0f, FIGURE_SCALE, FIGURE_SCALE);
         Point3f c1 = new Point3f(-FIGURE_SCALE, FIGURE_SCALE, FIGURE_SCALE);
-        Point3f d1 = new Point3f(-FIGURE_SCALE, FIGURE_SCALE, 0f);
+        Point3f d1 = new Point3f(-FIGURE_SCALE, 0f, FIGURE_SCALE);
 
         //------------------------------------------
         //create the points
@@ -216,14 +220,14 @@ public class GeometryBasket {
     private static Geometry runtimeGeometry() {
         //-------------GEOMETRY POINTS--------------
         Point3f a = new Point3f(0f, 0f, 0f);
-        Point3f b = new Point3f(0f, 0f, FIGURE_SCALE);
-        Point3f c = new Point3f(FIGURE_SCALE, 0f, FIGURE_SCALE);
+        Point3f b = new Point3f(0f, FIGURE_SCALE, 0f);
+        Point3f c = new Point3f(FIGURE_SCALE, FIGURE_SCALE, 0f);
         Point3f d = new Point3f(FIGURE_SCALE, 0f, 0f);
 
-        Point3f a1 = new Point3f(0f, FIGURE_SCALE, 0f);
+        Point3f a1 = new Point3f(0f, 0f, FIGURE_SCALE);
         Point3f b1 = new Point3f(0f, FIGURE_SCALE, FIGURE_SCALE);
         Point3f c1 = new Point3f(FIGURE_SCALE, FIGURE_SCALE, FIGURE_SCALE);
-        Point3f d1 = new Point3f(FIGURE_SCALE, FIGURE_SCALE, 0f);
+        Point3f d1 = new Point3f(FIGURE_SCALE, 0f, FIGURE_SCALE);
 
         //------------------------------------------
         //create the points
@@ -302,8 +306,8 @@ public class GeometryBasket {
     private static Geometry hostGeometry() {
         //-------------GEOMETRY POINTS--------------
         Point3f a = new Point3f(0f, 0f, 0f);
-        Point3f b = new Point3f(0f, FIGURE_SCALE, 0f);
-        Point3f c = new Point3f(FIGURE_SCALE, FIGURE_SCALE, 0f);
+        Point3f b = new Point3f(0f, 0f, FIGURE_SCALE);
+        Point3f c = new Point3f(FIGURE_SCALE, 0f, FIGURE_SCALE);
         Point3f d = new Point3f(FIGURE_SCALE, 0f, 0f);
 
         //------------------------------------------
@@ -340,6 +344,128 @@ public class GeometryBasket {
         geoInfo.setContourCounts(contourCount);
 
         //needed for lighting and shading the object
+        NormalGenerator normGen = new NormalGenerator();
+        //the angle beyond which the normal generator will not smooth the angles
+        normGen.setCreaseAngle((float) Math.toRadians(90));
+        //generate the normals
+        normGen.generateNormals(geoInfo);
+        return geoInfo.getGeometryArray();
+    }
+
+    private static Geometry alternateHostGeometry() {
+        //-------------GEOMETRY POINTS--------------
+
+        Point3f a = new Point3f(0f, 0f, 0f);
+        Point3f m1 = new Point3f(0.0f, 0f, FIGURE_SCALE / 2);
+        Point3f b = new Point3f(0f, 0f, FIGURE_SCALE);
+
+        Point3f m2 = new Point3f(FIGURE_SCALE, 0f, FIGURE_SCALE / 2);
+        Point3f c = new Point3f(FIGURE_SCALE, 0f, FIGURE_SCALE);
+        Point3f d = new Point3f(FIGURE_SCALE, 0f, 0f);
+
+        Color3f green = new Color3f(0.0f, 1.0f, 0.0f);
+        Color3f red = new Color3f(1.0f, 0.0f, 0.0f);
+        Color3f[] myColors = { red, red, red, red, green, green, green, green, red, red, red, red, green,
+                green, green, green };
+        //------------------------------------------
+        //create the points
+        Point3f[] pts = new Point3f[16];
+        //create the 6 face
+
+        //Host used resource
+        pts[0] = a;
+        pts[1] = m1;
+        pts[2] = m2;
+        pts[3] = d;
+
+        //Host free resources
+        pts[4] = m1;
+        pts[5] = b;
+        pts[6] = c;
+        pts[7] = m2;
+
+        //back free resources
+        pts[8] = d;
+        pts[9] = m2;
+        pts[10] = m1;
+        pts[11] = a;
+
+        // back used resource
+        pts[12] = m2;
+        pts[13] = c;
+        pts[14] = b;
+        pts[15] = m1;
+
+        //say what points belong to the shape
+        int[] stripCount = new int[4];
+        stripCount[0] = 4;
+        stripCount[1] = 4;
+        stripCount[2] = 4;
+        stripCount[3] = 4;
+
+        //say what the faces are
+        int[] contourCount = new int[4];
+        contourCount[0] = 1;
+        contourCount[1] = 1;
+        contourCount[2] = 1;
+        contourCount[3] = 1;
+
+        //build the geometry
+        GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
+        geoInfo.setCoordinates(pts);
+        geoInfo.setStripCounts(stripCount);
+        geoInfo.setContourCounts(contourCount);
+        geoInfo.setColors(myColors);
+
+        //quite needed for lighting and shading the object
+        NormalGenerator normGen = new NormalGenerator();
+        //the angle beyond which the normal generator will not smooth the angles
+        normGen.setCreaseAngle((float) Math.toRadians(90));
+        //generate the normals
+        normGen.generateNormals(geoInfo);
+        return geoInfo.getGeometryArray();
+    }
+
+    private static Geometry barMonitorGeometry() {
+        //-------------GEOMETRY POINTS--------------
+
+        Point3f a = new Point3f(0f, 0f, 0f);
+        Point3f b = new Point3f(0f,0f, FIGURE_SCALE * 0.25f);
+        Point3f c = new Point3f(FIGURE_SCALE * 0.25f,0f, FIGURE_SCALE * 0.25f);
+        Point3f d = new Point3f(FIGURE_SCALE * 0.25f, 0f, 0f);
+        Point3f e = new Point3f(a);
+        e.y = e.y + FIGURE_SCALE * 2;
+        Point3f f = new Point3f(b);
+        f.y = f.y + FIGURE_SCALE * 2;
+        Point3f g = new Point3f(c);
+        g.y = g.y + FIGURE_SCALE * 2;
+        Point3f h = new Point3f(d);
+        h.y = h.y + FIGURE_SCALE * 2;
+        
+        //------------------------------------------
+        //create the points
+        Point3f[] pts = { 
+        			a, b, c, d,
+                	a, d, h, e,
+                	a, e, f, b,
+                	g, h, d, c,
+                	c, b, f, g,
+                	h, g, f, e // Top
+        };
+
+        //say what points belong to the shape
+        int[] stripCount = { 4, 4, 4, 4, 4, 4 };
+
+        //say what the faces are
+        int[] contourCount = { 1, 1, 1, 1, 1, 1 };
+
+        //build the geometry
+        GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
+        geoInfo.setCoordinates(pts);
+        geoInfo.setStripCounts(stripCount);
+        geoInfo.setContourCounts(contourCount);
+        
+        //quite needed for lighting and shading the object
         NormalGenerator normGen = new NormalGenerator();
         //the angle beyond which the normal generator will not smooth the angles
         normGen.setCreaseAngle((float) Math.toRadians(90));
@@ -474,26 +600,26 @@ public class GeometryBasket {
 
     //not static because lines have different coordinates
     private static Geometry coordinatesGeometry() {
-        Point3f z1 = new Point3f(0, 0, 400);
-        Point3f z2 = new Point3f(0, 0, -400);
+        Point3f z1 = new Point3f(0, 400,0);
+        Point3f z2 = new Point3f(0, -400, 0);
 
         Point3f x1 = new Point3f(400, 0, 0);
         Point3f x2 = new Point3f(-400, 0, 0);
 
-        Point3f y1 = new Point3f(0, 400, 0);
-        Point3f y2 = new Point3f(0, -400, 0);
+        Point3f y1 = new Point3f(0,0, 400);
+        Point3f y2 = new Point3f(0,0, -400);
 
-        Point3f v1 = new Point3f(5, 0, 400);
-        Point3f v2 = new Point3f(5, 0, -400);
+        Point3f v1 = new Point3f(5, 400,0);
+        Point3f v2 = new Point3f(5, -400, 0);
 
-        Point3f v3 = new Point3f(0, 5, 400);
-        Point3f v4 = new Point3f(0, 5, -400);
+        Point3f v3 = new Point3f(0, 400, 5);
+        Point3f v4 = new Point3f(0, -400, 5);
 
-        Point3f v5 = new Point3f(-5, 0, 400);
-        Point3f v6 = new Point3f(-5, 0, -400);
+        Point3f v5 = new Point3f(-5, 400, 0);
+        Point3f v6 = new Point3f(-5, -400, 0);
 
-        Point3f v7 = new Point3f(0, -5, 400);
-        Point3f v8 = new Point3f(0, -5, -400);
+        Point3f v7 = new Point3f(0, 400, -5);
+        Point3f v8 = new Point3f(0, -400, -5);
 
         Point3f[] pts = new Point3f[14];
         pts[0] = x1;
@@ -572,5 +698,13 @@ public class GeometryBasket {
 
     public static Geometry getCoordinatesGeometry() {
         return coordinatesGeometry;
+    }
+
+    public static Geometry getAlternateHostGeometry() {
+        return alternateHostGeometry;
+    }
+
+    public static Geometry getBarMonitorGeometry() {
+        return barMonitorGeometry;
     }
 }
