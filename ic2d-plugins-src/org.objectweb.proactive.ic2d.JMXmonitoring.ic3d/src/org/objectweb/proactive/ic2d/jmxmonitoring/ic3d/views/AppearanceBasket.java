@@ -35,6 +35,12 @@ public class AppearanceBasket {
     public static final Appearance defaultActiveObjectAppearance = getDefaultActiveObjectAppearance();
     public static final Appearance servingRequestAppearance = getServingRequestAppearance();
     public static final Appearance waitingForRequestAppearance = getWaitingForRequestAppearance();
+    public static final Appearance barMonitorAppearence = null;
+    public static final Appearance monitorFull = getMonitoringAppearanceFull();
+    public static final Appearance monitor = getMonitoringAppearance();
+    public static final Appearance monitorLow = getMonitoringAppearanceLow();
+
+
 
     //Earth grid appearances
     public static final Appearance earthGridAppearance = getEarthGridAppearance();
@@ -102,7 +108,7 @@ public class AppearanceBasket {
         }
 
         PolygonAttributes polyAttributes = new PolygonAttributes();
-        polyAttributes.setPolygonMode(PolygonAttributes.POLYGON_POINT);
+        polyAttributes.setPolygonMode(PolygonAttributes.POLYGON_FILL);
         polyAttributes.setCullFace(1);
         appear.setPolygonAttributes(polyAttributes);
 
@@ -137,6 +143,90 @@ public class AppearanceBasket {
 
         TransparencyAttributes transparencyAttributes = new TransparencyAttributes(
             TransparencyAttributes.NONE, 0f);
+        transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
+        return appear;
+    }
+    
+    private static Appearance getMonitoringAppearanceFull() {
+        Appearance appear = new Appearance();
+
+        ColoringAttributes colorAttrib = new ColoringAttributes(1f, 0f, 0f, 3);
+
+        Color3f matAmbient = ColorPalette.RED;
+        Color3f matEmissive = ColorPalette.RED;
+        Color3f matDiffuse = ColorPalette.RED;
+        Color3f matSpecular = ColorPalette.RED;
+        float matShininess = 73.0f;
+
+        Material material = new Material(matAmbient, matEmissive, matDiffuse, matSpecular, matShininess);
+
+        PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(2);
+        polyAttributes.setCullFace(PolygonAttributes.POLYGON_FILL);
+        appear.setPolygonAttributes(polyAttributes);
+
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(
+            TransparencyAttributes.NICEST, 0.25f);
+        transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
+        return appear;
+    }
+    
+    private static Appearance getMonitoringAppearance() {
+        Appearance appear = new Appearance();
+
+        ColoringAttributes colorAttrib = new ColoringAttributes(1f, 1f, 0f, 3);
+
+        Color3f matAmbient = ColorPalette.YELLOW;
+        Color3f matEmissive = ColorPalette.YELLOW;
+        Color3f matDiffuse = ColorPalette.YELLOW;
+        Color3f matSpecular = ColorPalette.YELLOW;
+        float matShininess = 73.0f;
+
+        Material material = new Material(matAmbient, matEmissive, matDiffuse, matSpecular, matShininess);
+
+        PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(2);
+        polyAttributes.setCullFace(PolygonAttributes.POLYGON_FILL);
+        appear.setPolygonAttributes(polyAttributes);
+
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(
+            TransparencyAttributes.NICEST, 0.25f);
+        transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
+        return appear;
+    }
+    
+    private static Appearance getMonitoringAppearanceLow() {
+        Appearance appear = new Appearance();
+
+        ColoringAttributes colorAttrib = new ColoringAttributes(0f, 1f, 0f, 3);
+
+        Color3f matAmbient = ColorPalette.GREEN;
+        Color3f matEmissive = ColorPalette.GREEN;
+        Color3f matDiffuse = ColorPalette.GREEN;
+        Color3f matSpecular = ColorPalette.GREEN;
+        float matShininess = 73.0f;
+
+        Material material = new Material(matAmbient, matEmissive, matDiffuse, matSpecular, matShininess);
+
+        PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(2);
+        polyAttributes.setCullFace(PolygonAttributes.POLYGON_FILL);
+        appear.setPolygonAttributes(polyAttributes);
+
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(
+            TransparencyAttributes.NICEST, 0.25f);
         transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
         appear.setTransparencyAttributes(transparencyAttributes);
         appear.setMaterial(material);
