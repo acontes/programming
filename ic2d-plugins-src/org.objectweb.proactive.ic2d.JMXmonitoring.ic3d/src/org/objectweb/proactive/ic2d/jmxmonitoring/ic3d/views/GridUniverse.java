@@ -23,7 +23,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
-import com.sun.j3d.utils.behaviors.picking.PickRotateBehavior;
 import com.sun.j3d.utils.behaviors.vp.OrbitBehavior;
 import com.sun.j3d.utils.pickfast.behaviors.PickTranslateBehavior;
 import com.sun.j3d.utils.universe.ConfiguredUniverse;
@@ -62,6 +61,10 @@ public class GridUniverse {
      * @return a Canvas3D view that can be used for displaying the universe
      */
     public Canvas3D newView() {
+        return newView(new Point3d(), new Vector3d(1, -10, 10));
+    }
+
+    public Canvas3D newView(Point3d myCenter, Vector3d viewPoint) {
         // create viewer and platform
         Viewer viewer = new Viewer(new Canvas3D(SimpleUniverse.getPreferredConfiguration()));
         ViewingPlatform vp = new ViewingPlatform();
@@ -74,16 +77,21 @@ public class GridUniverse {
         // add a new branch containing the view group
         universe.getLocale().addBranchGraph(vp);
 
+        // \todo change this part to plug camera in
+        
         // set the default behaviour
         OrbitBehavior orbit = new OrbitBehavior(viewer.getCanvas3D());
         // set bounds
         orbit.setSchedulingBounds(new BoundingSphere());
         // inverse mouse is more natural
         orbit.setReverseRotate(true);
+        // set the orbit center 
+        orbit.setRotationCenter(myCenter);
         // set the view platform for the orbit
         vp.setViewPlatformBehavior(orbit);
+
         // move back a bit
-        setUpView(vp.getViewPlatformTransform());
+        setUpView(vp.getViewPlatformTransform(), viewPoint);
 
         // add a Behaviour to the viewplatform transform
         // so we can start an automatic rotation
@@ -114,7 +122,7 @@ public class GridUniverse {
         //new BoundingSphere());
         // objGrp.addChild(pickZoom);
 
-        viewer.getCanvas3D().getView().setSceneAntialiasingEnable(true);
+     //   viewer.getCanvas3D().getView().setSceneAntialiasingEnable(true);
 
         return viewer.getCanvas3D();
     }
@@ -260,18 +268,15 @@ public class GridUniverse {
         // BoundingSphere(new Point3d(0,0,0),10000));
         // objGrp.addChild(tooltip);
         // add the axes
-        // CoordinateSystem3D coord = new CoordinateSystem3D(0.07f);
+        /*CoordinateSystem3D coord = new CoordinateSystem3D(0.07f);
         TransformGroup coordTrans = new TransformGroup();
-        // coordTrans.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-        // coordTrans.setCapability(TransformGroup.ALLOW_CHILDREN_EXTEND);
-
-        // coordTrans.addChild(coord);
-        // setUpAutomaticOrbit(coordTrans);
-        // CoordinateSystem3D coord1 = new CoordinateSystem3D(0.07f);
-
-        // objGrp.addChild(coord1);
-        objGrp.addChild(coordTrans);
-
+         coordTrans.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+         coordTrans.setCapability(TransformGroup.ALLOW_CHILDREN_EXTEND);
+         coordTrans.addChild(coord);
+         setUpAutomaticOrbit(coordTrans);
+         objGrp.addChild(coordTrans);*/
+        CoordinateSystem3D coord1 = new CoordinateSystem3D(0.07f);
+        objGrp.addChild(coord1);
         objGrp.compile();
         return objGrp;
     }
@@ -282,11 +287,12 @@ public class GridUniverse {
      * @param trans
      *            the view platform's TransformGroup
      */
-    private void setUpView(TransformGroup trans) {
+    private void setUpView(TransformGroup trans, Vector3d viewPoint) {
         Transform3D setUp = new Transform3D();
         setUp.rotX(Math.toRadians(50));
 
-        setUp.setTranslation(new Vector3d(1, -10, 10));
+        setUp.setTranslation(viewPoint);
+        //setUp.setTranslation(new Vector3d(1, -10, 10));
 
         trans.setTransform(setUp);
     }
