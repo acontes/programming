@@ -3,6 +3,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
 import javax.media.j3d.Appearance;
@@ -16,6 +17,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
@@ -41,7 +43,8 @@ public abstract class AbstractFigure3D extends Shape3D {
      */
     private Hashtable<String, AbstractFigure3D> arrows = new Hashtable<String, AbstractFigure3D>();
     /**
-     * Timer for the threads specified to run as a daemon so as not to block the application
+     * Timer for the threads specified to run as a daemon so as not to keep the
+     * application running.
      */
     private Timer arrowTimer = new Timer();
     /**
@@ -181,6 +184,9 @@ public abstract class AbstractFigure3D extends Shape3D {
          */
         this.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
         this.setCapability(Shape3D.ALLOW_GEOMETRY_WRITE);
+        this.setCapability(Shape3D.ALLOW_PICKABLE_READ);
+        this.setCapability(Shape3D.ALLOW_PICKABLE_WRITE);
+        this.setPickable(true);
 
         // create geometry and appearance
         voGeometry = createGeometry();
@@ -525,4 +531,7 @@ public abstract class AbstractFigure3D extends Shape3D {
         return rotTrans;
     }
 
+    public Geometry getGeometry() {
+        return voGeometry;
+    }
 }
