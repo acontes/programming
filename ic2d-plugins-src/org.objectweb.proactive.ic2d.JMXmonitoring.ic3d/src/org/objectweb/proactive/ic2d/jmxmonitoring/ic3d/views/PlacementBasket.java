@@ -6,6 +6,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Point3d;
 
 
 /**
@@ -24,8 +25,56 @@ public class PlacementBasket {
      */
     public static void spiralArrangement(int figureIndex, AbstractFigure3D figure) {
         double x = Math.cos(figureIndex) * Math.sqrt(figureIndex) * GeometryBasket.FIGURE_SCALE;
-        double y = Math.sin(figureIndex) * Math.sqrt(figureIndex) * GeometryBasket.FIGURE_SCALE;
-        figure.placeSubFigure(figure, x, y, 0);
+        double z = Math.sin(figureIndex) * Math.sqrt(figureIndex) * GeometryBasket.FIGURE_SCALE;
+        figure.placeSubFigure(figure, x, 0, z);
+    }
+
+    /**
+     * Arranges figures in matrix
+     * You can find index of the figure with x == y -> idx = x^2, ( x < y )  -> y^2 - y + x, ( x > y ) -> x^2 - 2x + y
+     * @param figureIndex
+     * @param figure
+     */
+    public static void matrixArrangement(int figureIndex, AbstractFigure3D figure) {
+        /* Setting up our variables */
+        double x, z; /* Our host 2D placement */
+        int fig_sqrt, c;
+        /* Checking parameters */
+        if (figureIndex < 1) {
+            return;
+        }
+        /* figureIndex begin at 2 surely for the spiralArrangement, let it begin at 1 */
+        figureIndex--;
+
+        fig_sqrt = (int) Math.sqrt(figureIndex);
+        c = fig_sqrt + 1;
+        /* Short sample of the 2D placement policy */
+        /* Could have been easier but maintains an order relation
+         * Moreover you can find the index with the 2D coordinates.
+         * 
+         *     1  2  5 10 17
+         *     3  4  6 11 18
+         *     7  8  9 12 19
+         *    13 14 15 16 20
+         *    21 22 23 24 25
+         */
+
+        /* Our index is a square so x and y coordinates are the same */
+        if (fig_sqrt * fig_sqrt == figureIndex) {
+            x = fig_sqrt;
+            z = fig_sqrt;
+        }
+        /* Our index is lower or equal than the middle of next and previous squares (N) */
+        else if (figureIndex <= (fig_sqrt * fig_sqrt + c * c) / 2) {
+            x = c;
+            z = (int) Math.abs(fig_sqrt * fig_sqrt - figureIndex);
+        }
+        /* The index is greater than the middle of next and previous squares (N) */
+        else {
+            x = c - (int) Math.abs(c * c - figureIndex);
+            z = c;
+        }
+        figure.placeSubFigure(figure, x, 0, z);
     }
 
     /**
@@ -55,11 +104,11 @@ public class PlacementBasket {
         double subFigureWidth = (1 - 2 * padding - (figures - 1) * spacing) / figures;
 
         newScale.x = subFigureWidth; //x size
-        newScale.y = 1 - padding * 2;//y size //oldScale.y * (1-padding*2)*GeometryBasket.FIGURE_SCALE; //*X* length - slightly smaller
-        newScale.z = height; //GeometryBasket.FIGURE_SCALE; //height - slightly bigger so it's visible z size
+        newScale.z = 1 - padding * 2;//y size //oldScale.y * (1-padding*2)*GeometryBasket.FIGURE_SCALE; //*X* length - slightly smaller
+        newScale.y = height; //GeometryBasket.FIGURE_SCALE; //height - slightly bigger so it's visible z size
 
         TransformGroup moveOld;
-        moveOld = figure.getRootTransform();
+        moveOld = figure.getTranslateScaleTransform();
         moveOld.setTransform(figureTransforms);
         figureTransforms.setScale(newScale);
 
@@ -73,8 +122,9 @@ public class PlacementBasket {
 
         figureTransforms.setTranslation(new Vector3d(GeometryBasket.FIGURE_SCALE *
             (padding + (figureIndex - 1) * subFigureWidth + (figureIndex - 1) * spacing),
-            GeometryBasket.FIGURE_SCALE * padding, //connected to the scale above   *X*
-            0));
+            0,
+            GeometryBasket.FIGURE_SCALE * padding //connected to the scale above   *X*
+            ));
 
         //    	figureTransforms.setTranslation(new Vector3d(
         //    						GeometryBasket.FIGURE_SCALE * (padding*totalScale.x + 
@@ -113,11 +163,11 @@ public class PlacementBasket {
         double subFigureWidth = (1 - 2 * padding - (figures - 1) * spacing) / figures;
 
         newScale.x = 1 - padding * 2;//y size //oldScale.y * (1-padding*2)*GeometryBasket.FIGURE_SCALE; //*X* length - slightly smaller
-        newScale.y = subFigureWidth; //y size
-        newScale.z = height; //GeometryBasket.FIGURE_SCALE; //height - slightly bigger so it's visible z size
+        newScale.z = subFigureWidth; //y size
+        newScale.y = height; //GeometryBasket.FIGURE_SCALE; //height - slightly bigger so it's visible z size
 
         TransformGroup moveOld;
-        moveOld = figure.getRootTransform();
+        moveOld = figure.getTranslateScaleTransform();
         moveOld.setTransform(figureTransforms);
         figureTransforms.setScale(newScale);
 
@@ -129,8 +179,8 @@ public class PlacementBasket {
         figure.getLocalToVworld(totalTransform);
         totalTransform.getScale(totalScale);
         figureTransforms.setTranslation(new Vector3d(GeometryBasket.FIGURE_SCALE * padding, //connected to the scale above   *X*
-            GeometryBasket.FIGURE_SCALE *
-                (padding + (figureIndex - 1) * subFigureWidth + (figureIndex - 1) * spacing), 0));
+            0, GeometryBasket.FIGURE_SCALE *
+                (padding + (figureIndex - 1) * subFigureWidth + (figureIndex - 1) * spacing)));
         //    	figureTransforms.setTranslation(new Vector3d(
         //    					GeometryBasket.FIGURE_SCALE *padding*totalScale.x,	//connected to the scale above   *X*
         //    						GeometryBasket.FIGURE_SCALE * (padding*totalScale.y + 
@@ -175,8 +225,8 @@ public class PlacementBasket {
 
         TransformGroup moveOld;
         parentFigurePosition.setScale(newScale);
-        parentFigurePosition.setTranslation(new Vector3d(GeometryBasket.FIGURE_SCALE / 2,
-            GeometryBasket.FIGURE_SCALE / 2, spacing * figureIndex));
+        parentFigurePosition.setTranslation(new Vector3d(GeometryBasket.FIGURE_SCALE / 2, spacing * figureIndex,
+            GeometryBasket.FIGURE_SCALE / 2));
         moveOld = (TransformGroup) figure.getParent().getParent();
         moveOld.setTransform(parentFigurePosition);
 
@@ -187,32 +237,38 @@ public class PlacementBasket {
      * radius. The host is placed according to 
      * the two angles in radians.
      * 
-     * @param alpha 	angle 
-     * @param beta		angle
+     * @param theta 	x, z angle (polar)
+     * @param phi		y angle
      * @param figure	figure to be placed 
      */
-    public static void sphereArrangement(double alpha, double beta, AbstractFigure3D figure) {
-
-        final double RADIUS = 16;
+    public static void sphereArrangement(double theta, double phi, AbstractFigure3D figure) {
+    	final double RADIUS = 16;
+    	// Phi should be [0,PI] and theta between [0, 2PI] 
+    	phi %= Math.PI;
+    	theta %= Math.PI * 2;
         //get the coordinates in a plane 
-        double x = Math.cos(alpha) * RADIUS;
-        double y = Math.sin(alpha) * RADIUS;
+        double x = Math.cos(theta) * Math.sin(phi) * RADIUS;
+        double z = Math.sin(theta) * Math.sin(phi) * RADIUS;
 
         //get the z coordinate
-        double z = Math.cos(beta) * RADIUS;
-
-        //rotate
-        TransformGroup rot = (TransformGroup) figure.getParent();
-        Transform3D t3d = new Transform3D();
-        rot.getTransform(t3d);
-        t3d.rotY(alpha);
-        t3d.rotX(beta);
-        rot.setTransform(t3d);
-        //make the x and y proportional
-        x = x * Math.sin(beta);
-        y = y * Math.sin(beta);
+        double y = Math.cos(phi) * RADIUS;
+        
+        // Create the lookAt Transform Matrix
+        TransformGroup rotation = figure.getRotationTransform();
+        Transform3D lookAtTransform = new Transform3D();
+        lookAtTransform.lookAt(new Point3d(), new Point3d(x, y , z), new Vector3d(0, 1, 0));
+        lookAtTransform.invert(); // Keep it else wont work ( java3d failure )
+        
+        // Rotate the lookAt Matrix the right way
+        Transform3D rotationMatrix = new Transform3D();
+        rotationMatrix.rotX(-Math.PI/2);
+        // Add the second transform
+        lookAtTransform.mul(rotationMatrix);
+        lookAtTransform.normalize();
+        
+        // And commit the changes
+        rotation.setTransform(lookAtTransform);
         figure.placeSubFigure(figure, x, y, z);
-
     }
 
 }
