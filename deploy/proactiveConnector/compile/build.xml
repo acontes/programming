@@ -11,8 +11,9 @@ ant rar		-> creates the rar archive, rady for deployment
 ant clean	-> cleanup the mess
 -->
 
-    <!-- Antelope! We want that If! -->
+    <!-- Antelope! We want that switch && if! -->
     <taskdef name="switch" classname="ise.antelope.tasks.SwitchTask" />
+	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
 
     <property file="build.properties"/>
     <property environment="env" />
@@ -53,9 +54,19 @@ ant clean	-> cleanup the mess
     </target>
 
     <target name="jar" depends="compile" description="Packs the connector classes into a jar file">
-	<jar destfile="${deploy.connector.dir}/proactiveConnector.jar" >
-	    <fileset dir="${cl.connector.dir}" includes="**" />
-	</jar>
+	<!-- for Geronimo we have to put the proactive-log4j file into the jar file -->
+	<if name="as.name" value="geronimo">
+		<jar destfile="${deploy.connector.dir}/proactiveConnector.jar" >
+			<fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
+			<fileset dir="${cl.connector.dir}" includes="**" />
+		</jar>
+	</if>
+	<else>
+		<jar destfile="${deploy.connector.dir}/proactiveConnector.jar" >
+			<fileset dir="${cl.connector.dir}" includes="**" />
+		</jar>
+	</else>
+	
     </target> 
 
     <target name="rar" depends="jar" description="Creates the RAR archive for deployment into the application server">
@@ -63,8 +74,9 @@ ant clean	-> cleanup the mess
 	    <case value="geronimo">
 		<jar destfile="${deploy.connector.dir}/${rar.name}.rar" >
 		    <fileset dir="${deploy.connector.dir}" includes="proactiveConnector.jar" />
-		    <!-- log4j.xml -->
-		    <fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
+		    <!-- log4j config 
+				no need to do it, it is put into the jar file. -->
+		    <!-- fileset dir="${connector.base}" includes="META-INF/proactive-log4j" /-->
 		    <!-- META-INF -->
 		    <fileset dir="${connector.base}" includes="META-INF/MANIFEST.MF" />
 		    <fileset dir="${connector.base}" includes="META-INF/ra.xml" />
@@ -77,7 +89,7 @@ ant clean	-> cleanup the mess
 	    <case value="jonas">
 		<jar destfile="${deploy.connector.dir}/${rar.name}.rar" >
 		    <fileset dir="${deploy.connector.dir}" includes="proactiveConnector.jar" />
-		    <!-- log4j.xml -->
+		    <!-- log4j config -->
 		    <fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
 		    <!-- META-INF -->
 		    <fileset dir="${connector.base}" includes="META-INF/MANIFEST.MF" />
@@ -91,7 +103,7 @@ ant clean	-> cleanup the mess
 	    <default>
 		<jar destfile="${deploy.connector.dir}/${rar.name}.rar" >
 		    <fileset dir="${deploy.connector.dir}" includes="proactiveConnector.jar" />
-		    <!-- log4j.xml -->
+		    <!-- log4j config -->
 		    <fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
 		    <!-- META-INF -->
 		    <fileset dir="${connector.base}" includes="META-INF/MANIFEST.MF" />
