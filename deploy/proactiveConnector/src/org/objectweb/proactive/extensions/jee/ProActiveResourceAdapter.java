@@ -95,8 +95,9 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.resource.spi.ResourceAdapter#start(javax.resource.spi.BootstrapContext)
+	/* 
+	 * This method will be called when a new ProActive ResourceAdapter
+	 * will be bootstrapped into the application server. 
 	 */
 	@Override
 	public void start(BootstrapContext arg0)
@@ -114,14 +115,15 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.resource.spi.ResourceAdapter#stop()
+	/* 
+	 * This method is called when the ProActive ResourceAdapter is
+	 * undeployed from the application server
 	 */
 	@Override
 	public void stop() {
 		_raLogger.info("terminating Runtime " + _proActiveRuntime.getURL());
         
-		// kill the nodes deployed until now
+		// kill the nodes deployed up until now
 		_proActiveRuntime.killAllNodes();
 		
 		// destroy the JMX MBean associated with this runtime
@@ -141,7 +143,7 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 			// unbind the name onto which PART is bound
 			rmiRegistry.unbind(PART_PREFIX + _vmName);
 		} catch ( RemoteException  e) {
-			_raLogger.error( "Unable to contact the RMI registry that (is supposed to) be on the localhost. Details on the error:" ); 
+			_raLogger.error( "Unable to contact the RMI registry that is (supposed to be) on the localhost." ); 
 			_raLogger.error( e.getMessage() , e );
 		} catch (NotBoundException e) {
 			_raLogger.error( "The name " + PART_PREFIX + _vmName + " is not bound in the RMI Registry." );

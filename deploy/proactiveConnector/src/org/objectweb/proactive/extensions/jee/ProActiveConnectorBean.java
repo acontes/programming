@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 
 /**
- * Some basic functionality for the Resource Adapter. Helps code clarity(I hope,for your sake :P)
+ * Some basic functionality for the Resource Adapter
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
@@ -58,10 +58,7 @@ public abstract class ProActiveConnectorBean {
 	 * logging issues
 	 */
 	private void configureLogging() {
-		// override the default log4j initialization phase	
-		// we know that there is a root logger(do we?!)
-//		System.setProperty("log4j.defaultInitOverride", "true");
-//		System.setProperty("log4j.configuration", _log4jConfigFile );
+		// logging is configured via a separate RepositorySelector
 		try {
 			ContextRepositorySelector.init(this);
 			_raLogger = Logger.getLogger(Loggers.CONNECOR);
@@ -90,27 +87,28 @@ public abstract class ProActiveConnectorBean {
 			_raLogger.info("Could not obtain the hostname, going for the default , which is localhost");
 			_hostName = "localhost";
 		}
-		
-		String communicationProtocol = System.getProperty("proactive.communication.protocol");
-		// if not set, assume communication protocol is RMI
-		if( communicationProtocol == null || 
-				(communicationProtocol != null && communicationProtocol.equals("rmi") ) ) {
-		
-			int codebasePort = getCodebasePort();
-			System.setProperty("java.rmi.server.hostname", _hostName);
-			_codeBaseUrl = "http://" + _hostName + ":" + codebasePort +"/";
-			System.setProperty("java.rmi.server.codebase", _codeBaseUrl );
-			
-			System.setProperty("proactive.net.nolocal", "true" );
-			_raLogger.debug("Configuration info: hostName : " + _hostName + 
-					"; codebase URL : " + _codeBaseUrl );
-			
+		finally {
+			String communicationProtocol = System.getProperty("proactive.communication.protocol");
+			// if not set, assume communication protocol is RMI
+			if( communicationProtocol == null || 
+					(communicationProtocol != null && communicationProtocol.equals("rmi") ) ) {
+
+				int codebasePort = getCodebasePort();
+				System.setProperty("java.rmi.server.hostname", _hostName);
+				_codeBaseUrl = "http://" + _hostName + ":" + codebasePort +"/";
+				System.setProperty("java.rmi.server.codebase", _codeBaseUrl );
+
+				System.setProperty("proactive.net.nolocal", "true" );
+				_raLogger.debug("Configuration info: hostName : " + _hostName + 
+						"; codebase URL : " + _codeBaseUrl );
+
+			}
 		}
 	}
 	
 	/**
 	 * if the codebase port not set, use a default value
-	 * in order for the service to function, the codebase property MUST be set!
+	 * in order for the connector to function, the codebase property MUST be set!
 	 */
 	private int getCodebasePort() {
 		String codebasePort = System.getProperty("proactive.http.port");

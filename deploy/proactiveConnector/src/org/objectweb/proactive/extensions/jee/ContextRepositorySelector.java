@@ -54,7 +54,7 @@ public class ContextRepositorySelector implements RepositorySelector
 {
 
 	// we are expecting to find the log4j config file in the resource archive
-	// in a known place : META-INF/log4j.xml
+	// in a known place : META-INF/proactive-log4j
 	public static final String LOG4J_CONFIG_FILE = "/META-INF/proactive-log4j";
 		
 	private static boolean _alreadyStarted = false;
@@ -67,7 +67,7 @@ public class ContextRepositorySelector implements RepositorySelector
 	private static LoggerRepository _defaultRepository;
 
 	/**
-	 * Register your web-app with this repository selector.
+	 * This method initializes a new log4j hierarchy for ProActive Logging.
 	 * @throws Exception 
 	 */
 	public static synchronized void init(ProActiveConnectorBean caller) throws Exception 
@@ -85,24 +85,16 @@ public class ContextRepositorySelector implements RepositorySelector
 		_knownRepositories.put(loader, hierarchy);
 	}
 
-	// load the Log4J configuration, using the DOMConfigurator, from the log4j config file
+	// this will create && initialize a new Log4j Hierarchy with the configuration options
+	// specified in the LOG4J_CONFIG_FILE
 	// caller is needed in order to have the path where to search for the log4j config file
+	// this file is LOG4J_CONFIG_FILE, placed relative to the caller class's path
 	private static Hierarchy loadLog4JConfig(ProActiveConnectorBean caller) 
 		throws Exception
 	{
 		
 		// create a new hierarchy of loggers
 		Hierarchy hierarchy = new Hierarchy(new RootLogger(Level.DEBUG));
-		
-		// try to get the log4j configuration file
-		/*InputStream log4JConfig = caller.getClass().
-					getResourceAsStream(LOG4J_CONFIG_FILE);
-		
-		Document doc = DocumentBuilderFactory.newInstance().
-				newDocumentBuilder().parse(log4JConfig);
-		
-		DOMConfigurator conf = new DOMConfigurator();
-		conf.doConfigure( doc.getDocumentElement(), hierarchy);*/
 		
 		URL log4jConfigFile = caller.getClass().getResource(LOG4J_CONFIG_FILE);
 		PropertyConfigurator conf = new PropertyConfigurator();
@@ -119,6 +111,8 @@ public class ContextRepositorySelector implements RepositorySelector
 		// constructor private - no access allowed
 	}
 
+	// this is called by LogManager, when it receives a request for a Logger
+	@Override
 	public LoggerRepository getLoggerRepository() 
 	{
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
