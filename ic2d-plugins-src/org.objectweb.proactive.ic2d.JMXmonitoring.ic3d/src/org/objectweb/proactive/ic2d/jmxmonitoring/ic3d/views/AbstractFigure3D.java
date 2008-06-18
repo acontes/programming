@@ -3,7 +3,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
 import javax.media.j3d.Appearance;
@@ -17,7 +16,6 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
@@ -43,8 +41,7 @@ public abstract class AbstractFigure3D extends Shape3D {
      */
     private Hashtable<String, AbstractFigure3D> arrows = new Hashtable<String, AbstractFigure3D>();
     /**
-     * Timer for the threads specified to run as a daemon so as not to keep the
-     * application running.
+     * Timer for the threads specified to run as a daemon so as not to block the application
      */
     private Timer arrowTimer = new Timer();
     /**
