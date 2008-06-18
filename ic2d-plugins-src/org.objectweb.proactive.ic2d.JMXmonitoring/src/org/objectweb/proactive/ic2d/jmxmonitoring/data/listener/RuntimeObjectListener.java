@@ -76,7 +76,7 @@ public class RuntimeObjectListener implements NotificationListener {
             if (node != null) {
                 node.addChild(new ActiveObject(node, id, name, oname));
             } else {
-                System.out.println("RuntimeObjectListener.handleNotification() node pas trouve nodeUrl=" +
+                System.out.println("RuntimeObjectListener.handleNotification() node not found nodeUrl=" +
                     nodeUrl);
             }
         } else if (type.equals(NotificationType.bodyDestroyed)) {
@@ -127,7 +127,12 @@ public class RuntimeObjectListener implements NotificationListener {
             //            if (node != null) {
             //                node.destroy();
             //            }
-        } else {
+        } else if (type.equals(NotificationType.runtimeThreadsChanged)){
+        	Integer threads = (Integer)notification.getUserData();
+        	System.out.println("..................................Threads changed : " + threads);
+        	runtimeObject.setThreadsNumber(threads);
+        }
+        else {
             System.out.println(runtimeObject + " => " + type);
         }
     }
