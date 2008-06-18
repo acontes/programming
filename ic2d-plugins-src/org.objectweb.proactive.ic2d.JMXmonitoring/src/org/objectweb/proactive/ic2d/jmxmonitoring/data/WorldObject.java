@@ -225,7 +225,7 @@ public class WorldObject extends AbstractData {
         }
 
         if (ao == null) {
-            System.out.println("Represntation of Active Object " + id + " already removed.");
+            System.out.println("Representation of Active Object " + id + " already removed.");
         } else {
             System.out.println("Stop monitoring " + ao + ", on " + ao.getParent());
 
