@@ -148,6 +148,10 @@ public enum MVCNotificationTag {
     /**
      * Notification message sent when a Target connection have changed
      */
-    TARGET_CONNECTIONS_CHANGED;
+    TARGET_CONNECTIONS_CHANGED,
 
+    /**
+     * Notification message sent when a VM has changed its number of threads
+     */
+    RUNTIME_THREADS_CHANGED;
 }
