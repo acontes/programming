@@ -3,9 +3,13 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
+import java.util.UUID;
+
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
+import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
+import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 
@@ -87,5 +91,30 @@ public class Runtime3D extends AbstractRuntime3D {
     protected AbstractFigure3D setArrow(String name, Vector3f start, Vector3f stop) {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    /****************************/
+    /*  Threads usage indicator  */
+    /*    FOR TESTING               */
+    /***************************/
+    
+    private Queue3D queue = new Queue3D(""); 
+    private boolean noQueue = true;
+    public void setThreads(int size) {
+        //TODO hacky, change
+        if (noQueue) {
+            addSubFigure(UUID.randomUUID().toString(), queue);
+            noQueue = false;
+
+        }
+        assert size > 0;
+        TransformGroup trans = (TransformGroup) queue.getParent().getParent();
+        Transform3D resize = new Transform3D();
+        trans.getTransform(resize);
+        Vector3d oldScale = new Vector3d();
+        resize.getScale(oldScale);
+        //TODO remove constant
+        resize.setScale(new Vector3d((double) size / 2, oldScale.y, oldScale.z));
+        trans.setTransform(resize);
     }
 }
