@@ -7,9 +7,9 @@ import javax.media.j3d.TransformGroup;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.PlacementBasket;
 
@@ -21,20 +21,19 @@ public class MonitorGrid3D extends AbstractGrid3D {
 	}
 
 	@Override
-	protected void animateCreation() {
+	public void animateCreation() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void arrangeSubFigures() {
-		// TODO Auto-generated method stub
-		int i = 2;
-        for (AbstractFigure3D host : this.getSubFigures().values()) {
-            PlacementBasket.matrixArrangement(i, host);
-            i++;
-            host.arrangeSubFigures();
-        }
+		int figureIndex = 1;
+		for (final Figure3D host : this.getSubFigures().values()) {
+			PlacementBasket.matrixArrangement(figureIndex, host);
+			figureIndex++;
+			host.arrangeSubFigures();
+		}
 	}
 
 	@Override
@@ -55,15 +54,15 @@ public class MonitorGrid3D extends AbstractGrid3D {
 	}
 
 	@Override
-	protected AbstractFigure3D setArrow(String name, Vector3f start,
-			Vector3f stop) {
+	protected Figure3D setArrow(final String name, final Vector3f start,
+			final Vector3f stop) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	public void translateGrid(Vector3d position) {
-		TransformGroup myTranslateTG = getTranslateScaleTransform();
-		Transform3D myTranslation = new Transform3D();
+
+	public void translateGrid(final Vector3d position) {
+		final TransformGroup myTranslateTG = this.getTranslateScaleTransform();
+		final Transform3D myTranslation = new Transform3D();
 		myTranslation.setTranslation(position);
 		myTranslateTG.setTransform(myTranslation);
 	}

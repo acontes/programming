@@ -14,75 +14,80 @@ import javax.media.j3d.TransparencyAttributes;
 import javax.media.j3d.TransparencyInterpolator;
 import javax.vecmath.Vector3d;
 
-
 /**
- * This class is a container for all the animations.
- * An object that wants to use the animation has to 
- * create a new instance of this class and use it to
+ * This class is a container for all the animations. An object that wants to use
+ * the animation has to create a new instance of this class and use it to
  * animate itself.
+ * 
  * @author vasile
- *
+ * 
  */
 public class AnimationBasket {
-    /**
-     * This method makes the figure grow from 
-     * a small point. It uses the original coordinates 
-     * of the figure while it does a scale from 0
-     * to the original figure size.
-     * 
-     * @param figure the figure to be animated
-     * @param runTime animation time in milliseconds
-     */
-    public void growFromNothing(AbstractFigure3D figure, int runTime) {
-        TransformGroup trans = (TransformGroup) figure.getParent();
-        Transform3D t3d = new Transform3D();
-        trans.getTransform(t3d);
-        Alpha alpha = new Alpha(1, runTime);
-        ScaleInterpolator scale = new ScaleInterpolator(alpha, trans, t3d, 0, (float) t3d.getScale());
-        scale.setSchedulingBounds(new BoundingSphere());
-        //the branch group is needed in order to be able
-        //to add to the compiled scene
-        BranchGroup bg = new BranchGroup();
-        bg.addChild(scale);
-        trans.addChild(bg);
-    }
+	/**
+	 * This method makes the figure grow from a small point. It uses the
+	 * original coordinates of the figure while it does a scale from 0 to the
+	 * original figure size.
+	 * 
+	 * @param figure
+	 *            the figure to be animated
+	 * @param runTime
+	 *            animation time in milliseconds
+	 */
+	public void growFromNothing(final AbstractFigure3D figure, final int runTime) {
+		final TransformGroup trans = (TransformGroup) figure.getParent();
+		final Transform3D t3d = new Transform3D();
+		trans.getTransform(t3d);
+		final Alpha alpha = new Alpha(1, runTime);
+		final ScaleInterpolator scale = new ScaleInterpolator(alpha, trans,
+				t3d, 0, (float) t3d.getScale());
+		scale.setSchedulingBounds(new BoundingSphere());
+		// the branch group is needed in order to be able
+		// to add to the compiled scene
+		final BranchGroup bg = new BranchGroup();
+		bg.addChild(scale);
+		trans.addChild(bg);
+	}
 
-    /**
-     * Fades the figure from zero transparency to
-     * the  default transparency of the figure.
-     * 
-     * @param figure  figure to be animated
-     * @param runTime time until object has it's original transparency
-     */
-    public void fadeInto(AbstractFigure3D figure, int runTime) {
-        TransparencyAttributes attrib = figure.getAppearance().getTransparencyAttributes();
-        Alpha alpha = new Alpha(1, runTime);
-        TransparencyInterpolator transp = new TransparencyInterpolator(alpha, attrib, 1, attrib
-                .getTransparency());
-        transp.setSchedulingBounds(new BoundingSphere());
+	/**
+	 * Fades the figure from zero transparency to the default transparency of
+	 * the figure.
+	 * 
+	 * @param figure
+	 *            figure to be animated
+	 * @param runTime
+	 *            time until object has it's original transparency
+	 */
+	public void fadeInto(final AbstractFigure3D figure, final int runTime) {
+		final TransparencyAttributes attrib = figure.getAppearance()
+				.getTransparencyAttributes();
+		final Alpha alpha = new Alpha(1, runTime);
+		final TransparencyInterpolator transp = new TransparencyInterpolator(
+				alpha, attrib, 1, attrib.getTransparency());
+		transp.setSchedulingBounds(new BoundingSphere());
 
-        //the branch group is needed in order to be able
-        //to add to the compiled scene
+		// the branch group is needed in order to be able
+		// to add to the compiled scene
 
-        BranchGroup bg = new BranchGroup();
-        bg.addChild(transp);
-        figure.getFigureBranch().addChild(bg);
-    }
+		final BranchGroup bg = new BranchGroup();
+		bg.addChild(transp);
+		figure.getFigureBranch().addChild(bg);
+	}
 
-    public void skyDrop(AbstractFigure3D figure, int runTime) {
-        TransformGroup trans = (TransformGroup) figure.getParent();
-        Transform3D t3d = new Transform3D();
-        Vector3d translation = new Vector3d();
-        trans.getTransform(t3d);
-        t3d.get(translation);
-        Alpha alpha = new Alpha(1, runTime);
-        PositionInterpolator scale = new PositionInterpolator(alpha, trans, t3d, -100, (float) translation.x);
-        scale.setSchedulingBounds(new BoundingSphere());
-        //the branch group is needed in order to be able
-        //to add to the compiled scene
-        BranchGroup bg = new BranchGroup();
-        bg.addChild(scale);
-        figure.getFigureBranch().addChild(bg);
+	public void skyDrop(final AbstractFigure3D figure, final int runTime) {
+		final TransformGroup trans = (TransformGroup) figure.getParent();
+		final Transform3D t3d = new Transform3D();
+		final Vector3d translation = new Vector3d();
+		trans.getTransform(t3d);
+		t3d.get(translation);
+		final Alpha alpha = new Alpha(1, runTime);
+		final PositionInterpolator scale = new PositionInterpolator(alpha,
+				trans, t3d, -100, (float) translation.x);
+		scale.setSchedulingBounds(new BoundingSphere());
+		// the branch group is needed in order to be able
+		// to add to the compiled scene
+		final BranchGroup bg = new BranchGroup();
+		bg.addChild(scale);
+		figure.getFigureBranch().addChild(bg);
 
-    }
+	}
 }

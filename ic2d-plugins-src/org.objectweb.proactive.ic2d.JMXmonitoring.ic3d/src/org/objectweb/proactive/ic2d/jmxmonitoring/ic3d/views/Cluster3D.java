@@ -7,21 +7,21 @@ import javax.vecmath.Vector3f;
 
 public class Cluster3D extends AbstractCluster3D {
 
-	public Cluster3D(String name) {
+	public Cluster3D(final String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	protected void animateCreation() {
+	public void animateCreation() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void arrangeSubFigures() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -43,7 +43,8 @@ public class Cluster3D extends AbstractCluster3D {
 	}
 
 	@Override
-	protected AbstractFigure3D setArrow(String name, Vector3f start, Vector3f stop) {
+	protected Figure3D setArrow(final String name, final Vector3f start,
+			final Vector3f stop) {
 		// TODO Auto-generated method stub
 		return null;
 	}
