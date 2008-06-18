@@ -6,25 +6,17 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class TextureBasket {
-	public static final String path = "org/objectweb/proactive/ic2d/jmxmonitoring/ic3d/resources/";
-	public static final BufferedImage pebbles = TextureBasket
-			.loadImage(TextureBasket.path + "light_pebbles.jpg");
-	public static final BufferedImage white_sand = TextureBasket
-			.loadImage(TextureBasket.path + "white_sand.jpg");
-	public static final BufferedImage metal_walk = TextureBasket
-			.loadImage(TextureBasket.path + "metal_walk.jpg");
-	public static final BufferedImage fedora = TextureBasket
-			.loadImage(TextureBasket.path + "fedoraTexture.jpg");
-	public static final BufferedImage kde = TextureBasket
-			.loadImage(TextureBasket.path + "kde.png");
-	public static final BufferedImage ao = TextureBasket
-			.loadImage(TextureBasket.path + "ActiveObject.jpg");
-	public static final BufferedImage node_border = TextureBasket
-			.loadImage(TextureBasket.path + "node_skin.jpg");
-	public static final BufferedImage round_corners = TextureBasket
-			.loadImage(TextureBasket.path + "round_corners.png");
-	public static final BufferedImage earth = TextureBasket
-			.loadImage(TextureBasket.path + "EarthMap.jpg");
+    public static final String path = "org/objectweb/proactive/ic2d/jmxmonitoring/ic3d/resources/";
+    public static final BufferedImage pebbles = loadImage(path + "light_pebbles.jpg");
+    public static final BufferedImage white_sand = loadImage(path + "white_sand.jpg");
+    public static final BufferedImage metal_walk = loadImage(path + "metal_walk.jpg");
+    public static final BufferedImage fedora = loadImage(path + "fedoraTexture.jpg");
+    public static final BufferedImage kde = loadImage(path + "kde.png");
+    public static final BufferedImage ao = loadImage(path + "ActiveObject.jpg");
+    public static final BufferedImage node_border = loadImage(path + "node_skin.jpg");
+    public static final BufferedImage round_corners = loadImage(path + "round_corners.png");
+    public static final BufferedImage earth = loadImage(path + "EarthMap.jpg");
+    public static final BufferedImage flatMap = loadImage(path + "france.gif");
 
 	private static BufferedImage loadImage(final String fname) {
 		// Level logLevel = Level.FINE;
