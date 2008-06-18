@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.scheduler.common.job;
 import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -45,8 +46,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public final class JobId implements Comparable<JobId>, Serializable {
 
-    /** Default task name */
-    public static final String DEFAULT_JOB_NAME = "Not set";
+    /** Default job name */
+    public static final String DEFAULT_JOB_NAME = PASchedulerProperties.JOB_DEFAULT_NAME.getValueAsString();
 
     /** global id count */
     private static int currentId = 0;

@@ -37,12 +37,13 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 public class IntervalDivide implements Divide<Interval, Interval> {
 
     public Interval[] divide(Interval param, SkeletonSystem system) {
-        Interval ttUp = new Interval(1 + param.min + ((param.max - param.min) / 2), param.max,
-            param.solvableSize);
 
-        Interval ttDown = new Interval(param.min, param.min + ((param.max - param.min) / 2),
-            param.solvableSize);
+        int middle = param.min + ((param.max - param.min) / 2);
 
-        return new Interval[] { ttUp, ttDown };
+        Interval top = new Interval(middle + 1, param.max, param.solvableSize);
+
+        Interval bottom = new Interval(param.min, middle, param.solvableSize);
+
+        return new Interval[] { top, bottom };
     }
 }

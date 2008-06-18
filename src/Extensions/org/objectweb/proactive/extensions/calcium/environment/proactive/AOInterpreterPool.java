@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -48,11 +46,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class AOInterpreterPool implements RunActive, InitActive {
+
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
+
     private Vector<AOStageIn> pool;
     private boolean shutdown;
-    Collection<AOInterpreter> interpreterList;
-    int times;
+    private AOInterpreterPool thisStub;
 
     /**
      * Empty constructor for ProActive  MOP
@@ -67,34 +66,37 @@ public class AOInterpreterPool implements RunActive, InitActive {
      *
      * @param aoi The AOInterpreter array
      */
-    public AOInterpreterPool(Collection<AOInterpreter> aoi, Integer times) {
+    public AOInterpreterPool(Boolean proactiveNoise) {
         shutdown = false;
         pool = new Vector<AOStageIn>();
-        this.times = Math.max(1, times); //in case someone passed an argument < 0
-
-        interpreterList = aoi;
     }
 
     public void initActivity(Body body) {
-        AOInterpreterPool thisStub = (AOInterpreterPool) PAActiveObject.getStubOnThis();
-
-        ArrayList<AOStageIn> list = new ArrayList<AOStageIn>(interpreterList.size());
-        for (AOInterpreter interp : interpreterList) {
-            list.add(interp.getStageIn(thisStub));
-        }
-
-        for (int i = 0; i < times; i++) {
-            pool.addAll(list);
-        }
-
-        logger.debug("Interpreter Pool size: " + pool.size());
+        this.thisStub = (AOInterpreterPool) PAActiveObject.getStubOnThis();
     }
 
-    public void put(AOStageIn aoi) {
+    public synchronized void put(AOInterpreter list[], final int times) {
+
+        for (int i = 0; i < times; i++) {
+            for (AOInterpreter interpreter : list) {
+                pool.add(interpreter.getStageIn(thisStub));
+            }
+        }
+    }
+
+    public synchronized void put(AOStageIn aoi) {
         pool.add(aoi);
     }
 
-    public AOStageIn get() throws ProActiveException {
+    public void putInRandomPosition(AOStageIn aoi, int times) {
+
+        for (int i = 0; i < times; i++) {
+            int position = (int) Math.round((Math.random() * pool.size()));
+            pool.add(position, aoi);
+        }
+    }
+
+    public synchronized AOStageIn get() throws ProActiveException {
         if (shutdown) {
             throw new ProActiveException("Interpreter pool is shutting down");
         }
@@ -111,7 +113,7 @@ public class AOInterpreterPool implements RunActive, InitActive {
         Service service = new Service(body);
 
         while (true) {
-            String allowedMethodNames = "put|shutdown";
+            String allowedMethodNames = "put|putInRandomPosition|shutdown";
 
             if ((pool != null) && !pool.isEmpty()) {
                 allowedMethodNames += "get";

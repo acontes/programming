@@ -4,7 +4,11 @@ public class Utils {
 
     public static final String EMPTY_STRING = "";
 
+    public static final String PRIMITIVE_TYPE_INT = "int";
+
     public static final int MAX_RGB_VALUE = 255;
+
+    public static final long SEED = 19580427l;
 
     /**
      * Checks if a string is contained in an array of string.

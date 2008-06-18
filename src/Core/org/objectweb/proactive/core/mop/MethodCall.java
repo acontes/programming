@@ -386,7 +386,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             // In order to call from this class protected methods of the Active Object,
             // we need to bypass the Java Runtime security. 
             this.reifiedMethod.setAccessible(true);
-
             return this.reifiedMethod.invoke(targetObject, this.effectiveArguments);
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException("Access rights to the method denied: " + e);
@@ -394,7 +393,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             e.printStackTrace();
             throw new MethodCallExecutionFailedException("Arguments for the method " + this.getName() +
                 " are invalids: " + e + "for the object " + targetObject + "(" +
-                targetObject.getClass().getName() + ")");
+                targetObject.getClass().getName() + ")", e);
         }
     }
 

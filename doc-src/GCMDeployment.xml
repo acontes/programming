@@ -1,5 +1,5 @@
-<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
--->
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
+
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
 		<title>ProActive GCM Deployment</title>
@@ -466,6 +466,81 @@
 
 			<section>
 				<info>
+					<title>Host List</title>
+				</info>
+
+				<para>
+					A host list can be used with SSH and RSH groups as a shorthand to specify several machine names in a compact form. The format of a
+					host list is a whitespace-seperated list of name patterns or hostnames. A name pattern describes a set of hostnames with a common
+					root. The format is as follows.
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<root name><interval> 
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					with root name being an alphanumeric string (only letters and digits, no spaces or punctuation signs), and interval defining a set
+					of numerical values in the form of an interval or list of values, possibly followed by an exclusion interval or list of values.
+					The general form of an interval is:
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+
+[<value set>]^[<value set>]
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					or simply
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+
+[<value set>] 
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					if no exclusion interval is needed.
+
+				</para>
+
+				<para>
+					A value set is a coma-seperated list of integers or integers pairs separated by a dash, meaning an interval of values. The values
+					of an interval must be specified in increasing order, and the generated values will be in increasing order. Also, the first
+					integer of an interval can have leading zeroes to indicate the number of digits (numbers will be padded with zeroes if needed).
+					Some examples:
+					<itemizedlist>
+						<listitem>
+							<para>host[0-5]: host0, host1 … host5;</para>
+						</listitem>
+						<listitem>
+							<para>host[0-5]^[4]: host0, host1, host2, host3, host5;</para>
+						</listitem>
+						<listitem>
+							<para>host[0-10]^[4-6]: host0, host1, host2, host3, host7, host8, host9, host10;</para>
+						</listitem>
+						<listitem>
+							<para>host[00-5]: host00, host01, host02… host05;</para>
+						</listitem>
+						<listitem>
+							<para>host[1, 004-7, 09]: host1, host004, host005, host006, host007, host09.</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+
+			</section><!-- host list def -->
+
+			<section>
+				<info>
 					<title>RSH</title>
 				</info>
 
@@ -665,7 +740,7 @@
 				<listitem>
 					<para>
 						technicalServices (technical service) : a technical service specific to this virtual node. There can be any number of such
-						children. Technical Services are described in section 5.2.3
+						children.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -710,5 +785,410 @@
 
 		<para></para>
 	</section>
+
+	<section>
+		<info>
+			<title>Tutorial</title>
+		</info>
+
+		<para>
+			This tutorial shows how to deploy a grid-enabled application through the GCM standard. It will present the points of view of both the grid
+			administrator and the application developer.
+		</para>
+
+
+
+		<!-- 
+			
+			Deployment Descriptor Tutorial
+			
+		-->
+		<section>
+			<info>
+				<title>For the Grid Administrator : creating a deployment descriptor</title>
+			</info>
+
+			<para>
+				The task of a grid administrator is to make a model of his grid resources through a GCM Deployment Descriptor. Several examples are
+				available in the ProActive distribution. The deployment descriptor should represent the resources of the grid.
+
+				A deployment descriptor has the following XML structure:
+
+				<blockquote>
+					<para>
+						<programlisting>
+							<![CDATA[
+<environment>
+		<descriptorVariable …/>
+…
+</environment>
+
+<resources>
+		<bridge …/>
+		<group>
+			<host …/>
+			<host …/>
+			…
+		</group>
+	…
+</resources>
+
+<acquisition>
+		<lookup …/>
+		<p2p …/>
+	…
+</acquisition>
+
+<infrastructure>
+		<hosts>
+			<host…/>
+		</hosts>
+
+		<groups>
+			<groupType …/>
+		</group>
+
+		<bridges>
+			<bridgeType …/>
+		</bridges>
+	…
+</infrastructure>
+
+]]>
+
+						</programlisting>
+					</para>
+				</blockquote>
+
+			</para>
+			<para>
+				The elements must be specified in this order. The &lt;environment&gt; and &lt;acquisition&gt; elements can be omitted, while the
+				&lt;resources&gt; and &lt;infrastructure&gt; ones are mandatory. They are the ones which define the model :
+
+				<orderedlist>
+					<listitem>
+						<para>
+							Infrastructure: this is a flat list of each individual element of the grid: hosts, groups and bridges listed in no
+							particular order.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Resources: this is a tree describing the hierarchical relationships between these infrastructure elements. These
+							relationships are defined by:
+							<itemizedlist>
+								<listitem>
+									<para>a host being within which group;</para>
+								</listitem>
+								<listitem>
+									<para>a group being behind a bridge;</para>
+								</listitem>
+								<listitem>
+									<para>a host being directly available.</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+			<para>
+				Let's examine a couple of basic examples. Considering a very simple grid, that is two desktop PCs networked together. Such a setup
+				would be represented as follows (configuration parameters are omitted for the sake of clarity):
+			</para>
+
+			<blockquote>
+				<para>
+					<programlisting>
+						<![CDATA[
+<resources>
+	<hosts>
+		<host refid="host1"  />
+		<host refid="host2"  />
+	</hosts>
+</resources>
+
+<infrastructure>	
+    <hosts>
+		<host id="host1"  />
+		<host id="host2"  />
+	</hosts>
+</infrastructure>
+]]>
+					</programlisting>
+				</para>
+			</blockquote>
+
+			<para>
+				There is no hierarchical relation between the two hosts, so both resources and infrastructure parts are identical (aside of the extra
+				configuration parameters which are omitted here). A slightly more complex example would be a cluster of 12 mono-processor machines
+				running LSF. The representation in GCM Deployment would be as follows:
+			</para>
+
+			<blockquote>
+				<para>
+					<programlisting>
+						<![CDATA[
+<resources>
+		<group refid="LSF_GROUP">
+			<host refid="LSF_GROUP_MEMBER" />
+		</group>
+</resources>
+
+<infrastructure>
+	<hosts>
+		<host id="LSF_GROUP_MEMBER" />
+	</hosts>
+
+	<groups>
+		<lsfGroup id="LSF_GROUP" >
+			<resources processorNumber="12" />
+		</lsfGroup>
+	</groups>
+</infrastructure>
+
+]]>
+					</programlisting>
+				</para>
+			</blockquote>
+
+			<para>
+				Within the &lt;infrastructure&gt;, the &lt;hosts&gt; part describes the configuration common to the machines in the group. The
+				&lt;groups&gt; part describes the LSF group itself. Finally, the &lt;resources&gt; part describes how they fit together, in this case
+				the host model being within the LSF group.
+			</para>
+
+			<para>The next paragraphs go more in depth on the content and usage of each element.</para>
+
+			<section>
+				<info>
+					<title>Environment element</title>
+				</info>
+				<para>
+					To allow for a bit of flexibility, it is possible to define variables in a descriptor. The variables can be used in any XML value
+					element. They cannot be used in an XML element name. The &lt;environment&gt; element is where the variables are defined. It is a
+					simple list of &lt;descriptorVariable&gt; elements. For example:
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<environment>
+	<descriptorVariable name="usertype" value="admin" />
+  <descriptorVariable name="username" value="jsmith" />
+</environment>
+]]>
+
+							</programlisting>
+						</para>
+					</blockquote>
+
+					This allows the following usage later on in the decriptor: &lt;sshGroup user="${username}" /&gt;
+
+
+				</para>
+			</section>
+
+			<section>
+				<info>
+					<title>Resources element</title>
+				</info>
+				<para>
+					The &lt;resource&gt; element describes the hierarchical structure of the available grid resources. This can be seen as the
+					topology of the grid: which hosts are part of a group, which group is behind a bridge, etc… All the grid resources which are
+					listed in it must be fully defined in the &lt;infrastructure&gt; element. However it doesn't have to hold every element listed in
+					&lt;infrastructure&gt;, it is meant to contain only the subset of resources which are actually used by the deployment.
+				</para>
+
+				<para>
+
+					You can use the following elements to build your grid topology :
+					<orderedlist>
+						<listitem>
+							<para>
+								&lt;host&gt; : this represents a single machine, or more precisely a single configuration. When used within a group,
+								it represents the common configuration of all machines within this group.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								&lt;group&gt; : this represents a set of machines all sharing a common configuration. Typically a cluster. The
+								configuration is represented through a Host element.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								&lt;bridge&gt; : this represents a machine which acts as a gateway to one or several other machines. Typically, a
+								front-end for a cluster.
+							</para>
+						</listitem>
+					</orderedlist>
+
+					These elements all take a single argument named 'refid'. The value of the argument is the id of the corresponding
+					host/bridge/group element defined in the &lt;infrastructure&gt; element. The topology must be described according to the following
+					rules:
+					<itemizedlist>
+						<listitem>
+							<para>A host can be at the top level, or in a group element</para>
+						</listitem>
+						<listitem>
+							<para>A group can be at the top level, or in a bridge element</para>
+						</listitem>
+						<listitem>
+							<para>A bridge can only be at the top level</para>
+						</listitem>
+					</itemizedlist>
+
+					For example, the following constructions are correct: Single host:
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<host refid="A_HOST" />
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					Group:
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<group refid="CLUSTER">
+	<host refid="CLUSTER_NODE" />
+</group>
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					Group behind a bridge:
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<bridge refid="CLUSTER_FRONT_END" />
+	<group refid="CLUSTER">
+		<host refid="CLUSTER_NODE" />
+	</group>
+</bridge>
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+				</para>
+
+			</section>
+
+			<section>
+				<info>
+					<title>Acquisition element</title>
+				</info>
+				<para>
+					An alternative to the &lt;infrastructure&gt; element, the &lt;acquisition&gt; element describes how resources which are already
+					running can be acquired. It contains two types of elements: &lt;lookup&gt; and &lt;p2p&gt;, in this order. Each element can either
+					have a single occurrence or be omitted. The &lt;lookup&gt; element has the following three attributes:
+					<orderedlist>
+						<listitem>
+							<para>type: one of "RMI", "HTTP", "IBIS";</para>
+						</listitem>
+						<listitem>
+							<para>hostlist: a HostList as defined in 5.1.1;</para>
+						</listitem>
+						<listitem>
+							<para>port: a positive integer.</para>
+						</listitem>
+					</orderedlist>
+				</para>
+				<para>
+					The &lt;p2p&gt; element has a single attribute named "nodesAsked", indicating the number of requested nodes. You can set the value
+					to 'MAX' so that the maximum number of available nodes will be allocated to the task.
+				</para>
+			</section>
+
+			<section>
+				<info>
+					<title>Infrastructure element</title>
+				</info>
+				<para>
+					The &lt;infrastructure&gt; is where you will list the grid resources on which the deployment can take place, in no particular
+					order. Its purpose is to describe how these resources are deployed (i.e. through which protocols). It can have a single child
+					element of each of the following types: &lt;hosts&gt;, &lt;bridges&gt;, &lt;groups&gt;. &lt;bridges&gt; and &lt;groups&gt; may be
+					empty or omitted, but there should be at least one child element in &lt;hosts&gt;.
+				</para>
+
+
+			</section><!-- infrastructure element -->
+
+
+		</section><!-- end of Deployment Descriptor Tutorial -->
+
+
+		<para>Now we can look at the Application Descriptor</para>
+
+		<!-- 
+			
+			Application Descriptor Tutorial
+			
+		-->
+		<section>
+			<info>
+				<title>For the Grid Application Developer : creating an application descriptor</title>
+			</info>
+
+			<para>
+				While the Deployment Descriptor lists the grid resources, the application descriptor lists the resources the application needs.
+			</para>
+
+			<para>
+				The overall structure of an Application Descriptor is as follows :
+
+				<blockquote>
+					<para>
+						<programlisting>
+							<![CDATA[
+<environment>
+		…
+</environment>
+
+<application>
+…
+</application>
+
+<resources>
+		<nodeProvider>
+			<file …/>
+			…
+		</nodeProvider>
+		…
+</resources>
+]]>
+						</programlisting>
+					</para>
+				</blockquote>
+
+			</para>
+
+			<para>
+				The &lt;environment&gt; element is similar to the one in the Deployment Descriptor. The &lt;application&gt; one is where the
+				application itself and the resources it requests are described (see GCM Application descriptor section). Finally, the
+				&lt;resources&gt; element is where you'll make the link between the requested resources and the deployed ones.
+			</para>
+
+			<para>
+				The &lt;application&gt; tag can hold either an &lt;executable&gt; or a &lt;proactive&gt; tag. In both cases the requested resources
+				are specified through &lt;nodeProvider&gt; elements. These elements only carry a single 'refid' attribute which points to a
+				corresponding &lt;nodeProvider&gt; element listed in the &lt;resources&gt; element.
+			</para>
+
+
+		</section><!-- end of Application Descriptor Tutorial -->
+
+	</section>
+
 
 </chapter>

@@ -86,6 +86,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskState;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
 import org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB;
 import org.objectweb.proactive.extensions.scheduler.core.db.RecoverableState;
+import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
 import org.objectweb.proactive.extensions.scheduler.exception.DataBaseNotFoundException;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 import org.objectweb.proactive.extensions.scheduler.job.JobDescriptor;
@@ -119,13 +120,15 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /** Scheduler main loop time out */
-    private static final int SCHEDULER_TIME_OUT = 2000;
+    private static final int SCHEDULER_TIME_OUT = PASchedulerProperties.SCHEDULER_TIME_OUT.getValueAsInt();
 
     /** Scheduler node ping frequency in ms. */
-    private static final int SCHEDULER_NODE_PING_FREQUENCY = 45000;
+    private static final int SCHEDULER_NODE_PING_FREQUENCY = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY
+            .getValueAsInt();
 
     /** Delay to wait for between getting a job result and removing the job concerned */
-    private static final long SCHEDULER_REMOVED_JOB_DELAY = 60 * 60 * 1000;
+    private static final int SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
+            .getValueAsInt();
 
     /** Host name of the scheduler for logger system. */
     private String host = null;
@@ -1044,8 +1047,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     remove(job.getId());
                 }
             };
-            Timer t = new Timer();
-            t.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+            new Timer().schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
             logger.info("[SCHEDULER] Job " + jobId + " will be removed in " +
                 (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
         } catch (Exception e) {
@@ -1081,17 +1083,23 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String)
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) {
-        logger.info("[SCHEDULER] getTaskResult of task [" + taskName + "] for job[" + jobId + "]");
+        logger.info("[SCHEDULER] trying to getTaskResult of task [" + taskName + "] for job[" + jobId + "]");
         TaskResult result = null;
         InternalJob job = jobs.get(jobId);
 
         if (job != null) {
             //extract taskResult reference from memory (weak instance) 
+            //useful to get the task result with the task name
             result = job.getJobResult().getAllResults().get(taskName);
+            if (PAFuture.isAwaited(result)) {
+                //the result is not yet available
+                return null;
+            }
             //extract full taskResult from DB
+            //use the previous result to get the task Id matching the given name.
             result = AbstractSchedulerDB.getInstance().getTaskResult(result.getTaskId());
 
-            if ((result != null) && !PAFuture.isAwaited(result)) {
+            if ((result != null)) {
                 logger.info("[SCHEDULER] Get '" + taskName + "' task result for job " + jobId);
             }
         }
@@ -1703,6 +1711,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     //UNUSED OVERRIDED METHOD
+    //here to keep consistency in the architecture
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
         return null;
