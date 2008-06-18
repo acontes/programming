@@ -2,9 +2,11 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import javax.media.j3d.Geometry;
 import javax.media.j3d.LineArray;
+import javax.media.j3d.QuadArray;
 import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
+import javax.vecmath.TexCoord2f;
 import javax.vecmath.Tuple2d;
 import javax.vecmath.Vector3f;
 
@@ -42,14 +44,24 @@ public final class GeometryBasket {
 	private static Geometry barMonitorGeometry = GeometryBasket
 			.barMonitorGeometry();
 
-	private static Geometry runtimeGeometry = GeometryBasket.runtimeGeometry();
-	private static Geometry coordinatesGeometry = GeometryBasket
-			.coordinatesGeometry();
-	private static Geometry queueGeometry = GeometryBasket.queueGeometry();
+    /**
+     * Contains an application wide value for the size of the figures.
+     * It is needed for placing and scaling the figures. 
+     */
+    public static final float FIGURE_SCALE = 1f;
+    public static final int EARTH_RADIUS = 50;
+    //default geometries
+    private static Geometry nodeGeometry = nodeGeometry();
+    private static Geometry activeObjectGeometry = activeObjectGeometry();
+    private static Geometry gridGeometry = gridGeometry();
+    private static Geometry hostGeometry = hostGeometry();
+    private static Geometry alternateHostGeometry = alternateHostGeometry();
+    private static Geometry barMonitorGeometry = barMonitorGeometry();
 
-	// earth view geometries
-	private static Geometry earthGridGeometry = GeometryBasket
-			.earthGridGeometry();
+    private static Geometry runtimeGeometry = runtimeGeometry();
+    private static Geometry coordinatesGeometry = coordinatesGeometry();
+    private static Geometry queueGeometry = queueGeometry();
+    private static Geometry flatMap = flatMap();
 
 	/** Private constructor as this class should never be instantiated */
 	private GeometryBasket() {
@@ -146,13 +158,44 @@ public final class GeometryBasket {
 		return geoInfo.getGeometryArray();
 	}
 
+    private static Geometry flatMap() {
+    	float length = FIGURE_SCALE * 50; 
+    	 //-------------GEOMETRY POINTS--------------
+        Point3f a = new Point3f(-length, 0f, -length);
+        Point3f b = new Point3f(-length, 0f, length);
+        Point3f c = new Point3f(length, 0f, length);
+        Point3f d = new Point3f(length, 0f, -length);
+
+        //------------------------------------------
+        //create the points
+        Point3f[] pts = new Point3f[4];
+        //create the 6 face
+
+        //front
+        pts[0] = a;
+        pts[1] = b;
+        pts[2] = c;
+        pts[3] = d;
+        
+        TexCoord2f[] coords = new TexCoord2f[4];
+        coords[1] = new TexCoord2f(0f, 0f);
+        coords[0] = new TexCoord2f(0f, 1f);
+        coords[3] = new TexCoord2f(1f, 1f);
+        coords[2] = new TexCoord2f(1f, 0f);
+        
+        QuadArray quad =  new QuadArray(4, QuadArray.COORDINATES| QuadArray.TEXTURE_COORDINATE_2);
+        quad.setCoordinates(0, pts);
+        quad.setTextureCoordinates(0, 0, coords);
+        return quad;
+
+    }
+
 	private static Geometry queueGeometry() {
-		// -------------GEOMETRY POINTS--------------
-		final Point3f a = new Point3f(0f, 0f, 0f);
-		final Point3f b = new Point3f(0f, GeometryBasket.FIGURE_SCALE, 0f);
-		final Point3f c = new Point3f(-GeometryBasket.FIGURE_SCALE,
-				GeometryBasket.FIGURE_SCALE, 0f);
-		final Point3f d = new Point3f(-GeometryBasket.FIGURE_SCALE, 0f, 0f);
+        //-------------GEOMETRY POINTS--------------
+        Point3f a = new Point3f(0f, 0f, 0f);
+        Point3f b = new Point3f(0f, FIGURE_SCALE, 0f);
+        Point3f c = new Point3f(-FIGURE_SCALE, FIGURE_SCALE, 0f);
+        Point3f d = new Point3f(-FIGURE_SCALE, 0f, 0f);
 
 		final Point3f a1 = new Point3f(0f, 0f, GeometryBasket.FIGURE_SCALE);
 		final Point3f b1 = new Point3f(0f, GeometryBasket.FIGURE_SCALE,
@@ -705,11 +748,10 @@ public final class GeometryBasket {
 		return s.getShape().getGeometry();
 	}
 
-	private static Geometry earthGridGeometry() {
-		final Sphere s = new Sphere(15, Primitive.GENERATE_NORMALS
-				| Primitive.GENERATE_TEXTURE_COORDS, 150);
-		return s.getShape().getGeometry();
-	}
+    private static Geometry earthGridGeometry() {
+        Sphere s = new Sphere(EARTH_RADIUS, Primitive.GENERATE_NORMALS | Primitive.GENERATE_TEXTURE_COORDS, 150);
+        return s.getShape().getGeometry();
+    }
 
 	// ------------- PUBLIC METHODS ----------------
 	public static Geometry getEarthGridGeometry() {
@@ -748,7 +790,11 @@ public final class GeometryBasket {
 		return GeometryBasket.alternateHostGeometry;
 	}
 
-	public static Geometry getBarMonitorGeometry() {
-		return GeometryBasket.barMonitorGeometry;
-	}
+    public static Geometry getBarMonitorGeometry() {
+        return GeometryBasket.barMonitorGeometry;
+    }
+    
+    public static Geometry getFlatMap() {
+    	return GeometryBasket.flatMap;
+    }
 }
