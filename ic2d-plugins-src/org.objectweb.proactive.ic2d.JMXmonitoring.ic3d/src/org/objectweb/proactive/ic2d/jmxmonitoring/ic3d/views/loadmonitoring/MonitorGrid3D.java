@@ -60,11 +60,4 @@ public class MonitorGrid3D extends AbstractGrid3D {
 		return null;
 	}
 
-	public void translateGrid(final Vector3d position) {
-		final TransformGroup myTranslateTG = this.getTranslateScaleTransform();
-		final Transform3D myTranslation = new Transform3D();
-		myTranslation.setTranslation(position);
-		myTranslateTG.setTransform(myTranslation);
-	}
-
 }
