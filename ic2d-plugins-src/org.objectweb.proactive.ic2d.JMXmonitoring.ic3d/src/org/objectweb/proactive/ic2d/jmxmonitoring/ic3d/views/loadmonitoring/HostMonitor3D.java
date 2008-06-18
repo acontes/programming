@@ -108,7 +108,7 @@ public class HostMonitor3D extends AbstractFigure3D implements Figure3D {
 				.getTranslateScaleTransform();
 		final Transform3D translateScaleTransform3D = new Transform3D();
 		translateScaleTransform.getTransform(translateScaleTransform3D);
-		translateScaleTransform3D.setScale(new Vector3d(1, 1, loadScale));
+		translateScaleTransform3D.setScale(new Vector3d(1, loadScale, 1));
 		translateScaleTransform.setTransform(translateScaleTransform3D);
 
 	}
