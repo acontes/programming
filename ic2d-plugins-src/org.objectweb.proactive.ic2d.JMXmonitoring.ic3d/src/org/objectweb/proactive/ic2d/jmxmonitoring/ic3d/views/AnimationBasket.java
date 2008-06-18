@@ -66,7 +66,7 @@ public class AnimationBasket {
 
         BranchGroup bg = new BranchGroup();
         bg.addChild(transp);
-        figure.getParticularBranch().addChild(bg);
+        figure.getFigureBranch().addChild(bg);
     }
 
     public void skyDrop(AbstractFigure3D figure, int runTime) {
@@ -82,7 +82,7 @@ public class AnimationBasket {
         //to add to the compiled scene
         BranchGroup bg = new BranchGroup();
         bg.addChild(scale);
-        figure.getParticularBranch().addChild(bg);
+        figure.getFigureBranch().addChild(bg);
 
     }
 }
