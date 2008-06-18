@@ -8,6 +8,9 @@ import javax.media.j3d.TransformGroup;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3D;
+
+
 /**
  * THis class holds the placement strategies for the figures. <br/> WORK IN
  * PROGRESS
@@ -299,47 +302,42 @@ public class PlacementBasket {
 
 	}
 
-	/**
-	 * Places the figure on a sphere of radius radius. The host is placed
-	 * according to the two angles in radians.
-	 * 
-	 * @param theta
-	 *            x, z angle (polar)
-	 * @param phi
-	 *            y angle
-	 * @param figure
-	 *            figure to be placed
-	 */
-	public static void sphereArrangement(double theta, double phi,
-			final Figure3D figure) {
-		final double RADIUS = 16;
-		// Phi should be [0,PI] and theta between [0, 2PI]
-		phi %= Math.PI;
-		theta %= Math.PI * 2;
-		// get the coordinates in a plane
-		final double x = Math.cos(theta) * Math.sin(phi) * RADIUS;
-		final double z = Math.sin(theta) * Math.sin(phi) * RADIUS;
+    /**
+     * Places the figure on a sphere of EARTH_RADIUS
+     * EARTH_RADIUS. The host is placed according to 
+     * the two angles in radians.
+     * 
+     * @param theta 	x, z angle (polar)
+     * @param phi		y angle
+     * @param figure	figure to be placed 
+     */
+    public static void sphereArrangement(double theta, double phi, AbstractFigure3D figure) {
+    	// Phi should be [0,PI] and theta between [0, 2PI] 
+    	phi %= Math.PI;
+    	theta %= Math.PI * 2;
+        //get the coordinates in a plane 
+        double x = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS;
+        double z = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS;
 
-		// get the z coordinate
-		final double y = Math.cos(phi) * RADIUS;
-
-		// Create the lookAt Transform Matrix
-		final TransformGroup rotation = figure.getRotationTransform();
-		final Transform3D lookAtTransform = new Transform3D();
-		lookAtTransform.lookAt(new Point3d(), new Point3d(x, y, z),
-				new Vector3d(0, 1, 0));
-		lookAtTransform.invert(); // Keep it else wont work ( java3d failure )
-
-		// Rotate the lookAt Matrix the right way
-		final Transform3D rotationMatrix = new Transform3D();
-		rotationMatrix.rotX(-Math.PI / 2);
-		// Add the second transform
-		lookAtTransform.mul(rotationMatrix);
-		lookAtTransform.normalize();
-
-		// And commit the changes
-		rotation.setTransform(lookAtTransform);
-		figure.placeSubFigure(figure, x, y, z);
-	}
+        //get the z coordinate
+        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS;
+        
+        // Create the lookAt Transform Matrix
+        TransformGroup rotation = figure.getRotationTransform();
+        Transform3D lookAtTransform = new Transform3D();
+        lookAtTransform.lookAt(new Point3d(), new Point3d(x, y , z), new Vector3d(0, 1, 0));
+        lookAtTransform.invert(); // Keep it else wont work ( java3d failure )
+        
+        // Rotate the lookAt Matrix the right way
+        Transform3D rotationMatrix = new Transform3D();
+        rotationMatrix.rotX(-Math.PI/2);
+        // Add the second transform
+        lookAtTransform.mul(rotationMatrix);
+        lookAtTransform.normalize();
+        
+        // And commit the changes
+        rotation.setTransform(lookAtTransform);
+        figure.placeSubFigure(figure, x, y, z);
+    }
 
 }
