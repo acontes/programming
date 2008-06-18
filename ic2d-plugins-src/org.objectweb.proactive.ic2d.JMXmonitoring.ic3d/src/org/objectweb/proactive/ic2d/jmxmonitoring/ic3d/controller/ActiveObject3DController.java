@@ -25,12 +25,15 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 
 /**
  * @author esalagea
  * 
  */
 public class ActiveObject3DController extends AbstractActiveObject3DController {
+	private static final Logger logger = Logger.getLogger(ActiveObject3DController.class.getName());
     /**
      * @param modelObject
      * @param figure3D
@@ -48,8 +51,8 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
      */
     @Override
     protected AbstractFigure3DController createChildController(AbstractData figure) {
-        System.out.println("No children have been implemented for ActiveObjects");
-        return null;
+        logger.debug("No children have been implemented for ActiveObjects");
+        throw new NotImplementedException();
     }
 
     /*
@@ -73,6 +76,7 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
     }
 
     public void update(Observable o, Object arg) {
+    	super.update(o, arg);
         final MVCNotification notif = (MVCNotification) arg;
 
         // final Observable notificationSender = o;
@@ -89,10 +93,14 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
                 // }.start();
                 break;
             }
+            case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED: {
+            	int queueSize = (Integer) notif.getData();
+                ((ActiveObject3D) getFigure()).setQueueSize(queueSize);
+            	break;
+            }
             case ACTIVE_OBJECT_ADD_COMMUNICATION: {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+//                new Thread(new Runnable() {
+//                    public void run() {
                         final ActiveObject aoSource = (ActiveObject) notif.getData();
 
                         // final ActiveObject aoDestination = (ActiveObject)
@@ -132,9 +140,9 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
                         AbstractFigure3D rootGrid = (AbstractFigure3D) rootGridController.getFigure();
                         //TODO remove constant
                         //draw the communications on the grid with the given starting and stopping points
-                        rootGrid.drawCommunication(UUID.randomUUID().toString(), "", 100, source3d, dest3d);
-                    }
-                }).start();
+                       // rootGrid.drawCommunication(UUID.randomUUID().toString(), "", 5, source3d, dest3d);
+//                    }
+//                }).start();
                 // else
                 //			Logger.getRootLogger().log(
                 //					Priority.INFO,
