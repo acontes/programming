@@ -6,6 +6,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
@@ -13,6 +14,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
 public abstract class AbstractFigure3DController implements Observer {
+	private static final Logger logger = Logger.getLogger(AbstractFigure3DController.class.getName());
     /**
      * The figure of the parent controller
      */
@@ -49,7 +51,6 @@ public abstract class AbstractFigure3DController implements Observer {
         modelObject.addObserver(this);
     }
 
-    @Override
     public void update(Observable o, Object arg) {
         // get the notification data
         MVCNotification notif = (MVCNotification) arg;
@@ -74,7 +75,7 @@ public abstract class AbstractFigure3DController implements Observer {
             }
             case ADD_CHILDREN: {
                 // HostObject hostObj=this.host;
-                ArrayList<String> keys = (ArrayList) notif.getData();
+                ArrayList<String> keys = (ArrayList<String>) notif.getData();
 
                 for (int k = 0; k < keys.size(); k++) {
                     String modelObjectKey = keys.get(k);
@@ -89,12 +90,16 @@ public abstract class AbstractFigure3DController implements Observer {
             case REMOVE_CHILD: {
                 String figureKey = (String) notif.getData();
                 AbstractFigure3DController childController = getChildControllerByKey(figureKey);
+            	logger.debug("Removing child controller: " + "key [" + figureKey+ "]"
+            			+ " controller [" + childController + "]...");
                 if (childController == null) {
                     System.out.println("Child already removed " + figureKey);
                     return;
                 }
 
                 childController.remove();
+                logger.debug("Child controller: " + "key [" + figureKey+ "]"
+            			+ " controller [" + childController + "] removed");
                 break;
             }
             case REMOVE_CHILD_FROM_MONITORED_CHILDREN: {
@@ -109,32 +114,48 @@ public abstract class AbstractFigure3DController implements Observer {
                 childController.remove();
                 break;
             }
+           
         }
     }
 
     /**
-     * removes all children unsubscribes this controller (this listener) from
-     * the modelObject remove graphical representation
+     * Unsubscribes itself from
+     * the modelObject and  removes  its graphical representation
+     * from the graphical tree. This is done after calling remove()
+     * recursively on all the children.
      */
     public void remove() {
-        // System.out.println("Starting remove");
+    	logger.debug("Trying to remove all the children for controller ["
+    			+ this.toString() +"]");
         removeChildren();
-        // System.out.println("All children removed");
+    	logger.debug("All children removed for controller ["
+    			+ this.toString() +"]");
+    	logger.debug("Unsubscribing as a listener... ");
+        
+        //unsubscribe itself as observer
         this.modelObject.deleteObserver(this);
-        // System.out.println("Observer removed");
+    	logger.debug("I'm removing myself from the controller registry... ");        
+        //remove itself from the registry
         AbstractFigure3DController.registry.remove(this.modelObject);
         // System.out.println("Object model removed");
 
         // ---not right---
-        //    figure.getRootBranch().removeAllChildren();
-
+        //figure.getRootBranch().removeAllChildren();
+        
+        //figure.removeAllSubFigures();
+        
         //        
         // //the parent of this figure (the one
         // //corresponding to the controller that called remove
         // //should remove this particular figure)
         // System.out.println(figure);
-        parentFigure.removeSubFigure(figure);
-        // System.out.println("Remove done");
+        
+        //remove itself from the figure tree
+    	logger.debug("I'm deleting my graphical representation ["
+    			+this.figure+"]");        
+        this.parentFigure.removeSubFigure(this.figure);
+    	logger.debug("Controller ["+ this +"] and coresponding "
+    			+ this.figure + "graphical figure removed");        
     }
 
     public void removeChildren() {
