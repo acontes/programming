@@ -71,12 +71,14 @@ public class RuntimeObject extends AbstractData {
 
     //    public enum methodName {RUNTIME_KILLED,
     //        RUNTIME_NOT_RESPONDING,
-    //        RUNTIME_NOT_MONITORED;
+    //        RUNTIME_NOT_MONITORED,
+	//		  RUNTIME_THREADS_CHANGED;
     //    }
     //    ;
     private final HostObject parent;
     private final String url;
-
+    /** The number of threads on this virtual machine with -1 being an unknown number of threads. */
+    private int threads = -1;
     //private ProActiveConnection connection;
     private final String hostUrlServer;
     private final String serverName;
@@ -329,5 +331,19 @@ public class RuntimeObject extends AbstractData {
 
     public NotificationListener getListener() {
         return this.listener;
+    }
+    
+
+    /**
+     * Sets the number of threads in this runtime and notifies
+     * the observers. 
+     * @param threads the number of threads 
+     */
+    public void setThreadsNumber(int threads){
+    	if (this.threads != threads){
+    		this.threads = threads;
+	    	setChanged();
+	    	notifyObservers(new MVCNotification(MVCNotificationTag.RUNTIME_THREADS_CHANGED, threads));
+    	}
     }
 }
