@@ -195,6 +195,43 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     private long gcmNodes;
 
+
+    
+    //starts the thread that polls for system information 
+    // -----------------------------------------------------------    
+    static {
+    	new Thread(){
+    		@Override
+    		public void run() {
+    			ProActiveRuntimeWrapperMBean runtimeMbean 
+    				= ProActiveRuntimeImpl.getProActiveRuntime().getMBean();
+    			int threads = -1; 
+    			long heapUsed = -1;
+    			while (true) {
+    				if (threads != runtimeMbean.getThreadCount()){
+	    				threads = runtimeMbean.getThreadCount();
+	    				runtimeMbean.sendNotification(NotificationType.runtimeThreadsChanged, threads);
+    				}
+    				if (heapUsed != runtimeMbean.getUsedHeapMemory()){
+    					heapUsed = runtimeMbean.getUsedHeapMemory();
+    					runtimeMbean.sendNotification(NotificationType.heapUsageChanged, heapUsed);
+    				}
+    				try {
+    					//FIXME change to monitor 
+    					Thread.sleep(3000);
+    				} catch (InterruptedException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+    			}
+    		}
+    	}.start();
+    }
+    // -----------------------------------------------------------
+    
+    
+    
+    
     //
     // -- CONSTRUCTORS
     // -----------------------------------------------------------
