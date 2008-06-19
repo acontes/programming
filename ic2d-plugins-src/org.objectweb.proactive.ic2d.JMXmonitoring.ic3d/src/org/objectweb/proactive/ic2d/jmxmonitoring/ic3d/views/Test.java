@@ -15,400 +15,500 @@ import java.util.UUID;
 import javax.media.j3d.Canvas3D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.OrbitalCameraBehavior;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractActiveObject3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractGrid3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ActiveObject3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Grid3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Host3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Node3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Runtime3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorHost3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
+import com.sun.j3d.utils.pickfast.behaviors.PickMouseBehavior;
+
+
 /**
  * @author vjuresch
- * 
+ *
  */
 public class Test extends JFrame {
-	Figure3D grid;
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6327098576785371018L;
+    AbstractFigure3D grid;
+    AbstractFigure3D monitorGrid;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6327098576785371018L;
 
-	/**
-	 * @param args
-	 */
-	public Test() {
-		// testMany();
-		// testFew();
-		this.testRandom();
-		// testPicking();
-	}
+    /**
+     * @param args
+     */
+    public Test() {
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //testMany();
+        //testFew();
+        testNew();
+        //testRandom();
+        //testPicking();
+    }
 
-	private void testPicking() {
-		this.setUpWindow();
-		final Host3D pr = new Host3D("rmi://predadab.inria.fr");
-		final Host3D pu = new Host3D("rmi://puravida.inria.fr");
-		final Host3D ch = new Host3D("rmi://cheypa.inria.fr");
+    private void testPicking() {
+        setUpWindow();
+        Host3D pr = new Host3D("rmi://predadab.inria.fr");
+        Host3D pu = new Host3D("rmi://segfault.inria.fr");
+        Host3D ch = new Host3D("rmi://cheypa.inria.fr");
 
-		this.grid.addSubFigure("predadab", pr);
-		this.grid.addSubFigure("puravida", pu);
-		this.grid.addSubFigure("cheypa", ch);
+        grid.addSubFigure("predadab", pr);
+        grid.addSubFigure("segfault", pu);
+        grid.addSubFigure("cheypa", ch);
 
-	}
+    }
 
-	private void testRandom() {
-		final ArrayList<AbstractActiveObject3D> aos = new ArrayList<AbstractActiveObject3D>();
-		this.setUpWindow();
+    private void testNew() {
+        setUpNewWindow();
 
-		for (int i = 1; i < 30; i++) {
-			this.grid.addSubFigure("Host : " + Integer.valueOf(i), new Host3D(
-					"Host : " + Integer.valueOf(i)));
-		}
-		final int size = this.grid.getSubFigures().size();
-		int pick;
-		double chance;
-		Host3D picked;
-		int cati = 0;
-		while (cati < 50) {
-			pick = (int) Math.round(Math.random() * (size - 1));
-			// pick a host
-			picked = (Host3D) this.grid.getSubFigures().values().toArray()[pick];
-			chance = Math.random();
-			// add a runtime with a probability
-			if (chance > 0.351) {
-				picked.addSubFigure(new Double(chance).toString(),
-						new Runtime3D(new Double(chance).toString()));
-				chance = Math.random();
-				// iterate over runtiems and add a node with a probability
-				for (final String key : picked.getSubFigures().keySet()) {
-					if (chance > 0.01) {
-						final Runtime3D run = (Runtime3D) picked
-								.getSubFigure(key);
-						run.addSubFigure(new Double(chance).toString(),
-								new Node3D(new Double(chance).toString()));
-						chance = Math.random();
-						// iterate over nodes and add a ao with a probability
-						for (final String keyNode : run.getSubFigures()
-								.keySet()) {
-							if (chance > 0.01) {
-								final ActiveObject3D obiect = new ActiveObject3D(
-										new Double(chance).toString());
-								final Node3D nod = (Node3D) run.getSubFigures()
-										.get(keyNode);
-								nod.addSubFigure(new Double(chance).toString(),
-										obiect);
-								aos.add(obiect);
-							}
-						}
-					}
-				}
-			}
-			cati++;
-		}
+        Host3D pr = new Host3D("rmi://predabab.inria.fr");
+        Host3D pu = new Host3D("rmi://segfault.inria.fr");
+        Host3D ch = new Host3D("rmi://cheypa.inria.fr");
 
-		System.out.println("All generated:" + cati);
-		System.out.println("Starting communication between :" + aos.size());
-		final int aoNumber = aos.size();
+        grid.addSubFigure("predadab", pr);
+        grid.addSubFigure("segfault", pu);
+        grid.addSubFigure("cheypa", ch);
 
-		final ArrayList<AbstractActiveObject3D> obiecte = new ArrayList<AbstractActiveObject3D>(
-				aos);
-		while (true) {
-			new Thread(new Runnable() {
-				public void run() {
-					int a;
-					int b;
-					a = (int) Math.round(Math.random() * (aoNumber - 1));
-					b = (int) Math.round(Math.random() * (aoNumber - 1));
+        MonitorHost3D mpr = new MonitorHost3D("rmi://predadab.inria.fr");
+        MonitorHost3D mpu = new MonitorHost3D("rmi://segfault.inria.fr");
+        MonitorHost3D mch = new MonitorHost3D("rmi://cheypa.inria.fr");
 
-					// grid.drawCommunication(UUID.randomUUID().toString(),
-					// new Double(a).toString(),
-					// Math.round(Math.random()*5), obiecte.get(a),
-					// obiecte.get(b));
+        monitorGrid.addSubFigure("1", mpr);
+        monitorGrid.addSubFigure("2", mpu);
+        monitorGrid.addSubFigure("3", mch);
 
-					// grid.drawSphereArrow(new
-					// Double(Math.random()).toString(),
-					// new Double(a).toString(),
-					// 5000, new
-					// Vector2d(Math.random()*2*Math.PI,Math.random()*Math.PI
-					// -Math.PI/2),
-					// new
-					// Vector2d(Math.random()*2*Math.PI,Math.random()*Math.PI -
-					// Math.PI/2 ));
-					//                        
-				}
-			}).start();
-			try {
-				Thread.sleep(15);
-			} catch (final InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			// grid.drawSphereArrow(new Double(Math.random()).toString(),
-			// new Double(10000).toString(),
-			// 50000, new Vector2d(0,0),
-			// new Vector2d(Math.PI,Math.PI/2));
+        mpr.setAppearance(AppearanceBasket.defaultRuntimeAppearance);
 
-		}
-	}
+        mpr.setLoad(0.5);
+        mpu.setLoad(0.3);
+        mch.setLoad(0.95);
 
-	private void testMany() {
-		this.setUpWindow();
+        while (true) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            mpr.setLoad(Math.random());
+            mpu.setLoad(Math.random());
+            mch.setLoad(Math.random());
 
-		for (int i = 1; i < 50; i++) {
-			this.grid.addSubFigure("Host :" + Integer.valueOf(i), new Host3D(
-					"rmi://puravida.inria.fr"));
-			for (int k = 1; k < 3; k++) {
-				this.grid.getSubFigure("Host :" + Integer.valueOf(i))
-						.addSubFigure("cheie" + Integer.valueOf(k),
-								new Runtime3D(Integer.valueOf(k).toString()));
-				for (int j = 1; j < 3; j++) {
-					this.grid
-							.getSubFigure("Host :" + new Integer(i).toString())
-							.getSubFigure("cheie" + new Integer(k).toString())
-							.addSubFigure("node:" + j, new Node3D("nodul"));
-				}
-			}
-		}
-	}
+        }
+    }
 
-	private void setUpWindow() {
-		final GridUniverse universe = new GridUniverse();
-		this.grid = new EarthGrid3D("");
-		// grid = new Grid3D();
-		universe.addGrid((AbstractGrid3D) this.grid);
-		// three views
-		final Canvas3D viewOne = universe.newView();
-		final Canvas3D viewTwo = universe.newView();
-		final Canvas3D viewThree = universe.newView();
+    private void testRandom() {
+        ArrayList<AbstractActiveObject3D> aos = new ArrayList<AbstractActiveObject3D>();
+        setUpWindow();
 
-		// create layout 65/35
-		final GridBagConstraints constr = new GridBagConstraints();
-		final GridBagLayout mainLay = new GridBagLayout();
-		final JPanel main = new JPanel(mainLay);
+        for (int i = 1; i < 30; i++)
+            grid.addSubFigure("Host : " + Integer.valueOf(i), new Host3D("Host : " + Integer.valueOf(i)));
+        int size = grid.getSubFigures().size();
+        int pick;
+        double chance;
+        Host3D picked;
+        int cati = 0;
+        while (cati < 50) {
+            pick = (int) Math.round(Math.random() * (size - 1));
+            //pick a host
+            picked = (Host3D) grid.getSubFigures().values().toArray()[pick];
+            chance = Math.random();
+            //add a runtime with a probability
+            if (chance > 0.351) {
+                picked.addSubFigure(new Double(chance).toString(), new Runtime3D(new Double(chance)
+                        .toString()));
+                chance = Math.random();
+                //iterate over runtiems and add a node with a probability
+                for (String key : picked.getSubFigures().keySet())
+                    if (chance > 0.01) {
+                        Runtime3D run = (Runtime3D) picked.getSubFigure(key);
+                        run.addSubFigure(new Double(chance).toString(), new Node3D(new Double(chance)
+                                .toString()));
+                        chance = Math.random();
+                        //iterate over nodes and  add a ao with a probability
+                        for (String keyNode : run.getSubFigures().keySet()) {
+                            if (chance > 0.01) {
+                                ActiveObject3D obiect = new ActiveObject3D(new Double(chance).toString());
+                                Node3D nod = (Node3D) run.getSubFigures().get(keyNode);
+                                nod.addSubFigure(new Double(chance).toString(), obiect);
+                                aos.add(obiect);
+                            }
+                        }
+                    }
+            }
+            cati++;
+        }
 
-		// create layout in the 35 side with three rows
-		final JPanel side = new JPanel(new GridLayout(2, 1, 1, 1));
-		final JPanel left = new JPanel(new GridLayout(1, 1, 1, 1));
+        System.out.println("All generated:" + cati);
+        System.out.println("Starting communication between :" + aos.size());
+        final int aoNumber = aos.size();
 
-		left.setBackground(new Color(0, 0, 0));
-		side.setBackground(new Color(0, 0, 0));
-		main.setBackground(new Color(0, 0, 0));
+        final ArrayList<AbstractActiveObject3D> obiecte = new ArrayList<AbstractActiveObject3D>(aos);
+        while (true) {
+            new Thread(new Runnable() {
+                public void run() {
+                    int a;
+                    int b;
+                    a = (int) Math.round(Math.random() * (aoNumber - 1));
+                    b = (int) Math.round(Math.random() * (aoNumber - 1));
 
-		// add the first view on the left and all three on the right
-		constr.insets = new Insets(1, 1, 1, 1);
+                    //                        grid.drawCommunication(UUID.randomUUID().toString(),
+                    //                            new Double(a).toString(),
+                    //                           Math.round(Math.random()*5), obiecte.get(a),
+                    //                            obiecte.get(b));
 
-		constr.fill = GridBagConstraints.BOTH;
-		constr.gridwidth = 2;
-		constr.weightx = 1;
-		constr.weighty = 1;
-		main.add(left, constr);
+                    //                      grid.drawSphereArrow(new Double(Math.random()).toString(),
+                    //                      new Double(a).toString(),
+                    //                       5000, new Vector2d(Math.random()*2*Math.PI,Math.random()*Math.PI -Math.PI/2),
+                    //                       new Vector2d(Math.random()*2*Math.PI,Math.random()*Math.PI - Math.PI/2 ));
+                    //                        
+                }
+            }).start();
+            try {
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            //            grid.drawSphereArrow(new Double(Math.random()).toString(),
+            //                    new Double(10000).toString(),
+            //                     50000, new Vector2d(0,0),
+            //                     new Vector2d(Math.PI,Math.PI/2));
 
-		constr.gridwidth = 2;
-		constr.weightx = 0.3;
-		constr.weighty = 1;
+        }
+    }
 
-		main.add(side, constr);
+    private void testMany() {
+        setUpWindow();
 
-		// add views in the side pane
-		left.add(viewOne);
+        for (int i = 1; i < 50; i++) {
+            grid.addSubFigure("Host :" + Integer.valueOf(i), new Host3D("rmi://puravida.inria.fr"));
+            for (int k = 1; k < 3; k++) {
+                grid.getSubFigure("Host :" + Integer.valueOf(i)).addSubFigure("cheie" + Integer.valueOf(k),
+                        new Runtime3D(Integer.valueOf(k).toString()));
+                for (int j = 1; j < 3; j++) {
+                    grid.getSubFigure("Host :" + new Integer(i).toString()).getSubFigure(
+                            "cheie" + new Integer(k).toString()).addSubFigure("node:" + j,
+                            new Node3D("nodul"));
+                }
+            }
+        }
+    }
 
-		side.add(viewTwo);
-		side.add(viewThree);
-		this.add(main);
+    private void setUpWindow() {
+        CustomUniverse universe = new CustomUniverse();
+        grid = new EarthGrid3D("");
+        //grid = new Grid3D();
+        universe.addGrid((AbstractGrid3D) grid);
 
-		this.pack();
-		this.setVisible(true);
-		this.setSize(800, 600);
+        //three views
+        //three views
+        Canvas3D viewOne = universe.newView("1");
+        Canvas3D viewTwo = universe.newView("3", new Point3d(), grid.getRootBranch(),
+                new OrbitalCameraBehavior());
+        Canvas3D viewThree = universe.newView("2");
+        //create layout  65/35
+        GridBagConstraints constr = new GridBagConstraints();
+        GridBagLayout mainLay = new GridBagLayout();
+        JPanel main = new JPanel(mainLay);
 
-		viewOne.addMouseListener(new TemporaryMouseListener(side, left));
+        //create layout in the 35 side with three rows
+        JPanel side = new JPanel(new GridLayout(2, 1, 1, 1));
+        JPanel left = new JPanel(new GridLayout(1, 1, 1, 1));
 
-		viewTwo.addMouseListener(new TemporaryMouseListener(side, left));
-		viewThree.addMouseListener(new TemporaryMouseListener(side, left));
-	}
+        left.setBackground(new Color(0, 0, 0));
+        side.setBackground(new Color(0, 0, 0));
+        main.setBackground(new Color(0, 0, 0));
 
-	private void testFew() {
-		this.setUpWindow();
+        //add the first view on the left and all three on the right
+        constr.insets = new Insets(1, 1, 1, 1);
 
-		final Host3D pr = new Host3D("rmi://predadab.inria.fr");
-		final Host3D pu = new Host3D("rmi://puravida.inria.fr");
-		final Host3D ch = new Host3D("rmi://cheypa.inria.fr");
+        constr.fill = GridBagConstraints.BOTH;
+        constr.gridwidth = 2;
+        constr.weightx = 1;
+        constr.weighty = 1;
+        main.add(left, constr);
 
-		this.grid.addSubFigure("predadab", pr);
-		this.grid.addSubFigure("puravida", pu);
-		this.grid.addSubFigure("cheypa", ch);
+        constr.gridwidth = 2;
+        constr.weightx = 0.3;
+        constr.weighty = 1;
 
-		final Runtime3D r1 = new Runtime3D("r123");
-		final Runtime3D r2 = new Runtime3D("r1234");
-		final Runtime3D r3 = new Runtime3D("r123456");
-		final Runtime3D r4 = new Runtime3D("r12345678");
-		final Runtime3D r5 = new Runtime3D("r1234567890");
-		final Runtime3D r6 = new Runtime3D("r123456789011");
+        main.add(side, constr);
 
-		final Node3D n1 = new Node3D("nod12345");
-		final Node3D n2 = new Node3D("nod1234567");
-		final Node3D n3 = new Node3D("nod12345678");
-		final Node3D n4 = new Node3D("nod123456789");
-		final Node3D n5 = new Node3D("nod1234567890");
-		final Node3D n6 = new Node3D("nod6");
-		final Node3D n7 = new Node3D("nod7");
-		final Node3D n8 = new Node3D("nod8");
-		final Node3D n9 = new Node3D("nod9");
+        //add views in the side pane
+        left.add(viewOne);
 
-		final ActiveObject3D o1 = new ActiveObject3D("01234567890");
-		final ActiveObject3D o2 = new ActiveObject3D("022345678");
-		final ActiveObject3D o3 = new ActiveObject3D("032345678");
-		final ActiveObject3D o4 = new ActiveObject3D("042345678");
-		final ActiveObject3D o5 = new ActiveObject3D("o5234567823456789");
-		final ActiveObject3D o6 = new ActiveObject3D(
-				"o6234567892345678923456789");
-		final ActiveObject3D o7 = new ActiveObject3D("o72345678923456789");
-		final ActiveObject3D o8 = new ActiveObject3D(
-				"o8234567892345678923456789");
-		final ActiveObject3D o9 = new ActiveObject3D(
-				"o2345678923456789234567899");
-		final ActiveObject3D o10 = new ActiveObject3D("o102345678923456789");
+        side.add(viewTwo);
+        side.add(viewThree);
+        add(main);
 
-		// add runtimes
-		pr.addSubFigure("runtime1", r1);
-		pr.addSubFigure("runtime2", r2);
-		pr.addSubFigure("runtime3", r3);
+        pack();
+        setVisible(true);
+        setSize(800, 600);
 
-		pu.addSubFigure("runtime1", r4);
-		pu.addSubFigure("runtime2", r5);
-		ch.addSubFigure("runtime3", r6);
+        viewOne.addMouseListener(new TemporaryMouseListener(side, left));
+        viewTwo.addMouseListener(new TemporaryMouseListener(side, left));
+        viewThree.addMouseListener(new TemporaryMouseListener(side, left));
+    }
 
-		r1.addSubFigure("nod1", n1);
+    private void setUpNewWindow() {
+        CustomUniverse universe = new CustomUniverse();
 
-		r2.addSubFigure("nod2", n2);
-		r2.addSubFigure("nod3", n3);
+        grid = new Grid3D();
+        universe.addGrid((AbstractGrid3D) grid);
 
-		r3.addSubFigure("nod4", n4);
-		r3.addSubFigure("nod5", n5);
-		r3.addSubFigure("nod6", n6);
+        double dist = 300;
+        monitorGrid = new MonitorGrid3D();
+        universe.addGrid((AbstractGrid3D) monitorGrid);
+        //        ((MonitorGrid3D)monitorGrid).translateGrid(new Vector3d(dist, -2, 0));
 
-		r4.addSubFigure("nod7", n7);
-		r4.addSubFigure("nod8", n8);
-		r5.addSubFigure("nod9", n9);
+        //three views
+        Canvas3D viewOne = universe.newView("1");
+        Canvas3D viewTwo = universe.newView("3", new Point3d(), grid.getRootBranch(),
+                new OrbitalCameraBehavior());
+        Canvas3D viewThree = universe.newView("2");
 
-		n1.addSubFigure("o1", o1);
-		n1.addSubFigure("o2", o2);
-		n1.addSubFigure("o3", o3);
-		n2.addSubFigure("o4", o4);
-		n2.addSubFigure("o5", o5);
-		n3.addSubFigure("o6", o6);
-		n9.addSubFigure("o7", o7);
+        //create layout  65/35
+        GridBagConstraints constr = new GridBagConstraints();
+        GridBagLayout mainLay = new GridBagLayout();
+        JPanel main = new JPanel(mainLay);
 
-		n1.addSubFigure("o8", o8);
-		n1.addSubFigure("o9", o9);
-		n1.addSubFigure("o10", o10);
+        //create layout in the 35 side with three rows
+        JPanel side = new JPanel(new GridLayout(2, 1, 1, 1));
+        JPanel left = new JPanel(new GridLayout(1, 1, 1, 1));
 
-		// n1.removeSubFigure("o10");
-		o1.setState(State.SERVING_REQUEST);
-		o2.setState(State.MIGRATING);
-		o3.setState(State.WAITING_FOR_REQUEST);
-		o4.setState(State.UNKNOWN);
-		try {
-			System.in.read();
-		} catch (final IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        left.setBackground(new Color(0, 0, 0));
+        side.setBackground(new Color(0, 0, 0));
+        main.setBackground(new Color(0, 0, 0));
 
-		while (true) {
-			new Thread(new Runnable() {
-				public void run() {
-					int a;
-					int b;
-					ActiveObject3D start;
-					ActiveObject3D stop;
-					a = (int) Math.round(Math.random() * 7);
-					b = (int) Math.round(Math.random() * 7);
+        //add the first view on the left and all three on the right
+        constr.insets = new Insets(1, 1, 1, 1);
 
-					switch (a) {
-					case 1:
-						start = o1;
-						break;
-					case 2:
-						start = o2;
-						break;
-					case 3:
-						start = o3;
-						break;
-					case 4:
-						start = o4;
-						break;
-					case 5:
-						start = o5;
-						break;
-					case 6:
-						start = o6;
-						break;
-					case 7:
-						start = o7;
-						break;
-					default:
-						start = o1;
-						break;
-					}
+        constr.fill = GridBagConstraints.BOTH;
+        constr.gridwidth = 2;
+        constr.weightx = 1;
+        constr.weighty = 1;
+        main.add(left, constr);
 
-					switch (b) {
-					case 1:
-						stop = o1;
-						break;
-					case 2:
-						stop = o2;
-						break;
-					case 3:
-						stop = o3;
-						break;
-					case 4:
-						stop = o4;
-						break;
-					case 5:
-						stop = o5;
-						break;
-					case 6:
-						stop = o6;
-						break;
-					case 7:
-						stop = o7;
-						break;
-					default:
-						stop = o2;
-						break;
-					}
+        constr.gridwidth = 2;
+        constr.weightx = 0.3;
+        constr.weighty = 1;
 
-					final UUID cheie = UUID.randomUUID();
-					Test.this.grid.drawCommunication(cheie.toString(), "", 2,
-							start, stop);
-				}
-			}).start();
-			// try {
-			// Thread.sleep(3);
-			// } catch (InterruptedException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
+        main.add(side, constr);
 
-			o1.setQueueSize((int) Math.round(Math.random() * 20 + 1));
-			o2.setQueueSize((int) Math.round(Math.random() * 20 + 1));
-			o3.setQueueSize((int) Math.round(Math.random() * 20 + 1));
-			o4.setQueueSize((int) Math.round(Math.random() * 20 + 1));
-			o5.setQueueSize((int) Math.round(Math.random() * 20 + 1));
-			o6.setQueueSize((int) Math.round(Math.random() * 20 + 1));
-			try {
-				Thread.sleep(10);
-			} catch (final InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+        //add views in the side pane
+        left.add(viewOne);
 
-		// grid.drawArrow("puravida",
-		// "runtime2", "nod9",
-		// "o7",
-		// "predadab", "runtime1",
-		// "nod1", "o1");
-	}
+        side.add(viewTwo);
+        side.add(viewThree);
+        add(main);
 
-	public static void main(final String[] args) {
-		final Test test = new Test();
-		System.out.println("running test...");
-	}
+        pack();
+        setVisible(true);
+        setSize(800, 600);
+
+        viewOne.addMouseListener(new TemporaryMouseListener(side, left));
+        viewTwo.addMouseListener(new TemporaryMouseListener(side, left));
+        viewThree.addMouseListener(new TemporaryMouseListener(side, left));
+    }
+
+    private void testFew() {
+        setUpWindow();
+
+        Host3D pr = new Host3D("rmi://predadab.inria.fr");
+        Host3D pu = new Host3D("rmi://puravida.inria.fr");
+        Host3D ch = new Host3D("rmi://cheypa.inria.fr");
+
+        grid.addSubFigure("predadab", pr);
+        grid.addSubFigure("puravida", pu);
+        grid.addSubFigure("cheypa", ch);
+
+        Runtime3D r1 = new Runtime3D("r123");
+        Runtime3D r2 = new Runtime3D("r1234");
+        Runtime3D r3 = new Runtime3D("r123456");
+        Runtime3D r4 = new Runtime3D("r12345678");
+        Runtime3D r5 = new Runtime3D("r1234567890");
+        Runtime3D r6 = new Runtime3D("r123456789011");
+
+        Node3D n1 = new Node3D("nod12345");
+        Node3D n2 = new Node3D("nod1234567");
+        Node3D n3 = new Node3D("nod12345678");
+        Node3D n4 = new Node3D("nod123456789");
+        Node3D n5 = new Node3D("nod1234567890");
+        Node3D n6 = new Node3D("nod6");
+        Node3D n7 = new Node3D("nod7");
+        Node3D n8 = new Node3D("nod8");
+        Node3D n9 = new Node3D("nod9");
+
+        final ActiveObject3D o1 = new ActiveObject3D("01234567890");
+        final ActiveObject3D o2 = new ActiveObject3D("022345678");
+        final ActiveObject3D o3 = new ActiveObject3D("032345678");
+        final ActiveObject3D o4 = new ActiveObject3D("042345678");
+        final ActiveObject3D o5 = new ActiveObject3D("o5234567823456789");
+        final ActiveObject3D o6 = new ActiveObject3D("o6234567892345678923456789");
+        final ActiveObject3D o7 = new ActiveObject3D("o72345678923456789");
+        final ActiveObject3D o8 = new ActiveObject3D("o8234567892345678923456789");
+        final ActiveObject3D o9 = new ActiveObject3D("o2345678923456789234567899");
+        final ActiveObject3D o10 = new ActiveObject3D("o102345678923456789");
+
+        //add runtimes
+        pr.addSubFigure("runtime1", r1);
+        pr.addSubFigure("runtime2", r2);
+        pr.addSubFigure("runtime3", r3);
+
+        pu.addSubFigure("runtime1", r4);
+        pu.addSubFigure("runtime2", r5);
+        ch.addSubFigure("runtime3", r6);
+
+        r1.addSubFigure("nod1", n1);
+
+        r2.addSubFigure("nod2", n2);
+        r2.addSubFigure("nod3", n3);
+
+        r3.addSubFigure("nod4", n4);
+        r3.addSubFigure("nod5", n5);
+        r3.addSubFigure("nod6", n6);
+
+        r4.addSubFigure("nod7", n7);
+        r4.addSubFigure("nod8", n8);
+        r5.addSubFigure("nod9", n9);
+
+        n1.addSubFigure("o1", o1);
+        n1.addSubFigure("o2", o2);
+        n1.addSubFigure("o3", o3);
+        n2.addSubFigure("o4", o4);
+        n2.addSubFigure("o5", o5);
+        n3.addSubFigure("o6", o6);
+        n9.addSubFigure("o7", o7);
+
+        n1.addSubFigure("o8", o8);
+        n1.addSubFigure("o9", o9);
+        n1.addSubFigure("o10", o10);
+
+        //     n1.removeSubFigure("o10");
+        o1.setState(State.SERVING_REQUEST);
+        o2.setState(State.MIGRATING);
+        o3.setState(State.WAITING_FOR_REQUEST);
+        o4.setState(State.UNKNOWN);
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        while (true) {
+            new Thread(new Runnable() {
+                public void run() {
+                    int a;
+                    int b;
+                    ActiveObject3D start;
+                    ActiveObject3D stop;
+                    a = (int) Math.round(Math.random() * 7);
+                    b = (int) Math.round(Math.random() * 7);
+
+                    switch (a) {
+                        case 1:
+                            start = o1;
+                            break;
+                        case 2:
+                            start = o2;
+                            break;
+                        case 3:
+                            start = o3;
+                            break;
+                        case 4:
+                            start = o4;
+                            break;
+                        case 5:
+                            start = o5;
+                            break;
+                        case 6:
+                            start = o6;
+                            break;
+                        case 7:
+                            start = o7;
+                            break;
+                        default:
+                            start = o1;
+                            break;
+                    }
+
+                    switch (b) {
+                        case 1:
+                            stop = o1;
+                            break;
+                        case 2:
+                            stop = o2;
+                            break;
+                        case 3:
+                            stop = o3;
+                            break;
+                        case 4:
+                            stop = o4;
+                            break;
+                        case 5:
+                            stop = o5;
+                            break;
+                        case 6:
+                            stop = o6;
+                            break;
+                        case 7:
+                            stop = o7;
+                            break;
+                        default:
+                            stop = o2;
+                            break;
+                    }
+
+                    UUID cheie = UUID.randomUUID();
+                    grid.drawCommunication(cheie.toString(), "", 2, start, stop);
+                }
+            }).start();
+            //                    try {
+            //						Thread.sleep(3);
+            //					} catch (InterruptedException e) {
+            //						// TODO Auto-generated catch block
+            //						e.printStackTrace();
+            //					}
+
+            o1.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o2.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o3.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o4.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o5.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            o6.setQueueSize((int) Math.round(Math.random() * 20 + 1));
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        //		grid.drawArrow("puravida",
+        //					"runtime2", "nod9",
+        //					"o7", 
+        //					"predadab", "runtime1", 
+        //					"nod1", "o1");
+    }
+
+    public static void main(String[] args) {
+        Test test = new Test();
+        System.out.println("running test...");
+    }
 }

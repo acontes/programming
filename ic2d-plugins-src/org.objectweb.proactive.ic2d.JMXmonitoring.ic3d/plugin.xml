@@ -9,7 +9,7 @@
       </category>
       <view
             category="org.objectweb.proactive.ic2d.jmxmonitoring.category"
-            class="org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Monitoring3DView"
+            class="org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.Monitoring3DView"
             icon="icons/monitoring.gif"
             id="testPlugin.testView"
             name="3D view (experimental)">

@@ -127,12 +127,11 @@ public class RuntimeObjectListener implements NotificationListener {
             //            if (node != null) {
             //                node.destroy();
             //            }
-        } else if (type.equals(NotificationType.runtimeThreadsChanged)){
-        	Integer threads = (Integer)notification.getUserData();
-        	System.out.println("..................................Threads changed : " + threads);
-        	runtimeObject.setThreadsNumber(threads);
-        }
-        else {
+        } else if (type.equals(NotificationType.runtimeThreadsChanged)) {
+            Integer threads = (Integer) notification.getUserData();
+            System.out.println("..................................Threads changed : " + threads);
+            runtimeObject.setThreadsNumber(threads);
+        } else {
             System.out.println(runtimeObject + " => " + type);
         }
     }

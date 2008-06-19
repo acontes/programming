@@ -1,7 +1,8 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
+
 
 /**
  * Common interface for all the figure controller that defines all the basic
@@ -15,27 +16,27 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
  */
 public interface Figure3DController {
 
-	/**
-	 * Unsubscribes itself from the modelObject and removes its graphical
-	 * representation from the graphical tree. This is done after calling
-	 * remove() recursively on all the children.
-	 */
-	void remove();
+    /**
+     * Unsubscribes itself from the modelObject and removes its graphical
+     * representation from the graphical tree. This is done after calling
+     * remove() recursively on all the children.
+     */
+    void remove();
 
-	void removeChildren();
+    void removeChildren();
 
-	void addChildController(Figure3DController figureController);
+    void addChildController(Figure3DController figureController);
 
-	Figure3D getFigure();
+    Figure3D getFigure();
 
-	Figure3D getParentFigure();
+    Figure3D getParentFigure();
 
-	void removeFigure(String key);
+    void removeFigure(String key);
 
-	Figure3DController getParent();
+    Figure3DController getParent();
 
-	Figure3DController getChildControllerByKey(String key);
+    Figure3DController getChildControllerByKey(String key);
 
-	AbstractData getModelObject();
+    AbstractData getModelObject();
 
 }
