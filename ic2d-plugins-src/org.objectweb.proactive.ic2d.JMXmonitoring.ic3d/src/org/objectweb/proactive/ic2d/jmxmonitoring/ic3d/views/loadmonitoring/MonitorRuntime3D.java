@@ -16,6 +16,9 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 public class MonitorRuntime3D extends AbstractFigure3D implements Figure3D {
     private static final double LOAD_AVERAGE_THRESHOLD = 0.2;
     private static final double LOAD_HIGH_THRESHOLD = 0.8;
+    
+    private static final float MAX_THREADS_NUMBER = 1000;
+    private float maxHeap = 64;
 
     public MonitorRuntime3D(final String name) {
         super(name);
@@ -85,17 +88,42 @@ public class MonitorRuntime3D extends AbstractFigure3D implements Figure3D {
     }
 
     /**
-     * Visually update the load of the object according the host load we are
-     * currently monitoring.
+     * Visually update the number of threads of the object according to
+     * the number of threads on the runtime we are currently monitoring.
      * 
-     * @param loadScale
+     * @param threads
      */
-    public void setLoad(final double loadScale) {
-        if ((loadScale > 1) || (loadScale < 0)) {
+    public void setThreads(final int threads) {
+    	if (threads < 0) {
+            throw new IllegalArgumentException("The number of threads  " 
+            		+ threads + " cannot be smaller than 0.");
+        }
+    	setScale(threads * 1/MAX_THREADS_NUMBER);
+    }
+    
+    
+    /**
+     * Visually update the heap memory used according to
+     * the heap memory on the runtime we are currently monitoring.
+     * 
+     * @param heapUsed
+     */
+    public void setHeapUsed(final double heapUsed) {
+    	if (heapUsed < 0) {
+            throw new IllegalArgumentException("The heap used  " 
+            		+ heapUsed + " cannot be smaller than 0.");
+        }
+    	setScale(heapUsed * 1/maxHeap);
+    }
+    
+    
+    private void setScale(final double loadScale){
+    	//check that the arguments are in the correct range
+    	if ((loadScale > 1) || (loadScale < 0)) {
             throw new IllegalArgumentException("The scale  " + loadScale + " should be in the [0,1] range");
         }
 
-        if (loadScale > MonitorRuntime3D.LOAD_HIGH_THRESHOLD) {
+    	if (loadScale > MonitorRuntime3D.LOAD_HIGH_THRESHOLD) {
             this.setAppearance(AppearanceBasket.monitorFull);
         } else if (loadScale > MonitorRuntime3D.LOAD_AVERAGE_THRESHOLD) {
             this.setAppearance(AppearanceBasket.monitor);
@@ -108,6 +136,18 @@ public class MonitorRuntime3D extends AbstractFigure3D implements Figure3D {
         translateScaleTransform.getTransform(translateScaleTransform3D);
         translateScaleTransform3D.setScale(new Vector3d(1, loadScale, 1));
         translateScaleTransform.setTransform(translateScaleTransform3D);
-
     }
+    public void setMaxHeap(float maxHeap){
+    	this.maxHeap = maxHeap;
+    }
+    public void setMonitor(MonitoringTypes monitor) {
+		switch (monitor) {
+		case RUNTIME_THREADS: {
+			break;
+		}
+		case RUNTIME_HEAP_MEMORY_USED: {
+			break;
+		}
+		}
+	}
 }
