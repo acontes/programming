@@ -31,9 +31,9 @@ public class LoadHost3DController extends AbstractLoadHost3DController {
      */
     @Override
     protected AbstractFigure3D createFigure(final String name) {
-        // Logger.getRootLogger().log(Priority.INFO_INT, "Creating figure for
-        // host controller:"+name);
-        return new Grid3D();
+        MonitorHost3D monitorHost3D = new MonitorHost3D(name);
+        monitorHost3D.setLoad(0);
+    	return monitorHost3D;
     }
 
     /*

@@ -57,12 +57,15 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetDepthAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetTTRAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.FlatCameraBehavior;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.OrbitalCameraBehavior;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed.EarthGrid3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed.Grid3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.load.LoadGrid3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.CustomUniverse;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Grid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Universe3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorGrid3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3D;
 
 
 public class Monitoring3DView extends ViewPart {
@@ -132,28 +135,33 @@ public class Monitoring3DView extends ViewPart {
 
         final CustomUniverse universe = new CustomUniverse();
         final Universe3D universe3D = new Universe3D();
-
-        final Grid3D detailedGrid = new Grid3D();
-
-        final MonitorGrid3D loadGrid = new MonitorGrid3D();
-
-        universe3D.addSubFigure("detailed", detailedGrid);
-        universe3D.addSubFigure("load", loadGrid);
-
         universe.addGrid(universe3D.getRootBranch());
-        // create the grid controller,
-        // the grid controller will be responsible with creating/removing
-        // the host controllers and so on
+        
+        // Creates the controllers
         final Grid3DController gcontroller = new Grid3DController(this.world, universe3D, null);
         final LoadGrid3DController glcontroller = new LoadGrid3DController(this.world, universe3D, null);
-
+        final EarthGrid3DController egcontroller = new EarthGrid3DController(this.world, universe3D, null);
+        
+        // Fetch Grids
+        final Grid3D detailedGrid = (Grid3D)gcontroller.getFigure();
+        detailedGrid.setTranslation(new Vector3d(0, 0.5, 0));
+        
+        final MonitorGrid3D loadGrid = (MonitorGrid3D)glcontroller.getFigure();
+        
+        final EarthGrid3D earthGrid = (EarthGrid3D)egcontroller.getFigure();
+        earthGrid.setTranslation(new Vector3d(0, -300, 0));
+        
         // three views
         final Canvas3D viewOne = universe.newView("one", new Point3d(), detailedGrid.getRootBranch(),
                 new FlatCameraBehavior());
+        
         final Canvas3D viewTwo = universe.newView("two", LoadGrid3DController.GRID_POSITION, loadGrid
                 .getRootBranch(), new FlatCameraBehavior());
-        final Canvas3D viewThree = universe.newView("three", new Point3d(), detailedGrid.getRootBranch(),
-                new FlatCameraBehavior());
+        
+        //final Canvas3D viewThree = universe.newView("three", new Point3d(), detailedGrid.getRootBranch(),
+        //        new FlatCameraBehavior());
+        final Canvas3D viewThree = universe.newView("three", new Point3d(0, -300, 0), earthGrid.getRootBranch(),
+                new OrbitalCameraBehavior());
 
         // create layout 65/35
         final GridBagConstraints constr = new GridBagConstraints();

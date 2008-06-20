@@ -34,7 +34,7 @@ public final class GeometryBasket {
      * It is needed for placing and scaling the figures. 
      */
     public static final float FIGURE_SCALE = 1f;
-    public static final int EARTH_RADIUS = 50;
+    public static final int EARTH_RADIUS = 150;
     //default geometries
     private static Geometry nodeGeometry = nodeGeometry();
     private static Geometry activeObjectGeometry = activeObjectGeometry();

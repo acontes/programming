@@ -18,6 +18,7 @@ public class MonitorGrid3D extends AbstractGrid3D {
 
     public MonitorGrid3D() {
         super("");
+        System.out.println("MonitorGrid");
         // TODO Auto-generated constructor stub
     }
 

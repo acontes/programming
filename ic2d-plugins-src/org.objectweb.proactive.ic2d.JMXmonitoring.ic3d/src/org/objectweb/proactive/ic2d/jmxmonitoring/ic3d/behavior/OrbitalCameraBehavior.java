@@ -191,8 +191,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
     }
 
     private void dragSelected(float x_diff, float y_diff) {
-        /* TODO if camera in figure bounds cancel displace -> rotate */
-
+        
         double selectedPhi, selectedTheta;
         TransformGroup tg = (TransformGroup) selectedShape.getParent().getParent();
         Transform3D transform = new Transform3D();
@@ -210,29 +209,40 @@ public class OrbitalCameraBehavior extends CameraBehavior {
             selectedTheta = Math.PI - selectedTheta;
         }
 
-        System.out.println("Theta: " + selectedTheta + " Phi: " + selectedPhi);
-        // TODO now move the shape itself
-        selectedTheta += (double) x_diff / 120d;
+        selectedTheta += (double) x_diff / 60d;
         selectedTheta %= Math.PI * 2;
-        selectedPhi -= (double) y_diff / 120d;
+        selectedPhi -= (double) y_diff / 60d;
         if (selectedPhi < min_phi)
             selectedPhi = min_phi;
         else if (selectedPhi > max_phi)
             selectedPhi = max_phi;
         shapePosition.z = (float) (Math.cos(selectedTheta) * Math.sin(selectedPhi) *
-            GeometryBasket.EARTH_RADIUS * 1.10f);
+            GeometryBasket.EARTH_RADIUS * 1.1f);
         shapePosition.x = (float) (Math.sin(selectedTheta) * Math.sin(selectedPhi) *
-            GeometryBasket.EARTH_RADIUS * 1.10f);
+            GeometryBasket.EARTH_RADIUS * 1.1f);
 
         //get the z coordinate
-        shapePosition.y = (float) (Math.cos(selectedPhi) * GeometryBasket.EARTH_RADIUS * 1.10f);
+        shapePosition.y = (float) (Math.cos(selectedPhi) * GeometryBasket.EARTH_RADIUS * 1.1f);
 
-        // TODO make look at
-        System.out.println("dragging + " + shapePosition);
+        TransformGroup rotation = (TransformGroup)selectedShape.getParent();
+        Transform3D lookAtTransform = new Transform3D();
+        lookAtTransform.lookAt(new Point3d(), new Point3d(shapePosition), new Vector3d(0, 1, 0));
+        lookAtTransform.invert(); // Keep it else wont work ( java3d failure )
+
+        // Rotate the lookAt Matrix the right way
+        Transform3D rotationMatrix = new Transform3D();
+        rotationMatrix.rotX(-Math.PI / 2);
+        // Add the second transform
+        lookAtTransform.mul(rotationMatrix);
+        lookAtTransform.normalize();
+
+        // And commit the changes
+        rotation.setTransform(lookAtTransform);
+        
         transform.setTranslation(shapePosition);
         tg.setTransform(transform);
 
-        cameraRotation((int) x_diff, (int) y_diff);
+        cameraRotation((int) x_diff, (int)-y_diff);
 
     }
 

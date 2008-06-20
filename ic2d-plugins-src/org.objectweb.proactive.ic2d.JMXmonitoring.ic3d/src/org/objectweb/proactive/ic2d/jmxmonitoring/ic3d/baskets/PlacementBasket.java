@@ -295,11 +295,11 @@ public class PlacementBasket {
         phi %= Math.PI;
         theta %= Math.PI * 2;
         //get the coordinates in a plane 
-        double z = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS;
-        double x = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS;
+        double z = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.1;
+        double x = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.1;
 
         //get the z coordinate
-        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS;
+        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS * 1.1;
 
         // Create the lookAt Transform Matrix
         TransformGroup rotation = figure.getRotationTransform();

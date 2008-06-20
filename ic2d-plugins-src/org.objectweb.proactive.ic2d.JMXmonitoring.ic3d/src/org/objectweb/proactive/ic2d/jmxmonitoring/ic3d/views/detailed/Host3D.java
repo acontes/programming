@@ -24,6 +24,7 @@ public class Host3D extends AbstractHost3D {
      */
     public Host3D(final String name) {
         super(name);
+        System.out.println(name);
     }
 
     /*

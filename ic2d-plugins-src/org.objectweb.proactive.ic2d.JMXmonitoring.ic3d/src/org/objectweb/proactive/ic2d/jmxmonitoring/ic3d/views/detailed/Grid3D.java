@@ -52,8 +52,8 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     protected Geometry createGeometry() {
-        return GeometryBasket.getCoordinatesGeometry();
-        //return null;
+        //return GeometryBasket.getCoordinatesGeometry();
+        return null;
     }
 
     /*
@@ -85,8 +85,8 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     protected Appearance createAppearance() {
-        return AppearanceBasket.coordinatesAppearance;
-        //return null;
+        //return AppearanceBasket.coordinatesAppearance;
+        return null;
     }
 
     /*

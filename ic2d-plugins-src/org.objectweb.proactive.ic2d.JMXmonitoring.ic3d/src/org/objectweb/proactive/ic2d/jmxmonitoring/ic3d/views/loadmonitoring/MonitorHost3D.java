@@ -9,6 +9,7 @@ import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.PlacementBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 
@@ -34,7 +35,13 @@ public class MonitorHost3D extends AbstractFigure3D implements Figure3D {
      */
     @Override
     public void arrangeSubFigures() {
-        return;
+    	int figureIndex = 1;
+        for (final Figure3D host : this.getSubFigures().values()) {
+        	PlacementBasket.yArrangement(0.05, 0.05, 2, figureIndex, this.getSubFigures().size(), host, this);
+            //PlacementBasket.matrixArrangement(figureIndex, host);
+            figureIndex++;
+            host.arrangeSubFigures();
+        }
     }
 
     /*
