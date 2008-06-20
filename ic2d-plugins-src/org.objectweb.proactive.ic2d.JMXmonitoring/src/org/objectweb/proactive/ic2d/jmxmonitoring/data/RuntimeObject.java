@@ -73,12 +73,15 @@ public class RuntimeObject extends AbstractData {
     //        RUNTIME_NOT_RESPONDING,
     //        RUNTIME_NOT_MONITORED,
     //		  RUNTIME_THREADS_CHANGED;
-    //    }
+    //		  RUNTIME_HEAP_USED_CHANGED;
+	//    }
     //    ;
     private final HostObject parent;
     private final String url;
     /** The number of threads on this virtual machine with -1 being an unknown number of threads. */
     private int threads = -1;
+    /** The amount of heap memory used with -1 being an unknown amount. */
+    private float heapUsed = -1;
     //private ProActiveConnection connection;
     private final String hostUrlServer;
     private final String serverName;
@@ -343,4 +346,18 @@ public class RuntimeObject extends AbstractData {
             notifyObservers(new MVCNotification(MVCNotificationTag.RUNTIME_THREADS_CHANGED, threads));
         }
     }
+    
+    /**
+     * Sets the amount of heap memory used in the runtime and notifies
+     * the observers. 
+     * @param heapUsed 
+     */
+    public void setHeapMemoryUsed(float heapUsed) {
+        if (this.heapUsed != heapUsed) {
+            this.heapUsed = heapUsed;
+            setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.RUNTIME_HEAP_MEMORY_CHANGED, threads));
+        }
+    }
+
 }
