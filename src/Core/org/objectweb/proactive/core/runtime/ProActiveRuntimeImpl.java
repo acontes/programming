@@ -212,7 +212,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
                     }
                     if (heapUsed != runtimeMbean.getUsedHeapMemory()) {
                         heapUsed = runtimeMbean.getUsedHeapMemory();
-                        runtimeMbean.sendNotification(NotificationType.heapUsageChanged, heapUsed);
+                        runtimeMbean.sendNotification(NotificationType.runtimeHeapUsageChanged, heapUsed);
                     }
                     try {
                         //FIXME change to monitor 

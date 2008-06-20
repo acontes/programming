@@ -52,7 +52,7 @@ public class NotificationType {
     public final static String servingStarted = "servingStarted";
     public final static String voidRequestServed = "voidRequestServed";
     public final static String runtimeThreadsChanged = "runtimeThreadsChanged";
-    public final static String heapUsageChanged = "heapUsageChanged";
+    public final static String runtimeHeapUsageChanged = "heapUsageChanged";
 
     // --- Corresponds to the MigrationEvent -----------------------
     public final static String migratedBodyRestarted = "migratedBodyRestarted";
