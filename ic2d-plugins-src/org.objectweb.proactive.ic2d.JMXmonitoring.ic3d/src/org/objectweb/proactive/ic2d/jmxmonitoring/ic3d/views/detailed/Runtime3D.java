@@ -97,30 +97,4 @@ public class Runtime3D extends AbstractRuntime3D {
         // TODO Auto-generated method stub
         return null;
     }
-
-    /** ************************* */
-    /* Threads usage indicator */
-    /* FOR TESTING */
-    /** ************************ */
-
-    private final Queue3D queue = new Queue3D("");
-    private boolean noQueue = true;
-
-    public void setThreads(final int size) {
-        // TODO hacky, change
-        if (this.noQueue) {
-            this.addSubFigure(UUID.randomUUID().toString(), this.queue);
-            this.noQueue = false;
-
-        }
-        assert size > 0;
-        final TransformGroup trans = (TransformGroup) this.queue.getParent().getParent();
-        final Transform3D resize = new Transform3D();
-        trans.getTransform(resize);
-        final Vector3d oldScale = new Vector3d();
-        resize.getScale(oldScale);
-        // TODO remove constant
-        resize.setScale(new Vector3d((double) size / 2, oldScale.y, oldScale.z));
-        trans.setTransform(resize);
-    }
 }
