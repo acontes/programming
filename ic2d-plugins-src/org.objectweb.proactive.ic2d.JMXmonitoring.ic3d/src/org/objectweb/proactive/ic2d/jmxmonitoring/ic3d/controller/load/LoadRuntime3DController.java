@@ -11,8 +11,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Runtime3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorHost3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorRuntime3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
@@ -47,7 +46,7 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
      */
     @Override
     protected AbstractFigure3D createFigure(final String name) {
-        return new MonitorHost3D(name);
+        return new MonitorRuntime3D(name);
     }
 
     /*
@@ -69,7 +68,7 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
         switch (mvcNotif) {
             case RUNTIME_THREADS_CHANGED: {
                 final int threads = (Integer) notif.getData();
-                ((MonitorHost3D) this.getFigure()).setLoad((double) threads / 1000);
+                ((MonitorRuntime3D) this.getFigure()).setLoad((double) threads / 1000);
                 LoadRuntime3DController.logger.debug("The number of threads has changed " + threads);
                 break;
             }
