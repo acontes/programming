@@ -431,8 +431,8 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D {
         this.arrangeSubFigures();
     }
 
-    /**
-     * @return the highest BranchGroup of this figure
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D#getRootBranch()
      */
     public BranchGroup getRootBranch() {
         return this.rootBranch;
@@ -520,6 +520,9 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D {
         this.arrows.remove(key);
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D#getTranslateScaleTransform()
+     */
     public TransformGroup getTranslateScaleTransform() {
         return this.translateScaleTrans;
     }
