@@ -38,6 +38,14 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
     // children controllers
     private final Collection<Figure3DController> childrenControllers = new ArrayList<Figure3DController>();
 
+    /**
+     * Creates a controller that observes the modelObject,
+     * has a parent figure, and a parent controller. 
+     * 
+     * @param modelObject
+     * @param parentFigure3D
+     * @param parent
+     */
     public AbstractFigure3DController(final AbstractData modelObject, final Figure3D parentFigure3D,
             final Figure3DController parent) {
         this.modelObject = modelObject;
@@ -131,11 +139,11 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController#remove()
      */
     public void remove() {
-        AbstractFigure3DController.logger.debug("Trying to remove all the children for controller [" +
-            this.toString() + "]");
+        AbstractFigure3DController.logger.debug("Trying to remove all the children for controller [" 
+        		+ this.toString() + "]");
         this.removeChildren();
-        AbstractFigure3DController.logger.debug("All children removed for controller [" + this.toString() +
-            "]");
+        AbstractFigure3DController.logger.debug("All children removed for controller [" 
+        		+ this.toString() + "]");
         AbstractFigure3DController.logger.debug("Unsubscribing as a listener... ");
 
         // unsubscribe itself as observer
