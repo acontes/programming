@@ -68,9 +68,14 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
         switch (mvcNotif) {
             case RUNTIME_THREADS_CHANGED: {
                 final int threads = (Integer) notif.getData();
-                ((MonitorRuntime3D) this.getFigure()).setLoad((double) threads / 1000);
-                LoadRuntime3DController.logger.debug("The number of threads has changed " + threads);
+                ((MonitorRuntime3D) this.getFigure()).setThreads(threads);
+                LoadRuntime3DController.logger.debug("The number of threads has changed: " + threads);
                 break;
+            }
+            case RUNTIME_HEAP_MEMORY_CHANGED : {
+            	final float heapUsed = (Float) notif.getData();
+                LoadRuntime3DController.logger.debug("The heap memory usage has changed: " + heapUsed);
+            	
             }
         }
     }
