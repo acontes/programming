@@ -131,7 +131,11 @@ public interface Figure3D {
     void removeSubFigure(Figure3D figure);
 
     /**
-     * @return the highest BranchGroup of this figure
+     * Returns a  branch group containing the root branch of the figure.
+     * The root branch connects to the subfigures branch of the parent
+     * figure.
+     *  
+     * @return a BranchGroup containing the highest BranchGroup of this figure
      */
     BranchGroup getRootBranch();
 
@@ -163,6 +167,11 @@ public interface Figure3D {
      */
     void drawCommunication(final String key, String name, long timeToLive, Figure3D startAO, Figure3D stopAO);
 
+    /**
+     * Returns the transform containing the translation and scaling
+     * for the figure. 
+     * @return TransformGroup containing scaling and translation
+     */
     TransformGroup getTranslateScaleTransform();
 
     TransformGroup getRotationTransform();
