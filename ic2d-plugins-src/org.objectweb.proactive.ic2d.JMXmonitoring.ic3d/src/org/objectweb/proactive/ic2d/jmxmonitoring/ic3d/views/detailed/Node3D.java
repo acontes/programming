@@ -5,7 +5,9 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
 
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
+import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
+import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
@@ -39,19 +41,18 @@ public class Node3D extends AbstractNode3D {
         // iterate through all the ao of the node
         // and place them vertically
         for (final Figure3D ao : this.getSubFigures().values()) {
-            PlacementBasket.sphericalAOVerticalArrangement(0.05, 1.5, i, this.getSubFigures().size(), ao,
+            PlacementBasket.sphericalAOVerticalArrangement(0.05, 0.7 , i, this.getSubFigures().size(), ao,
                     this);
             i++;
             ao.arrangeSubFigures();
         }
-        // //change the height of the node to fit the number of active objects
-        // TransformGroup scaleHeight =
-        // (TransformGroup)this.getParent().getParent();
-        // Transform3D height = new Transform3D();
-        // scaleHeight.getTransform(height);
-        // height.setScale(new Vector3d(1,1,i * 1.5 + 0.1));
-
-        // scaleHeight.setTransform(height);
+//         //change the height of the node to fit the number of active objects
+//         TransformGroup scaleHeight =
+//         (TransformGroup)this.getTranslateScaleTransform();
+//         Transform3D height = new Transform3D();
+//         scaleHeight.getTransform(height);
+//         height.setScale(new Vector3d(1,i * 1.5 + 0.1,1));
+//         scaleHeight.setTransform(height);
     }
 
     /*
