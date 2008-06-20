@@ -131,6 +131,10 @@ public class RuntimeObjectListener implements NotificationListener {
             Integer threads = (Integer) notification.getUserData();
             System.out.println("..................................Threads changed : " + threads);
             runtimeObject.setThreadsNumber(threads);
+        } else if (type.equals(NotificationType.runtimeHeapUsageChanged)) {
+            Integer threads = (Integer) notification.getUserData();
+            System.out.println("..................................Threads changed : " + threads);
+            runtimeObject.setThreadsNumber(threads);
         } else {
             System.out.println(runtimeObject + " => " + type);
         }
