@@ -58,8 +58,4 @@ public class Runtime3DController extends AbstractRuntime3DController {
     public void removeFigure(final String key) {
         // TODO Auto-generated method stub
     }
-
-    public void update(final Observable observable, final Object arg) {
-
-    }
 }
