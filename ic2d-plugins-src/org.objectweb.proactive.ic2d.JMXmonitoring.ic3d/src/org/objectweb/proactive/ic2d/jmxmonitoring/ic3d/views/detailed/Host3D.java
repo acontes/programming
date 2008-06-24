@@ -41,7 +41,8 @@ public class Host3D extends AbstractHost3D {
     public void arrangeSubFigures() {
         int i = 1; // to count the runtimes
         for (final Figure3D runtime : this.getSubFigures().values()) {
-            PlacementBasket.xArrangement(0.1, 0.1, 0.1, i, this.getSubFigures().size(), runtime, this);
+        	PlacementBasket.matrixSubArrangement(i, runtime, this.getSubFigures().size(), new Vector3f(0f, 0.1f, 0f));
+        	//PlacementBasket.xArrangement(0.1, 0.1, 0.1, i, this.getSubFigures().size(), runtime, this);
             i++;
             runtime.arrangeSubFigures();
         }
@@ -54,7 +55,7 @@ public class Host3D extends AbstractHost3D {
      */
     @Override
     protected Geometry createGeometry() {
-        return GeometryBasket.getDefaultHostGeometry();
+        return GeometryBasket.getSmoothHostGeometry();
     }
 
     // code to create default appearance of visual object
