@@ -11,6 +11,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
 public class MonitorRuntime3D extends AbstractFigure3D implements Figure3D {
@@ -18,7 +19,9 @@ public class MonitorRuntime3D extends AbstractFigure3D implements Figure3D {
     private static final double LOAD_HIGH_THRESHOLD = 0.8;
     
     private static final float MAX_THREADS_NUMBER = 1000;
-    private float maxHeap = 64;
+    private long maxHeap = 64;
+    
+    private MVCNotificationTag monitor = MVCNotificationTag.RUNTIME_THREADS_CHANGED;
 
     public MonitorRuntime3D(final String name) {
         super(name);
@@ -108,12 +111,13 @@ public class MonitorRuntime3D extends AbstractFigure3D implements Figure3D {
      * 
      * @param heapUsed
      */
-    public void setHeapUsed(final double heapUsed) {
+    public void setHeapUsed(final long heapUsed) {
     	if (heapUsed < 0) {
             throw new IllegalArgumentException("The heap used  " 
             		+ heapUsed + " cannot be smaller than 0.");
         }
-    	setScale(heapUsed * 1/maxHeap);
+    	float scale = (float)heapUsed * 1/(float)maxHeap; 
+    	setScale(scale);
     }
     
     
@@ -137,17 +141,19 @@ public class MonitorRuntime3D extends AbstractFigure3D implements Figure3D {
         translateScaleTransform3D.setScale(new Vector3d(1, loadScale, 1));
         translateScaleTransform.setTransform(translateScaleTransform3D);
     }
-    public void setMaxHeap(float maxHeap){
+    public void setMaxHeap(long maxHeap){
     	this.maxHeap = maxHeap;
     }
-    public void setMonitor(MonitoringTypes monitor) {
-		switch (monitor) {
-		case RUNTIME_THREADS: {
-			break;
-		}
-		case RUNTIME_HEAP_MEMORY_USED: {
-			break;
-		}
-		}
+    public void setMonitor(MVCNotificationTag monitor) {
+    	if (monitor != MVCNotificationTag.RUNTIME_THREADS_CHANGED	||
+    		monitor !=  MVCNotificationTag.RUNTIME_HEAP_MEMORY_CHANGED) {
+    		throw new IllegalArgumentException("The monitoring type must a RUNTIME_* type ");
+    	}
+    		
+    	this.monitor = monitor;
 	}
+    public  MVCNotificationTag getMonitor() {
+		return this.monitor;
+	}
+
 }
