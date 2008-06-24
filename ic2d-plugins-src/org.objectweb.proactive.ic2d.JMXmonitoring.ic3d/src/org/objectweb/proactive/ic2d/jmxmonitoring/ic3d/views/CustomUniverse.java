@@ -2,6 +2,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import java.util.HashMap;
 
+import javax.media.j3d.AmbientLight;
 import javax.media.j3d.Background;
 import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.BranchGroup;
@@ -10,13 +11,14 @@ import javax.media.j3d.Locale;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.VirtualUniverse;
+import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.ColorPalette;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.CameraBehavior;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.FlatCameraBehavior;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ColorPalette;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 
 
@@ -73,8 +75,7 @@ public class CustomUniverse {
         CustomView customView = new CustomView();
         views.put(name, customView);
         locale.addBranchGraph(customView.getView());
-        customView.setCamera(camera, pickableScene);
-        customView.getCamera().setTarget(target);
+        customView.setCamera(camera, pickableScene, target);
         return customView.getCanvas3D();
     }
 
