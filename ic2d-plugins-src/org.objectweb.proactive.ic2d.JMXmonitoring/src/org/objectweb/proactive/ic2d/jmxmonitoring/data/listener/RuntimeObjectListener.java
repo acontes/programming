@@ -34,6 +34,7 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
@@ -57,6 +58,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
  *
  */
 public class RuntimeObjectListener implements NotificationListener {
+	private static final Logger logger = Logger.getLogger(RuntimeObjectListener.class.getName());
     private RuntimeObject runtimeObject;
 
     public RuntimeObjectListener(RuntimeObject runtimeObject) {
@@ -71,20 +73,19 @@ public class RuntimeObjectListener implements NotificationListener {
             UniqueID id = notificationData.getId();
             String nodeUrl = notificationData.getNodeUrl();
             ObjectName oname = FactoryName.createActiveObjectName(id);
-            System.out.println("...............................Body Created " + notification.getSource());
+            logger.debug("Body Created " + notification.getSource());
             NodeObject node = (NodeObject) runtimeObject.getChild(nodeUrl);
             if (node != null) {
                 node.addChild(new ActiveObject(node, id, name, oname));
             } else {
-                System.out.println("RuntimeObjectListener.handleNotification() node not found nodeUrl=" +
+                logger.debug("RuntimeObjectListener.handleNotification() node not found nodeUrl=" +
                     nodeUrl);
             }
         } else if (type.equals(NotificationType.bodyDestroyed)) {
             BodyNotificationData notificationData = (BodyNotificationData) notification.getUserData();
             UniqueID id = notificationData.getId();
             // ObjectName oname = Name.createActiveObjectName(id);
-            System.out.println("...............................Body Destroyed " + notification.getSource());
-
+            logger.debug("Body Destroyed " + notification.getSource());
             ActiveObject ao = runtimeObject.getWorldObject().findActiveObject(id);
             if (ao != null) {
                 ao.setDestroyed(true);
@@ -92,25 +93,23 @@ public class RuntimeObjectListener implements NotificationListener {
 
             runtimeObject.getWorldObject().removeActiveObject(id);
         } else if (type.equals(NotificationType.runtimeRegistered)) {
-            System.out.println("...............................Runtime Registered " +
-                notification.getSource());
+            logger.debug("Runtime Registered " +  notification.getSource());
             this.runtimeObject.getParent().explore();
             // this lines don't actually do anything  
             //TODO: remove them        	
             //RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
             runtimeObject.getParent().proposeChild();
         } else if (type.equals(NotificationType.runtimeUnregistered)) {
-            System.out.println("...............................Runtime Unregistered " +
-                notification.getSource());
+        	logger.debug("Runtime Unregistered " + notification.getSource());
             this.runtimeObject.getParent().explore();
             //   RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
         } else if (type.equals(NotificationType.runtimeDestroyed)) {
-            System.out.println("...............................Runtime destroyed " + runtimeObject);
+        	logger.debug("Runtime destroyed " + runtimeObject);
             runtimeObject.runtimeKilled();
         }
         // --- NodeEvent ----------------
         else if (type.equals(NotificationType.nodeCreated)) {
-            System.out.println("...............................Node Created");
+        	logger.debug("Node Created");
             this.runtimeObject.getParent().explore();
             //            
             //            Node node = ((NodeNotificationData) notification.getUserData()).getNode();
@@ -122,21 +121,21 @@ public class RuntimeObjectListener implements NotificationListener {
         } else if (type.equals(NotificationType.nodeDestroyed)) {
             this.runtimeObject.getParent().explore();
             String nodeUrl = (String) notification.getUserData();
-            System.out.println("...............................Node Destroyed : " + nodeUrl);
+            logger.debug("Node Destroyed : " + nodeUrl);
             //            NodeObject node = (NodeObject) runtimeObject.getChild(nodeUrl);
             //            if (node != null) {
             //                node.destroy();
             //            }
         } else if (type.equals(NotificationType.runtimeThreadsChanged)) {
             Integer threads = (Integer) notification.getUserData();
-            System.out.println("..................................Threads changed : " + threads);
+            logger.trace("Threads changed : " + threads);
             runtimeObject.setThreadsNumber(threads);
         } else if (type.equals(NotificationType.runtimeHeapUsageChanged)) {
-            Integer threads = (Integer) notification.getUserData();
-            System.out.println("..................................Threads changed : " + threads);
-            runtimeObject.setThreadsNumber(threads);
+            long heapMemoryUsed = (Long) notification.getUserData();
+            logger.trace("Memory changed : " + heapMemoryUsed + " bytes");
+            runtimeObject.setHeapMemoryUsed(heapMemoryUsed);
         } else {
-            System.out.println(runtimeObject + " => " + type);
+            logger.debug(runtimeObject + " => " + type);
         }
     }
 }
