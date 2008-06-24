@@ -147,20 +147,19 @@ public class Monitoring3DView extends ViewPart {
         detailedGrid.setTranslation(new Vector3d(0, 0.5, 0));
         
         final MonitorGrid3D loadGrid = (MonitorGrid3D)glcontroller.getFigure();
+        loadGrid.setTranslation(new Vector3d(0, 500, 0));
         
         final EarthGrid3D earthGrid = (EarthGrid3D)egcontroller.getFigure();
-        earthGrid.setTranslation(new Vector3d(0, -300, 0));
+        earthGrid.setTranslation(new Vector3d(0, -500, 0));
         
         // three views
-        final Canvas3D viewOne = universe.newView("one", new Point3d(), detailedGrid.getRootBranch(),
+        final Canvas3D viewOne = universe.newView("one", new Point3d(0, 0.5, 0), detailedGrid.getRootBranch(),
                 new FlatCameraBehavior());
         
-        final Canvas3D viewTwo = universe.newView("two", LoadGrid3DController.GRID_POSITION, loadGrid
+        final Canvas3D viewTwo = universe.newView("two", new Point3d(0, 500, 0), loadGrid
                 .getRootBranch(), new FlatCameraBehavior());
         
-        //final Canvas3D viewThree = universe.newView("three", new Point3d(), detailedGrid.getRootBranch(),
-        //        new FlatCameraBehavior());
-        final Canvas3D viewThree = universe.newView("three", new Point3d(0, -300, 0), earthGrid.getRootBranch(),
+        final Canvas3D viewThree = universe.newView("three", new Point3d(0, -500, 0), earthGrid.getRootBranch(),
                 new OrbitalCameraBehavior());
 
         // create layout 65/35

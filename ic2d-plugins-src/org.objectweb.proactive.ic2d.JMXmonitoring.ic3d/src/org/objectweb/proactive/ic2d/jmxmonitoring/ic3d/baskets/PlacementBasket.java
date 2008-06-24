@@ -7,6 +7,7 @@ import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3D;
@@ -86,6 +87,110 @@ public class PlacementBasket {
             z = c;
         }
         figure.placeSubFigure(figure, x, 0, z);
+    }
+    
+    /**
+     * Arranges figures in matrix You can find index of the figure with:
+     * 
+     * <br/> x == y -> idx = x^2,
+     * 
+     * <br/> ( x < y ) -> y^2 - y + x,
+     * 
+     * <br/> ( x > y ) -> x^2 -2x + y <br/>
+     * 
+     * 
+     * 
+     * @param figureIndex
+     * @param figure
+     */
+    public static void matrixSubArrangement(final int figureIndex, final Figure3D figure, final int figureCount, final Vector3f scales) {
+        /* Setting up our variables */
+        double x, z; /* Our host 2D placement */
+        int figureIndexSquareRoot, figureIndexUpperSquareRoot, xCountSquareRoot, zCountSquareRoot;
+        Vector3d figureScale;
+        
+        /* Checking parameters */
+        if (figureIndex < 1) {
+            throw new IllegalArgumentException("The figure index must be larger than 0");
+        }
+        
+        if (figureCount < 1) {
+        	throw new IllegalArgumentException("If you pass at least one figure this count should be at least 1");
+        }
+        
+        figureIndexSquareRoot = (int) Math.sqrt(figureIndex);
+        figureIndexUpperSquareRoot = figureIndexSquareRoot + 1;
+        
+        xCountSquareRoot = (int) Math.sqrt(figureCount);
+        if ( xCountSquareRoot * xCountSquareRoot < figureCount )
+        	xCountSquareRoot++;
+        zCountSquareRoot = xCountSquareRoot;
+        if( figureCount <= xCountSquareRoot * xCountSquareRoot - xCountSquareRoot)
+        	zCountSquareRoot--;
+        
+        /* Short sample of the 2D placement policy */
+        /*
+         * Could have been easier but maintains an order relation. Moreover you
+         * can find the index with the 2D coordinates.
+         * 
+         *  1  2  5 10 17
+         *  3  4  6 11 18
+         *  7  8  9 12 19
+         * 13 14 15 16 20
+         * 21 22 23 24 25
+         */
+
+        /* Our index is a square so x and y coordinates are the same */
+        if (figureIndexSquareRoot * figureIndexSquareRoot == figureIndex) {
+            x = figureIndexSquareRoot;
+            z = figureIndexSquareRoot;
+        }
+        /*
+         * Our index is lower or equal than the middle of next and previous
+         * squares (N)
+         */
+        else if (figureIndex <= (figureIndexSquareRoot * figureIndexSquareRoot + figureIndexUpperSquareRoot * figureIndexUpperSquareRoot) / 2) {
+            x = figureIndexUpperSquareRoot;
+            z = Math.abs(figureIndexSquareRoot * figureIndexSquareRoot - figureIndex);
+        }
+        /* The index is greater than the middle of next and previous squares (N) */
+        else {
+            x = figureIndexUpperSquareRoot - Math.abs(figureIndexUpperSquareRoot * figureIndexUpperSquareRoot - figureIndex);
+            z = figureIndexUpperSquareRoot;
+        }
+        
+        /* Offset to 0 */
+    	x--;
+    	z--;
+    	
+    	System.out.println("X: " + x + " Z: " + z);
+    	System.out.println("Xc: " + xCountSquareRoot + " Zc: " + zCountSquareRoot);
+    	/* Align figures to the center */
+    	x -= (double)((xCountSquareRoot - 1 )/ 2d);
+    	z -= (double)((zCountSquareRoot - 1 )/ 2d);
+    	
+    	System.out.println("X1: " + x + " Z1: " + z);
+    	
+    	/* Set the scale */
+    	x /= xCountSquareRoot;
+    	z /= zCountSquareRoot;
+    	
+    	/* Set the unit scale value */
+    	x *= GeometryBasket.FIGURE_SCALE;
+    	z *= GeometryBasket.FIGURE_SCALE;
+    	
+    	/* Scale the figure */
+    	figureScale = new Vector3d(1f /(xCountSquareRoot * 1.1f), scales.y, 1f / (zCountSquareRoot * 1.1f));
+        
+    	TransformGroup figureTransform = figure.getTranslateScaleTransform();
+        Transform3D figureTransform3D = new Transform3D();
+        figureTransform.getTransform(figureTransform3D);
+        figureTransform3D.setTranslation(new Vector3d(x, 0, z));
+        figureTransform3D.setScale(figureScale);
+        figureTransform.setTransform(figureTransform3D);
+        
+        
+        //figure.placeSubFigure(figure, x, 0, z);
     }
 
     /**
@@ -274,8 +379,8 @@ public class PlacementBasket {
 
         TransformGroup moveOld;
         parentFigurePosition.setScale(newScale);
-        parentFigurePosition.setTranslation(new Vector3d(GeometryBasket.FIGURE_SCALE / 2, spacing *
-            figureIndex, GeometryBasket.FIGURE_SCALE / 2));
+        parentFigurePosition.setTranslation(new Vector3d(0, spacing *
+            figureIndex, 0));
         moveOld = figure.getTranslateScaleTransform();
         moveOld.setTransform(parentFigurePosition);
 

@@ -35,8 +35,9 @@ public final class GeometryBasket {
      */
     public static final float FIGURE_SCALE = 1f;
     public static final int EARTH_RADIUS = 150;
+    
     //default geometries
-    private static Geometry nodeGeometry = nodeGeometry();
+    private static Geometry nodeGeometry = smoothNodeGeometry();
     private static Geometry activeObjectGeometry = activeObjectGeometry();
     private static Geometry gridGeometry = gridGeometry();
     private static Geometry hostGeometry = hostGeometry();
@@ -48,6 +49,9 @@ public final class GeometryBasket {
     private static Geometry queueGeometry = queueGeometry();
     private static Geometry flatMap = flatMap();
     private static Geometry earthGridGeometry = earthGridGeometry();
+    private static Geometry smoothHostGeometry = smoothHostGeometry();
+    private static Geometry smoothNodeGeometry = smoothNodeGeometry();
+    private static Geometry smoothRuntimeGeometry = smoothRuntimeGeometry();
 
     /** Private constructor as this class should never be instantiated */
     private GeometryBasket() {
@@ -140,6 +144,9 @@ public final class GeometryBasket {
         return geoInfo.getGeometryArray();
     }
 
+    
+    
+    
     private static Geometry flatMap() {
         float length = FIGURE_SCALE * 50;
         //-------------GEOMETRY POINTS--------------
@@ -472,7 +479,210 @@ public final class GeometryBasket {
         normGen.generateNormals(geoInfo);
         return geoInfo.getGeometryArray();
     }
+    
+    private static Geometry smoothHostGeometry() {
+    	final float length = GeometryBasket.FIGURE_SCALE / 2;
+    	final float length_smooth = GeometryBasket.FIGURE_SCALE * 0.4f;
+    	// -------------GEOMETRY POINTS--------------
+    	final Point3f a = new Point3f(-length_smooth, 0, length);
+    	final Point3f b = new Point3f(length_smooth, 0, length);
+    	final Point3f c = new Point3f(length, 0, length_smooth);
+    	final Point3f d = new Point3f(length, 0, -length_smooth);
+    	final Point3f e = new Point3f(length_smooth, 0, -length);
+    	final Point3f f = new Point3f(-length_smooth, 0, -length);
+    	final Point3f g = new Point3f(-length, 0, -length_smooth);
+    	final Point3f h = new Point3f(-length, 0, length_smooth);
 
+    	// ------------------------------------------
+        // create the points
+        final Point3f[] pts = new Point3f[16];
+
+        // front
+        pts[0] = a;
+        pts[1] = b;
+        pts[2] = c;
+        pts[3] = d;
+        pts[4] = e;
+        pts[5] = f;
+        pts[6] = g;
+        pts[7] = h;
+        
+        // back
+        pts[8] = h;
+        pts[9] = g;
+        pts[10] = f;
+        pts[11] = e;
+        pts[12] = d;
+        pts[13] = c;
+        pts[14] = b;
+        pts[15] = a;
+        
+        // say what points belong to the shape
+        final int[] stripCount = new int[2];
+        stripCount[0] = 8;
+        stripCount[1] = 8;
+
+        // say what the faces are
+        final int[] contourCount = new int[2];
+        contourCount[0] = 1;
+        contourCount[1] = 1;
+
+        // build the geometry
+        final GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
+        geoInfo.setCoordinates(pts);
+        geoInfo.setStripCounts(stripCount);
+        geoInfo.setContourCounts(contourCount);
+
+        // needed for lighting and shading the object
+        final NormalGenerator normGen = new NormalGenerator();
+        // the angle beyond which the normal generator will not smooth the
+        // angles
+        normGen.setCreaseAngle((float) Math.toRadians(90));
+        // generate the normals
+        normGen.generateNormals(geoInfo);
+        return geoInfo.getGeometryArray();
+    }
+    
+    private static Geometry smoothNodeGeometry() {
+    	final float length = GeometryBasket.FIGURE_SCALE / 2;
+    	final float length_smooth = GeometryBasket.FIGURE_SCALE * 0.4f;
+    	// -------------GEOMETRY POINTS--------------
+    	final Point3f a = new Point3f(-length_smooth, 0, length);
+    	final Point3f b = new Point3f(length_smooth, 0, length);
+    	final Point3f c = new Point3f(length, 0, length_smooth);
+    	final Point3f d = new Point3f(length, 0, -length_smooth);
+    	final Point3f e = new Point3f(length_smooth, 0, -length);
+    	final Point3f f = new Point3f(-length_smooth, 0, -length);
+    	final Point3f g = new Point3f(-length, 0, -length_smooth);
+    	final Point3f h = new Point3f(-length, 0, length_smooth);
+
+    	final Point3f i = new Point3f(-length_smooth, GeometryBasket.FIGURE_SCALE, length);
+    	final Point3f j = new Point3f(length_smooth, GeometryBasket.FIGURE_SCALE, length);
+    	final Point3f k = new Point3f(length, GeometryBasket.FIGURE_SCALE, length_smooth);
+    	final Point3f l = new Point3f(length, GeometryBasket.FIGURE_SCALE, -length_smooth);
+    	final Point3f m = new Point3f(length_smooth, GeometryBasket.FIGURE_SCALE, -length);
+    	final Point3f n = new Point3f(-length_smooth, GeometryBasket.FIGURE_SCALE, -length);
+    	final Point3f o = new Point3f(-length, GeometryBasket.FIGURE_SCALE, -length_smooth);
+    	final Point3f p = new Point3f(-length, GeometryBasket.FIGURE_SCALE, length_smooth);
+
+    	// ------------------------------------------
+        // create the points
+        final Point3f[] pts = {
+        		h, g, f, e, d, c, b, a,
+        		a, b, j, i,
+        		b, c, k, j,
+        		c, d, l, k,
+        		d, e, m, l,
+        		e, f, n, m,
+        		f, g, o, n,
+        		g, h, p, o,
+        		h, a, i, p,
+        		i, j, k, l, m, n, o, p
+        };
+
+        // say what points belong to the shape
+        final int[] stripCount = new int[10];
+        stripCount[0] = 8;
+        stripCount[1] = 4;
+        stripCount[2] = 4;
+        stripCount[3] = 4;
+        stripCount[4] = 4;
+        stripCount[5] = 4;
+        stripCount[6] = 4;
+        stripCount[7] = 4;
+        stripCount[8] = 4;
+        stripCount[9] = 8;
+        
+
+        // say what the faces are
+        final int[] contourCount = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+        // build the geometry
+        final GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
+        geoInfo.setCoordinates(pts);
+        geoInfo.setStripCounts(stripCount);
+        geoInfo.setContourCounts(contourCount);
+
+        // needed for lighting and shading the object
+        final NormalGenerator normGen = new NormalGenerator();
+        // the angle beyond which the normal generator will not smooth the
+        // angles
+        normGen.setCreaseAngle((float) Math.toRadians(45));
+        // generate the normals
+        normGen.generateNormals(geoInfo);
+        return geoInfo.getGeometryArray();
+    }
+    
+    private static Geometry smoothRuntimeGeometry() {
+    	final float length = GeometryBasket.FIGURE_SCALE / 2;
+    	final float length_smooth = GeometryBasket.FIGURE_SCALE * 0.4f;
+    	// -------------GEOMETRY POINTS--------------
+    	final Point3f a = new Point3f(-length_smooth, 0, length);
+    	final Point3f b = new Point3f(length_smooth, 0, length);
+    	final Point3f c = new Point3f(length, 0, length_smooth);
+    	final Point3f d = new Point3f(length, 0, -length_smooth);
+    	final Point3f e = new Point3f(length_smooth, 0, -length);
+    	final Point3f f = new Point3f(-length_smooth, 0, -length);
+    	final Point3f g = new Point3f(-length, 0, -length_smooth);
+    	final Point3f h = new Point3f(-length, 0, length_smooth);
+
+    	final Point3f i = new Point3f(-length_smooth, GeometryBasket.FIGURE_SCALE, length);
+    	final Point3f j = new Point3f(length_smooth, GeometryBasket.FIGURE_SCALE, length);
+    	final Point3f k = new Point3f(length, GeometryBasket.FIGURE_SCALE, length_smooth);
+    	final Point3f l = new Point3f(length, GeometryBasket.FIGURE_SCALE, -length_smooth);
+    	final Point3f m = new Point3f(length_smooth, GeometryBasket.FIGURE_SCALE, -length);
+    	final Point3f n = new Point3f(-length_smooth, GeometryBasket.FIGURE_SCALE, -length);
+    	final Point3f o = new Point3f(-length, GeometryBasket.FIGURE_SCALE, -length_smooth);
+    	final Point3f p = new Point3f(-length, GeometryBasket.FIGURE_SCALE, length_smooth);
+
+    	// ------------------------------------------
+        // create the points
+        final Point3f[] pts = {
+        		h, g, f, e, d, c, b, a,
+        		a, b, j, i,
+        		b, c, k, j,
+        		c, d, l, k,
+        		d, e, m, l,
+        		e, f, n, m,
+        		f, g, o, n,
+        		g, h, p, o,
+        		h, a, i, p,
+        		i, j, k, l, m, n, o, p
+        };
+
+        // say what points belong to the shape
+        final int[] stripCount = new int[10];
+        stripCount[0] = 8;
+        stripCount[1] = 4;
+        stripCount[2] = 4;
+        stripCount[3] = 4;
+        stripCount[4] = 4;
+        stripCount[5] = 4;
+        stripCount[6] = 4;
+        stripCount[7] = 4;
+        stripCount[8] = 4;
+        stripCount[9] = 8;
+        
+
+        // say what the faces are
+        final int[] contourCount = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+        // build the geometry
+        final GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
+        geoInfo.setCoordinates(pts);
+        geoInfo.setStripCounts(stripCount);
+        geoInfo.setContourCounts(contourCount);
+
+        // needed for lighting and shading the object
+        final NormalGenerator normGen = new NormalGenerator();
+        // the angle beyond which the normal generator will not smooth the
+        // angles
+        normGen.setCreaseAngle((float) Math.toRadians(45));
+        // generate the normals
+        normGen.generateNormals(geoInfo);
+        return geoInfo.getGeometryArray();
+    }
+    
     private static Geometry barMonitorGeometry() {
         // -------------GEOMETRY POINTS--------------
 
@@ -758,4 +968,16 @@ public final class GeometryBasket {
     public static Geometry getFlatMap() {
         return GeometryBasket.flatMap;
     }
+
+	public static Geometry getSmoothHostGeometry() {
+		return smoothHostGeometry;
+	}
+	
+	public static Geometry getSmoothNodeGeometry() {
+		return smoothNodeGeometry;
+	}
+	
+	public static Geometry getSmoothRuntimeGeometry() {
+		return smoothRuntimeGeometry;
+	}
 }

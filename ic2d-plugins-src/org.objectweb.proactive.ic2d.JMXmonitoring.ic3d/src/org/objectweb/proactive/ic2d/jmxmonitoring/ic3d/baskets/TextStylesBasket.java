@@ -13,7 +13,6 @@ import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Color3f;
 import javax.vecmath.Vector3d;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ColorPalette;
 
 import com.sun.j3d.utils.geometry.Text2D;
 

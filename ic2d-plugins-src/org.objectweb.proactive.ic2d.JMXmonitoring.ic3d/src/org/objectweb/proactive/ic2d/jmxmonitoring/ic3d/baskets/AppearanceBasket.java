@@ -13,7 +13,6 @@ import javax.media.j3d.TransparencyAttributes;
 import javax.vecmath.Color3f;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ColorPalette;
 
 import com.sun.j3d.utils.image.TextureLoader;
 
@@ -366,6 +365,7 @@ public final class AppearanceBasket {
         appearance.setTexture(metal_walk);
         final TexCoordGeneration tex = new TexCoordGeneration();
         tex.setEnable(true);
+        tex.setFormat(TexCoordGeneration.OBJECT_LINEAR);
         appearance.setTexCoordGeneration(tex);
 
         return appearance;
