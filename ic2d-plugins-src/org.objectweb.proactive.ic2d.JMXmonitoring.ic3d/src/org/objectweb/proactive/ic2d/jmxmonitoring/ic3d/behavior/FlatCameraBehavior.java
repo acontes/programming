@@ -10,6 +10,8 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Host3D;
+
 import com.sun.j3d.utils.geometry.ColorCube;
 import com.sun.j3d.utils.picking.PickResult;
 
@@ -20,15 +22,6 @@ public class FlatCameraBehavior extends CameraBehavior {
     private double phi;
     private double theta;
     private double distance;
-
-    public FlatCameraBehavior(Canvas3D canvas3D, TransformGroup cameraTransform) {
-        super(canvas3D, cameraTransform);
-        targetPosition = new Point3d();
-        phi = 0;
-        theta = Math.PI / 4;
-        distance = 8;
-        refresh();
-    }
 
     public FlatCameraBehavior() {
         super();
@@ -144,6 +137,8 @@ public class FlatCameraBehavior extends CameraBehavior {
             //	pop = pops[2];
             /*else */if (selectedShape instanceof ColorCube)
                 pop = pops[1];
+            else if(selectedShape instanceof Host3D)
+            	pop = pops[2];
             /* Shan't happen all non listed figures should be marked as not pickable */
             else
                 pop = pops[3];
@@ -235,6 +230,7 @@ public class FlatCameraBehavior extends CameraBehavior {
 
         /* Set Translation */
         position.add(targetPosition);
+        System.out.println(position);
         transform.setTranslation(new Vector3f(position)); //transform.setTranslation(position); // Strange break, bug ???;
         transformGroup.setTransform(transform);
     }

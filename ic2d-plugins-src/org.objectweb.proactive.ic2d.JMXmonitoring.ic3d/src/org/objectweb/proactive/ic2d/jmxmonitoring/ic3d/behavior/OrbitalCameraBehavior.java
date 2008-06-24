@@ -18,19 +18,25 @@ import com.sun.j3d.utils.picking.PickResult;
 
 
 public class OrbitalCameraBehavior extends CameraBehavior {
-    /* Useful constant for this camera type */
+    // Vector up is used to make the camera look at some point
     protected final static Vector3d up = new Vector3d(0, 1, 0);
+    // Bounds for the phi angle
     protected final static double min_phi = Math.PI / 36;
     protected final static double max_phi = 35 * Math.PI / 36;
+    // Bounds for the distance of the camera
     protected final static double min_distance = GeometryBasket.EARTH_RADIUS * 1.1;
     protected final static double max_distance = GeometryBasket.EARTH_RADIUS * 2.5;
 
+    // Theta is the angle of the camera relative to Z-X plane [0-2PI]
     private double theta;
+    // Phi is the angle of the angle of the camera related to the Y axis [0-PI]
     private double phi;
+    // Distance is the distance from the camera to the target
     private double distance;
 
     public OrbitalCameraBehavior() {
         super();
+        // Initialize the spherical camera settings
         theta = 0;
         phi = Math.PI / 2;
         distance = (min_distance + max_distance) / 2;
@@ -67,7 +73,8 @@ public class OrbitalCameraBehavior extends CameraBehavior {
 
     @Override
     protected void mouse1Dragged() {
-        /* On a figure */
+        /* On a figure  drag it */
+    	// TODO add test for draggable shapes
         if (selectedShape != null)
             dragSelected(x - x_last, y_last - y);
         /* Outside a figure */
@@ -77,14 +84,12 @@ public class OrbitalCameraBehavior extends CameraBehavior {
 
     @Override
     protected void mouse1Pressed() {
-        /* Left click -> Selects a shape */
-
         /* Pick the shape */
         PickResult pickResult = null;
         pickCanvas.setShapeLocation(x, y);
         pickResult = pickCanvas.pickClosest();
 
-        /* Act */
+        /* Set the selected shape as current selection */
         if (pickResult == null)
             selectedShape = null;
         else {
@@ -100,56 +105,26 @@ public class OrbitalCameraBehavior extends CameraBehavior {
 
     @Override
     protected void mouse1Released() {
-        /*if ( selectedShape != null && selectedShapeTranslation != null ) {
-        	TransformGroup tg = (TransformGroup)selectedShape.getParent();
-        	Transform3D t3d = new Transform3D();
-        	tg.getTransform(t3d);
-        	t3d.setTranslation(selectedShapeTranslation);
-        	tg.setTransform(t3d);
-        	selectedShapeTranslation = null;
-        }*/
+    	// TODO Drop properly the active Objects
     }
 
     @Override
-    protected void mouse2DoubleClick() {
-        // TODO Auto-generated method stub
-
-    }
+    protected void mouse2DoubleClick() { return; }
 
     @Override
-    protected void mouse2Dragged() {
-        /* Move on the x-z plane ( mouse 2 ) */
-        /*double x_diff, y_diff;
-        x_diff = (double)(x - x_last)/960d*distance;
-        y_diff = (double)(y_last - y)/960d*distance;
-        targetPosition.z += Math.cos(phi) * y_diff + Math.sin(phi) * x_diff;
-        targetPosition.x += Math.sin(phi) * y_diff - Math.cos(phi) * x_diff;
-        refresh();*/
-    }
+    protected void mouse2Dragged() { return; }
 
     @Override
-    protected void mouse2Pressed() {
-        // TODO Auto-generated method stub
-
-    }
+    protected void mouse2Pressed() { return; }
 
     @Override
-    protected void mouse2Released() {
-        // TODO Auto-generated method stub
-
-    }
+    protected void mouse2Released() { return; }
 
     @Override
-    protected void mouse3DoubleClick() {
-        // TODO Auto-generated method stub
-
-    }
+    protected void mouse3DoubleClick() { return; }
 
     @Override
-    protected void mouse3Dragged() {
-        // TODO Auto-generated method stub
-
-    }
+    protected void mouse3Dragged() { return; }
 
     @Override
     protected void mouse3Pressed() {
@@ -160,8 +135,6 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         /* We need a context menu */
         if (selectedShape != null) {
             /* Checks the type of the figure */
-            //if( selectedShape instanceof FractalKoch3D )
-            //	pop = pops[2];
             /*else */if (selectedShape instanceof ColorCube)
                 pop = pops[1];
             /* Shan't happen all non listed figures should be marked as not pickable */
@@ -175,23 +148,23 @@ public class OrbitalCameraBehavior extends CameraBehavior {
     }
 
     @Override
-    protected void mouse3Released() {
-        // TODO Auto-generated method stub
-
-    }
+    protected void mouse3Released() { return; }
 
     @Override
     protected void mouseWheel(int amount, int direction) {
+    	// Adjust the distance of the camera
         distance += (double) (amount * direction) / 6d;
+        // Make it fit the bounds
         if (distance > max_distance)
             distance = max_distance;
         else if (distance < min_distance)
             distance = min_distance;
+        // Set changes on screen
         refresh();
     }
 
     private void dragSelected(float x_diff, float y_diff) {
-        
+    	
         double selectedPhi, selectedTheta;
         TransformGroup tg = (TransformGroup) selectedShape.getParent().getParent();
         Transform3D transform = new Transform3D();

@@ -46,19 +46,6 @@ public abstract class CameraBehavior extends Behavior {
     protected PopupMenu[] pops = new PopupMenu[4];
     private BranchGroup cameraBranch;
 
-    /*double phi;
-    double theta;
-    double distance;
-    Vector3d up = new Vector3d(0, 1, 0);*/
-
-    public CameraBehavior(Canvas3D canvas3D, TransformGroup cameraTransform) {
-        super();
-        this.canvas3D = canvas3D;
-        transformGroup = cameraTransform;
-        targetPosition = new Point3d();
-        initComponents();
-    }
-
     public CameraBehavior() {
         super();
         cameraBranch = new BranchGroup();
@@ -76,7 +63,7 @@ public abstract class CameraBehavior extends Behavior {
         ActionListener ali;
 
         pops[1] = new PopupMenu("ColorCube");
-        pops[2] = new PopupMenu("Fractal");
+        pops[2] = new PopupMenu("Host");
         pops[2].add(new MenuItem("Stop Monitoring"));
         mit = new MenuItem("Reset translation");
         ali = new ActionListener() {
@@ -119,12 +106,6 @@ public abstract class CameraBehavior extends Behavior {
         }
     }
 
-    /* Load the scene graph */
-    public void setScene(BranchGroup scene) {
-        pickCanvas = new PickCanvas(canvas3D, scene);
-        pickCanvas.setMode(PickTool.GEOMETRY);
-        pickCanvas.setTolerance(0f);
-    }
 
     public void initialize() {
         WakeupCriterion[] mouseEvents = new WakeupCriterion[4];
