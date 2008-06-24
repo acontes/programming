@@ -1,7 +1,10 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.osgi.framework.BundleContext;
 
 
@@ -9,7 +12,7 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle
  */
 public class Activator extends AbstractUIPlugin {
-
+	private static Logger logger  = Logger.getLogger(Activator.class.getName());
     // The plug-in ID
     public static final String PLUGIN_ID = "testPlugin";
 
@@ -32,6 +35,7 @@ public class Activator extends AbstractUIPlugin {
         super.start(context);
         Activator.plugin = this;
         BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.TRACE);
     }
 
     /*
