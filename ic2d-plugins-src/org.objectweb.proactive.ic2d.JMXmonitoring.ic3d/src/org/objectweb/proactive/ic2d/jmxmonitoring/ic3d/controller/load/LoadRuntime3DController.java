@@ -12,13 +12,18 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DContro
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorRuntime3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitoringTypes;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
 /**
- * @author esalagea
+ * Controller for monitoring the runtime. Uses as 
+ * 3D figure {@link MonitorRuntime3D}.
  * 
+ * @author vjuresch
+ * @version $Id$
+ * @since 3.9 
  */
 public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
     private final static Logger logger = Logger.getLogger(AbstractLoadRuntime3DController.class.getName());
@@ -69,13 +74,16 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
             case RUNTIME_THREADS_CHANGED: {
                 final int threads = (Integer) notif.getData();
                 ((MonitorRuntime3D) this.getFigure()).setThreads(threads);
+                ((MonitorRuntime3D) this.getFigure()).setMonitor(mvcNotif);                
                 LoadRuntime3DController.logger.debug("The number of threads has changed: " + threads);
                 break;
             }
             case RUNTIME_HEAP_MEMORY_CHANGED : {
-            	final float heapUsed = (Float) notif.getData();
+            	final long heapUsed = (Long) notif.getData();
+                ((MonitorRuntime3D) this.getFigure()).setHeapUsed(heapUsed);
+                ((MonitorRuntime3D) this.getFigure()).setMonitor(mvcNotif);
                 LoadRuntime3DController.logger.debug("The heap memory usage has changed: " + heapUsed);
-            	
+                break;
             }
         }
     }
