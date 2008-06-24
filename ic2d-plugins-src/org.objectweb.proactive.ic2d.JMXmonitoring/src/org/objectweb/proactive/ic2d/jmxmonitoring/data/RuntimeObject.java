@@ -352,11 +352,11 @@ public class RuntimeObject extends AbstractData {
      * the observers. 
      * @param heapUsed 
      */
-    public void setHeapMemoryUsed(float heapUsed) {
+    public void setHeapMemoryUsed(long heapUsed) {
         if (this.heapUsed != heapUsed) {
             this.heapUsed = heapUsed;
             setChanged();
-            notifyObservers(new MVCNotification(MVCNotificationTag.RUNTIME_HEAP_MEMORY_CHANGED, threads));
+            notifyObservers(new MVCNotification(MVCNotificationTag.RUNTIME_HEAP_MEMORY_CHANGED, heapUsed));
         }
     }
 
