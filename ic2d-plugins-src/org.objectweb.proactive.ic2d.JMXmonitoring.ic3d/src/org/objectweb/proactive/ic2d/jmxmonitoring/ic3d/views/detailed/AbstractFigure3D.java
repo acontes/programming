@@ -1,6 +1,7 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
 
 import java.util.Hashtable;
+import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 

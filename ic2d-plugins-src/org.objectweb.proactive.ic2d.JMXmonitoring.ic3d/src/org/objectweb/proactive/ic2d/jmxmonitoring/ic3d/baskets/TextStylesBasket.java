@@ -5,11 +5,14 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets;
 
 import java.awt.Font;
 
+import javax.media.j3d.BoundingBox;
+import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.Group;
 import javax.media.j3d.Node;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
-import javax.vecmath.AxisAngle4d;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 import javax.vecmath.Color3f;
 import javax.vecmath.Vector3d;
 
@@ -27,33 +30,38 @@ public class TextStylesBasket {
 
     public static TransformGroup hostText(final String text) {
         return TextStylesBasket.figureText(text, ColorPalette.BLACK, "Arial", 25, Font.PLAIN, new Vector3d(
-            0d, -0.1d, 0.1d), new AxisAngle4d(1, 0, 0, Math.PI / 4), 1);
+            0d, 0d, 0.7d), new Vector3d(-Math.PI / 4, 0, 0), 1);
     }
 
     public static TransformGroup runtimeText(final String text) {
-        return TextStylesBasket.figureText(text, ColorPalette.BLACK, Font.SERIF, 20, Font.BOLD, new Vector3d(
-            1.1d, 0.1d, 0.5d), new AxisAngle4d(1, 0, 0, Math.PI / 3), 1.5);
+        return TextStylesBasket.figureText(text, ColorPalette.RED, Font.SERIF, 20, Font.BOLD, new Vector3d(
+            0d, 1d, 0.475d), new Vector3d(-Math.PI / 3, 0, 0), 1.5);
     }
 
     public static TransformGroup activeObjectText(final String text) {
-        return TextStylesBasket.figureText(text, ColorPalette.BLACK, Font.MONOSPACED, 30, Font.BOLD,
-                new Vector3d(1.5d, -1d, 0d), new AxisAngle4d(1, 0, 0, Math.PI / 2), 8);
+        return TextStylesBasket.figureText(text, ColorPalette.YELLOW, Font.MONOSPACED, 30, Font.BOLD,
+                new Vector3d(1.5d, -0.1d, 0d), new Vector3d(0, 0, 0), 8);
 
     }
 
     public static TransformGroup nodeText(final String text) {
-        return TextStylesBasket.figureText(text, ColorPalette.BLACK, "Arial", 35, Font.BOLD, new Vector3d(
-            0.1d, 0.1d, 1.1d), new AxisAngle4d(0, 0, 0, 0), 1); // no rotation or scaling
+        return TextStylesBasket.figureText(text, ColorPalette.BLUE, "Arial", 35, Font.BOLD, new Vector3d(
+            0d, 0.75d, -0.3d), new Vector3d(-Math.PI/2, 0, 0), 1); // no rotation or scaling
     }
 
     private static TransformGroup figureText(final String text, final Color3f color, final String fontName,
-            final int fontSize, final int fontStyle, final Vector3d translation, final AxisAngle4d rotation,
+            final int fontSize, final int fontStyle, final Vector3d translation, final Vector3d rotation,
             final double scale) {
         final Text2D figureName = new Text2D(text, color, fontName, fontSize, fontStyle);
-
+        
+        final Point3d point = new Point3d();
+        final BoundingBox box = (BoundingBox)figureName.getBounds();
+        box.getUpper(point);
+        translation.x -= point.x / 2d;
+        
         final TransformGroup fontRotate = TextStylesBasket.createTransform();
         final Transform3D rotate = new Transform3D();
-        rotate.setRotation(rotation);
+        rotate.setEuler(rotation);
         fontRotate.setTransform(rotate);
         final TransformGroup fontTrans = TextStylesBasket.createTransform();
         final Transform3D translate = new Transform3D();

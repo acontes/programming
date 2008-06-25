@@ -2,7 +2,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior;
 
 import java.awt.PopupMenu;
 
-import javax.media.j3d.Canvas3D;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
@@ -10,6 +9,7 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ActiveObject3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Host3D;
 
 import com.sun.j3d.utils.geometry.ColorCube;
@@ -49,20 +49,22 @@ public class FlatCameraBehavior extends CameraBehavior {
 
     @Override
     protected void mouse1Dragged() {
+    	/* The only objects you can drag are activeObjects */
         /* On a figure */
-        //if ( selectedShape != null && selectedShape instanceof FractalKoch3D)
-        //	dragSelected(x - x_last, y_last - y);
+        if ( selectedShape != null && selectedShape instanceof ActiveObject3D)
+        	dragSelected(x - x_last, y_last - y);
         /* Outside a figure */
-        //else
-        cameraRotation(x - x_last, y - y_last);
+        else
+        	cameraRotation(x - x_last, y - y_last);
     }
 
     @Override
     protected void mouse1Pressed() {
         /* Left click -> Selects a shape */
         PickResult pickResult = null;
-        if (pickCanvas == null)
-            System.out.println("pickCanvas null");
+        if (pickCanvas == null) {
+        	throw new NullPointerException("Pick Canvas not initialized");
+        }
         pickCanvas.setShapeLocation(x, y);
         pickResult = pickCanvas.pickClosest();
         if (pickResult == null)
@@ -177,11 +179,12 @@ public class FlatCameraBehavior extends CameraBehavior {
         if (selectedShapeTranslation == null) {
             selectedShapeTranslation = new Vector3f();
             selectedShapeTranslation.set(translation);
-            translation.y += 0.5f;
+            //translation.y += 0.5f;
         }
-
-        translation.x += (Math.cos(phi) * x_diff + Math.sin(phi) * y_diff) / 120f;
-        translation.z += (Math.sin(phi) * x_diff - Math.cos(phi) * y_diff) / 120f;
+        
+        // TODO move on the 2D Plate
+        translation.x += (Math.cos(phi) * x_diff + Math.sin(phi) * y_diff) / 10f;
+        translation.z += (Math.sin(phi) * x_diff - Math.cos(phi) * y_diff) / 10f;
 
         transform.set(translation);
         tg.setTransform(transform);
@@ -230,7 +233,6 @@ public class FlatCameraBehavior extends CameraBehavior {
 
         /* Set Translation */
         position.add(targetPosition);
-        System.out.println(position);
         transform.setTranslation(new Vector3f(position)); //transform.setTranslation(position); // Strange break, bug ???;
         transformGroup.setTransform(transform);
     }

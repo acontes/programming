@@ -2,7 +2,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior;
 
 import java.awt.PopupMenu;
 
-import javax.media.j3d.Canvas3D;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
@@ -13,7 +12,6 @@ import javax.vecmath.Vector3f;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 
 import com.sun.j3d.utils.geometry.ColorCube;
-import com.sun.j3d.utils.geometry.Sphere;
 import com.sun.j3d.utils.picking.PickResult;
 
 
@@ -164,7 +162,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
     }
 
     private void dragSelected(float x_diff, float y_diff) {
-    	
+    	/*
         double selectedPhi, selectedTheta;
         TransformGroup tg = (TransformGroup) selectedShape.getParent().getParent();
         Transform3D transform = new Transform3D();
@@ -216,7 +214,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         tg.setTransform(transform);
 
         cameraRotation((int) x_diff, (int)-y_diff);
-
+		*/
     }
 
     /*

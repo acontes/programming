@@ -64,7 +64,7 @@ public class Runtime3D extends AbstractRuntime3D {
     public void arrangeSubFigures() {
         int i = 1; // to count the nodes
         for (final Figure3D node : this.getSubFigures().values()) {
-            PlacementBasket.matrixSubArrangement(i, node, this.getSubFigures().size(), new Vector3f(0f, 2f, 0f));
+            PlacementBasket.matrixArrangement(i, node, this.getSubFigures().size(), new Vector3f(0f, 2f, 0f));
         	//PlacementBasket.yArrangement(0.05, 0.05, 2, i, this.getSubFigures().size(), node, this);
             i++;
             node.arrangeSubFigures();

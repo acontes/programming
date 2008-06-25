@@ -103,7 +103,7 @@ public class PlacementBasket {
      * @param figureIndex
      * @param figure
      */
-    public static void matrixSubArrangement(final int figureIndex, final Figure3D figure, final int figureCount, final Vector3f scales) {
+    public static void matrixArrangement(final int figureIndex, final Figure3D figure, final int figureCount, final Vector3f scales) {
         /* Setting up our variables */
         double x, z; /* Our host 2D placement */
         int figureIndexSquareRoot, figureIndexUpperSquareRoot, xCountSquareRoot, zCountSquareRoot;
@@ -163,8 +163,16 @@ public class PlacementBasket {
     	x--;
     	z--;
     	
-    	System.out.println("X: " + x + " Z: " + z);
-    	System.out.println("Xc: " + xCountSquareRoot + " Zc: " + zCountSquareRoot);
+    	/* Last row placement behavior */
+    	if( xCountSquareRoot == zCountSquareRoot
+    			&& zCountSquareRoot == z + 1 
+    			&& figureCount < xCountSquareRoot * xCountSquareRoot ) {
+    		/* Scale the last figures */
+    		//xCountSquareRoot = xCountSquareRoot * xCountSquareRoot - figureCount;
+    		/* centered */
+    		x += (double)(xCountSquareRoot * xCountSquareRoot - figureCount ) / (double)xCountSquareRoot;
+    	}
+    	
     	/* Align figures to the center */
     	x -= (double)((xCountSquareRoot - 1 )/ 2d);
     	z -= (double)((zCountSquareRoot - 1 )/ 2d);
@@ -188,9 +196,6 @@ public class PlacementBasket {
         figureTransform3D.setTranslation(new Vector3d(x, 0, z));
         figureTransform3D.setScale(figureScale);
         figureTransform.setTransform(figureTransform3D);
-        
-        
-        //figure.placeSubFigure(figure, x, 0, z);
     }
 
     /**
@@ -400,11 +405,11 @@ public class PlacementBasket {
         phi %= Math.PI;
         theta %= Math.PI * 2;
         //get the coordinates in a plane 
-        double z = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.1;
-        double x = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.1;
+        double z = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.075;
+        double x = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.075;
 
         //get the z coordinate
-        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS * 1.1;
+        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS * 1.075;
 
         // Create the lookAt Transform Matrix
         TransformGroup rotation = figure.getRotationTransform();
@@ -415,7 +420,12 @@ public class PlacementBasket {
         // Rotate the lookAt Matrix the right way
         Transform3D rotationMatrix = new Transform3D();
         rotationMatrix.rotX(-Math.PI / 2);
+        
         // Add the second transform
+        lookAtTransform.mul(rotationMatrix);
+        lookAtTransform.normalize();
+        
+        rotationMatrix.rotY(Math.PI);
         lookAtTransform.mul(rotationMatrix);
         lookAtTransform.normalize();
 
