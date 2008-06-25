@@ -69,95 +69,97 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
     }
 
     public void update(final Observable o, final Object arg) {
-        super.update(o, arg);
-        final MVCNotification notif = (MVCNotification) arg;
+    	if ( o != null) {
+    		super.update(o, arg);
+    		final MVCNotification notif = (MVCNotification) arg;
 
-        // final Observable notificationSender = o;
-        final MVCNotificationTag mvcNotif = notif.getMVCNotification();
+    		// final Observable notificationSender = o;
+    		final MVCNotificationTag mvcNotif = notif.getMVCNotification();
 
-        // check the posibilities
-        switch (mvcNotif) {
-            case STATE_CHANGED: {
-                // new Thread() {
-                // public void run() {
-                // Thread also has a State enum, careful if using a new thread, the
-                // full package name must be specified
-                ((ActiveObject3D) this.getFigure()).setState((State) notif.getData());
-                // }
-                // }.start();
-                break;
-            }
-            case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED: {
-                final int queueSize = (Integer) notif.getData();
-                ((ActiveObject3D) this.getFigure()).setQueueSize(queueSize);
-                break;
-            }
-            case ACTIVE_OBJECT_ADD_COMMUNICATION: {
+        	// check the posibilities
+        	switch (mvcNotif) {
+            	case STATE_CHANGED: {
+                	// new Thread() {
+                	// public void run() {
+                	// Thread also has a State enum, careful if using a new thread, the
+                	// full package name must be specified
+                	((ActiveObject3D) this.getFigure()).setState((State) notif.getData());
+                	// }
+                	// }.start();
+                	break;
+            	}
+            	case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED: {
+                	final int queueSize = (Integer) notif.getData();
+                	((ActiveObject3D) this.getFigure()).setQueueSize(queueSize);
+                	break;
+            	}
+            	case ACTIVE_OBJECT_ADD_COMMUNICATION: {
 
-                //			remove because the global registry of figures has been removed
-                //			FIXME create alternative implementation
-                //			// new Thread(new Runnable() {
-                //			// public void run() {
-                //			final ActiveObject aoSource = (ActiveObject) notif.getData();
-                //
-                //			// final ActiveObject aoDestination = (ActiveObject)
-                //			// notificationSender;
-                //			if ((aoSource == null)) {
-                //				ActiveObject3DController.logger
-                //						.warn("No source object found for commmunication");
-                //				return;
-                //			}
-                //
-                //			final Figure3DController srcController = AbstractFigure3DController.registry
-                //					.get(aoSource);
-                //
-                //			if (srcController == null) {
-                //				return;
-                //			}
-                //			final ActiveObject3D source3d = (ActiveObject3D) srcController
-                //					.getFigure();
-                //
-                //			// the destination is this figure
-                //			final ActiveObject3D dest3d = (ActiveObject3D) ActiveObject3DController.this
-                //					.getFigure();
-                //
-                //			if (source3d == null) {
-                //				ActiveObject3DController.logger
-                //						.warn("No figures found for source commmunication "
-                //								+ aoSource.getKey());
-                //				return;
-                //			}
-                //
-                //			if (dest3d == null) {
-                //				ActiveObject3DController.logger
-                //						.warn("No figures found for destination commmunication ");
-                //				return;
-                //			}
-                //			// get the grid controller
-                //			final Figure3DController rootGridController = ActiveObject3DController.this
-                //					.getParent(). // node
-                //					getParent(). // runtime
-                //					getParent(). // host
-                //					getParent();// grid
-                //			// get the figure for the grid
-                //			final Figure3D rootGrid = rootGridController.getFigure();
-                //			// TODO remove constant
-                //			// draw the communications on the grid with the given starting and
-                //			// stopping points
-                //			// rootGrid.drawCommunication(UUID.randomUUID().toString(), "", 5,
-                //			// source3d, dest3d);
-                //			// }
-                //			// }).start();
-                //			// else
-                //			// Logger.getRootLogger().log(
-                //			// Priority.INFO,
-                //			// "Communication from " + aoSource + ":" + source3d + " to "
-                //			// + this + ":" + dest3d);
+                	//			remove because the global registry of figures has been removed
+                	//			FIXME create alternative implementation
+                	//			// new Thread(new Runnable() {
+            		//			// public void run() {
+                	//			final ActiveObject aoSource = (ActiveObject) notif.getData();
+                	//
+                	//			// final ActiveObject aoDestination = (ActiveObject)
+                	//			// notificationSender;
+                	//			if ((aoSource == null)) {
+                	//				ActiveObject3DController.logger
+                	//						.warn("No source object found for commmunication");
+                	//				return;
+            		//			}
+                	//
+                	//			final Figure3DController srcController = AbstractFigure3DController.registry
+                	//					.get(aoSource);
+                	//
+                	//			if (srcController == null) {
+                	//				return;
+                	//			}
+                	//			final ActiveObject3D source3d = (ActiveObject3D) srcController
+                	//					.getFigure();
+                	//
+                	//			// the destination is this figure
+                	//			final ActiveObject3D dest3d = (ActiveObject3D) ActiveObject3DController.this
+                	//					.getFigure();
+                	//
+                	//			if (source3d == null) {
+                	//				ActiveObject3DController.logger
+                	//						.warn("No figures found for source commmunication "
+                	//								+ aoSource.getKey());
+                	//				return;
+                	//			}
+                	//
+                	//			if (dest3d == null) {
+                	//				ActiveObject3DController.logger
+                	//						.warn("No figures found for destination commmunication ");
+                	//				return;
+                	//			}
+                	//			// get the grid controller
+                	//			final Figure3DController rootGridController = ActiveObject3DController.this
+                	//					.getParent(). // node
+                	//					getParent(). // runtime
+                	//					getParent(). // host
+                	//					getParent();// grid
+                	//			// get the figure for the grid
+                	//			final Figure3D rootGrid = rootGridController.getFigure();
+                	//			// TODO remove constant
+                	//			// draw the communications on the grid with the given starting and
+                	//			// stopping points
+                	//			// rootGrid.drawCommunication(UUID.randomUUID().toString(), "", 5,
+                	//			// source3d, dest3d);
+                	//			// }
+            		//			// }).start();
+            		//			// else
+            		//			// Logger.getRootLogger().log(
+            		//			// Priority.INFO,
+                	//			// "Communication from " + aoSource + ":" + source3d + " to "
+                	//			// + this + ":" + dest3d);
 
-                break;
-            } // switch
-            default:
-                super.update(o, arg);
-        }
+                	break;
+            	} // switch
+            	default:
+            		super.update(o, arg);
+        	}
+    	}
     }
 }

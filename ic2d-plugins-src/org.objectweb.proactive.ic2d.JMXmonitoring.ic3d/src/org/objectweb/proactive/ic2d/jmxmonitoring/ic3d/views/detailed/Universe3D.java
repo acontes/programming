@@ -8,6 +8,7 @@ import javax.media.j3d.Geometry;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.PlacementBasket;
 
 
@@ -82,5 +83,11 @@ public class Universe3D extends AbstractUniverse3D {
     @Override
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         return null;
+    }
+    
+    @Override
+    public FigureType getType() {
+    	// TODO Auto-generated method stub
+    	return  FigureType.UNDEFINED;
     }
 }

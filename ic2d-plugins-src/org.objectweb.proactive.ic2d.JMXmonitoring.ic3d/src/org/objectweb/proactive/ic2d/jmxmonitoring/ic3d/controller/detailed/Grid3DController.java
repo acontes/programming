@@ -26,8 +26,9 @@ public class Grid3DController extends AbstractGrid3DController {
 
     @Override
     public void update(final Observable o, final Object arg) {
-        // TODO Auto-generated method stub
-        super.update(o, arg);
+    	if ( o != null) {
+    		super.update(o, arg);
+    	}
     }
 
     @Override

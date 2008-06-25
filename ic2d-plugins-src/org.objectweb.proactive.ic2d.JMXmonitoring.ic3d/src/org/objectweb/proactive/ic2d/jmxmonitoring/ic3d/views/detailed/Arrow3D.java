@@ -9,6 +9,7 @@ import javax.media.j3d.TransformGroup;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 
 
@@ -85,4 +86,10 @@ public class Arrow3D extends AbstractArrow3D {
         // TODO Auto-generated method stub
         return null;
     }
+
+	@Override
+	public FigureType getType() {
+		// TODO Auto-generated method stub
+		return FigureType.ARROW;
+	}
 }

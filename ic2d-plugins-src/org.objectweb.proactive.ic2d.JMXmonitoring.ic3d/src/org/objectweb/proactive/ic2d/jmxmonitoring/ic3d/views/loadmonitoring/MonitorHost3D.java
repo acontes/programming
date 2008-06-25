@@ -8,6 +8,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.PlacementBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
@@ -116,5 +117,11 @@ public class MonitorHost3D extends AbstractFigure3D implements Figure3D {
         translateScaleTransform3D.setScale(new Vector3d(1, loadScale, 1));
         translateScaleTransform.setTransform(translateScaleTransform3D);
 
+    }
+    
+    @Override
+    public FigureType getType() {
+    	// TODO Auto-generated method stub
+    	return FigureType.HOST;
     }
 }

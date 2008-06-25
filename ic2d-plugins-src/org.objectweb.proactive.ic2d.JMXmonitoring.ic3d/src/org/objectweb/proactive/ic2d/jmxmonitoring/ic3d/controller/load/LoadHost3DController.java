@@ -3,6 +3,8 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.load;
 
+import java.util.Observable;
+
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
@@ -50,5 +52,12 @@ public class LoadHost3DController extends AbstractLoadHost3DController {
     protected Figure3DController createChildController(AbstractData figure) {
         return new LoadRuntime3DController(figure, this.getFigure(), this);
 
+    }
+    
+    @Override
+    public void update(final Observable o, final Object arg) {
+    	if ( o != null) {
+    		super.update(o, arg);
+    	}
     }
 }

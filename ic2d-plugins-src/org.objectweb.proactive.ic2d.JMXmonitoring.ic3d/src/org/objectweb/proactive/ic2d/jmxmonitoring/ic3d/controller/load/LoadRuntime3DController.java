@@ -64,28 +64,31 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
         // TODO Auto-generated method stub
     }
 
-    public void update(final Observable observable, final Object arg) {
-        super.update(observable, arg);
-        final MVCNotification notif = (MVCNotification) arg;
-        // final Observable notificationSender = o;
-        final MVCNotificationTag mvcNotif = notif.getMVCNotification();
-        // check the posibilities
-        switch (mvcNotif) {
-            case RUNTIME_THREADS_CHANGED: {
-                final int threads = (Integer) notif.getData();
-                ((MonitorRuntime3D) this.getFigure()).setThreads(threads);
-                ((MonitorRuntime3D) this.getFigure()).setMonitor(mvcNotif);                
-                LoadRuntime3DController.logger.debug("The number of threads has changed: " + threads);
-                break;
-            }
-            case RUNTIME_HEAP_MEMORY_CHANGED : {
-            	final long heapUsed = (Long) notif.getData();
-                ((MonitorRuntime3D) this.getFigure()).setHeapUsed(heapUsed);
-                ((MonitorRuntime3D) this.getFigure()).setMonitor(mvcNotif);
-                LoadRuntime3DController.logger.debug("The heap memory usage has changed: " + heapUsed);
-                break;
-            }
-        }
+    public void update(final Observable o, final Object arg) {
+    	if ( o != null) {
+    		super.update(o, arg);
+        	final MVCNotification notif = (MVCNotification) arg;
+        	// final Observable notificationSender = o;
+        	final MVCNotificationTag mvcNotif = notif.getMVCNotification();
+        	// check the posibilities
+        	switch (mvcNotif) {
+            	case RUNTIME_THREADS_CHANGED: {
+                	final int threads = (Integer) notif.getData();
+                	((MonitorRuntime3D) this.getFigure()).setThreads(threads);
+                	((MonitorRuntime3D) this.getFigure()).setMonitor(mvcNotif);                
+                	//LoadRuntime3DController.logger.debug("The number of threads has changed: " + threads);
+                	break;
+            	}
+            	case RUNTIME_HEAP_MEMORY_CHANGED : {
+            		long heapUsed = (Long) notif.getData();
+            		// TODO Use the getUsage() function of the memory MXBean, to scale this value
+            		heapUsed /= 1024 * 1024 * 1024;
+                	((MonitorRuntime3D) this.getFigure()).setHeapUsed(heapUsed);
+                	((MonitorRuntime3D) this.getFigure()).setMonitor(mvcNotif);
+                	//LoadRuntime3DController.logger.debug("The heap memory usage has changed: " + heapUsed);
+                	break;
+            	}
+        	}
+    	}
     }
-
 }

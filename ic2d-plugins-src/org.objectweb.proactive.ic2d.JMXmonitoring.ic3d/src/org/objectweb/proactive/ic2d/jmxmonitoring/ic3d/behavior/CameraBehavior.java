@@ -24,6 +24,12 @@ import javax.media.j3d.WakeupOr;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.HostMenu;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.NodeMenu;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.RuntimeMenu;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
+
 import com.sun.j3d.utils.picking.PickCanvas;
 import com.sun.j3d.utils.picking.PickTool;
 
@@ -44,7 +50,7 @@ public abstract class CameraBehavior extends Behavior {
     Point3d targetPosition;
 
     /* Shouldn't be there but testing */
-    protected PopupMenu[] pops = new PopupMenu[4];
+    protected PopupMenu popup;
     private BranchGroup cameraBranch;
 
     public CameraBehavior() {
@@ -59,41 +65,7 @@ public abstract class CameraBehavior extends Behavior {
      * Aka pop up menus
      * 
      */
-    private void initComponents() {
-        MenuItem mit;
-        ActionListener ali;
-
-        pops[1] = new PopupMenu("ColorCube");
-        pops[2] = new PopupMenu("Host");
-        pops[2].add(new MenuItem("Stop Monitoring"));
-        mit = new MenuItem("Reset translation");
-        ali = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                resetCurentTranslation();
-            }
-        };
-        mit.addActionListener(ali);
-        pops[2].add(mit);
-
-        pops[3] = new PopupMenu("Other");
-
-        pops[0] = new PopupMenu("Goto");
-        mit = new MenuItem("Origin");
-        ali = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                targetPosition.set(new Point3d());
-                refresh();
-            }
-        };
-        mit.addActionListener(ali);
-        pops[0].add(mit);
-        canvas3D.add(pops[0]);
-        canvas3D.add(pops[1]);
-        canvas3D.add(pops[2]);
-        canvas3D.add(pops[3]);
-    }
+    protected abstract void initCameraDefaultMenu();
 
     /* Reset the translation of the selected figure */
     protected void resetCurentTranslation() {
@@ -226,7 +198,26 @@ public abstract class CameraBehavior extends Behavior {
         pickCanvas.setMode(PickTool.GEOMETRY);
         pickCanvas.setTolerance(0f);
         cameraBranch.addChild(this);
-        initComponents();
+        initCameraDefaultMenu();
         refresh();
+    }
+    
+    protected void popup() {
+    	PopupMenu pop = popup;
+    	if(selectedShape != null && selectedShape instanceof AbstractFigure3D) {
+    		AbstractFigure3D figure = (AbstractFigure3D)selectedShape;
+    		switch(figure.getType()) {
+				case NODE:
+					pop = new NodeMenu(canvas3D, figure);
+    				break;
+    			case HOST:
+    				pop = new HostMenu(canvas3D, figure);
+    				break;
+    			case RUNTIME:
+    				pop = new RuntimeMenu(canvas3D, figure);
+    				break;
+    		}
+    	}
+    	pop.show(canvas3D, x, y);
     }
 }

@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
 
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Observer;
 import java.util.Timer;
@@ -30,7 +31,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
  * @author vjuresch
  * 
  */
-public abstract class AbstractFigure3D extends Shape3D implements Figure3D {
+public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObservable {
 
     private final static Logger logger = Logger.getLogger(AbstractFigure3D.class.getName());
 
@@ -71,6 +72,10 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D {
     private final TransformGroup translateScaleTrans;
 
     private final TransformGroup rotTrans;
+    
+    // TODO remove this when creating LOD
+    // replace the extends of this class to observable
+    private HashSet<Observer> observers;
 
     /**
      * When implemented this abstract method should arrange the subfigures
@@ -243,6 +248,10 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D {
         // optimize
         this.rootBranch.compile();
         AbstractFigure3D.logger.debug("Figure created");
+        
+        // Create the observer set
+        // TODO remove this while implementing LOD
+        this.observers = new HashSet<Observer>();
     }
 
     /**
@@ -540,6 +549,18 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D {
         final Transform3D trans = new Transform3D();
         this.getLocalToVworld(trans);
         return trans;
+    }
+    
+    @Override
+    public void addObserver(Observer o) {
+    	observers.add(o);
+    }
+    
+    @Override
+    public void notifyObservers(Object arg) {
+    	for (Observer observer : observers) {
+			observer.update(null, arg);
+		}
     }
 
 }

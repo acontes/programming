@@ -3,9 +3,13 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed;
 
+import java.util.Observable;
+
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.MenuAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Node3D;
@@ -39,7 +43,9 @@ public class Node3DController extends AbstractNode3DController {
      */
     @Override
     protected AbstractFigure3D createFigure(final String name) {
-        return new Node3D(name);
+    	Node3D node = new Node3D(name);
+    	node.addObserver(this);
+        return node;
     }
 
     /*
@@ -49,5 +55,26 @@ public class Node3DController extends AbstractNode3DController {
      */
     @Override
     public void removeFigure(final String key) {
+    }
+    
+    @Override
+    public void update(final Observable o, final Object arg) {
+    	if ( o != null) {
+    		super.update(o, arg);
+    	}
+    	else {
+    		MenuAction menuAction = (MenuAction)arg;
+    		NodeObject node = (NodeObject)this.getModelObject();
+    		switch (menuAction) {
+				case NODE_REFRESH:
+					node.explore();
+					break;
+				case NODE_STOP_MONITORING:
+					node.stopMonitoring(true);
+					break;
+				case NODE_CHARTIT:
+					break;
+    		}
+    	}
     }
 }

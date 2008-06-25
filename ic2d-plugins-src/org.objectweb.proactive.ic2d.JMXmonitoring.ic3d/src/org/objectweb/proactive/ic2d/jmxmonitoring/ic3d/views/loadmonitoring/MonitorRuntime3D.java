@@ -8,6 +8,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
@@ -156,4 +157,9 @@ public class MonitorRuntime3D extends AbstractFigure3D implements Figure3D {
 		return this.monitor;
 	}
 
+    @Override
+    public FigureType getType() {
+    	// TODO Auto-generated method stub
+    	return FigureType.RUNTIME;
+    }
 }

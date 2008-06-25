@@ -7,6 +7,7 @@ import javax.media.j3d.Geometry;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
@@ -181,5 +182,7 @@ public interface Figure3D {
     Transform3D getCoordinates();
 
     void animateCreation();
+    
+    public FigureType getType();
 
 }

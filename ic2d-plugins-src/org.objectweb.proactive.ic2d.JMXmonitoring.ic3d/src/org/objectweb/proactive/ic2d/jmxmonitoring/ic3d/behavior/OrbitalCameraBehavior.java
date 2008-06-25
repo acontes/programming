@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior;
 
+import java.awt.MenuItem;
 import java.awt.PopupMenu;
 
 import javax.media.j3d.Shape3D;
@@ -128,21 +129,22 @@ public class OrbitalCameraBehavior extends CameraBehavior {
     protected void mouse3Pressed() {
         /* Right click > Pop up context menu */
         mouse1Pressed();
-        PopupMenu pop;
-
-        /* We need a context menu */
-        if (selectedShape != null) {
-            /* Checks the type of the figure */
-            /*else */if (selectedShape instanceof ColorCube)
-                pop = pops[1];
-            /* Shan't happen all non listed figures should be marked as not pickable */
-            else
-                pop = pops[0];
-        }
-        /* Default menu */
-        else
-            pop = pops[0];
-        pop.show(canvas3D, x, y);
+//        PopupMenu pop;
+//
+//        /* We need a context menu */
+//        if (selectedShape != null) {
+//            /* Checks the type of the figure */
+//            /*else */if (selectedShape instanceof ColorCube)
+//                pop = pops[1];
+//            /* Shan't happen all non listed figures should be marked as not pickable */
+//            else
+//                pop = pops[0];
+//        }
+//        /* Default menu */
+//        else
+//            pop = pops[0];
+//        pop.show(canvas3D, x, y);
+        popup();
     }
 
     @Override
@@ -268,4 +270,12 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         this.distance = f;
         refresh();
     }
+
+	@Override
+	protected void initCameraDefaultMenu() {
+		popup = new PopupMenu("Camera");
+		popup.add(new MenuItem("Reset"));
+		popup.add(new MenuItem("Goto: Nice"));
+		canvas3D.add(popup);
+	}
 }

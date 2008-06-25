@@ -10,6 +10,7 @@ import javax.vecmath.Tuple2d;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractArrow3D;
@@ -123,4 +124,9 @@ public class SphereArrow3D extends AbstractArrow3D {
         return null;
     }
 
+    @Override
+    public FigureType getType() {
+    	// TODO Auto-generated method stub
+    	return FigureType.ARROW;
+    }
 }

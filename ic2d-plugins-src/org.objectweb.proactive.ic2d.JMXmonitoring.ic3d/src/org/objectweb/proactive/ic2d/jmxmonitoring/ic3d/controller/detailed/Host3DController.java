@@ -3,9 +3,13 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed;
 
+import java.util.Observable;
+
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.MenuAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Host3D;
@@ -32,7 +36,9 @@ public class Host3DController extends AbstractHost3DController {
     protected AbstractFigure3D createFigure(final String name) {
         // Logger.getRootLogger().log(Priority.INFO_INT, "Creating figure for
         // host controller:"+name);
-        return new Host3D(name);
+    	Host3D host = new Host3D(name);
+    	host.addObserver(this);
+        return host;
     }
 
     /*
@@ -48,5 +54,26 @@ public class Host3DController extends AbstractHost3DController {
     @Override
     protected AbstractFigure3DController createChildController(final AbstractData modelObject) {
         return new Runtime3DController(modelObject, this.getFigure(), this);
+    }
+    
+    @Override
+    public void update(final Observable o, final Object arg) {
+    	if ( o != null) {
+    		super.update(o, arg);
+    	}
+    	else {
+    		MenuAction menuAction = (MenuAction)arg;
+    		HostObject host = (HostObject)this.getModelObject();
+    		switch (menuAction) {
+				case HOST_REFRESH:
+					host.explore();
+					break;
+				case HOST_STOP_MONITORING:
+					host.stopMonitoring(true);
+					break;
+				case HOST_CHARTIT:
+					break;
+    		}
+    	}
     }
 }

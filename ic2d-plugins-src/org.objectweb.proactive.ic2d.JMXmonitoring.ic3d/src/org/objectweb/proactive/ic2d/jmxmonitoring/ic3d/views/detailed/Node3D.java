@@ -9,6 +9,7 @@ import javax.media.j3d.TransformGroup;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.PlacementBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.TextStylesBasket;
@@ -106,5 +107,11 @@ public class Node3D extends AbstractNode3D {
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    @Override
+    public FigureType getType() {
+    	// TODO Auto-generated method stub
+    	return FigureType.NODE;
     }
 }
