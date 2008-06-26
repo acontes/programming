@@ -64,7 +64,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.load.LoadGrid3
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.CustomUniverse;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Grid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Universe3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorGrid3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.LoadGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3D;
 
 
@@ -146,7 +146,7 @@ public class Monitoring3DView extends ViewPart {
         final Grid3D detailedGrid = (Grid3D)gcontroller.getFigure();
         detailedGrid.setTranslation(new Vector3d(0, 0.5, 0));
         
-        final MonitorGrid3D loadGrid = (MonitorGrid3D)glcontroller.getFigure();
+        final LoadGrid3D loadGrid = (LoadGrid3D)glcontroller.getFigure();
         loadGrid.setTranslation(new Vector3d(0, 500, 0));
         
         final EarthGrid3D earthGrid = (EarthGrid3D)egcontroller.getFigure();

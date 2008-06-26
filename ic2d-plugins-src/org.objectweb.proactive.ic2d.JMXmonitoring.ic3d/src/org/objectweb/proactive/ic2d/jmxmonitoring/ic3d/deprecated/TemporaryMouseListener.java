@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
+package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;

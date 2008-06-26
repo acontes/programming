@@ -4,7 +4,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.osgi.framework.BundleContext;
 
 
@@ -35,7 +34,7 @@ public class Activator extends AbstractUIPlugin {
         super.start(context);
         Activator.plugin = this;
         BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.TRACE);
+        Logger.getRootLogger().setLevel(Level.FATAL);
     }
 
     /*

@@ -5,14 +5,12 @@ import java.awt.PopupMenu;
 
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
-import javax.media.j3d.TransformGroup;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 
-import com.sun.j3d.utils.geometry.ColorCube;
 import com.sun.j3d.utils.picking.PickResult;
 
 

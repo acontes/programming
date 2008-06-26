@@ -6,7 +6,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Grid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3D;
 
 

@@ -1,15 +1,10 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior;
 
 import java.awt.AWTEvent;
-import java.awt.MenuItem;
 import java.awt.PopupMenu;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Enumeration;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.media.j3d.Behavior;
 import javax.media.j3d.BoundingSphere;
@@ -24,7 +19,6 @@ import javax.media.j3d.WakeupOr;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3f;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.HostMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.NodeMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.RuntimeMenu;

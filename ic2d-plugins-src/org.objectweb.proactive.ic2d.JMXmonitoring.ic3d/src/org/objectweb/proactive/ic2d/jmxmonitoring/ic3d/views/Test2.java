@@ -14,11 +14,11 @@ import javax.vecmath.Vector3d;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.OrbitalCameraBehavior;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorGrid3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorHost3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Grid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Host3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorGrid3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorHost3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3D;
 
 

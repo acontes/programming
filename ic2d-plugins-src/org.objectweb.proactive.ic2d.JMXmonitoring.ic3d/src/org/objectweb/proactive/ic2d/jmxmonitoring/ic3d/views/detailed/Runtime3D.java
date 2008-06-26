@@ -3,13 +3,9 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
 
-import java.util.UUID;
-
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
-import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;

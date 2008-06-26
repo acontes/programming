@@ -9,10 +9,10 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorRuntime3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorRuntime3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitoringTypes;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.LoadRuntime3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
@@ -51,7 +51,9 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
      */
     @Override
     protected AbstractFigure3D createFigure(final String name) {
-        return new MonitorRuntime3D(name);
+    	LoadRuntime3D runtime = new LoadRuntime3D(name);
+    	runtime.addObserver(this);
+    	return runtime;
     }
 
     /*
@@ -60,9 +62,7 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#removeFigure(java.lang.String)
      */
     @Override
-    public void removeFigure(final String key) {
-        // TODO Auto-generated method stub
-    }
+    public void removeFigure(final String key) { }
 
     public void update(final Observable o, final Object arg) {
     	if ( o != null) {
@@ -74,18 +74,14 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
         	switch (mvcNotif) {
             	case RUNTIME_THREADS_CHANGED: {
                 	final int threads = (Integer) notif.getData();
-                	((MonitorRuntime3D) this.getFigure()).setThreads(threads);
-                	((MonitorRuntime3D) this.getFigure()).setMonitor(mvcNotif);                
-                	//LoadRuntime3DController.logger.debug("The number of threads has changed: " + threads);
+                	((LoadRuntime3D)this.getFigure()).setScale((double)threads/1000d);
                 	break;
             	}
             	case RUNTIME_HEAP_MEMORY_CHANGED : {
             		long heapUsed = (Long) notif.getData();
             		// TODO Use the getUsage() function of the memory MXBean, to scale this value
             		heapUsed /= 1024 * 1024 * 1024;
-                	((MonitorRuntime3D) this.getFigure()).setHeapUsed(heapUsed);
-                	((MonitorRuntime3D) this.getFigure()).setMonitor(mvcNotif);
-                	//LoadRuntime3DController.logger.debug("The heap memory usage has changed: " + heapUsed);
+                	((LoadRuntime3D)this.getFigure()).setScale((double)heapUsed);
                 	break;
             	}
         	}

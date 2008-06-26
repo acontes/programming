@@ -11,9 +11,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ActiveObject3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Host3D;
 
-import com.sun.j3d.utils.geometry.ColorCube;
 import com.sun.j3d.utils.picking.PickResult;
 
 

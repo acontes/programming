@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring;
+package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 

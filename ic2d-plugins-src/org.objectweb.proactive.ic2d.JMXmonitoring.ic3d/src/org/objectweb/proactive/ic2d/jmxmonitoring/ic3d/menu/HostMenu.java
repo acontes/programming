@@ -32,5 +32,8 @@ public class HostMenu extends PopupMenu {
 		menuItem = new MenuItem("Stop Monitoring");
 		menuItem.addActionListener(new ViewActionListener(canvas, figure, this, MenuAction.HOST_STOP_MONITORING));
 		this.add(menuItem);
+		menuItem = new MenuItem("View with chartit");
+		menuItem.addActionListener(new ViewActionListener(canvas, figure, this, MenuAction.HOST_CHARTIT));
+		this.add(menuItem);
 	}
 }

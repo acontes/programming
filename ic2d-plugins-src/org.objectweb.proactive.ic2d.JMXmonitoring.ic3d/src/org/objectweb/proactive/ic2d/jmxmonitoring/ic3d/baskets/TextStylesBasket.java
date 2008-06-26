@@ -6,16 +6,13 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets;
 import java.awt.Font;
 
 import javax.media.j3d.BoundingBox;
-import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.Group;
 import javax.media.j3d.Node;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
+import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-import javax.vecmath.Color3f;
-import javax.vecmath.Vector3d;
-
 
 import com.sun.j3d.utils.geometry.Text2D;
 
@@ -86,5 +83,11 @@ public class TextStylesBasket {
         trans.setCapability(Group.ALLOW_CHILDREN_EXTEND);
         return trans;
     }
+
+	public static TransformGroup hostText(String text, Color3f color) {
+		return TextStylesBasket.figureText(text, color, "Arial", 25, Font.PLAIN, new Vector3d(
+	            0d, 0d, 0.7d), new Vector3d(-Math.PI / 4, 0, 0), 1);
+	    
+	}
 
 }

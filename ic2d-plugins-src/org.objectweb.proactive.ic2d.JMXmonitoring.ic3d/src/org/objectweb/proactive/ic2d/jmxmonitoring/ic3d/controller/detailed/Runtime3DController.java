@@ -14,8 +14,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.MenuAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Runtime3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
 /**

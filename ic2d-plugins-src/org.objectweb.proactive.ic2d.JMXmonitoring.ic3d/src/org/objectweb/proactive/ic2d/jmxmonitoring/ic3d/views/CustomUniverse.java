@@ -2,7 +2,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import java.util.HashMap;
 
-import javax.media.j3d.AmbientLight;
 import javax.media.j3d.Background;
 import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.BranchGroup;
@@ -11,7 +10,6 @@ import javax.media.j3d.Locale;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.VirtualUniverse;
-import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
@@ -54,12 +52,6 @@ public class CustomUniverse {
         scene.compile();
         locale.addBranchGraph(scene);
         views = new HashMap<String, CustomView>();
-    }
-
-    private void createUniverse() {
-        /* Create the universe */
-        universe = new VirtualUniverse();
-        locale = new Locale(universe);
     }
 
     public Canvas3D newView(String name) {

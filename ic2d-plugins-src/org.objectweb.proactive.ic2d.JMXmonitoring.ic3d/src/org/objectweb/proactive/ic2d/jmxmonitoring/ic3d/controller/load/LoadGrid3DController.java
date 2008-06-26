@@ -5,16 +5,13 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.load;
 
 import java.util.Observable;
 
-import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
-
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Grid3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.LoadGrid3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitoringTypes;
 
 
 /**
@@ -22,16 +19,25 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DContro
  * 
  */
 public class LoadGrid3DController extends AbstractLoadGrid3DController {
-    public static final Point3d GRID_POSITION = new Point3d(0, 300, 0);
-
+    
+	private MonitoringTypes gridMode;
+	
     public LoadGrid3DController(final AbstractData modelObject, final Figure3D parentFigure3D,
             final Figure3DController parent) {
 
         super(modelObject, parentFigure3D, parent);
-
+        gridMode = MonitoringTypes.RUNTIME_HEAP_MEMORY_USED;
         // TODO Auto-generated constructor stub
     }
 
+    public LoadGrid3DController(final AbstractData modelObject, final Figure3D parentFigure3D,
+            final Figure3DController parent, final MonitoringTypes type) {
+
+        super(modelObject, parentFigure3D, parent);
+        this.gridMode = type;
+        // TODO Auto-generated constructor stub
+    }
+    
     @Override
     public void update(final Observable o, final Object arg) {
     	if ( o != null) {
@@ -44,8 +50,7 @@ public class LoadGrid3DController extends AbstractLoadGrid3DController {
         // TODO Auto-generated method stub
         // the grid has no name in the current implementation
         //FIXME assumes there is only one grid created
-        MonitorGrid3D grid = new MonitorGrid3D();
-        ((MonitorGrid3D) grid).setTranslation(new Vector3d(GRID_POSITION));
+        LoadGrid3D grid = new LoadGrid3D();
         return grid;
     }
 
@@ -58,5 +63,14 @@ public class LoadGrid3DController extends AbstractLoadGrid3DController {
     protected AbstractFigure3DController createChildController(final AbstractData figure) {
         // TODO Auto-generated method stub
         return new LoadHost3DController(figure, this.getFigure(), this);
+    }
+    
+    public void setGridMode(MonitoringTypes type) {
+    	this.gridMode = type;
+    	// TODO reset all sub shapes
+    }
+    
+    public MonitoringTypes getGridMode() {
+    	return this.gridMode;
     }
 }

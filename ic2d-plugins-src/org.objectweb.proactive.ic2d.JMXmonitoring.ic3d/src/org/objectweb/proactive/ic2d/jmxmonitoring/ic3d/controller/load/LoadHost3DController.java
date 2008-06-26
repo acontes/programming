@@ -6,12 +6,12 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.load;
 import java.util.Observable;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Grid3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Host3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.MonitorHost3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.AbstractLoadHost3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.EmptyLoadHost3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.LoadHost3D;
 
 
 /**
@@ -33,9 +33,16 @@ public class LoadHost3DController extends AbstractLoadHost3DController {
      */
     @Override
     protected AbstractFigure3D createFigure(final String name) {
-        MonitorHost3D monitorHost3D = new MonitorHost3D(name);
-        monitorHost3D.setLoad(0);
-    	return monitorHost3D;
+    	AbstractLoadHost3D loadHost = null;
+    	switch (((LoadGrid3DController)this.getParent()).getGridMode()) {
+    		case RUNTIME_HEAP_MEMORY_USED:
+    		case RUNTIME_THREADS:
+    			loadHost = new EmptyLoadHost3D(name);		
+    			break;
+    		default:
+    			loadHost = new LoadHost3D(name);
+		}
+    	return loadHost;
     }
 
     /*
@@ -50,8 +57,13 @@ public class LoadHost3DController extends AbstractLoadHost3DController {
 
     @Override
     protected Figure3DController createChildController(AbstractData figure) {
-        return new LoadRuntime3DController(figure, this.getFigure(), this);
-
+    	LoadRuntime3DController loadRuntime3DController = null;
+    	switch (((LoadGrid3DController)this.getParent()).getGridMode()) {
+    		case RUNTIME_HEAP_MEMORY_USED:
+    		case RUNTIME_THREADS:
+    			loadRuntime3DController = new LoadRuntime3DController(figure, this.getFigure(), this);
+    	}
+        return loadRuntime3DController;
     }
     
     @Override

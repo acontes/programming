@@ -1,13 +1,11 @@
-package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring;
-
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorRuntime3D;
+package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated;
 
 /**
  * List what can be monitored through a monitor figure.
  * This is needed since for example, a runtime  figure {@link MonitorRuntime3D}
  * can display different information on a particular runtime. 
  * 
- * @version $Id$
+ * @version $Id: MonitoringTypes.java 9361 2008-06-24 15:53:19Z vjuresch $
  * @since 3.9
  * @author vjuresch
  */

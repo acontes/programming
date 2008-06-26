@@ -2,7 +2,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
 
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
-import javax.vecmath.Point3f;
 import javax.vecmath.Vector3d;
 
 

@@ -3,10 +3,8 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
@@ -179,7 +177,8 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
      */
     public void removeChildren() {
         for (final Figure3DController c : this.childrenControllers) {
-            c.remove();
+            if(c != null)
+            	c.remove();
         }
     }
 
@@ -236,7 +235,9 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
             return null;
         }
         for (final Figure3DController c : this.childrenControllers) {
-            if (key.equals(c.getModelObject().getKey())) {
+            if( c == null)
+            	return null;
+        	if (key.equals(c.getModelObject().getKey())) {
                 return c;
             }
         }

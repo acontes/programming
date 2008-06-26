@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
+package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring;
 
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
@@ -10,14 +10,16 @@ import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.PlacementBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Arrow3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 
 
 /**
  * @author vjuresch
  * 
  */
-public class Grid3D extends AbstractGrid3D {
-    public Grid3D() {
+public class LoadGrid3D extends AbstractLoadGrid3D {
+    public LoadGrid3D() {
         super("");
     }
 
@@ -36,9 +38,9 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     public void arrangeSubFigures() {
-        int i = 2;
+        int i = 1;
         for (final Figure3D host : this.getSubFigures().values()) {
-            PlacementBasket.spiralArrangement(i, host);
+            PlacementBasket.matrixArrangement(i, host);
             i++;
             host.arrangeSubFigures();
         }

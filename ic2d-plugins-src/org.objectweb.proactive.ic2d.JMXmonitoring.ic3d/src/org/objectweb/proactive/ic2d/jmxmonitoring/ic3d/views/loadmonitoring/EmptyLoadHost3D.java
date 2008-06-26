@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
+package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring;
 
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
@@ -10,37 +10,31 @@ import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.PlacementBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 
 
 /**
  * @author vjuresch
  * 
  */
-public class Grid3D extends AbstractGrid3D {
-    public Grid3D() {
-        super("");
+public class EmptyLoadHost3D extends AbstractLoadHost3D {
+
+	public EmptyLoadHost3D(String name) {
+        super(name);
     }
 
-    // add a new host and translate its
-    // position according to the coordinates
-    // (add to a custom location)
-
-    // TODO ***HORRIBLE PLACING ALGORITHM*** MUST BE CHANGED !!! the cost is n^2
-    // * method calls in depth
-    // for each host or removed placed, the entire scene gets rearranged
-
-    /*
+	/*
      * (non-Javadoc)
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
      */
     @Override
     public void arrangeSubFigures() {
-        int i = 2;
-        for (final Figure3D host : this.getSubFigures().values()) {
-            PlacementBasket.spiralArrangement(i, host);
+        int i = 1;
+        for (final Figure3D runtime : this.getSubFigures().values()) {
+            PlacementBasket.matrixArrangement(i, runtime, this.getSubFigures().size(), new Vector3f(0f, 1f, 0f));
             i++;
-            host.arrangeSubFigures();
+            runtime.arrangeSubFigures();
         }
     }
 
@@ -51,7 +45,6 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     protected Geometry createGeometry() {
-        //return GeometryBasket.getCoordinatesGeometry();
         return null;
     }
 
@@ -62,7 +55,6 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     protected TransformGroup createTextBranch() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -73,8 +65,6 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     public void animateCreation() {
-        // TODO Auto-generated method stub
-
     }
 
     /*
@@ -84,7 +74,6 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     protected Appearance createAppearance() {
-        //return AppearanceBasket.coordinatesAppearance;
         return null;
     }
 
@@ -97,12 +86,15 @@ public class Grid3D extends AbstractGrid3D {
     @Override
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
-        return new Arrow3D("", start, stop);
+        return null;
     }
 
 	@Override
 	public FigureType getType() {
 		// TODO Auto-generated method stub
-		return FigureType.GRID;
+		return FigureType.HOST;
 	}
+	
+	public void setScale(final double loadScale) {
+    }
 }

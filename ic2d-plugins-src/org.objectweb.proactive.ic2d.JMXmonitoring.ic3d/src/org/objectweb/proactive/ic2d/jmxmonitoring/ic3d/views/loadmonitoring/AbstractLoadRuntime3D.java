@@ -1,5 +1,6 @@
-package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
+package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 
 
 /**
@@ -10,12 +11,13 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
  * @author vjuresch
  * 
  */
-public abstract class AbstractUniverse3D extends AbstractFigure3D {
+public abstract class AbstractLoadRuntime3D extends AbstractFigure3D {
     /**
      * @param name - name of the figure, for a grid is usually empty 
      */
-    public AbstractUniverse3D(String name) {
+    public AbstractLoadRuntime3D(String name) {
         super(name);
         // TODO Auto-generated constructor stub
     }
+    
 }
