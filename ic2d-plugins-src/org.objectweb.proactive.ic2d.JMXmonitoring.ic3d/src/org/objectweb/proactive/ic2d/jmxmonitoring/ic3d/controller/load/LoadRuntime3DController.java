@@ -3,9 +3,12 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.load;
 
+import java.io.IOException;
 import java.util.Observable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
@@ -93,6 +96,14 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
     		RuntimeObject runtime = (RuntimeObject)this.getModelObject();
     		switch (menuAction) {
 				case RUNTIME_CHARTIT:
+					try {
+						System.out.println("ICici");
+						IResourceDescriptor descriptor = new AbstractDataDescriptor(runtime);
+						ChartItDataEditor.openNewFromResourceDescriptor(descriptor);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					break;
 				case RUNTIME_KILL:
 					runtime.killRuntime();

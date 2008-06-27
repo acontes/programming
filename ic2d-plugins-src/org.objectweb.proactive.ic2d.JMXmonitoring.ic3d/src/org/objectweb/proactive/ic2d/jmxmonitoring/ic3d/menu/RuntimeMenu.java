@@ -36,6 +36,9 @@ public class RuntimeMenu extends PopupMenu {
 		menuItem = new MenuItem("Kill");
 		menuItem.addActionListener(new ViewActionListener(canvas, figure, this, MenuAction.RUNTIME_KILL));
 		this.add(menuItem);
+		menuItem = new MenuItem("Chartit");
+		menuItem.addActionListener(new ViewActionListener(canvas, figure, this, MenuAction.RUNTIME_CHARTIT));
+		this.add(menuItem);
 	}
 }
 

@@ -6,6 +6,11 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed;
 import java.util.Observable;
 
 import org.apache.log4j.Logger;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.ChartItAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
@@ -71,6 +76,22 @@ public class Runtime3DController extends AbstractRuntime3DController {
     		RuntimeObject runtime = (RuntimeObject)this.getModelObject();
     		switch (menuAction) {
 				case RUNTIME_CHARTIT:
+					try {
+						System.out.println("ICici");
+						final IResourceDescriptor descriptor = new AbstractDataDescriptor(runtime);
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								try {
+									ChartItDataEditor.openNewFromResourceDescriptor(descriptor,ChartItAction.PARUNTIME_CHARTIT_CONFIG_FILENAME);
+								} catch (PartInitException e) {									
+									e.printStackTrace();
+								}
+							}
+						});											
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					break;
 				case RUNTIME_KILL:
 					runtime.killRuntime();

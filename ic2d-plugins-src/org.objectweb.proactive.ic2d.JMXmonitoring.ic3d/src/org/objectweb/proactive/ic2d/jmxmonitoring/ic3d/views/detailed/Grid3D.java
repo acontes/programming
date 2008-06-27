@@ -37,9 +37,10 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     public void arrangeSubFigures() {
-        int i = 2;
+        int i = 1;
         for (final Figure3D host : this.getSubFigures().values()) {
-            PlacementBasket.spiralArrangement(i, host);
+        	PlacementBasket.matrixArrangement(i, host, this.getSubFigures().size());
+            //PlacementBasket.spiralArrangement(i + 1, host);
             i++;
             host.arrangeSubFigures();
         }

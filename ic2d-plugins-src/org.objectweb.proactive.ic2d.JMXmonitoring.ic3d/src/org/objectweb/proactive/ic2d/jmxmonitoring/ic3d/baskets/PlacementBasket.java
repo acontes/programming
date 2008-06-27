@@ -102,6 +102,77 @@ public class PlacementBasket {
      * @param figureIndex
      * @param figure
      */
+    public static void matrixArrangement(final int figureIndex, final Figure3D figure, final int figureCount) {
+        /* Setting up our variables */
+        double x, z; /* Our host 2D placement */
+        int figureIndexSquareRoot, c, xCountSquareRoot, zCountSquareRoot;
+        /* Checking parameters */
+        if (figureIndex < 1) {
+            throw new IllegalArgumentException("The figure index must be larger than 0");
+        }
+        figureIndexSquareRoot = (int) Math.sqrt(figureIndex);
+        c = figureIndexSquareRoot + 1;
+        
+        xCountSquareRoot = (int) Math.sqrt(figureCount);
+        if ( xCountSquareRoot * xCountSquareRoot < figureCount )
+        	xCountSquareRoot++;
+        zCountSquareRoot = xCountSquareRoot;
+        if( figureCount <= xCountSquareRoot * xCountSquareRoot - xCountSquareRoot)
+        	zCountSquareRoot--;
+        
+        
+        /* Short sample of the 2D placement policy */
+        /*
+         * Could have been easier but maintains an order relation. Moreover you
+         * can find the index with the 2D coordinates.
+         * 
+         * 1 2 5 10 17 3 4 6 11 18 7 8 9 12 19 13 14 15 16 20 21 22 23 24 25
+         */
+
+        /* Our index is a square so x and y coordinates are the same */
+        if (figureIndexSquareRoot * figureIndexSquareRoot == figureIndex) {
+            x = figureIndexSquareRoot;
+            z = figureIndexSquareRoot;
+        }
+        /*
+         * Our index is lower or equal than the middle of next and previous
+         * squares (N)
+         */
+        else if (figureIndex <= (figureIndexSquareRoot * figureIndexSquareRoot + c * c) / 2) {
+            x = c;
+            z = Math.abs(figureIndexSquareRoot * figureIndexSquareRoot - figureIndex);
+        }
+        /* The index is greater than the middle of next and previous squares (N) */
+        else {
+            x = c - Math.abs(c * c - figureIndex);
+            z = c;
+        }
+        
+        /* Align figures to the center */
+    	x -= (double)((xCountSquareRoot - 1 )/ 2d);
+    	z -= (double)((zCountSquareRoot - 1 )/ 2d);
+    	
+        /* Scale the offset and set a padding */
+        x *= GeometryBasket.FIGURE_SCALE * 1.2;
+        z *= GeometryBasket.FIGURE_SCALE * 1.2;
+        
+        figure.placeSubFigure(figure, x, 0, z);
+    }
+    
+    /**
+     * Arranges figures in matrix You can find index of the figure with:
+     * 
+     * <br/> x == y -> idx = x^2,
+     * 
+     * <br/> ( x < y ) -> y^2 - y + x,
+     * 
+     * <br/> ( x > y ) -> x^2 -2x + y <br/>
+     * 
+     * 
+     * 
+     * @param figureIndex
+     * @param figure
+     */
     public static void matrixArrangement(final int figureIndex, final Figure3D figure, final int figureCount, final Vector3f scales) {
         /* Setting up our variables */
         double x, z; /* Our host 2D placement */
