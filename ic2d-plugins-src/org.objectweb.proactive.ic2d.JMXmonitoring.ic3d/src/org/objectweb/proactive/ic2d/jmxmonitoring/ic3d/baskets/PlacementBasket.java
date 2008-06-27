@@ -9,7 +9,7 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 
 
 /**
@@ -176,8 +176,6 @@ public class PlacementBasket {
     	x -= (double)((xCountSquareRoot - 1 )/ 2d);
     	z -= (double)((zCountSquareRoot - 1 )/ 2d);
     	
-    	System.out.println("X1: " + x + " Z1: " + z);
-    	
     	/* Set the scale */
     	x /= xCountSquareRoot;
     	z /= zCountSquareRoot;
@@ -196,6 +194,8 @@ public class PlacementBasket {
         figureTransform3D.setScale(figureScale);
         figureTransform.setTransform(figureTransform3D);
     }
+    
+    
 
     /**
      * This method places a subfigure on the x axis with the specified spacing

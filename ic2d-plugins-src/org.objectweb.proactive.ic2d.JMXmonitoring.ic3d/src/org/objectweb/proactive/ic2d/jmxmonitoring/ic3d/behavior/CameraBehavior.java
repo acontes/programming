@@ -22,7 +22,7 @@ import javax.vecmath.Vector3f;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.HostMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.NodeMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.RuntimeMenu;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
 
 import com.sun.j3d.utils.picking.PickCanvas;
 import com.sun.j3d.utils.picking.PickTool;

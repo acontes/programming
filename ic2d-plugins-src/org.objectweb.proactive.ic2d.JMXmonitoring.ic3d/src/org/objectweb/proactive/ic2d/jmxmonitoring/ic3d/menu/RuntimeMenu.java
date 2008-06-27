@@ -5,7 +5,7 @@ import java.awt.PopupMenu;
 
 import javax.media.j3d.Canvas3D;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
 
 public class RuntimeMenu extends PopupMenu {
 

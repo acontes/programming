@@ -8,7 +8,7 @@ import java.util.Observer;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 

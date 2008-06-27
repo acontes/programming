@@ -685,12 +685,11 @@ public final class GeometryBasket {
     
     private static Geometry barMonitorGeometry() {
         // -------------GEOMETRY POINTS--------------
-
-        final Point3f a = new Point3f(0f, 0f, 0f);
-        final Point3f b = new Point3f(0f, 0f, GeometryBasket.FIGURE_SCALE * 0.25f);
-        final Point3f c = new Point3f(GeometryBasket.FIGURE_SCALE * 0.25f, 0f,
-            GeometryBasket.FIGURE_SCALE * 0.25f);
-        final Point3f d = new Point3f(GeometryBasket.FIGURE_SCALE * 0.25f, 0f, 0f);
+    	final float length = GeometryBasket.FIGURE_SCALE / 8;
+        final Point3f a = new Point3f(-length, 0f, -length);
+        final Point3f b = new Point3f(-length, 0f, length);
+        final Point3f c = new Point3f(length, 0f, length);
+        final Point3f d = new Point3f(length, 0f, -length);
         final Point3f e = new Point3f(a);
         e.y = e.y + GeometryBasket.FIGURE_SCALE * 2;
         final Point3f f = new Point3f(b);

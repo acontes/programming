@@ -4,6 +4,8 @@ import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.Vector3d;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
+
 
 /**
  * All representation of a grid should extend this class. Usually the grid is an

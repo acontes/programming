@@ -23,7 +23,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorHost3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.TemporaryMouseListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractActiveObject3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ActiveObject3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Grid3D;

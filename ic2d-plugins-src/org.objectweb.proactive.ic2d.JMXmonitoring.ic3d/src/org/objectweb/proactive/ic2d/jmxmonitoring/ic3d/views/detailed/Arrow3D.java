@@ -11,6 +11,7 @@ import javax.vecmath.Vector3f;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 
 
 /**

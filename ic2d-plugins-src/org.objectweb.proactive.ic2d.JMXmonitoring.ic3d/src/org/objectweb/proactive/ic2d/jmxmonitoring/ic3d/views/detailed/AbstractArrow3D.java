@@ -3,6 +3,8 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
+
 /**
  * All arrows implementations should extend this class
  * 

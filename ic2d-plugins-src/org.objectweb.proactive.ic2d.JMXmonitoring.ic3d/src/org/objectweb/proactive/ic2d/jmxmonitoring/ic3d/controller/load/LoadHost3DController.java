@@ -6,9 +6,11 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.load;
 import java.util.Observable;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.MenuAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.AbstractLoadHost3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.EmptyLoadHost3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.LoadHost3D;
@@ -70,6 +72,20 @@ public class LoadHost3DController extends AbstractLoadHost3DController {
     public void update(final Observable o, final Object arg) {
     	if ( o != null) {
     		super.update(o, arg);
+    	}
+    	else {
+    		MenuAction menuAction = (MenuAction)arg;
+    		HostObject host = (HostObject)this.getModelObject();
+    		switch (menuAction) {
+				case HOST_REFRESH:
+					host.explore();
+					break;
+				case HOST_STOP_MONITORING:
+					host.stopMonitoring(true);
+					break;
+				case HOST_CHARTIT:
+					break;
+    		}
     	}
     }
 }

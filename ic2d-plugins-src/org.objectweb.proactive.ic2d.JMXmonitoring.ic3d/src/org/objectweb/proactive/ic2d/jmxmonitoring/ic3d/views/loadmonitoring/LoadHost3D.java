@@ -15,7 +15,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.ColorPalette;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.TextStylesBasket;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 
 
 /**
@@ -99,7 +99,7 @@ public class LoadHost3D extends AbstractLoadHost3D {
 	
 	public void setScale(final double loadScale) {
 		//check that the arguments are in the correct range
-    	if ((loadScale > 1) || (loadScale < 0)) {
+    	if ((loadScale > 1) || (loadScale <= 0)) {
             throw new IllegalArgumentException("The scale  " + loadScale + " should be in the [0,1] range");
         }
 

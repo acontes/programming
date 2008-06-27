@@ -1,6 +1,6 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
 
 
 public abstract class AbstractMonitorGrid3D extends AbstractFigure3D {

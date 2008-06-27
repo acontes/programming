@@ -17,7 +17,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.ColorPalette;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.CameraBehavior;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.FlatCameraBehavior;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
 
 
 public class CustomUniverse {

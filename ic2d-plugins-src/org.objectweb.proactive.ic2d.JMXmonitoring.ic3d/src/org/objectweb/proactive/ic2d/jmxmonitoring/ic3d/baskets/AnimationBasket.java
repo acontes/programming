@@ -14,7 +14,7 @@ import javax.media.j3d.TransparencyAttributes;
 import javax.media.j3d.TransparencyInterpolator;
 import javax.vecmath.Vector3d;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
 
 
 /**

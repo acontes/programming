@@ -7,11 +7,13 @@ import java.util.Observable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorRuntime3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractFigure3D;
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.MenuAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring.LoadRuntime3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
@@ -85,6 +87,23 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
                 	break;
             	}
         	}
+    	}
+    	else {
+    		MenuAction menuAction = (MenuAction)arg;
+    		RuntimeObject runtime = (RuntimeObject)this.getModelObject();
+    		switch (menuAction) {
+				case RUNTIME_CHARTIT:
+					break;
+				case RUNTIME_KILL:
+					runtime.killRuntime();
+					break;
+				case RUNTIME_REFRESH:
+					runtime.explore();
+					break;
+				case RUNTIME_STOP_MONITORING:
+					runtime.stopMonitoring(true);
+					break;
+    		}
     	}
     }
 }

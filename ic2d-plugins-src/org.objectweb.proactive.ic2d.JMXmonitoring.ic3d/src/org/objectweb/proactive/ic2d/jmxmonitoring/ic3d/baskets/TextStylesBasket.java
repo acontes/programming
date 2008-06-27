@@ -90,4 +90,9 @@ public class TextStylesBasket {
 	    
 	}
 
+	public static TransformGroup runtimeLoadText(String text) {
+		return TextStylesBasket.figureText(text, ColorPalette.RED, Font.SERIF, 20, Font.BOLD, new Vector3d(
+	            0d, 0d, 0d), new Vector3d(-Math.PI/2, 0, 0), 1.5);
+	}
+
 }
