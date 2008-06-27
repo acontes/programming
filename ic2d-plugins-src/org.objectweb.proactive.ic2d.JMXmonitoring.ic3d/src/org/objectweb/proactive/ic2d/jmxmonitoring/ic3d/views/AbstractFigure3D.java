@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
+package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -20,6 +20,7 @@ import javax.vecmath.Vector3f;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.IObservable;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
@@ -69,9 +70,9 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
      */
     private final BranchGroup subFiguresBranch;
 
-    private final TransformGroup translateScaleTrans;
-
-    private final TransformGroup rotTrans;
+    private final TransformGroup translateTransform;
+    
+    private final TransformGroup rotateTransform;
     
     // TODO remove this when creating LOD
     // replace the extends of this class to observable
@@ -231,20 +232,21 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
         // rootBranch.addChild(subFiguresBranch);
 
         this.rootBranch.addChild(this.figureBranch);
-        this.translateScaleTrans = this.createTransform();
-        this.rotTrans = this.createTransform();
+        this.translateTransform = this.createTransform();
+        this.rotateTransform = this.createTransform();
         // connect the rotation transform to the translation transform
-        this.translateScaleTrans.addChild(this.rotTrans);
+        this.translateTransform.addChild(this.rotateTransform);
         // add the text to the rotation Transform
-        this.rotTrans.addChild(this.createTextBranch());
+        this.rotateTransform.addChild(this.createTextBranch());
         // add this figure to the rotation transform
-        this.rotTrans.addChild(this);
+        this.rotateTransform.addChild(this);
 
         // TODO maybe change like this, needs to be checked
-        this.rotTrans.addChild(this.subFiguresBranch);
+        this.rotateTransform.addChild(this.subFiguresBranch);
 
         // connect the transforms to the figure branch
-        this.figureBranch.addChild(this.translateScaleTrans);
+        this.figureBranch.addChild(this.translateTransform);
+        
         // optimize
         this.rootBranch.compile();
         AbstractFigure3D.logger.debug("Figure created");
@@ -534,11 +536,11 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.Figure3D#getTranslateScaleTransform()
      */
     public TransformGroup getTranslateScaleTransform() {
-        return this.translateScaleTrans;
+        return this.translateTransform;
     }
 
     public TransformGroup getRotationTransform() {
-        return this.rotTrans;
+        return this.rotateTransform;
     }
 
     public Geometry getGeometry() {

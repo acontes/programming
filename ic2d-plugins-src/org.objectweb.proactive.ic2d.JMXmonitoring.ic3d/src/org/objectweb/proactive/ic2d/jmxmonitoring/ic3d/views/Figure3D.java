@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
+package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views;
 
 import java.util.Hashtable;
 
