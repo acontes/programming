@@ -172,7 +172,7 @@ public interface Loggers {
     // EJB
     public static final String EJB = JEE + ".ejb";
     // Connector
-    public static final String CONNECOR = JEE + ".connector";
+    public static final String CONNECTOR = JEE + ".connector";
     
     // annotations
     public static final String ANNOTATIONS = CORE + ".annotations";

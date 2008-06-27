@@ -127,7 +127,7 @@ public class ProActiveProcessor extends AbstractProcessor {
 	private void processActiveObjectAnnotation(RoundEnvironment roundEnv,
 			TypeElement proActiveAnotElement) {
 		
-		// initialisation stuff		
+		// initialization stuff		
 		Trees trees = Trees.instance(processingEnv);
 		Messager messager = processingEnv.getMessager();
 		ActiveObjectVisitor visitor = new ActiveObjectVisitor(messager);

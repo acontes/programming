@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:deployment:3.3
+ http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+	<componentDefinition>
+   <virtualNodesDefinition>
+    <virtualNode name='as' property='multiple'/>
+   </virtualNodesDefinition>
+  </componentDefinition>
+  <deployment>
+   <mapping>
+    <map virtualNode='as'>
+     <jvmSet>
+      <vmName value='Jvm1'/>
+      <vmName value='Jvm2'/>
+      <vmName value='Jvm3'/>
+<!--      <vmName value='Jvm4'/>-->
+     </jvmSet>
+    </map>
+   </mapping>
+   <jvms>
+    <jvm name='Jvm1'>
+     <acquisition>
+      <serviceReference refid='lookupRMI1'/>
+     </acquisition>
+    </jvm>
+    <jvm name='Jvm2'>
+     <acquisition>
+      <serviceReference refid='lookupRMI2'/>
+     </acquisition>
+    </jvm>
+    <jvm name='Jvm3'>
+     <acquisition>
+      <serviceReference refid='lookupRMI3'/>
+     </acquisition>
+    </jvm>
+<!--    <jvm name='Jvm4'>
+     <acquisition>
+      <serviceReference refid='lookupRMI4'/>
+     </acquisition>
+    </jvm>-->
+<!--	<jvm name='Jvm3'>
+      <creation>
+       <processReference refid='creationProcess'/>
+      </creation>
+    </jvm>-->
+<!--	<jvm name='Jvm4'>
+     <creation>
+       <processReference refid='creationProcess'/>
+      </creation>
+    </jvm>-->
+   </jvms>
+  </deployment>
+  <infrastructure>
+	  <!--Create local node-->
+	  <processes>
+        <processDefinition id='creationProcess'>
+          <jvmProcess class='org.objectweb.proactive.core.process.JVMNodeProcess'/>
+        </processDefinition>
+      </processes>
+   <services>
+    <serviceDefinition id='lookupRMI1'>
+     <RMIRegistryLookup url='rmi://eon1.inria.fr:6635/PA_JVMjbossVM'/>
+    </serviceDefinition>
+    <serviceDefinition id='lookupRMI2'>
+     <RMIRegistryLookup url='rmi://eon2.inria.fr:6635/PA_JVMglassfishVM'/>
+    </serviceDefinition>
+    <serviceDefinition id='lookupRMI3'>
+     <RMIRegistryLookup url='rmi://eon3.inria.fr:6635/PA_JVMgeronimoVM'/>
+    </serviceDefinition>
+<!--    <serviceDefinition id='lookupRMI4'>
+     <RMIRegistryLookup url='rmi://apple.inria.fr:6635/PA_JVMjbossVM'/>
+    </serviceDefinition>-->
+   </services>
+  </infrastructure>
+</ProActiveDescriptor>

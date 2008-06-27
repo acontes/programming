@@ -61,7 +61,7 @@ public abstract class ProActiveConnectorBean {
 		// logging is configured via a separate RepositorySelector
 		try {
 			ContextRepositorySelector.init(this);
-			_raLogger = Logger.getLogger(Loggers.CONNECOR);
+			_raLogger = Logger.getLogger(Loggers.CONNECTOR);
 			_raLogger.debug("log4j initialised succesfully!");
 		} catch (Exception e) {
 			System.err.println("ERROR - Could not init log4j system. " +

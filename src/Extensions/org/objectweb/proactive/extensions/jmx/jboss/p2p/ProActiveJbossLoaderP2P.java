@@ -28,12 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.jboss;
+package org.objectweb.proactive.extensions.jmx.jboss.p2p;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.StartP2PService;
+import org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoader;
+import org.objectweb.proactive.extra.p2p.service.P2PService;
+import org.objectweb.proactive.extra.p2p.service.StartP2PService;
 
 /**
  * This is the ProActive loader implemented as JBoss service. See

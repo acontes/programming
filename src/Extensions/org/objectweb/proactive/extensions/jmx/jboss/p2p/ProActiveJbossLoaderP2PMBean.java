@@ -28,9 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.jboss;
+package org.objectweb.proactive.extensions.jmx.jboss.p2p;
 
 import org.jboss.system.ServiceMBean;
+import org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderMBean;
 
 /**
  * Interface for the ProActive JBoss Service implementation

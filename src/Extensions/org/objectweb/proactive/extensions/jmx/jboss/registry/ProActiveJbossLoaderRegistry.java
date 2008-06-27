@@ -28,12 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.jboss;
+package org.objectweb.proactive.extensions.jmx.jboss.registry;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoader;
 
 
 public class ProActiveJbossLoaderRegistry extends ProActiveJbossLoader 

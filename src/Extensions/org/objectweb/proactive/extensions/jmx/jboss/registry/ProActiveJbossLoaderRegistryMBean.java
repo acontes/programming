@@ -28,9 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.jboss;
+package org.objectweb.proactive.extensions.jmx.jboss.registry;
 
 import org.jboss.system.ServiceMBean;
+import org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoaderMBean;
 
 /**
  * Interface for the ProActive Registry JBoss Service implementation

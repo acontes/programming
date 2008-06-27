@@ -32,16 +32,22 @@
 package org.objectweb.proactive.extensions.jee;
 
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.spi.LoggerRepository;
 import org.apache.log4j.spi.RepositorySelector;
 import org.apache.log4j.spi.RootLogger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Context repository selector, to use for log4j logging
@@ -102,9 +108,26 @@ public class ContextRepositorySelector implements RepositorySelector
 		// clear old config
 		hierarchy.resetConfiguration();
 		conf.doConfigure(log4jConfigFile, hierarchy);
+		
+		// let's test now the configuration, shall we?
+		//System.out.println("Proactive is logging to file:" + ((FileAppender)hierarchy.getRootLogger().getAppender("FILE")).getFile());
+		
 		return hierarchy; 
 		
 	}
+
+//	private static void testLog4jConfig(Hierarchy hierarchy) {
+//		Logger _jeeLogger = hierarchy.getLogger(Loggers.CONNECTOR);
+//		Enumeration<Appender> rootLoggerAppenders = hierarchy.getRootLogger().getAllAppenders();
+//		while (rootLoggerAppenders.hasMoreElements()) {
+//			Appender appender = rootLoggerAppenders.nextElement();
+//			if (appender instanceof FileAppender) {
+//				FileAppender fileAppender = (FileAppender) appender;
+//				_jeeLogger.debug("Proactive is logging to file:" + fileAppender.getFile() );
+//			}
+//			
+//		}
+//	}
 
 	private ContextRepositorySelector() 
 	{

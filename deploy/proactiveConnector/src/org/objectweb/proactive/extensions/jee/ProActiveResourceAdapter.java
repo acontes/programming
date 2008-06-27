@@ -126,11 +126,11 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 		// kill the nodes deployed up until now
 		_proActiveRuntime.killAllNodes();
 		
-		// destroy the JMX MBean associated with this runtime
-		destroyMBean();
-		
 		// unregister from the RMI Registry
 		unregisterRuntime();
+		
+		// destroy the JMX MBean associated with this runtime
+		destroyMBean();
 
 	}
 	
@@ -155,7 +155,7 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 		// Deal with the JMX MBeans
         ProActiveRuntimeWrapperMBean mbean = _proActiveRuntime.getMBean(); 
         if ( mbean != null) {
-            mbean.sendNotification(NotificationType.runtimeDestroyed);
+            mbean.sendNotification(NotificationType.runtimeUnregistered);
 
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName objectName = mbean.getObjectName();
