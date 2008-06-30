@@ -30,16 +30,6 @@
  */
 package org.objectweb.proactive.extensions.jee;
 
-import java.lang.management.ManagementFactory;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
-
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.BootstrapContext;
@@ -48,9 +38,6 @@ import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
-import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
-import org.objectweb.proactive.core.jmx.notification.NotificationType;
-import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 /**
@@ -124,72 +111,11 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 	public void stop() {
 		_raLogger.info("terminating Runtime " + _proActiveRuntime.getURL());
         
-		// kill the nodes deployed up until now
-		_proActiveRuntime.killAllNodes();
-		
-		// unregister from the RMI Registry
-		unregisterRuntime();
-		
-		// destroy the JMX MBean associated with this runtime
-		destroyMBean();
+		// kill the PART w/o killing the underlying JVM
+		_proActiveRuntime.killPART();
 		
 		// shutdown log4j
 		ContextRepositorySelector.shutdown();
-	}
-	
-	private void unregisterRuntime() {
-		try {
-			// interesting class, this Registry helper!
-			RegistryHelper regHelper = new RegistryHelper();
-			regHelper.initializeRegistry();
-			Registry rmiRegistry = RegistryHelper.getRegistry();
-			// unbind the name onto which PART is bound
-			rmiRegistry.unbind(PART_PREFIX + _vmName);
-		} catch ( RemoteException  e) {
-			_raLogger.error( "Unable to contact the RMI registry that is (supposed to be) on the localhost." ); 
-			_raLogger.error( e.getMessage() , e );
-		} catch (NotBoundException e) {
-			_raLogger.error( "The name " + PART_PREFIX + _vmName + " is not bound in the RMI Registry." );
-			_raLogger.error( e.getMessage() , e );
-		}
-	}
-	
-	private void destroyMBean() {
-		// Deal with the JMX MBeans
-        ProActiveRuntimeWrapperMBean mbean = _proActiveRuntime.getMBean();
-        if ( mbean != null) {
-        	ObjectName objectName = null;
-        	try {
-
-        		// send notification
-        		mbean.sendNotification(NotificationType.runtimeDestroyed);
-        		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();            
-        		
-        		// unregister the object
-        		objectName = mbean.getObjectName();
-        		if (mbs.isRegistered(objectName)) {
-        			mbs.unregisterMBean(objectName);
-        		}
-
-        		// unregister the JMXClassLoader
-        		objectName = new ObjectName(ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME);
-        		if(mbs.isRegistered(objectName)){
-        			mbs.unregisterMBean(objectName);
-        		}
-        		
-			} catch (MalformedObjectNameException e) {
-				_raLogger.error( "Cannot create the objectName " + ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME );
-				_raLogger.error( e.getMessage() , e );
-			} catch (NullPointerException e) {
-				_raLogger.error( "Cannot create the objectName " + ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME );
-				_raLogger.error( e.getMessage() , e );
-			} catch (InstanceNotFoundException e) {
-                _raLogger.error("The MBean with the objectName " + objectName + " was not found", e);
-            } catch (MBeanRegistrationException e) {
-                _raLogger.error("The MBean with the objectName " + objectName +
-                    " can't be unregistered from the MBean server", e);
-            }
-        }
 	}
 	
 	/* 
