@@ -375,6 +375,13 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             logger.debug("MethodCall.execute() reifiedMethod.getDeclaringClass() = " +
                 this.reifiedMethod.getDeclaringClass());
             logger.debug("MethodCall.execute() targetObject " + targetObject);
+            logger.debug("MethodCall.execute() arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
+            for (int i = 0; i < this.effectiveArguments.length; i++) {
+            	Object argument = this.effectiveArguments[i];
+            	logger.debug("MethodCall.execute() argument #" + i + "=" 
+            				+ argument + ";" + ( argument != null ? argument.getClass() : "" )
+            			);
+			}
         }
 
         if (this.reifiedMethod.getParameterTypes().length > 0) {
