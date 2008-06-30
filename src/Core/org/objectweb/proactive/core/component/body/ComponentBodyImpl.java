@@ -30,8 +30,16 @@
  */
 package org.objectweb.proactive.core.component.body;
 
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -46,6 +54,8 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.jmx.mbean.ComponentWrapper;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -61,6 +71,8 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private boolean insideFunctionalActivity = false;
 
+    private ComponentWrapper cmbean;
+    
     public ComponentBodyImpl() {
         super();
     }
@@ -93,6 +105,57 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                     }
                     this.componentIdentity = factory.newComponentFactory().newProActiveComponent(this);
 
+                    /*
+                     * change the super.mbean into ComponentWrapperMBean if this is a component
+                     */
+//                 // JMX registration        
+//                    if (!super.isProActiveInternalObject) {
+//                        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+//                        ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
+//                        if (!mbs.isRegistered(oname)) {
+//                        	
+//                        	System.out.println("[YYL Test Output:]in mbs not registered"+oname.toString());
+//                        	
+//                            this.cmbean = new ComponentWrapper(oname, this);
+//                            try {
+//                                mbs.registerMBean(cmbean, oname);
+//                            } catch (InstanceAlreadyExistsException e) {
+//                                bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
+//                            } catch (MBeanRegistrationException e) {
+//                                bodyLogger.error("Can't register the MBean of the body", e);
+//                            } catch (NotCompliantMBeanException e) {
+//                                bodyLogger.error("The MBean of the body is not JMX compliant", e);
+//                            }
+//                        }
+//                        else
+//                        {
+////                        	try
+////                        	{
+////                        		mbs.unregisterMBean(oname);
+////                        	}catch(InstanceNotFoundException e)
+////                        	{
+////                        		bodyLogger.error("The specified MBean does not exist in the repository. The specified MBean does not exist in the repository.", e);
+////                        	}catch (MBeanRegistrationException e) {
+////                                bodyLogger.error("Can't register the MBean of the body", e);
+////                            }
+//                        	
+//                        	System.out.println("[YYL Test Output:]"+oname.toString());
+//                        	
+//                        	this.cmbean = new ComponentWrapper(oname, this);
+//                            try {
+//                                mbs.registerMBean(cmbean, oname);
+//                            } catch (InstanceAlreadyExistsException e) {
+//                                bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
+//                            } catch (MBeanRegistrationException e) {
+//                                bodyLogger.error("Can't register the MBean of the body", e);
+//                            } catch (NotCompliantMBeanException e) {
+//                                bodyLogger.error("The MBean of the body is not JMX compliant", e);
+//                            }
+//                        	
+//                        	
+//                        }
+//                    }
+                    
                     // change activity into a component activity
                     // activity = new ComponentActivity(activity, reifiedObject);
                 } else {
