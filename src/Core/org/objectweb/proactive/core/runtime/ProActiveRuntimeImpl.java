@@ -38,6 +38,9 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -99,6 +102,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.FileProcess;
+import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -186,6 +190,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     protected RemoteObjectExposer roe;
 
     // JMX
+    /** The name under which the JMXClassLoader will be registered as a MBean */
+    public static final String JMX_CLASSLOADER_MBEAN_OBJECTNAME = "org.objectweb.proactive:type=JMXClassLoader"; 
     /** The Server Connector to connect remotly to the JMX server */
     private ServerConnector serverConnector;
     private Object mutex = new Object();
@@ -389,7 +395,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         }
     }
 
-    public static final String JMX_CLASSLOADER_MBEAN_OBJECTNAME = "org.objectweb.proactive:type=JMXClassLoader"; 
+
     
     /**
      * Creates the MBean associated to the ProActiveRuntime
@@ -432,6 +438,72 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             }
         }
     }
+    
+    /**
+     * Destroys the MBean associated to the ProActiveRuntime
+     * practically it undoes everything that is being done in createMBean()
+     */
+    protected void destroyMBean() {
+    	ObjectName objectName = null;
+    	try {
+    		// send notification
+    		mbean.sendNotification(NotificationType.runtimeDestroyed);
+    		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();            
+    		
+    		// unregister the object
+    		objectName = mbean.getObjectName();
+    		if (mbs.isRegistered(objectName)) {
+    			mbs.unregisterMBean(objectName);
+    		}
+
+    		// unregister the JMXClassLoader
+    		objectName = new ObjectName(ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME);
+    		if(mbs.isRegistered(objectName)){
+    			mbs.unregisterMBean(objectName);
+    		}
+    		
+    		mbean = null;
+    		
+		} catch (MalformedObjectNameException e) {
+			jmxLogger.error( "Cannot create the objectName " + ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME );
+			jmxLogger.error( e.getMessage() , e );
+		} catch (NullPointerException e) {
+			jmxLogger.error( "Cannot create the objectName " + ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME );
+			jmxLogger.error( e.getMessage() , e );
+		} catch (InstanceNotFoundException e) {
+            jmxLogger.error("The MBean with the objectName " + objectName + " was not found", e);
+        } catch (MBeanRegistrationException e) {
+            jmxLogger.error("The MBean with the objectName " + objectName +
+                " can't be unregistered from the MBean server", e);
+        }
+    }
+    
+    /**
+     * Unregister the ProActiveRuntime object from the RMI registry
+     */
+	protected void unregisterRuntime() {
+		
+		String partName = System.getProperty("proactive.runtime.name");
+		if( partName == null){
+			// then I assume there is no proactive runtime! => nothing to do
+			return;
+		}
+		
+		try {
+			// interesting class, this Registry helper!
+			RegistryHelper regHelper = new RegistryHelper();
+			regHelper.initializeRegistry();
+			Registry rmiRegistry = RegistryHelper.getRegistry();
+			// unbind the name onto which PART is bound
+			rmiRegistry.unbind(partName);
+		} catch ( RemoteException  e) {
+			jmxLogger.error( "Unable to contact the RMI registry that is (supposed to be) on the localhost." ); 
+			jmxLogger.error( e.getMessage() , e );
+		} catch (NotBoundException e) {
+			jmxLogger.error( "The name " + partName + " is not bound in the RMI Registry. Maybe the ProActive Runtime was never created in the first place?!" );
+			jmxLogger.error( e.getMessage() , e );
+		}
+	}
 
     //
     // -- Implements ProActiveRuntime
@@ -697,34 +769,37 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killRT(boolean)
      */
     public void killRT(boolean softly) {
-        // JMX Notification
+    	
+    	killPART();
+        
+        // exit & don't care
+        System.exit(0);
+    }
+    
+    /**
+     * Try to kill the ProActive Runtime, but without killing the underlying JVM
+     * This is VERY useful in a J2EE environment, where most of the time
+     * it is desirable to leave the application server running after the ProActive
+     * runtime is destroyed 
+     */
+    public void killPART() {
+    	
+    	 // JMX Notification
         if (getMBean() != null) {
             getMBean().sendNotification(NotificationType.runtimeDestroyed);
         }
 
-        // END JMX Notification
+        // finish them nodes
         killAllNodes();
 
         logger.info("terminating Runtime " + getInternalURL());
 
-        // JMX unregistration
-        if (getMBean() != null) {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName objectName = getMBean().getObjectName();
-            if (mbs.isRegistered(objectName)) {
-                try {
-                    mbs.unregisterMBean(objectName);
-                } catch (InstanceNotFoundException e) {
-                    jmxLogger.error("The MBean with the objectName " + objectName + " was not found", e);
-                } catch (MBeanRegistrationException e) {
-                    jmxLogger.error("The MBean with the objectName " + objectName +
-                        " can't be unregistered from the MBean server", e);
-                }
-            }
-            mbean = null;
-        }
-        // END JMX unregistration
-        System.exit(0);
+        // unregister from the RMI Registry
+		unregisterRuntime();
+		
+		// destroy the JMX MBean associated with this runtime
+		destroyMBean();
+
     }
 
     /**
