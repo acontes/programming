@@ -32,22 +32,16 @@
 package org.objectweb.proactive.extensions.jee;
 
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.spi.LoggerRepository;
 import org.apache.log4j.spi.RepositorySelector;
 import org.apache.log4j.spi.RootLogger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Context repository selector, to use for log4j logging
@@ -63,32 +57,46 @@ public class ContextRepositorySelector implements RepositorySelector
 	// in a known place : META-INF/proactive-log4j
 	public static final String LOG4J_CONFIG_FILE = "/META-INF/proactive-log4j";
 		
-	private static boolean _alreadyStarted = false;
+//	private static boolean _alreadyStarted = false;
 
-	private static Object _guardObj = new Object();
+	private static Object _guardObj; 
+
+	// init the new repository selector when the class gets loaded
+	// must take care that the class will be loaded along with log4j classes
+	static{
+		_defaultRepository = LogManager.getLoggerRepository();
+		RepositorySelector theSelector = new ContextRepositorySelector();
+		LogManager.setRepositorySelector(theSelector, _guardObj);
+	}
 
 	private static Map<ClassLoader,LoggerRepository> _knownRepositories = 
 		new HashMap<ClassLoader,LoggerRepository>();
 
 	private static LoggerRepository _defaultRepository;
 
-	/**
+	/*
 	 * This method initializes a new log4j hierarchy for ProActive Logging.
-	 * @throws Exception 
 	 */
 	public static synchronized void init(ProActiveConnectorBean caller) throws Exception 
 	{
-		if( !_alreadyStarted ) // set the global RepositorySelector
-		{
-			_defaultRepository = LogManager.getLoggerRepository();
-			RepositorySelector theSelector = new ContextRepositorySelector();
-			LogManager.setRepositorySelector(theSelector, _guardObj);
-			_alreadyStarted = true;
-		}
+//		if( !_alreadyStarted ) // set the global RepositorySelector
+//		{
+//			_defaultRepository = LogManager.getLoggerRepository();
+//			RepositorySelector theSelector = new ContextRepositorySelector();
+//			LogManager.setRepositorySelector(theSelector, _guardObj);
+//			_alreadyStarted = true;
+//		}
 
 		Hierarchy hierarchy = loadLog4JConfig(caller);
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		_knownRepositories.put(loader, hierarchy);
+	}
+	
+	/*
+	 * shutdown log4j
+	 */
+	public static synchronized void shutdown() {
+		LogManager.shutdown();
 	}
 
 	// this will create && initialize a new Log4j Hierarchy with the configuration options

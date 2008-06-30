@@ -389,6 +389,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         }
     }
 
+    public static final String JMX_CLASSLOADER_MBEAN_OBJECTNAME = "org.objectweb.proactive:type=JMXClassLoader"; 
+    
     /**
      * Creates the MBean associated to the ProActiveRuntime
      */
@@ -399,7 +401,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName objectName = null;
         try {
-            objectName = new ObjectName("org.objectweb.proactive:type=JMXClassLoader");
+            objectName = new ObjectName(JMX_CLASSLOADER_MBEAN_OBJECTNAME);
         } catch (MalformedObjectNameException e) {
             jmxLogger.error("Can't create the objectName of the JMX ClassLoader MBean", e);
         } catch (NullPointerException e) {

@@ -38,6 +38,7 @@ import java.rmi.registry.Registry;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
@@ -131,7 +132,9 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 		
 		// destroy the JMX MBean associated with this runtime
 		destroyMBean();
-
+		
+		// shutdown log4j
+		ContextRepositorySelector.shutdown();
 	}
 	
 	private void unregisterRuntime() {
@@ -153,23 +156,39 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 	
 	private void destroyMBean() {
 		// Deal with the JMX MBeans
-        ProActiveRuntimeWrapperMBean mbean = _proActiveRuntime.getMBean(); 
+        ProActiveRuntimeWrapperMBean mbean = _proActiveRuntime.getMBean();
         if ( mbean != null) {
-            mbean.sendNotification(NotificationType.runtimeUnregistered);
+        	ObjectName objectName = null;
+        	try {
 
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName objectName = mbean.getObjectName();
-            if (mbs.isRegistered(objectName)) {
-                try {
-                    mbs.unregisterMBean(objectName);
-                } catch (InstanceNotFoundException e) {
-                    _raLogger.error("The MBean with the objectName " + objectName + " was not found", e);
-                } catch (MBeanRegistrationException e) {
-                    _raLogger.error("The MBean with the objectName " + objectName +
-                        " can't be unregistered from the MBean server", e);
-                }
+        		// send notification
+        		mbean.sendNotification(NotificationType.runtimeDestroyed);
+        		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();            
+        		
+        		// unregister the object
+        		objectName = mbean.getObjectName();
+        		if (mbs.isRegistered(objectName)) {
+        			mbs.unregisterMBean(objectName);
+        		}
+
+        		// unregister the JMXClassLoader
+        		objectName = new ObjectName(ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME);
+        		if(mbs.isRegistered(objectName)){
+        			mbs.unregisterMBean(objectName);
+        		}
+        		
+			} catch (MalformedObjectNameException e) {
+				_raLogger.error( "Cannot create the objectName " + ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME );
+				_raLogger.error( e.getMessage() , e );
+			} catch (NullPointerException e) {
+				_raLogger.error( "Cannot create the objectName " + ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME );
+				_raLogger.error( e.getMessage() , e );
+			} catch (InstanceNotFoundException e) {
+                _raLogger.error("The MBean with the objectName " + objectName + " was not found", e);
+            } catch (MBeanRegistrationException e) {
+                _raLogger.error("The MBean with the objectName " + objectName +
+                    " can't be unregistered from the MBean server", e);
             }
-            mbean = null;
         }
 	}
 	
