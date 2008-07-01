@@ -772,8 +772,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     	
     	killPART();
         
-        // exit & don't care
-        System.exit(0);
+    	if(!softly) {
+    		// exit & don't care
+    		System.exit(0);
+    	}
     }
     
     /**
@@ -782,7 +784,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
      * it is desirable to leave the application server running after the ProActive
      * runtime is destroyed 
      */
-    public void killPART() {
+    private void killPART() {
     	
     	 // JMX Notification
         if (getMBean() != null) {

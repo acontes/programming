@@ -112,7 +112,7 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 		_raLogger.info("terminating Runtime " + _proActiveRuntime.getURL());
         
 		// kill the PART w/o killing the underlying JVM
-		_proActiveRuntime.killPART();
+		_proActiveRuntime.killRT(true);
 		
 		// shutdown log4j
 		ContextRepositorySelector.shutdown();
