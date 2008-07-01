@@ -35,12 +35,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.mbean.ComponentWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
@@ -144,6 +146,9 @@ public class NodeObject extends AbstractData {
         final Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
 
         final List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
+        
+        Vector<ComponentModel> componentmodels = new Vector<ComponentModel>();
+        
 
         for (final ObjectName oname : activeObjectNames) {
             final BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler
@@ -166,6 +171,25 @@ public class NodeObject extends AbstractData {
                 final String activeObjectName = proxyBodyMBean.getName();
                 child = new ActiveObject(this, id, activeObjectName, oname, proxyBodyMBean);
                 childrentoAdd.add(child);
+                
+                
+                /**
+                 * create component model here
+                 */
+                ComponentWrapperMBean proxyComponentMBean = (ComponentWrapperMBean) MBeanServerInvocationHandler
+                .newProxyInstance(getProActiveConnection(), oname, ComponentWrapperMBean.class, false);
+                try
+                {
+                ComponentModel Cchild = new ComponentModel(this,id,activeObjectName,oname,proxyComponentMBean);
+                componentmodels.add(Cchild);
+                }
+                catch(Exception e)
+                {
+                	e.printStackTrace();
+                }
+                
+               
+                
             }
 
             // Removes from the model the not monitored or termined aos.
@@ -182,6 +206,8 @@ public class NodeObject extends AbstractData {
             // listener for this
             // child object
         }
+        
+        
     }
 
     @Override
