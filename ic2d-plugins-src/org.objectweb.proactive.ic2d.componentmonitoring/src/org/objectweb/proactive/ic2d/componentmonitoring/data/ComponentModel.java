@@ -1,9 +1,12 @@
 package org.objectweb.proactive.ic2d.componentmonitoring.data;
 
+import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.mbean.ComponentWrapperMBean;
 import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotification;
 import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotificationTag;
 
@@ -13,8 +16,11 @@ public class ComponentModel extends AbstractData
 	private static String ObjectNameString = "org.objectweb.proactive.ic2d.componentmonitoring:type=Component";
 
 	private AbstractData parent;
+	
+	 /** ID used to identify the active object globally, even in case of migration. */
+    private UniqueID id;
 
-	private String name = "";
+	private String ClassName = "";
 
 	private String Hierachical = "";
 
@@ -43,28 +49,65 @@ public class ComponentModel extends AbstractData
 	//     * */
 	//    private final NotificationListener listener;
 	//    
-	//    /** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
-	//    private final BodyWrapperMBean proxyMBean;
+	    /** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
+	    private ComponentWrapperMBean proxyMBean;
 
-	public ComponentModel(ComponentHolderModel parent, String name)
+	public ComponentModel(ComponentHolderModel parent, String ClassName)
 			throws MalformedObjectNameException, NullPointerException
 	{
 		super(new ObjectName(ObjectNameString));
 		this.parent = parent;
-		this.name = name;
+		this.ClassName = ClassName;
 		this.parent.addChild(this);
 
 	}
 
-	public ComponentModel(ComponentModel parent, String name)
+	public ComponentModel(ComponentModel parent, String ClassName)
 			throws MalformedObjectNameException, NullPointerException
 	{
 		super(new ObjectName(ObjectNameString));
 		this.parent = parent;
-		this.name = name;
+		this.ClassName = ClassName;
 		this.parent.addChild(this);
 	}
 
+	
+	public ComponentModel(ComponentModel parent,UniqueID id, String ClassName,ObjectName objectName,
+            BodyWrapperMBean proxyMBean)
+			throws MalformedObjectNameException, NullPointerException
+	{
+		super(objectName, null, null);
+		this.parent = parent;
+		this.ClassName = ClassName;
+		this.parent.addChild(this);
+		
+        this.id = id;
+        this.ClassName = ClassName;
+
+//        this.listener = new ActiveObjectListener(this);
+        
+        this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(
+                getProActiveConnection(), getObjectName(), ComponentWrapperMBean.class, false);
+        
+        
+        
+        
+        if( this.proxyMBean instanceof ComponentWrapperMBean)
+        {
+//        	System.out.println("[YYL Test Output:]"+"this.proxyMBean instanceof BodyWrapperMBean");
+        	System.out.println("[YYL Test Output:]"+"in ActiveObject Body Name = "+this.proxyMBean.getName());
+//        	System.out.println("[YYL Test Output:]"+"in ActiveObject ComponentName"+" "+this.proxyMBean.getComponentName());
+        	System.out.println("[YYL Test Output:]"+"is Component?:"+this.proxyMBean.isComponent());
+//        	System.out.println("[YYL Test Output:]"+"Node Url= "+this.proxyMBean.getNodeUrl());
+        }
+        else
+        {
+        	System.out.println("[YYL Test Output:]"+"BodyWrapperMBean");
+        }
+		
+	}
+	
+	
 	@Override
 	public void explore()
 	{
@@ -84,7 +127,7 @@ public class ComponentModel extends AbstractData
 	public String getName()
 	{
 		// TODO Auto-generated method stub
-		return name;
+		return ClassName;
 	}
 
 	@Override
@@ -202,17 +245,17 @@ public class ComponentModel extends AbstractData
 
 	public void setName(String newName)
 	{
-		if (newName.equals(this.name))
+		if (newName.equals(this.ClassName))
 		{
 			return;
 		}
 		else
 		{
-			this.name = newName;
+			this.ClassName = newName;
 		}
 		setChanged();
 		notifyObservers(new ComponentMVCNotification(
-				ComponentMVCNotificationTag.NAME_CHANGED, this.name));
+				ComponentMVCNotificationTag.NAME_CHANGED, this.ClassName));
 
 	}
 
