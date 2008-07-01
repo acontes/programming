@@ -39,7 +39,7 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
     /**
      * Contains the list of subFigures for this figure.
      */
-    private final Hashtable<String, Figure3D> figures = new Hashtable<String, Figure3D>();
+    protected final Hashtable<String, Figure3D> figures = new Hashtable<String, Figure3D>();
     /**
      * Arrows for this figure.
      */
@@ -68,7 +68,7 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
     /**
      * The subFiguresBranch contains the subfigures of this figure.
      */
-    private final BranchGroup subFiguresBranch;
+    protected final BranchGroup subFiguresBranch;
 
     private final TransformGroup translateTransform;
     
@@ -468,6 +468,7 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
         // return the first 10 or less characters
         return this.name.substring(0, Math.min(characters, this.name.length()));
     }
+    
 
     /**
      * Draws communication between two figures. It uses the setArrow and
@@ -564,5 +565,11 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
 			observer.update(null, arg);
 		}
     }
+    
+//    protected BranchGroup getSubFigureBranch () {
+//    	return this.subFiguresBranch;
+//    }
+//    
+   //protected 
 
 }

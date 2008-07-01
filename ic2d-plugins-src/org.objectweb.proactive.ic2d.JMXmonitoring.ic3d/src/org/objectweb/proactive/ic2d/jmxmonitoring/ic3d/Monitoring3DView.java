@@ -56,6 +56,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetDepthAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetTTRAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.SiteBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.FlatCameraBehavior;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.OrbitalCameraBehavior;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed.EarthGrid3DController;
@@ -132,7 +133,8 @@ public class Monitoring3DView extends ViewPart {
         // TODO hacky
         // *********** ADDED FOR MULTIPLE VIEWS *********
         // uncomment above to go back to the old view
-
+        
+        SiteBasket.init();
         final CustomUniverse universe = new CustomUniverse();
         final Universe3D universe3D = new Universe3D();
         universe.addGrid(universe3D.getRootBranch());

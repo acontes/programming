@@ -1,6 +1,6 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.loadmonitoring;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.AbstractGrid3D;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractGrid3D;
 
 
 /**

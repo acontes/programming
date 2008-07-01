@@ -3,6 +3,8 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed;
 
+import java.util.Hashtable;
+
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Geometry;
 import javax.media.j3d.TransformGroup;
@@ -10,6 +12,8 @@ import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.PlacementBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.SiteBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 
 
@@ -18,7 +22,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
  * 
  */
 public class Grid3D extends AbstractGrid3D {
-    public Grid3D() {
+	
+	public Grid3D() {
         super("");
     }
 
@@ -37,11 +42,24 @@ public class Grid3D extends AbstractGrid3D {
      */
     @Override
     public void arrangeSubFigures() {
-        int i = 1;
-        for (final Figure3D host : this.getSubFigures().values()) {
-        	PlacementBasket.matrixArrangement(i, host, this.getSubFigures().size());
-            //PlacementBasket.spiralArrangement(i + 1, host);
-            i++;
+    	//for (final Figure3D site : this.getSubFigures().values()) {
+		//	site.arrangeSubFigures();
+		//}
+    	Hashtable<String, Integer> countedHosts = new Hashtable<String, Integer>();
+    	for (final Figure3D host : this.getSubFigures().values()) {
+    		final String site = SiteBasket.getSite(host.getFigureName());
+            Integer siteHostCount = hostSites.get(site);
+            Integer siteHostIndex = countedHosts.get(site);
+            if(siteHostIndex == null) {
+            	siteHostIndex = 1;
+            	countedHosts.put(site, siteHostIndex);
+            }
+            else {
+            	siteHostIndex++;
+            	countedHosts.put(site, siteHostIndex );
+            }
+            
+            PlacementBasket.matrixGridArrangement(siteHostIndex, host, siteHostCount, SiteBasket.getFlatLocation(host.getFigureName()));
             host.arrangeSubFigures();
         }
     }
