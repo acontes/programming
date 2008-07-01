@@ -368,44 +368,94 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
             this.serializedEffectiveArguments = null;
         }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("MethodCall.execute() name = " + this.getName());
-            logger.debug("MethodCall.execute() reifiedMethod = " + this.reifiedMethod);
-            logger.debug("MethodCall.execute() reifiedMethod.getDeclaringClass() = " +
-                this.reifiedMethod.getDeclaringClass());
-            logger.debug("MethodCall.execute() targetObject " + targetObject);
-            logger.debug("MethodCall.execute() arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
-            for (int i = 0; i < this.effectiveArguments.length; i++) {
-            	Object argument = this.effectiveArguments[i];
-            	logger.debug("MethodCall.execute() argument #" + i + "=" 
-            				+ argument + ";" + ( argument != null ? argument.getClass() : "" )
-            			);
-			}
-        }
-
-        if (this.reifiedMethod.getParameterTypes().length > 0) {
-            this.reifiedMethod.setAccessible(true);
-        }
-
         try {
-            targetObject = PAFuture.getFutureValue(targetObject);
-            // In order to call from this class protected methods of the Active Object,
-            // we need to bypass the Java Runtime security. 
-            this.reifiedMethod.setAccessible(true);
+        	if (logger.isDebugEnabled()) {
+        		printMethodExecutionDebugInfo(targetObject);
+        	}
+        	// basic parameter compatibility check
+        	// not quite working...
+        	// checkMethodExecutionParameters(); 
 
-            return this.reifiedMethod.invoke(targetObject, this.effectiveArguments);
+        	if (this.reifiedMethod.getParameterTypes().length > 0) {
+        		this.reifiedMethod.setAccessible(true);
+        	}
+
+
+        	targetObject = PAFuture.getFutureValue(targetObject);
+        	// In order to call from this class protected methods of the Active Object,
+        	// we need to bypass the Java Runtime security. 
+        	this.reifiedMethod.setAccessible(true);
+
+        	return this.reifiedMethod.invoke(targetObject, this.effectiveArguments);
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException("Access rights to the method denied: " + e);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
             throw new MethodCallExecutionFailedException("Arguments for the method " + this.getName() +
-                " are invalids: " + e + "for the object " + targetObject + "(" +
-                targetObject.getClass().getName() + ")");
+                " are invalid: " + e + " for the object " + targetObject + "(" +
+                targetObject.getClass().getName() + ")" , e );
         }
     }
+    
+    /*
+     * check done before executing a method invocation using reflection
+     * it does some type checking on the parameters of the method
+     */
+    private void checkMethodExecutionParameters() throws IllegalArgumentException {
+    	Class<?>[] methodFormalParameters = this.reifiedMethod.getParameterTypes();
+        // must have the same number of actual parameters
+    	if( this.effectiveArguments.length != methodFormalParameters.length ) {
+        	throw new IllegalArgumentException( "Trying to invoke the method " + this.getName() + " which has " 
+        			+ methodFormalParameters.length + " using " + this.effectiveArguments.length + " actual parameters." );
+        }
+        // the parameters must be compatible
+        for (int i = 0; i < this.effectiveArguments.length; i++) {
+        	//special cases
+        	if( this.effectiveArguments[i] == null ) {
+        		// nothing to do...
+        		continue;
+        	}
+			Class<?> formalParameter = methodFormalParameters[i];
+			Class<?> actualParameter = this.effectiveArguments[i].getClass();
+			if(formalParameter.isPrimitive()){
+				// lame test
+				if(!formalParameter.getSimpleName().equals(actualParameter.getSimpleName().toLowerCase()))
+					throw new IllegalArgumentException( "Error on the argument #" + i + " of the method " + this.getName()
+							+ "; the actual parameter type " + actualParameter.getName() 
+							+ " is not compatible with the formal parameter type " + formalParameter.getName() 
+							);
+				else
+					continue;
+			}
+			// verify if the type of the actual parameter can be used as the type of the formal parameter
+			if( !formalParameter.isAssignableFrom(actualParameter) ) {
+				throw new IllegalArgumentException( "Error on the argument #" + i + " of the method " + this.getName()
+						+ "; the actual parameter type " + actualParameter.getName() 
+						+ " is not compatible with the formal parameter type " + formalParameter.getName() 
+						);
+			}
+		}
+        
+    }
 
-    @Override
+    /*
+     * big debugging statement block
+     */
+    private void printMethodExecutionDebugInfo(Object targetObject) {
+        logger.debug("MethodCall.execute() name = " + this.getName());
+        logger.debug("MethodCall.execute() reifiedMethod = " + this.reifiedMethod);
+        logger.debug("MethodCall.execute() reifiedMethod.getDeclaringClass() = " +
+            this.reifiedMethod.getDeclaringClass());
+        logger.debug("MethodCall.execute() targetObject " + targetObject);
+        logger.debug("MethodCall.execute() arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
+        for (int i = 0; i < this.effectiveArguments.length; i++) {
+        	Object argument = this.effectiveArguments[i];
+        	logger.debug("MethodCall.execute() argument #" + i + "=" 
+        				+ argument + ";" + ( argument != null ? argument.getClass() : "null" )
+        			);
+		}
+	}
+
+	@Override
     protected void finalize() {
         MethodCall.setMethodCall(this);
     }
