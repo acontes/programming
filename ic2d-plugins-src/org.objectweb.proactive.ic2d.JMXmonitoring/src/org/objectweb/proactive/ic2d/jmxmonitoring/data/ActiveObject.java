@@ -30,10 +30,12 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.lang.management.ManagementFactory;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.management.MBeanServer;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
@@ -42,6 +44,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.mbean.ComponentWrapperMBean;
 import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
@@ -81,7 +84,9 @@ public class ActiveObject extends AbstractData {
     private int requestQueueLength = -1; // -1 = not known
 
     /** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
-    private final BodyWrapperMBean proxyMBean;
+//    private final BodyWrapperMBean proxyMBean;
+    
+    private final ComponentWrapperMBean proxyMBean;
 
     // -------------------------------------------
     // --- Constructor ---------------------------
@@ -120,8 +125,28 @@ public class ActiveObject extends AbstractData {
 
         this.listener = new ActiveObjectListener(this);
 
-        this.proxyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
-                getProActiveConnection(), getObjectName(), BodyWrapperMBean.class, false);
+//        this.proxyMBean = (BodyWrapperMBean)MBeanServerInvocationHandler.newProxyInstance(
+//                getProActiveConnection(), getObjectName(), BodyWrapperMBean.class, false);
+        
+        this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(
+                getProActiveConnection(), getObjectName(), ComponentWrapperMBean.class, false);
+        
+        
+        
+//        
+        if( this.proxyMBean instanceof ComponentWrapperMBean)
+        {
+//        	System.out.println("[YYL Test Output:]"+"this.proxyMBean instanceof BodyWrapperMBean");
+        	System.out.println("[YYL Test Output:]"+"in ActiveObject Body Name = "+this.proxyMBean.getName());
+//        	System.out.println("[YYL Test Output:]"+"in ActiveObject ComponentName"+" "+this.proxyMBean.getComponentName());
+        	System.out.println("[YYL Test Output:]"+"is Component?:"+this.proxyMBean.isComponent());
+//        	System.out.println("[YYL Test Output:]"+"Node Url= "+this.proxyMBean.getNodeUrl());
+        }
+        else
+        {
+        	System.out.println("[YYL Test Output:]"+"BodyWrapperMBean");
+        }
+        
     }
 
     /**
