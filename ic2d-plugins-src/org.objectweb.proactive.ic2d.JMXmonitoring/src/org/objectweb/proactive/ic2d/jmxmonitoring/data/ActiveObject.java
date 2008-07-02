@@ -84,9 +84,9 @@ public class ActiveObject extends AbstractData {
     private int requestQueueLength = -1; // -1 = not known
 
     /** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
-//    private final BodyWrapperMBean proxyMBean;
+   private final BodyWrapperMBean proxyMBean;
     
-    private final ComponentWrapperMBean proxyMBean;
+//    private final ComponentWrapperMBean proxyMBean;
 
     // -------------------------------------------
     // --- Constructor ---------------------------
@@ -125,27 +125,27 @@ public class ActiveObject extends AbstractData {
 
         this.listener = new ActiveObjectListener(this);
 
-//        this.proxyMBean = (BodyWrapperMBean)MBeanServerInvocationHandler.newProxyInstance(
-//                getProActiveConnection(), getObjectName(), BodyWrapperMBean.class, false);
+        this.proxyMBean = (BodyWrapperMBean)MBeanServerInvocationHandler.newProxyInstance(
+                getProActiveConnection(), getObjectName(), BodyWrapperMBean.class, false);
         
-        this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(
-                getProActiveConnection(), getObjectName(), ComponentWrapperMBean.class, false);
-        
-        
-        
+//        this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(
+//                getProActiveConnection(), getObjectName(), ComponentWrapperMBean.class, false);
 //        
-        if( this.proxyMBean instanceof ComponentWrapperMBean)
-        {
-//        	System.out.println("[YYL Test Output:]"+"this.proxyMBean instanceof BodyWrapperMBean");
-        	System.out.println("[YYL Test Output:]"+"in ActiveObject Body Name = "+this.proxyMBean.getName());
-//        	System.out.println("[YYL Test Output:]"+"in ActiveObject ComponentName"+" "+this.proxyMBean.getComponentName());
-        	System.out.println("[YYL Test Output:]"+"is Component?:"+this.proxyMBean.isComponent());
-//        	System.out.println("[YYL Test Output:]"+"Node Url= "+this.proxyMBean.getNodeUrl());
-        }
-        else
-        {
-        	System.out.println("[YYL Test Output:]"+"BodyWrapperMBean");
-        }
+//        
+//        
+////        
+//        if( this.proxyMBean instanceof ComponentWrapperMBean)
+//        {
+////        	System.out.println("[YYL Test Output:]"+"this.proxyMBean instanceof BodyWrapperMBean");
+//        	System.out.println("[YYL Test Output:]"+"in ActiveObject Body Name = "+this.proxyMBean.getName());
+////        	System.out.println("[YYL Test Output:]"+"in ActiveObject ComponentName"+" "+this.proxyMBean.getComponentName());
+//        	System.out.println("[YYL Test Output:]"+"is Component?:"+this.proxyMBean.isComponent());
+////        	System.out.println("[YYL Test Output:]"+"Node Url= "+this.proxyMBean.getNodeUrl());
+//        }
+//        else
+//        {
+//        	System.out.println("[YYL Test Output:]"+"BodyWrapperMBean");
+//        }
         
     }
 

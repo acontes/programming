@@ -9,6 +9,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.body.ComponentBody;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 
 public class ComponentWrapper extends BodyWrapper implements ComponentWrapperMBean {
@@ -49,7 +50,7 @@ public class ComponentWrapper extends BodyWrapper implements ComponentWrapperMBe
 		return this.iscomponent;
 	}
 
-	public Component[] getSubComponents() {
+	public ProActiveComponent[] getSubComponents() {
 		if (!isComponent())
 			return null;
 
@@ -57,7 +58,21 @@ public class ComponentWrapper extends BodyWrapper implements ComponentWrapperMBe
 		try
 		{
 			ContentController CC = (ContentController) componentImpl.getFcInterface(Constants.CONTENT_CONTROLLER);
-			return CC.getFcSubComponents();
+			Component[] components = CC.getFcSubComponents();
+			if(components == null)
+				return null;
+			ProActiveComponent[] subs = new ProActiveComponent[components.length];
+			int index = 0;
+			for(Component c:components)
+			{
+				ProActiveComponent pc = (ProActiveComponent)c;
+				
+				subs[index++] = pc;
+				
+				System.out.println("[YYL Test Output:]"+" index = " + index);
+				System.out.println("[YYL Test Output:]"+" pc.getID() = " + pc.getID());
+			}
+			return subs;
 		}
 		catch(NoSuchInterfaceException e)
 		{
@@ -73,6 +88,11 @@ public class ComponentWrapper extends BodyWrapper implements ComponentWrapperMBe
 	public ObjectName getObjectName()
 	{
 		return super.getObjectName();
+	}
+	
+	public UniqueID getParentUID()
+	{
+		return this.cbody.getProActiveComponentImpl().getBody().getParentUID();
 	}
 
 }

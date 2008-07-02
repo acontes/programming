@@ -63,21 +63,21 @@ public class ComponentModel extends AbstractData
 //
 //	}
 
-	public ComponentModel(ComponentModel parent, String ClassName)
-			throws MalformedObjectNameException, NullPointerException
-	{
-		super(new ObjectName(ObjectNameString));
-		this.parent = parent;
-		this.ClassName = ClassName;
-		this.parent.addChild(this);
-	}
+//	public ComponentModel(ComponentModel parent, String ClassName)
+//			throws MalformedObjectNameException, NullPointerException
+//	{
+//		super(new ObjectName(ObjectNameString));
+//		this.parent = parent;
+//		this.ClassName = ClassName;
+//		this.parent.addChild(this);
+//	}
 
 	
 	public ComponentModel(NodeObject parent,UniqueID id, String ClassName,ObjectName objectName,
 			ComponentWrapperMBean proxyMBean)
 			throws MalformedObjectNameException, NullPointerException
 	{
-		super(objectName, null, null);
+		super(objectName);
 		this.parent = parent;
 		this.ClassName = ClassName;
 		if(this.parent!=null)
@@ -208,6 +208,11 @@ public class ComponentModel extends AbstractData
 	public double getTimeServiceRate()
 	{
 		return this.time_service_rate;
+	}
+	
+	public ComponentWrapperMBean getComponentWrapperMBean()
+	{
+		return this.proxyMBean;
 	}
 
 	/* Set Methods*/

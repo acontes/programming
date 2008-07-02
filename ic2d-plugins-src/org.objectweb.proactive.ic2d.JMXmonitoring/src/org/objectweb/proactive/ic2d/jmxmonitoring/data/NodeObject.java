@@ -40,7 +40,9 @@ import java.util.Vector;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
+import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.ComponentWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
@@ -57,6 +59,7 @@ public class NodeObject extends AbstractData {
     private final RuntimeObject parent;
     private final VirtualNodeObject vnParent;
     private final String url;
+    private ComponentHolderModel CHolder;
 
     // Warning: Don't use this variavle directly, use getProxyNodeMBean().
     private NodeWrapperMBean proxyNodeMBean;
@@ -69,6 +72,17 @@ public class NodeObject extends AbstractData {
         this.parent = parent;
         this.vnParent = vnParent;
         this.url = FactoryName.getCompleteUrl(url);
+      
+        /*
+         * initial the component Holder Model
+         */
+        try
+        {
+           this.CHolder = new ComponentHolderModel();
+        }catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -147,9 +161,9 @@ public class NodeObject extends AbstractData {
 
         final List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
         
-        Vector<ComponentModel> componentmodels = new Vector<ComponentModel>();
-        
-
+//        Vector<ComponentModel> componentmodels = new Vector<ComponentModel>();
+        ComponentModel[] componentmodels = new ComponentModel[activeObjectNames.size()]; 
+        int index = 0;
         for (final ObjectName oname : activeObjectNames) {
             final BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler
                     .newProxyInstance(getProActiveConnection(), oname, BodyWrapperMBean.class, false);
@@ -173,20 +187,6 @@ public class NodeObject extends AbstractData {
                 childrentoAdd.add(child);
                 
                 
-                /**
-                 * create component model here
-                 */
-                ComponentWrapperMBean proxyComponentMBean = (ComponentWrapperMBean) MBeanServerInvocationHandler
-                .newProxyInstance(getProActiveConnection(), oname, ComponentWrapperMBean.class, false);
-                try
-                {
-                ComponentModel Cchild = new ComponentModel(this,id,activeObjectName,oname,proxyComponentMBean);
-                componentmodels.add(Cchild);
-                }
-                catch(Exception e)
-                {
-                	e.printStackTrace();
-                }
                 
                
                 
@@ -194,8 +194,31 @@ public class NodeObject extends AbstractData {
 
             // Removes from the model the not monitored or termined aos.
             childrenToRemoved.remove(idString);
+            
+            
+            /**
+             * create component model here
+             */
+            String activeObjectName = proxyBodyMBean.getName();
+            ComponentWrapperMBean proxyComponentMBean = (ComponentWrapperMBean) MBeanServerInvocationHandler
+            .newProxyInstance(getProActiveConnection(), oname, ComponentWrapperMBean.class, false);
+            try
+            {
+                ComponentModel Cchild = new ComponentModel(this,id,activeObjectName,oname,proxyComponentMBean);
+                componentmodels[index++] = Cchild;
+            }
+            catch(Exception e)
+            {
+            	e.printStackTrace();
+            }
+            
+            
         }
 
+        // re build the relation ship of these components
+        ComponentHierarchicalRebuild(componentmodels);
+        
+        
         // add all children
         this.addChildren(childrentoAdd);
         // Some child have to be removed
@@ -293,4 +316,82 @@ public class NodeObject extends AbstractData {
         this.notifyObservers(null);
     }
 
+    
+    private void ComponentHierarchicalRebuild(ComponentModel[] componentmodels)
+    {
+    	System.out.println("[YYL Test OutPut:]"+"in NodeObject "+"componentmodels.size()="+componentmodels.length);
+    	for(int i=0;i<componentmodels.length;i++)
+    	{
+    		
+    		ComponentModel currentModel = componentmodels[i];
+    		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
+    		System.out.println("[YYL Test OutPut:]"+"in NodeObject "+"CurrentComponent["+i+"]="+currentModel.getName()+" ID="+proxyMBean.getID());
+    		UniqueID currentID = proxyMBean.getID();
+    		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
+    		
+//    		System.out.println("[YYL Test OutPut:]"+"in NodeObject "+" subComponents[0].getID() = "+subComponents[0].getID());
+    		if(subComponents!=null)
+    		{
+    			addSubComponents(currentModel,subComponents,componentmodels);
+    		}
+    	}
+    	  	
+    	for(ComponentModel currentModel:componentmodels)
+    	{
+    		if(currentModel.getParent() instanceof NodeObject)
+    		{
+    			currentModel.setParent(this.CHolder);
+    			this.CHolder.addChild(currentModel);
+    		}
+    	}
+    	
+    	showComponentHierachical();
+    }
+    
+    private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,ComponentModel[] componentmodels)
+    {
+    	for(ProActiveComponent child:subcomponents)
+    	{
+    		UniqueID childID = child.getID();
+    		for(ComponentModel CM:componentmodels)
+    		{
+    			if(CM.getComponentWrapperMBean().getID().equals(childID))
+    			{
+    				CM.setParent(parent);
+    				parent.addChild(CM);
+//    				/break;
+    			}
+    		}
+    	}
+    }
+    
+    private void showComponentHierachical()
+    {
+    	System.out.println("[YYL Test OutPut:]"+"in NodeObject"+"this.CHolder has "+this.CHolder.getMonitoredChildrenSize()+" children");
+    	List<AbstractData> childrens = this.CHolder.getMonitoredChildrenAsList();
+    	if(childrens!=null)
+    	{
+    		for(AbstractData child:childrens)
+    		{
+    			ComponentModel tmpChild = (ComponentModel)child;
+    			showComponent(tmpChild,this.CHolder.getName());
+    		}
+    	}
+    	
+    }
+    
+    private void showComponent(ComponentModel model,String parent)
+    {
+    	System.out.println("[YYL Test OutPut:]"+"in NodeObject "+model.getName()+" parent ="+parent);
+    	List<AbstractData> childrens = model.getMonitoredChildrenAsList();
+    	if(childrens!=null)
+    	{
+    		for(AbstractData child:childrens)
+    		{
+    			ComponentModel tmpChild = (ComponentModel)child;
+    			showComponent(tmpChild,model.getName());
+    		}
+    	}
+    }
+   
 }

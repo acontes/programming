@@ -143,6 +143,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
         this.isReifiedObjectSerializable = body.getReifiedObject() instanceof Serializable;
         this.notifications = new ConcurrentLinkedQueue<Notification>();
         this.launchNotificationsThread();
+
     }
 
     public UniqueID getID() {
