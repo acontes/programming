@@ -29,6 +29,7 @@
 	-->
 
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
+	<taskdef name="switch" classname="ise.antelope.tasks.SwitchTask" />
 
 	<!-- emma -->
 	<path id="emma.lib">
@@ -359,11 +360,16 @@
 				<fileset dir="${cl.extensions.dir}" includes="**" />
 				<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
 				<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+				<!-- log4j config file for the ContextRepositorySelector -->
+				<fileset dir="${compile.dir}" includes="META-INF/proactive-log4j" />
+				<!-- annotations info -->
+				<fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />
+				<fileset dir="${compile.dir}" includes="META-INF/services/javax.annotation.processing.Processor" />
 				<indexjars>
 					<fileset dir="${lib.dir}">
 						<include name="*.jar" />
-				</fileset>
-			</indexjars>
+					</fileset>
+				</indexjars>
 			</jar>
 
 			<else>
@@ -374,6 +380,8 @@
 					<fileset dir="${cl.extra.dir}" includes="**" />
 					<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
 					<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+					<!-- log4j config file for the ContextRepositorySelector -->
+					<fileset dir="${compile.dir}" includes="META-INF/proactive-log4j" />
 					<indexjars>
 						<fileset dir="${lib.dir}">
 							<include name="*.jar" />
@@ -381,6 +389,7 @@
 					</indexjars>
 					<!-- annotations info -->
 					<fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />
+					<fileset dir="${compile.dir}" includes="META-INF/services/javax.annotation.processing.Processor" />
 				</jar>
 			</else>
 		</if>
@@ -1002,6 +1011,47 @@
 			</lib>
 		</war>
 	</target>
+	
+	<!-- =================================================================================== -->
+	<!-- ProActive Resource Archive, used for ProActive integration with application servers -->
+	<!-- =================================================================================== -->
+	<target name="proActiveRar" description="Creates the RAR archive for deployment into the application server">
+		<switch name="as.name">
+	    <case value="geronimo">
+		<jar destfile="${deploy.dir}/${rar.name}.rar" >
+		    <!-- META-INF -->
+		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
+		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
+		    <fileset dir="${compile.dir}" includes="META-INF/geronimo-ra.xml" />
+		    <!-- ProActive libs -->
+		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar" />
+		</jar>
+		<break/>
+	    </case>
+	    <case value="jonas">
+		<jar destfile="${deploy.dir}/${rar.name}.rar" >
+		    <!-- META-INF -->
+		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
+		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
+		    <fileset dir="${compile.dir}" includes="META-INF/jonas-ra.xml" />
+		    <!-- ProActive libs -->
+		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar" /> 
+		</jar>
+		<break/>
+	    </case>
+	    <default>
+		<jar destfile="${deploy.dir}/${rar.name}.rar" >
+		    <!-- META-INF -->
+		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
+		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
+		    <!-- ProActive libs -->
+		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar" />
+		</jar>
+		<break/>
+	    </default>
+		</switch>
+	</target>
+	
 
 	<!-- ================================================================ -->
 	<!--  Scheduler Specific - Convert Schemas from Relax NG to XMLSchema -->

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ProActive J2EE integration" basedir="../../../../../../../compile/">
+	
+	<import file="${basedir}/build.xml" />
+	<target name="compile" depends="core,-compile"/>
+	
+	<target name="-compile">
+		<compile_extra module="javaee" />
+	</target>
+</project>
