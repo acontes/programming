@@ -16,6 +16,7 @@ import com.sun.j3d.utils.geometry.GeometryInfo;
 import com.sun.j3d.utils.geometry.NormalGenerator;
 import com.sun.j3d.utils.geometry.Primitive;
 import com.sun.j3d.utils.geometry.Sphere;
+import com.sun.j3d.utils.geometry.Stripifier;
 
 
 /**
@@ -492,31 +493,21 @@ public final class GeometryBasket {
     	final Point3f f = new Point3f(-length_smooth, 0, -length);
     	final Point3f g = new Point3f(-length, 0, -length_smooth);
     	final Point3f h = new Point3f(-length, 0, length_smooth);
+    	
+    	final TexCoord2f ta = new TexCoord2f(0.1f, 1f);
+    	final TexCoord2f tb = new TexCoord2f(0.9f, 1f);
+    	final TexCoord2f tc = new TexCoord2f(1f, 0.9f);
+    	final TexCoord2f td = new TexCoord2f(1f, 0.1f);
+    	final TexCoord2f te = new TexCoord2f(0.9f, 0f);
+    	final TexCoord2f tf = new TexCoord2f(0.1f, 0f);
+    	final TexCoord2f tg = new TexCoord2f(0f, 0.1f);
+    	final TexCoord2f th = new TexCoord2f(0f, 0.9f);
 
     	// ------------------------------------------
         // create the points
-        final Point3f[] pts = new Point3f[16];
+        final Point3f[] pts = { a,b,c,d,e,f,g,h,h,g,f,e,d,c,b,a};
+        final TexCoord2f[] coords = {ta,tb,tc,td,te,tf,tg,th,th,tg,tf,te,td,tc,tb,ta};
 
-        // front
-        pts[0] = a;
-        pts[1] = b;
-        pts[2] = c;
-        pts[3] = d;
-        pts[4] = e;
-        pts[5] = f;
-        pts[6] = g;
-        pts[7] = h;
-        
-        // back
-        pts[8] = h;
-        pts[9] = g;
-        pts[10] = f;
-        pts[11] = e;
-        pts[12] = d;
-        pts[13] = c;
-        pts[14] = b;
-        pts[15] = a;
-        
         // say what points belong to the shape
         final int[] stripCount = new int[2];
         stripCount[0] = 8;
@@ -530,16 +521,19 @@ public final class GeometryBasket {
         // build the geometry
         final GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
         geoInfo.setCoordinates(pts);
+        geoInfo.setTextureCoordinateParams(1, 2);
+        geoInfo.setTextureCoordinates(0, coords);
         geoInfo.setStripCounts(stripCount);
         geoInfo.setContourCounts(contourCount);
-
         // needed for lighting and shading the object
         final NormalGenerator normGen = new NormalGenerator();
         // the angle beyond which the normal generator will not smooth the
         // angles
-        normGen.setCreaseAngle((float) Math.toRadians(90));
+        //normGen.setCreaseAngle((float) Math.toRadians(90));
         // generate the normals
         normGen.generateNormals(geoInfo);
+        Stripifier strip = new Stripifier();
+        strip.stripify(geoInfo);
         return geoInfo.getGeometryArray();
     }
     
@@ -565,6 +559,16 @@ public final class GeometryBasket {
     	final Point3f o = new Point3f(-length, GeometryBasket.FIGURE_SCALE, -length_smooth);
     	final Point3f p = new Point3f(-length, GeometryBasket.FIGURE_SCALE, length_smooth);
 
+    	final TexCoord2f ta = new TexCoord2f(0.1f, 1f);
+    	final TexCoord2f tb = new TexCoord2f(0.9f, 1f);
+    	final TexCoord2f tc = new TexCoord2f(1f, 0.9f);
+    	final TexCoord2f td = new TexCoord2f(1f, 0.1f);
+    	final TexCoord2f te = new TexCoord2f(0.9f, 0f);
+    	final TexCoord2f tf = new TexCoord2f(0.1f, 0f);
+    	final TexCoord2f tg = new TexCoord2f(0f, 0.1f);
+    	final TexCoord2f th = new TexCoord2f(0f, 0.9f);
+    	final TexCoord2f ti = new TexCoord2f(0f, 0f);
+    	
     	// ------------------------------------------
         // create the points
         final Point3f[] pts = {
@@ -580,6 +584,18 @@ public final class GeometryBasket {
         		i, j, k, l, m, n, o, p
         };
 
+        final TexCoord2f[] coords = {
+        		th, tg, tf, te, td, tc, tb, ta,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ta, tb, tc, td, te, tf, tg, th
+        };
         // say what points belong to the shape
         final int[] stripCount = new int[10];
         stripCount[0] = 8;
@@ -599,6 +615,8 @@ public final class GeometryBasket {
 
         // build the geometry
         final GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
+        geoInfo.setTextureCoordinateParams(1, 2);
+        geoInfo.setTextureCoordinates(0, coords);
         geoInfo.setCoordinates(pts);
         geoInfo.setStripCounts(stripCount);
         geoInfo.setContourCounts(contourCount);
@@ -635,6 +653,16 @@ public final class GeometryBasket {
     	final Point3f o = new Point3f(-length, GeometryBasket.FIGURE_SCALE, -length_smooth);
     	final Point3f p = new Point3f(-length, GeometryBasket.FIGURE_SCALE, length_smooth);
 
+    	final TexCoord2f ta = new TexCoord2f(0.1f, 1f);
+    	final TexCoord2f tb = new TexCoord2f(0.9f, 1f);
+    	final TexCoord2f tc = new TexCoord2f(1f, 0.9f);
+    	final TexCoord2f td = new TexCoord2f(1f, 0.1f);
+    	final TexCoord2f te = new TexCoord2f(0.9f, 0f);
+    	final TexCoord2f tf = new TexCoord2f(0.1f, 0f);
+    	final TexCoord2f tg = new TexCoord2f(0f, 0.1f);
+    	final TexCoord2f th = new TexCoord2f(0f, 0.9f);
+    	final TexCoord2f ti = new TexCoord2f(0f, 0f);
+    	
     	// ------------------------------------------
         // create the points
         final Point3f[] pts = {
@@ -649,7 +677,19 @@ public final class GeometryBasket {
         		h, a, i, p,
         		i, j, k, l, m, n, o, p
         };
-
+        
+        final TexCoord2f[] coords = {
+        		th, tg, tf, te, td, tc, tb, ta,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ti, ti, ti, ti,
+        		ta, tb, tc, td, te, tf, tg, th
+        };
         // say what points belong to the shape
         final int[] stripCount = new int[10];
         stripCount[0] = 8;
@@ -669,6 +709,8 @@ public final class GeometryBasket {
 
         // build the geometry
         final GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
+        geoInfo.setTextureCoordinateParams(1, 2);
+        geoInfo.setTextureCoordinates(0, coords);
         geoInfo.setCoordinates(pts);
         geoInfo.setStripCounts(stripCount);
         geoInfo.setContourCounts(contourCount);

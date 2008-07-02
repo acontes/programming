@@ -256,7 +256,7 @@ public final class AppearanceBasket {
         TextureLoader tex;
 
         try {
-            tex = new TextureLoader(TextureBasket.kde);
+            tex = new TextureLoader(TextureBasket.node);
             final Texture texture1 = tex.getTexture();
             textureUnitState[0] = new TextureUnitState();
             textureUnitState[0].setTexture(texture1);
@@ -283,92 +283,95 @@ public final class AppearanceBasket {
     }
 
     private static Appearance getDefaultRuntimeAppearance() {
-        final Appearance appear = new Appearance();
-        final Material mat = new Material();
-        mat.setShininess(50);
-        mat.setEmissiveColor(ColorPalette.BLUE);
-        mat.setAmbientColor(ColorPalette.BLACK);
-        mat.setSpecularColor(ColorPalette.DARK_GRAY);
-        /*
-         * ambientColor the material's ambient color emissiveColor the
-         * material's emissive color diffuseColor the material's diffuse color
-         * when illuminated by a light specularColor the material's specular
-         * color when illuminated to generate a highlight shininess the
-         * material's shininess in the range [1.0, 128.0] with 1.0 being not
-         * shiny and 128.0 being very shiny. Values outside this range are
-         * clamped.
-         */
-        appear.setMaterial(mat);
+        Appearance appear = new Appearance();
 
-        // TODO optimization:all faces are rendered, render only those visible
-        final PolygonAttributes polygonAttributes = new PolygonAttributes();
-        polygonAttributes.setCullFace(PolygonAttributes.CULL_NONE);
-        appear.setPolygonAttributes(polygonAttributes);
+        ColoringAttributes colorAttrib = new ColoringAttributes(0.0f, 0.0f, 0.0f, 3);
 
-        final TextureLoader loader = new TextureLoader(TextureBasket.node_border);
+        Color3f matAmbient = new Color3f(0.2f, 0.2f, 0.2f);
+        Color3f matEmissive = new Color3f(0.0f, 0.0f, 0.0f);
+        Color3f matDiffuse = new Color3f(1.0f, 1.0f, 1.0f);
+        Color3f matSpecular = new Color3f(1.0f, 1.0f, 1.0f);
+        float matShininess = 73.0f;
 
-        // Create Texture object
-        final Texture metal_walk = loader.getTexture();
+        Material material = new Material(matAmbient, matEmissive, matDiffuse, matSpecular, matShininess);
 
-        // Create Appearance Attributes and give to Appearance.
-        // TextureAttributes can be used for transforming texture (e.g. scaling)
-        final TextureAttributes textureAttributes = new TextureAttributes();
-        appear.setTextureAttributes(textureAttributes);
+        TextureUnitState[] textureUnitState = new TextureUnitState[2];
+        TextureAttributes texAttr1 = new TextureAttributes();
+        texAttr1.setTextureMode(3);
+        TextureLoader tex;
 
-        // Attach Texture object to Appearance object
-        appear.setTexture(metal_walk);
-        final TexCoordGeneration tex = new TexCoordGeneration();
-        tex.setEnable(true);
-        appear.setTexCoordGeneration(tex);
+        try {
+            tex = new TextureLoader(TextureBasket.runtime);
+            Texture texture1 = tex.getTexture();
+            textureUnitState[0] = new TextureUnitState();
+            textureUnitState[0].setTexture(texture1);
+            textureUnitState[0].setTextureAttributes(texAttr1);
+            appear.setTextureUnitState(textureUnitState);
+        } catch (Exception ex) {
+            System.out.println("imgeURL1 - texture null !");
+            ex.printStackTrace();
+        }
+
+        PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(2);
+        polyAttributes.setCullFace(1);
+        appear.setPolygonAttributes(polyAttributes);
+
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(
+            TransparencyAttributes.NONE, 0f);
+        transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
+
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
         return appear;
     }
 
     private static Appearance getDefaultHostAppearance() {
-        final Appearance appear = new Appearance();
-        final Material mat = new Material();
-        mat.setShininess(50);
-        mat.setEmissiveColor(ColorPalette.BLUE);
-        mat.setAmbientColor(ColorPalette.BLACK);
-        mat.setSpecularColor(ColorPalette.PINK);
-        /*
-         * ambientColor the material's ambient color emissiveColor the
-         * material's emissive color diffuseColor the material's diffuse color
-         * when illuminated by a light specularColor the material's specular
-         * color when illuminated to generate a highlight shininess the
-         * material's shininess in the range [1.0, 128.0] with 1.0 being not
-         * shiny and 128.0 being very shiny. Values outside this range are
-         * clamped.
-         */
-        appear.setMaterial(mat);
+    	Appearance appear = new Appearance();
 
-        // TODO optimization:all faces are rendered, render only those visible
-        final PolygonAttributes polygonAttributes = new PolygonAttributes();
-        polygonAttributes.setCullFace(PolygonAttributes.CULL_NONE);
-        appear.setPolygonAttributes(polygonAttributes);
+        ColoringAttributes colorAttrib = new ColoringAttributes(0.0f, 0.0f, 0.0f, 3);
 
-        // TODO remove constant
-        final TextureLoader loader = new TextureLoader(TextureBasket.white_sand);
+        Color3f matAmbient = new Color3f(0.2f, 0.2f, 0.2f);
+        Color3f matEmissive = new Color3f(0.0f, 0.0f, 0.0f);
+        Color3f matDiffuse = new Color3f(1.0f, 1.0f, 1.0f);
+        Color3f matSpecular = new Color3f(1.0f, 1.0f, 1.0f);
+        float matShininess = 73.0f;
 
-        // Create Texture object
-        final Texture metal_walk = loader.getTexture();
+        Material material = new Material(matAmbient, matEmissive, matDiffuse, matSpecular, matShininess);
 
-        // Create Appearance Object
-        final Appearance appearance = new Appearance();
+        TextureUnitState[] textureUnitState = new TextureUnitState[2];
+        TextureAttributes texAttr1 = new TextureAttributes();
+        texAttr1.setTextureMode(3);
+        TextureLoader tex;
 
-        // Create Appearance Attributes and give to Appearance.
-        // TextureAttributes can be used for transforming texture (e.g. scaling)
-        final TextureAttributes ta = new TextureAttributes();
+        try {
+            tex = new TextureLoader(TextureBasket.host);
+            Texture texture1 = tex.getTexture();
+            textureUnitState[0] = new TextureUnitState();
+            textureUnitState[0].setTexture(texture1);
+            textureUnitState[0].setTextureAttributes(texAttr1);
+            appear.setTextureUnitState(textureUnitState);
+        } catch (Exception ex) {
+            System.out.println("imgeURL1 - texture null !");
+            ex.printStackTrace();
+        }
 
-        appearance.setTextureAttributes(ta);
+        PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(2);
+        polyAttributes.setCullFace(1);
+        appear.setPolygonAttributes(polyAttributes);
 
-        // Attach Texture object to Appearance object
-        appearance.setTexture(metal_walk);
-        final TexCoordGeneration tex = new TexCoordGeneration();
-        tex.setEnable(true);
-        tex.setFormat(TexCoordGeneration.OBJECT_LINEAR);
-        appearance.setTexCoordGeneration(tex);
+        TransparencyAttributes transparencyAttributes = new TransparencyAttributes(
+            TransparencyAttributes.NONE, 0f);
+        transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
 
-        return appearance;
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
+        return appear;
     }
 
     private static Appearance getDefaultActiveObjectAppearance() {

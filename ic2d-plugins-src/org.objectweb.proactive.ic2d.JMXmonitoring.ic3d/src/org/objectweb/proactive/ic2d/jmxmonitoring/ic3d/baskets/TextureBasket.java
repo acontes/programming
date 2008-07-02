@@ -15,10 +15,13 @@ public class TextureBasket {
     public static final BufferedImage kde = loadImage(path + "kde.png");
     public static final BufferedImage ao = loadImage(path + "ActiveObject.jpg");
     public static final BufferedImage node_border = loadImage(path + "node_skin.jpg");
+    public static final BufferedImage runtime = loadImage(path + "node_skin4.png");
     public static final BufferedImage round_corners = loadImage(path + "round_corners.png");
     public static final BufferedImage earth = loadImage(path + "EarthMap.jpg");
     public static final BufferedImage flatMap = loadImage(path + "france.gif");
-
+    public static final BufferedImage host = loadImage(path + "host2.png");
+    public static final BufferedImage node = loadImage(path + "node_node.png");
+    
     private static BufferedImage loadImage(final String fname) {
         // Level logLevel = Level.FINE;
         // Logger logger =
