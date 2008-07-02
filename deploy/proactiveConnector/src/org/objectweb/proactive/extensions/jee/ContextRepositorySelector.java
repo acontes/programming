@@ -57,8 +57,6 @@ public class ContextRepositorySelector implements RepositorySelector
 	// in a known place : META-INF/proactive-log4j
 	public static final String LOG4J_CONFIG_FILE = "/META-INF/proactive-log4j";
 		
-//	private static boolean _alreadyStarted = false;
-
 	private static Object _guardObj; 
 
 	// init the new repository selector when the class gets loaded
@@ -79,14 +77,6 @@ public class ContextRepositorySelector implements RepositorySelector
 	 */
 	public static synchronized void init(ProActiveConnectorBean caller) throws Exception 
 	{
-//		if( !_alreadyStarted ) // set the global RepositorySelector
-//		{
-//			_defaultRepository = LogManager.getLoggerRepository();
-//			RepositorySelector theSelector = new ContextRepositorySelector();
-//			LogManager.setRepositorySelector(theSelector, _guardObj);
-//			_alreadyStarted = true;
-//		}
-
 		Hierarchy hierarchy = loadLog4JConfig(caller);
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		_knownRepositories.put(loader, hierarchy);
@@ -117,25 +107,9 @@ public class ContextRepositorySelector implements RepositorySelector
 		hierarchy.resetConfiguration();
 		conf.doConfigure(log4jConfigFile, hierarchy);
 		
-		// let's test now the configuration, shall we?
-		//System.out.println("Proactive is logging to file:" + ((FileAppender)hierarchy.getRootLogger().getAppender("FILE")).getFile());
-		
 		return hierarchy; 
 		
 	}
-
-//	private static void testLog4jConfig(Hierarchy hierarchy) {
-//		Logger _jeeLogger = hierarchy.getLogger(Loggers.CONNECTOR);
-//		Enumeration<Appender> rootLoggerAppenders = hierarchy.getRootLogger().getAllAppenders();
-//		while (rootLoggerAppenders.hasMoreElements()) {
-//			Appender appender = rootLoggerAppenders.nextElement();
-//			if (appender instanceof FileAppender) {
-//				FileAppender fileAppender = (FileAppender) appender;
-//				_jeeLogger.debug("Proactive is logging to file:" + fileAppender.getFile() );
-//			}
-//			
-//		}
-//	}
 
 	private ContextRepositorySelector() 
 	{
