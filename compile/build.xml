@@ -1015,7 +1015,7 @@
 	<!-- =================================================================================== -->
 	<!-- ProActive Resource Archive, used for ProActive integration with application servers -->
 	<!-- =================================================================================== -->
-	<target name="proActiveRar" description="Creates the RAR archive for deployment into the application server">
+	<target name="proActiveRar" depends="deploy" description="Creates the RAR archive for deployment into the application server">
 		<switch name="as.name">
 	    <case value="geronimo">
 		<jar destfile="${deploy.dir}/${rar.name}.rar" >
