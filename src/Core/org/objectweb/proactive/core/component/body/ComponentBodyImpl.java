@@ -105,11 +105,11 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         if ((null != factory_parameters)) {
             if (null != factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY)) {
             	
-            	 System.out.println("null != factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY");
+//            	 System.out.println("null != factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY");
             	 
                 if (factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters) {
                 	
-                	System.out.println("factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters");
+//                	System.out.println("factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters");
                 	
                     if (logger.isDebugEnabled()) {
                         logger.debug("creating metaobject component identity");
@@ -125,7 +125,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                         ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
                         if (!mbs.isRegistered(oname)) {
                         	
-                        	System.out.println("[YYL Test Output:] in mbs first registerd"+oname.toString());
+//                        	System.out.println("[YYL Test Output:] in mbs first registerd"+oname.toString());
                             this.cmbean = new ComponentWrapper(oname, this);
                             try {
                                 mbs.registerMBean(cmbean, oname);
@@ -149,7 +149,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                                 bodyLogger.error("Can't register the MBean of the body", e);
                             }
                         	
-                        	System.out.println("[YYL Test Output:] in mbs already has oname: "+oname.toString());
+//                        	System.out.println("[YYL Test Output:] in mbs already has oname: "+oname.toString());
                         	
                         	this.cmbean = new ComponentWrapper(oname, this);
                             try {
