@@ -17,7 +17,6 @@ public interface ComponentWrapperMBean extends BodyWrapperMBean {
 	
 	public ObjectName getObjectName();
 	
-	public UniqueID getParentUID();
 	
 	
 }
