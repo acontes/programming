@@ -68,9 +68,6 @@ public class ComponentWrapper extends BodyWrapper implements ComponentWrapperMBe
 				ProActiveComponent pc = (ProActiveComponent)c;
 				
 				subs[index++] = pc;
-				
-				System.out.println("[YYL Test Output:]"+" index = " + index);
-				System.out.println("[YYL Test Output:]"+" pc.getID() = " + pc.getID());
 			}
 			return subs;
 		}
@@ -90,9 +87,6 @@ public class ComponentWrapper extends BodyWrapper implements ComponentWrapperMBe
 		return super.getObjectName();
 	}
 	
-	public UniqueID getParentUID()
-	{
-		return this.cbody.getProActiveComponentImpl().getBody().getParentUID();
-	}
+	
 
 }
