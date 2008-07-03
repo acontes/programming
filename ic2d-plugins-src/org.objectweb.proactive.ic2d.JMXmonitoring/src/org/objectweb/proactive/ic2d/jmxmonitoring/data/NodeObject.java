@@ -76,13 +76,19 @@ public class NodeObject extends AbstractData {
         /*
          * initial the component Holder Model
          */
-        try
-        {
-           this.CHolder = new ComponentHolderModel();
-        }catch(Exception e)
-        {
-        	e.printStackTrace();
-        }
+        
+        
+//        try
+//        {
+//           this.CHolder = new ComponentHolderModel();
+//        }catch(Exception e)
+//        {
+//        	e.printStackTrace();
+//        }
+//        
+//        getWorldObject().CHolder = this.CHolder;
+        
+        this.CHolder = getWorldObject().CHolder;
     }
 
     @SuppressWarnings("unchecked")
@@ -161,13 +167,22 @@ public class NodeObject extends AbstractData {
 
         final List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
         
-//        Vector<ComponentModel> componentmodels = new Vector<ComponentModel>();
         ComponentModel[] componentmodels = new ComponentModel[activeObjectNames.size()]; 
+        
+//        System.out.println("[YYL Test OutPut:]"+"in NodeObject activeObjectNames.size() =  "+activeObjectNames.size());
+        
+        
+//        Vector<ComponentModel> componentmodels = new Vector<ComponentModel>();
+       
         int index = 0;
+        
         for (final ObjectName oname : activeObjectNames) {
             final BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler
                     .newProxyInstance(getProActiveConnection(), oname, BodyWrapperMBean.class, false);
 
+//            System.out.println("[YYL Test OutPut:]"+"in NodeObject "+" begin to create component model 2");
+            
+            
             // Since the id is already contained as a String in the ObjectName
             // this call can be avoid if the UniqueID can be built from a string
             final UniqueID id = proxyBodyMBean.getID();
@@ -195,7 +210,7 @@ public class NodeObject extends AbstractData {
             // Removes from the model the not monitored or termined aos.
             childrenToRemoved.remove(idString);
             
-            
+//            System.out.println("[YYL Test OutPut:]"+"in NodeObject "+" begin to create component model");
             /**
              * create component model here
              */
@@ -205,6 +220,11 @@ public class NodeObject extends AbstractData {
             try
             {
                 ComponentModel Cchild = new ComponentModel(this,id,activeObjectName,oname,proxyComponentMBean);
+                
+                
+                Cchild.setName(activeObjectName);
+                
+                
                 componentmodels[index++] = Cchild;
             }
             catch(Exception e)
@@ -319,18 +339,14 @@ public class NodeObject extends AbstractData {
     
     private void ComponentHierarchicalRebuild(ComponentModel[] componentmodels)
     {
-    	System.out.println("[YYL Test OutPut:]"+"in NodeObject "+"componentmodels.size()="+componentmodels.length);
     	for(int i=0;i<componentmodels.length;i++)
     	{
     		
     		ComponentModel currentModel = componentmodels[i];
     		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
-    		System.out.println("[YYL Test OutPut:]"+"in NodeObject "+"CurrentComponent["+i+"]="+currentModel.getName()+" ID="+proxyMBean.getID());
-    		UniqueID currentID = proxyMBean.getID();
     		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
     		
-//    		System.out.println("[YYL Test OutPut:]"+"in NodeObject "+" subComponents[0].getID() = "+subComponents[0].getID());
-    		if(subComponents!=null)
+            if(subComponents!=null)
     		{
     			addSubComponents(currentModel,subComponents,componentmodels);
     		}
@@ -345,7 +361,15 @@ public class NodeObject extends AbstractData {
     		}
     	}
     	
-    	showComponentHierachical();
+    	getWorldObject().CHolder = this.CHolder;
+    	showComponentHierachical(getWorldObject().CHolder);
+    	
+//    	AbstractData parent = getParent();
+//    	while(!(parent instanceof WorldObject))
+//    		parent = parent.getParent();
+//    	parent.addChild(this.CHolder);
+//    	
+    	
     }
     
     private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,ComponentModel[] componentmodels)
@@ -359,22 +383,22 @@ public class NodeObject extends AbstractData {
     			{
     				CM.setParent(parent);
     				parent.addChild(CM);
-//    				/break;
+    				break;
     			}
     		}
     	}
     }
     
-    private void showComponentHierachical()
+    private void showComponentHierachical(ComponentHolderModel CHolder)
     {
-    	System.out.println("[YYL Test OutPut:]"+"in NodeObject"+"this.CHolder has "+this.CHolder.getMonitoredChildrenSize()+" children");
-    	List<AbstractData> childrens = this.CHolder.getMonitoredChildrenAsList();
+    	System.out.println("[YYL Test OutPut:]"+"in NodeObject"+"this.CHolder has "+CHolder.getMonitoredChildrenSize()+" children");
+    	List<AbstractData> childrens = CHolder.getMonitoredChildrenAsList();
     	if(childrens!=null)
     	{
     		for(AbstractData child:childrens)
     		{
     			ComponentModel tmpChild = (ComponentModel)child;
-    			showComponent(tmpChild,this.CHolder.getName());
+    			showComponent(tmpChild,CHolder.getName());
     		}
     	}
     	
@@ -392,6 +416,11 @@ public class NodeObject extends AbstractData {
     			showComponent(tmpChild,model.getName());
     		}
     	}
+    }
+    
+    public ComponentHolderModel getComponentHolderModel()
+    {
+    	return this.CHolder;
     }
    
 }

@@ -58,6 +58,8 @@ public class WorldObject extends AbstractData {
     public final static String ADD_VN_MESSAGE = "Add a virtual node";
     public final static String REMOVE_VN_MESSAGE = "Remove a virtual node";
 
+    public ComponentHolderModel CHolder;
+    
     // 60 s
     public static int MAX_AUTO_RESET_TIME = 60;
 
@@ -123,6 +125,15 @@ public class WorldObject extends AbstractData {
 
         // Creates a notification manager
         notificationManager = JMXNotificationManager.getInstance();
+        
+        try
+        {
+        CHolder = new ComponentHolderModel();
+        }
+        catch(Exception e)
+        {
+        	
+        }
     }
 
     // -------------------------------------------
