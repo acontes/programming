@@ -1,18 +1,25 @@
 package org.objectweb.proactive.ic2d.componentmonitoring.view;
 
+import java.util.List;
+
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.editparts.RootTreeEditPart;
 import org.eclipse.gef.ui.parts.TreeViewer;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentHolderModel;
-import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
+import org.objectweb.proactive.ic2d.componentmonitoring.actions.CollapseAllAction;
+import org.objectweb.proactive.ic2d.componentmonitoring.actions.ExpandAllAction;
+import org.objectweb.proactive.ic2d.componentmonitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.componentmonitoring.editpart.TreeEditPartFactory;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentHolderModel;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 public class ComponentTreeView extends ViewPart
 {
@@ -75,6 +82,8 @@ public class ComponentTreeView extends ViewPart
 	protected TreeViewer treeViewer;
 
 	public Tree tree;
+	
+	private WorldObject world;
 
 	// protected SaveToXmlAction saveToXmlAction;
 	// protected ExpandAllAction expandAllAction;
@@ -91,7 +100,17 @@ public class ComponentTreeView extends ViewPart
 	public ComponentTreeView()
 	{
 		super();
-		builtComponentSample();
+//		builtComponentSample();
+//		try
+//		{
+//			this.CHolder = new ComponentHolderModel();
+//		}catch (Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+		
+		this.world = new WorldObject();
+		this.CHolder = this.world.CHolder;
 	}
 
 	@Override
@@ -124,6 +143,12 @@ public class ComponentTreeView extends ViewPart
 		addTreeColumn(tree, "Time Arrival Rate", 100);
 		addTreeColumn(tree, "Time Departure Rate", 100);
 		addTreeColumn(tree, "Time Service Rate", 100);
+		
+		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+
+        toolBarManager.add(new ExpandAllAction(treeViewer));
+        toolBarManager.add(new CollapseAllAction(treeViewer));
+        toolBarManager.add(new NewHostAction(parent.getDisplay(),this.world));
 
 		//////////////////////////////////////////
 //		Listener sortListener = new Listener()
@@ -172,8 +197,20 @@ public class ComponentTreeView extends ViewPart
 //		this.treeViewer.setEditPartFactory(new TreeEditPartFactory(this));
 		this.treeViewer.setEditPartFactory(new TreeEditPartFactory());
 		// this.treeViewer.setContents(this.hellomodel);
-		this.treeViewer.setContents(this.CHolder);
-
+		
+		
+//        List<AbstractData> worldchildren = world.getMonitoredChildrenAsList();
+//        for(AbstractData wc : worldchildren)
+//        {
+//        	if(wc instanceof ComponentHolderModel)
+//        	{
+//        		this.CHolder = (ComponentHolderModel)wc;
+//        	}
+//        }
+//		
+		this.CHolder = world.CHolder;
+		this.treeViewer.setContents(world.CHolder);
+//
 		Thread showThread = new Thread(new changeShow());
 		showThread.start();
 
@@ -187,7 +224,7 @@ public class ComponentTreeView extends ViewPart
 	{
 		public void run()
 		{
-			int i = 0;
+			int i = 3;
 			String newName = "name";
 			while (true)
 			{
@@ -195,9 +232,23 @@ public class ComponentTreeView extends ViewPart
 				{
 
 					Thread.sleep(5000);
-					C1.setName(newName + (i++));
-					C1.setMeanArrivalRate(i);
-					System.out.println("C1.setName(newName+i) = " + i);
+//					addChild(i++);
+//					C1.setName(newName + (i++));
+//					C1.setMeanArrivalRate(i);
+//					System.out.println("C1.setName(newName+i) = " + i);
+					
+					
+//					System.out.println("In ComponentTreeView world.getName() = "+world.getName());
+//					System.out.println("In ComponentTreeView world.CHolder.getMonitoredChildrenSize() = "+world.CHolder.getMonitoredChildrenSize());
+////					
+////					System.out.println("[YYL Test Output:] in ComponentTreeView "+"world.getObjectName()"+world.getObjectName());
+//					CHolder = world.CHolder;
+//					if(CHolder.getMonitoredChildrenSize()!=0)
+//					{
+//					ComponentModel c = (ComponentModel)CHolder.getMonitoredChildrenAsList().get(0);
+//					c.setName(newName + (i++));
+//					}
+					showComponentHierachical();
 				}
 				catch (Exception e)
 				{
@@ -245,6 +296,25 @@ public class ComponentTreeView extends ViewPart
 			e.printStackTrace();
 		}
 	}
+	
+	public void addChild(int i)
+	{
+		try
+		{
+		   ComponentModel C = new ComponentModel(this.CHolder, "Component"+i);
+//		   C.setName("Component"+i);
+		   C.setHierachical("Composite"+i);
+		   C.setState("Start");
+		   
+		   ComponentModel Cc = new ComponentModel(this.C1, "Component1_"+i);
+		   Cc.setHierachical("primitive"+i);
+		   Cc.setState("Start");
+		}
+		catch(Exception e)
+		{
+			
+		}
+	}
 
 	private TreeColumn addTreeColumn(Tree tree, String name, int width)
 	{
@@ -266,4 +336,33 @@ public class ComponentTreeView extends ViewPart
 	// return pieAction;
 	// }
 
+	
+	private void showComponentHierachical()
+    {
+    	System.out.println("[YYL Test OutPut:]"+"in ComponentTreeView "+"this.CHolder has "+this.CHolder.getMonitoredChildrenSize()+" children");
+    	List<AbstractData> childrens = this.CHolder.getMonitoredChildrenAsList();
+    	if(childrens!=null)
+    	{
+    		for(AbstractData child:childrens)
+    		{
+    			ComponentModel tmpChild = (ComponentModel)child;
+    			showComponent(tmpChild,this.CHolder.getName());
+    		}
+    	}
+    	
+    }
+    
+    private void showComponent(ComponentModel model,String parent)
+    {
+    	System.out.println("[YYL Test OutPut:]"+"in ComponentTreeView "+model.getName()+" parent ="+parent);
+    	List<AbstractData> childrens = model.getMonitoredChildrenAsList();
+    	if(childrens!=null)
+    	{
+    		for(AbstractData child:childrens)
+    		{
+    			ComponentModel tmpChild = (ComponentModel)child;
+    			showComponent(tmpChild,model.getName());
+    		}
+    	}
+    }
 }
