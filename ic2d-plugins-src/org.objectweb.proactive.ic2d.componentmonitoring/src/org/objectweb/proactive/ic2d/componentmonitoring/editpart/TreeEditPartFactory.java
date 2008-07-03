@@ -2,10 +2,10 @@ package org.objectweb.proactive.ic2d.componentmonitoring.editpart;
 
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentHolderModel;
-import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.componentmonitoring.data.HelloModel;
 import org.objectweb.proactive.ic2d.componentmonitoring.view.ComponentTreeView;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentHolderModel;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
 
 public class TreeEditPartFactory implements EditPartFactory
 {

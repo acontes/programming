@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.objectweb.proactive.ic2d.componentmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
-import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotification;
-import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotificationTag;
 import org.objectweb.proactive.ic2d.componentmonitoring.view.ComponentTreeView;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotificationTag;
 
 public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentModel>
 {
@@ -38,6 +37,8 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 		final ComponentMVCNotification notif = (ComponentMVCNotification) arg;
 		mvcNotif = notif.getMVCNotification();
 		//		Object data = notif.getData();
+		
+		System.out.println("in Component Edit Part, notification received!");
 
 		if (!getViewer().getControl().getDisplay().isDisposed())
 		{
@@ -135,7 +136,9 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 							case TIME_SERVICE_RATE_CHANGED:
 								((TreeItem) getWidget()).setText(ComponentTreeView.TIME_SERVICE_RATE_COLUMN, String.valueOf(model
 										.getTimeServiceRate()));
-
+//							case ADD_CHILD:
+//								System.out.println("add child notification received in Component  Editpart");
+//								new TreeItem((TreeItem)getWidget(),0);
 							default:
 								break;
 						} // switch

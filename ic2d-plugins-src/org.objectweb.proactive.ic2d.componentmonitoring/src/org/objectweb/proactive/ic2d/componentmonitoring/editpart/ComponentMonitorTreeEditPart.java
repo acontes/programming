@@ -35,7 +35,7 @@ import java.util.Observer;
 
 import org.eclipse.gef.editparts.AbstractTreeEditPart;
 import org.eclipse.swt.widgets.Tree;
-import org.objectweb.proactive.ic2d.componentmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
 /**
  * This abstract class represents a controller part of the JobMonitoring plugin.<p>
