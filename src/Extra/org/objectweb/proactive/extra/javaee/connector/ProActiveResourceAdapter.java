@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.extra.javaee.connector;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
+
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.BootstrapContext;
@@ -38,6 +42,7 @@ import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
+import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 /**
@@ -109,15 +114,40 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 	 */
 	@Override
 	public void stop() {
-		_raLogger.info("terminating Runtime " + _proActiveRuntime.getURL());
-        
 		// kill the PART w/o killing the underlying JVM
-		_proActiveRuntime.killRT(true);
+		if( !runtimeAlreadyUnregistered() )
+			_proActiveRuntime.killRT(true);
 		
 		// shutdown log4j
 		ContextRepositorySelector.shutdown();
 	}
 	
+	/*
+	 * The runtime is not destroyed if there is still an RMI reference 
+	 * to the ProActive Runtime in the RMI registry
+	 * This check is done to prevent that at undeployment we try to kill 
+	 * an inexistent runtime - because the runtime can also be killed when undeploying the nodes 
+	 */
+	private boolean runtimeAlreadyUnregistered() {
+		try {
+			RegistryHelper regHelper = new RegistryHelper();
+			regHelper.initializeRegistry();
+			Registry rmiRegistry = RegistryHelper.getRegistry();
+			rmiRegistry.lookup(_proActiveRuntime.getURL());
+			// it is here alright...
+			_raLogger.debug( "There is still something left here to cleanup" );
+			return false;
+		}
+		catch ( RemoteException  e) {
+			_raLogger.error( "Unable to contact the RMI registry that is (supposed to be) on the localhost." ); 
+			_raLogger.error( e.getMessage() , e );
+			return true;
+		} catch (NotBoundException e) {
+			_raLogger.debug( "Cleanup already done elsewhere, nothing left to do." );
+			return true;
+		}
+	}
+
 	/* 
 	 * I need this to make sure that the AS will not create two separate instances of the RA
 	 * For now, two RAs are considered to be equal if they create a PART with the same name
