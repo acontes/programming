@@ -124,8 +124,15 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		ProActiveResourceAdapter raObj = (ProActiveResourceAdapter)obj;
-		return _vmName.equals(raObj.getVmName());
+		
+		try {
+			ProActiveResourceAdapter raObj = (ProActiveResourceAdapter)obj;
+			return _vmName.equals(raObj.getVmName());
+		}
+		catch(ClassCastException e){
+			return false;
+		}
+		
 	}
 
 }

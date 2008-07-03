@@ -34,6 +34,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 
 /**
@@ -88,22 +89,44 @@ public abstract class ProActiveConnectorBean {
 			_hostName = "localhost";
 		}
 		finally {
+			
+			System.setProperty("proactive.net.nolocal", "true" );
+			
+			// protocol-dependent configuration
 			String communicationProtocol = System.getProperty("proactive.communication.protocol");
 			// if not set, assume communication protocol is RMI
 			if( communicationProtocol == null || 
 					(communicationProtocol != null && communicationProtocol.equals("rmi") ) ) {
 
-				int codebasePort = getCodebasePort();
-				System.setProperty("java.rmi.server.hostname", _hostName);
-				_codeBaseUrl = "http://" + _hostName + ":" + codebasePort +"/";
-				System.setProperty("java.rmi.server.codebase", _codeBaseUrl );
-
-				System.setProperty("proactive.net.nolocal", "true" );
-				_raLogger.debug("Configuration info: hostName : " + _hostName + 
-						"; codebase URL : " + _codeBaseUrl );
-
+				setRmiParams();
+				
 			}
+			
 		}
+	}
+	
+	private void setRmiParams() {
+		System.setProperty("java.rmi.server.hostname", _hostName);
+
+		// codebase
+		int codebasePort = getCodebasePort();
+		_codeBaseUrl = "http://" + _hostName + ":" + codebasePort +"/";
+		
+		String oldCodebase = System.getProperty("java.rmi.server.codebase");
+        String newCodebase = null;
+        if (oldCodebase != null) {
+            // RMI support multiple class server locations
+            newCodebase = oldCodebase + " " + _codeBaseUrl;
+            _raLogger.debug("The old codebase " + oldCodebase);
+        } else {
+            newCodebase = _codeBaseUrl;
+             
+        }
+
+        _raLogger.debug("Adding the codebase  " + _codeBaseUrl);
+        System.setProperty("java.rmi.server.codebase", newCodebase);
+        _raLogger.debug("Configuration info: hostName : " + _hostName + 
+				"; RMI codebase list : " + newCodebase );
 	}
 	
 	/**
