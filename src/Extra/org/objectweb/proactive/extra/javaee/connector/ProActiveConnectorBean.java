@@ -108,42 +108,43 @@ public abstract class ProActiveConnectorBean {
 	private void setRmiParams() {
 		System.setProperty("java.rmi.server.hostname", _hostName);
 
+		// I don't think this is needed
 		// codebase
-		int codebasePort = getCodebasePort();
-		_codeBaseUrl = "http://" + _hostName + ":" + codebasePort +"/";
-		
-		String oldCodebase = System.getProperty("java.rmi.server.codebase");
-        String newCodebase = null;
-        if (oldCodebase != null) {
-            // RMI support multiple class server locations
-            newCodebase = oldCodebase + " " + _codeBaseUrl;
-            _raLogger.debug("The old codebase " + oldCodebase);
-        } else {
-            newCodebase = _codeBaseUrl;
-             
-        }
-
-        _raLogger.debug("Adding the codebase  " + _codeBaseUrl);
-        System.setProperty("java.rmi.server.codebase", newCodebase);
-        _raLogger.debug("Configuration info: hostName : " + _hostName + 
-				"; RMI codebase list : " + newCodebase );
+//		int codebasePort = getCodebasePort();
+//		_codeBaseUrl = "http://" + _hostName + ":" + codebasePort +"/";
+//		
+//		String oldCodebase = System.getProperty("java.rmi.server.codebase");
+//        String newCodebase = null;
+//        if (oldCodebase != null) {
+//            // RMI support multiple class server locations
+//            newCodebase = oldCodebase + " " + _codeBaseUrl;
+//            _raLogger.debug("The old codebase " + oldCodebase);
+//        } else {
+//            newCodebase = _codeBaseUrl;
+//             
+//        }
+//
+//        _raLogger.debug("Adding the codebase  " + _codeBaseUrl);
+//        System.setProperty("java.rmi.server.codebase", newCodebase);
+//        _raLogger.debug("Configuration info: hostName : " + _hostName + 
+//				"; RMI codebase list : " + newCodebase );
 	}
 	
 	/**
 	 * if the codebase port not set, use a default value
 	 * in order for the connector to function, the codebase property MUST be set!
 	 */
-	private int getCodebasePort() {
-		String codebasePort = System.getProperty("proactive.http.port");
-		if (codebasePort == null) {
-			System.setProperty("proactive.http.port", DEFAULT_CODEBASE_PORT + "");
-			return DEFAULT_CODEBASE_PORT;
-		}
-		else {
-			// codebase port property already set
-			return Integer.parseInt(codebasePort);
-		}
-	}
+//	private int getCodebasePort() {
+//		String codebasePort = System.getProperty("proactive.http.port");
+//		if (codebasePort == null) {
+//			System.setProperty("proactive.http.port", DEFAULT_CODEBASE_PORT + "");
+//			return DEFAULT_CODEBASE_PORT;
+//		}
+//		else {
+//			// codebase port property already set
+//			return Integer.parseInt(codebasePort);
+//		}
+//	}
 	
 	////////// 	according to JSR the RA must be a JavaBean
 	protected String _vmName;  //RW
