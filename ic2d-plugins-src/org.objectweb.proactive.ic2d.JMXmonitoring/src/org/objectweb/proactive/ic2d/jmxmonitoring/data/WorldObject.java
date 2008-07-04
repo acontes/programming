@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -59,6 +60,8 @@ public class WorldObject extends AbstractData {
     public final static String REMOVE_VN_MESSAGE = "Remove a virtual node";
 
     public ComponentHolderModel CHolder;
+    
+    public Map<UniqueID,ComponentModel> components;
     
     // 60 s
     public static int MAX_AUTO_RESET_TIME = 60;
@@ -134,6 +137,7 @@ public class WorldObject extends AbstractData {
         {
         	
         }
+        this.components = new ConcurrentHashMap<UniqueID,ComponentModel>();
     }
 
     // -------------------------------------------
@@ -431,5 +435,9 @@ public class WorldObject extends AbstractData {
         }
         return n;
     }
+    
+    /**
+     * build the components hierachical
+     */
 
 }

@@ -34,13 +34,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
-import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
@@ -76,18 +75,6 @@ public class NodeObject extends AbstractData {
         /*
          * initial the component Holder Model
          */
-        
-        
-//        try
-//        {
-//           this.CHolder = new ComponentHolderModel();
-//        }catch(Exception e)
-//        {
-//        	e.printStackTrace();
-//        }
-//        
-//        getWorldObject().CHolder = this.CHolder;
-        
         this.CHolder = getWorldObject().CHolder;
     }
 
@@ -167,13 +154,7 @@ public class NodeObject extends AbstractData {
 
         final List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
         
-        ComponentModel[] componentmodels = new ComponentModel[activeObjectNames.size()]; 
-        
-//        System.out.println("[YYL Test OutPut:]"+"in NodeObject activeObjectNames.size() =  "+activeObjectNames.size());
-        
-        
-//        Vector<ComponentModel> componentmodels = new Vector<ComponentModel>();
-       
+//        ComponentModel[] componentmodels = new ComponentModel[activeObjectNames.size()]; 
         int index = 0;
         
         for (final ObjectName oname : activeObjectNames) {
@@ -210,10 +191,11 @@ public class NodeObject extends AbstractData {
             // Removes from the model the not monitored or termined aos.
             childrenToRemoved.remove(idString);
             
-//            System.out.println("[YYL Test OutPut:]"+"in NodeObject "+" begin to create component model");
-            /**
+            
+            
+           /**
              * create component model here
-             */
+//             */
             String activeObjectName = proxyBodyMBean.getName();
             ComponentWrapperMBean proxyComponentMBean = (ComponentWrapperMBean) MBeanServerInvocationHandler
             .newProxyInstance(getProActiveConnection(), oname, ComponentWrapperMBean.class, false);
@@ -224,8 +206,11 @@ public class NodeObject extends AbstractData {
                 
                 Cchild.setName(activeObjectName);
                 
+                //using hashmap
+                if(! getWorldObject().components.containsKey(id))
+                      getWorldObject().components.put(id, Cchild);
                 
-                componentmodels[index++] = Cchild;
+//                componentmodels[index++] = Cchild;
             }
             catch(Exception e)
             {
@@ -236,8 +221,8 @@ public class NodeObject extends AbstractData {
         }
 
         // re build the relation ship of these components
-        ComponentHierarchicalRebuild(componentmodels);
-        
+//        ComponentHierarchicalRebuild(componentmodels);
+        ComponentHierarchicalRebuild(getWorldObject().components);
         
         // add all children
         this.addChildren(childrentoAdd);
@@ -245,6 +230,7 @@ public class NodeObject extends AbstractData {
         for (final AbstractData child : childrenToRemoved.values()) {
             org.objectweb.proactive.ic2d.console.Console.getInstance(Activator.CONSOLE_NAME).log(
                     "Active object " + child.getName() + " is no longer visible");
+            if(child instanceof ActiveObject)
             ((ActiveObject) child).stopMonitoring(true); // unsubscribes
             // listener for this
             // child object
@@ -336,6 +322,35 @@ public class NodeObject extends AbstractData {
         this.notifyObservers(null);
     }
 
+    private void ComponentHierarchicalRebuild(Map<UniqueID,ComponentModel> componentmodels)
+    {
+    	Set<UniqueID> keys = componentmodels.keySet();
+    	for(UniqueID key : keys)
+    	{
+    		ComponentModel currentModel = componentmodels.get(key);
+    		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
+    		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
+    		if(subComponents!=null)
+    		{
+    			addSubComponents(currentModel,subComponents,componentmodels);
+    		}
+    	}
+    	for(UniqueID key : keys)
+    	{
+    		ComponentModel currentModel = componentmodels.get(key);
+    		if(currentModel.getParent() instanceof NodeObject)
+    		{
+    			currentModel.setParent(this.CHolder);
+    			this.CHolder.addChild(currentModel);
+    		}
+    	}
+    	
+    	getWorldObject().CHolder = this.CHolder;
+    	showComponentHierachical(getWorldObject().CHolder);
+    }
+    
+    
+    
     
     private void ComponentHierarchicalRebuild(ComponentModel[] componentmodels)
     {
@@ -349,6 +364,11 @@ public class NodeObject extends AbstractData {
             if(subComponents!=null)
     		{
     			addSubComponents(currentModel,subComponents,componentmodels);
+    			currentModel.setHierachical("Composite");
+    		}
+            else
+            {
+            	currentModel.setHierachical("primitive");
     		}
     	}
     	  	
@@ -372,6 +392,48 @@ public class NodeObject extends AbstractData {
     	
     }
     
+    private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,Map<UniqueID,ComponentModel> componentmodels)
+    {
+    	for(ProActiveComponent child:subcomponents)
+    	{
+    		UniqueID childID = child.getID();
+    		Set<UniqueID> keys = componentmodels.keySet();
+        	for(UniqueID key : keys)
+        	{
+        		if(key.equals(childID))
+        		{
+        			//find one child.
+        			//if this child is not primitive one, first add its children..
+        			ComponentModel currentModel = componentmodels.get(key);
+            		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
+            		ProActiveComponent[] subsubComponents = proxyMBean.getSubComponents();
+            		if(subsubComponents!=null)
+            		{
+            			addSubComponents(currentModel,subsubComponents,componentmodels);
+            			currentModel.setHierachical("Composite");
+            		}
+            		else
+            		{
+            			currentModel.setHierachical("primitive");
+            		}
+            		//then add it to the parent
+        			currentModel.setParent(parent);
+        			parent.addChild(currentModel);
+        			componentmodels.put(parent.getID(), parent);
+        			componentmodels.put(currentModel.getID(), currentModel);
+        			
+        			//if this one used to be the root, now it has its parent, delete from CHolder
+        			
+        			getWorldObject().CHolder.monitoredChildren.remove(currentModel.getKey());
+            		
+        			break;
+        		}
+        	}
+    	}
+    	
+    	// after add all the subcomponents return;
+    }
+    
     private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,ComponentModel[] componentmodels)
     {
     	for(ProActiveComponent child:subcomponents)
@@ -391,7 +453,7 @@ public class NodeObject extends AbstractData {
     
     private void showComponentHierachical(ComponentHolderModel CHolder)
     {
-    	System.out.println("[YYL Test OutPut:]"+"in NodeObject"+"this.CHolder has "+CHolder.getMonitoredChildrenSize()+" children");
+//    	System.out.println("[YYL Test OutPut:]"+"in NodeObject"+"this.CHolder has "+CHolder.getMonitoredChildrenSize()+" children");
     	List<AbstractData> childrens = CHolder.getMonitoredChildrenAsList();
     	if(childrens!=null)
     	{

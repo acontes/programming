@@ -2,11 +2,12 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
+import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.ComponentWrapperMBean;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ComponentModelListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotificationTag;
 
@@ -25,7 +26,7 @@ public class ComponentModel extends AbstractData
 
 	private String Hierachical = "";
 
-	private String Status = "";
+	private String Status = "Stoped";
 
 	private double mean_arrival_rate = -1;
 
@@ -48,7 +49,7 @@ public class ComponentModel extends AbstractData
 	//    /** JMX Notification listener
 	//     *  This listener will be subscribed to the JMXNotificationManager
 	//     * */
-	//    private final NotificationListener listener;
+	    private final NotificationListener listener;
 	//    
 	    /** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
 	    private ComponentWrapperMBean proxyMBean;
@@ -60,6 +61,7 @@ public class ComponentModel extends AbstractData
 		this.parent = parent;
 		this.ClassName = ClassName;
 		this.parent.addChild(this);
+		 this.listener = new ComponentModelListener(this);
 
 	}
 
@@ -70,6 +72,8 @@ public class ComponentModel extends AbstractData
 		this.parent = parent;
 		this.ClassName = ClassName;
 		this.parent.addChild(this);
+		 this.listener = new ComponentModelListener(this);
+		
 	}
 
 	
@@ -88,7 +92,7 @@ public class ComponentModel extends AbstractData
         
 //        System.out.println("ComponentModel()");
 
-//        this.listener = new ActiveObjectListener(this);
+        this.listener = new ComponentModelListener(this);
         
         this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(
                 getProActiveConnection(), getObjectName(), ComponentWrapperMBean.class, false);
@@ -155,6 +159,11 @@ public class ComponentModel extends AbstractData
 	}
 
 	/* get Methods*/
+	public UniqueID getID()
+	{
+		return this.id;
+	}
+	
 	public String getHierachical()
 	{
 		return this.Hierachical;
