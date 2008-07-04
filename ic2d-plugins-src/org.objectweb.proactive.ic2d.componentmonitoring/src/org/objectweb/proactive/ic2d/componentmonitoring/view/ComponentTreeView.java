@@ -211,8 +211,8 @@ public class ComponentTreeView extends ViewPart
 		this.CHolder = world.CHolder;
 		this.treeViewer.setContents(world.CHolder);
 //
-		Thread showThread = new Thread(new changeShow());
-		showThread.start();
+//		Thread showThread = new Thread(new changeShow());
+//		showThread.start();
 
 	}
 
