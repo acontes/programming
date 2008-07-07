@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.componentmonitoring.editpart;
+package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.Observable;
 
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.objectweb.proactive.ic2d.componentmonitoring.view.ComponentTreeView;
+import org.objectweb.proactive.ic2d.jmxmonitoring.view.ComponentTreeView;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
@@ -160,26 +160,36 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 
 	protected final void refreshVisuals()
 	{
-		ComponentModel model = (ComponentModel) getModel();
-		if (getWidget() instanceof Tree)
+		Runnable runnable = new Runnable()
 		{
-			return;
-		}
-		if (this.getWidget() instanceof TreeItem)
-		{
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.NAME_COLUMN, model.getName());
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.HIERARCHICAL_COLUMN, model.getHierachical());
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.STATUS_COLUMN, model.getStatus());
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.MEAN_ARRIVAL_RATE_COLUMN, String.valueOf(model.getMeanArrivalRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.MEAN_DEPARTURE_RATE_COLUMN, String.valueOf(model.getMeanDepartureRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.MEAN_SERVICE_RATE_COLUMN, String.valueOf(model.getMeanServiceRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.SAMPLE_ARRIVAL_RATE_COLUMN, String.valueOf(model.getSampleArrivalRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.SAMPLE_DEPARTURE_RATE_COLUMN, String.valueOf(model.getSampleDepartureRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.SAMPLE_SERVICE_RATE_COLUMN, String.valueOf(model.getSampleServiceRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.TIME_ARRIVAL_RATE_COLUMN, String.valueOf(model.getTimeArrivalRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.TIME_DEPARTURE_RATE_COLUMN, String.valueOf(model.getTimeDepartureRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.TIME_SERVICE_RATE_COLUMN, String.valueOf(model.getTimeServiceRate()));
-		}
+			public void run()
+			{
+				ComponentModel model = (ComponentModel) getModel();
+				if (getWidget() instanceof Tree)
+				{
+					return;
+				}
+				if (getWidget() instanceof TreeItem)
+				{
+					((TreeItem) getWidget()).setText(ComponentTreeView.NAME_COLUMN, model.getName());
+					((TreeItem) getWidget()).setText(ComponentTreeView.HIERARCHICAL_COLUMN, model.getHierachical());
+					((TreeItem) getWidget()).setText(ComponentTreeView.STATUS_COLUMN, model.getStatus());
+					((TreeItem) getWidget()).setText(ComponentTreeView.MEAN_ARRIVAL_RATE_COLUMN, String.valueOf(model.getMeanArrivalRate()));
+					((TreeItem) getWidget()).setText(ComponentTreeView.MEAN_DEPARTURE_RATE_COLUMN, String.valueOf(model.getMeanDepartureRate()));
+					((TreeItem) getWidget()).setText(ComponentTreeView.MEAN_SERVICE_RATE_COLUMN, String.valueOf(model.getMeanServiceRate()));
+					((TreeItem) getWidget()).setText(ComponentTreeView.SAMPLE_ARRIVAL_RATE_COLUMN, String.valueOf(model.getSampleArrivalRate()));
+					((TreeItem) getWidget()).setText(ComponentTreeView.SAMPLE_DEPARTURE_RATE_COLUMN, String.valueOf(model.getSampleDepartureRate()));
+					((TreeItem) getWidget()).setText(ComponentTreeView.SAMPLE_SERVICE_RATE_COLUMN, String.valueOf(model.getSampleServiceRate()));
+					((TreeItem) getWidget()).setText(ComponentTreeView.TIME_ARRIVAL_RATE_COLUMN, String.valueOf(model.getTimeArrivalRate()));
+					((TreeItem) getWidget()).setText(ComponentTreeView.TIME_DEPARTURE_RATE_COLUMN, String.valueOf(model.getTimeDepartureRate()));
+					((TreeItem) getWidget()).setText(ComponentTreeView.TIME_SERVICE_RATE_COLUMN, String.valueOf(model.getTimeServiceRate()));
+				}
+			}
+		};
+		
+		getViewer().getControl().getDisplay().asyncExec(runnable);
+		
+		
 	}
 
 	@Override

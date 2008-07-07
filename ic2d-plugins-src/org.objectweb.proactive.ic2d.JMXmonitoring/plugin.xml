@@ -33,6 +33,13 @@
             icon="icons/legend.gif"
             id="org.objectweb.proactive.ic2d.jmxmonitoring.view.Legend"
             name="Legend"/>
+      <view
+            allowMultiple="false"
+            category="org.objectweb.proactive.ic2d.jmxmonitoring.category"
+            class="org.objectweb.proactive.ic2d.jmxmonitoring.view.ComponentTreeView"
+            icon=""
+            id="org.objectweb.proactive.ic2d.jmxmonitoring.view.ComponentTreeView"
+            name="Component Monitoring"/>
    </extension>
    <extension
          id="org.objectweb.proactive.ic2d.jmxmonitoring.perspectiveextensions"

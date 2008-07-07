@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.componentmonitoring.editpart;
+package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,34 +6,29 @@ import java.util.Observable;
 
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.objectweb.proactive.ic2d.componentmonitoring.view.ComponentTreeView;
+import org.objectweb.proactive.ic2d.jmxmonitoring.view.ComponentTreeView;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentHolderModel;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotificationTag;
 
-public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentModel>
+public class ComponentHolderEditPart extends ComponentMonitorTreeEditPart<ComponentHolderModel>
 {
 
-	// public static final Image COMPONENT_IMAGE = new
-	// Image(Display.getCurrent(),
-	// ComponentEditPart.class.getResourceAsStream("component_icon.png"));
-
 	private ComponentMVCNotificationTag mvcNotif;
-
 	/**
 	 * The contructor of this controller part.
-	 * 
-	 * @param model  The instance Component model associated to this controller
+	 * @param model The instance ComponentHolderModel model associated to this controller
 	 */
-	public ComponentEditPart(final ComponentModel model)
+	public ComponentHolderEditPart(final ComponentHolderModel model)
 	{
 		super(model);
 	}
 
 	public void update(Observable o, Object arg)
 	{
-		// TODO Auto-generated method stub
+	// TODO Auto-generated method stub
 		final ComponentMVCNotification notif = (ComponentMVCNotification) arg;
 		mvcNotif = notif.getMVCNotification();
 		//		Object data = notif.getData();
@@ -97,7 +92,15 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 					ComponentModel model = (ComponentModel) getModel();
 					if (getWidget() instanceof Tree)
 					{
-						return;
+//						switch (mvcNotif)
+//						{
+//						case ADD_CHILD:
+//							System.out.println("add child notification received in Component Holder Editpart");
+//							new TreeItem((Tree)getWidget(),0);
+//						default:
+//							break;
+//						}
+					 
 					}
 					else if (getWidget() instanceof TreeItem)
 					{
@@ -136,9 +139,6 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 							case TIME_SERVICE_RATE_CHANGED:
 								((TreeItem) getWidget()).setText(ComponentTreeView.TIME_SERVICE_RATE_COLUMN, String.valueOf(model
 										.getTimeServiceRate()));
-//							case ADD_CHILD:
-//								System.out.println("add child notification received in Component  Editpart");
-//								new TreeItem((TreeItem)getWidget(),0);
 							default:
 								break;
 						} // switch
@@ -152,7 +152,7 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 			//			getViewer().getControl().getDisplay().syncExec(this);
 
 			// this asyncExec would not suspend the caller
-			getViewer().getControl().getDisplay().asyncExec(runnable);
+			getViewer().getControl().getDisplay().asyncExec(this);
 
 		}
 
@@ -160,7 +160,7 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 
 	protected final void refreshVisuals()
 	{
-		ComponentModel model = (ComponentModel) getModel();
+		ComponentHolderModel model = (ComponentHolderModel) getModel();
 		if (getWidget() instanceof Tree)
 		{
 			return;
@@ -168,20 +168,18 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 		if (this.getWidget() instanceof TreeItem)
 		{
 			((TreeItem) this.getWidget()).setText(ComponentTreeView.NAME_COLUMN, model.getName());
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.HIERARCHICAL_COLUMN, model.getHierachical());
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.STATUS_COLUMN, model.getStatus());
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.MEAN_ARRIVAL_RATE_COLUMN, String.valueOf(model.getMeanArrivalRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.MEAN_DEPARTURE_RATE_COLUMN, String.valueOf(model.getMeanDepartureRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.MEAN_SERVICE_RATE_COLUMN, String.valueOf(model.getMeanServiceRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.SAMPLE_ARRIVAL_RATE_COLUMN, String.valueOf(model.getSampleArrivalRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.SAMPLE_DEPARTURE_RATE_COLUMN, String.valueOf(model.getSampleDepartureRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.SAMPLE_SERVICE_RATE_COLUMN, String.valueOf(model.getSampleServiceRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.TIME_ARRIVAL_RATE_COLUMN, String.valueOf(model.getTimeArrivalRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.TIME_DEPARTURE_RATE_COLUMN, String.valueOf(model.getTimeDepartureRate()));
-			((TreeItem) this.getWidget()).setText(ComponentTreeView.TIME_SERVICE_RATE_COLUMN, String.valueOf(model.getTimeServiceRate()));
+			//    		 ((TreeItem)this.getWidget()).setText(ComponentTreeView.HIERARCHICAL_COLUMN, model.getHierachical());
+			//    		 ((TreeItem)this.getWidget()).setText(ComponentTreeView.STATUS_COLUMN, model.getStatus());
 		}
 	}
 
+	//
+	// -- PROTECTED METHODS -------------------------------------------
+	//
+
+	/**
+	 * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
+	 */
 	@Override
 	protected final List<ComponentModel> getModelChildren()
 	{

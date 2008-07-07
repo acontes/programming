@@ -8,5 +8,7 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.objectweb.proactive.ic2d.lib,
- org.eclipse.gef
+ org.eclipse.gef,
+ org.objectweb.proactive.ic2d.JMXmonitoring,
+ org.objectweb.proactive.ic2d.console
 Eclipse-LazyStart: true

@@ -346,7 +346,7 @@ public class NodeObject extends AbstractData {
     	}
     	
     	getWorldObject().CHolder = this.CHolder;
-    	showComponentHierachical(getWorldObject().CHolder);
+//    	showComponentHierachical(getWorldObject().CHolder);
     }
     
     

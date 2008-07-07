@@ -67,6 +67,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.ChartItAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.ComponentMonitoringAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.EnableDisableMonitoringAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.KillVMAction;
@@ -376,6 +377,10 @@ public class MonitoringView extends ViewPart {
         // Adds "New Monitoring view" action to the view's toolbar
         NewViewAction toolBarNewView = new NewViewAction();
         toolBarManager.add(toolBarNewView);
+        
+        // add component monitoring
+        ComponentMonitoringAction componentMonitoringView = new ComponentMonitoringAction(parent.getDisplay(),this.world);
+        toolBarManager.add(componentMonitoringView);
     }
 
     /**

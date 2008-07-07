@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.componentmonitoring.view;
+package org.objectweb.proactive.ic2d.jmxmonitoring.view;
 
 import java.util.List;
 
@@ -11,19 +11,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.componentmonitoring.actions.CollapseAllAction;
-import org.objectweb.proactive.ic2d.componentmonitoring.actions.ExpandAllAction;
-import org.objectweb.proactive.ic2d.componentmonitoring.actions.NewHostAction;
-import org.objectweb.proactive.ic2d.componentmonitoring.editpart.TreeEditPartFactory;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.CollapseAllAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.ExpandAllAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentHolderModel;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.TreeEditPartFactory;
 
 public class ComponentTreeView extends ViewPart
 {
-
+	
 	// @Override
 	// public void createPartControl(Composite parent) {
 	// // TODO Auto-generated method stub
@@ -35,7 +33,7 @@ public class ComponentTreeView extends ViewPart
 	// // TODO Auto-generated method stub
 	//
 	// }
-	public static final String ID = "org.objectweb.proactive.ic2d.componentmonitoring.view.ComponentTreeView";
+	public static final String ID = "org.objectweb.proactive.ic2d.jmxmonitoring.view.ComponentTreeView";
 
 	/**
 	 * Component Metrics:
@@ -96,6 +94,8 @@ public class ComponentTreeView extends ViewPart
 	private EditDomain editDomain;
 
 	private ComponentModel C1;
+	
+	private static int TIME_TO_REFRESH_NUMBER_OF_MONITORED_OBJECTS = 2000;
 
 	public ComponentTreeView()
 	{
@@ -111,8 +111,21 @@ public class ComponentTreeView extends ViewPart
 		
 		this.world = new WorldObject();
 		this.CHolder = this.world.CHolder;
+		
+		
+	}
+	
+	public ComponentTreeView(WorldObject world)
+	{
+		this.world = world;
+		this.CHolder  = this.world.CHolder;
 	}
 
+	public void setWorld(WorldObject world)
+	{
+		this.world = world;
+		this.CHolder  = this.world.CHolder;
+	}
 	@Override
 	public void createPartControl(Composite parent)
 	{
@@ -148,7 +161,7 @@ public class ComponentTreeView extends ViewPart
 
         toolBarManager.add(new ExpandAllAction(treeViewer));
         toolBarManager.add(new CollapseAllAction(treeViewer));
-        toolBarManager.add(new NewHostAction(parent.getDisplay(),this.world));
+//        toolBarManager.add(new NewHostAction(parent.getDisplay(),this.world));
 
 		//////////////////////////////////////////
 //		Listener sortListener = new Listener()
@@ -339,7 +352,7 @@ public class ComponentTreeView extends ViewPart
 	
 	private void showComponentHierachical()
     {
-    	System.out.println("[YYL Test OutPut:]"+"in ComponentTreeView "+"this.CHolder has "+this.CHolder.getMonitoredChildrenSize()+" children");
+    	System.out.println("[YYL Test OutPut:]"+"in IC2D ComponentTreeView "+"this.CHolder has "+this.CHolder.getMonitoredChildrenSize()+" children");
     	List<AbstractData> childrens = this.CHolder.getMonitoredChildrenAsList();
     	if(childrens!=null)
     	{
@@ -354,7 +367,7 @@ public class ComponentTreeView extends ViewPart
     
     private void showComponent(ComponentModel model,String parent)
     {
-    	System.out.println("[YYL Test OutPut:]"+"in ComponentTreeView "+model.getName()+" parent ="+parent);
+    	System.out.println("[YYL Test OutPut:]"+"in IC2D ComponentTreeView "+model.getName()+" parent ="+parent);
     	List<AbstractData> childrens = model.getMonitoredChildrenAsList();
     	if(childrens!=null)
     	{

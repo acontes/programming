@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.management.ObjectName;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+
 
 
 public class AbstractModel extends AbstractData {
