@@ -11,12 +11,16 @@ ant rar		-> creates the rar archive, rady for deployment
 ant clean	-> cleanup the mess
 -->
 
+	<!-- Debugging -->
+	<property name="debug" value="on" />
+	
     <!-- Antelope! We want that switch && if! -->
     <taskdef name="switch" classname="ise.antelope.tasks.SwitchTask" />
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
 
     <property file="build.properties"/>
     <property environment="env" />
+	
     <property name="connector.base"		     value="${basedir}/../" />
     <property name="proactive.base.dir"           value="${env.PROACTIVE_HOME}" />
     <property name="proactive.lib.dir"            value="${proactive.base.dir}/dist/lib" />
@@ -47,26 +51,29 @@ ant clean	-> cleanup the mess
     </target>
 
     <target name="compile" depends="init" description="Compiles the proActive connector">
-	<javac srcdir="${src.connector.dir}" destdir="${cl.connector.dir}"> 
+	<javac srcdir="${src.connector.dir}" destdir="${cl.connector.dir}" debug="${debug}"> 
 	    <classpath refid="connector.classpath" />
 	    <!--include name="**/*.java" /-->
 	</javac>
     </target>
 
     <target name="jar" depends="compile" description="Packs the connector classes into a jar file">
-	<!-- for Geronimo we have to put the proactive-log4j file into the jar file -->
-	<if name="as.name" value="geronimo">
-		<jar destfile="${deploy.connector.dir}/proactiveConnector.jar" >
-			<fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
-			<fileset dir="${cl.connector.dir}" includes="**" />
-		</jar>
-	</if>
-	<else>
-		<jar destfile="${deploy.connector.dir}/proactiveConnector.jar" >
-			<fileset dir="${cl.connector.dir}" includes="**" />
-		</jar>
-	</else>
-	
+	<!-- for some appplication servers,  we have to put the proactive-log4j file into the jar file -->
+	<switch name="as.name">
+		<case value="jonas"><!--fallthrough--></case>
+	    <case value="geronimo">
+			<jar destfile="${deploy.connector.dir}/proactiveConnector.jar" >
+				<fileset dir="${connector.base}" includes="META-INF/proactive-log4j" />
+				<fileset dir="${cl.connector.dir}" includes="**" />
+			</jar>
+			<break/>
+		</case>
+		<default>
+			<jar destfile="${deploy.connector.dir}/proactiveConnector.jar" >
+				<fileset dir="${cl.connector.dir}" includes="**" />
+			</jar>
+		</default>
+	</switch>
     </target> 
 
     <target name="rar" depends="jar" description="Creates the RAR archive for deployment into the application server">
@@ -96,7 +103,7 @@ ant clean	-> cleanup the mess
 		    <fileset dir="${connector.base}" includes="META-INF/ra.xml" />
 		    <fileset dir="${connector.base}" includes="META-INF/jonas-ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${proactive.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar log4j.jar" />
+		    <fileset dir="${proactive.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar" /> 
 		</jar>
 		<break/>
 	    </case>

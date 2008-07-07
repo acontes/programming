@@ -5,7 +5,7 @@
   	<dep:moduleId>
       	<dep:groupId>proactive</dep:groupId>
       	<dep:artifactId>proactive</dep:artifactId>
-      	<dep:version>1.10</dep:version>
+      	<dep:version>1.20</dep:version>
       	<dep:type>rar</dep:type>
     </dep:moduleId>
     <dep:dependencies/>

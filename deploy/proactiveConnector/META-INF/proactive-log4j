@@ -85,14 +85,13 @@ log4j.rootLogger=DEBUG,FILE
 #log4j.logger.proactive.jmx.mbean = DEBUG
 #log4j.logger.proactive.jmx.notification = DEBUG
 
-# Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender
 # by default, log into a file in the ~/.proactive directory
-log4j.appender.FILE.File=${user.home}/.proactive/proactive.log
+log4j.appender.FILE.File=${user.home}/.proactive/geronimo.log
 # the following is for JBoss
-# log4j.appender.FILE.File=${jboss.home}/server/{jboss.domain}/log/proactive.log
+# log4j.appender.FILE.File=${jboss.home}/server/${jboss.domain}/log/proactive.log
 # the following is for GlassFish
-# log4j.appender.FILE.File=${glassfish.home}/domains/{glassfish.domain}/logs/proactive.log
+# log4j.appender.FILE.File=${glassfish.home}/domains/proactive/logs/proactive.log
 # the following is for Geronimo AS
 # log4j.appender.FILE.File=${geronimo.home}/var/log/proactive.log
 # the following is for JOnAs AS
@@ -105,7 +104,7 @@ log4j.appender.FILE.threshold=DEBUG
 log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
 # %X{hostname} adds the hostname
 # %X{runtime} adds the runtime url
-log4j.appender.FILE.layout.ConversionPattern=%5p [%t] %C: %m%n
+log4j.appender.FILE.layout.ConversionPattern=\%d/ %5p [%t] %C: %m%n
 
 
 #CONSOLE uses PatternLayout

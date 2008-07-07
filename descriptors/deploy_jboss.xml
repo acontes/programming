@@ -15,7 +15,7 @@
       <vmName value='Jvm1'/>
       <vmName value='Jvm2'/>
       <vmName value='Jvm3'/>
-<!--      <vmName value='Jvm4'/>-->
+      <vmName value='Jvm4'/>
      </jvmSet>
     </map>
    </mapping>
@@ -40,16 +40,11 @@
       <serviceReference refid='lookupRMI4'/>
      </acquisition>
     </jvm>-->
-<!--	<jvm name='Jvm3'>
-      <creation>
-       <processReference refid='creationProcess'/>
-      </creation>
-    </jvm>-->
-<!--	<jvm name='Jvm4'>
+	<jvm name='Jvm4'>
      <creation>
        <processReference refid='creationProcess'/>
       </creation>
-    </jvm>-->
+    </jvm>
    </jvms>
   </deployment>
   <infrastructure>
@@ -70,7 +65,7 @@
      <RMIRegistryLookup url='rmi://eon3.inria.fr:6635/PA_JVMgeronimoVM'/>
     </serviceDefinition>
 <!--    <serviceDefinition id='lookupRMI4'>
-     <RMIRegistryLookup url='rmi://apple.inria.fr:6635/PA_JVMjbossVM'/>
+     <RMIRegistryLookup url='rmi://orchidee.inria.fr:6635/PA_JVMjbossVM'/>
     </serviceDefinition>-->
    </services>
   </infrastructure>

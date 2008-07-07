@@ -416,9 +416,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         	}
 			Class<?> formalParameter = methodFormalParameters[i];
 			Class<?> actualParameter = this.effectiveArguments[i].getClass();
-			if(formalParameter.isPrimitive()){
+			if( formalParameter.isPrimitive() || actualParameter.isPrimitive() ){
 				// lame test
-				if(!formalParameter.getSimpleName().equals(actualParameter.getSimpleName().toLowerCase()))
+				if(!formalParameter.getSimpleName().toLowerCase().equals(actualParameter.getSimpleName().toLowerCase()))
 					throw new IllegalArgumentException( "Error on the argument #" + i + " of the method " + this.getName()
 							+ "; the actual parameter type " + actualParameter.getName() 
 							+ " is not compatible with the formal parameter type " + formalParameter.getName() 
@@ -449,10 +449,15 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         logger.debug("MethodCall.execute() arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
         for (int i = 0; i < this.effectiveArguments.length; i++) {
         	Object argument = this.effectiveArguments[i];
-        	logger.debug("MethodCall.execute() argument #" + i + "=" 
+        	logger.debug("MethodCall.execute() formal argument #" + i + "=" 
         				+ argument + ";" + ( argument != null ? argument.getClass() : "null" )
         			);
 		}
+        Class<?>[] methodFormalParameters = this.reifiedMethod.getParameterTypes();
+        for (int i = 0; i < methodFormalParameters.length; i++) {
+        	Object argument = methodFormalParameters[i];
+        	logger.debug("MethodCall.execute() actual argument #" + i + "=" + argument );
+        }
 	}
 
 	@Override

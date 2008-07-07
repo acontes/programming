@@ -101,7 +101,12 @@
 		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
 		</fileset>
-		<!-- XXX ${dev.dir} is not included in the source release ! -->
+	         <!-- jboss patch TODO -->
+                <fileset dir="${lib.dir}/jboss">
+                        <include name="*.jar" />
+                </fileset>
+
+	<!-- XXX ${dev.dir} is not included in the source release ! -->
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>
 	
@@ -193,6 +198,8 @@
 					<appendclasspath />
 				</classpath>
 				<include name="@{package}/@{module}/**/*.java" />
+				<!--hack-->
+				<exclude name="org/objectweb/proactive/extensions/jmx/jboss/p2p/*.java" />
 			</javac>
 
 			<copy todir="@{dest}" includeEmptyDirs="no">

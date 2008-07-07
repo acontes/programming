@@ -5,17 +5,20 @@
   	<dep:moduleId>
       	<dep:groupId>proactive</dep:groupId>
       	<dep:artifactId>proactive</dep:artifactId>
-      	<dep:version>1.1</dep:version>
+      	<dep:version>1.9</dep:version>
       	<dep:type>rar</dep:type>
     </dep:moduleId>
     <dep:dependencies/>
-    <dep:hidden-classes/>
+	  <!-- we want our own log4j -->
+    <dep:hidden-classes>
+        <dep:filter>org.apache.log4.</dep:filter>
+    </dep:hidden-classes> 
     <dep:non-overridable-classes/>
   </dep:environment>
       <resourceadapter>
         <resourceadapter-instance>
             <resourceadapter-name>ProActiveResourceAdapter</resourceadapter-name>
-            <config-property-setting name="VmName">asVM</config-property-setting>
+            <config-property-setting name="VmName">geronimoVM</config-property-setting>
             <nam:workmanager xmlns:nam="http://geronimo.apache.org/xml/ns/naming-1.1">
 		<nam:gbean-link>DefaultWorkManager</nam:gbean-link>
 	    </nam:workmanager>

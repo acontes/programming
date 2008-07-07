@@ -1012,10 +1012,26 @@
 		</war>
 	</target>
 	
+	
 	<!-- =================================================================================== -->
 	<!-- ProActive Resource Archive, used for ProActive integration with application servers -->
 	<!-- =================================================================================== -->
-	<target name="proActiveRar" depends="deploy" description="Creates the RAR archive for deployment into the application server">
+
+	<!-- Define jars to be included into the archive -->
+	<patternset id="rar_included_jars" >
+		<include name="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar"/>
+	</patternset>
+	
+<!--	<target name="rartest">
+		<jar destfile="${deploy.dir}/${rar.name}.rar" >
+		    <!-#- ProActive libs -#->
+			<fileset dir="${deploy.lib.dir}">
+				<include name="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar"/>
+			</fileset>		
+		</jar>
+	</target>-->
+	
+	<target name="proActiveRar" depends="deploy.all" description="Creates the RAR archive for deployment into the application server">
 		<switch name="as.name">
 	    <case value="geronimo">
 		<jar destfile="${deploy.dir}/${rar.name}.rar" >
@@ -1024,7 +1040,7 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <fileset dir="${compile.dir}" includes="META-INF/geronimo-ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar" />
+			<fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar ProActive_examples.jar" />	
 		</jar>
 		<break/>
 	    </case>
@@ -1035,7 +1051,7 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <fileset dir="${compile.dir}" includes="META-INF/jonas-ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar" /> 
+		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar ProActive_examples.jar" /> 
 		</jar>
 		<break/>
 	    </case>
@@ -1045,11 +1061,54 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar" />
+   			<fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar ProActive_examples.jar" />
 		</jar>
 		<break/>
 	    </default>
 		</switch>
+	</target>
+	
+	<!-- Create the rar archive for all the application servers -->
+	<!-- Cannot use the proActiveRar as a subant task, as the properties are immutable, so I cannot change as.name and rar.name
+		Consequences:
+			* all the archives will create a runtime with the same name
+			* all the archives will log to the same file. better make that file appendable in the log4j config
+		-->
+	<target name="allrars" description="Create a RAR archive for every application server">
+		<!-- JBoss -->
+		<jar destfile="${deploy.dir}/proactive-jboss.rar" >
+		    <!-- META-INF -->
+		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
+		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
+		    <!-- ProActive libs -->
+		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar ProActive_examples.jar" />
+		</jar>
+		<!-- Glassfish -->
+		<jar destfile="${deploy.dir}/proactive-glassfish.rar" >
+		    <!-- META-INF -->
+		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
+		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
+		    <!-- ProActive libs -->
+		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar ProActive_examples.jar" />
+		</jar>
+		<!-- Geronimo -->
+		<jar destfile="${deploy.dir}/proactive-geronimo.rar" >
+		    <!-- META-INF -->
+		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
+		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
+		    <fileset dir="${compile.dir}" includes="META-INF/geronimo-ra.xml" />
+		    <!-- ProActive libs -->
+		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar ProActive_examples.jar" />
+		</jar>
+		<!-- Jonas -->
+		<jar destfile="${deploy.dir}/proactive-jonas.rar" >
+		    <!-- META-INF -->
+		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
+		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
+		    <fileset dir="${compile.dir}" includes="META-INF/jonas-ra.xml" />
+		    <!-- ProActive libs -->
+		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar ProActive_examples.jar" /> 
+		</jar>
 	</target>
 	
 
