@@ -78,7 +78,7 @@ public class Start implements Serializable {
         new Start().run(args);
     }
 
-    private static String WORKERS_NODE_NAME = "jboss";
+    private static String WORKERS_NODE_NAME = "as";
     public void run(String[] args) {
         int input = 0;
         boolean display = true;
