@@ -49,4 +49,5 @@ public interface GCMApplicationInternal extends GCMApplication {
      * @return the Node Provider mapped to this deployment ID, or null if not found
      */
     public NodeProvider getNodeProviderFromTopologyId(Long topologyId);
+
 }

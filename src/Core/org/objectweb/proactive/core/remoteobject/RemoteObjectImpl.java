@@ -36,8 +36,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.util.Arrays;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -104,7 +102,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
             if (message instanceof RemoteObjectRequest) {
                 o = message.getMethodCall().execute(this);
             } else {
-                o = (message).getMethodCall().execute(this.target);
+                o = message.getMethodCall().execute(this.target);
             }
 
             return new SynchronousReplyImpl(new MethodCallResult(o, null));

@@ -1,17 +1,14 @@
-<!-- Converted by db4-upgrade version 1.0 -->
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">    -->
 
 <appendix xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="FAQ"><info><title>Frequently Asked Questions</title></info>
   
 
   <para><emphasis role="bold">Note:</emphasis> This FAQ is under construction.
   If one of your question is not answered here, just send it at 
-  <email>proactive@objectweb.org</email> and we'll update the FAQ.</para>
+  <email>proactive@ow2.org</email> and we'll update the FAQ.</para>
 
  <qandaset>
- 
-  <qandadiv>
-   
-  
+   <qandadiv><title>Frequently Asked Questions</title>
   <qandaentry>
         <question>
           <para>How do I build ProActive from the distribution?</para>
@@ -25,17 +22,17 @@
           <literal>compile</literal> directory and use the script:</para>
          
          <itemizedlist>
-          <listitem> <para>on Windows: <literal>build.bat all</literal></para> </listitem>
-          <listitem> <para>on Unix systems: <literal>build all</literal></para> </listitem>
+          <listitem> <para>on Windows: <literal>build.bat compile.all</literal></para> </listitem>
+          <listitem> <para>on Unix systems: <literal>build compile.all</literal></para> </listitem>
          </itemizedlist>
          
-         <para> <literal>'all'</literal>  represents the target of the 
+         <para> <literal>'compile.all'</literal>  represents the target of the 
           build. It will compile all sources files and generate the documentation.
           To compile only the source files, for example if you 
           have modified the code, you should try</para>          
          <itemizedlist>
-          <listitem> <para>on Windows: <literal>build.bat compile</literal></para> </listitem>
-          <listitem> <para>on Unix systems: <literal>build compile</literal></para> </listitem>
+          <listitem> <para>on Windows: <literal>build.bat compile.core</literal></para> </listitem>
+          <listitem> <para>on Unix systems: <literal>build compile.core</literal></para> </listitem>
          </itemizedlist>
 
           <para>If you want only to compile only parts of ProActive, 
@@ -43,28 +40,67 @@
            As of version v3.2, the result is: </para>
           
           <screen>/home/bob/ProActive/compile/$ build
-           Buildfile: ./proactive.xml
-           
-           Main targets:
-           
-           all            Compile All and build the docs
-           clean          Remove all generated files
-           compile        build the class files
-           core           Compile the ProActive core classes
-           dist           Create the distribution binary
-           docs           Construct the javadoc and the manual
-           examples       Compile all the examples
-           ibis           Everything related to ProActive IBIS
-           ic2d           Compile the IC2D Tool
-           javadoc        Use javadoc to build information on the ProActive classes
-           manual         Build all the different manual version: html, pdf...
-           manualHtml     Make only the html files in the manual
-           manualPdf      Make only the pdf files in the manual
-           rewrite        Rewrite classes to enhance performance with ibis
-           runBench       Run benchmarks
-           runTests       Run all non regression tests
-           runTestsLocal  Run all non regression tests on the current host only
-           Default target: compile </screen>          
+Buildfile: build.xml
+
+Main targets:
+ProActive Documentation.docs               Construct the javadoc and the manual
+ProActive Documentation.javadoc.complete   Make complete Javadoc
+ProActive Documentation.javadoc.published  Make published Javadoc
+ProActive Documentation.manual             Build all the different manual version: html, pdf...
+ProActive Documentation.manualHtml         Make only the html files in the manual
+ProActive Documentation.manualPdf          Make only the pdf files in the manual
+ProActive Documentation.manualSingleHtml   Make only the big html file in the manual
+all                                        build the class files and the documentation
+clean                                      Remove all generated files
+compile                                    Deprecated, see compile.all
+compile.all                                Build class files (ProActive + Extensions + Extra + Examples + Utils + Tests)
+compile.benchmarks                         Compile the benchmarks
+compile.core                               Compile ProActive core classes
+compile.examples                           Compile all examples classes
+compile.extensions                         Compile ProActive Extensions classes
+compile.extra                              Compile ProActive Extensions classes
+compile.stubGenerator                      Compile Stub Generator Classes
+compile.tests                              Compile functional and unit tests classes
+compile.trywithcatch                       Compile ProActive Try With Catch classes
+compile.util                               Compile ProActive Utils classes
+copyright_format                           Update Copyright and Version in every text files and format them
+core                                       Deprecated, see compile.core
+deploy                                     Populate dist/ with all needed file
+deploy.all                                 Populate dist/ (with ProActive_examples.jar)
+deploy.examples                            Add examples.jar to the dist/ directory
+docs                                       Construct the javadoc and the manual
+examples                                   Deprecated, see compile.examples
+extensions                                 Deprecated, see compile.extensions
+extra                                      Deprecated, see compile.extra
+format                                     hibernate's eclipse-based formatter
+ibis                                       Everything related to ProActive IBIS
+ic2d.libClean                              Clean all needed libraries to IC2D
+ic2d.libCopy                               Copy all needed libraries to IC2D
+ic2dLib                                    Deprecated, see ic2d.libCopy
+ic2dLibClean                               Deprecated, see ic2d.libClean
+javadoc.complete                           Make complete Javadoc
+javadoc.published                          Make published Javadoc
+jdepend                                    JDepend report
+junit                                      Run all non regression tests on the current host only
+junit.clover                               Same as junit but with code coverage enabled
+junit.distributed                          Run all non regression tests
+junit.emma                                 Same as junit but with code coverage enabled
+manual                                     Build all the different manual version: html, pdf...
+manualHtml                                 Make only the html files in the manual
+manualPdf                                  Make only the pdf files in the manual
+manualSingleHtml                           Make only the big html file in the manual
+microTimer                                 Deprecated, see compile.microTimer
+proActiveJar                               Deprecated, see deploy
+release                                    Source and Binary Releases
+release.all                                Source and Binary Releases
+release.bin                                Binary Release: dist + docs
+release.src                                Source Release: sources + docs
+runPerformanceTest                         Run performance test on the current host.
+stubGenerator                              Deprecated, see compile.stubGenerator
+update_copyright_and_version               Update Copyright and Version in every text files
+uploadSchemas                              upload schemas on web site
+Default target: compile.all
+ </screen>          
 
           </answer>
       </qandaentry>
@@ -106,8 +142,7 @@
         </answer>
       </qandaentry>
 
-     </qandadiv>
-     <qandadiv>
+
        
        
        
@@ -151,7 +186,7 @@
          
          <screen>        org.objectweb.proactive.core.node.Node n = org.objectweb.proactive.core.n\
           ode.NodeFactory.getNode('//X/node1');
-          ProActive.turnActive(myObject, n);       </screen>
+          PAActiveObject.turnActive(myObject, n);       </screen>
          
          <para>You do not need to start any rmiregistry manually as they are
           started automatically as needed.</para>
@@ -263,18 +298,22 @@
           that represent the activity of the active object.</para>
          
          <para>The body has two representations. One is local and given by
-          the interface Body (see code in <xref role="javaFileSrc" linkend="Body.java"/>). This is the
+          the interface <literal>Body</literal> </para>
+          <programlisting xml:lang="java"><textobject><textdata fileref="Body.java"/></textobject></programlisting>
+          <para> This is the
           local view of the body an object can have when being in the same JVM
           as the body. For instance, the implementation of the activity of an
           object done through the method <literal>runActivity(Body)</literal>
           of the interface <literal>RunActive</literal> sees the body locally
           as it is instantiated by the body itself. The other representation,
-          given by the interface UniversalBody 
-          (see code in <xref role="javaFileSrc" linkend="core/body/UniversalBody.java"/>), is
-          remote. It represents the view of the body a remote object can have
+          given by the interface UniversalBody is remote. 
+          
+          It represents the view of the body a remote object can have
           and therefore the methods that can be invoked. That view is the one
           used by the proxy of a remote reference to the active object to send
           request to the body of the active object.</para>
+           <programlisting xml:lang="java"><textobject><textdata fileref="core/body/UniversalBody.java"/></textobject></programlisting>
+          
         </answer>
        </qandaentry>
        
@@ -292,10 +331,10 @@
           the fly. Suppose you have a class <literal>A</literal> and an
           instance <literal>a</literal> of this class. A way to turn the
           instance <literal>a</literal> into an active object is to use the
-          method <literal>ProActive.turnActive</literal>:</para>
+          method <literal>PAActiveObject.turnActive</literal>:</para>
          
          <screen>    A a = new A();
-          A activeA = (A) ProActive.turnActive(a);</screen>
+          A activeA = (A) PAActiveObject.turnActive(a);</screen>
          
          <para>In the code above, the variable <literal>a</literal> is a
           direct reference onto the instance of <literal>A</literal> stored
@@ -347,9 +386,6 @@
        </answer>
       </qandaentry>
 
-      </qandadiv>
-       <qandadiv>
-        
 
       <qandaentry>
         <question>
@@ -378,10 +414,10 @@
         at java.lang.ClassLoader.loadClass(ClassLoader.java:262)
         at java.lang.ClassLoader.loadClassInternal(ClassLoader.java:322)
         at org.objectweb.proactive.core.mop.MOP.&lt;clinit&gt;(MOP.java:88)
-        at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:836)
-        at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:830)
-        at org.objectweb.proactive.ProActive.newActive(ProActive.java:255)
-        at org.objectweb.proactive.ProActive.newActive(ProActive.java:180)
+        at org.objectweb.proactive.MOP.createStubObject(MOP.java:836)
+        at org.objectweb.proactive.MOP.createStubObject(MOP.java:830)
+        at org.objectweb.proactive.PAActiveObject.newActive(PAActiveObject.java:255)
+        at org.objectweb.proactive.PAActiveObject.newActive(PAActiveObject.java:180)
         at org.objectweb.proactive.examples.binarytree.TreeApplet.main(TreeApplet.java:103)</screen>
 
           <para>The problem can simply be fixed by adding asm<literal>.jar</literal> in the
@@ -415,10 +451,10 @@
          at org.objectweb.proactive.core.mop.MOP.createStubObject(MOP.java:443)
          at org.objectweb.proactive.core.mop.MOP.newInstance(MOP.java:165)
          at org.objectweb.proactive.core.mop.MOP.newInstance(MOP.java:137)
-         at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:590)
-         at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:585)
-         at org.objectweb.proactive.ProActive.newActive(ProActive.java:170)
-         at org.objectweb.proactive.ProActive.newActive(ProActive.java:137)
+         at org.objectweb.proactive.MOP.createStubObject(MOP.java:590)
+         at org.objectweb.proactive.MOP.createStubObject(MOP.java:585)
+         at org.objectweb.proactive.PAActiveObject.newActive(PAActiveObject.java:170)
+         at org.objectweb.proactive.PAActiveObject.newActive(PAActiveObject.java:137)
          at DiscoveryManager.main(DiscoveryManager.java:226)</screen>
         
         <para>The problem can simply be fixed by adding
@@ -532,18 +568,14 @@
        <answer>
         <para>Sometimes, the hosts files (<literal>/etc/hosts</literal> for UNIX)
          contains <literal>127.0.0.1</literal> along with the name of the machine.
-         This troubles ProActive, and JAVA network connexions in general. To circumvent
-         this issue , you should start your programs with the command line argument 
+         This is an issue for ProActive and JAVA network connections in general. To circumvent
+         the problem, start your programs with the command line argument 
          <screen>-Dsun.net.spi.nameservice.provider.1=dns,sun"</screen>
          This tells java not to look at the hosts file, but rather to ask
          the DNS for network information.</para>
        </answer>
       </qandaentry>
       
-     
-     </qandadiv>
-       <qandadiv>
-        
 
         <qandaentry>
          <question>
@@ -558,7 +590,7 @@
            public int a1;
            public static void main(String[] args) {
            A a = new A();
-           A activeA = (A) ProActive.turnActive(a);
+           A activeA = (A) PAActiveObject.turnActive(a);
            a.a1 = 2;       // set the attribute a1 of the instance pointed by a to 2
            activeA.a1 = 2; // !!! set the attribute a1 of the stub instance to 2
            }
@@ -587,7 +619,7 @@
         <qandaentry>
  <question>
   <para>How can I pass a reference on an active object or the
-   difference between this and ProActive.getStubOnThis()?</para>
+   difference between this and PAActiveObject.getStubOnThis()?</para>
  </question>
  
  <answer>
@@ -614,14 +646,14 @@
   
   <para>The solution, if you want to pass a link to the active object
    from the code of the reified object, is to use the method
-   <literal>ProActive.getStubOnThis()</literal>. This method will
+   <literal>PAActiveObject.getStubOnThis()</literal>. This method will
    return the reference to the stub associated to the active object
    whose thread is calling the method. The correct version of the
    previous class is:</para>
   
   <screen>  public class A {
    public A getRef() {
-   return ProActive.getStubOnThis(); // returns a reference on the stub
+   return PAActiveObject.getStubOnThis(); // returns a reference on the stub
    }
    }</screen>
  </answer>
@@ -637,9 +669,9 @@
   <para>To create an active object you invoke one of the methods
    <literal>newActive</literal> or <literal>turnActive</literal> of the
    <literal>ProActive</literal> class.
-   <literal>ProActive.newActive</literal> creates an active object
+   <literal>PAActiveObject.newActive</literal> creates an active object
    based on the instantiation of a new object,
-   <literal>ProActive.turnActive</literal> creates an active object
+   <literal>PAActiveObject.turnActive</literal> creates an active object
    based on an existing object. The different versions of the same
    <literal>newActive</literal> or <literal>turnActive</literal>
    methods allow you to specify where to create the active object
@@ -667,7 +699,7 @@
    A a;
    Object[] params = new Object[] { new Integer (26), 'astring' };
    try {
-   a = (A) ProActive.newActive(A.class.getName(), params);
+   a = (A) PAActiveObject.newActive(A.class.getName(), params);
    } catch (ActiveObjectCreationException e) {
    // creation of ActiveObject failed
    e.printStackTrace();
@@ -675,7 +707,7 @@
    // object based creation
    A a = new A(26, 'astring');
    try {
-   a = (A) ProActive.turnActive(a);
+   a = (A) PAActiveObject.turnActive(a);
    } catch (ActiveObjectCreationException e) {
    // creation of ActiveObject failed
    e.printStackTrace();
@@ -693,19 +725,19 @@
  <answer>
   <para>In <emphasis role="bold">ProActive</emphasis> there are two
    ways to create active objects. One way is to use
-   <literal>ProActive.newActive</literal> and is based on the
+   <literal>PAActiveObject.newActive</literal> and is based on the
    instantiation of a new object, the other is to use
-   <literal>ProActive.turnActive</literal> and is based on the use of
+   <literal>PAActiveObject.turnActive</literal> and is based on the use of
    an existing object.</para>
   
   <para>When using instantiation based creation, any argument passed
    to the constructor of the reified object through
-   <literal>ProActive.newActive</literal> is serialized and passed by
+   <literal>PAActiveObject.newActive</literal> is serialized and passed by
    copy to the object. This is because the model behind 
    <emphasis role="bold">ProActive</emphasis> is uniform whether the active
    object is instantiated locally or remotely. The parameters are
    therefore guaranteed to be passed by copy to the constructor. When
-   using <literal>ProActive.newActive</literal> you must make sure that
+   using <literal>PAActiveObject.newActive</literal> you must make sure that
    the arguments of the constructor are
    <literal>Serializable</literal>. On the other hand, the class used
    to create the active object <emphasis role="bold">does not need to
@@ -715,7 +747,7 @@
   <para>When using object based creation, you create the object that
    is going to be reified as an active object before hand. Therefore
    there is no serialization involved when you create the object. When
-   you invoke <literal>ProActive.turnActive</literal> on the object two
+   you invoke <literal>PAActiveObject.turnActive</literal> on the object two
    cases are possible. If you create the active object locally (on a
    local node), it will not be serialized. If you create the active
    object remotely (on a remote node), the reified object will be
@@ -802,7 +834,7 @@
          }
          }
          public static void main(String[] args) throws Exception {
-         A a = (A) ProActive.newActive(A.class.getName,null);
+         A a = (A) PAActiveObject.newActive(A.class.getName,null);
          System.out.println('Name = '+a.getName());
          }
          }</screen>
@@ -851,7 +883,7 @@
          // newActive(classname, constructor parameter (null = none), 
          //           node (null = local), active, MetaObjectFactory (null = d\
          efault)
-         A a = (A) ProActive.newActive(A.class.getName(), null, null, new LIFO\
+         A a = (A) PAActiveObject.newActive(A.class.getName(), null, null, new LIFO\
          Activity(), null);
          System.out.println('Name = '+a.getName());
          }
@@ -870,9 +902,9 @@
          marker interface allowing to change the body and/or the proxy of an
          active object. It was of no use most of the time and was made
          obsolete with the introduction of the MetaObjectFactory 
-         (see code in <xref role="javaFileSrc" linkend="core/body/MetaObjectFactory.java"/>)
          in the <emphasis role="bold">0.9.3</emphasis> release.</para>
-        
+<programlisting><textobject><textdata fileref="core/body/MetaObjectFactory.java"></textdata></textobject></programlisting>        
+
         <para>Up to <emphasis role="bold">ProActive 0.9.3</emphasis> the
          activity of an active object was given by a method
          <literal>live(Body)</literal> called by reflection of the reified
@@ -1048,11 +1080,7 @@
         
        </qandaentry>
        
-      
-     </qandadiv>
-     <qandadiv>
-       
-
+ 
        <qandaentry>
        <question>
         <para>What is the difference between passing parameters in
@@ -1092,9 +1120,7 @@
          the path to point to the correct schema.</para>
        </answer>
       </qandaentry>
-      
-
-    </qandadiv>
+      </qandadiv>
    </qandaset>
 
    </appendix>

@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -77,9 +75,10 @@ public class Util {
         return fserverclient;
     }
 
-    static public AOInterpreterPool createAOInterpreterPool(AOTaskPool taskpool,
-            FileServerClientImpl fserver, Node frameworknode, Node[] nodes, int times)
+    static public AOInterpreterPool createAOInterpreterPool(final AOTaskPool taskpool,
+            final FileServerClientImpl fserver, final Node frameworknode, final Node[] nodes, final int times)
             throws ProActiveException {
+
         if (logger.isDebugEnabled()) {
             logger.debug("Creating Active Object Interpreters in nodes.");
         }
@@ -97,8 +96,18 @@ public class Util {
             throw new ProActiveException(e);
         }
 
+        AOInterpreterPool interpool = createAOInterpreterPool(taskpool, fserver, frameworknode);
+        interpool.put(ai, times);
+
+        return interpool;
+    }
+
+    public static AOInterpreterPool createAOInterpreterPool(AOTaskPool taskpool,
+            FileServerClientImpl fserver, final Node frameworknode) throws ActiveObjectCreationException,
+            NodeException {
+
         AOInterpreterPool interpool = (AOInterpreterPool) PAActiveObject.newActive(AOInterpreterPool.class
-                .getName(), new Object[] { Arrays.asList(ai), new Integer(times) }, frameworknode);
+                .getName(), new Object[] { new Boolean(true) }, frameworknode);
 
         return interpool;
     }

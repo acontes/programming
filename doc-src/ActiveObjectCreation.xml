@@ -177,7 +177,7 @@
 				active thread is started.
 			</para>
 
-			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActive.txt"/></textobject></programlisting>
 		</section>
 
 
@@ -205,7 +205,7 @@
 				returns, the active objects have been created and their
 				threads have been started.
 			</para>
-			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActiveInParallel.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActiveInParallel.txt"/></textobject></programlisting>
 
 
 		</section>
@@ -228,7 +228,7 @@
 			Because the object already exists before turning it active,
 			there is no serialization involved when we create the
 			object. When we invoke
-			<literal>ProActive.turnActive</literal>
+			<literal>PAActiveObject.turnActive</literal>
 			on the object, two cases are possible. If we create the
 			active object locally (on a local node), it will not be
 			serialized. If we create the active object remotely (on a
@@ -420,13 +420,13 @@
 				contained in the virtual node.
 
 			</para>
-			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.onNode.Node.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActive.onNode.Node.txt"/></textobject></programlisting>
 
 			<para>
 				To deploy using the node's URL we just have the use the
 				URL instead of the Node as argument:
 			</para>
-			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.onNode.URL.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActive.onNode.URL.txt"/></textobject></programlisting>
 			<para>
 				The usage is similar for
 				<literal>PAActiveObject.turnActive(...)</literal>
@@ -609,11 +609,11 @@
 
 				<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/CustomInitAndRun.txt"/></textobject></programlisting>
 
-				<para>
 					<example><info><title>
 							Start, stop, suspend, restart a simulation
 							algorithm in runActivity method
-						</title></info>
+						</title></info>					
+						
 						
 						<para>
 							Bellow is the skeleton code for a class that
@@ -622,11 +622,12 @@
 							<literal>RunActive</literal>
 							to provide the necessary control.
 						</para>
+
+			
 						<para>
 							<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/SimulationWithActivity.txt"/></textobject></programlisting>
 						</para>
-					</example>
-				</para>
+			</example>
 
 			</section>
 
@@ -781,10 +782,11 @@
 				</literal>
 				is one convenience method that
 				<literal>ProActiveMetaObjectFactory</literal>
-				(see code in
-				<xref linkend="core/body/ProActiveMetaObjectFactory.java" role="javaFileSrc"/>
-				) provides to simplify the creation of factories as
-				singleton. More explanations can be found in the<!-- This url can only work in the html generated files: in pdf there's no ".." -->
+				 provides to simplify the creation of factories as
+				singleton. 
+				<programlisting><textobject><textdata fileref="core/body/ProActiveMetaObjectFactory.java"></textdata></textobject></programlisting>
+							
+				More explanations can be found in the<!-- This url can only work in the html generated files: in pdf there's no ".." -->
 				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html" os="html">
 					javadoc of that class
 				</link>
@@ -845,7 +847,7 @@
 			using a piece of code like this:
 		</para>
 
-	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt"/></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActive.txt"/></textobject></programlisting>
 
 		<para>
 			If the creation of the active instance of B is successful,
@@ -2148,6 +2150,84 @@
 		</section>
 
 	</section>
+	
+	
+	<section xml:id="EXCHANGE"><info><title>Data Exchange between Active Objects</title></info>
+		
+
+		<indexterm significance="preferred">
+			<primary>Exchange</primary>
+		</indexterm>
+
+	
+		<para>
+			Exchange operation offers a way to exchange potentially a very large amount of
+			data between two active objects, making an implicit synchronization. The Exchange
+			operator takes advantage of the serialization / de-serialization steps to exchange
+			data in an efficient way.
+		</para>
+		
+		<para>
+			This operator is *not* compatible with the ProActive Fault-Tolerance mechanism.
+		</para>
+		
+		<para>
+			To use it, you have to specify different variables :
+		</para>
+
+		<itemizedlist>
+      		<listitem>
+      			<para>a <literal>tag</literal> which is an unique identifier for the exchange
+      			operation in case of multiple exchanges	performed in parallel,</para>
+      		</listitem>
+
+      		<listitem>
+        		<para>a <literal>reference to the active object</literal> you want to exchange
+        		data with,</para>
+      		</listitem>
+
+      		<listitem>
+        		<para>a <literal>reference to the data source</literal>	you want to send to the
+        		other Active Object,</para>
+      		</listitem>
+
+      		<listitem>
+        		<para>a <literal>reference to the location</literal> where the received data
+        		will be put,</para>
+      		</listitem>
+      		
+      		<listitem>
+        		<para>the <literal>amount of data</literal> you want to exchange (must be
+        		symmetric).</para>
+      		</listitem>      		
+    	</itemizedlist>
+    	
+		<para>
+			To illustrate the usage of the <literal>Exchange</literal> operator, here is an
+			example with two active objects, AO1 and AO2 which are exchanging the half of a
+			local array to get a full one.
+		</para>
+		
+		<para>
+			<programlisting xml:lang="java">
+				<textobject><textdata fileref="code_snippets/exchangeOperator.txt"/></textobject>
+			</programlisting>
+		</para>
+		
+		<para>
+			Standard exchangeable data are array of integers, doubles and bytes. Also, you
+			can exchange your own complex double structure by implementing the
+			<literal>ExchangeablDouble</literal> interface. Here is an example of an
+			implementation:			
+		</para>
+		
+		<para>
+			<programlisting xml:lang="java">
+				<textobject><textdata fileref="code_snippets/exchangeableDouble.txt"/></textobject>
+			</programlisting>
+		</para>
+	</section>
+	
 			<!-- //TODO add immediateService maybe and expand or remove this section, it is present in other parts of the manual		
 	
 	<sect1 id="ActiveObjectCreation_html_events">

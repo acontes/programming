@@ -81,7 +81,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     private List<PathElement> applicationClasspath;
 
     /** Security Policy file */
-    private PathElement securityPolicy;
+    private PathElement javaSecurityPolicy;
 
     /** Log4j configuration file */
     private PathElement log4jProperties;
@@ -175,7 +175,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     public void setSecurityPolicy(PathElement pe) {
         if (pe != null) {
             GCMD_LOGGER.trace(" Set securityPolicy relpath to " + pe.getRelPath());
-            securityPolicy = pe;
+            javaSecurityPolicy = pe;
         }
     }
 
@@ -183,7 +183,9 @@ public class CommandBuilderProActive implements CommandBuilder {
         if (pe != null) {
             GCMD_LOGGER.trace(" Set applicationPolicy relpath to " + pe.getRelPath());
             applicationPolicy = pe;
+
         }
+
     }
 
     public void setRuntimePolicy(PathElement pe) {
@@ -275,6 +277,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     }
 
     public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma) {
+
         if ((proActivePath == null) && (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
             throw new IllegalStateException(
                 "ProActive installation path must be specified with the relpath attribute inside the proactive element (GCMA), or as tool in all hostInfo elements (GCMD). HostInfo=" +
@@ -295,6 +298,11 @@ public class CommandBuilderProActive implements CommandBuilder {
         for (String arg : jvmArgs) {
             command.append(arg);
             command.append(" ");
+        }
+
+        if (PAProperties.PA_TEST.isTrue()) {
+            command.append(PAProperties.PA_TEST.getCmdLine());
+            command.append("true ");
         }
 
         if (PAProperties.PA_CLASSLOADER.isTrue() ||
@@ -325,23 +333,31 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append(" ");
         }
 
-        // Security Policy
-        if (securityPolicy != null) {
-            command.append(PAProperties.SECURITY_POLICY.getCmdLine());
+        // Java Security Policy
+        if (javaSecurityPolicy != null) {
+            command.append(PAProperties.JAVA_SECURITY_POLICY.getCmdLine());
             command.append("\"");
-            command.append(securityPolicy.getFullPath(hostInfo, this));
+            command.append(javaSecurityPolicy.getFullPath(hostInfo, this));
             command.append("\"");
             command.append(" ");
         } else {
-            command.append(PAProperties.SECURITY_POLICY.getCmdLine());
+            command.append(PAProperties.JAVA_SECURITY_POLICY.getCmdLine());
             command.append("\"");
-            command.append(PAProperties.SECURITY_POLICY.getValue());
+            command.append(PAProperties.JAVA_SECURITY_POLICY.getValue());
             command.append("\"");
             command.append(" ");
         }
 
         if (hostInfo.getNetworkInterface() != null) {
             command.append(PAProperties.PA_NET_INTERFACE.getCmdLine() + hostInfo.getNetworkInterface());
+            command.append(" ");
+        }
+
+        if (runtimePolicy != null) {
+            command.append(PAProperties.PA_RUNTIME_SECURITY.getCmdLine());
+            command.append("\"");
+            command.append(runtimePolicy.getFullPath(hostInfo, this));
+            command.append("\"");
             command.append(" ");
         }
 

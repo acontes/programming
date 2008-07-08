@@ -31,6 +31,7 @@
 package functionalTests.component.descriptor.fractaladl;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,15 +42,17 @@ import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 import functionalTests.ComponentTest;
+import functionalTests.GCMFunctionalTest;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.component.I1Multicast;
 import functionalTests.component.Message;
 import functionalTests.component.PrimitiveComponentA;
@@ -103,17 +106,14 @@ public class Test extends ComponentTest {
                 messages = i1Multicast.processInputMessage(new Message(MESSAGE));
 
                 for (Message msg : messages) {
+                    System.out.println("Test.testOldDeployment()" + messages);
                     msg.append(MESSAGE);
                 }
                 break;
             }
         }
         StringBuffer resulting_msg = new StringBuffer();
-        Object futureValue = PAFuture.getFutureValue(messages);
-        Message m = (Message) ((Group<?>) futureValue).getGroupByType();
-
-        //        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
-        int nb_messages = append(resulting_msg, m);
+        int nb_messages = append(resulting_msg, messages);
 
         //        System.out.println("*** received " + nb_messages + "  : " +
         //            resulting_msg.toString());
@@ -123,21 +123,29 @@ public class Test extends ComponentTest {
             PrimitiveComponentA.MESSAGE + Test.MESSAGE;
 
         // there should be 4 messages with the current configuration
-        Assert.assertEquals(4, nb_messages);
+        Assert.assertEquals(2, nb_messages);
 
-        Assert.assertEquals(single_message + single_message + single_message + single_message, resulting_msg
-                .toString());
+        Assert.assertEquals(single_message + single_message, resulting_msg.toString());
+
     }
 
-    //    @org.junit.Test
-    public void testNewDeployment() throws Exception {
+    @org.junit.Test
+    public void testGCMDeployment() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map<String, Object> context = new HashMap<String, Object>();
 
-        String descriptorPath = Test.class.getResource(
-                "/functionalTests/component/descriptor/applicationDescriptor.xml").getPath();
+        URL descriptorPath = Test.class
+                .getResource("/functionalTests/component/descriptor/applicationDescriptor.xml");
 
-        newDeploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath));
+        VariableContractImpl vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(GCMFunctionalTest.VAR_OS, OperatingSystem.getOperatingSystem()
+                .name(), VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, new Integer(4)
+                .toString(), VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, new Integer(1)
+                .toString(), VariableContractType.DescriptorDefaultVariable);
+
+        newDeploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(descriptorPath, vContract);
 
         newDeploymentDescriptor.startDeployment();
 
@@ -160,11 +168,7 @@ public class Test extends ComponentTest {
             }
         }
         StringBuffer resulting_msg = new StringBuffer();
-        Object futureValue = PAFuture.getFutureValue(messages);
-        Message m = (Message) ((Group<?>) futureValue).getGroupByType();
-
-        //        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
-        int nb_messages = append(resulting_msg, m);
+        int nb_messages = append(resulting_msg, messages);
 
         //        System.out.println("*** received " + nb_messages + "  : " +
         //            resulting_msg.toString());
@@ -174,10 +178,9 @@ public class Test extends ComponentTest {
             PrimitiveComponentA.MESSAGE + Test.MESSAGE;
 
         // there should be 4 messages with the current configuration
-        Assert.assertEquals(4, nb_messages);
+        Assert.assertEquals(2, nb_messages);
 
-        Assert.assertEquals(single_message + single_message + single_message + single_message, resulting_msg
-                .toString());
+        Assert.assertEquals(single_message + single_message, resulting_msg.toString());
     }
 
     /*
@@ -196,15 +199,11 @@ public class Test extends ComponentTest {
             oldDeploymentDescriptor.killall(false);
     }
 
-    private int append(StringBuffer buffer, Message message) {
+    private int append(StringBuffer buffer, List<Message> messages) {
         int nb_messages = 0;
-        if (PAGroup.isGroup(message)) {
-            for (int i = 0; i < PAGroup.size(message); i++) {
-                nb_messages += append(buffer, (Message) PAGroup.get(message, i));
-            }
-        } else {
-            buffer.append(message.getMessage());
+        for (Message message : messages) {
             nb_messages++;
+            buffer.append(message);
         }
         return nb_messages;
     }

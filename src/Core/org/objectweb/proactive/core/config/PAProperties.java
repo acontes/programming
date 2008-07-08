@@ -60,7 +60,7 @@ public enum PAProperties {
     /**
      * Java security policy file location
      */
-    SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING),
+    JAVA_SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING),
 
     /**
      * If IPv6 is available on the operating system the default preference is to prefer an IPv4-mapped address over an IPv6 address
@@ -367,9 +367,16 @@ public enum PAProperties {
      * Master/Worker ping period in milliseconds
      *
      * The ping period is the default interval at which workers receive a ping message
-     * (to check if they're alive).
+     * (to check if they're alive). Default to ten seconds
      */
     PA_MASTERWORKER_PINGPERIOD("proactive.masterworker.pingperiod", PAPropertiesType.INTEGER),
+    /**
+     * Master/Worker compress tasks
+     *
+     * Parameter which decides wether tasks should be compressed when they are saved inside the task repository
+     * compressing increases CPU usage on the master side, but decrease memory usage, default to false
+     */
+    PA_MASTERWORKER_COMPRESSTASKS("proactive.masterworker.compresstasks", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
      *  SCHEDULER

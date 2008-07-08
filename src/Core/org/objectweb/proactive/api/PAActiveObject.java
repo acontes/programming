@@ -76,13 +76,15 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.ext.hpc.exchange.ExchangeManager;
+import org.objectweb.proactive.ext.hpc.exchange.ExchangeableDouble;
 
 
 /**
  * This class provides the main operations on active objects. It allows to create and terminate an
  * active object, and to get a reference on it. It also provides methods to register and lookup an
  * active object through the network. Finally, it allows to control the synchronicity related
- * behaviour of an active object such as automatic continuation or immediate services.
+ * behavior of an active object such as automatic continuation or immediate services.
  * 
  * @author The ProActive Team
  * @since ProActive 3.9 (December 2007)
@@ -153,7 +155,7 @@ public class PAActiveObject {
      * in the local JVM if the given node is null.
      * 
      * @param classname
-     *            the name of the class to instanciate as active
+     *            the name of the class to instantiate as active
      * @param constructorParameters
      *            the parameters of the constructor.
      * @param node
@@ -173,7 +175,7 @@ public class PAActiveObject {
      * Creates a new ActiveObject based on classname attached to a default node in the local JVM.
      * 
      * @param classname
-     *            the name of the class to instanciate as active
+     *            the name of the class to instantiate as active
      * @param genericParameters
      *            parameterizing types (of class
      * @param classname)
@@ -196,7 +198,7 @@ public class PAActiveObject {
      * Creates a new ActiveObject based on classname attached to the node of the given URL.
      * 
      * @param classname
-     *            the name of the class to instanciate as active
+     *            the name of the class to instantiate as active
      * @param genericParameters
      *            parameterizing types (of class
      * @param classname)
@@ -918,7 +920,7 @@ public class PAActiveObject {
     public static String[] listActive(String url) throws java.io.IOException {
         String[] activeNames = null;
         try {
-            URI[] uris = RemoteObjectHelper.list(URI.create(url));
+            URI[] uris = PARemoteObject.list(URI.create(url));
             activeNames = new String[uris.length];
             for (int i = 0; i < uris.length; i++) {
                 activeNames[i] = uris[i].toString();
@@ -1157,7 +1159,7 @@ public class PAActiveObject {
      * active thread is calling this method.
      * 
      * @return a Stub-Proxy couple pointing to the local body, or null if the calling thread is not
-     * an active thread.
+     *         an active thread.
      * @see PAActiveObject#getBodyOnThis
      */
     public static StubObject getStubOnThis() {
@@ -1270,6 +1272,69 @@ public class PAActiveObject {
      */
     public static Body getBodyOnThis() {
         return LocalBodyStore.getInstance().getContext().getBody();
+    }
+
+    /**
+     * Performs an exchange on a byte array between two Active Objects.
+     * 
+     * @param tag
+     * @param destAO
+     * @param srcArray
+     * @param srcOffset
+     * @param dstArray
+     * @param dstOffset
+     * @param len
+     */
+    public static void exchange(String tag, Object destAO, byte[] srcArray, int srcOffset, byte[] dstArray,
+            int dstOffset, int len) {
+        ExchangeManager.getExchangeManager().exchange(tag.hashCode(), destAO, srcArray, srcOffset, dstArray,
+                dstOffset, len);
+    }
+
+    /**
+     * Performs an exchange on a double array between two Active Objects.
+     * 
+     * @param tag
+     * @param destAO
+     * @param srcArray
+     * @param srcOffset
+     * @param dstArray
+     * @param dstOffset
+     * @param len
+     */
+    public static void exchange(String tag, Object destAO, double[] srcArray, int srcOffset,
+            double[] dstArray, int dstOffset, int len) {
+        ExchangeManager.getExchangeManager().exchange(tag.hashCode(), destAO, srcArray, srcOffset, dstArray,
+                dstOffset, len);
+    }
+
+    /**
+     * Performs an exchange on an integer array between two Active Objects.
+     * 
+     * @param tag
+     * @param destAO
+     * @param srcArray
+     * @param srcOffset
+     * @param dstArray
+     * @param dstOffset
+     * @param len
+     */
+    public static void exchange(String tag, Object destAO, int[] srcArray, int srcOffset, int[] dstArray,
+            int dstOffset, int len) {
+        ExchangeManager.getExchangeManager().exchange(tag.hashCode(), destAO, srcArray, srcOffset, dstArray,
+                dstOffset, len);
+    }
+
+    /**
+     * Performs an exchange on a complex structure of doubles between two Active Objects.
+     * 
+     * @param tag
+     * @param destAO
+     * @param src
+     * @param dst
+     */
+    public static void exchange(String tag, Object destAO, ExchangeableDouble src, ExchangeableDouble dst) {
+        ExchangeManager.getExchangeManager().exchange(tag.hashCode(), destAO, src, dst);
     }
 
     // -------------------------------------------------------------------------------------------

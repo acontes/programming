@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
@@ -73,7 +72,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team
  */
 public class ComponentRequestImpl extends RequestImpl implements ComponentRequest, Serializable {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
 
     //private int shortcutCounter = 0;
     //private Shortcut shortcut;
@@ -103,109 +102,79 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
         Throwable exception = null;
 
         if (logger.isDebugEnabled()) {
-            try {
-                logger.debug("invocation on method [" +
-                    methodCall.getName() +
-                    "] of interface [" +
-                    methodCall.getComponentMetadata().getComponentInterfaceName() +
-                    "] on component : [" +
-                    Fractive.getComponentParametersController(
-                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                            .getComponentParameters().getName() + "]");
-            } catch (NoSuchInterfaceException e) {
-                e.printStackTrace();
-            }
+            logger.debug("invocation on method [" + methodCall.getName() + "] of interface [" +
+                methodCall.getComponentMetadata().getComponentInterfaceName() + "] on component : [" +
+                ((ComponentBody) targetBody).getProActiveComponentImpl().getComponentParameters().getName() +
+                "]");
+
         }
 
         try {
+            if (((ComponentBody) targetBody).getProActiveComponentImpl() == null) {
+                throw new ServeException(
+                    "trying to execute a component method on an object that is not a component");
+            }
+
+            Interface targetItf = (Interface) ((ComponentBody) targetBody).getProActiveComponentImpl()
+                    .getFcInterface(methodCall.getComponentMetadata().getComponentInterfaceName());
+            ProActiveInterfaceType itfType = (ProActiveInterfaceType) targetItf.getFcItfType();
+
             if (isControllerRequest()) {
-                //result = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
-                //      .getControllerRequestHandler().handleRequest(this);
-                //New implementation for serving non-functional requests
-                if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
-                    ProActiveInterface itf = (ProActiveInterface) ((ComponentBody) targetBody)
-                            .getProActiveComponentImpl().getFcInterface(
-                                    methodCall.getComponentMetadata().getComponentInterfaceName());
-                    ProActiveInterfaceType itfType = (ProActiveInterfaceType) itf.getFcItfType();
+                // Serving non-functional request
+                if (itfType.isFcGathercastItf() &&
+                    (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
+                            new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
+                    // delegate to gather controller, except for self requests
+                    result = Fractive.getGathercastController(
+                            ((ComponentBody) targetBody).getProActiveComponentImpl())
+                            .handleRequestOnGatherItf(this);
+                } else if (methodCall.getComponentMetadata().getComponentInterfaceName().equals(
+                        Constants.ATTRIBUTE_CONTROLLER)) {
+                    // calls on the attribute controller have to be executed on the reified object
+                    result = methodCall.execute(targetBody.getReifiedObject());
+                } else {
+                    result = methodCall.execute(targetItf);
+                }
+            } else {
+                // Serving functional request
+                interceptBeforeInvocation(targetBody);
 
-                    if (itfType.isFcGathercastItf() &&
-                        (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
-                                new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
-                        // delegate to gather controller, except for self requests
-                        result = Fractive.getGathercastController(
-                                ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                                .handleRequestOnGatherItf(this);
-                    }
+                String hierarchical_type = ((ComponentBody) targetBody).getProActiveComponentImpl()
+                        .getComponentParameters().getHierarchicalType();
 
-                    if (methodCall.getComponentMetadata().getComponentInterfaceName().equals(
-                            Constants.ATTRIBUTE_CONTROLLER)) { /*calls on the attribute controller have to be executed on the reified object*/
-                        //AttributeController.class.isAssignableFrom(getTargetClass())
-                        result = methodCall.execute(targetBody.getReifiedObject());
-
-                    } else {
-                        result = methodCall.execute((ProActiveInterface) (((ComponentBodyImpl) targetBody)
-                                .getProActiveComponentImpl()).getFcInterface(methodCall
-                                .getComponentMetadata().getComponentInterfaceName()));
+                // gather: interception managed with non-transformed incoming requests
+                if (itfType.isFcGathercastItf() &&
+                    (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
+                            new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
+                    // delegate to gather controller, except for self requests
+                    result = Fractive.getGathercastController(
+                            ((ComponentBody) targetBody).getProActiveComponentImpl())
+                            .handleRequestOnGatherItf(this);
+                } else if (hierarchical_type.equals(Constants.COMPOSITE)) {
+                    // forward to functional interface whose name is given as a parameter in the method call
+                    try {
+                        if (getShortcut() != null) {
+                            // TODO_M allow stopping shortcut here
+                        }
+                        // executing on connected server interface
+                        result = methodCall.execute(targetItf);
+                    } catch (IllegalArgumentException e) {
+                        throw new ServeException("could not reify method call : ", e);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        throw new ServeException("could not reify method call : ", e);
                     }
                 } else {
-                    throw new ServeException(
-                        "trying to execute a component method on an object that is not a component");
-                }
-
-            } else {//The request was emmited on a functional interface
-                if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
-                    interceptBeforeInvocation(targetBody);
-
-                    String hierarchical_type = Fractive.getComponentParametersController(
-                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                            .getComponentParameters().getHierarchicalType();
-
-                    // gather: interception managed with non-transformed incoming requests
-                    ProActiveInterface itf = (ProActiveInterface) ((ComponentBody) targetBody)
-                            .getProActiveComponentImpl().getFcInterface(
-                                    methodCall.getComponentMetadata().getComponentInterfaceName());
-                    ProActiveInterfaceType itfType = (ProActiveInterfaceType) itf.getFcItfType();
-                    if (itfType.isFcGathercastItf() &&
-                        (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
-                                new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
-                        // delegate to gather controller, except for self requests
-                        result = Fractive.getGathercastController(
-                                ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                                .handleRequestOnGatherItf(this);
-                    }
-                    // if the component is a composite , forward to functional interface 
-                    else if (hierarchical_type.equals(Constants.COMPOSITE)) {
-                        //						// forward to functional interface whose name is given as a parameter in the method call
-                        try {
-                            if (getShortcut() != null) {
-                                // TODO_M allow stopping shortcut here
-                            }
-                            // executing on connected server interface
-                            result = methodCall.execute((((ComponentBodyImpl) targetBody)
-                                    .getProActiveComponentImpl()).getFcInterface(methodCall
-                                    .getComponentMetadata().getComponentInterfaceName()));
-                        } catch (IllegalArgumentException e) {
-                            throw new ServeException("could not reify method call : ", e);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                            throw new ServeException("could not reify method call : ", e);
+                    // the component is a primitive directly execute the method on the active object
+                    if (logger.isDebugEnabled()) {
+                        if (getShortcutLength() > 0) {
+                            logger.debug("request has crossed " + (getShortcutLength() - 1) +
+                                " membranes before reaching a primitive component");
                         }
-                    } else {
-                        // the component is a primitive
-                        // directly execute the method on the active object
-                        if (logger.isDebugEnabled()) {
-                            if (getShortcutLength() > 0) {
-                                logger.debug("request has crossed " + (getShortcutLength() - 1) +
-                                    " membranes before reaching a primitive component");
-                            }
-                        }
-                        result = methodCall.execute(targetBody.getReifiedObject());
                     }
-                    interceptAfterInvocation(targetBody);
-                } else {
-                    throw new ServeException(
-                        "trying to execute a component method on an object that is not a component");
+                    result = methodCall.execute(targetBody.getReifiedObject());
                 }
+                interceptAfterInvocation(targetBody);
             }
         } catch (NoSuchInterfaceException nsie) {
             throw new ServeException("cannot serve request : problem accessing a component controller", nsie);
@@ -214,13 +183,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                 e);
         } catch (java.lang.reflect.InvocationTargetException e) {
             exception = e.getTargetException();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Serve method " + methodCall.getReifiedMethod().getName() + " failed: ", e);
-            } else {
-                logger.info("Serve method " + methodCall.getReifiedMethod().getName() +
-                    " failed; throws exception with the following message:" + e.getMessage() +
-                    " Activate debug logger level for more information.");
-            }
+            logger.debug("Serve method " + methodCall.getReifiedMethod().getName() + " failed: ", e);
 
             if (isOneWay) {
                 throw new ServeException("serve method " + methodCall.getReifiedMethod().toString() +
@@ -234,7 +197,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     // intercept and delegate for preprocessing from the inputInterceptors 
     private void interceptBeforeInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            List<Interface> inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
+            List<Interface> inputInterceptors = ((ComponentBody) targetBody).getProActiveComponentImpl()
                     .getInputInterceptors();
             Iterator<Interface> it = inputInterceptors.iterator();
             while (it.hasNext()) {
@@ -251,8 +214,8 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     // intercept and delegate for postprocessing from the inputInterceptors 
     private void interceptAfterInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
-                List<Interface> interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
+            if (((ComponentBody) targetBody).getProActiveComponentImpl() != null) {
+                List<Interface> interceptors = ((ComponentBody) targetBody).getProActiveComponentImpl()
                         .getInputInterceptors();
 
                 // use inputInterceptors in reverse order after invocation

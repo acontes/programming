@@ -1,17 +1,51 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package functionalTests.ft;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
@@ -51,12 +85,18 @@ public class AbstractFTTezt extends FunctionalTest {
      * @param gcmApplicationFile the deployment file  
      * @return the result of the computation
      */
-    protected int deployAndStartAgents(String gcmApplicationFile) throws ProActiveException {
+    protected int deployAndStartAgents(URL gcmApplicationFile) throws ProActiveException {
         GCMApplication gcma;
         GCMVirtualNode vnode;
 
         //	create nodes
-        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile));
+        VariableContractImpl vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, "4",
+                VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, "1",
+                VariableContractType.DescriptorDefaultVariable);
+
+        gcma = PAGCMDeployment.loadApplicationDescriptor(gcmApplicationFile, vContract);
         gcma.startDeployment();
         vnode = gcma.getVirtualNode("Workers");
         Node[] nodes = new Node[2];

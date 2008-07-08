@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.core.IsClearingError;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 
@@ -44,8 +45,9 @@ public interface MasterIntern {
     * Internal version of the solve method
     * @param tasks tasks to compute
     */
+    //@snippet-start masterworker_solve
     public void solveIntern(final String originatorName,
-            final List<? extends Task<? extends Serializable>> tasks);
+            final List<? extends Task<? extends Serializable>> tasks) throws IsClearingError;
 
     //@snippet-end masterworker_solve
     //@snippet-start masterworker_collection
@@ -56,7 +58,7 @@ public interface MasterIntern {
      * @param originatorName name of the worker initiating the call
      * @throws org.objectweb.proactive.extensions.masterworker.TaskException if a task threw an Exception
      */
-    List<ResultIntern<Serializable>> waitAllResults(final String originatorName) throws TaskException;
+    List<Serializable> waitAllResults(final String originatorName) throws TaskException, IsClearingError;
 
     /**
      * Wait for the first result available <br>
@@ -66,7 +68,18 @@ public interface MasterIntern {
      * @return an object containing the result
      * @throws TaskException if the task threw an Exception
      */
-    ResultIntern<Serializable> waitOneResult(final String originatorName) throws TaskException;
+    Serializable waitOneResult(final String originatorName) throws TaskException, IsClearingError;
+
+    /**
+    * Wait for at least one result is available <br>
+    * If there are more results availables at the time the request is executed, then every currently available results are returned
+    * Note that in SubmittedOrder mode, the method will block until the next result in submission order is available and will return
+    * as many successive results as possible<br>
+    * @param originatorName name of the worker initiating the call
+    * @return a collection of objects containing the results
+    * @throws TaskException if the task threw an Exception
+    */
+    List<Serializable> waitSomeResults(final String originatorName) throws TaskException;
 
     /**
      * Wait for a number of results<br>
@@ -77,21 +90,31 @@ public interface MasterIntern {
      * @return a collection of objects containing the results
      * @throws TaskException if the task threw an Exception
      */
-    List<ResultIntern<Serializable>> waitKResults(final String originatorName, int k) throws TaskException;
+    List<Serializable> waitKResults(final String originatorName, int k) throws TaskException, IsClearingError;
+
+    //@snippet-end masterworker_collection
 
     /**
      * Tells if the master is completely empty (i.e. has no result to provide and no tasks submitted)
-     * @param originatorName name of the worker initiating the call
+     * @param originatorName name of the worker initiating the call (null, if it's the main client)
      * @return the answer
      */
-    boolean isEmpty(final String originatorName);
+    boolean isEmpty(final String originatorName) throws IsClearingError;
+
+    /**
+     * Tells how many tasks have been submitted to the master
+     * @param originatorName name of the worker initiating the call (null, if it's the main client)
+     * @return number of tasks submitted
+     * @throws org.objectweb.proactive.extensions.masterworker.core.IsClearingError
+     */
+    int countPending(final String originatorName) throws IsClearingError;
 
     /**
      * Returns the number of available results <br/>
-     * @param originatorName name of the worker initiating the call
+     * @param originatorName name of the worker initiating the call (null, if it's the main client)
      * @return the answer
      */
-    int countAvailableResults(final String originatorName);
+    int countAvailableResults(final String originatorName) throws IsClearingError;
 
     /**
      * Sets the current ordering mode <br/>
@@ -99,5 +122,7 @@ public interface MasterIntern {
      * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
      * @param mode the new mode for result gathering
      */
-    void setResultReceptionOrder(final String originatorName, final SubMaster.OrderingMode mode);
+    void setResultReceptionOrder(final String originatorName, final SubMaster.OrderingMode mode)
+            throws IsClearingError;
+
 }

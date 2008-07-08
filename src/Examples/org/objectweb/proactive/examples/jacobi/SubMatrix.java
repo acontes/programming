@@ -490,7 +490,7 @@ public class SubMatrix implements Serializable {
      */
     public void compute() {
         this.buildNeighborhood();
-        PASPMD.barrier("InitDone");
+        PASPMD.totalBarrier("InitDone");
 
         this.asyncRefToMe.loop();
     }
@@ -503,8 +503,10 @@ public class SubMatrix implements Serializable {
 
         // compute the internal values
         this.internalCompute();
+        //@snippet-start spmd_neighbour_barrier
         // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop, this.neighbors);
+        PASPMD.neighbourBarrier("SynchronizationWithNeighbors" + this.iterationsToStop, this.neighbors);
+        //@snippet-end spmd_neighbour_barrier
         // compute the border values
         this.asyncRefToMe.borderCompute();
         // send the borders to neighbors
@@ -533,7 +535,7 @@ public class SubMatrix implements Serializable {
     public void stop() {
         this.iterationsToStop = 0;
         logger.debug("[JACOBI] [" + this.name + "] Stop Message Received, waiting for others.");
-        PASPMD.barrier("stop");
+        PASPMD.totalBarrier("stop");
         if ((north != null) && (east != null) && (west != null) && (south != null)) {
             PrintWriter pw = null;
             try {

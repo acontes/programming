@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.future;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -43,8 +44,10 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
+import org.objectweb.proactive.core.group.DispatchMonitor;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -56,6 +59,8 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
@@ -71,6 +76,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
+    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -112,9 +118,19 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private transient ExceptionMaskLevel exceptionLevel;
 
     /**
+     * The proxy that created this future. Set as transient to avoid
+     * adding remote references when sending the future. Migration is
+     * thus not supported.
+     */
+    private transient AbstractProxy originatingProxy;
+
+    /**
      * The methods to call when this future is updated
      */
     private transient LocalFutureUpdateCallbacks callbacks;
+
+    // returns future update info used during dynamic dispatch for groups
+    private transient DispatchMonitor dispatchMonitor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -191,6 +207,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     public synchronized void receiveReply(MethodCallResult obj) {
         if (isAvailable()) {
             throw new IllegalStateException("FutureProxy receives a reply and this target field is not null");
+        }
+        if (dispatchMonitor != null) {
+            dispatchMonitor.updatedResult(originatingProxy);
         }
         target = obj;
         ExceptionHandler.addResult(this);
@@ -299,7 +318,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             try {
                 this.wait(time.getRemainingTimeout());
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.debug(e);
             }
         }
 
@@ -355,6 +374,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     public void setSenderID(UniqueID i) {
         senderID = i;
+    }
+
+    public void setOriginatingProxy(AbstractProxy p) {
+        originatingProxy = p;
     }
 
     //
@@ -548,5 +571,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
         return res;
+    }
+
+    public synchronized void setDispatchMonitor(DispatchMonitor dispatchMonitor) {
+        this.dispatchMonitor = dispatchMonitor;
     }
 }

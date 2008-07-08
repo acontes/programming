@@ -1,3 +1,4 @@
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  --> 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0"
 	xml:id="userguide">
 	<info>
@@ -344,7 +345,7 @@
 				debugging purposes.
 			</para>
 		</section>
-		<section xml:id="adl_usage">
+		<section xml:id="adl_usage_userguide">
 			<info>
 				<title>Usage</title>
 			</info>
@@ -394,7 +395,7 @@
 		<para></para>
 	</section>
 
-	<section>
+	<section xml:id="collective-interfaces">
 		<info>
 			<title>Collective interfaces</title>
 		</info>
@@ -673,6 +674,17 @@
 								server interfaces.
 								<programlisting xml:lang="java">
 									ParamDispatchMode.ROUND_ROBIN
+								</programlisting>
+							</para>
+						</listitem>
+
+						<listitem>
+							<para>
+								RANDOM, which distributes each element
+								of the list parameter in a random manner
+								to the connected server interfaces.
+								<programlisting xml:lang="java">
+									ParamDispatchMode.RANDOM
 								</programlisting>
 							</para>
 						</listitem>
@@ -1309,9 +1321,7 @@
 					an annotation on the method subject to the timeout,
 					the value of the timeout is specified in
 					milliseconds:
-					<programlisting xml:lang="java">
-						@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(timeout=20)
-					</programlisting>
+					<programlisting xml:lang="java">@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(timeout=20)</programlisting>
 				</para>
 
 				<para>
@@ -1341,9 +1351,7 @@
 					Thus, this specific feature can be used by the same
 					annotation as for the timeout but with a different
 					attribute:
-					<programlisting xml:lang="java">
-						@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(waitForAll=false)
-					</programlisting>
+					<programlisting xml:lang="java">@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(waitForAll=false)</programlisting>
 					Therefore, the waitForAll attribute accepts boolean
 					values and has for default value "true" (same
 					behavior as if the annotation is not specified).
@@ -1403,8 +1411,7 @@
 				<listitem>
 					<para>
 						a utility class providing static methods to
-						create collective interfaces and retrieve
-						references to ComponentParametersController
+						create collective interfaces
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -1636,12 +1643,8 @@
 					org.objectweb.proactive.core.component.controller.PriorityController
 				</literal>
 				, has to be used:
-				<programlisting xml:lang="java">
-					<textobject>
-						<textdata
-							fileref="core/component/controller/PriorityController.Java" />
-					</textobject>
-				</programlisting>
+				<programlisting xml:lang="java"><textobject><textdata
+					fileref="core/component/controller/PriorityController.java" /></textobject></programlisting>
 			</para>
 		</section>
 
@@ -1682,7 +1685,7 @@
 		</info>
 
 		<section
-			xml:id="configuration_html_Controllers_and_interceptors_new">
+			xml:id="configuration_html_Controllers_and_interceptors_n">
 			<info>
 				<title>Controllers and interceptors</title>
 			</info>
@@ -2212,7 +2215,7 @@
 					 </para>
 					
 				 <para>			 
-				 	<figure id="figNaiveSolution">
+				 	<figure xml:id="figNaiveSolution">
 						<info>
 							<title>
 								Example: architecture of a naive solution for secure communications
@@ -2236,7 +2239,7 @@
 						</info>
 						<para>
 							
-							<figure id="figStructure">
+							<figure xml:id="figStructure">
 						<info>
 							<title>
 								Structure for the membrane of Fractal/GCM components
@@ -2359,7 +2362,7 @@
 							</info>
 							<para>	
 								
-							 <figure id="codeAPI1">
+							 <figure xml:id="codeAPI1">
 								<info>
 									<title>
 										The primitives for managing the membrane.
@@ -2451,7 +2454,7 @@
 								  </title>
 								</info>
 								
-							<figure id="codeAPI2">
+							<figure xml:id="codeAPI2">
 								<info>
 									<title>
 										Higher level API

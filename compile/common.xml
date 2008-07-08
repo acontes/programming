@@ -77,10 +77,6 @@
 	<property name="ic2d-plugin.dir" value="${base.dir}/ic2d-plugins-src" />
 	<property name="plugin.lib" value="org.objectweb.proactive.ic2d.lib" />
 	
-	<!-- Scheduler/Infrastructure Manager properties -->
-	<property name="scheduler-plugin.dir" value="${base.dir}/scheduler-plugins-src" />
-	<property name="resourcemanager-plugin.dir" value="${base.dir}/resource-manager-plugin-src" />
-	
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
 	
 	<!-- junit properties -->
@@ -113,6 +109,7 @@
 	<path id="deploy.classpath">
 		<fileset dir="${deploy.lib.dir}">
 			<include name="**/*.jar"/>
+			<exclude name="**/ProActive_tests.jar"/>
 		</fileset>
 	</path>
 	

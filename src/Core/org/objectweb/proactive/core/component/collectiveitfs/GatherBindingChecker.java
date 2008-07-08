@@ -110,7 +110,7 @@ public class GatherBindingChecker implements Serializable {
             // 3. check parameters types
             Type[] serverSideParametersTypes = serverSideMethod.getGenericParameterTypes();
 
-            serverSideParametersTypesLoop: for (int i = 0; i < serverSideParametersTypes.length; i++) {
+            for (int i = 0; i < serverSideParametersTypes.length; i++) {
                 ParameterizedType pServerParameterType = null;
                 if (!(serverSideParametersTypes[i] instanceof ParameterizedType)) {
                     // need parameterized types for server itf parameters
@@ -143,6 +143,9 @@ public class GatherBindingChecker implements Serializable {
                     }
                 } else {
                     pServerParameterType = (ParameterizedType) serverSideParametersTypes[i];
+                }
+                if (pServerParameterType == null) {
+                    continue serverSideMethodsLoop;
                 }
                 if (!List.class.isAssignableFrom((Class<?>) pServerParameterType.getRawType())) {
                     continue serverSideMethodsLoop;

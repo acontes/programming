@@ -32,7 +32,7 @@
     mean ProActive class, NodeFactory class, RuntimeFactory class (static
     block in all that classes).</para>
 
-    <para>For instance calling <emphasis role="bold">ProActive.newActive or
+    <para>For instance calling <emphasis role="bold">PAActiveObject.newActive or
     NodeFactory.getNode</emphasis> .... loads that file. This only occurs once
     inside a jvm.</para>
 
@@ -447,6 +447,7 @@
     <para>A configuration file could have following structure:</para>
 
     <example><info><title>A configuration file example</title></info>
+    
      
     <screen>&lt;ProActiveUserProperties&gt;
  &lt;properties&gt;
@@ -460,7 +461,6 @@
  &lt;/properties&gt;
 &lt;/ProActiveUserProperties&gt;</screen>
 </example>
-
     <note><para>
       In order to have ProActive parse correctly the document, the following are mandatory:
       <itemizedlist>

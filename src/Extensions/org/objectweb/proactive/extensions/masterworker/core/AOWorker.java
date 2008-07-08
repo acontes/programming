@@ -66,6 +66,8 @@ public class AOWorker implements InitActive, Serializable, Worker {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
     protected static final boolean debug = logger.isDebugEnabled();
 
+    protected boolean suspended = false;
+
     /** stub on this active object */
     protected AOWorker stubOnThis;
 
@@ -134,7 +136,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
     public void initActivity(final Body body) {
         stubOnThis = (AOWorker) PAActiveObject.getStubOnThis();
         PAActiveObject.setImmediateService("heartBeat");
-        PAActiveObject.setImmediateService("terminate");
+        //PAActiveObject.setImmediateService("terminate");
 
         // Initial Task
         stubOnThis.getTaskAndSchedule();
@@ -142,20 +144,59 @@ public class AOWorker implements InitActive, Serializable, Worker {
 
     /** gets the initial task to solve */
     @SuppressWarnings("unchecked")
-    public void getTasks() {
+    protected void getTasks() {
         if (debug) {
             logger.debug(name + " asks a new task...");
         }
-
-        // InitialTask
-        Queue<TaskIntern<Serializable>> newTasks = (Queue<TaskIntern<Serializable>>) PAFuture
-                .getFutureValue(provider.getTasks((Worker) stubOnThis, name, true));
-
-        if (debug) {
-            logger.debug(name + " received " + newTasks.size() + " tasks.");
+        Queue<TaskIntern<Serializable>> newTasks;
+        if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
+            if (debug) {
+                logger.debug(name + " requests a task flooding...");
+            }
+            newTasks = provider.getTasks(stubOnThis, name, true);
+        } else {
+            newTasks = provider.getTasks(stubOnThis, name, false);
         }
-        pendingTasks.addAll(newTasks);
+        pendingTasksFutures.offer(newTasks);
 
+    }
+
+    /** gets the initial task to solve */
+    @SuppressWarnings("unchecked")
+    protected void getTasksWithResult(ResultInternImpl result) {
+        if (debug) {
+            logger.debug(name + " sends the result of task " + result.getId() + " and asks a new task...");
+        }
+        Queue<TaskIntern<Serializable>> newTasks;
+        if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
+            if (debug) {
+                logger.debug(name + " requests a task flooding...");
+            }
+            newTasks = provider.sendResultAndGetTasks(result, name, true);
+        } else {
+
+            newTasks = provider.sendResultAndGetTasks(result, name, false);
+        }
+        pendingTasksFutures.offer(newTasks);
+
+    }
+
+    public void suspendWork() {
+        if (debug) {
+            logger.debug(name + " suspended");
+        }
+
+        suspended = true;
+    }
+
+    public void resumeWork() {
+        if (debug) {
+            logger.debug(name + " resumed work");
+        }
+        if (suspended) {
+            suspended = false;
+            stubOnThis.scheduleTask();
+        }
     }
 
     /** gets the initial task to solve */
@@ -176,32 +217,31 @@ public class AOWorker implements InitActive, Serializable, Worker {
     public void handleTask(final TaskIntern<Serializable> task) {
 
         // if the task is a divisible one, we spawn a new specialized worker for it
-
         if (task.getTask() instanceof DivisibleTask) {
+            String newWorkerName = name + "_" + subWorkerNameCounter;
+            subWorkerNameCounter = (subWorkerNameCounter + 1) % (Long.MAX_VALUE - 1);
+            AODivisibleTaskWorker spawnedWorker = null;
             try {
-                Worker spawnedWorker = (Worker) PAActiveObject.newActive(AODivisibleTaskWorker.class
-                        .getName(), new Object[] { name + "_" + subWorkerNameCounter, provider,
-                        initialMemory, name, task });
-                subWorkerNameCounter = (subWorkerNameCounter + 1) % (Long.MAX_VALUE - 1);
+                spawnedWorker = (AODivisibleTaskWorker) PAActiveObject
+                        .newActive(AODivisibleTaskWorker.class.getName(), new Object[] { newWorkerName,
+                                provider, stubOnThis, initialMemory, task });
+
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {
                 e.printStackTrace();
             }
-            // We send the result back to the master
-            Queue<TaskIntern<Serializable>> newTasks;
-            if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
-                if (debug) {
-                    logger.debug(name + " requests a task flooding...");
-                }
-                newTasks = provider.getTasks(stubOnThis, name, true);
-            } else {
-                newTasks = provider.getTasks(stubOnThis, name, false);
-            }
-            pendingTasksFutures.offer(newTasks);
+            // We tell the master that we forwarded the task to another worker
+            PAFuture.waitFor(provider.forwardedTask(task.getId(), name, newWorkerName));
+            // We tell the worker that it's now known by the master and can do it's job
+            spawnedWorker.readyToLive();
+            // We get some new tasks
+            getTasks();
+            // // but we are suspended
+            // suspendWork();
         } else {
             Serializable resultObj = null;
-            ResultInternImpl result = new ResultInternImpl(task);
+            ResultInternImpl result = new ResultInternImpl(task.getId());
 
             // We run the task and listen to exception thrown by the task itself
             try {
@@ -217,24 +257,8 @@ public class AOWorker implements InitActive, Serializable, Worker {
 
             // We store the result inside our internal version of the task
             result.setResult(resultObj);
-            if (debug) {
-                logger
-                        .debug(name + " sends the result of task " + result.getId() +
-                            " and asks a new task...");
-            }
-
-            // We send the result back to the master
-            Queue<TaskIntern<Serializable>> newTasks;
-            if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
-                if (debug) {
-                    logger.debug(name + " requests a task flooding...");
-                }
-                newTasks = provider.sendResultAndGetTasks(result, name, true);
-            } else {
-                newTasks = provider.sendResultAndGetTasks(result, name, false);
-            }
-            pendingTasksFutures.offer(newTasks);
-
+            // We send the result back and ask for new tasks
+            getTasksWithResult(result);
         }
         // Schedule
         stubOnThis.scheduleTask();
@@ -245,25 +269,15 @@ public class AOWorker implements InitActive, Serializable, Worker {
         while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0)) {
             pendingTasks.addAll(pendingTasksFutures.remove());
         }
-        if (pendingTasks.size() > 0) {
+
+        if (!suspended && (pendingTasks.size() > 0)) {
+
             TaskIntern<Serializable> newTask = pendingTasks.remove();
             // We handle the current Task
             stubOnThis.handleTask(newTask);
 
-        } else {
-            // if there is nothing to do we ask a last time for a task to the master
-            getTasks();
-            if (pendingTasks.size() > 0) {
-                TaskIntern<Serializable> newTask = pendingTasks.remove();
-                // We handle the current Task
-                stubOnThis.handleTask(newTask);
-            } else {
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug(name + " sleeps...");
-                }
-            }
         }
+        // if there is nothing to do or if we are suspended we sleep
     }
 
     /** {@inheritDoc} */
@@ -271,8 +285,12 @@ public class AOWorker implements InitActive, Serializable, Worker {
         if (debug) {
             logger.debug("Terminating " + name + "...");
         }
+        provider = null;
+        stubOnThis = null;
+        ((WorkerMemoryImpl) memory).clear();
+        initialMemory.clear();
 
-        PAActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(false);
         if (debug) {
             logger.debug(name + " terminated...");
         }
@@ -286,23 +304,23 @@ public class AOWorker implements InitActive, Serializable, Worker {
             logger.debug(name + " receives a wake up message...");
         }
 
-        if (pendingTasks.size() == 0) {
+        if (pendingTasks.size() > 0 || suspended) {
+            if (debug) {
+                logger.debug(name + " ignored wake up message ...");
+            }
+        } else {
             if (debug) {
                 logger.debug(name + " wakes up...");
             }
             // Initial Task
             stubOnThis.getTaskAndSchedule();
-        } else {
-            if (debug) {
-                logger.debug(name + " ignored wake up message ...");
-            }
         }
 
     }
 
-    public BooleanWrapper clear() {
+    public void clear() {
         pendingTasks.clear();
-        //pendingTasksFutures.clear();
-        return new BooleanWrapper(true);
+        pendingTasksFutures.clear();
+        provider.isCleared(stubOnThis);
     }
 }

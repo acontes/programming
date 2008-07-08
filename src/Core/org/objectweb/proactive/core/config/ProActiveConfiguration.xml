@@ -64,6 +64,8 @@
 		<!-- MASTER/WORKER PROPERTIES VALUE -->
 		<!-- Period of the slave pinging (in ms) -->
         <prop key="proactive.masterworker.pingperiod" value="10000" />
+        <!-- Compressing tasks in the repository -->
+        <prop key="proactive.masterworker.compresstasks" value="false" />
         
         <!-- ***************************************************** -->
         <!-- SCHEDULER PROPERTIES VALUE -->
@@ -97,6 +99,5 @@
         <prop key="ibis.name_server.key" value="1" />
         <prop key="ibis.io.serialization.classloader" value="org.objectweb.proactive.core.mop.MOPClassLoader" />
         <prop key="ibis.serialization" value="ibis" />
-        <prop key="ibis.name" value="tcp" />
     </javaProperties>
 </ProActiveUserProperties>

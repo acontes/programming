@@ -31,16 +31,20 @@
 package functionalTests.gcmdeployment.technicalservice;
 
 import java.io.File;
+import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
@@ -51,8 +55,14 @@ public class TestOverriding extends FunctionalTest {
 
     @Before
     public void before() throws ProActiveException {
-        File desc = new File(this.getClass().getResource("TestOverridingApplication.xml").getPath());
-        app = PAGCMDeployment.loadApplicationDescriptor(desc);
+        VariableContractImpl vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, "4",
+                VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, "1",
+                VariableContractType.DescriptorDefaultVariable);
+
+        URL desc = this.getClass().getResource("TestOverridingApplication.xml");
+        app = PAGCMDeployment.loadApplicationDescriptor(desc, vContract);
         app.startDeployment();
         app.waitReady();
     }

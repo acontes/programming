@@ -35,8 +35,8 @@ import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
+import org.objectweb.proactive.extensions.calcium.environment.Environment;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
-import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.CalFuture;
@@ -61,12 +61,11 @@ public class FindPrimes implements Serializable {
     public void solve() throws InterruptedException, PanicException {
         String descriptor = FindPrimes.class.getResource("LocalDescriptor.xml").getPath();
 
-        EnvironmentFactory enviroment = new MultiThreadedEnvironment(1);
+        Environment environment = EnvironmentFactory.newMultiThreadedEnvironment(2);
+        //Environment environment = EnvironmentFactory.newProActiveEnvironment(descriptor);
+        //Environment environment = ProActiveSchedulerEnvironment.factory("localhost","chri", "chri");
 
-        //new MonoThreadedManager();
-        //new MultiThreadedManager(5);
-        //new ProActiveManager(descriptor, "local");
-        Calcium calcium = new Calcium(enviroment);
+        Calcium calcium = new Calcium(environment);
 
         Stream<Interval, Primes> stream = calcium.newStream(root);
 

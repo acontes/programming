@@ -44,9 +44,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
-import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.LoadedClassCountDataProvider;
-import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.ThreadCountDataProvider;
-import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.UsedHeapMemoryDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
 import org.objectweb.proactive.ic2d.console.Console;
@@ -61,7 +58,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 /**
  * This action allows the user to open a ChartIt editor using as input a
  * resource descriptor based on an {@link org.objectweb.proactive.ic2d.data.AbstractData}.
- * Only 
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
@@ -70,7 +66,9 @@ public final class ChartItAction extends Action implements IActionExtPoint {
     /**
      * The text displayed by this action
      */
-    public static final String SHOW_IN_CHARTIT_VIEW_ACTION = "Show in ChartIt View";
+    public static final String SHOW_IN_CHARTIT_VIEW_ACTION = "Show in ChartIt";
+
+    public static final String PARUNTIME_CHARTIT_CONFIG_FILENAME = "predef_paruntime_chartit_conf.xml";
 
     /**
      * The target data
@@ -86,7 +84,6 @@ public final class ChartItAction extends Action implements IActionExtPoint {
                 org.objectweb.proactive.ic2d.chartit.Activator.getDefault().getBundle(), new Path(
                     "icons/graph.gif"), null)));
         super.setToolTipText(SHOW_IN_CHARTIT_VIEW_ACTION);
-        super.setText(SHOW_IN_CHARTIT_VIEW_ACTION);
         super.setEnabled(false);
     }
 
@@ -99,6 +96,7 @@ public final class ChartItAction extends Action implements IActionExtPoint {
         if (object.getClass() == WorldObject.class || object.getClass() == HostObject.class)
             return;
         this.target = object;
+        super.setText("Show " + object.getName() + " in ChartIt");
         super.setEnabled(true);
     }
 
@@ -112,11 +110,13 @@ public final class ChartItAction extends Action implements IActionExtPoint {
     }
 
     /**
-     * Handles incoming abstract data reference ie opens a new or existing editor associated 
-     * to the data.
+     * Handles incoming abstract data reference ie opens a new or existing
+     * editor associated to the data.
      * 
-     * @param abstractData The incoming abstract data
-     * @param createNewIfNotFound Creates new editor if not found
+     * @param abstractData
+     *            The incoming abstract data
+     * @param createNewIfNotFound
+     *            Creates new editor if not found
      */
     private void handleData(final AbstractData abstractData, final boolean createNewIfNotFound) {
         try {
@@ -128,7 +128,12 @@ public final class ChartItAction extends Action implements IActionExtPoint {
                 // First build a ResourceDescriptor
                 final IResourceDescriptor resourceDescriptor = new AbstractDataDescriptor(abstractData);
                 // Open new editor based the descriptor
-                ChartItDataEditor.openNewFromResourceData(resourceDescriptor);
+                if (abstractData instanceof RuntimeObject) {
+                    ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor,
+                            PARUNTIME_CHARTIT_CONFIG_FILENAME);
+                } else {
+                    ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor);
+                }
             }
         } catch (Exception e) {
             Console.getInstance(Activator.CONSOLE_NAME)
@@ -141,9 +146,12 @@ public final class ChartItAction extends Action implements IActionExtPoint {
     /**
      * Activates an editor by name.
      * 
-     * @param currentWindow The current window
-     * @param name The name of the editor to activate
-     * @return <code>True</code> if the existing editor was activated, <code>False</code> otherwise
+     * @param currentWindow
+     *            The current window
+     * @param name
+     *            The name of the editor to activate
+     * @return <code>True</code> if the existing editor was activated,
+     *         <code>False</code> otherwise
      * @throws PartInitException
      *             Thrown if the part can not be activated
      */
@@ -200,16 +208,7 @@ public final class ChartItAction extends Action implements IActionExtPoint {
          */
         public AbstractDataDescriptor(final AbstractData abstractData) throws IOException {
             this.abstractData = abstractData;
-            // For runtime object only provide some predefined custom providers
-            // based on MXBeans attributes
-            if (this.abstractData instanceof RuntimeObject) {
-                // These attributes are provided from an MBeanServerConnection
-                final MBeanServerConnection con = this.abstractData.getMBeanServerConnection();
-                this.customProviders = new IDataProvider[] { new ThreadCountDataProvider(con),
-                        new UsedHeapMemoryDataProvider(con), new LoadedClassCountDataProvider(con) };
-            } else {
-                this.customProviders = new IDataProvider[0];
-            }
+            this.customProviders = new IDataProvider[0];
         }
 
         public String getHostUrlServer() {

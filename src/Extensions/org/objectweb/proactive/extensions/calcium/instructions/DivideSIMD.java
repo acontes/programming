@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.instructions;
 
-import java.util.Collection;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -67,7 +66,7 @@ public class DivideSIMD<P, X> implements Instruction<P, X> {
     public Task<X> compute(SkeletonSystemImpl system, Task<P> parent) throws Exception {
         Timer timer = new Timer();
 
-        Collection<X> childObjects = div.divide(system, parent.getObject());
+        X[] childObjects = div.divide(parent.getObject(), system);
         timer.stop();
 
         for (X o : childObjects) {

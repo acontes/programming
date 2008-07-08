@@ -33,18 +33,18 @@ package functionalTests.activeobject.request.forgetonsend;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URL;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
-import functionalTests.FunctionalTest;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.ft.AbstractFTTezt;
 import functionalTests.ft.cic.TestCIC;
 
@@ -52,8 +52,8 @@ import functionalTests.ft.cic.TestCIC;
 public class TestFaultTolerance extends AbstractFTTezt {
 
     private JVMProcessImpl server;
-    private static String FT_XML_LOCATION_UNIX = TestCIC.class.getResource(
-            "/functionalTests/ft/cic/testFT_CIC.xml").getPath();
+    private static URL FT_XML_LOCATION_UNIX = TestCIC.class
+            .getResource("/functionalTests/ft/cic/testFT_CIC.xml");
 
     /**
      * We will try to perform a failure during a sending, and then verify that the sending restart
@@ -69,8 +69,15 @@ public class TestFaultTolerance extends AbstractFTTezt {
         GCMApplication gcma;
         GCMVirtualNode vnode;
 
+        VariableContractImpl vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, "4",
+                VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, "1",
+                VariableContractType.DescriptorDefaultVariable);
+
         //	create nodes
-        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(FT_XML_LOCATION_UNIX));
+
+        gcma = PAGCMDeployment.loadApplicationDescriptor(FT_XML_LOCATION_UNIX, vContract);
         gcma.startDeployment();
         vnode = gcma.getVirtualNode("Workers");
         Node[] nodes = new Node[2];

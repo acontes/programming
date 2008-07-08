@@ -1,4 +1,4 @@
-<!-- Converted by db4-upgrade version 1.0 -->
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="XML_Descriptors"><info><title>XML Deployment Descriptors</title></info>
   
@@ -274,7 +274,7 @@
         <para><emphasis role="bold">Typical example of a program
         code:</emphasis></para>
 
-        <para><screen> ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFile); 
+        <para><screen> ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFile); 
         //--------- Returns a ProActiveDescriptor object from the xml file 
         VirtualNode dispatcher = pad.getVirtualNode('Dispatcher');
         //-------- Returns the VirtualNode Dispatcher described in the xml file as a java  object
@@ -468,7 +468,7 @@
             machine in the RMIRegistry. As said before this VirtualNode will
             be accessible by another application using the lookup tag(see
             below) or using method:
-            ProActive.lookupVirtualNode(String).</para>
+            PADeployment.lookupVirtualNode(String).</para>
           </listitem>
         </itemizedlist></para>
     </section>
@@ -516,7 +516,7 @@
       org.objectweb.proactive.core.descriptor.data.VirtualNode to update the
       value and to perform the lookup. Typical example of code:</para>
 
-      <programlisting xml:lang="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
+      <programlisting xml:lang="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
 
       <para>//----------- Returns a ProActiveDescriptor object from the xml
       file</para>
@@ -543,14 +543,14 @@
       tags in the descriptor as well as programmatically using static methods
       provided in org.objectweb.Proactive class:</para>
 
-      <programlisting xml:lang="java">ProActive.registerVirtualNode(
+      <programlisting xml:lang="java">PADeployment.registerVirtualNode(
         VirtualNode virtualNode, 
         String registrationProtocol, 
         boolean replacePreviousBinding );          </programlisting>
 
-      <programlisting xml:lang="java">ProActive.lookupVirtualNode(String url, String protocol);          </programlisting>
+      <programlisting xml:lang="java">PADeployment.lookupVirtualNode(String url, String protocol);          </programlisting>
 
-      <programlisting xml:lang="java">ProActive.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
+      <programlisting xml:lang="java">PADeployment.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
     </section>
   </section>
 
@@ -662,6 +662,7 @@
     described earlier in this document.</para>
 
     <example><info><title>C3D_Dispatcher_Render.xml</title></info>
+    
       
 
       <para><screen> &lt;ProActiveDescriptor
@@ -729,7 +730,6 @@
  &lt;/ProActiveDescriptor&gt;
 </screen></para>
     </example>
-
     <para>This example represents xml deployment descriptor for the C3D
     application. The abstract part containing VirtualNodes definition and
     deployment informations has already been explained. To summarize, two
@@ -742,6 +742,7 @@
     JVMs called <emphasis role="bold">Jvm1</emphasis>, ..., <emphasis role="bold">Jvm4</emphasis>.</para>
 
     <example><info><title>C3D_User.xml</title></info>
+    
       
 
       <para><screen> &lt;ProActiveDescriptor
@@ -777,8 +778,7 @@
   &lt;/infrastructure&gt;
  &lt;/ProActiveDescriptor&gt;
 </screen></para>
-    </example>
-
+   </example>
     <para>This file is read when addind a C3DUser. Two VirtualNodes are
     defined <emphasis role="bold">User</emphasis> which is mapped to the jvm
     running the main(), whose acquisition method is performed by looking up
@@ -935,7 +935,7 @@
 
       <!-- This paragraph only appears in the html version  -->
 
-      <para os="html">You can find <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../examples/">here</link>
+      <para os="html">You can find <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../examples_legacy_descriptors/">here</link>
       several examples of supported protocols and useful combinations.</para>
 
       <!-- This paragraph only appears in the pdfversion  -->
@@ -990,7 +990,10 @@
           node will be created on sea.inria.fr thanks to the process defined
           by <emphasis role="bold">jvmProcess</emphasis>.</para>
 
-          <para>Check <xref linkend="examples/RSH_Example.xml" role="xmlFileSrc"/> for a complete rsh deployment example.</para>
+          <para>The following is a complete RSH deployment example.</para>
+          
+          <programlisting xml:lang="xml"> <textobject><textdata fileref="examples_legacy_descriptors/RSH_Example.xml"> </textdata></textobject></programlisting>
+
         </listitem>
 
         <listitem>
@@ -1075,7 +1078,9 @@
           using <emphasis role="bold">ssh</emphasis> protocol. If you are not
           familiar with ssh, see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.openssh.org">openSSH</link></para>
 
-          <para>Check <xref linkend="examples/SSH_Example.xml" role="xmlFileSrc"/> for a complete ssh deployment example.</para>
+          <para>The following is a complete SSH deployment example.</para>
+          
+          <programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/SSH_Example.xml"></textdata></textobject></programlisting>
         </listitem>
 
         <listitem xml:id="Descriptor_html_processlist" xreflabel="Process list">
@@ -1118,18 +1123,19 @@
           the <emphasis role="bold">class</emphasis> attribute can take 3
           values: <itemizedlist>
               <listitem>
-                <para>org.objectweb.proactive.core.process.ssh.SSHProcessList
-                (see <xref linkend="core/process/ssh/SSHProcessList.java" role="javaFileSrc"/>),</para>
+                <para>org.objectweb.proactive.core.process.ssh.SSHProcessList</para>
+                <programlisting><textobject><textdata fileref="core/process/ssh/SSHProcessList.java"></textdata></textobject></programlisting>
+
               </listitem>
 
               <listitem>
-                <para>org.objectweb.proactive.core.process.rsh.RSHProcessList
-                (see <xref linkend="core/process/rsh/RSHProcessList.java" role="javaFileSrc"/>),</para>
+                <para>org.objectweb.proactive.core.process.rsh.RSHProcessList</para>
+                <programlisting><textobject><textdata fileref="core/process/rsh/RSHProcessList.java"></textdata></textobject></programlisting>
               </listitem>
 
               <listitem>
-                <para>org.objectweb.proactive.core.process.rlogin.RLoginProcessList
-                (see <xref linkend="core/process/rlogin/RLoginProcessList.java" role="javaFileSrc"/>),</para>
+                <para>org.objectweb.proactive.core.process.rlogin.RLoginProcessList</para>
+                <programlisting><textobject><textdata fileref="core/process/rlogin/RLoginProcessList.java"></textdata></textobject></programlisting>
               </listitem>
             </itemizedlist> according to the protocol being used is ssh, rsh
           or rlogin. The <emphasis role="bold">fixedName</emphasis> attribute
@@ -1182,8 +1188,12 @@
           attribute. In the example, a jvm is going to be created using ssh on
           crusoe.inria.fr, waha.inria.fr, nahuel.inria.fr.</para>
 
-          <para>Check <xref linkend="examples/SSHList_example.xml" role="xmlFileSrc"/> or <xref linkend="examples/SSHListbyHost_Example.xml" role="xmlFileSrc"/>
-          for list examples.</para>
+          <para>The following are example of SSH deployment using lists of hosts.</para>
+          
+          <programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/SSHList_example.xml"></textdata></textobject></programlisting>
+           <para>and</para>
+           <programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/SSHListbyHost_Example.xml"></textdata></textobject></programlisting>
+          
         </listitem>
 
         <listitem>
@@ -1304,7 +1314,8 @@
           in the bsub command: interactive mode, and the name of the
           queue.</para>
 
-          <para>Check also <xref linkend="examples/SSH_LSF_Example.xml" role="xmlFileSrc"/> .</para>
+		<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_LSF_Example.xml"></textdata></textobject></programlisting>
+
         </listitem>
 
         <listitem>
@@ -1368,8 +1379,9 @@
           the ouput of the job(default is specified by pbs), <emphasis role="bold">scriptPath</emphasis> represents the location on the
           frontend_host of the script pbsStartRuntime.sh(default is
           /user.home/ProActive/scripts/unix/cluster/pbsStartRuntime.sh).</para>
+		
+		<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_PBS_Example.xml"></textdata></textobject></programlisting>
 
-          <para>Check also <xref linkend="examples/SSH_PBS_Example.xml" role="xmlFileSrc"/>.</para>
         </listitem>
 
         <listitem>
@@ -1431,7 +1443,8 @@
           frontend_host of the script gridEngineStartRuntime.sh (default is
           /user.home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh).</para>
 
-          <para>Check also <xref linkend="examples/SSH_SGE_Example.xml" role="xmlFileSrc"/>.</para>
+	<programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/SSH_SGE_Example.xml"></textdata></textobject></programlisting>
+          
         </listitem>
 
         <listitem>
@@ -1491,8 +1504,10 @@
           to the main options specified in an OAR system. <emphasis role="bold">ScriptPath</emphasis> represents the location on the
           frontend_host of the script oarStartRuntime.sh (default is
           /user.home/ProActive/scripts/unix/cluster/oarStartRuntime.sh).</para>
+			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_Example.xml"></textdata></textobject></programlisting>
+          <para> and </para>
+          <programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_OARGRID_Example.xml"></textdata></textobject></programlisting>
 
-          <para>Check also <xref linkend="examples/SSH_OAR_Example.xml" role="xmlFileSrc"/> and <xref linkend="examples/SSH_OARGRID_Example.xml" role="xmlFileSrc"/>.</para>
         </listitem>
 
         <listitem>
@@ -1508,7 +1523,8 @@
           <literal>org.objectweb.proactive.core.process.prun.PrunSubProcess</literal>
           to use such protocol.</para>
 
-          <para>Check also <xref linkend="examples/SSH_PRUN_Example.xml" role="xmlFileSrc"/>.</para>
+			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_PRUN_Example.xml"></textdata></textobject></programlisting>
+
         </listitem>
 
         <listitem>
@@ -1581,8 +1597,7 @@
           &lt;globusOption&gt; is neither manatory. Default value for
           &lt;count&gt; element is 1. It represents the number of processor
           requested.</para>
-
-          <para>Check also <xref linkend="examples/Globus_Example.xml" role="xmlFileSrc"/>.</para>
+			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/Globus_Example.xml"></textdata></textobject></programlisting>
         </listitem>
 
         <listitem>
@@ -1591,8 +1606,8 @@
           <para>ProActive provides
           <literal>org.objectweb.proactive.core.process.unicore.UnicoreProcess</literal>
           to use such protocol.</para>
+			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/Unicore_Example.xml"></textdata></textobject></programlisting>
 
-          <para>Check also <xref linkend="examples/Unicore_Example.xml" role="xmlFileSrc"/>.</para>
         </listitem>
 
         <listitem>
@@ -1604,8 +1619,8 @@
 
           <para>To use ARC you will need to download the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://ftp.nordugrid.org/download/index.php">ARC
           Client</link></para>
+			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/NorduGrid_Example.xml"></textdata></textobject></programlisting>
 
-          <para>Check also <xref linkend="examples/NorduGrid_Example.xml" role="xmlFileSrc"/>.</para>
         </listitem>
 
         <listitem>
@@ -1621,7 +1636,8 @@
           <literal>org.objectweb.proactive.core.process.glite.GLiteProcess</literal>
           to use such protocol.</para>
 
-          <para>Check also <xref linkend="examples/SSH_GLite_Example.xml" role="xmlFileSrc"/>.</para>
+
+          <programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_GLite_Example.xml"></textdata></textobject></programlisting>
         </listitem>
 
         <listitem>
@@ -1631,8 +1647,9 @@
           <literal>org.objectweb.proactive.core.process.mpi.MPIDependentProcess</literal>
           to use such protocol. You have to couple this process with the
           DependentListProcessDecorator explained below.</para>
+			
+			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_MPI_Example.xml"></textdata></textobject></programlisting>
 
-          <para>Check also <xref linkend="examples/SSH_MPI_Example.xml" role="xmlFileSrc"/>.</para>
 
           <para><screen>
 &lt;processDefinition id='<emphasis role="bold">mpiProcess</emphasis>'&gt;
@@ -1841,8 +1858,8 @@
       one must be a DependentProcess thus has to implement the
       org.objectweb.proactive.core.process.DependentProcess interface.</para>
 
-      <para>Check also <xref linkend="examples/SSH_MPI_Example.xml" role="xmlFileSrc"/>.</para>
-
+		<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_MPI_Example.xml"></textdata></textobject></programlisting>
+     
       <para><screen>   &lt;processDefinition id='<emphasis role="bold">dependentProcessSequence</emphasis>'&gt;
     &lt;dependentProcessSequence class='<emphasis role="bold">org.objectweb.proactive.core.process.DependentListProcessDecorator</emphasis>'&gt;
      &lt;processReference refid='<emphasis role="bold">pbsProcess</emphasis>' /&gt;
@@ -1952,14 +1969,14 @@
 		letting the master terminate all the slaves and then itself.</para>
 
 		<para>In a more complex topology, a distributed termination algorithm
-		must be designed to coordinate the ProActiveObject.terminateActiveObject()
+		must be designed to coordinate the PAActiveObject.terminateActiveObject()
 		method calls.</para>
 
 		<para>The simplest alternative is to enable the DGC by setting the
 		<emphasis>proactive.dgc</emphasis> property to <emphasis>true</emphasis>
 		and let it destroy unreferenced active objects and cycles of idle active
 		objects. The DGC is the bridge between active objects and the local GC. The
-		DGC automatically calls the ProActiveObject.terminateActiveObject() method on
+		DGC automatically calls the PAActiveObject.terminateActiveObject() method on
 		unreachable active objects so that you don't have to.</para>		
 
 		<para>The default configuration should be suitable in most case, but
@@ -1996,9 +2013,11 @@
 		
     <para>ProActive gives the ability to kill all JVMs and Nodes deployed with
     an XML descriptor with the method: killall(boolean softly) in class
-    ProActiveDescriptor (this class's code is in <xref linkend="core/descriptor/data/ProActiveDescriptor.java" role="javaFileSrc"/>)</para>
+    ProActiveDescriptor.</para>
+    
+    <programlisting><textobject><textdata fileref="core/descriptor/data/ProActiveDescriptor.java"></textdata></textobject></programlisting>
 
-    <para><programlisting xml:lang="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
+    <para><programlisting xml:lang="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFileLocation);
 //----------- Returns a ProActiveDescriptor object from the xml file
 pad.activateMappings();
 

@@ -1,6 +1,36 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package functionalTests;
 
-import java.io.File;
+import java.net.URL;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
@@ -14,34 +44,31 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * 
  */
 public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
-    public enum DeploymentType {
-        _1x1("1x1.xml", 1), _1x2("1x2.xml", 2), _2x1("2x1.xml", 2), _4x1("4x1.xml", 4), _2x2("2x2.xml", 4);
 
-        public String filename;
-        public int size;
-
-        private DeploymentType(String filename, int size) {
-            this.filename = filename;
-            this.size = size;
-        }
-
-    }
-
-    static final private File defaultApplicationDescriptor = new File(FunctionalTest.class.getResource(
-            "/functionalTests/_CONFIG/JunitApp.xml").getFile());
+    static final private URL defaultApplicationDescriptor = FunctionalTest.class
+            .getResource("/functionalTests/_CONFIG/JunitApp.xml");
 
     static public final String VN_NAME = "nodes";
     static public final String VAR_DEPDESCRIPTOR = "deploymentDescriptor";
     static public final String VAR_JVMARG = "jvmargDefinedByTest";
 
-    DeploymentType deploymentType;
+    static public final String VAR_HOSTCAPACITY = "hostCapacity";
+    int hostCapacity;
 
-    public GCMFunctionalTestDefaultNodes(DeploymentType type) {
+    static public final String VAR_VMCAPACITY = "vmCapacity";
+    int vmCapacity;
+
+    public GCMFunctionalTestDefaultNodes(int hostCapacity, int vmCapacity) {
         super(defaultApplicationDescriptor);
-        this.deploymentType = type;
 
-        super.vContract.setVariableFromProgram(VAR_DEPDESCRIPTOR,
-                "localhost/" + this.deploymentType.filename, VariableContractType.DescriptorDefaultVariable);
+        this.hostCapacity = hostCapacity;
+        this.vmCapacity = vmCapacity;
+
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, new Integer(
+            hostCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, new Integer(
+            vmCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
+
     }
 
     public Node getANode() {

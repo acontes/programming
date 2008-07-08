@@ -32,7 +32,6 @@ package org.objectweb.proactive.extensions.gcmdeployment;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.MalformedURLException;
@@ -61,6 +60,9 @@ public class Helpers {
     }
 
     public static URL fileToURL(File file) {
+        if (file == null)
+            return null;
+
         URL answer = null;
         try {
             answer = file.toURI().toURL();

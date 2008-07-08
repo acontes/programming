@@ -31,7 +31,6 @@
 package functionalTests.masterworker.divisibletasks;
 
 import functionalTests.FunctionalTest;
-import functionalTests.masterworker.A;
 import functionalTests.masterworker.basicordered.TestBasicOrdered;
 import static junit.framework.Assert.assertTrue;
 import org.junit.After;
@@ -41,7 +40,6 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -53,21 +51,24 @@ public class TestDivisibleTasks extends FunctionalTest {
             .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
     private Master<DaCSort, ArrayList<Integer>> master;
     private List<DaCSort> tasks;
-    public static final int NB_ELEM = 50000;
+    public static final int NB_ELEM = 10000;
 
     @org.junit.Test
     public void action() throws Exception {
-        System.out.println(descriptor);
-        tasks = new ArrayList<DaCSort>();
-        ArrayList<Integer> bigList = new ArrayList<Integer>();
-        for (int i = 0; i < NB_ELEM; i++) {
-            bigList.add((int) Math.round(Math.random() * NB_ELEM));
-        }
-        tasks.add(new DaCSort(bigList));
 
         master.solve(tasks);
 
         ArrayList<Integer> answer = master.waitOneResult();
+
+        for (int i = 0; i < answer.size() - 1; i++) {
+            assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
+        }
+        master.solve(tasks);
+        Thread.sleep(2000);
+        master.clear();
+
+        master.solve(tasks);
+        answer = master.waitOneResult();
 
         for (int i = 0; i < answer.size() - 1; i++) {
             assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
@@ -80,6 +81,13 @@ public class TestDivisibleTasks extends FunctionalTest {
         master = new ProActiveMaster<DaCSort, ArrayList<Integer>>();
         master.addResources(descriptor);
         master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+
+        tasks = new ArrayList<DaCSort>();
+        ArrayList<Integer> bigList = new ArrayList<Integer>();
+        for (int i = 0; i < NB_ELEM; i++) {
+            bigList.add((int) Math.round(Math.random() * NB_ELEM));
+        }
+        tasks.add(new DaCSort(bigList));
 
     }
 

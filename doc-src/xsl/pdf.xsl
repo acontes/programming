@@ -23,6 +23,10 @@
 		on every image :(
 	-->
 
+	<!-- wraps very long lines -->
+	<xsl:attribute-set name="monospace.verbatim.properties">
+    	<xsl:attribute name="wrap-option">wrap</xsl:attribute>
+	</xsl:attribute-set>
 
 	<!--  center all images in the tag figure horizontally  -->
 	<xsl:attribute-set name="figure.properties">
@@ -36,7 +40,12 @@
 	</xsl:attribute-set>
 
 	<xsl:attribute-set name="table.properties">
-		<xsl:attribute name="keep-together.within-page">always</xsl:attribute>
+		<xsl:attribute name="keep-together.within-page">3</xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:attribute-set name="informaltable.properties">
+	  <xsl:attribute name="font-family">Lucida Sans Typewriter</xsl:attribute>
+	  <xsl:attribute name="font-size">8pt</xsl:attribute>
 	</xsl:attribute-set>
 
 	<!--  Changing font sizes -->
@@ -332,9 +341,9 @@
 				</xsl:call-template>
 
 				<!--  fop requires one table-column per column in the table (this tag can be left empty though)  -->
-				<fo:table-column />
-				<fo:table-column />
-				<fo:table-column />
+				<fo:table-column column-width="proportional-column-width(1)" />
+				<fo:table-column column-width="proportional-column-width(1)"/>
+				<fo:table-column column-width="proportional-column-width(1)"/>
 
 				<fo:table-body>
 					<fo:table-row height="15pt">
@@ -628,11 +637,12 @@
 			</fo:block>
 
 			<!-- The three logos, in a 1x3 table: INRIA, UNSA, CNRS/I3S -->
-			<fo:table table-layout="fixed" space-before="27mm">
+			<fo:table table-layout="fixed"  width="100%" space-before="27mm">
 
-				<fo:table-column />
-				<fo:table-column />
-				<fo:table-column />
+				<fo:table-column column-width="proportional-column-width(1)" />
+				<fo:table-column column-width="proportional-column-width(1)"/>
+				<fo:table-column column-width="proportional-column-width(1)"/>
+
 
 				<fo:table-body>
 					<fo:table-row>
@@ -671,10 +681,11 @@
 			</fo:table>
 
 			<!-- The Revision and copyright -->
-			<fo:table table-layout="fixed" space-before="5mm">
+			<fo:table table-layout="fixed" space-before="5mm" width="100%">
 
-				<fo:table-column />
-				<fo:table-column />
+				<fo:table-column column-width="proportional-column-width(1)"/>
+				<fo:table-column column-width="proportional-column-width(1)"/>
+				<fo:table-column column-width="proportional-column-width(1)"/>
 				<fo:table-body>
 					<fo:table-row>
 						<fo:table-cell>
@@ -1266,7 +1277,7 @@
 					<xsl:copy-of select="$markup" />
 				</fo:basic-link>
 			</fo:inline>
-			<fo:inline keep-together.within-line="always">
+			<fo:inline keep-together.within-line="1">
 				<xsl:call-template name="gentext.space" />
 				<fo:leader leader-pattern="dots"
 					leader-pattern-width="3pt" leader-alignment="reference-area"
@@ -1462,7 +1473,7 @@
 	<xsl:template name="emailF">
 		<xsl:call-template name="inline.charseq">
 			<xsl:with-param name="content">
-				<fo:inline keep-together.within-line="always"
+				<fo:inline keep-together.within-line="1"
 					hyphenate="false">
 					<fo:basic-link>
 						<xsl:attribute name="external-destination">mailto:<xsl:value-of

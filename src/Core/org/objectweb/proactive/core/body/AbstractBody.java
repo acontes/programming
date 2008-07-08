@@ -35,20 +35,18 @@ import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.security.AccessControlException;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashSet;
 
-import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -72,13 +70,10 @@ import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
-import org.objectweb.proactive.core.jmx.mbean.BodyWrapper;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
-import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
@@ -237,43 +232,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("Active Object security Off");
         } else {
             this.isSecurityOn = true;
-            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug(
-                    "Active Object security On application is " + this.securityManager.getApplicationName());
-            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug(
-                    "current thread is " + Thread.currentThread().getName());
 
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug(
+                    "Application is " + this.securityManager.getApplicationName());
             this.isSecurityOn = this.securityManager.getCertificate() != null;
-            // this.securityManager.setBody(this);
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
         }
 
-        //        // JMX registration
-        //        isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
-        //
-        //        // if (PAProperties.PA_JMX_MBEAN.isTrue()) {
-        //        if (!isProActiveInternalObject) {
-        //            // If the node is not a HalfBody
-        //            if (!NodeFactory.isHalfBodiesNode(nodeURL)) { // SHOULD BE IN BODYIMPL !!
-        //                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        //                ObjectName oname = FactoryName.createActiveObjectName(getID());
-        //                if (!mbs.isRegistered(oname)) {
-        //                    mbean = new BodyWrapper(oname, this, getID());
-        //                    try {
-        //                        mbs.registerMBean(mbean, oname);
-        //                    } catch (InstanceAlreadyExistsException e) {
-        //                        logger.error("A MBean with the object name " + oname + " already exists", e);
-        //                    } catch (MBeanRegistrationException e) {
-        //                        logger.error("Can't register the MBean of the body", e);
-        //                    } catch (NotCompliantMBeanException e) {
-        //                        logger.error("The MBean of the body is not JMX compliant", e);
-        //                    }
-        //                }
-        //            }
-        //        }
-
-        // }
-
-        // END JMX registration
     }
 
     public void updateReference(UniversalBodyProxy ref) {
@@ -998,7 +963,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 sendRequest(methodCall, future, destinationBody);
             }
         } catch (CommunicationForbiddenException e) {
-            System.out.println("Communication forbidden.");
+            bodyLogger.debug("Communication forbidden." + e.getMessage());
             bodyLogger.warn(e);
             // if the communication is not allowed, set the result as the exception
             future.receiveReply(new MethodCallResult(null, new RuntimeSecurityException(e)));
