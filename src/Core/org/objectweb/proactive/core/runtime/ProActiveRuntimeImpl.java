@@ -38,9 +38,6 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -61,6 +58,7 @@ import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -102,7 +100,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.FileProcess;
-import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -481,6 +478,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
      */
 	protected void unregisterRuntime() {
 		
+		// TODO use PARemoteObject, it seems to be protocol-independent
 		String partName = System.getProperty("proactive.runtime.name");
 		if( partName == null){
 			// then I assume there is no proactive runtime! => nothing to do
@@ -488,19 +486,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 		}
 		
 		try {
-			// interesting class, this Registry helper!
-			RegistryHelper regHelper = new RegistryHelper();
-			regHelper.initializeRegistry();
-			Registry rmiRegistry = RegistryHelper.getRegistry();
-			// unbind the name onto which PART is bound
-			rmiRegistry.unbind(partName);
-		} catch ( RemoteException  e) {
-			jmxLogger.error( "Unable to contact the RMI registry that is (supposed to be) on the localhost." ); 
-			jmxLogger.error( e.getMessage() , e );
-		} catch (NotBoundException e) {
-			jmxLogger.error( "The name " + partName + " is not bound in the RMI Registry. Maybe the ProActive Runtime was never created in the first place?!" );
-			jmxLogger.error( e.getMessage() , e );
+			PARemoteObject.unregister(RemoteObjectHelper.generateUrl(partName));
+		} catch (ProActiveException e) {
+			jmxLogger.error("Could not unregister the ProActiveRuntime remote object" +
+					"with the name "+ partName + "; cause is: " , e );
 		}
+
 	}
 
     //

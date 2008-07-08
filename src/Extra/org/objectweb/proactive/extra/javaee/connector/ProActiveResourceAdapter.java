@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.extra.javaee.connector;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -42,6 +45,8 @@ import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
+import org.objectweb.proactive.api.PARemoteObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
@@ -130,20 +135,15 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 	 */
 	private boolean runtimeAlreadyUnregistered() {
 		try {
-			RegistryHelper regHelper = new RegistryHelper();
-			regHelper.initializeRegistry();
-			Registry rmiRegistry = RegistryHelper.getRegistry();
-			rmiRegistry.lookup(_proActiveRuntime.getURL());
+			PARemoteObject.lookup( new URI(_proActiveRuntime.getURL()) );
 			// it is here alright...
 			_raLogger.debug( "There is still something left here to cleanup" );
 			return false;
-		}
-		catch ( RemoteException  e) {
-			_raLogger.error( "Unable to contact the RMI registry that is (supposed to be) on the localhost." ); 
-			_raLogger.error( e.getMessage() , e );
-			return true;
-		} catch (NotBoundException e) {
+		} catch (ProActiveException e) {
 			_raLogger.debug( "Cleanup already done elsewhere, nothing left to do." );
+			return true;
+		} catch (URISyntaxException e) {
+			_raLogger.error( "The URI " + _proActiveRuntime.getURL() + " is invalid as a ProActive Runtime URL" , e );
 			return true;
 		}
 	}
