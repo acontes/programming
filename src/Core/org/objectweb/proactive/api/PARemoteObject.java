@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 
@@ -99,6 +100,16 @@ public class PARemoteObject {
     public static Object lookup(URI url) throws ProActiveException {
         return RemoteObjectHelper.getFactoryFromURL(url).lookup(RemoteObjectHelper.expandURI(url))
                 .getObjectProxy();
+    }
+    
+    /**
+     * unexports the remote object, according to the underlying protocol used
+     * @param url - the URL where the remote object/remote object factory/registry resides
+     * @param rro - the remote reference to the remote object which should be exported
+     * @throws ProActiveException
+     */
+    public static void unexport(URI url, RemoteRemoteObject rro) throws ProActiveException {
+    	RemoteObjectHelper.getFactoryFromURL(url).unexport(rro);
     }
 
 }
