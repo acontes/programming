@@ -37,14 +37,13 @@ import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NamesFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;

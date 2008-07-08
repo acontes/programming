@@ -6,10 +6,10 @@ import java.util.Observable;
 
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentHolderModel;
+import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.componentmonitoring.view.ComponentTreeView;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentHolderModel;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotificationTag;
 

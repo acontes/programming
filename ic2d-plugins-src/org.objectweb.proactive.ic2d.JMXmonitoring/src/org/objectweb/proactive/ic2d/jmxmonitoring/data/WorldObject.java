@@ -59,9 +59,14 @@ public class WorldObject extends AbstractData {
     public final static String ADD_VN_MESSAGE = "Add a virtual node";
     public final static String REMOVE_VN_MESSAGE = "Remove a virtual node";
 
-    public ComponentHolderModel CHolder;
+    //public ComponentHolderModel CHolder;
     
-    public Map<UniqueID,ComponentModel> components;
+    
+    
+    private HashMap<HolderTypes,AbstractHolder> holders;
+    
+    
+    
     
     // 60 s
     public static int MAX_AUTO_RESET_TIME = 60;
@@ -118,7 +123,7 @@ public class WorldObject extends AbstractData {
         this.activeObjects = new ConcurrentHashMap<UniqueID, ActiveObject>();
         this.migrations = new ConcurrentHashMap<UniqueID, ActiveObject>();
         this.vnChildren = new ConcurrentHashMap<String, VirtualNodeObject>();
-
+        this.holders = new HashMap<HolderTypes, AbstractHolder>();
         // Record the model
         this.name = ModelRecorder.getInstance().addModel(this);
 
@@ -129,17 +134,22 @@ public class WorldObject extends AbstractData {
         // Creates a notification manager
         notificationManager = JMXNotificationManager.getInstance();
         
-        try
-        {
-        CHolder = new ComponentHolderModel();
-        }
-        catch(Exception e)
-        {
-        	
-        }
-        this.components = new ConcurrentHashMap<UniqueID,ComponentModel>();
     }
 
+    /**
+     * It replaces the holder if its type already exists in the list
+     * @param h
+     */
+    public void addHolder(AbstractHolder h)
+    {
+    	holders.put(h.getHolderType(), h);
+    }
+    
+    public AbstractHolder getHolder(HolderTypes ht)
+    {
+    	return holders.get(ht);
+    }
+    
     // -------------------------------------------
     // --- Methods -------------------------------
     // -------------------------------------------

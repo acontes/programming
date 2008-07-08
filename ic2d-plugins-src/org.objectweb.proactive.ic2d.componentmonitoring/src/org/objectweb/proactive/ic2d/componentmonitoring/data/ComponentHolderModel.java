@@ -1,11 +1,26 @@
 package org.objectweb.proactive.ic2d.componentmonitoring.data;
 
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-public class ComponentHolderModel extends AbstractData
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractHolder;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.HolderTypes;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+
+public class ComponentHolderModel extends AbstractData implements AbstractHolder
 {
 
+	public Map<UniqueID,ComponentModel> components;
+	
 	private static String ObjectNameString = "org.objectweb.proactive.ic2d.componentmonitoring:type=ComponentHolder";
 
 	// -------------------------------------------
@@ -18,6 +33,8 @@ public class ComponentHolderModel extends AbstractData
 	{
 		super(new ObjectName(ObjectNameString));
 		name = ComponentHolderModel.class.getName();
+        this.components = new ConcurrentHashMap<UniqueID,ComponentModel>();
+
 	}
 
 	@Override
@@ -58,6 +75,44 @@ public class ComponentHolderModel extends AbstractData
 	private void findSubComponents()
 	{
 
+	}
+	
+	 /**
+     * Adds a child to this object, and explore this one.
+     * @param <T>
+     * @param child The child to explore
+     */
+    public synchronized void addChild(AbstractData child) {
+        if (!this.monitoredChildren.containsKey(child.getKey())) {
+            this.monitoredChildren.put(child.getKey(), child);
+            setChanged();
+            notifyObservers(new ComponentMVCNotification(ComponentMVCNotificationTag.ADD_CHILD, child.getKey()));
+            child.explore();
+        }
+    }
+
+    /**
+     * Deletes a child from all recorded data.
+     * @param child The child to delete.
+     */
+    public void removeChild(AbstractData child) {
+        if (child == null) {
+            return;
+        }
+
+        child.removeAllConnections();
+
+        String key = child.getKey();
+        monitoredChildren.remove(key);
+        notMonitoredChildren.remove(key);
+        setChanged();
+
+        notifyObservers(new ComponentMVCNotification(ComponentMVCNotificationTag.REMOVE_CHILD, key));
+    }
+
+	@Override
+	public HolderTypes getHolderType() {
+		return HolderTypes.COMPONENT_HOLDER;
 	}
 
 }

@@ -379,8 +379,8 @@ public class MonitoringView extends ViewPart {
         toolBarManager.add(toolBarNewView);
         
         // add component monitoring
-        ComponentMonitoringAction componentMonitoringView = new ComponentMonitoringAction(parent.getDisplay(),this.world);
-        toolBarManager.add(componentMonitoringView);
+//        ComponentMonitoringAction componentMonitoringView = new ComponentMonitoringAction(parent.getDisplay(),this.world);
+//        toolBarManager.add(componentMonitoringView);
     }
 
     /**

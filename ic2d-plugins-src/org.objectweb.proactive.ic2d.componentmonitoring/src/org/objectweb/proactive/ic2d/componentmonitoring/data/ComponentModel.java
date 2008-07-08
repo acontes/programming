@@ -2,13 +2,17 @@ package org.objectweb.proactive.ic2d.componentmonitoring.data;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
+import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.ComponentWrapperMBean;
-import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotification;
-import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotificationTag;
+import org.objectweb.proactive.ic2d.componentmonitoring.data.listener.ComponentModelListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotificationTag;
+
 
 public class ComponentModel extends AbstractData
 {
@@ -24,7 +28,7 @@ public class ComponentModel extends AbstractData
 
 	private String Hierachical = "";
 
-	private String Status = "";
+	private String Status = "Stoped";
 
 	private double mean_arrival_rate = -1;
 
@@ -47,7 +51,7 @@ public class ComponentModel extends AbstractData
 	//    /** JMX Notification listener
 	//     *  This listener will be subscribed to the JMXNotificationManager
 	//     * */
-	//    private final NotificationListener listener;
+	    private final NotificationListener listener;
 	//    
 	    /** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
 	    private ComponentWrapperMBean proxyMBean;
@@ -59,6 +63,7 @@ public class ComponentModel extends AbstractData
 		this.parent = parent;
 		this.ClassName = ClassName;
 		this.parent.addChild(this);
+		 this.listener = new org.objectweb.proactive.ic2d.componentmonitoring.data.listener.ComponentModelListener(this);
 
 	}
 
@@ -69,22 +74,27 @@ public class ComponentModel extends AbstractData
 		this.parent = parent;
 		this.ClassName = ClassName;
 		this.parent.addChild(this);
+		 this.listener = new ComponentModelListener(this);
+		
 	}
 
 	
-	public ComponentModel(ComponentModel parent,UniqueID id, String ClassName,ObjectName objectName,
-            BodyWrapperMBean proxyMBean)
+	public ComponentModel(NodeObject parent,UniqueID id, String ClassName,ObjectName objectName,
+			ComponentWrapperMBean proxyMBean)
 			throws MalformedObjectNameException, NullPointerException
 	{
-		super(objectName, null, null);
+		super(objectName);
 		this.parent = parent;
 		this.ClassName = ClassName;
+		if(this.parent!=null)
 		this.parent.addChild(this);
 		
         this.id = id;
-        this.ClassName = ClassName;
+        
+        
+//        System.out.println("ComponentModel()");
 
-//        this.listener = new ActiveObjectListener(this);
+        this.listener = new ComponentModelListener(this);
         
         this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(
                 getProActiveConnection(), getObjectName(), ComponentWrapperMBean.class, false);
@@ -95,14 +105,14 @@ public class ComponentModel extends AbstractData
         if( this.proxyMBean instanceof ComponentWrapperMBean)
         {
 //        	System.out.println("[YYL Test Output:]"+"this.proxyMBean instanceof BodyWrapperMBean");
-        	System.out.println("[YYL Test Output:]"+"in ActiveObject Body Name = "+this.proxyMBean.getName());
-//        	System.out.println("[YYL Test Output:]"+"in ActiveObject ComponentName"+" "+this.proxyMBean.getComponentName());
-        	System.out.println("[YYL Test Output:]"+"is Component?:"+this.proxyMBean.isComponent());
-//        	System.out.println("[YYL Test Output:]"+"Node Url= "+this.proxyMBean.getNodeUrl());
+//        	System.out.println("[YYL Test Output:]"+"in ComponentModel Body Name = "+this.proxyMBean.getName());
+//        	System.out.println("[YYL Test Output:]"+"in ComponentModel ComponentName"+" "+this.proxyMBean.getComponentName());
+//        	System.out.println("[YYL Test Output:]"+"in ComponentModel is Component?:"+this.proxyMBean.isComponent());
+////        	System.out.println("[YYL Test Output:]"+"Node Url= "+this.proxyMBean.getNodeUrl());
         }
         else
         {
-        	System.out.println("[YYL Test Output:]"+"BodyWrapperMBean");
+//        	System.out.println("[YYL Test Output:]"+"BodyWrapperMBean");
         }
 		
 	}
@@ -151,6 +161,11 @@ public class ComponentModel extends AbstractData
 	}
 
 	/* get Methods*/
+	public UniqueID getID()
+	{
+		return this.id;
+	}
+	
 	public String getHierachical()
 	{
 		return this.Hierachical;
@@ -205,6 +220,11 @@ public class ComponentModel extends AbstractData
 	{
 		return this.time_service_rate;
 	}
+	
+	public ComponentWrapperMBean getComponentWrapperMBean()
+	{
+		return this.proxyMBean;
+	}
 
 	/* Set Methods*/
 	/**
@@ -256,6 +276,7 @@ public class ComponentModel extends AbstractData
 		setChanged();
 		notifyObservers(new ComponentMVCNotification(
 				ComponentMVCNotificationTag.NAME_CHANGED, this.ClassName));
+//		System.out.println("in COmponent Model, set Name notification send!");
 
 	}
 
@@ -339,9 +360,48 @@ public class ComponentModel extends AbstractData
 				ComponentMVCNotificationTag.TIME_SERVICE_RATE_CHANGED,
 				this.time_service_rate));
 	}
+	
+	public void setParent(AbstractData parent)
+	{
+		this.parent = parent;
+	}
 
 	private void findChildren()
 	{
 
 	}
+	
+	/**
+     * Adds a child to this object, and explore this one.
+     * @param <T>
+     * @param child The child to explore
+     */
+    public synchronized void addChild(AbstractData child) {
+        if (!this.monitoredChildren.containsKey(child.getKey())) {
+            this.monitoredChildren.put(child.getKey(), child);
+            setChanged();
+            notifyObservers(new ComponentMVCNotification(ComponentMVCNotificationTag.ADD_CHILD, child.getKey()));
+            
+            child.explore();
+        }
+    }
+
+    /**
+     * Deletes a child from all recorded data.
+     * @param child The child to delete.
+     */
+    public void removeChild(AbstractData child) {
+        if (child == null) {
+            return;
+        }
+
+        child.removeAllConnections();
+
+        String key = child.getKey();
+        monitoredChildren.remove(key);
+        notMonitoredChildren.remove(key);
+        setChanged();
+
+        notifyObservers(new ComponentMVCNotification(ComponentMVCNotificationTag.REMOVE_CHILD, key));
+    }
 }

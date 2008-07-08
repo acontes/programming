@@ -14,12 +14,16 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.CollapseAllAction;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.ExpandAllAction;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.NewHostAction;
+import org.objectweb.proactive.ic2d.componentmonitoring.controllers.detailed.HostController;
+import org.objectweb.proactive.ic2d.componentmonitoring.controllers.detailed.WorldController;
+import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentHolderModel;
+import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.componentmonitoring.editpart.TreeEditPartFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentHolderModel;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ComponentModel;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.HolderTypes;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
+
 
 public class ComponentTreeView extends ViewPart
 {
@@ -101,16 +105,18 @@ public class ComponentTreeView extends ViewPart
 	{
 		super();
 //		builtComponentSample();
-//		try
-//		{
-//			this.CHolder = new ComponentHolderModel();
-//		}catch (Exception e)
-//		{
-//			e.printStackTrace();
-//		}
+		try
+		{
+			this.CHolder = new ComponentHolderModel();
+		}catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 		
 		this.world = new WorldObject();
-		this.CHolder = this.world.CHolder;
+		
+		//this.CHolder = (ComponentHolderModel)this.world.getHolder(HolderTypes.COMPONENT_HOLDER);
+		this.world.addHolder(this.CHolder);
 	}
 
 	@Override
@@ -208,9 +214,13 @@ public class ComponentTreeView extends ViewPart
 //        	}
 //        }
 //		
-		this.CHolder = world.CHolder;
+//		this.CHolder = (ComponentHolderModel)world.getHolder(HolderTypes.COMPONENT_HOLDER);
+	
 		this.treeViewer.setContents(this.CHolder);
 //
+	
+		   final WorldController gcontroller = new WorldController(this.world,  null);
+		
 		Thread showThread = new Thread(new changeShow());
 		showThread.start();
 

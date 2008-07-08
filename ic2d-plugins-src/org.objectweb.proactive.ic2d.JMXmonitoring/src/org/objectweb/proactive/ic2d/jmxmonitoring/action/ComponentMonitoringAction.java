@@ -42,65 +42,66 @@ import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.view.ComponentTreeView;
 
 
-public class ComponentMonitoringAction extends Action implements IWorkbenchWindowActionDelegate {
-    private Display display;
-    private int index= 0;
 
-    /** The World */
-    private WorldObject world;
-    public static final String COMPONENT_MONITORING_ACTION = "Component Monitor";
-
-    public ComponentMonitoringAction(Display display, WorldObject world) {
-//        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "host.gif"));
-        this.display = display;
-        this.world = world;
-        this.setId(COMPONENT_MONITORING_ACTION);
-        this.setText(COMPONENT_MONITORING_ACTION);
-        setToolTipText(COMPONENT_MONITORING_ACTION);
-    }
-
-    //
-    // -- PUBLICS METHODS -----------------------------------------------
-    //
-    protected void setWorldObject(WorldObject world) {
-        this.world = world;
-    }
-    
-    //
-    // -- PUBLICS METHODS -----------------------------------------------
-    //
-    public void dispose() {
-        // TODO Auto-generated method stub
-    }
-
-    public void init(IWorkbenchWindow window) {
-        // TODO Auto-generated method stub
-    }
-
-    public void run(IAction action) {
-        this.run();
-    }
-
-    public void selectionChanged(IAction action, ISelection selection) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void run() {
-    	try {
-           IViewPart componentTreeView =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ComponentTreeView.ID);
-           if(componentTreeView instanceof ComponentTreeView)
-           {
-        	   ((ComponentTreeView)componentTreeView).setWorld(world);
-           }
-        } catch (PartInitException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        Console.getInstance(Activator.CONSOLE_NAME).debug("New Monitoring view");
-    	
-    }
+public class ComponentMonitoringAction // extends Action implements IWorkbenchWindowActionDelegate 
+{
+//    private Display display;
+//    private int index= 0;
+//
+//    /** The World */
+//    private WorldObject world;
+//    public static final String COMPONENT_MONITORING_ACTION = "Component Monitor";
+//
+//    public ComponentMonitoringAction(Display display, WorldObject world) {
+////        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "host.gif"));
+//        this.display = display;
+//        this.world = world;
+//        this.setId(COMPONENT_MONITORING_ACTION);
+//        this.setText(COMPONENT_MONITORING_ACTION);
+//        setToolTipText(COMPONENT_MONITORING_ACTION);
+//    }
+//
+//    //
+//    // -- PUBLICS METHODS -----------------------------------------------
+//    //
+//    protected void setWorldObject(WorldObject world) {
+//        this.world = world;
+//    }
+//    
+//    //
+//    // -- PUBLICS METHODS -----------------------------------------------
+//    //
+//    public void dispose() {
+//        // TODO Auto-generated method stub
+//    }
+//
+//    public void init(IWorkbenchWindow window) {
+//        // TODO Auto-generated method stub
+//    }
+//
+//    public void run(IAction action) {
+//        this.run();
+//    }
+//
+//    public void selectionChanged(IAction action, ISelection selection) {
+//        // TODO Auto-generated method stub
+//    }
+//
+//    @Override
+//    public void run() {
+//    	try {
+//           IViewPart componentTreeView =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ComponentTreeView.ID);
+//           if(componentTreeView instanceof ComponentTreeView)
+//           {
+//        	   ((ComponentTreeView)componentTreeView).setWorld(world);
+//           }
+//        } catch (PartInitException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        Console.getInstance(Activator.CONSOLE_NAME).debug("New Monitoring view");
+//    	
+//    }
 }
