@@ -485,11 +485,20 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 			return;
 		}
 		
+		// unregister
 		try {
 			PARemoteObject.unregister(RemoteObjectHelper.generateUrl(partName));
 		} catch (ProActiveException e) {
 			jmxLogger.error("Could not unregister the ProActiveRuntime remote object" +
-					"with the name "+ partName + "; cause is: " , e );
+					"with the name "+ partName + "; problem caused by: " , e );
+		}
+		
+		// also unexport
+		try {
+			roe.unexport(RemoteObjectHelper.generateUrl(partName));
+		} catch (ProActiveException e) {
+			jmxLogger.error("Could not unexport the ProActiveRuntime remote object" +
+					"with the name "+ partName + "; problem caused by: " , e );
 		}
 
 	}

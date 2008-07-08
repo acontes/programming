@@ -231,6 +231,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory implemen
         if (rro instanceof RmiRemoteObject) {
             try {
                 UnicastRemoteObject.unexportObject((RmiRemoteObject) rro, false);
+                LOGGER_RO.debug("remote object unexported from registry");
             } catch (NoSuchObjectException e) {
                 throw new ProActiveException(e);
             }
