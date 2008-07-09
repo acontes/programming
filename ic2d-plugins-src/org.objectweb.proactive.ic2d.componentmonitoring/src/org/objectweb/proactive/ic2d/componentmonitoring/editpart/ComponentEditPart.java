@@ -9,8 +9,8 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.componentmonitoring.view.ComponentTreeView;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotificationTag;
+import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotification;
+import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotificationTag;
 
 public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentModel>
 {

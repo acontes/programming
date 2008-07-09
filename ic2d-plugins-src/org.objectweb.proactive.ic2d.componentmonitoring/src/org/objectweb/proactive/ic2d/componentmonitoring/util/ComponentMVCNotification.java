@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.jmxmonitoring.util;
+package org.objectweb.proactive.ic2d.componentmonitoring.util;
 
 /*
  * ################################################################

@@ -47,7 +47,7 @@ public abstract class AbstractStandardToComponentsController implements Observer
     }
 
     public void update(final Observable observable, final Object arg) {
-    	
+//    	System.out.println("AbstractStandardToComponentsController.update()");
     	
         // get the notification data
         final MVCNotification mvcNotif = (MVCNotification) arg;
@@ -69,7 +69,7 @@ public abstract class AbstractStandardToComponentsController implements Observer
                 this.addChildController(controller);
                 //			AbstractFigure3DController.registry.put(childModelObject,
                 //					controller);
-                
+//                System.out.println("in AbstractStandardToComponentsController get Notification : add Child");
 
                 break;
             }
@@ -87,7 +87,7 @@ public abstract class AbstractStandardToComponentsController implements Observer
                     //						controller);
                 } // [for all keys]
                 
-                System.out.println("in AbstractStandardToComponentsController get Notification : add Children");
+//                System.out.println("in AbstractStandardToComponentsController get Notification : add Children");
                 break;
             } // [case ADD_CHILDREN]
             case REMOVE_CHILD: {

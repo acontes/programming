@@ -11,8 +11,8 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractHolder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HolderTypes;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.ComponentMVCNotificationTag;
+import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotification;
+import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotificationTag;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 

@@ -65,9 +65,7 @@ public class NodeController extends AbstractStandardToComponentsController {
     
     @Override
     public void update(final Observable o, final Object arg) {
-    	System.out.println("NodeController.update()");
     	super.update(o, arg);
-    	System.out.println("NodeController.update() after super.update");;
     	final MVCNotification mvcNotif = (MVCNotification) arg;
            final MVCNotificationTag mvcNotifTag = mvcNotif.getMVCNotification();
         switch (mvcNotifTag) {
@@ -76,29 +74,21 @@ public class NodeController extends AbstractStandardToComponentsController {
         	// add new controller/figure
             // get key
             final String figureKey = (String) mvcNotif.getData();
-
-        	System.out.println("After figureKey");
-
             // get data on the figure
             final AbstractData childModelObject = ((AbstractData) o)
                     .getMonitoredChild(figureKey);
-        	System.out.println("After childModelObject");
-
             this.createComponentModel((ActiveObject)childModelObject); 
-        	System.out.println("After createcomponentmodel");
-
-            break;
+        	break;
         }
         case ADD_CHILDREN: {
             // HostObject hostObj=this.host;
             final List<String> keys = (ArrayList<String>) mvcNotif.getData();
-            System.out.println("NodeController.update() : " + mvcNotif.getData());
+
+//            System.out.println("NodeController.update() in ADD_CHILDREN keys.size() = "+keys.size());
             for (int k = 0; k < keys.size(); k++) {
                 final String modelObjectKey = keys.get(k);
                 final AbstractData childModelObject = this.getModelObject().getChild(modelObjectKey);
                 this.createComponentModel((ActiveObject)childModelObject); 
-                
-                System.out.println("NodeController.update() in ADD_CHILDREN");
             } 
             break;
         } // [case ADD_CHILDREN]

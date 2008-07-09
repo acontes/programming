@@ -228,7 +228,6 @@ public class NodeObject extends AbstractData {
          * ----->>>>   finishes : create component model here
 //         */
         
-        System.out.println("NodeObject.findActiveObjects() it has children size = "+childrentoAdd.size());
         
         // add all children
         this.addChildren(childrentoAdd);
