@@ -928,7 +928,9 @@
 
 	<!-- Define jars to be included into the archive -->
 	<patternset id="rar_included_jars" >
-		<include name="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar"/>
+		<include name="ProActive.jar bouncycastle.jar fractal.jar javassist.jar 
+			xercesImpl.jar xml-apis.jar connector_extra/xalan.jar log4j.jar
+			ibis-1.4.jar ibis-connect-1.0.jar ibis-util-1.0.jar"/>
 	</patternset>
 	
 <!--	<target name="rartest">
@@ -949,7 +951,9 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <fileset dir="${compile.dir}" includes="META-INF/geronimo-ra.xml" />
 		    <!-- ProActive libs -->
-			<fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar ProActive_examples.jar" />	
+			<fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar ProActive.jar ProActive_examples.jar" />
+			<!-- appplication-server specific fixup-->
+			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  />	
 		</jar>
 		<break/>
 	    </case>
@@ -960,7 +964,9 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <fileset dir="${compile.dir}" includes="META-INF/jonas-ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar ProActive_examples.jar" /> 
+		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar ProActive.jar ProActive_examples.jar" />
+			<!-- appplication-server specific fixup-->
+			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  /> 
 		</jar>
 		<break/>
 	    </case>
@@ -970,7 +976,9 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <!-- ProActive libs -->
-   			<fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar ProActive_examples.jar" />
+   			<fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar ProActive.jar ProActive_examples.jar" />
+			<!-- appplication-server specific fixup-->
+			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  />
 		</jar>
 		<break/>
 	    </default>
@@ -990,7 +998,9 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar ProActive_examples.jar" />
+		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar log4j.jar ProActive_examples.jar" />
+			<!-- appplication-server specific fixup-->
+			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  />
 		</jar>
 		<!-- Glassfish -->
 		<jar destfile="${deploy.dir}/proactive-glassfish.rar" >
@@ -998,7 +1008,9 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar ProActive_examples.jar" />
+		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar log4j.jar ProActive_examples.jar" />
+			<!-- appplication-server specific fixup-->
+			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  />
 		</jar>
 		<!-- Geronimo -->
 		<jar destfile="${deploy.dir}/proactive-geronimo.rar" >
@@ -1007,7 +1019,9 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <fileset dir="${compile.dir}" includes="META-INF/geronimo-ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar ProActive_examples.jar" />
+		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar log4j.jar ProActive_examples.jar" />
+			<!-- appplication-server specific fixup-->
+			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  />
 		</jar>
 		<!-- Jonas -->
 		<jar destfile="${deploy.dir}/proactive-jonas.rar" >
@@ -1016,7 +1030,9 @@
 		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
 		    <fileset dir="${compile.dir}" includes="META-INF/jonas-ra.xml" />
 		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar xalan.jar ProActive.jar ProActive_examples.jar" /> 
+		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar ProActive.jar ProActive_examples.jar" />
+			<!-- appplication-server specific fixup-->
+			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  /> 
 		</jar>
 	</target>
 	
