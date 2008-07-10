@@ -71,6 +71,7 @@ import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -798,6 +799,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 		
 		// destroy the JMX MBean associated with this runtime
 		destroyMBean();
+		
+		// unset the properties that were set in ProActiveConfiguration static initializer
+		// see issue ProActive-433
+		ProActiveConfiguration.getInstance().unsetProperties();
 
     }
 

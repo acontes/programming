@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.config;
 import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -51,6 +52,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveConfiguration {
     protected static Properties properties;
+    // the properties that were originally existent before loading the ProActive configuration
+    protected static Properties originalProperties;
     protected static final String PROACTIVE_CONFIG_FILENAME = "ProActiveConfiguration.xml";
     public static final String PROACTIVE_LOG_PROPERTIES_FILE = "ProActiveLoggers.properties";
     protected static final String PROACTIVE_USER_CONFIG_FILENAME = Constants.USER_CONFIG_DIR +
@@ -123,6 +126,10 @@ public class ProActiveConfiguration {
     }
 
     static private void checkSystemProperties() {
+    	// make a copy of the existing system properties
+    	originalProperties = new Properties(); 
+    	originalProperties.putAll(System.getProperties());
+    	
         Iterator<Object> it = System.getProperties().keySet().iterator();
         while (it.hasNext()) {
             String key = (String) it.next();
@@ -153,7 +160,7 @@ public class ProActiveConfiguration {
         Vector<String> v = new Vector(properties.keySet());
         Collections.sort(v);
         Iterator<String> it = v.iterator();
-
+        
         while (it.hasNext()) {
             String key = it.next();
             String value = properties.getProperty(key);
@@ -166,6 +173,12 @@ public class ProActiveConfiguration {
                     value);
             }
         }
+    }
+    
+    public void unsetProperties() {
+    	       
+        logger.debug("rolling back system properties to the original configuration");
+        System.setProperties(originalProperties);
     }
 
     /**

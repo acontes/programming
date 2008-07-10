@@ -32,10 +32,6 @@ package org.objectweb.proactive.extra.javaee.connector;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
@@ -47,7 +43,7 @@ import javax.transaction.xa.XAResource;
 
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.rmi.RegistryHelper;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 /**
@@ -60,9 +56,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 public class ProActiveResourceAdapter extends ProActiveConnectorBean
 	implements ResourceAdapter {
 
-	private ProActiveRuntimeImpl _proActiveRuntime;
-	private static final String PART_PREFIX = "PA_JVM";
-	
 	/* (non-Javadoc)
 	 * @see javax.resource.spi.ResourceAdapter#endpointActivation(javax.resource.spi.endpoint.MessageEndpointFactory, javax.resource.spi.ActivationSpec)
 	 */
@@ -93,6 +86,16 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 		return null;
 	}
 
+	
+	/*
+	 * Interesting code starts here :P
+	 */
+	
+	private ProActiveRuntimeImpl _proActiveRuntime;
+	private static final String PART_PREFIX = "PA_JVM";
+	// for efficiency reasons, we store the result of the getUrl call locally
+	private String _runtimeUrl;
+
 	/* 
 	 * This method will be called when a new ProActive ResourceAdapter
 	 * will be bootstrapped into the application server. 
@@ -105,11 +108,14 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 		
 		// the PART name
 		_raLogger.debug("Set the vmName to " + _vmName);
-		System.setProperty("proactive.runtime.name", PART_PREFIX + _vmName );
+		PAProperties.PA_RUNTIME_NAME.setValue(PART_PREFIX + _vmName);
 
 		// actually create the runtime
 		_proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-		_raLogger.debug("New PART created succesfully at URL:" + _proActiveRuntime.getMBean().getURL());
+		// this also tests the ActiveObject representing the runtime; 
+		// the getUrl is a remote call; the result will be stored locally 
+		_runtimeUrl = _proActiveRuntime.getURL();
+		_raLogger.debug("New PART created succesfully at URL:" + _runtimeUrl);
 
 	}
 
@@ -135,7 +141,7 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 	 */
 	private boolean runtimeAlreadyUnregistered() {
 		try {
-			PARemoteObject.lookup( new URI(_proActiveRuntime.getURL()) );
+			PARemoteObject.lookup( new URI(_runtimeUrl) );
 			// it is here alright...
 			_raLogger.debug( "There is still something left here to cleanup" );
 			return false;
@@ -143,7 +149,7 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 			_raLogger.debug( "Cleanup already done elsewhere, nothing left to do." );
 			return true;
 		} catch (URISyntaxException e) {
-			_raLogger.error( "The URI " + _proActiveRuntime.getURL() + " is invalid as a ProActive Runtime URL" , e );
+			_raLogger.error( "The URI " + _runtimeUrl + " is invalid as a ProActive Runtime URL" , e );
 			return true;
 		}
 	}
