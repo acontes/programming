@@ -8,9 +8,11 @@ import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Canvas3D;
 import javax.media.j3d.Locale;
 import javax.media.j3d.Shape3D;
+import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.VirtualUniverse;
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.ColorPalette;
@@ -36,6 +38,9 @@ public class CustomUniverse {
         scene = new BranchGroup();
         scene.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
         TransformGroup mapTG = new TransformGroup();
+        Transform3D mapT = new Transform3D();
+        mapT.setTranslation(new Vector3d(0d, -0.05d, 0d));
+        mapTG.setTransform(mapT);
         Shape3D map = new Shape3D(GeometryBasket.getFlatMap());
         map.setAppearance(AppearanceBasket.flatMap);
         mapTG.addChild(map);

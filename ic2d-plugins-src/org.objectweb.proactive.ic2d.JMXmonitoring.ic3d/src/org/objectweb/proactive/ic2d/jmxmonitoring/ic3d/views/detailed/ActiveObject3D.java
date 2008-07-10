@@ -147,9 +147,16 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      */
     @Override
     public void setStateActive() {
-        // TODO Auto-generated method stub
+    	this.setAppearance(AppearanceBasket.defaultActiveObjectAppearance);
     }
-
+    
+    @Override
+    public void setStateUnkown() {
+    	// TODO Auto-generated method stub
+    	//super.setStateUnkown();
+    	this.setAppearance(AppearanceBasket.unknownActiveObjectAppearance);
+    }
+    
     /*
      * (non-Javadoc)
      * 

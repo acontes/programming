@@ -65,7 +65,13 @@ public class FlatCameraBehavior extends CameraBehavior {
         	throw new NullPointerException("Pick Canvas not initialized");
         }
         pickCanvas.setShapeLocation(x, y);
-        pickResult = pickCanvas.pickClosest();
+        try {
+        	pickResult = pickCanvas.pickClosest();
+        }
+        catch (Exception e) {
+        	e.printStackTrace();
+        }
+        
         if (pickResult == null)
             selectedShape = null;
         else

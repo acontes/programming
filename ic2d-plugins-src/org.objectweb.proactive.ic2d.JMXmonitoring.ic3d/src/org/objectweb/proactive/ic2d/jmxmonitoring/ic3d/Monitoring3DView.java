@@ -146,7 +146,7 @@ public class Monitoring3DView extends ViewPart {
         
         // Fetch Grids
         final Grid3D detailedGrid = (Grid3D)gcontroller.getFigure();
-        detailedGrid.setTranslation(new Vector3d(0, 0.5, 0));
+        detailedGrid.setTranslation(new Vector3d(0, 0, 0));
         
         final LoadGrid3D loadGrid = (LoadGrid3D)glcontroller.getFigure();
         loadGrid.setTranslation(new Vector3d(0, 500, 0));
@@ -155,7 +155,7 @@ public class Monitoring3DView extends ViewPart {
         earthGrid.setTranslation(new Vector3d(0, -500, 0));
         
         // three views
-        final Canvas3D viewOne = universe.newView("one", new Point3d(0, 0.5, 0), detailedGrid.getRootBranch(),
+        final Canvas3D viewOne = universe.newView("one", new Point3d(0, 0, 0), detailedGrid.getRootBranch(),
                 new FlatCameraBehavior());
         
         final Canvas3D viewTwo = universe.newView("two", new Point3d(0, 500, 0), loadGrid

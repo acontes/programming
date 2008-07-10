@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 
+import javax.media.j3d.Appearance;
 import javax.media.j3d.BoundingBox;
 import javax.media.j3d.Font3D;
 import javax.media.j3d.FontExtrusion;
@@ -78,6 +79,7 @@ public class TextStylesBasket {
         fontTrans.setTransform(translate);
         
         Shape3D textShape = new Shape3D(textGeom);
+        textShape.setAppearance(AppearanceBasket.red);
         fontRotate.addChild(textShape);
         //fontRotate.addChild(figureName);
         fontTrans.addChild(fontRotate);

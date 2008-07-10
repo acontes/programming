@@ -4,10 +4,17 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.media.j3d.Texture;
+import javax.media.j3d.Texture2D;
+
+import org.j3d.renderer.java3d.geom.Torus;
+import org.j3d.renderer.java3d.texture.J3DTextureCacheFactory;
+import org.j3d.texture.TextureCache;
+import org.j3d.texture.TextureCacheFactory;
 
 
 public class TextureBasket {
-    public static final String path = "org/objectweb/proactive/ic2d/jmxmonitoring/ic3d/resources/";
+	public static final String path = "org/objectweb/proactive/ic2d/jmxmonitoring/ic3d/resources/";
     public static final BufferedImage pebbles = loadImage(path + "light_pebbles.jpg");
     public static final BufferedImage white_sand = loadImage(path + "white_sand.jpg");
     public static final BufferedImage metal_walk = loadImage(path + "metal_walk.jpg");
@@ -18,9 +25,13 @@ public class TextureBasket {
     public static final BufferedImage runtime = loadImage(path + "node_skin4.png");
     public static final BufferedImage round_corners = loadImage(path + "round_corners.png");
     public static final BufferedImage earth = loadImage(path + "EarthMap.jpg");
+    //public static final BufferedImage flatMap = loadImage(path + "world_large.jpg");
     public static final BufferedImage flatMap = loadImage(path + "france.gif");
     public static final BufferedImage host = loadImage(path + "host2.png");
     public static final BufferedImage node = loadImage(path + "node_node.png");
+	public static BufferedImage activeObject = loadImage(path + "ActiveObject2.png");
+    
+    //public static final Texture2D flatMapTexture = loadTexture(path + "world_large.jpg");
     
     private static BufferedImage loadImage(final String fname) {
         // Level logLevel = Level.FINE;
@@ -45,7 +56,7 @@ public class TextureBasket {
             bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 
             System.out.println("Could not load resource from " + fname);
-
+            
             return bufferedImage;
         }
     }

@@ -47,12 +47,58 @@ public final class AppearanceBasket {
 
     // Earth grid appearances
     public static final Appearance earthGridAppearance = AppearanceBasket.getEarthGridAppearance();
-
+	public static Appearance unknownActiveObjectAppearance = getUnknownActiveObjectAppearance();
+	public static Appearance red = red();
+	
     // make this class non instantiable
     private AppearanceBasket() {
     };
 
-    private static Appearance getDefaultQueueAppearance() {
+    private static Appearance getUnknownActiveObjectAppearance() {
+    	final Appearance appear = new Appearance();
+
+        final ColoringAttributes colorAttrib = new ColoringAttributes(0.0f, 0.0f, 0.0f, 3);
+
+        final Color3f matAmbient = ColorPalette.RED;
+        final Color3f matEmissive = ColorPalette.RED;
+        final Color3f matDiffuse = ColorPalette.RED;
+        final Color3f matSpecular = ColorPalette.RED;
+        final float matShininess = 73.0f;
+
+        final Material material = new Material(matAmbient, matEmissive, matDiffuse, matSpecular, matShininess);
+
+        final TextureUnitState[] textureUnitState = new TextureUnitState[2];
+        final TextureAttributes texAttr1 = new TextureAttributes();
+        texAttr1.setTextureMode(2);
+        TextureLoader tex;
+
+        try {
+            tex = new TextureLoader(TextureBasket.activeObject);
+            final Texture texture1 = tex.getTexture();
+            textureUnitState[0] = new TextureUnitState();
+            textureUnitState[0].setTexture(texture1);
+            textureUnitState[0].setTextureAttributes(texAttr1);
+            appear.setTextureUnitState(textureUnitState);
+        } catch (final Exception ex) {
+            AppearanceBasket.logger.warn("Error loading texture: ", ex);
+        }
+        final TransparencyAttributes transparencyAttributes = new TransparencyAttributes(
+            TransparencyAttributes.NONE, 0f);
+        transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
+
+        final PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(2);
+        polyAttributes.setCullFace(1);
+        appear.setPolygonAttributes(polyAttributes);
+
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
+        return appear;
+	}
+
+	private static Appearance getDefaultQueueAppearance() {
         final Appearance appear = new Appearance();
 
         final ColoringAttributes colorAttrib = new ColoringAttributes(1f, 1f, 0.0f, 3);
@@ -95,7 +141,7 @@ public final class AppearanceBasket {
 
         final TextureUnitState[] textureUnitState = new TextureUnitState[2];
         final TextureAttributes texAttr1 = new TextureAttributes();
-        texAttr1.setTextureMode(3);
+        texAttr1.setTextureMode(TextureAttributes.REPLACE);
         TextureLoader tex;
 
         try {
@@ -393,7 +439,7 @@ public final class AppearanceBasket {
         TextureLoader tex;
 
         try {
-            tex = new TextureLoader(TextureBasket.metal_walk);
+            tex = new TextureLoader(TextureBasket.activeObject);
             final Texture texture1 = tex.getTexture();
             textureUnitState[0] = new TextureUnitState();
             textureUnitState[0].setTexture(texture1);
@@ -438,7 +484,7 @@ public final class AppearanceBasket {
         TextureLoader tex;
 
         try {
-            tex = new TextureLoader(TextureBasket.metal_walk);
+            tex = new TextureLoader(TextureBasket.activeObject);
             final Texture texture1 = tex.getTexture();
             textureUnitState[0] = new TextureUnitState();
             textureUnitState[0].setTexture(texture1);
@@ -524,7 +570,7 @@ public final class AppearanceBasket {
         TextureLoader tex;
 
         try {
-            tex = new TextureLoader(TextureBasket.metal_walk);
+            tex = new TextureLoader(TextureBasket.activeObject);
             final Texture texture1 = tex.getTexture();
             textureUnitState[0] = new TextureUnitState();
             textureUnitState[0].setTexture(texture1);
@@ -569,7 +615,7 @@ public final class AppearanceBasket {
         TextureLoader tex;
 
         try {
-            tex = new TextureLoader(TextureBasket.metal_walk);
+            tex = new TextureLoader(TextureBasket.activeObject);
             final Texture texture1 = tex.getTexture();
             textureUnitState[0] = new TextureUnitState();
             textureUnitState[0].setTexture(texture1);
@@ -595,7 +641,36 @@ public final class AppearanceBasket {
 
         return appear;
     }
+    
+    private static Appearance red() {
+        final Appearance appear = new Appearance();
 
+        final ColoringAttributes colorAttrib = new ColoringAttributes(0.0f, 0.0f, 0.0f, 3);
+
+        final Color3f matAmbient = ColorPalette.RED;
+        final Color3f matEmissive = ColorPalette.RED;
+        final Color3f matDiffuse = ColorPalette.RED;
+        final Color3f matSpecular = ColorPalette.RED;
+        final float matShininess = 16.0f;
+
+        final Material material = new Material(matAmbient, matEmissive, matDiffuse, matSpecular, matShininess);
+
+        final PolygonAttributes polyAttributes = new PolygonAttributes();
+        polyAttributes.setPolygonMode(2);
+        polyAttributes.setCullFace(1);
+        appear.setPolygonAttributes(polyAttributes);
+
+        final TransparencyAttributes transparencyAttributes = new TransparencyAttributes(
+            TransparencyAttributes.NONE, 0f);
+        transparencyAttributes.setCapability(TransparencyAttributes.ALLOW_VALUE_WRITE);
+
+        appear.setTransparencyAttributes(transparencyAttributes);
+        appear.setMaterial(material);
+        appear.setColoringAttributes(colorAttrib);
+
+        return appear;
+    }
+    
     private static Appearance getFlatMapAppearance() {
         Appearance appear = new Appearance();
 

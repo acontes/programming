@@ -530,7 +530,7 @@ public class PlacementBasket {
         TransformGroup moveOld;
         parentFigurePosition.setScale(newScale);
         parentFigurePosition.setTranslation(new Vector3d(0, spacing *
-            figureIndex, 0));
+            ( figureIndex + 1 ), 0));
         moveOld = figure.getTranslateScaleTransform();
         moveOld.setTransform(parentFigurePosition);
 

@@ -13,6 +13,7 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.SiteBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior.OrbitalCameraBehavior;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorGrid3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.deprecated.MonitorHost3D;
@@ -23,11 +24,12 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.proearth.EarthGrid3
 
 public class Test2 extends JFrame {
     private static final long serialVersionUID = 6327098576785371018L;
-
+    
     public Test2() {
+    	SiteBasket.init();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Test2");
-        Test2Features();
+        Test2Features();  
     }
 
     private void Test2Features() {
