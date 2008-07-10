@@ -3,8 +3,10 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
@@ -24,7 +26,8 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
     // new HashMap<String, AbstractFigure3D>();
     // model object for the 3D figure
     //removed because it breaks load monitoring and earth view  - global variables are bad
-    //	protected static final Map<AbstractData, Figure3DController> registry = new ConcurrentHashMap<AbstractData, Figure3DController>();
+    protected static final Map<AbstractData, Figure3DController> registry = new ConcurrentHashMap<AbstractData, Figure3DController>();
+    
     private final AbstractData modelObject; // model object
     // 3D figure controlled
     private final Figure3D figure; // 3dFigure
@@ -78,10 +81,11 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
 
                 // System.out.println("----------->> new host added: "+hostKey);
                 final Figure3DController controller = this.createChildController(childModelObject);
+                
                 this.addChildController(controller);
-                //			AbstractFigure3DController.registry.put(childModelObject,
-                //					controller);
-
+                if(controller != null)
+                	AbstractFigure3DController.registry.put(childModelObject,
+                			controller);
                 break;
             }
             case ADD_CHILDREN: {
@@ -94,8 +98,8 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
 
                     final Figure3DController controller = this.createChildController(childModelObject);
                     this.addChildController(controller);
-                    //				AbstractFigure3DController.registry.put(childModelObject,
-                    //						controller);
+                    AbstractFigure3DController.registry.put(childModelObject,
+                    			controller);
                 } // [for all keys]
                 break;
             } // [case ADD_CHILDREN]
@@ -127,6 +131,10 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
                 childController.remove();
                 break;
             }
+            case ACTIVE_OBJECT_ADD_COMMUNICATION: {
+            	System.out.println("ADD_COMMUNICATION");
+            	break;
+            }
 
         }
     }
@@ -148,8 +156,8 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
         this.modelObject.deleteObserver(this);
         AbstractFigure3DController.logger.debug("I'm removing myself from the controller registry... ");
         // remove itself from the registry
-        //		AbstractFigure3DController.registry.remove(this.modelObject);
-        // System.out.println("Object model removed");
+        AbstractFigure3DController.registry.remove(this.modelObject);
+        AbstractFigure3DController.logger.trace("Object model removed");
 
         // ---not right---
         // figure.getRootBranch().removeAllChildren();

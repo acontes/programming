@@ -5,6 +5,11 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed;
 
 import java.util.Observable;
 
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.ChartItAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
@@ -73,6 +78,21 @@ public class Node3DController extends AbstractNode3DController {
 					node.stopMonitoring(true);
 					break;
 				case NODE_CHARTIT:
+					try {
+						final IResourceDescriptor descriptor = new AbstractDataDescriptor(node);
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								try {
+									ChartItDataEditor.openNewFromResourceDescriptor(descriptor,ChartItAction.PARUNTIME_CHARTIT_CONFIG_FILENAME);
+								} catch (PartInitException e) {									
+									e.printStackTrace();
+								}
+							}
+						});											
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					break;
     		}
     	}

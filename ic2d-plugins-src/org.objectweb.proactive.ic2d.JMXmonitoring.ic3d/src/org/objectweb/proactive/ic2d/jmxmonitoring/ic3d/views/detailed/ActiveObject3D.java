@@ -180,7 +180,6 @@ public class ActiveObject3D extends AbstractActiveObject3D {
 
 	@Override
 	public FigureType getType() {
-		// TODO Auto-generated method stub
 		return FigureType.ACTIVEOBJECT;
 	}
 

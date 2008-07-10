@@ -90,7 +90,6 @@ public class Arrow3D extends AbstractArrow3D {
 
 	@Override
 	public FigureType getType() {
-		// TODO Auto-generated method stub
 		return FigureType.ARROW;
 	}
 }

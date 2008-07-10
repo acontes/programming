@@ -71,20 +71,20 @@ public class Host3DController extends AbstractHost3DController {
 				case HOST_STOP_MONITORING:
 					host.stopMonitoring(true);
 					break;
-				case HOST_CHARTIT:
-					// TODO understand why this part mess up all
-					/* IResourceDescriptor resourceDescriptor;
-					try {
-						resourceDescriptor = new AbstractDataDescriptor(host);
-						ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor); 
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (PartInitException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} */
-					break;
+//				case HOST_CHARTIT:
+//					// TODO understand why this part mess up all
+//					/* IResourceDescriptor resourceDescriptor;
+//					try {
+//						resourceDescriptor = new AbstractDataDescriptor(host);
+//						ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor); 
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} catch (PartInitException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} */
+//					break;
     		}
     	}
     }

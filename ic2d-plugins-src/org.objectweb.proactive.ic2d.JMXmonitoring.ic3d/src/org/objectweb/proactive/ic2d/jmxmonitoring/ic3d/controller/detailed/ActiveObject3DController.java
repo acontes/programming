@@ -4,11 +4,19 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed;
 
 import java.util.Observable;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.ChartItAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.MenuAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ActiveObject3D;
@@ -93,72 +101,98 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
                 	break;
             	}
             	case ACTIVE_OBJECT_ADD_COMMUNICATION: {
-
-                	//			remove because the global registry of figures has been removed
-                	//			FIXME create alternative implementation
-                	//			// new Thread(new Runnable() {
-            		//			// public void run() {
-                	//			final ActiveObject aoSource = (ActiveObject) notif.getData();
-                	//
-                	//			// final ActiveObject aoDestination = (ActiveObject)
-                	//			// notificationSender;
-                	//			if ((aoSource == null)) {
-                	//				ActiveObject3DController.logger
-                	//						.warn("No source object found for commmunication");
-                	//				return;
-            		//			}
-                	//
-                	//			final Figure3DController srcController = AbstractFigure3DController.registry
-                	//					.get(aoSource);
-                	//
-                	//			if (srcController == null) {
-                	//				return;
-                	//			}
-                	//			final ActiveObject3D source3d = (ActiveObject3D) srcController
-                	//					.getFigure();
-                	//
-                	//			// the destination is this figure
-                	//			final ActiveObject3D dest3d = (ActiveObject3D) ActiveObject3DController.this
-                	//					.getFigure();
-                	//
-                	//			if (source3d == null) {
-                	//				ActiveObject3DController.logger
-                	//						.warn("No figures found for source commmunication "
-                	//								+ aoSource.getKey());
-                	//				return;
-                	//			}
-                	//
-                	//			if (dest3d == null) {
-                	//				ActiveObject3DController.logger
-                	//						.warn("No figures found for destination commmunication ");
-                	//				return;
-                	//			}
-                	//			// get the grid controller
-                	//			final Figure3DController rootGridController = ActiveObject3DController.this
-                	//					.getParent(). // node
-                	//					getParent(). // runtime
-                	//					getParent(). // host
-                	//					getParent();// grid
-                	//			// get the figure for the grid
-                	//			final Figure3D rootGrid = rootGridController.getFigure();
-                	//			// TODO remove constant
-                	//			// draw the communications on the grid with the given starting and
-                	//			// stopping points
-                	//			// rootGrid.drawCommunication(UUID.randomUUID().toString(), "", 5,
-                	//			// source3d, dest3d);
-                	//			// }
-            		//			// }).start();
-            		//			// else
-            		//			// Logger.getRootLogger().log(
-            		//			// Priority.INFO,
-                	//			// "Communication from " + aoSource + ":" + source3d + " to "
-                	//			// + this + ":" + dest3d);
-
+            		//Never executed because ACTIVE_OBJECT_ADD_COMMUNICATION never notified
+//            					System.out.println("ADD_COMMUNICATION");
+//                				//remove because the global registry of figures has been removed
+//                				//FIXME create alternative implementation
+//                				// new Thread(new Runnable() {
+//            					// public void run() {
+//                				final ActiveObject aoSource = (ActiveObject) notif.getData();
+//                	
+//                				// final ActiveObject aoDestination = (ActiveObject)
+//                				// notificationSender;
+//                				if ((aoSource == null)) {
+//                					ActiveObject3DController.logger
+//                							.warn("No source object found for commmunication");
+//                					return;
+//            					}
+//                	
+//                				final Figure3DController srcController = registry.get(aoSource);
+//                	
+//                				if (srcController == null) {
+//                					return;
+//                				}
+//                				
+//                				final ActiveObject3D source3d = (ActiveObject3D) srcController
+//                						.getFigure();
+//                	
+//                				// the destination is this figure
+//                				final ActiveObject3D dest3d = (ActiveObject3D) ActiveObject3DController.this
+//                						.getFigure();
+//                	
+//                				if (source3d == null) {
+//                					ActiveObject3DController.logger
+//                							.warn("No figures found for source commmunication "
+//                									+ aoSource.getKey());
+//                					return;
+//                				}
+//                	
+//                				if (dest3d == null) {
+//                					ActiveObject3DController.logger
+//                							.warn("No figures found for destination commmunication ");
+//                					return;
+//                				}
+//                				
+//                				final Figure3DController rootGridController = ActiveObject3DController.this
+//                						.getParent(). // node
+//                						getParent(). // runtime
+//                						getParent(). // host
+//                						getParent();// grid
+//                				// get the figure for the grid
+//                				final Figure3D rootGrid = rootGridController.getFigure();
+//                				
+//                				//rootGrid.drawCommunication(UUID.randomUUID().toString(), name, timeToLive, startAO, stopAO)
+//                				// TODO remove constant
+//                				// draw the communications on the grid with the given starting and
+//                				// stopping points
+//                				rootGrid.drawCommunication(UUID.randomUUID().toString(), "", 5,
+//                						source3d, dest3d);
+//                				// }
+//            					// }).start();
+//            					// else
+//            					// Logger.getRootLogger().log(
+//            					// Priority.INFO,
+//                				// "Communication from " + aoSource + ":" + source3d + " to "
+//                				// + this + ":" + dest3d);
+//
                 	break;
             	} // switch
             	default:
             		super.update(o, arg);
         	}
+    	}
+    	else {
+    		MenuAction menuAction = (MenuAction)arg;
+    		ActiveObject ao = (ActiveObject)this.getModelObject();
+    		switch (menuAction) {
+				case AO_CHARTIT:
+					try {
+						final IResourceDescriptor descriptor = new AbstractDataDescriptor(ao);
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								try {
+									ChartItDataEditor.openNewFromResourceDescriptor(descriptor,ChartItAction.PARUNTIME_CHARTIT_CONFIG_FILENAME);
+								} catch (PartInitException e) {									
+									e.printStackTrace();
+								}
+							}
+						});											
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
+    		}
     	}
     }
 }
