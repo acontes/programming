@@ -175,6 +175,7 @@ public class PlacementBasket {
      */
     public static void matrixGridArrangement(final int figureIndex, final Figure3D figure, final int figureCount, final Vector3f offset) {
         /* Setting up our variables */
+    	System.out.println(offset);
         double x, z; /* Our host 2D placement */
         int figureIndexSquareRoot, c, xCountSquareRoot, zCountSquareRoot;
         /* Checking parameters */
@@ -222,16 +223,18 @@ public class PlacementBasket {
         /* Align figures to the center */
     	x -= (double)((xCountSquareRoot - 1 )/ 2d);
     	z -= (double)((zCountSquareRoot - 1 )/ 2d);
-    	
-    	/* Offset the figure according their location */
-    	x += offset.x;
-    	z += offset.z;
+    	x--;
+    	z--;
     	
         /* Scale the offset and set a padding */
         x *= GeometryBasket.FIGURE_SCALE * 1.2;
         z *= GeometryBasket.FIGURE_SCALE * 1.2;
         
-        figure.placeSubFigure(figure, x, 0, z);
+        /* Offset the figure according their location */
+    	x += offset.x;
+    	z += offset.z;
+    	
+    	figure.placeSubFigure(figure, x, 0, z);
     }
     
     /**

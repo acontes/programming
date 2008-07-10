@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.vecmath.Point3d;
 import javax.vecmath.Vector3f;
 
 public class SiteBasket {
@@ -48,15 +49,15 @@ public class SiteBasket {
 		//portoalegre
 		grid5000Pattern = Pattern.compile(".*grid5000.*");
 		Vector3f sophia = new Vector3f(28f,0,23f);
-		Vector3f paris = new Vector3f(0.5f,0f,-20f);
-		Vector3f bordeaux = new Vector3f(-18f,0f,15f);
-		Vector3f toulouse = new Vector3f(-6f,0f,26f);
-		Vector3f lyon = new Vector3f(15.5f, 0f, 7f);
-		Vector3f lille = new Vector3f(4.5f, 0f, -35f);
-		Vector3f orsay = new Vector3f(-1f,0f,-18f);;
-		Vector3f grenoble = new Vector3f(21.5f, 0f, 13f);
-		Vector3f nancy = new Vector3f(23f, 0f, -19f);
-		Vector3f rennes = new Vector3f(-23f, 0f, -14f);;
+		Vector3f paris = new Vector3f(3f,0f,-23f);
+		Vector3f bordeaux = new Vector3f(-20f,0f,19.5f);
+		Vector3f toulouse = new Vector3f(-5.5f,0f,32.5f);
+		Vector3f lyon = new Vector3f(18.5f, 0f, 11f);
+		Vector3f lille = new Vector3f(1.5f, 0f, -33.5f);
+		Vector3f orsay = new Vector3f(0f,0f,-19.5f);;
+		Vector3f grenoble = new Vector3f(26.5f, 0f, 16f);
+		Vector3f nancy = new Vector3f(29f, 0f, -21.5f);
+		Vector3f rennes = new Vector3f(-26.5f, 0f, -15.5f);;
 		
 		siteFlatLocation.put("bordeaux", bordeaux);
 		siteFlatLocation.put("grenoble", grenoble);
@@ -77,9 +78,9 @@ public class SiteBasket {
 		hostSites.put("shainese.inria.fr", "orsay");
 		hostSites.put("sgouirk.inria.fr", "paris");
 		hostSites.put("paquito.inria.fr", "rennes");
-		hostSites.put("macondo.inria.fr", "sophia");
-		hostSites.put("lo.inria.fr", "sophia");
-		hostSites.put("jily.inria.fr", "sophia");
+		hostSites.put("macondo.inria.fr", "bordeaux");
+		hostSites.put("lo.inria.fr", "toulouse");
+		hostSites.put("jily.inria.fr", "lille");
 		hostSites.put("islamabad.inria.fr", "sophia");
 		hostSites.put("dalmatie.inria.fr", "sophia");
 		hostSites.put("crios.inria.fr", "sophia");
@@ -183,5 +184,10 @@ public class SiteBasket {
 		hostSites.put("amstel", "sophia");
 		hostSites.put("aglae", "sophia");
 		hostSites.put("adrar", "sophia");
+	}
+
+	public static Point3d getTownLocation(String string) {
+		Vector3f toReturn = siteFlatLocation.get(string);
+		return new Point3d(toReturn);
 	}
 }

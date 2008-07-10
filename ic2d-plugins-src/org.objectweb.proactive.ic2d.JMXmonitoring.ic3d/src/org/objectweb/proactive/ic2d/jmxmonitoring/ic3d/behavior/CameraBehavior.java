@@ -19,6 +19,7 @@ import javax.media.j3d.WakeupOr;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.ActiveObjectMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.HostMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.NodeMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.RuntimeMenu;
@@ -209,6 +210,9 @@ public abstract class CameraBehavior extends Behavior {
     				break;
     			case RUNTIME:
     				pop = new RuntimeMenu(canvas3D, figure);
+    				break;
+    			case ACTIVEOBJECT:
+    				pop = new ActiveObjectMenu(canvas3D, figure);
     				break;
     		}
     	}

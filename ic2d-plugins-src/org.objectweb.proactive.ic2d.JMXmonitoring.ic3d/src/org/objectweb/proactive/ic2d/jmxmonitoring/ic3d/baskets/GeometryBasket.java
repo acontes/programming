@@ -325,16 +325,16 @@ public final class GeometryBasket {
 
     private static Geometry queueGeometry() {
         //-------------GEOMETRY POINTS--------------
-        Point3f a = new Point3f(0f, 0f, 0f);
-        Point3f b = new Point3f(0f, FIGURE_SCALE, 0f);
-        Point3f c = new Point3f(-FIGURE_SCALE, FIGURE_SCALE, 0f);
-        Point3f d = new Point3f(-FIGURE_SCALE, 0f, 0f);
+        Point3f a = new Point3f(0f, -FIGURE_SCALE / 2f, 0f);
+        Point3f b = new Point3f(0f, FIGURE_SCALE / 2f, 0f);
+        Point3f c = new Point3f(-FIGURE_SCALE, FIGURE_SCALE / 2f, 0f);
+        Point3f d = new Point3f(-FIGURE_SCALE, -FIGURE_SCALE / 2f, 0f);
 
-        final Point3f a1 = new Point3f(0f, 0f, GeometryBasket.FIGURE_SCALE);
-        final Point3f b1 = new Point3f(0f, GeometryBasket.FIGURE_SCALE, GeometryBasket.FIGURE_SCALE);
-        final Point3f c1 = new Point3f(-GeometryBasket.FIGURE_SCALE, GeometryBasket.FIGURE_SCALE,
+        final Point3f a1 = new Point3f(0f, -FIGURE_SCALE / 2f, GeometryBasket.FIGURE_SCALE);
+        final Point3f b1 = new Point3f(0f, GeometryBasket.FIGURE_SCALE/2f, GeometryBasket.FIGURE_SCALE);
+        final Point3f c1 = new Point3f(-GeometryBasket.FIGURE_SCALE, GeometryBasket.FIGURE_SCALE / 2f,
             GeometryBasket.FIGURE_SCALE);
-        final Point3f d1 = new Point3f(-GeometryBasket.FIGURE_SCALE, 0f, GeometryBasket.FIGURE_SCALE);
+        final Point3f d1 = new Point3f(-GeometryBasket.FIGURE_SCALE, -FIGURE_SCALE / 2f, GeometryBasket.FIGURE_SCALE);
 
         // ------------------------------------------
         // create the points

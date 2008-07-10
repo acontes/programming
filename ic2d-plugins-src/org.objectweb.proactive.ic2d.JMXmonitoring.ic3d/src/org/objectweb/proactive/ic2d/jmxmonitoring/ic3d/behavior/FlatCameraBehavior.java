@@ -2,6 +2,8 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.behavior;
 
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
@@ -10,6 +12,7 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.SiteBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ActiveObject3D;
 
 import com.sun.j3d.utils.picking.PickResult;
@@ -248,9 +251,136 @@ public class FlatCameraBehavior extends CameraBehavior {
 
 	@Override
 	protected void initCameraDefaultMenu() {
+		ActionListener al;
+		MenuItem mit;
 		popup = new PopupMenu("Camera");
-		popup.add(new MenuItem("Reset"));
-		popup.add(new MenuItem("Goto: Nice"));
+		
+		mit = new MenuItem("Reset");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = new Point3d();
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		
+		mit = new MenuItem("Goto: Sophia");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(SiteBasket.getTownLocation("sophia"));
+				targetPosition = SiteBasket.getTownLocation("sophia");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		
+		mit = new MenuItem("Goto: Bordeaux");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("bordeaux");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		mit = new MenuItem("Goto: Grenoble");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("grenoble");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		mit = new MenuItem("Goto: Lille");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("lille");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		mit = new MenuItem("Goto: Lyon");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("lyon");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		mit = new MenuItem("Goto: Nancy");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("nancy");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		mit = new MenuItem("Goto: Paris");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("paris");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		mit = new MenuItem("Goto: Orsay");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("orsay");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		
+		mit = new MenuItem("Goto: Rennes");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("rennes");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		mit = new MenuItem("Goto: Toulouse");
+		al = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetPosition = SiteBasket.getTownLocation("toulouse");
+				refresh();
+			}
+			
+		};
+		mit.addActionListener(al);
+		popup.add(mit);
+		
 		canvas3D.add(popup);
 	}
 }
