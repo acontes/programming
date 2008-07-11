@@ -158,6 +158,7 @@ public class ComponentEditPart extends ComponentMonitorTreeEditPart<ComponentMod
 
 	}
 
+	@Override
 	protected final void refreshVisuals()
 	{
 		ComponentModel model = (ComponentModel) getModel();

@@ -13,8 +13,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractHolder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HolderTypes;
 import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotification;
 import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotificationTag;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 public class ComponentHolderModel extends AbstractData implements AbstractHolder
 {
@@ -82,7 +80,8 @@ public class ComponentHolderModel extends AbstractData implements AbstractHolder
      * @param <T>
      * @param child The child to explore
      */
-    public synchronized void addChild(AbstractData child) {
+    @Override
+	public synchronized void addChild(AbstractData child) {
         if (!this.monitoredChildren.containsKey(child.getKey())) {
             this.monitoredChildren.put(child.getKey(), child);
             setChanged();
@@ -95,7 +94,8 @@ public class ComponentHolderModel extends AbstractData implements AbstractHolder
      * Deletes a child from all recorded data.
      * @param child The child to delete.
      */
-    public void removeChild(AbstractData child) {
+    @Override
+	public void removeChild(AbstractData child) {
         if (child == null) {
             return;
         }

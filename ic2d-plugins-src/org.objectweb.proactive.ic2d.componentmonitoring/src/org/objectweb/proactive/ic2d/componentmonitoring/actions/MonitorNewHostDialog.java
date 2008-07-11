@@ -65,8 +65,6 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.ic2d.console.Console;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 

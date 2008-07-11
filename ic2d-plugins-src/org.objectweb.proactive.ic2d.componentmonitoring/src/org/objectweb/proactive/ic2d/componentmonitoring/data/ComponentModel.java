@@ -1,21 +1,17 @@
 package org.objectweb.proactive.ic2d.componentmonitoring.data;
 
-import java.util.List;
-
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.ComponentWrapperMBean;
 import org.objectweb.proactive.ic2d.componentmonitoring.data.listener.ComponentModelListener;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotification;
 import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 
 public class ComponentModel extends AbstractData {
 
@@ -87,9 +83,17 @@ public class ComponentModel extends AbstractData {
 		super(objectName);
 		this.parent = parent;
 		this.ClassName = ClassName;
-		if (this.parent != null)
-			this.parent.addChild(this);
-
+		
+		/**
+		 * delete this because ComponentModel is the logic unit, do not depend on any NodeOject, Node Object is just used as a temp parent
+		 */
+//		if (this.parent != null)
+//			this.parent.addChild(this);
+       
+		
+		
+		
+		
 		this.id = id;
 
 		// System.out.println("ComponentModel()");
@@ -112,9 +116,19 @@ public class ComponentModel extends AbstractData {
 		} else {
 			// System.out.println("[YYL Test Output:]"+"BodyWrapperMBean");
 		}
+		
+		
+		
 
 	}
 
+	/**
+     * Returns a JMX Notification listener.
+     * @return a JMX Notification listener.
+     */
+    public NotificationListener getListener() {
+        return this.listener;
+    }
 	
 
 	@Override
@@ -315,6 +329,7 @@ public class ComponentModel extends AbstractData {
 	 * @param child
 	 *            The child to explore
 	 */
+	@Override
 	public synchronized void addChild(AbstractData child) {
 		if (!this.monitoredChildren.containsKey(child.getKey())) {
 			this.monitoredChildren.put(child.getKey(), child);
@@ -331,6 +346,7 @@ public class ComponentModel extends AbstractData {
 	 * @param child
 	 *            The child to delete.
 	 */
+	@Override
 	public void removeChild(AbstractData child) {
 		if (child == null) {
 			return;

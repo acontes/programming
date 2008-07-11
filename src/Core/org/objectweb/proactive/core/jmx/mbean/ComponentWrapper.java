@@ -22,6 +22,7 @@ public class ComponentWrapper extends BodyWrapper implements ComponentWrapperMBe
 	 */
 	public ComponentWrapper() {
 		/* Empty Constructor required by JMX */
+		super();
 	}
 
 	/**

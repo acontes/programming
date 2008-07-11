@@ -81,6 +81,7 @@ public class ComponentModelListener implements NotificationListener {
             for (Notification notification : notifications) {
                 String type = notification.getType();
 
+                System.out.println("Component Model Listener Task.run() -> get Notification"+type);
                 if (type.equals(NotificationType.requestReceived)) {
                     logger.debug(".................................Request Received : " + cm.getName());
                     RequestNotificationData request = (RequestNotificationData) notification.getUserData();
@@ -157,9 +158,11 @@ public class ComponentModelListener implements NotificationListener {
 
     @SuppressWarnings("unchecked")
     public void handleNotification(Notification notifications, Object handback) {
-        if (!cm.getWorldObject().getEnableMonitoring()) {
-            return;
-        }
+//        if (!cm.getWorldObject().getEnableMonitoring()) {
+//            return;
+//        }
+    	
+    	System.out.println("ComponentModelListener.handleNotification() ->"+notifications.toString());
 
         ConcurrentLinkedQueue notifs = (ConcurrentLinkedQueue<Notification>) notifications.getUserData();
         IC2DThreadPool.execute(new Task(notifs));

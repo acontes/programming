@@ -170,6 +170,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
 
     public void sendNotification(String type) {
         this.sendNotification(type, null);
+        
     }
 
     public void sendNotification(String type, Object userData) {
@@ -190,6 +191,8 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
         } else {
             notifications.add(notification);
         }
+        
+//        System.out.println("BodyWrapper.sendNotification() -> send notificaiton :"+type);
     }
 
     public void migrateTo(String nodeUrl) throws MigrationException {

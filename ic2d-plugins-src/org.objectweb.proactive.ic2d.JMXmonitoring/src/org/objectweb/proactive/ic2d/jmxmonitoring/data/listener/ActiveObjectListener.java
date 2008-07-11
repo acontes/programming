@@ -81,6 +81,8 @@ public class ActiveObjectListener implements NotificationListener {
             for (Notification notification : notifications) {
                 String type = notification.getType();
 
+                System.out.println("Task.run() -> get Notification "+type);
+                
                 if (type.equals(NotificationType.requestReceived)) {
                     logger.debug(".................................Request Received : " + ao.getName());
                     RequestNotificationData request = (RequestNotificationData) notification.getUserData();

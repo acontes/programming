@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" 
+"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition name="myhelloworld.adl.myapplication" 
+extends="componentmonitorTests.component.monitor.controller.adl.ComponentMonitorController">				
+	<interface signature="myhelloworld.Client" role="server" name="Outer-interface"/>
+	<component name="client" definition="myhelloworld.adl.client"/>
+	<component name="server" definition="myhelloworld.adl.server"/>	
+	
+	<!--<binding client="this.Outer-interface" 
+	         server="client.myhelloworld-client"/>
+    <binding client="client.myhelloworld-server" 
+	         server="server.myhelloworld-server"/>-->
+	         
+	         
+	<binding client="this.Outer-interface" 
+	         server="client.myhelloworld-client-server"/>
+    <binding client="client.myhelloworld-client-client" 
+	         server="server.myhelloworld-server"/>
+	         
+	<!--<controller desc="composite"/>-->
+
+	<!--<virtual-node name="myapplication-node" cardinality="single"/>-->
+	
+</definition>

@@ -8,7 +8,6 @@ import java.util.Observable;
 import org.objectweb.proactive.ic2d.componentmonitoring.controllers.AbstractStandardToComponentsController;
 import org.objectweb.proactive.ic2d.componentmonitoring.controllers.StandardToComponentsController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
 
 

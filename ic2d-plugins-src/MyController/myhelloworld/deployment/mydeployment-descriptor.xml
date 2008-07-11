@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./DescriptorSchema.xsd">
+-->
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="DescriptorSchema.xsd">
+
+
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="myapplication-node" />
+			<virtualNode name="server-node" />
+			<virtualNode name="client-node" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+
+	<deployment>
+
+		<mapping>
+			<map virtualNode="myapplication-node">
+				<jvmSet>
+					<vmName value="MyApplicationJvm" />
+				</jvmSet>
+			</map>
+			<map virtualNode="server-node">
+				<jvmSet>
+					<vmName value="ServerJvm" />
+				</jvmSet>
+			</map>
+			<map virtualNode="client-node">
+				<jvmSet>
+					<vmName value="ClientJvm" />
+				</jvmSet>
+			</map>
+		</mapping>
+
+		<jvms>
+			<jvm name="MyApplicationJvm">
+				<creation>
+					<processReference refid="linuxJVM1" />
+				</creation>
+			</jvm>
+
+			<jvm name="ServerJvm">
+				<creation>
+					<processReference refid="linuxJVM1" />
+				</creation>
+			</jvm>
+
+			<jvm name="ClientJvm">
+				<creation>
+					<processReference refid="linuxJVM1" />
+				</creation>
+			</jvm>
+
+		</jvms>
+
+	</deployment>
+
+
+	<infrastructure>
+
+		<processes>
+
+
+
+
+			<processDefinition id="linuxJVM1">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<jvmParameters>
+						<parameter
+							value="-Dproactive.communication.protocol=rmissh" />
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+
+
+			<processDefinition id="linuxJVM2">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/ic2d-plugins-src/org.objectweb.proactive.ic2d.lib/ProActive.jar" />
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/ic2d-plugins-src/org.objectweb.proactive.ic2d.lib/lib/fractal.jar" />
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/ic2d-plugins-src/org.objectweb.proactive.ic2d.lib/lib/asm.jar" />
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/ic2d-plugins-src/org.objectweb.proactive.ic2d.lib/lib/log4j.jar" />
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/ic2d-plugins-src/org.objectweb.proactive.ic2d.lib/lib/xercesImpl.jar" />
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/ic2d-plugins-src/org.objectweb.proactive.ic2d.lib/lib/bouncycastle.jar" />
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/ic2d-plugins-src/org.objectweb.proactive.ic2d.lib/lib/javassist.jar" />
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/ic2d-plugins-src/org.objectweb.proactive.ic2d.lib/lib/jsch.jar" />
+					</classpath>
+					<policyFile>
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/scripts/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath
+							value="/user/yyuan/home/workspace/SHORT_IC2D_COMPONENT/scripts/proactive-log4j" />
+					</log4jpropertiesFile>
+					<jvmParameters>
+						<parameter
+							value="-Dproactive.communication.protocol=rmissh" />
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+
+			<processDefinition id="RemoteJVM1">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="krios" username="yyuan">
+					<processReference refid="linuxJVM2" />
+					<!-- <commandPath value="ssh"/> -->
+				</sshProcess>
+			</processDefinition>
+
+
+
+		</processes>
+
+	</infrastructure>
+
+</ProActiveDescriptor>

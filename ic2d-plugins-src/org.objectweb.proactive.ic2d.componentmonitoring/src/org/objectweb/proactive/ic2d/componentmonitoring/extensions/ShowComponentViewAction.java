@@ -5,8 +5,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.componentmonitoring.controllers.AbstractStandardToComponentsController;
-import org.objectweb.proactive.ic2d.componentmonitoring.controllers.StandardToComponentsController;
-import org.objectweb.proactive.ic2d.componentmonitoring.controllers.detailed.ActiveObjectController;
 import org.objectweb.proactive.ic2d.componentmonitoring.controllers.detailed.HostController;
 import org.objectweb.proactive.ic2d.componentmonitoring.controllers.detailed.NodeController;
 import org.objectweb.proactive.ic2d.componentmonitoring.controllers.detailed.RuntimeController;
@@ -59,7 +57,8 @@ public class ShowComponentViewAction extends Action implements IActionExtPoint{
 	    }
 	
 	 
-	 public void run()
+	 @Override
+	public void run()
 	 {
 		 this.handleData(target);
 	 }
@@ -74,7 +73,7 @@ public class ShowComponentViewAction extends Action implements IActionExtPoint{
 	                return;
 	   
 	        WorldObject wo = (WorldObject)abstractData;
-	        System.out.println("ShowComponentViewAction.handleData() -> showing component view of "+wo.toString());
+//	        System.out.println("ShowComponentViewAction.handleData() -> showing component view of "+wo.toString());
 	        
 	        try {
 	            ComponentTreeView view = (ComponentTreeView)PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ComponentTreeView.ID,
@@ -90,7 +89,7 @@ public class ShowComponentViewAction extends Action implements IActionExtPoint{
 				register(wo, wc);
 				created = true;
 			}
-	        System.out.println("ShowComponentViewAction.handleData() -> will show comp view for " + target.toString());
+//	        System.out.println("ShowComponentViewAction.handleData() -> will show comp view for " + target.toString());
 	  }
 	
 	  /**
@@ -103,7 +102,7 @@ public class ShowComponentViewAction extends Action implements IActionExtPoint{
 					HostController wc = new HostController(child,parentController);
 					parentController.addChildController(wc);
 					register(child, wc); 
-					System.out.println("ShowComponentViewAction.register() -> register hostController");
+//					System.out.println("ShowComponentViewAction.register() -> register hostController");
 				}	
 				else if (child instanceof RuntimeObject) {
 					RuntimeController wc = new RuntimeController(child,parentController);
@@ -111,7 +110,7 @@ public class ShowComponentViewAction extends Action implements IActionExtPoint{
 
 					register(child, wc);  
 					
-					System.out.println("ShowComponentViewAction.register() -> register RunTimeController");
+//					System.out.println("ShowComponentViewAction.register() -> register RunTimeController");
 				}	
 				else if (child instanceof NodeObject) {
 					NodeController wc = new NodeController(child,parentController);
@@ -123,7 +122,7 @@ public class ShowComponentViewAction extends Action implements IActionExtPoint{
 //	                child.notifyObservers(
 //	                		new MVCNotification(MVCNotificationTag.ADD_CHILD, child));
 	                
-	                System.out.println("ShowComponentViewAction.register() -> register NodeController");
+//	                System.out.println("ShowComponentViewAction.register() -> register NodeController");
 				}	
 				else if (child instanceof ActiveObject) {
 					parentController.update(child.getParent(),

@@ -98,34 +98,31 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         super(reifiedObject, nodeURL, factory, jobID);
         //        filterOnNFRequests = new RequestFilterOnPrioritizedNFRequests();
         // create the component metaobject if necessary
-        // --> check the value of the "parameters" field
-//        System.out.println("[YYL Test Output:]"+"ComponentBodyImpl()");
-        
+        // --> check the value of the "parameters" field       
         Map<String, Object> factory_parameters = factory.getParameters();
         if ((null != factory_parameters)) {
             if (null != factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY)) {
             	
-//            	 System.out.println("null != factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY");
-            	 
                 if (factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters) {
-                	
-//                	System.out.println("factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters");
                 	
                     if (logger.isDebugEnabled()) {
                         logger.debug("creating metaobject component identity");
                     }
                     this.componentIdentity = factory.newComponentFactory().newProActiveComponent(this);
 
-                    /*
+                    /**
                      * change the super.mbean into ComponentWrapperMBean if this is a component
                      */
-                 // JMX registration        
+                 // JMX registration  
+                    
+                    
                    
                         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                        System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has "+mbs.getMBeanCount()+" mbean before register");
                         ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
                         if (!mbs.isRegistered(oname)) {
                         	
-//                        	System.out.println("[YYL Test Output:] in mbs first registerd"+oname.toString());
+                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs does not have oname:"+oname.toString());
                             this.cmbean = new ComponentWrapper(oname, this);
                             try {
                                 mbs.registerMBean(cmbean, oname);
@@ -149,7 +146,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                                 bodyLogger.error("Can't register the MBean of the body", e);
                             }
                         	
-//                        	System.out.println("[YYL Test Output:] in mbs already has oname: "+oname.toString());
+                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has already has oname:"+oname.toString());
                         	
                         	this.cmbean = new ComponentWrapper(oname, this);
                             try {
@@ -162,10 +159,9 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                                 bodyLogger.error("The MBean of the body is not JMX compliant", e);
                             }
                         	
-                            
-                            
-                        	
                         }
+                        
+                        System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has "+mbs.getMBeanCount()+" mbean after register");
                     
                     
                     // change activity into a component activity

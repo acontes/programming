@@ -1,12 +1,6 @@
 package org.objectweb.proactive.ic2d.componentmonitoring.view;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.management.MBeanServerInvocationHandler;
-import javax.management.ObjectName;
-
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.editparts.RootTreeEditPart;
 import org.eclipse.gef.ui.parts.TreeViewer;
@@ -16,22 +10,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.jmx.mbean.ComponentWrapperMBean;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.CollapseAllAction;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.ExpandAllAction;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.NewHostAction;
-import org.objectweb.proactive.ic2d.componentmonitoring.controllers.detailed.HostController;
 import org.objectweb.proactive.ic2d.componentmonitoring.controllers.detailed.WorldController;
 import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentHolderModel;
 import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.componentmonitoring.editpart.TreeEditPartFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.HolderTypes;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 
@@ -415,106 +401,106 @@ public class ComponentTreeView extends ViewPart
     	
     }
     
-    /**
-     *  create a ComponentModel from a ActiveObject if this is a component, then add this ComponentModel into ComponentHolderModel
-     * @param childModelObject
-     * @param chm
-     */
-    private void createComponentModel(ActiveObject childModelObject,ComponentHolderModel chm) {
-
-		System.out.println("createComponentModel in NodeController");
-
-		NodeObject myNode = childModelObject.getParent();
-		ObjectName oname = childModelObject.getObjectName();
-		UniqueID id = childModelObject.getUniqueID();
-		String activeObjectName = childModelObject.getName();
-
-		ComponentWrapperMBean proxyComponentMBean = (ComponentWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(myNode.getProActiveConnection(), oname,
-				ComponentWrapperMBean.class, false);
-		try {
-			ComponentModel Cchild = new ComponentModel(myNode, id, activeObjectName, oname, proxyComponentMBean);
-			Cchild.setName(activeObjectName);
-			// using hashmap
-			if (!chm.components.containsKey(id))
-				chm.components.put(id, Cchild);
-		} catch (Exception e) {
-			System.out.println("ComponentTreeView.createComponentModel() this is not a component!");
-			//e.printStackTrace();
-		}
-
-		componentHierarchicalRebuild(chm);
-	}
-    
-    private void componentHierarchicalRebuild(ComponentHolderModel chm)
-    {
-    	Map<UniqueID,ComponentModel> componentmodels = chm.components;
-    	Set<UniqueID> keys = componentmodels.keySet();
-    	for(UniqueID key : keys)
-    	{
-    		ComponentModel currentModel = componentmodels.get(key);
-    		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
-    		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
-    		if(subComponents!=null)
-    		{
-    			addSubComponents(currentModel,subComponents,chm);
-    		}
-    	}
-    	for(UniqueID key : keys)
-    	{
-    		ComponentModel currentModel = componentmodels.get(key);
-    		if(currentModel.getParent() instanceof NodeObject)
-    		{
-    			currentModel.setParent(chm);
-    			chm.addChild(currentModel);
-    		}
-    	}
-    	
-//    	getWorldObject().CHolder = this.CHolder;
-//    	showComponentHierachical(getWorldObject().CHolder);
-    }
-
-    
-    
-    private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,ComponentHolderModel chm)
-    {
-    	Map<UniqueID,ComponentModel> componentmodels = chm.components;
-    	for(ProActiveComponent child:subcomponents)
-    	{
-    		UniqueID childID = child.getID();
-    		Set<UniqueID> keys = componentmodels.keySet();
-        	for(UniqueID key : keys)
-        	{
-        		if(key.equals(childID))
-        		{
-        			//find one child.
-        			//if this child is not primitive one, first add its children..
-        			ComponentModel currentModel = componentmodels.get(key);
-            		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
-            		ProActiveComponent[] subsubComponents = proxyMBean.getSubComponents();
-            		if(subsubComponents!=null)
-            		{
-            			addSubComponents(currentModel,subsubComponents,chm);
-            			currentModel.setHierachical("Composite");
-            		}
-            		else
-            		{
-            			currentModel.setHierachical("primitive");
-            		}
-            		//then add it to the parent
-        			currentModel.setParent(parent);
-        			parent.addChild(currentModel);
-        			componentmodels.put(parent.getID(), parent);
-        			componentmodels.put(currentModel.getID(), currentModel);
-        			
-        			//if this one used to be the root, now it has its parent, delete from CHolder
-        			
-        			chm.removeChild(currentModel);
-            		
-        			break;
-        		}
-        	}
-    	}
-    	
-    	// after add all the subcomponents return;
-    }
+//    /**
+//     *  create a ComponentModel from a ActiveObject if this is a component, then add this ComponentModel into ComponentHolderModel
+//     * @param childModelObject
+//     * @param chm
+//     */
+//    private void createComponentModel(ActiveObject childModelObject,ComponentHolderModel chm) {
+//
+//		System.out.println("createComponentModel in NodeController");
+//
+//		NodeObject myNode = childModelObject.getParent();
+//		ObjectName oname = childModelObject.getObjectName();
+//		UniqueID id = childModelObject.getUniqueID();
+//		String activeObjectName = childModelObject.getName();
+//
+//		ComponentWrapperMBean proxyComponentMBean = (ComponentWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(myNode.getProActiveConnection(), oname,
+//				ComponentWrapperMBean.class, false);
+//		try {
+//			ComponentModel Cchild = new ComponentModel(myNode, id, activeObjectName, oname, proxyComponentMBean);
+//			Cchild.setName(activeObjectName);
+//			// using hashmap
+//			if (!chm.components.containsKey(id))
+//				chm.components.put(id, Cchild);
+//		} catch (Exception e) {
+//			System.out.println("ComponentTreeView.createComponentModel() this is not a component!");
+//			//e.printStackTrace();
+//		}
+//
+//		componentHierarchicalRebuild(chm);
+//	}
+//    
+//    private void componentHierarchicalRebuild(ComponentHolderModel chm)
+//    {
+//    	Map<UniqueID,ComponentModel> componentmodels = chm.components;
+//    	Set<UniqueID> keys = componentmodels.keySet();
+//    	for(UniqueID key : keys)
+//    	{
+//    		ComponentModel currentModel = componentmodels.get(key);
+//    		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
+//    		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
+//    		if(subComponents!=null)
+//    		{
+//    			addSubComponents(currentModel,subComponents,chm);
+//    		}
+//    	}
+//    	for(UniqueID key : keys)
+//    	{
+//    		ComponentModel currentModel = componentmodels.get(key);
+//    		if(currentModel.getParent() instanceof NodeObject)
+//    		{
+//    			currentModel.setParent(chm);
+//    			chm.addChild(currentModel);
+//    		}
+//    	}
+//    	
+////    	getWorldObject().CHolder = this.CHolder;
+////    	showComponentHierachical(getWorldObject().CHolder);
+//    }
+//
+//    
+//    
+//    private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,ComponentHolderModel chm)
+//    {
+//    	Map<UniqueID,ComponentModel> componentmodels = chm.components;
+//    	for(ProActiveComponent child:subcomponents)
+//    	{
+//    		UniqueID childID = child.getID();
+//    		Set<UniqueID> keys = componentmodels.keySet();
+//        	for(UniqueID key : keys)
+//        	{
+//        		if(key.equals(childID))
+//        		{
+//        			//find one child.
+//        			//if this child is not primitive one, first add its children..
+//        			ComponentModel currentModel = componentmodels.get(key);
+//            		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
+//            		ProActiveComponent[] subsubComponents = proxyMBean.getSubComponents();
+//            		if(subsubComponents!=null)
+//            		{
+//            			addSubComponents(currentModel,subsubComponents,chm);
+//            			currentModel.setHierachical("Composite");
+//            		}
+//            		else
+//            		{
+//            			currentModel.setHierachical("primitive");
+//            		}
+//            		//then add it to the parent
+//        			currentModel.setParent(parent);
+//        			parent.addChild(currentModel);
+//        			componentmodels.put(parent.getID(), parent);
+//        			componentmodels.put(currentModel.getID(), currentModel);
+//        			
+//        			//if this one used to be the root, now it has its parent, delete from CHolder
+//        			
+//        			chm.removeChild(currentModel);
+//            		
+//        			break;
+//        		}
+//        	}
+//    	}
+//    	
+//    	// after add all the subcomponents return;
+//    }
 }
