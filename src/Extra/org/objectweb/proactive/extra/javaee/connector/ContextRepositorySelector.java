@@ -56,14 +56,13 @@ public class ContextRepositorySelector implements RepositorySelector
 	// in a known place : META-INF/proactive-log4j
 	public static final String LOG4J_CONFIG_FILE = "/META-INF/proactive-log4j";
 		
-	private static Object _guardObj; 
-
 	// init the new repository selector when the class gets loaded
 	// must take care that the class will be loaded along with log4j classes
 	static{
 		_defaultRepository = LogManager.getLoggerRepository();
 		RepositorySelector theSelector = new ContextRepositorySelector();
-		LogManager.setRepositorySelector(theSelector, _guardObj);
+		// ignorant about the guard object
+		LogManager.setRepositorySelector(theSelector, null);
 	}
 
 	private static Map<ClassLoader,LoggerRepository> _knownRepositories = 
