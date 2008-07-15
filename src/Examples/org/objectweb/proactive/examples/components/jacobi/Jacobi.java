@@ -89,33 +89,6 @@ public class Jacobi {
     public static final double DEFAULT_BORDER_VALUE = 0;
     public static boolean useMulticast = false;
 
-    private static ComponentType createSubMatrixType() {
-        try {
-            Component boot = Fractal.getBootstrapComponent();
-            ProActiveTypeFactory typeFact = (ProActiveTypeFactory) Fractal.getTypeFactory(boot);
-            ProActiveGenericFactory genericFact = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
-
-            // component types: PrimitiveComputer, PrimitiveMaster, CompositeWrapper
-            ComponentType subMatrixType = typeFact.createFcType(new InterfaceType[] {
-                    typeFact.createFcItfType("main", Main.class.getName(), TypeFactory.SERVER,
-                            TypeFactory.MANDATORY, ProActiveTypeFactory.MULTICAST_CARDINALITY),
-                    typeFact.createFcItfType("sender", MulticastDataSender.class.getName(),
-                            TypeFactory.CLIENT, TypeFactory.OPTIONAL,
-                            ProActiveTypeFactory.MULTICAST_CARDINALITY),
-                    typeFact.createFcItfType("sender-collection-", CollectionDataSender.class.getName(),
-                            TypeFactory.CLIENT, TypeFactory.OPTIONAL,
-                            ProActiveTypeFactory.COLLECTION_CARDINALITY) ,
-                            typeFact.createFcItfType("receiver", GathercastDataReceiver.class.getName(), TypeFactory.SERVER,
-                                    TypeFactory.MANDATORY, ProActiveTypeFactory.GATHER_CARDINALITY),
-            typeFact.createFcItfType("attribute-controller", SubMatrixAttributes.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, ProActiveTypeFactory.SINGLETON_CARDINALITY)});
-            return subMatrixType;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static void main(String[] args) {
         //        System.out.println("#0 free mem = " + Runtime.getRuntime().freeMemory());
         if (args.length < 5) {
@@ -166,19 +139,12 @@ public class Jacobi {
             //        	System.out.println("Number of nodes asked on sophia : " + args[3]);
             //        	System.setProperty("SOPHIA_NODES", args[3]);
             //        }
-//            Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-//            Map context = new HashMap();
-//            context.put("deployment-descriptor", deploymentDescriptor);
+            Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+            Map context = new HashMap();
+            context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.activateMappings();
             Component[][] components = new Component[nbMatrixX][nbMatrixY];
-
-            System.out.println("Jacobi.main()XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             
-            ComponentType subMatrixType = createSubMatrixType();
-            Component boot = Fractal.getBootstrapComponent();
-            TypeFactory typeFact = Fractal.getTypeFactory(boot);
-            ProActiveGenericFactory genericFact = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
-
             // instantiate components
             System.out.println("\nInstantiate components...");
             for (int x = 0; x < nbMatrixX; x++) {
@@ -188,13 +154,10 @@ public class Jacobi {
                         "org.objectweb.proactive.examples.components.jacobi.SubMatrix(" + subMatrixWidth +
                         ";" + subMatrixHeight + "," + x + ";" + y + "," + nbMatrixX + ";" + nbMatrixY + "," +
                         args[1] + ")");
-                    components[x][y] = (Component) genericFact.newFcInstance(subMatrixType, new ControllerDescription(
-                            "SubMatrix", Constants.PRIMITIVE), new ContentDescription(SubMatrixComponent.class
-                                    .getName()), null);
-//                    components[x][y] = (Component) f.newComponent(
-//                            "org.objectweb.proactive.examples.components.jacobi.SubMatrix(" + subMatrixWidth +
-//                                ";" + subMatrixHeight + "," + x + ";" + y + "," + nbMatrixX + ";" +
-//                                nbMatrixY + "," + args[1] + ")", context);
+                    components[x][y] = (Component) f.newComponent(
+                            "org.objectweb.proactive.examples.components.jacobi.SubMatrix(" + subMatrixWidth +
+                                ";" + subMatrixHeight + "," + x + ";" + y + "," + nbMatrixX + ";" +
+                                nbMatrixY + "," + args[1] + ")", context);
                 }
             }
             // org.objectweb.proactive.examples.components.jacobi.SubMatrix(840;840,0;0,2;2,10)
