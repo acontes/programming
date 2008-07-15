@@ -318,7 +318,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                 //                Fractive.getMulticastController(owner)
                 //                .bindFcMulticast(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // no adaptor here
-                ((MulticastControllerImpl) Fractive.getMulticastController(owner))
+                ((MulticastControllerImpl) ((ProActiveInterface)Fractive.getMulticastController(owner)).getFcItfImpl())
                         .bindFc(clientItfName, sItf);
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
