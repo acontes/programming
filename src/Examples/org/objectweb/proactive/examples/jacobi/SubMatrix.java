@@ -30,54 +30,50 @@
  */
 package org.objectweb.proactive.examples.jacobi;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.DecimalFormat;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class SubMatrix implements Serializable {
+public class SubMatrix implements Serializable{
 
     /** Default width value of a submatrix */
-    private static final int DEFAULT_WIDTH = 100;
+//    public static int width = 50;
 
     /** Default height value of a submatrix */
-    private static final int DEFAULT_HEIGHT = 50;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+//    public static int height = 50;
 
     /** Step */
-    private int iterationsToStop = Jacobi.ITERATIONS;
+    protected int iterationsToStop;
 
     /** Min Diff of the loop */
-    private double minDiff = Jacobi.MINDIFF + 1;
+    protected double minDiff = Jacobi.MINDIFF + 1;
 
     /** the name of the submatrix */
-    private String name;
+    protected String name;
 
     /** Width of the submatrix */
-    private int width;
+    protected int width;
 
     /** Height of the submatrix */
-    private int height;
+    protected int height;
 
     /** the current values */
-    private double[] current;
+    protected double[] current;
 
     /** the old values */
-    private double[] old;
+    protected double[] old;
 
     /** North submatrix neighbor */
     private SubMatrix north;
@@ -100,65 +96,77 @@ public class SubMatrix implements Serializable {
     /** The whole matrix */
     private SubMatrix matrix;
 
-    /** The resultFile * */
-    private File resultFile;
-
-    /** A reference to the main program **/
-    private Jacobi jacobi;
-
     /** Border of the north submatrix neighbor */
-    private double[] northNeighborBorder;
+    protected double[] northNeighborBorder;
 
     /** Border of the south submatrix neighbor */
-    private double[] southNeighborBorder;
+    protected double[] southNeighborBorder;
 
     /** Border of the west submatrix neighbor */
-    private double[] westNeighborBorder;
+    protected double[] westNeighborBorder;
 
     /** Border of the east submatrix neighbor */
-    private double[] eastNeighborBorder;
+    protected double[] eastNeighborBorder;
+    
+    protected long startTime;
+    protected long endTime;
+    
+    // global topology information (required to build the topology itself)
+    int nbSubMatrixX;
+    int nbSubMatrixY;
 
     /** Empty constructor */
     public SubMatrix() {
-        this(SubMatrix.DEFAULT_WIDTH, SubMatrix.DEFAULT_HEIGHT);
     }
 
-    public SubMatrix(String name, File resultFile, Jacobi jacobi) {
+    public SubMatrix(String name) {
         this();
         this.name = name;
-        this.resultFile = resultFile;
-        this.jacobi = jacobi;
+    }
+    
+    public SubMatrix(String name, Integer iterations) {
+        this();
+        this.name = name;
+        iterationsToStop = iterations.intValue();
     }
 
+    public SubMatrix(String name, Integer width, Integer height, Integer nbSubMatrixX, Integer nbSubMatrixY, Integer iterations) {
+        this(width.intValue(), height.intValue());
+        this.name = name;
+        this.nbSubMatrixX = nbSubMatrixX.intValue();
+        this.nbSubMatrixY = nbSubMatrixY.intValue();
+        iterationsToStop = iterations.intValue();
+    }
+
+    protected static double value = 0;
     /**
      * Constructor
-     *
-     * @param x
-     *            the width of the submatrix
-     * @param y
-     *            the height of the matrix
+     * @param x the width of the submatrix
+     * @param y the height of the matrix
      */
     public SubMatrix(int x, int y) {
-        this.width = x;
+    	//System.out.println("SubMatrix.SubMatrix()");
+    	this.width = x;
         this.height = y;
+        //System.out.println("SubMatrix.SubMatrix() " + width + " , " + height);
         this.current = new double[x * y];
         this.old = new double[x * y];
         for (int i = 0; i < this.old.length; i++) {
-            this.old[i] = 1000000;
+//            this.old[i] = Math.random() * 10000;
+//        	this.old[i] = value;
+        	this.old[i] = 1000000;
         }
+        value++;
     }
 
     /**
      * Returns the value at the specified position
-     *
-     * @param x
-     *            the column of the value
-     * @param y
-     *            the line of the value
+     * @param x the column of the value
+     * @param y the line of the value
      * @return the value at the specified position
      */
     public double get(int x, int y) {
-        return this.old[(x * this.width) + y];
+  		return this.current[y*width + x];
     }
 
     /**
@@ -166,28 +174,29 @@ public class SubMatrix implements Serializable {
      * communication with other submatrix
      */
     public void internalCompute() {
-        int index = this.width + 1;
-        double current;
-        double diff = Jacobi.MINDIFF + 1;
-        double west;
-        double center;
-        double east;
-        for (int y = 1; y < (this.height - 1); y++) {
-            for (int x = 1; x < (this.width - 1); x++) {
-                center = old[index];
-                west = old[index - 1];
-                east = old[index + 1];
-                current = (west + east + this.old[index - this.width] + this.old[index + this.width]) / 4;
-                this.current[index] = current;
-                diff = Math.abs(current - center);
-                if (diff < this.minDiff) {
-                    this.minDiff = diff;
-                }
-
-                index++;
-            }
-            index += 2;
-        }
+		int index = this.width + 1;
+		double current;
+		double diff = Jacobi.MINDIFF + 1;
+		double west;
+		double center; 
+		double east;
+		for (int y = 1; y < (this.height - 1); y++) {
+		    for (int x = 1; x < (this.width - 1); x++) {
+				center = old[index];
+				west = old[index - 1];
+				east = old[index + 1];
+				current = (west + east + this.old[index - this.width] +
+				        this.old[index + this.width]) / 4;
+				this.current[index] = current;
+				diff = Math.abs(current - center);
+				if (diff < this.minDiff ) {
+					this.minDiff = diff;
+				}
+				
+				index++;
+		     }
+		    index += 2;
+		}
     }
 
     /**
@@ -201,7 +210,8 @@ public class SubMatrix implements Serializable {
 
         // north-west corner
         index = 0;
-        current = (this.northNeighborBorder[0] + this.old[index + this.width] + this.westNeighborBorder[0] + this.old[index + 1]) / 4;
+        current = (this.northNeighborBorder[0] + this.old[index + this.width] +
+            this.westNeighborBorder[0] + this.old[index + 1]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -210,8 +220,9 @@ public class SubMatrix implements Serializable {
 
         // north-east corner
         index = this.width - 1;
-        current = (this.northNeighborBorder[this.width - 1] + this.old[index + this.width] +
-            this.old[index - 1] + this.eastNeighborBorder[0]) / 4;
+        current = (this.northNeighborBorder[this.width - 1] +
+            this.old[index + this.width] + this.old[index - 1] +
+            this.eastNeighborBorder[0]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -220,7 +231,9 @@ public class SubMatrix implements Serializable {
 
         // north border
         for (index = 1; index < (this.width - 1); index++) {
-            current = (this.northNeighborBorder[index] + this.old[this.width + index] + this.old[index - 1] + this.old[index + 1]) / 4;
+            current = (this.northNeighborBorder[index] +
+                this.old[this.width + index] + this.old[index - 1] +
+                this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -241,8 +254,9 @@ public class SubMatrix implements Serializable {
         // west border
         index = this.width;
         for (int i = 1; i < (this.height - 1); i++) {
-            current = (this.old[index - this.width] + this.old[index + this.width] +
-                this.westNeighborBorder[i] + this.old[index + 1]) / 4;
+            current = (this.old[index - this.width] +
+                this.old[index + this.width] + this.westNeighborBorder[i] +
+                this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -253,8 +267,9 @@ public class SubMatrix implements Serializable {
 
         // south-east corner
         index = (this.width * this.height) - 1;
-        current = (this.old[index - this.width] + this.southNeighborBorder[this.width - 1] +
-            this.old[index - 1] + this.eastNeighborBorder[this.height - 1]) / 4;
+        current = (this.old[index - this.width] +
+            this.southNeighborBorder[this.width - 1] + this.old[index - 1] +
+            this.eastNeighborBorder[this.height - 1]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -264,7 +279,9 @@ public class SubMatrix implements Serializable {
         // south border
         index = (this.width * (this.height - 1)) + 1;
         for (int i = 1; i < (this.width - 1); i++) {
-            current = (this.old[index - this.width] + this.southNeighborBorder[i] + this.old[index - 1] + this.old[index + 1]) / 4;
+            current = (this.old[index - this.width] +
+                this.southNeighborBorder[i] + this.old[index - 1] +
+                this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -276,7 +293,9 @@ public class SubMatrix implements Serializable {
         // east border
         index = (this.width * 2) - 1;
         for (int i = 1; i < (this.height - 1); i++) {
-            current = (this.old[index - this.width] + this.old[index + this.width] + this.old[index - 1] + this.eastNeighborBorder[i]) / 4;
+            current = (this.old[index - this.width] +
+                this.old[index + this.width] + this.old[index - 1] +
+                this.eastNeighborBorder[i]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -300,13 +319,13 @@ public class SubMatrix implements Serializable {
      */
     public void buildNeighborhood() {
         this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
-        Group<SubMatrix> allSubMatrix = PAGroup.getGroup(this.matrix);
-        Plan<SubMatrix> topology = null;
+        Group allSubMatrix = PAGroup.getGroup(this.matrix);
+        Plan topology = null;
         try {
-            topology = new Plan<SubMatrix>(allSubMatrix, Jacobi.HEIGHT, Jacobi.WIDTH);
+            topology = new Plan(allSubMatrix, nbSubMatrixY, nbSubMatrixX);
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            logger
-                    .error("[JACOBI] ** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
+            System.err.println(
+                "** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
             e.printStackTrace();
         }
 
@@ -317,12 +336,14 @@ public class SubMatrix implements Serializable {
         this.east = (SubMatrix) topology.right(this.asyncRefToMe);
 
         try {
-            this.neighbors = (SubMatrix) PAGroup.newGroup(SubMatrix.class.getName());
+            this.neighbors = (SubMatrix)  PAGroup.newGroup(SubMatrix.class.getName());
         } catch (ClassNotReifiableException e) {
-            logger.error("[JACOBI] ** ClassNotReifiableException ** - Unable to build the neighbors group");
+            System.err.println(
+                "** ClassNotReifiableException ** - Unable to build the neighbors group");
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            logger.error("[JACOBI] ** ClassNotFoundException ** - Unable to build the neighbors group");
+            System.err.println(
+                "** ClassNotFoundException ** - Unable to build the neighbors group");
             e.printStackTrace();
         }
         Group<SubMatrix> neighborsGroup = PAGroup.getGroup(this.neighbors);
@@ -355,14 +376,12 @@ public class SubMatrix implements Serializable {
     }
 
     /**
-     * Builds a "fake border" for the external submatrix filled with
-     * DEFAULT_BORDER_VALUE
-     *
-     * @param size -
-     *            the size of the border
+     * Builds a "fake border" for the external submatrix
+     * filled with DEFAULT_BORDER_VALUE
+     * @param size - the size of the border
      * @return a "fake border" for the external submatrix
      */
-    private double[] buildFakeBorder(int size) {
+    protected double[] buildFakeBorder(int size) {
         double[] line = new double[size];
         for (int i = 0; i < line.length; i++) {
             line[i] = Jacobi.DEFAULT_BORDER_VALUE;
@@ -372,10 +391,9 @@ public class SubMatrix implements Serializable {
 
     /**
      * Returns the north border of the submatrix
-     *
      * @return the north border of the submatrix
      */
-    private double[] buildNorthBorder() {
+    protected double[] buildNorthBorder() {
         double[] line = new double[this.width];
         for (int i = 0; i < this.width; i++) {
             line[i] = this.old[i];
@@ -385,10 +403,9 @@ public class SubMatrix implements Serializable {
 
     /**
      * Returns the south border of the submatrix
-     *
      * @return the south border of the submatrix
      */
-    private double[] buildSouthBorder() {
+    protected double[] buildSouthBorder() {
         double[] line = new double[this.width];
         int index = this.width * (this.height - 1);
         for (int i = 0; i < this.width; i++) {
@@ -399,10 +416,9 @@ public class SubMatrix implements Serializable {
 
     /**
      * Returns the west border of the submatrix
-     *
      * @return the west border of the submatrix
      */
-    private double[] buildWestBorder() {
+    protected double[] buildWestBorder() {
         double[] line = new double[this.height];
         int index = 0;
         for (int i = 0; i < this.height; i++) {
@@ -414,10 +430,9 @@ public class SubMatrix implements Serializable {
 
     /**
      * Returns the west border of the submatrix
-     *
      * @return the west border of the submatrix
      */
-    private double[] buildEastBorder() {
+    protected double[] buildEastBorder() {
         double[] line = new double[this.height];
         int index = this.width - 1;
         for (int i = 0; i < this.height; i++) {
@@ -447,9 +462,7 @@ public class SubMatrix implements Serializable {
 
     /**
      * Set the north border
-     *
-     * @param border -
-     *            the north border
+     * @param border - the north border
      */
     public void setNorthBorder(double[] border) {
         this.northNeighborBorder = border;
@@ -457,9 +470,7 @@ public class SubMatrix implements Serializable {
 
     /**
      * Set the south border
-     *
-     * @param border -
-     *            the south border
+     * @param border - the south border
      */
     public void setSouthBorder(double[] border) {
         this.southNeighborBorder = border;
@@ -467,9 +478,7 @@ public class SubMatrix implements Serializable {
 
     /**
      * Set the west border
-     *
-     * @param border -
-     *            the west border
+     * @param border - the west border
      */
     public void setWestBorder(double[] border) {
         this.westNeighborBorder = border;
@@ -477,9 +486,7 @@ public class SubMatrix implements Serializable {
 
     /**
      * Set the east border
-     *
-     * @param border -
-     *            the east border
+     * @param border - the east border
      */
     public void setEastBorder(double[] border) {
         this.eastNeighborBorder = border;
@@ -489,9 +496,16 @@ public class SubMatrix implements Serializable {
      * Launch the calculus
      */
     public void compute() {
+		try {
+			System.out.println("["+name+ "] starting computation for " + iterationsToStop + " iterations on machine " + InetAddress.getLocalHost().getHostName());
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+
+        startTime = System.currentTimeMillis();
         this.buildNeighborhood();
         PASPMD.totalBarrier("InitDone");
-
+        
         this.asyncRefToMe.loop();
     }
 
@@ -499,68 +513,114 @@ public class SubMatrix implements Serializable {
      * Launch the main loop
      */
     public void loop() {
-        logger.debug("[JACOBI] [" + this.name + "] Iteration : " + iterationsToStop);
+            // compute the internal values
+            this.internalCompute();
+            this.borderCompute();
+            this.exchange();
 
-        // compute the internal values
-        this.internalCompute();
-        //@snippet-start spmd_neighbour_barrier
-        // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.neighbourBarrier("SynchronizationWithNeighbors" + this.iterationsToStop, this.neighbors);
-        //@snippet-end spmd_neighbour_barrier
-        // compute the border values
-        this.asyncRefToMe.borderCompute();
-        // send the borders to neighbors
-        this.asyncRefToMe.sendBordersToNeighbors();
-        // decrement the iteration counter
-        this.iterationsToStop--;
-        // continue or stop ?
-        if ((this.iterationsToStop > 0) && (this.minDiff > Jacobi.MINDIFF)) {
-            this.asyncRefToMe.exchange();
-            this.asyncRefToMe.loop();
-        } else {
-            logger.info("[JACOBI] [" + this.name + "] Computation over :\n      " + this.minDiff +
-                " (asked less than " + Jacobi.MINDIFF + ")");
-            this.matrix.stop();
+            // synchronization to be sure that all submatrix have exchanged borders    
+            PASPMD.neighbourBarrier("SynchronizationWithNeighbors" +
+    this.iterationsToStop, this.neighbors);
+
+            // send the borders to neighbors
+            this.sendBordersToNeighbors();
+
+            // continue or stop ?
+            if ((this.iterationsToStop > 0)) {
+                   //                      && (this.minDiff > Jacobi.MINDIFF)) {
+                PASPMD.neighbourBarrier("SynchronizationLoop" +
+    this.iterationsToStop, this.neighbors);
+                this.asyncRefToMe.loop();
+                // decrement the iteration counter
+                this.iterationsToStop--;
+            } else {
+
+                   this.asyncRefToMe.end();
+//                   System.out.println("******************************************");
+
+//    System.out.println(ProActive.getBodyOnThis().getRequestQueue());
+//                   System.out.println("******************************************");
+
+            }
         }
 
-        /*
-         * if (this.minDiff < Jacobi.MINDIFF) { System.out.println("[" + this.name + "] sent the
-         * \"end signal\""); this.matrix.stop(); }
-         */
-    }
+//        // System.out.println("iterations : " + this.iterationsToStop);
+//        // compute the internal values
+//        this.internalCompute();
+//        // synchronization to be sure that all submatrix have exchanged borders
+//        ProSPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop,
+//            this.neighbors);
+//        // compute the border values
+//        this.asyncRefToMe.borderCompute();
+//        // send the borders to neighbors
+//        this.asyncRefToMe.sendBordersToNeighbors();
+//        // decrement the iteration counter
+//        this.iterationsToStop--;
+//        // continue or stop ?
+//        if (this.iterationsToStop == 0) {
+////        	System.out.println("["+coordinates+"] terminated iterations \n" );
+//        	endTime = System.currentTimeMillis();
+//        	System.out.println("[" + name + "] computation time = " + (endTime - startTime));
+//            try {
+//            	System.out.println("writing file " + name);
+//            	PrintWriter pw = new PrintWriter(new FileWriter(name));
+//            	pw.write(matrixToString());
+//            	pw.close();
+//            }catch (Exception e) {
+//            	e.printStackTrace();
+//            }
+//        } else {
+//            this.asyncRefToMe.exchange();
+//            this.asyncRefToMe.loop();
+//		}
+////        if ((this.iterationsToStop > 0) && (this.minDiff > Jacobi.MINDIFF)) {
+//////        } else {
+////            System.out.println("[" + this.name +
+////                "] Computation over :\n      " + this.minDiff +
+////                " (asked less than " + Jacobi.MINDIFF + ")");
+////            if (this.minDiff < Jacobi.MINDIFF) {
+////                System.out.println("[" + this.name +
+////                    "] sent the \"end signal\"");
+////                this.matrix.stop();
+////            }
+////        }
+    
 
     /**
      * Stops the submatrix
      */
     public void stop() {
         this.iterationsToStop = 0;
-        logger.debug("[JACOBI] [" + this.name + "] Stop Message Received, waiting for others.");
-        PASPMD.totalBarrier("stop");
-        if ((north != null) && (east != null) && (west != null) && (south != null)) {
-            PrintWriter pw = null;
-            try {
-                pw = new PrintWriter(new FileOutputStream(resultFile), true);
-
-                DecimalFormat decimalFormat = new DecimalFormat("0.00");
-
-                for (int i = 0; i < height; i++) {
-                    String line = "[";
-                    for (int j = 0; j < (width - 1); j++) {
-                        line += (decimalFormat.format(current[(i * width) + j]) + " ");
-                    }
-                    line += decimalFormat.format(current[((i * width) + width) - 1]);
-                    line += "] ";
-                    pw.println(line);
-                }
-                logger.info("CALCULATION COMPLETE, plese find results in: " + resultFile.getAbsolutePath());
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } finally {
-                pw.close();
-            }
-            // Send the terminate signal to the main program
-            this.jacobi.terminateAll();
-        }
     }
+    
+    
+    public void end() {
+//    	System.out.println("["+coordinates+"] terminated iterations \n" );
+    	endTime = System.currentTimeMillis();
+    	System.out.println("[" + name + "] computation time = " + (endTime - startTime));
+        System.out.println("["+name+"] top left and bottom right elements are " + get(0,0) + " ; " + get(width-1,height-1) + "\n" );
+        try {
+        	System.out.println("writing file " + name);
+        	PrintWriter pw = new PrintWriter(new FileWriter(name));
+        	pw.write(matrixToString());
+        	pw.close();
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+    	
+    }
+    
+    public String matrixToString() {
+		String result = "";
+		for (int i=0; i<width; i++) {
+			for(int j=0; j<height; j++) {
+//				result += MathUtils.round(get(i, j),2) + " ";
+				result += get(i, j) + " ";
+			}
+			result+="\n";
+		}
+		result+="\n";
+		return result;
+	}
+        
 }

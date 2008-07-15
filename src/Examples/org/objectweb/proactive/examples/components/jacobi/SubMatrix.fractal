@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition name="org.objectweb.proactive.examples.components.jacobi.SubMatrix" arguments="dimensions,coordinates,globalDimensions,nbIterations" >
+    <interface name="main" role="server" signature="org.objectweb.proactive.examples.components.jacobi.Main" cardinality="multicast"/>
+    <interface name="sender" role="client" signature="org.objectweb.proactive.examples.components.jacobi.MulticastDataSender" cardinality="multicast" contingency="optional"/>
+    <interface name="sender-collection-" role="client" signature="org.objectweb.proactive.examples.components.jacobi.CollectionDataSender" cardinality="collection" contingency="optional"/>
+    <interface name="receiver" role="server" signature="org.objectweb.proactive.examples.components.jacobi.GathercastDataReceiver" cardinality="gathercast"/>
+    <content class="org.objectweb.proactive.examples.components.jacobi.SubMatrixComponent"/>
+    <attributes signature="org.objectweb.proactive.examples.components.jacobi.SubMatrixAttributes">
+      <attribute name="dimensions" value="${dimensions}"/>
+      <attribute name="coordinates" value="${coordinates}"/>
+      <attribute name="globalDimensions" value="${globalDimensions}"/>
+      <attribute name="nbIterations" value="${nbIterations}"/>
+    </attributes>
+    <controller desc="primitive"/>
+	<virtual-node name="matrixNode"/> 
+  	
+</definition>

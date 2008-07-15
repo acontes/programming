@@ -30,151 +30,139 @@
  */
 package org.objectweb.proactive.examples.jacobi;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PALifeCycle;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
-public class Jacobi implements Serializable {
+public class Jacobi {
 
     /**
-     * Number of columns of SubMatrix
-     */
-    public static final int WIDTH = 3;
+    * Number of columns of SubMatrix
+    */
+//    public static int nbMatrixY;
 
     /**
      * Number of lines of SubMatrix
      */
-    public static final int HEIGHT = 3;
+//    public static int nbMatrixX;
+    
+    
+    public static int subMatrixWidth;
+    public static int subMatrixHeight;
+    public static int totalHeight = 1680;
+    public static int totalWidth = 1680;
 
     /**
      * Max number of iterations
      */
-    public static final int ITERATIONS = 40;
+    public static int nbIterations = 100;
 
     /**
      * Min diff to stop
      */
-    public static final double MINDIFF = 0.000000001;
+    public static final double MINDIFF = 0.001;
 
     /**
      * Default external border value
      */
-    public static final double DEFAULT_BORDER_VALUE = 1;
-
-    /**
-     * the filename which will store the results
-     */
-    public static final String resultsFileName = "resultsJacobi.txt";
-    private GCMApplication descriptor = null;
-    public static Jacobi singleton = null;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-
-    private Node[] nodes;
-
-    public Jacobi() {
-    }
-
-    public Jacobi(File descriptorFile) {
-
-        nodes = null;
-        try {
-            descriptor = PAGCMDeployment.loadApplicationDescriptor(descriptorFile);
-        } catch (ProActiveException e) {
-            System.err.println("** ProActiveException **");
-        }
-        descriptor.startDeployment();
-        GCMVirtualNode vnode = descriptor.getVirtualNode("matrixNode");
-
-        vnode.waitReady();
-
-        List<Node> currentNodes = vnode.getCurrentNodes();
-        nodes = currentNodes.toArray(new Node[0]);
-
-    }
-
-    public Node[] getNodes() {
-        return nodes;
-    }
-
-    public static Jacobi getSingleton(File descriptor) {
-        if (singleton == null) {
-            Object[] params = new Object[1];
-            params[0] = descriptor;
-            try {
-                singleton = (Jacobi) PAActiveObject.newActive(Jacobi.class.getName(), params);
-            } catch (ActiveObjectCreationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (NodeException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        return singleton;
-    }
-
-    public void terminateAll() {
-        // Terminating
-        descriptor.kill();
-        PALifeCycle.exitSuccess();
-    }
+    public static final double DEFAULT_BORDER_VALUE = 0;
 
     public static void main(String[] args) {
-        if (args.length != 1) {
-            logger.error("Usage: java " + Jacobi.class.getName() + " <deployment file>");
-            System.exit(1);
+        if (args.length < 4) {
+            printUsage();
         }
-
-        File resultFile = new File(System.getProperty("user.dir") + File.separator + resultsFileName);
-
-        if (resultFile.exists()) {
-            resultFile.delete();
-        }
+        ProActiveDescriptor proActiveDescriptor = null;
+        String[] nodes = null;
 
         try {
-            if (!resultFile.createNewFile()) {
-                logger.error("Error creating : " + resultFile.getAbsolutePath());
-                System.exit(1);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
+                    args[0]);
+            if (args[1] != null) {
+                nbIterations = Integer.parseInt(args[1]);
+                System.out.println("RUNNING JACOBI WITH " + nbIterations +
+                    " iterations");
             }
-        } catch (IOException e2) {
-            e2.printStackTrace();
-            System.exit(1);
-        }
+            proActiveDescriptor.activateMappings();
+            VirtualNode vn = proActiveDescriptor.getVirtualNode("matrixNode");
+            try {
+                nodes = vn.getNodesURL();
+            } catch (NodeException e) {
+                System.err.println("** NodeException **");
+            }
 
-        Jacobi jacobi = getSingleton(new File(args[0]));
+            int nbMatrixX = Integer.parseInt(args[2]);
+            int nbMatrixY = Integer.parseInt(args[3]);
 
-        Object[][] params = new Object[Jacobi.WIDTH * Jacobi.HEIGHT][];
-        for (int i = 0; i < params.length; i++) {
-            params[i] = new Object[3];
-            params[i][0] = "SubMatrix" + i;
-            params[i][1] = resultFile;
-            params[i][2] = jacobi;
-        }
+            if (args.length == 6) {
+                totalWidth = Integer.parseInt(args[4]);
+                totalHeight = Integer.parseInt(args[5]);
+            } else {
+                System.out.println("\n--- using default total width " +
+                    totalWidth + " and total height " + totalHeight + " ---\n");
+            }
+            subMatrixWidth = totalWidth / nbMatrixX;
+            subMatrixHeight = totalHeight / nbMatrixY;
 
-        SubMatrix matrix = null;
-        Node[] jacobiNodes = jacobi.getNodes();
+            Object[][] params = new Object[nbMatrixX * nbMatrixY][];
+            for (int i = 0; i < params.length; i++) {
+                params[i] = new Object[6];
+                params[i][0] = "SubMatrix" + i;
+                params[i][1] = new Integer(subMatrixWidth);
+                params[i][2] = new Integer(subMatrixHeight);
+                params[i][3] = new Integer(nbMatrixX);
+                params[i][4] = new Integer(nbMatrixY);
+                params[i][5] = nbIterations;
+            }
 
-        try {
-            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(), params, jacobiNodes);
+            System.out.println(
+                "\n********************************************************");
+            System.out.println(
+                "Running group version of jacobi computation with the following parameters:");
+            System.out.println("           total width = " + totalWidth);
+            System.out.println("          total height = " + totalHeight);
+            System.out.println("  number of iterations = " + args[1]);
+            System.out.println("   number of submatrix = " +
+                (nbMatrixX * nbMatrixY));
+            System.out.println(
+                "********************************************************\n");
+
+            SubMatrix matrix = null;
+            try {
+                matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(),
+                        params, nodes);
+            } catch (ClassNotFoundException e) {
+                System.err.println("** ClassNotFoundException **");
+            } catch (ClassNotReifiableException e) {
+                System.err.println("** ClassNotReifiableException **");
+            } catch (ActiveObjectCreationException e) {
+                System.err.println("** ActiveObjectCreationException **");
+            } catch (NodeException e) {
+                System.err.println("** NodeException **");
+            }
+
             matrix.compute();
-        } catch (Exception e) {
+        } catch (ProActiveException e) {
             e.printStackTrace();
         }
+    }
 
+    private static void printUsage() {
+        System.out.println(
+            "Usage : jacobi [deployment_descriptor] [nb_iterations] [nbMatrixX] [nbMatrixY] [totalWidth] [totalHeight]");
+        System.out.println(
+            "[deployment_descriptor] specifies the deployment infrastructure");
+        System.out.println("[nb_iterations] specifies the number of iterations");
+        System.out.println(
+            "[nbMatrixX] [nbMatrixY] [totalWidth] [totalHeight] are number of sub matrix and dimensions of the global matrix");
+        System.out.println(
+            "As a deployment descriptor, you may want to try ../../../descriptors/Matrix.xml");
+
+        System.exit(-1);
     }
 }
