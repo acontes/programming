@@ -4,10 +4,10 @@
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
-			value="/home/sophia/cdalmasso/rsyncPAJ/ProActiveJacobi/" />
+			value="/home/sophia/cdalmasso/ProActiveJacobiComponent/" />
 		<!--CHANGE ME!!!!  /user/cdalmass/home/workspace/ProActiveLatest -->
 		
-		<includePropertyFile location="${PROACTIVE_HOME}/descriptors/nodes.properties"/>
+		<includePropertyFile location="${PROACTIVE_HOME}/examples/jacobiComponent/nodes.properties"/>
 		
 		<descriptorVariable name="JAVA_HOME"
 			value="/home/sophia/cdalmasso/pub/local/jdk1.6.0_06/" />
@@ -91,11 +91,11 @@
 					<jvmParameters><parameter value="-Dproactive.net.interface=eth0"/></jvmParameters>
 					<policyFile>
 						<absolutePath
-							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/examples/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
+							value="${PROACTIVE_HOME}/examples/proactive-log4j" />
 					</log4jpropertiesFile>
 				</jvmProcess>
 			</processDefinition>

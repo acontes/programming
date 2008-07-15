@@ -5,7 +5,7 @@ workingDir=`dirname $0`
 
 JAVACMD=$JAVACMD" -Dfractal.provider=org.objectweb.proactive.core.component.Fractive"
 
-# ./jacobi.sh ../../../descriptors/MatrixOldDep.xml 100 multicast 2 2 100 100 
+# ./jacobi.sh MatrixOldDep.xml 2 multicast 2 2 100 100
 
 #  -Djava.security.policy=../../../scripts/proactive.java.policy -Dlog4j.configuration=file:../../../scripts/proactive-log4j
 
