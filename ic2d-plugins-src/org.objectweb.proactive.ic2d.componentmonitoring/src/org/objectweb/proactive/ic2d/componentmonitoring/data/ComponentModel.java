@@ -12,7 +12,6 @@ import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotific
 import org.objectweb.proactive.ic2d.componentmonitoring.util.ComponentMVCNotificationTag;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
-
 public class ComponentModel extends AbstractData {
 
 	private static String ObjectNameString = "org.objectweb.proactive.ic2d.componentmonitoring:type=Component";
@@ -29,7 +28,7 @@ public class ComponentModel extends AbstractData {
 
 	private String Hierachical = "";
 
-	private String Status = "Stoped";
+	private String Status = "Stop";
 
 	private double mean_arrival_rate = -1;
 
@@ -65,7 +64,7 @@ public class ComponentModel extends AbstractData {
 		this.parent = parent;
 		this.ClassName = ClassName;
 		this.parent.addChild(this);
-		this.listener = new org.objectweb.proactive.ic2d.componentmonitoring.data.listener.ComponentModelListener(this);
+		this.listener = new ComponentModelListener(this);
 
 	}
 

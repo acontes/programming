@@ -237,8 +237,8 @@ public class ComponentTreeView extends ViewPart
 	
 		gcontroller = new WorldController(this.world,  null);
 		
-		Thread showThread = new Thread(new changeShow());
-		showThread.start();
+//		Thread showThread = new Thread(new changeShow());
+//		showThread.start();
 
 	}
 

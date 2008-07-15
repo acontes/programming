@@ -33,7 +33,7 @@ public class ComponentHolderEditPart extends ComponentMonitorTreeEditPart<Compon
 		mvcNotif = notif.getMVCNotification();
 		//		Object data = notif.getData();
 		
-		System.out.println("in Component Edit Part, notification received!");
+//		System.out.println("in Component Edit Part, notification received!");
 
 		if (!getViewer().getControl().getDisplay().isDisposed())
 		{

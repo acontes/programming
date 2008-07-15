@@ -68,7 +68,7 @@ public class NodeController extends AbstractStandardToComponentsController {
 		final MVCNotificationTag mvcNotifTag = mvcNotif.getMVCNotification();
 		switch (mvcNotifTag) {
 		case ADD_CHILD: {
-			System.out.println("NodeController.update() in ADD_CHILD");
+//			System.out.println("NodeController.update() in ADD_CHILD");
 			// add new controller/figure
 			// get key
 			final String figureKey = (String) mvcNotif.getData();
@@ -110,11 +110,11 @@ public class NodeController extends AbstractStandardToComponentsController {
 
 	private void createComponentModel(ActiveObject childModelObject) {
 
-		System.out.println("createComponentModel in NodeController");
+//		System.out.println("createComponentModel in NodeController");
 
 		NodeObject myNode = (NodeObject) this.getModelObject();
 		final List<ObjectName> activeObjectNames = myNode.getProxyNodeMBean().getActiveObjects();
-		System.out.println("NodeController.createComponentModel() -> now in node ="+myNode.getName()+" this node has AO number ="+activeObjectNames.size());
+//		System.out.println("NodeController.createComponentModel() -> now in node ="+myNode.getName()+" this node has AO number ="+activeObjectNames.size());
 		
 		
 		
@@ -124,7 +124,7 @@ public class NodeController extends AbstractStandardToComponentsController {
 			
 			
 			final UniqueID id = proxyBodyMBean.getID();
-			System.out.println("NodeController.createComponentModel() -> ComponentModel UniqueID = ActiveObject proxyBodyMBean UniqueID = "+id );
+//			System.out.println("NodeController.createComponentModel() -> ComponentModel UniqueID = ActiveObject proxyBodyMBean UniqueID = "+id );
 			
 			final String idString = id.toString();
 
@@ -133,7 +133,7 @@ public class NodeController extends AbstractStandardToComponentsController {
 					ComponentWrapperMBean.class, false);
 			try {
 				ComponentModel Cchild = new ComponentModel(myNode, id, activeObjectName, oname, proxyComponentMBean);
-				System.out.println("NodeController.createComponentModel()-> create component Model "+activeObjectName+" UniqueID ="+id);
+//				System.out.println("NodeController.createComponentModel()-> create component Model "+activeObjectName+" UniqueID ="+id);
 				Cchild.setName(activeObjectName);
 
 				// using hashmap
@@ -147,6 +147,8 @@ public class NodeController extends AbstractStandardToComponentsController {
 //						System.out.println("NodeController.createComponentModel() -> Cchild objectName = "+Cchild.getObjectName());
 			            JMXNotificationManager.getInstance().subscribe(Cchild.getObjectName(), Cchild.getListener(),
 			                    ((RuntimeObject)(Cchild.getParent().getParent())).getUrl());
+			            
+			            System.out.println("NodeController.createComponentModel()-> ComponentModelListener ="+Cchild.getListener().toString());
 			        } catch (IOException e) {
 			            System.out.println("ComponentModel: could not register ComponentListener: " + Cchild.getObjectName());
 			            e.printStackTrace();
@@ -155,7 +157,7 @@ public class NodeController extends AbstractStandardToComponentsController {
 					// add component model in the list
 					chm.components.put(id, Cchild);
 					
-					System.out.println("NodeController.createComponentModel() -> compnoent Holder has componts number ="+chm.components.size());
+//					System.out.println("NodeController.createComponentModel() -> compnoent Holder has componts number ="+chm.components.size());
 				}
 
 				// componentmodels[index++] = Cchild;
@@ -178,12 +180,12 @@ public class NodeController extends AbstractStandardToComponentsController {
 			ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
 			ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
 			if (subComponents != null) {
-				System.out.println("NodeController.componentHierarchicalRebuild()->subComponents !=null");
+//				System.out.println("NodeController.componentHierarchicalRebuild()->subComponents !=null");
 				addSubComponents(currentModel, subComponents, componentmodels);
 			}
 			else
 			{
-				System.out.println("NodeController.componentHierarchicalRebuild()->subComponents ==null");
+//				System.out.println("NodeController.componentHierarchicalRebuild()->subComponents ==null");
 			}
 			
 		}
@@ -207,18 +209,18 @@ public class NodeController extends AbstractStandardToComponentsController {
 			
 //			ProActiveComponentImpl Child = (ProActiveComponentImpl)child;
 			UniqueID childID = child.getID();
-			System.out.println("NodeController.addSubComponents()-> subcompnent ID = "+childID);
+//			System.out.println("NodeController.addSubComponents()-> subcompnent ID = "+childID);
 //			System.out.println("NodeController.addSubComponents() -> Child.getBody().getMBean().getID() ="+Child.getBody().getMBean().getID());
 			Set<UniqueID> keys = componentmodels.keySet();
 			for (UniqueID key : keys) {
-				System.out.println("NodeController.addSubComponents() -> componentmodel id ="+key);
+//				System.out.println("NodeController.addSubComponents() -> componentmodel id ="+key);
 				
 				if (key.equals(childID)) {
 					// find one child.
 					// if this child is not primitive one, first add its
 					// children..
 					ComponentModel currentModel = componentmodels.get(key);
-					System.out.println("NodeController.addSubComponents() -> children ="+currentModel.getName() +" its parent is ="+parent.getName());
+//					System.out.println("NodeController.addSubComponents() -> children ="+currentModel.getName() +" its parent is ="+parent.getName());
 					
 					
 					ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
@@ -227,7 +229,7 @@ public class NodeController extends AbstractStandardToComponentsController {
 						addSubComponents(currentModel, subsubComponents, componentmodels);
 						currentModel.setHierachical("Composite");
 					} else {
-						currentModel.setHierachical("primitive");
+						currentModel.setHierachical("Primitive");
 					}
 					
 					// then add it to the parent

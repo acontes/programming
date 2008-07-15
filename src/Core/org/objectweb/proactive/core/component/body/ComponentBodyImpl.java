@@ -39,6 +39,7 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.NotCompliantMBeanException;
+import javax.management.Notification;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
@@ -56,9 +57,12 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.jmx.mbean.ComponentWrapper;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+import com.vladium.emma.runCommand;
 
 
 /**
@@ -166,12 +170,39 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                     
                     // change activity into a component activity
                     // activity = new ComponentActivity(activity, reifiedObject);
+                        
+                        new Thread(){
+                        	public void run(){
+                        		while(true)
+                        		{
+                        		try {
+                					Thread.sleep(3000);
+                				} catch (InterruptedException e1) {
+                					// TODO Auto-generated catch block
+                					e1.printStackTrace();
+                				}
+                        		cmbean.sendNotification(NotificationType.waitForRequest);
+                        		System.out.println("ComponentBodyImpl.ComponentBodyImpl() cmbean"+cmbean.toString()+" send Notification->" +NotificationType.waitForRequest);
+                        		
+                        	}
+                        	}
+                        }.start();
+                        
+                        
+                        
+                        
                 } else {
                     logger
                             .error("component parameters for the components factory are not of type ComponentParameters");
                 }
+                
+                
+                
             }
         }
+        
+        
+        
     }
 
     /**
