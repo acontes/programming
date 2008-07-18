@@ -148,9 +148,9 @@ public class NodeController extends AbstractStandardToComponentsController {
 			            JMXNotificationManager.getInstance().subscribe(Cchild.getObjectName(), Cchild.getListener(),
 			                    ((RuntimeObject)(Cchild.getParent().getParent())).getUrl());
 			            
-			            System.out.println("NodeController.createComponentModel()-> ComponentModelListener ="+Cchild.getListener().toString());
+//			            System.out.println("NodeController.createComponentModel()-> ComponentModelListener ="+Cchild.getListener().toString());
 			        } catch (IOException e) {
-			            System.out.println("ComponentModel: could not register ComponentListener: " + Cchild.getObjectName());
+//			            System.out.println("ComponentModel: could not register ComponentListener: " + Cchild.getObjectName());
 			            e.printStackTrace();
 			        }
 					

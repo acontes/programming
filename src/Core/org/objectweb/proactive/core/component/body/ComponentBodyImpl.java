@@ -78,7 +78,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private boolean insideFunctionalActivity = false;
 
-    private ComponentWrapper cmbean;
+//    private ComponentWrapper cmbean;
     
     public ComponentBodyImpl() {
         super();
@@ -126,10 +126,12 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                         ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
                         if (!mbs.isRegistered(oname)) {
                         	
-                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs does not have oname:"+oname.toString());
-                            this.cmbean = new ComponentWrapper(oname, this);
+//                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs does not have oname:"+oname.toString());
+//                            this.cmbean = new ComponentWrapper(oname, this);
+                        	super.mbean = new ComponentWrapper(oname, this);
                             try {
-                                mbs.registerMBean(cmbean, oname);
+//                                mbs.registerMBean(cmbean, oname);
+                                mbs.registerMBean(super.mbean, oname);
                             } catch (InstanceAlreadyExistsException e) {
                                 bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
                             } catch (MBeanRegistrationException e) {
@@ -150,11 +152,13 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                                 bodyLogger.error("Can't register the MBean of the body", e);
                             }
                         	
-                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has already has oname:"+oname.toString());
+//                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has already has oname:"+oname.toString());
                         	
-                        	this.cmbean = new ComponentWrapper(oname, this);
+//                        	this.cmbean = new ComponentWrapper(oname, this);
+                        	super.mbean = new ComponentWrapper(oname, this);
                             try {
-                                mbs.registerMBean(cmbean, oname);
+//                                mbs.registerMBean(cmbean, oname);
+                            	mbs.registerMBean(super.mbean, oname);
                             } catch (InstanceAlreadyExistsException e) {
                                 bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
                             } catch (MBeanRegistrationException e) {
@@ -165,28 +169,31 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                         	
                         }
                         
-                        System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has "+mbs.getMBeanCount()+" mbean after register");
+//                        System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has "+mbs.getMBeanCount()+" mbean after register");
                     
                     
                     // change activity into a component activity
                     // activity = new ComponentActivity(activity, reifiedObject);
                         
-                        new Thread(){
-                        	public void run(){
-                        		while(true)
-                        		{
-                        		try {
-                					Thread.sleep(3000);
-                				} catch (InterruptedException e1) {
-                					// TODO Auto-generated catch block
-                					e1.printStackTrace();
-                				}
-                        		cmbean.sendNotification(NotificationType.waitForRequest);
-                        		System.out.println("ComponentBodyImpl.ComponentBodyImpl() cmbean"+cmbean.toString()+" send Notification->" +NotificationType.waitForRequest);
-                        		
-                        	}
-                        	}
-                        }.start();
+//                        new Thread(){
+//                        	public void run(){
+//                        		while(true)
+//                        		{
+//                        		try {
+//                					Thread.sleep(3000);
+//                				} catch (InterruptedException e1) {
+//                					// TODO Auto-generated catch block
+//                					e1.printStackTrace();
+//                				}
+////                        		cmbean.sendNotification(NotificationType.waitForRequest);
+////                        		System.out.println("ComponentBodyImpl.ComponentBodyImpl() cmbean"+cmbean.toString()+" send Notification->" +NotificationType.waitForRequest);
+//                        		
+//                				mbean.sendNotification(NotificationType.waitForRequest+" in ComponentBodyImpl");
+//                        		System.out.println("ComponentBodyImpl.ComponentBodyImpl() cmbean"+mbean.toString()+" send Notification->" +NotificationType.waitForRequest);
+//                        		
+//                        	}
+//                        	}
+//                        }.start();
                         
                         
                         

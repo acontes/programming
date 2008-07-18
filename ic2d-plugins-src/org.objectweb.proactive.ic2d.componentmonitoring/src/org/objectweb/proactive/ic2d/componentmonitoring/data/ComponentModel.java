@@ -42,6 +42,8 @@ public class ComponentModel extends AbstractData {
 
 	private double sample_service_rate = -1;
 
+	private int sampleSize = 10;
+	
 	private double time_arrival_rate = -1;
 
 	private double time_departure_rate = -1;
