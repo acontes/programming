@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.extpoint;
 
@@ -47,11 +48,11 @@ public interface IActionExtPoint extends IAction {
      * to the extension that plugs to an extension point.
      * @param object The AbstractDataObject that will be provided to the extension
      */
-    public void setAbstractDataObject(AbstractData object);
+    public void setAbstractDataObject(AbstractData<?, ?> object);
 
     /**
      * Sets the selected object.
      * @param The reference on the active object
      */
-    public void setActiveSelect(AbstractData ref);
+    public void setActiveSelect(AbstractData<?, ?> ref);
 }

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.p2p.service.node;
 
@@ -53,6 +54,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.p2p.service.util.P2PConstants;
@@ -183,7 +185,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
         try {
             // Kill the node
             if (this.descriptorPath == null) {
-                this.proactiveRuntime.killNode(nodeUrl);
+                this.proactiveRuntime.killNode(URIBuilder.getNameFromURI(nodeUrl));
                 logger.info("Node @" + nodeUrl + " left");
                 // Creating a new node
                 this.createNewNode();

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
@@ -34,7 +35,7 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 
 
-public final class VirtualNodeObject extends AbstractData {
+public final class VirtualNodeObject extends AbstractData<WorldObject, ProActiveNodeObject> {
     private WorldObject parent;
 
     /** The virtual node name */
@@ -92,21 +93,20 @@ public final class VirtualNodeObject extends AbstractData {
     }
 
     @Override
-    public void addChild(AbstractData child) {
+    public void addChild(ProActiveNodeObject child) {
         if (!monitoredChildren.containsKey(child.getKey())) {
             monitoredChildren.put(child.getKey(), child);
         }
     }
 
     @Override
-    public void removeChild(AbstractData child) {
+    public void removeChild(ProActiveNodeObject child) {
         monitoredChildren.remove(child.getKey());
         if (monitoredChildren.isEmpty()) {
             parent.removeVirtualNode(this);
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public WorldObject getParent() {
         return parent;

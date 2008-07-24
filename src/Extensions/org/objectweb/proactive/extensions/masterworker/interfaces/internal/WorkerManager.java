@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
@@ -66,15 +67,6 @@ public interface WorkerManager extends WorkerDeadListener {
      * @param nodes a collection of nodes
      */
     void addResources(Collection<Node> nodes);
-
-    /**
-     * Connects to a running scheduler by providing URL, login and password
-     * @param schedulerURL url of the running scheduler
-     * @param user username
-     * @param password password
-     * @throws ProActiveException if the scheduler cannot be found or if the login fails
-     */
-    void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
 
     /**
      * Terminates the worker manager and free every resources (if asked)

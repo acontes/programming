@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.config;
 
@@ -36,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.runtime.StartRuntime;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -60,23 +62,28 @@ public enum PAProperties {
     /**
      * Java security policy file location
      */
-    JAVA_SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING),
+    JAVA_SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING, true),
 
     /**
      * If IPv6 is available on the operating system the default preference is to prefer an IPv4-mapped address over an IPv6 address
      */
-    PREFER_IPV6_ADDRESSES("java.net.preferIPv6Addresses", PAPropertiesType.BOOLEAN),
+    PREFER_IPV6_ADDRESSES("java.net.preferIPv6Addresses", PAPropertiesType.BOOLEAN, true),
 
     /**
      * If IPv6 is available on the operating system the underlying native socket will be an IPv6 socket. This allows Java(tm) applications to connect too, and accept connections from, both IPv4 and IPv6 hosts.
      */
-    PREFER_IPV4_STACK("java.net.preferIPv4Stack", PAPropertiesType.BOOLEAN),
+    PREFER_IPV4_STACK("java.net.preferIPv4Stack", PAPropertiesType.BOOLEAN, true),
 
     /**
      * Indicate the Fractal provider class, to the ProActive implementation of
      * Fractal/GCM set it to org.objectweb.proactive.core.component.Fractive
      */
-    FRACTAL_PROVIDER("fractal.provider", PAPropertiesType.STRING),
+    FRACTAL_PROVIDER("fractal.provider", PAPropertiesType.STRING, true),
+
+    JAVA_SECURITY_AUTH_LOGIN_CONFIG("java.security.auth.login.config", PAPropertiesType.STRING, true),
+
+    JAVAX_XML_TRANSFORM_TRANSFORMERFACTORY("javax.xml.transform.TransformerFactory", PAPropertiesType.STRING,
+            true),
 
     /* ------------------------------------
      *  PROACTIVE
@@ -98,6 +105,16 @@ public enum PAProperties {
      * Used in unit and functional tests
      */
     PA_HOME("proactive.home", PAPropertiesType.STRING),
+
+    /**
+     * Indicates what is the operating system of the local machine
+     *
+     * It is not redundant with "os.name" since the only valid values those from <code>OperatingSystem</code>.
+     * Often users are only interested to know if the computer is running unix or windows.
+     *
+     * @see OperatingSystem
+     */
+    PA_OS("proactive.os", PAPropertiesType.STRING, true),
 
     /**
      * Log4j configuration file location
@@ -152,6 +169,8 @@ public enum PAProperties {
 
     /**
      * Period of the future monitoring ping, in milliseconds
+     * 
+     * If set to 0, then future monitoring is disabled
      */
     PA_FUTUREMONITORING_TTM("proactive.futuremonitoring.ttm", PAPropertiesType.INTEGER),
 
@@ -228,7 +247,7 @@ public enum PAProperties {
      * to post on the public ProActive mailing list before using this property.
      */
     PA_NET_SECONDARYNAMES("proactive.net.secondaryNames", PAPropertiesType.STRING), SCHEMA_VALIDATION(
-            "schema.validation", PAPropertiesType.BOOLEAN),
+            "schema.validation", PAPropertiesType.BOOLEAN, true),
 
     /* ------------------------------------
      *  RMI
@@ -240,7 +259,7 @@ public enum PAProperties {
      * this property identifies the default port used by the RMI communication protocol
      */
     PA_RMI_PORT("proactive.rmi.port", PAPropertiesType.INTEGER), JAVA_RMI_SERVER_CODEBASE(
-            "java.rmi.server.codebase", PAPropertiesType.STRING),
+            "java.rmi.server.codebase", PAPropertiesType.STRING, true),
 
     /* ------------------------------------
      *  HTTP
@@ -379,25 +398,6 @@ public enum PAProperties {
     PA_MASTERWORKER_COMPRESSTASKS("proactive.masterworker.compresstasks", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
-     *  SCHEDULER
-     */
-
-    /* ------------------------------------
-     *  SCHEDULER EXTENSIONS
-     */
-    PA_SCHEDULER_EXT_MATLAB_SCRIPT_LINUX("proactive.scheduler.ext.matlab.script.linux",
-            PAPropertiesType.STRING),
-
-    PA_SCHEDULER_EXT_MATLAB_SCRIPT_WINDOWS("proactive.scheduler.ext.matlab.script.windows",
-            PAPropertiesType.STRING),
-
-    PA_SCHEDULER_EXT_SCILAB_SCRIPT_LINUX("proactive.scheduler.ext.scilab.script.linux",
-            PAPropertiesType.STRING),
-
-    PA_SCHEDULER_EXT_SCILAB_SCRIPT_WINDOWS("proactive.scheduler.ext.scilab.script.windows",
-            PAPropertiesType.STRING),
-
-    /* ------------------------------------
      *  PEER TO PEER
      */
 
@@ -505,7 +505,7 @@ public enum PAProperties {
     /**
      * TODO vlegrand Describe this property
      */
-    CATALINA_BASE("catalina.base", PAPropertiesType.STRING),
+    CATALINA_BASE("catalina.base", PAPropertiesType.STRING, true),
 
     /**
      * TODO
@@ -514,12 +514,19 @@ public enum PAProperties {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
     public static final String FALSE = "false";
+
     private String key;
     private PAPropertiesType type;
+    private boolean isSystemProperty;
 
     PAProperties(String str, PAPropertiesType type) {
+        this(str, type, false);
+    }
+
+    PAProperties(String str, PAPropertiesType type, boolean isSystemProperty) {
         this.key = str;
         this.type = type;
+        this.isSystemProperty = isSystemProperty;
     }
 
     /**
@@ -632,6 +639,10 @@ public enum PAProperties {
 
     public boolean isBoolean() {
         return type == PAPropertiesType.BOOLEAN;
+    }
+
+    public boolean isSystemProperty() {
+        return isSystemProperty;
     }
 
     public boolean isValid(String value) {

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,10 +27,12 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.montecarlo;
 
 import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 import java.io.Serializable;
 import java.util.Enumeration;
@@ -44,14 +46,15 @@ import java.util.List;
  *
  * @author The ProActive Team
  */
+@PublicAPI
 public interface Simulator {
 
     /**
      * Asks the engine to solve a list of experience sets which will be run in parallel
-     * @param experienceSets list of experience sets to solve
+     * @param simulationSets list of experience sets to solve
      * @return a list of double which is a concatenation of each list of double produced by each experience set. The order of the ouput list is guarantied to be coherent with the order of the experience list.
      * @throws TaskException if an exception occured inside the user code
      */
-    public <T extends Serializable> Enumeration<T> solve(List<ExperienceSet<T>> experienceSets)
+    public <T extends Serializable> Enumeration<T> solve(List<SimulationSet<T>> simulationSets)
             throws TaskException;
 }

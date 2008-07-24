@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ext.locationserver;
 
@@ -41,8 +42,6 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
-
-import timer.MicroTimer;
 
 
 public class TimedRequestWithLocationServer extends RequestImpl implements java.io.Serializable {
@@ -66,13 +65,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
 
     @Override
     public Reply serve(Body targetBody) {
-        MicroTimer timer = new MicroTimer();
-        timer.start();
-
         Reply r = super.serve(targetBody);
-        timer.stop();
-        System.out.println("TimedRequestWithLocationServer: " + timer.getCumulatedTime() + " for method " +
-            methodName);
         return r;
     }
 

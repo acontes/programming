@@ -46,7 +46,9 @@
 	-->
 
 	<tstamp>
-		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+<!-- 	<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" /> -->
+		<format property="TODAY" pattern="yyyy-MM-dd" />
+
 	</tstamp>
 
 	<if name="version">
@@ -141,7 +143,7 @@
 		<replaceregexp file="${base.dir}/README.html" match="\$Id.*\$" replace="${version}" byline="true" />
 		<replaceregexp file="${base.dir}/README.txt" match="\$Id.*\$" replace="${version}" byline="true" />
 
-		<javac srcdir="${src.proactive.dir}:${src.utils.dir}" destdir="${cl.proactive.dir}" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${src.proactive.dir}" destdir="${cl.proactive.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 			<include name="**/*.java" />
 
@@ -245,7 +247,7 @@
 	</target>
 
 
-	<target name="compile.tests" depends="compile.core, compile.extensions, compile.extra" description="Compile functional and unit tests classes">
+	<target name="compile.tests" depends="compile.core, compile.extensions, compile.extra, compile.util" description="Compile functional and unit tests classes">
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
@@ -285,7 +287,7 @@
 
 	<target name="compile.examples" depends="compile.core, compile.extensions, compile.extra" description="Compile all examples classes">
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
-		<javac srcdir="${src.examples.dir}:${src.utils.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
+		<javac srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
 			<classpath refid="examples.classpath" />
 		</javac>
 
@@ -308,7 +310,7 @@
 	</target>
 
 
-	<target name="compile.util" depends="-init, compile.core" description="Compile ProActive Utils classes">
+	<target name="compile.util" depends="-configurationCopy" description="Compile ProActive Utils classes">
 		<!-- XXX Timer is in core.util.Profiling -->
 		<javac srcdir="${src.utils.dir}" destdir="${cl.utils.dir}" includes="**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
@@ -343,7 +345,7 @@
 		Deployment		
 	-->
 
-	<target name="deploy.core" depends="compile.all, -deploy.mkdir" description="Populate dist/ with all needed file">
+	<target name="deploy.core" depends="compile.all, -deploy.mkdir" description="Populate dist/ with all the files needed">
 		<!-- Update Implementation-Version -->
 		<if name="isRelease" exists="true">
 			<replaceregexp file="${compile.dir}/Manifest-base.mf" match="\$ID.*\$" replace="${version}" byline="true" />
@@ -376,7 +378,7 @@
 			<fileset dir="${lib.dir}">
 				<include name="**/*.jar" />
 				<include name="**/*.so" />
-                <include name="**/*.dll" />
+				<include name="**/*.dll" />
 			</fileset>
 		</copy>
 
@@ -388,6 +390,14 @@
 				<include name="gcmdeployment/**" />
 			</fileset>
 		</copy>
+
+		<copy todir="${deploy.dir}">
+			<fileset dir="${compile.dir}">
+				<include name="proactive-log4j"/>
+				<include name="proactive.java.policy"/>
+			</fileset>
+		</copy>
+
 		<chmod perm="755">
 			<fileset dir="${deploy.scripts.dir}" />
 			<include name="**/*.sh" />
@@ -396,16 +406,22 @@
 	</target>
 
 
-	<target name="deploy.examples" depends="examples, deploy.core" description="Add examples.jar to the dist/ directory">
+	<target name="deploy.examples" depends="examples, deploy.core" description="Add ProActive_examples.jar to the dist/ directory">
 		<jar destfile="${deploy.lib.dir}/ProActive_examples.jar">
 			<fileset dir="${cl.examples.dir}" />
 			<fileset dir="${cl.benchmarks.dir}" />
 		</jar>
 	</target>
 
-	<target name="deploy.tests" depends="deploy.core" description="Add examples.jar to the dist/ directory">
+	<target name="deploy.tests" depends="deploy.core" description="Add ProActive_tests.jar to the dist/ directory">
 		<jar destfile="${deploy.lib.dir}/ProActive_tests.jar">
 			<fileset dir="${cl.test.dir}" />
+		</jar>
+	</target>
+
+	<target name="deploy.utils" description="Add ProActive_utils.jar to the dist/ directory">
+		<jar destfile="${deploy.lib.dir}/ProActive_utils.jar">
+			<fileset dir="${cl.utils.dir}" />
 		</jar>
 	</target>
 
@@ -417,7 +433,7 @@
 	</target>
 
 
-	<target name="deploy.all" depends="deploy.core, deploy.examples, deploy.tests" description="Populate dist/ (with ProActive_examples.jar)" />
+	<target name="deploy.all" depends="deploy.core, deploy.examples, deploy.tests, deploy.utils" description="Populate dist/ with all ProActive Programming dependencies and JARs" />
 
 	<target name="deploy" depends="deploy.all" description="Populate dist/ (with ProActive_examples.jar)" />
 
@@ -615,6 +631,7 @@
 
 
 	<target name="update_copyright_and_version" depends="compile.util" description="Update Copyright and Version in every text files">
+
 		<java classname="sources.UpdateCopyrightAndVersion" fork="false">
 			<classpath refid="project.classpath" />
 			<!--  base dir -->
@@ -626,6 +643,8 @@
 			<arg value="${test.classes.dir}" />
 			<arg value="${lib.dir}" />
 			<arg value="${dev.dir}" />
+			<arg value="${extra.format.dir}"/>
+		<sysproperty key="copyright.update" value="${copyright.update}"/>
 		</java>
 	</target>
 
@@ -659,6 +678,7 @@
 			<sourcefileset>
 				<fileset dir="${src.dir}" includes="**/*.java" />
 				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
+				<fileset dir="${extra.format.dir}" includes="**/*.java" />
 			</sourcefileset>
 		</eclipse_format_m>
 	</target>
@@ -765,6 +785,11 @@
 				<include name="org/**/jaas.config" />
 			</fileset>
 		</copy>
+		<copy toDir="${cl.utils.dir}">
+			<fileset dir="${src.utils.dir}">
+				<include name="sources/*.txt" />
+			</fileset>
+		</copy>
 	</target>
 
 
@@ -833,7 +858,7 @@
 				<include name="log4j.jar" />
 				<include name="xercesImpl.jar" />
 				<include name="bouncycastle.jar" />
-				<include name="components/fractal.jar" />
+				<include name="fractal.jar" />
 			</fileset>
 		</jar>
 	</target>

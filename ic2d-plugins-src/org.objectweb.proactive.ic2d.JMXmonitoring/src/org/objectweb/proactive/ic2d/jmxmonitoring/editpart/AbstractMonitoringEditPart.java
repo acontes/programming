@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,29 +27,31 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AbstractFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
-public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPart implements Observer,
-        Runnable {
-    //protected static Map<AbstractData, AbstractMonitoringEditPart> registry = new java.util.concurrent.ConcurrentHashMap<AbstractData, AbstractMonitoringEditPart>();
+public abstract class AbstractMonitoringEditPart<E extends AbstractData<?, ?>> extends
+        AbstractGraphicalEditPart implements Observer, Runnable {
     private WorldEditPart worldEditPart;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public AbstractMonitoringEditPart(AbstractData model) {
-        setModel(model);
+    public AbstractMonitoringEditPart(E model) {
+        super.setModel(model);
     }
 
     //
@@ -109,7 +111,7 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
      */
     public WorldEditPart getWorldEditPart() {
         if (worldEditPart == null) {
-            worldEditPart = ((AbstractMonitoringEditPart) getParent()).getWorldEditPart();
+            worldEditPart = ((AbstractMonitoringEditPart<?>) getParent()).getWorldEditPart();
         }
         return worldEditPart;
     }
@@ -132,7 +134,18 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
      * to the real type of the model.
      * @return the casted model
      */
-    public abstract AbstractData getCastedModel();
+    @SuppressWarnings("unchecked")
+    public E getCastedModel() {
+        return (E) super.getModel();
+    }
+
+    /**
+     * Returns a List containing the children model objects.
+     * @return the List of children
+     */
+    protected List<?> getModelChildren() {
+        return (List<?>) getCastedModel().getMonitoredChildrenAsList();
+    }
 
     /**
      * Convert the result of EditPart.getFigure()
@@ -141,4 +154,13 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
      */
     public abstract IFigure getCastedFigure();
 
+    @Override
+    public EditPart getParent() {
+        if (super.getParent() == null) {
+            System.out
+                    .println("AbstractMonitoringEditPart.getParent()-------> PARENT IN NULL FOR EP OF MODEL " +
+                        getCastedModel().getName() + " type : " + getModel().getClass());
+        }
+        return super.getParent();
+    }
 }

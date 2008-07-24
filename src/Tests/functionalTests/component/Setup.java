@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionalTests.component;
 
@@ -46,6 +47,7 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -68,7 +70,7 @@ public class Setup {
 
     private static void init() throws InstantiationException, NoSuchInterfaceException {
         if ((tf == null) || (gf == null)) {
-            System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
+            PAProperties.FRACTAL_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
             Component boot = Fractal.getBootstrapComponent();
             if (tf == null) {
                 tf = (ProActiveTypeFactory) Fractal.getTypeFactory(boot);

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extensions.gcmdeployment.environment;
 
@@ -43,6 +44,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.core.config.PAProperties;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -70,7 +72,7 @@ class EnvironmentTransformer {
             valueList[i] = valueList[i].replaceAll("\\$", "\\\\\\$");
         }
 
-        System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
+        PAProperties.JAVAX_XML_TRANSFORM_TRANSFORMERFACTORY.setValue("net.sf.saxon.TransformerFactoryImpl");
         DOMSource domSource = new DOMSource(document);
         TransformerFactory tfactory = TransformerFactory.newInstance();
 

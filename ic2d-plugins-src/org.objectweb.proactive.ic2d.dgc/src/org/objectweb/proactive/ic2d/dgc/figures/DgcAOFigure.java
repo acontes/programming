@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.dgc.figures;
 
@@ -39,7 +40,6 @@ import javax.management.ReflectionException;
 
 import org.eclipse.draw2d.Label;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 
 
@@ -75,7 +75,6 @@ public class DgcAOFigure extends AOFigure {
     }
 
     public void updateDgcState(ActiveObject model) {
-        NodeObject node = model.getParent();
         String state = "";
         try {
             state = (String) model.getAttribute("DgcState");

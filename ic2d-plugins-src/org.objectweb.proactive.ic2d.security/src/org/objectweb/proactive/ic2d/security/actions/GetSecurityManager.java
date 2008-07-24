@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.security.actions;
 
@@ -54,7 +55,7 @@ import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.securityentity.RuleEntity;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ProActiveNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.security.core.KeystoreUtils;
@@ -160,7 +161,7 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
     public void setAbstractDataObject(AbstractData ref) {
         this.object = ref;
         super.setEnabled(this.object instanceof ActiveObject || this.object instanceof RuntimeObject ||
-            this.object instanceof NodeObject);
+            this.object instanceof ProActiveNodeObject);
     }
 
     public void setActiveSelect(AbstractData ref) {

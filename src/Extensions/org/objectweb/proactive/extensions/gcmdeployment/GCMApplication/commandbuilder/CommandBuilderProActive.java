@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
 
@@ -228,7 +229,7 @@ public class CommandBuilderProActive implements CommandBuilder {
                 javaCommand = javaTool.getPath();
             }
         }
-        return javaCommand;
+        return "\"" + javaCommand + "\"";
     }
 
     /**
@@ -395,30 +396,42 @@ public class CommandBuilderProActive implements CommandBuilder {
         if (hostInfo.getHostCapacity() == 0) {
             ret.append(command);
         } else {
-            for (int i = 0; i < hostInfo.getHostCapacity(); i++) {
-                ret.append(command);
-                ret.append(" &");
+            switch (hostInfo.getOS()) {
+                case unix:
+                    for (int i = 0; i < hostInfo.getHostCapacity(); i++) {
+                        ret.append(command);
+                        ret.append(" &");
+                    }
+                    ret.deleteCharAt(ret.length() - 1);
+                    break;
+
+                case windows:
+                    char fs = hostInfo.getOS().fileSeparator();
+                    ret.append("\"");
+                    ret.append(getPath(hostInfo));
+                    ret.append(fs);
+                    ret.append("dist");
+                    ret.append(fs);
+                    ret.append("scripts");
+                    ret.append(fs);
+                    ret.append("gcmdeployment");
+                    ret.append(fs);
+                    ret.append("startn.bat");
+                    ret.append("\"");
+
+                    ret.append(" ");
+                    ret.append(hostInfo.getHostCapacity());
+
+                    ret.append(" ");
+                    ret.append("\"");
+                    ret.append(command);
+                    ret.append("\"");
+                    break;
             }
-            ret.deleteCharAt(ret.length() - 1);
         }
 
         GCMD_LOGGER.trace(ret);
         return ret.toString();
-    }
-
-    private PathElement getDefaultSecurityPolicy() {
-        // TODO Return the default PathElement for Security Policy
-        return null;
-    }
-
-    private List<PathElement> getDefaultProActiveClassPath() {
-        // TODO Return the default PathElements for ProActive ClassPath
-        return null;
-    }
-
-    private PathElement getDefaultLog4jProperties() {
-        // TODO Return the default PathElemen for log4jProperties
-        return null;
     }
 
     public void setProActivePath(String proActivePath) {

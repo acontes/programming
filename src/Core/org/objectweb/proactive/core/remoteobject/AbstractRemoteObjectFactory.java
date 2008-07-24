@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,11 +27,13 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.remoteobject;
 
 import java.util.Hashtable;
 
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -58,7 +60,7 @@ public abstract class AbstractRemoteObjectFactory {
      * @return the new codebase
      */
     protected static synchronized String addCodebase(String newLocationURL) {
-        String oldCodebase = System.getProperty("java.rmi.server.codebase");
+        String oldCodebase = PAProperties.JAVA_RMI_SERVER_CODEBASE.getValue();
         String newCodebase = null;
         if (oldCodebase != null) {
             // RMI support multiple class server locations
@@ -67,7 +69,7 @@ public abstract class AbstractRemoteObjectFactory {
             newCodebase = newLocationURL;
         }
 
-        System.setProperty("java.rmi.server.codebase", newCodebase);
+        PAProperties.JAVA_RMI_SERVER_CODEBASE.setValue(newCodebase);
 
         return newCodebase;
     }

@@ -10,7 +10,11 @@
             value="false" />
         <prop key="proactive.mixedlocation.maxMigrationNb" value="-1" />
         <prop key="proactive.mixedlocation.maxTimeOnSite" value="-1" />
-        <prop key="proactive.net.nolocal" value="true" />
+    
+        <prop key="proactive.net.nolocal"   value="false" />
+        <prop key="proactive.net.noprivate" value="false" />
+    	<prop key="proactive.useIPaddress" value="true" />
+	    
         <prop key="proactive.future.ac" value="true" />
         <prop key="proactive.stack_trace" value="false" /> <!-- complete stack traces in requests -->
         <prop key="proactive.dgc" value="false" />
@@ -22,7 +26,6 @@
 		<!--<prop key="proactive.java.policy" value="../../../../../../scripts/unix/proactive.java.policy"/>-->
         <prop key="fractal.provider" value="org.objectweb.proactive.core.component.Fractive" />
         <prop key="proactive.http.servlet" value="false" />
-		<prop key="proactive.useIPaddress" value="false" />
 		<!-- <prop key="proactive.tunneling.connect_timeout" value="2000"/> -->
         <prop key="proactive.tunneling.try_normal_first" value="true" />
         <prop key="proactive.tunneling.use_gc" value="true" />
@@ -67,21 +70,6 @@
         <!-- Compressing tasks in the repository -->
         <prop key="proactive.masterworker.compresstasks" value="false" />
         
-        <!-- ***************************************************** -->
-        <!-- SCHEDULER PROPERTIES VALUE -->
-        
-        
-        <!-- ***************************************************** -->
-        <!-- SCHEDULER EXTENSION PROPERTIES VALUE -->
-        <!-- Paths to scripts used to find matlab and scilab -->
-        <prop key="proactive.scheduler.ext.matlab.script.linux"
-            value="find_matlab_command.sh" />
-        <prop key="proactive.scheduler.ext.matlab.script.windows"
-            value="find_matlab_command.bat" />
-        <prop key="proactive.scheduler.ext.scilab.script.linux"
-            value="find_scilab_command.sh" />
-        <prop key="proactive.scheduler.ext.scilab.script.windows"
-            value="find_scilab_command.bat" />
 
 		<!-- Workaround to fix rmissh/unicore conflict -->
         <prop key="proactive.unicore.forkclient" value="true" />

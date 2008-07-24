@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,7 +26,9 @@
  *                        http://www.activeeon.com/
  *  Contributor(s):
  *
+ *
  * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.objectweb.proactive.examples.userguide.cmagent.initialized;
 
@@ -54,7 +56,6 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
         startTime = System.currentTimeMillis();
     }
 
-    //@snippet-end cma_init_full
     public void runActivity(Body body) {
         Service service = new Service(body);
         long currentRequestDuration = 0;
@@ -99,5 +100,6 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
         //TODO 10. Use wrappers for primitive types so the calls are asynchronous
         return new LongWrapper(lastRequestDuration);
     }
+    //@snippet-end cma_init_full
 
 }

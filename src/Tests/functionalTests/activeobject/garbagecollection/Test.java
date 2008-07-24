@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,11 +27,13 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionalTests.activeobject.garbagecollection;
 
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
 import functionalTests.GCMDeploymentReady;
@@ -80,7 +82,7 @@ public class Test extends FunctionalTest {
     @Before
     public void initTest() throws Exception {
         /* This must be done before initializing ProActive, and the DGC */
-        System.setProperty("proactive.dgc", "true");
-        System.setProperty("proactive.dgc.ttb", "500");
+        PAProperties.PA_DGC.setValue(true);
+        PAProperties.PA_DGC_TTB.setValue(500);
     }
 }

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.p2p.service;
 
@@ -37,9 +38,9 @@ import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.util.Vector;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -58,6 +59,7 @@ import org.objectweb.proactive.extra.p2p.service.util.P2PConstants;
  *
  * Created on Jan 4, 2005
  */
+@PublicAPI
 public class StartP2PService implements P2PConstants {
     // TODO Disable node sharing when starting a p2p sevice
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_STARTSERVICE);
@@ -363,7 +365,7 @@ public class StartP2PService implements P2PConstants {
     // Main method
     // -------------------------------------------------------------------------
     public static void main(String[] args) {
-        ProActiveLogger.getLogger(Loggers.P2P).setLevel(Level.DEBUG);
+        // ProActiveLogger.getLogger(Loggers.P2P).setLevel(Level.DEBUG);
 
         // Parsing command line
         Args parsed = parseArgs(args);
@@ -475,12 +477,15 @@ public class StartP2PService implements P2PConstants {
         // can change the port values
 
         if (vals.length > 0) {
-
+            //TODO gsigety : set the good port value for each acquisition method
             if (!acquisitionMethod.equals("ibis")) {
-                bckPortValue = System.getProperty("proactive." + acquisitionMethod + ".port");
-                System.setProperty("proactive." + acquisitionMethod + ".port", portNumber);
-                System.out.println("BckPortValue: " + bckPortValue);
-                System.out.println("Port number: " + portNumber);
+                bckPortValue = PAProperties.getProperty("proactive." + acquisitionMethod + ".port")
+                        .toString();
+                PAProperties.PA_RMI_PORT.setValue(portNumber);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("BckPortValue: " + bckPortValue);
+                    logger.debug("Port number: " + portNumber);
+                }
             } else {
                 bckPortValue = PAProperties.PA_RMI_PORT.getValue();
                 PAProperties.PA_RMI_PORT.setValue(portNumber);

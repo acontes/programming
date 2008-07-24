@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,8 +27,11 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionalTests.component.conform.components;
+
+import java.util.List;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
@@ -48,6 +51,14 @@ public class SlaveImpl implements Slave {
         return new StringWrapper(computeSync(arg, other));
     }
 
+    public StringWrapper computeRoundRobinBroadcastAsync(String arg, List<String> other) {
+        String aggregOther = "";
+        for (String string : other) {
+            aggregOther += string;
+        }
+        return new StringWrapper(computeSync(arg, aggregOther));
+    }
+
     public GenericTypeWrapper<String> computeAsyncGenerics(String arg, String other) {
         return new GenericTypeWrapper<String>(computeSync(arg, other));
     }
@@ -56,4 +67,5 @@ public class SlaveImpl implements Slave {
         computeOneWay(arg, other);
         return "arg: '" + arg + "',other: '" + other + "'";
     }
+
 }

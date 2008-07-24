@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.p2p.service.node;
 
@@ -41,6 +42,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveException;
@@ -64,8 +66,9 @@ import org.objectweb.proactive.extra.p2p.service.util.UniversalUniqueID;
  *
  * Created on Jan 18, 2005
  */
+@PublicAPI
 public class P2PNodeLookup implements InitActive, RunActive, EndActive, P2PConstants, Serializable,
-        ProActiveInternalObject {
+        ProActiveInternalObject, P2PLookupInt {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private Vector<Node> waitingNodesList;
     private Vector<String> nodesToKillList;
@@ -340,15 +343,10 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive, P2PConst
             m = new RequestSingleNodeMessage(TTL, uuid, this.localP2pService_active, this.stub, this.vnName,
                 this.jobId);
         } else {
-            //         //       if (onlyUnderloadedAnswer) {
-            //                    m = new RequestNodesMessage(TTL, uuid, this.localP2pService,
-            //                            this.numberOfAskedNodes - this.acquiredNodes, stub,
-            //                            this.vnName, this.jobId, onlyUnderloadedAnswer, null);
-            //                } else {
+
             m = new RequestNodesMessage(TTL, uuid, this.localP2pService_active, this.numberOfAskedNodes -
                 this.acquiredNodes, stub, this.vnName, this.jobId, true, this.nodeFamilyRegexp);
         }
-        //            }
         this.localP2pService_active.requestNodes(m);
 
         while (true) {

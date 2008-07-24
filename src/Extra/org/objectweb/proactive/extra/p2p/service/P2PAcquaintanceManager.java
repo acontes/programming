@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.p2p.service;
 
@@ -156,7 +157,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
                 logger.info("I have too many neighbors!");
                 this.dropRandomPeer();
             } else {
-                logger.info("I have reached the maximum of acquaintance ");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("I have reached the maximum of acquaintance ");
+                }
             }
             waitTTU(service);
             // this.dumpTables();
@@ -247,14 +250,18 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
                 if ( // !peer.equals(this.localService) &&
                 !this.contains(peer).booleanValue()) {
                     // Send a message to the remote peer to register myself
-                    System.out.println("P2PAcquaintanceManager requesting peer " + peerUrl);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("P2PAcquaintanceManager requesting peer " + peerUrl);
+                    }
                     // peer.registerRequest(this.localService);
                     startAcquaintanceHandShake(peerUrl, peer);
                 } else {
                     newSet.add(peerUrl);
                 }
             } catch (Exception e) {
-                System.out.println("The peer at " + peerUrl + " couldn't be contacted");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The peer at " + peerUrl + " couldn't be contacted");
+                }
                 e.printStackTrace();
                 // put it back for later use
                 newSet.add(peerUrl);
@@ -300,7 +307,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
             // System.out.println("P2PAcquaintanceManager.cleanAwaitedReplies()
             // now " + System.currentTimeMillis());
             if ((System.currentTimeMillis() - (entry.getValue()).getTime()) > MAX_WAIT_TIME) {
-                System.out.println("xxxxx Peer " + entry.getKey() + " did not reply to our request");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("xxxxx Peer " + entry.getKey() + " did not reply to our request");
+                }
                 // this guy did not reply so we should put it back in the
                 // preferedACQList
                 urls.add(entry.getKey());
@@ -325,7 +334,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
 
         // peer.message(new AcquaintanceRequest(1,
         // this.localService.generateUuid(), this.localService));
-        System.out.println("XXXXXX putting in awaited List " + peerUrl);
+        if (logger.isDebugEnabled()) {
+            logger.debug("XXXXXX putting in awaited List " + peerUrl);
+        }
         awaitedReplies.put(buildCorrectUrl(peerUrl), new DatedRequest(peer, System.currentTimeMillis()));
     }
 
@@ -370,28 +381,41 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
             }
         } catch (Exception e) {
             this.acquaintances.remove(peer, peerUrl);
-            logger.debug("Problem when adding peer", e);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Problem when adding peer", e);
+            }
+
         }
         return this.getAcquaintancesURLs();
     }
 
     public void acqAccepted(String url, P2PService peer) {
-        logger.info("P2PAcquaintanceManager.acqAccepted() got a reply from " + url);
-        System.out.println("URL:" + url + " PEER:" + peer);
+        if (logger.isDebugEnabled()) {
+            logger.debug("P2PAcquaintanceManager.acqAccepted() got a reply from " + url);
+            logger.debug("URL:" + url + " PEER:" + peer);
+        }
+
         // we remove it from the awaited answers
         // if we don't do so, it might be refused because of the NOA limit
         this.removeFromAwaited(url);
         this.add(url, peer);
-        System.out.println("P2PAcquaintanceManager.acqAccepted() adding " + "--" + url + "--");
+        if (logger.isDebugEnabled()) {
+            logger.debug("P2PAcquaintanceManager.acqAccepted() adding " + "--" + url + "--");
+        }
         this.preferedAcquaintancesURLs.add(url);
-        Iterator<String> it = this.preferedAcquaintancesURLs.iterator();
-        while (it.hasNext()) {
-            System.out.println("            " + it.next());
+        if (logger.isDebugEnabled()) {
+            Iterator<String> it = this.preferedAcquaintancesURLs.iterator();
+            while (it.hasNext()) {
+                logger.debug("            " + it.next());
+            }
         }
     }
 
     public void acqRejected(String url, Vector<String> s) {
-        logger.info("P2PAcquaintanceManager.acqRejected() " + url);
+        if (logger.isDebugEnabled()) {
+            logger.debug("P2PAcquaintanceManager.acqRejected() " + url);
+        }
+
         // this.removeFromReply(url,s);
         this.removeFromAwaited(url);
         this.addToPreferedAcq(s);
@@ -400,11 +424,17 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
     }
 
     public void removeFromAwaited(String url) {
-        String[] tmp = this.getAwaitedRepliesUrls();
-        for (int i = 0; i < tmp.length; i++) {
-            System.out.println("--" + tmp[i] + "--");
+        if (logger.isDebugEnabled()) {
+            String[] tmp = this.getAwaitedRepliesUrls();
+            for (int i = 0; i < tmp.length; i++) {
+                logger.debug("--" + tmp[i] + "--");
+            }
         }
-        logger.info("Removing --" + url + "-- from awaited peers " + awaitedReplies.remove(url));
+
+        awaitedReplies.remove(url);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Removing --" + url + "-- from awaited peers ");
+        }
     }
 
     /**
@@ -513,7 +543,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
 
     public boolean shouldBeAcquaintance(P2PService remoteService) {
         if (this.contains(remoteService).booleanValue()) {
-            logger.debug("The remote peer is already known");
+            if (logger.isDebugEnabled()) {
+                logger.debug("The remote peer is already known");
+            }
             return false;
         }
         return acceptAnotherAcquaintance();
@@ -530,11 +562,15 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
      */
     protected boolean acceptAnotherAcquaintance() {
         if (this.getEstimatedNumberOfAcquaintances() < NOA) {
-            logger.debug("NOA not reached: I should be an acquaintance");
+            if (logger.isDebugEnabled()) {
+                logger.debug("NOA not reached: I should be an acquaintance");
+            }
             return true;
         }
         if (this.getEstimatedNumberOfAcquaintances() > (2 * NOA)) {
-            logger.debug("2*NOA reached, I refuse the acquaintance");
+            if (logger.isDebugEnabled()) {
+                logger.debug("2*NOA reached, I refuse the acquaintance");
+            }
             return false;
         }
         // we are in the grey area, only accept with some probability
@@ -554,12 +590,16 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
     }
 
     public void setPreferedAcq(Vector<String> v) {
-        logger.debug("SET PREFFERED ACQUAINTANCE LIST");
+        if (logger.isDebugEnabled()) {
+            logger.debug("SET PREFFERED ACQUAINTANCE LIST");
+        }
         this.preferedAcquaintancesURLs = new HashSet<String>();
         Iterator<String> it = v.iterator();
         while (it.hasNext()) {
             String p = buildCorrectUrl(it.next());
-            System.out.println(p);
+            if (logger.isDebugEnabled()) {
+                logger.debug(p);
+            }
             this.preferedAcquaintancesURLs.add(p);
         }
     }

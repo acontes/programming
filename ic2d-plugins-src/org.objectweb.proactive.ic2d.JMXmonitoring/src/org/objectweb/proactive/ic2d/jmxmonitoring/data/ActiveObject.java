@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
@@ -54,7 +55,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 /**
  * Class for the active object representation in the IC2D model.
  */
-public final class ActiveObject extends AbstractData {
+public final class ActiveObject extends AbstractData<ProActiveNodeObject, AbstractData<?, ?>> {
 
     public static final String ACTIVE_OBJECT_TYPE = "active object";
 
@@ -568,15 +569,22 @@ public final class ActiveObject extends AbstractData {
 
     @Override
     public void destroy() {
+        this.internalDestroy();
+        // The destroy method of the super-class will remove this object from
+        // the parents children
+        super.destroy();
+    }
+
+    /**
+     * Remove the jmx listener, removes this from world then removes communications
+     */
+    protected void internalDestroy() {
         // First unsubscribe JMX listener
         this.unsubscribeListener();
         // Remove this object from world
         super.getWorldObject().removeActiveObject(this.key);
         // Second remove all communications
         this.removeAllCommunications(true);
-        // The destroy method of the super-class will remove this object from
-        // the parents children
-        super.destroy();
     }
 
     public boolean subscribeListener() {

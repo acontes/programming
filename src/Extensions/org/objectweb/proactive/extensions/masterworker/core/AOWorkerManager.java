@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
@@ -223,30 +224,6 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                 // Otherwise, we reuse the previously started deployment
                 addResourcesInternal(applicationUsed.getVirtualNode(virtualNodeName));
             }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addResources(final String schedulerURL, String user, String password)
-            throws ProActiveException {
-
-        String workername = schedulerURL + "_" + workerNameCounter++;
-
-        // Creates the worker which will automatically connect to the master
-        try {
-            workers.put(workername, (Worker) PAActiveObject.newActive(
-                    "org.objectweb.proactive.extensions.scheduler.ext.masterworker.AOSchedulerWorker",
-                    new Object[] { workername, provider, memoryFactory.newMemoryInstance(), schedulerURL,
-                            user, password }));
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace(); // bad node
-        } catch (NodeException e) {
-            e.printStackTrace(); // bad node
-        }
-        if (debug) {
-            logger.debug("Worker " + workername + " created on scheduler " + schedulerURL);
         }
     }
 

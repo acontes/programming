@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.examples.flowshop;
 
@@ -45,11 +46,11 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.branchnbound.ProActiveBranchNBound;
-import org.objectweb.proactive.extensions.branchnbound.core.Manager;
-import org.objectweb.proactive.extensions.branchnbound.core.Result;
-import org.objectweb.proactive.extensions.branchnbound.core.Task;
-import org.objectweb.proactive.extensions.branchnbound.core.queue.BasicQueueImpl;
+import org.objectweb.proactive.extra.branchnbound.ProActiveBranchNBound;
+import org.objectweb.proactive.extra.branchnbound.core.Manager;
+import org.objectweb.proactive.extra.branchnbound.core.Result;
+import org.objectweb.proactive.extra.branchnbound.core.Task;
+import org.objectweb.proactive.extra.branchnbound.core.queue.BasicQueueImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;

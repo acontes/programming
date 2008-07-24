@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionalTests.component.conform.components;
 
@@ -39,16 +40,22 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public interface SlaveMulticast {
-    void computeOneWay(@ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
+    public void computeOneWay(@ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
     List<String> args, String other);
 
-    List<StringWrapper> computeAsync(@ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
+    public List<StringWrapper> computeAsync(@ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
     List<String> args, String other);
 
-    List<GenericTypeWrapper<String>> computeAsyncGenerics(
+    public List<StringWrapper> computeRoundRobinBroadcastAsync(
+            @ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
+            List<String> args, @ParamDispatchMetadata(mode = ParamDispatchMode.BROADCAST)
+            List<String> other);
+
+    public List<GenericTypeWrapper<String>> computeAsyncGenerics(
             @ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
             List<String> args, String other);
 
-    List<String> computeSync(@ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
+    public List<String> computeSync(@ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN)
     List<String> args, String other);
+
 }

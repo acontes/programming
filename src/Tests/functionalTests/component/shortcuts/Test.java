@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionalTests.component.shortcuts;
 
@@ -40,6 +41,7 @@ import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1;
@@ -210,11 +212,11 @@ public class Test extends ComponentTest {
 
     @Before
     public void initTest() throws Exception {
-        System.setProperty("proactive.components.use_shortcuts", "true");
+        PAProperties.PA_COMPONENT_USE_SHORTCUTS.setValue("true");
     }
 
     @After
     public void endTest() throws Exception {
-        System.setProperty("proactive.components.use_shortcuts", "false");
+        PAProperties.PA_COMPONENT_USE_SHORTCUTS.setValue("false");
     }
 }

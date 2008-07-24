@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,10 +27,12 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive;
 
 import org.objectweb.proactive.api.PAVersion;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -44,7 +46,7 @@ public class Main {
      * @return String
      */
     public static String getProActiveVersion() {
-        return "2008-07-02 14:30:36";
+        return "2008-07-10 11:59:18";
     }
 
     public static void main(String[] args) {
@@ -57,6 +59,7 @@ public class Main {
         String localAddress = null;
         localAddress = URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
         System.out.println("Local IP Address: " + localAddress);
+        System.out.println("Config dir: " + Constants.USER_CONFIG_DIR);
         System.out.println("Available properties:");
         for (PAProperties p : PAProperties.values()) {
             String type = p.isBoolean() ? "Boolean" : "String";

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.component.controller;
 
@@ -60,7 +61,7 @@ public interface ProActiveContentController extends ContentController {
      * @param subComponents the components to be added inside this component.
      * @throws ContentControllerExceptionListException if the addition of one or several components
      *         failed. This exception lists the components that were not added and the
-     *         exception that occured.
+     *         exception that occurred.
      */
     public void addFcSubComponent(List<Component> subComponents)
             throws ContentControllerExceptionListException;
@@ -75,7 +76,7 @@ public interface ProActiveContentController extends ContentController {
      * @param subComponents the list of components to be removed from this component.
      * @throws ContentControllerExceptionListException if the addition of one or several components
      *         failed. This exception lists the components that were not added and the
-     *         exception that occured.
+     *         exception that occurred.
      */
     void removeFcSubComponent(List<Component> subComponents) throws ContentControllerExceptionListException;
 }

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,12 +27,13 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.montecarlo.core;
 
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
-import org.objectweb.proactive.extra.montecarlo.ExperienceSet;
+import org.objectweb.proactive.extra.montecarlo.SimulationSet;
 import org.objectweb.proactive.extra.montecarlo.Simulator;
 
 import java.io.Serializable;
@@ -49,7 +50,7 @@ import java.util.List;
  */
 public class SimulatorImpl implements Simulator {
 
-    private SubMaster<ExperienceTask, Serializable> master;
+    private SubMaster<SimulationSetTask, Serializable> master;
     private SubMasterLock lock;
 
     public SimulatorImpl(SubMaster master, SubMasterLock lock) {
@@ -57,16 +58,16 @@ public class SimulatorImpl implements Simulator {
         this.lock = lock;
     }
 
-    public <R extends Serializable> Enumeration<R> solve(List<ExperienceSet<R>> experienceSets)
+    public <R extends Serializable> Enumeration<R> solve(List<SimulationSet<R>> simulationSets)
             throws TaskException {
         lock.useSimulator();
-        ArrayList<ExperienceTask> adapterTasks = new ArrayList<ExperienceTask>(experienceSets.size());
-        for (ExperienceSet eset : experienceSets) {
-            adapterTasks.add(new ExperienceTask(eset));
+        ArrayList<SimulationSetTask> adapterTasks = new ArrayList<SimulationSetTask>(simulationSets.size());
+        for (SimulationSet eset : simulationSets) {
+            adapterTasks.add(new SimulationSetTask(eset));
         }
         master.setResultReceptionOrder(SubMaster.COMPLETION_ORDER);
         master.solve(adapterTasks);
-        return new OutputEnumeration<R>(lock, experienceSets.size());
+        return new OutputEnumeration<R>(lock, simulationSets.size());
     }
 
     public class OutputEnumeration<R extends Serializable> implements Enumeration<R> {

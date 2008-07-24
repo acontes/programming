@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.timit.util;
 
@@ -79,7 +80,6 @@ public class ExecuteReport {
 
             // Set up the engine configuration
             final EngineConfig config = new EngineConfig();
-            System.setProperty("RUN_UNDER_ECLIPSE", "true");
 
             final IReportEngineFactory factory = (IReportEngineFactory) Platform
                     .createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.body.ft.servers.storage;
 
@@ -42,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
@@ -82,7 +84,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
         try {
             CheckpointServerImpl.classServerHelper.setShouldCreateClassServer(true);
             this.codebase = CheckpointServerImpl.classServerHelper.initializeClassServer();
-            System.setProperty("java.rmi.server.codebase", this.codebase);
+            PAProperties.JAVA_RMI_SERVER_CODEBASE.setValue(this.codebase);
             logger.info("ClassServer is bound on " + this.codebase);
         } catch (IOException e) {
             this.codebase = "NO CODEBASE";

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces;
 
@@ -84,15 +85,6 @@ public interface Master<T extends Task<R>, R extends Serializable> extends SubMa
      * @throws ProActiveException if a problem occurs while adding resources
      */
     void addResources(URL descriptorURL, String virtualNodeName) throws ProActiveException;
-
-    /**
-     * Adds a connection to the given Scheduler
-     * @param schedulerURL URL to this scheduler
-     * @param user user name
-     * @param password password
-     * @throws ProActiveException if a problem occurs while adding resources
-     */
-    void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
 
     //@snippet-end masterworker_addresources
 

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
@@ -49,7 +50,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
  * 
  * @author The ProActive Team
  */
-public final class WorldObject extends AbstractData {
+public final class WorldObject extends AbstractData<AbstractData<?, ?>, HostObject> {
     // -------------------------------------------
     // --- Constants -----------------------------
     // -------------------------------------------
@@ -169,7 +170,7 @@ public final class WorldObject extends AbstractData {
     }
 
     @Override
-    public void removeChild(AbstractData child) {
+    public void removeChild(HostObject child) {
         super.removeChild(child);
         setChanged();
         // this notification will be handled by the MonitorThread only for
@@ -204,6 +205,14 @@ public final class WorldObject extends AbstractData {
     }
 
     /**
+     * Returns a map of active objects known by this world
+     * @return The map of active objects
+     */
+    public Map<String, ActiveObject> getActiveObjects() {
+        return this.activeObjects;
+    }
+
+    /**
      * Removes an active object in the map of the known active objects.
      * 
      * @param key
@@ -232,7 +241,7 @@ public final class WorldObject extends AbstractData {
     }
 
     @Override
-    public AbstractData getParent() {
+    public AbstractData<?, ?> getParent() {
         return null;
     }
 
@@ -406,7 +415,7 @@ public final class WorldObject extends AbstractData {
 
     public int getNumberOfJVMs() {
         int n = 0;
-        for (final AbstractData data : this.getMonitoredChildrenAsList()) {
+        for (final HostObject data : this.getMonitoredChildrenAsList()) {
             n += data.getMonitoredChildrenSize();
         }
         return n;

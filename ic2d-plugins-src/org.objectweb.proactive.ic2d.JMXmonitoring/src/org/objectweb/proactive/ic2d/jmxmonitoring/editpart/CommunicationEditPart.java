@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,7 +26,9 @@
  *                        http://www.activeeon.com/
  *  Contributor(s):
  *
+ *
  * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
@@ -47,6 +49,11 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
+/**
+ * This class represents the controller part (edit part) of a communication object
+ * @author vbodnart
+ *
+ */
 public final class CommunicationEditPart extends AbstractConnectionEditPart implements Observer {
     private static final Color DEFAULT_ARROW_COLOR = new Color(Display.getCurrent(), 108, 108, 116);
     private static final int MAX_STROKE_WIDTH_RATIO = 12;

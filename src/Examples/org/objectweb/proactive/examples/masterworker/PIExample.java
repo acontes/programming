@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.examples.masterworker;
 
@@ -38,6 +39,7 @@ import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.api.PALifeCycle;
 
 
 public class PIExample {
@@ -45,13 +47,14 @@ public class PIExample {
     public static final int NUMBER_OF_TASKS = 30;
 
     public static void main(String[] args) throws TaskException, ProActiveException {
+
+        findOS();
         //@snippet-start masterworker_montecarlopi_master_creation
         // creation of the master
         ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
 
         // adding resources
-        master.addResources(PIExample.class
-                .getResource("/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml"));
+        master.addResources(PIExample.class.getResource("MWApplication.xml"));
         //@snippet-end masterworker_montecarlopi_master_creation
         //@snippet-start masterworker_montecarlopi_tasks_submit
         // defining tasks
@@ -81,6 +84,12 @@ public class PIExample {
         //@snippet-start masterworker_montecarlopi_terminate
         master.terminate(true);
         //@snippet-end masterworker_montecarlopi_terminate
+
+        PALifeCycle.exitSuccess();
+    }
+
+    public static void findOS() {
+
     }
 
     //@snippet-start masterworker_montecarlopi

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,16 +27,15 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
-import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VMFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.JVMListener;
@@ -45,8 +44,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
-public final class RuntimeEditPart extends AbstractMonitoringEditPart {
-    private RuntimeObject castedModel;
+public final class RuntimeEditPart extends AbstractMonitoringEditPart<RuntimeObject> {
     private VMFigure castedFigure;
 
     //
@@ -123,31 +121,9 @@ public final class RuntimeEditPart extends AbstractMonitoringEditPart {
     }
 
     /**
-     * Returns a List containing the children model objects.
-     * @return the List of children
-     */
-    protected List<AbstractData> getModelChildren() {
-        return getCastedModel().getMonitoredChildrenAsList();
-    }
-
-    /**
      * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
      */
     protected void createEditPolicies() { /* Do nothing */
-    }
-
-    /**
-     * Convert the result of EditPart.getModel()
-     * to VMObject (the real type of the model).
-     * @return the casted model
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public RuntimeObject getCastedModel() {
-        if (castedModel == null) {
-            castedModel = (RuntimeObject) getModel();
-        }
-        return castedModel;
     }
 
     /**

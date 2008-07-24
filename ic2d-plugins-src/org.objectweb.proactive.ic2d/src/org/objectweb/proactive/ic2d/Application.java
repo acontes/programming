@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d;
 
@@ -72,8 +73,7 @@ public class Application implements IApplication {
                 Properties p = new Properties();
                 p.load(in);
                 PropertyConfigurator.configure(p);
-                System.setProperty("log4j.configuration", PAProperties.class.getResource("proactive-log4j")
-                        .toString());
+                PAProperties.LOG4J.setValue(PAProperties.class.getResource("proactive-log4j").toString());
             } catch (Exception e) {
                 final URL u = PAProperties.class.getResource("proactive-log4j");
                 System.err.println("IC2D:the default log4j configuration file (" + u +

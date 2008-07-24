@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.component.controller;
 
@@ -337,8 +338,9 @@ public class MulticastControllerImpl extends AbstractCollectiveInterfaceControll
                     throw new ParameterDispatchException(
                         "cannot generate invocation for multicast interface " + itfType.getFcItfName() +
                             " because the specified distribution of parameters is incorrect in method " +
-                            matchingMethodInClientInterface.getName() + "(" +
-                            dispatchSizes.get(i).intValue() + " instead of " + expectedMethodCallsNb + ")");
+                            matchingMethodInClientInterface.getName() + "(expect " +
+                            dispatchSizes.get(i).intValue() + " method calls for the " + i +
+                            "th parameter instead of " + expectedMethodCallsNb + ")");
                 }
             }
         } else {

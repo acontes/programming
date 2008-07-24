@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.component.type.annotations.multicast;
 
@@ -90,11 +91,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
      * parameter, as a class signature.
      */
     CUSTOM;
-    /*
-     * 
-     * @see org.objectweb.proactive.core.component.type.annotations.ParametersDispatch#dispatch(java.util.List,
-     *      int, int)
-     */
+
     private List<Object> partition(List<?> inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
         List<Object> result = new ArrayList<Object>();
@@ -175,7 +172,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
 
         switch (this) {
             case BROADCAST:
-                result = nbOutputReceivers;
+                result = -1;
                 break;
             case ONE_TO_ONE:
                 if (inputParameter.size() != nbOutputReceivers) {

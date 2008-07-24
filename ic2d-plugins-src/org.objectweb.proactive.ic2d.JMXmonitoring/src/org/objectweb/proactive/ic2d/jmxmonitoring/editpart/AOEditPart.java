@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,10 +27,12 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 
@@ -53,7 +55,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
-public class AOEditPart extends AbstractMonitoringEditPart implements NodeEditPart {
+public class AOEditPart extends AbstractMonitoringEditPart<ActiveObject> implements NodeEditPart {
 
     /**
      * The default color of an arrow used in <code>getArrowColor()</code>
@@ -302,14 +304,11 @@ public class AOEditPart extends AbstractMonitoringEditPart implements NodeEditPa
     }
 
     /**
-     * Convert the result of EditPart.getModel() to AOObject (the real type of
-     * the model).
-     * 
-     * @return the casted model
+     * This method is overridden since this class has no model children 
      */
     @Override
-    public ActiveObject getCastedModel() {
-        return (ActiveObject) getModel();
+    protected List<?> getModelChildren() {
+        return Collections.EMPTY_LIST;
     }
 
     /**

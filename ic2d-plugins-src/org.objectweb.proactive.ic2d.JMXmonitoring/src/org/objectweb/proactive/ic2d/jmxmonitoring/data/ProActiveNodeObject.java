@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,12 +27,12 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.ObjectName;
 
@@ -50,12 +50,20 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
  * 
  * @author vbodnart
  */
-public final class ProActiveNodeObject extends AbstractData {
+public final class ProActiveNodeObject extends AbstractData<RuntimeObject, ActiveObject> {
     /**
-     * The parent
+     * The parent runtime object
      */
     private final RuntimeObject parent;
+
+    /**
+     * The virtual node that owns this node object
+     */
     private final VirtualNodeObject vnParent;
+
+    /**
+     * The url of this node object
+     */
     private final String url;
 
     // Warning: Don't use this variable directly, use getProxyNodeMBean().
@@ -65,7 +73,7 @@ public final class ProActiveNodeObject extends AbstractData {
             final VirtualNodeObject vnParent, final NodeWrapperMBean proxyNodeMBean) {
         // Call super constructor in order to specify a TreeMap<String,
         // AbstractData> for monitored children
-        super(objectName, new ConcurrentHashMap<String, AbstractData>());
+        super(objectName);
 
         // new TreeMap<String, AbstractData>(
         // new ActiveObject.ActiveObjectComparator()));
@@ -105,16 +113,18 @@ public final class ProActiveNodeObject extends AbstractData {
      */
     @Override
     public void destroy() {
-        for (final AbstractData child : this.getMonitoredChildrenAsList()) {
-            child.destroy();
+        for (final ActiveObject child : this.getMonitoredChildrenAsList()) {
+            child.internalDestroy();
         }
-
+        this.monitoredChildren.clear();
+        // Fire notification
+        super.notifyObservers(new MVCNotification(MVCNotificationTag.REMOVE_CHILDREN, null));
         this.vnParent.removeChild(this);
         super.destroy();
     }
 
     @Override
-    public synchronized void explore() {
+    public void explore() {
         if (super.isMonitored) {
             this.findActiveObjects();
         }
@@ -156,9 +166,11 @@ public final class ProActiveNodeObject extends AbstractData {
             }
             // If the aoID is unknown create a new ActiveObject from the
             // aoObjectName
-            final ActiveObject newChild = ActiveObject.createActiveObjectFrom(aoObjectName, this);
-            super.monitoredChildren.put(aoID, newChild);
-            newChildren.add(newChild);
+            if (!super.monitoredChildren.containsKey(aoID)) {
+                final ActiveObject newChild = ActiveObject.createActiveObjectFrom(aoObjectName, this);
+                super.monitoredChildren.put(aoID, newChild);
+                newChildren.add(newChild);
+            }
         }
         // In order to avoid sending costly notifications to observers each time
         // this method is called

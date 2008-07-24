@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,8 +27,12 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core;
+
+import java.io.File;
+
 
 /**
  * Defines many constants useful across ProActive
@@ -91,8 +95,9 @@ public interface Constants {
     // list of system properties used within proactive
     public static final String SSH_TUNNELING_DEFAULT_KNOW_HOSTS = "/.ssh/known_hosts";
 
-    /** this property indicates to send JMX notifications */
-    public static final String USER_CONFIG_DIR = ".proactive";
+    /** User configuration directory */
+    public static final String USER_CONFIG_DIR = System.getProperty("user.home") + File.separator +
+        ".proactive";
 
     /** The name of nodes created by a GCM Deployment
      *

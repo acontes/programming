@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.p2p.service.messages;
 
@@ -35,16 +36,16 @@ import java.util.Vector;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.p2p.service.P2PService;
+import org.objectweb.proactive.extra.p2p.service.node.P2PLookupInt;
 import org.objectweb.proactive.extra.p2p.service.node.P2PNode;
 import org.objectweb.proactive.extra.p2p.service.node.P2PNodeAck;
-import org.objectweb.proactive.extra.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.extra.p2p.service.util.P2PConstants;
 import org.objectweb.proactive.extra.p2p.service.util.UniversalUniqueID;
 
 
 public class RequestNodesMessage extends BreadthFirstMessage {
     protected int numberOfNodes;
-    protected P2PNodeLookup lookup;
+    protected P2PLookupInt lookup;
     protected String vnName;
     protected String jobId;
     protected boolean underloadedOnly;
@@ -62,8 +63,7 @@ public class RequestNodesMessage extends BreadthFirstMessage {
      * @param underloadedOnly determines if it replies with normal "askingNode" method or discard the call
      */
     public RequestNodesMessage(int ttl, UniversalUniqueID uuid, P2PService remoteService, int numberOfNodes,
-            P2PNodeLookup lookup, String vnName, String jobId, boolean underloadedOnly,
-            String nodeFamilyRegexp) {
+            P2PLookupInt lookup, String vnName, String jobId, boolean underloadedOnly, String nodeFamilyRegexp) {
         super(ttl, uuid, remoteService);
         this.numberOfNodes = numberOfNodes;
         this.lookup = lookup;

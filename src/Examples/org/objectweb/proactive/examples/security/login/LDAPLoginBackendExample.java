@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.examples.security.login;
 
@@ -35,6 +36,7 @@ import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extensions.security.loginmodule.Login;
 
 
@@ -62,7 +64,7 @@ public class LDAPLoginBackendExample {
         // example) with the jvm parameter
         // -Djava.security.auth.login.config==jaas.config or like this
         // :
-        System.setProperty("java.security.auth.login.config", Login.class.getResource("jaas.config")
+        PAProperties.JAVA_SECURITY_AUTH_LOGIN_CONFIG.setValue(Login.class.getResource("jaas.config")
                 .getFile());
 
         Map<String, Object> params = new HashMap<String, Object>(3);

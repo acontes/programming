@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.process.globus;
 
@@ -84,7 +85,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
     public static void main(String[] args) {
         String RSL = "& (executable = /nfs/software/java/j2sdk1.4.2_07/bin/java )(count=5)";
 
-        // String RSL = "& (executable = /user/rquilici/home/ProActive/scripts/unix/cluster/startRuntime.sh )(arguments='/user/rquilici/home/j2sdk1.4.2_05/bin/java -Dproactive.jobid=JOB-986939693  -cp /user/rquilici/home/ProActive/classes:/user/rquilici/home/ProActive/lib/asm.jar:/user/rquilici/home/ProActive/lib/log4j.jar:/user/rquilici/home/ProActive/lib/components/fractal.jar:/user/rquilici/home/ProActive/lib/xercesImpl.jar:/user/rquilici/home/ProActive/lib/bouncycastle.jar -Djava.security.policy=/user/rquilici/home/ProActive/scripts/proactive.java.policy -Dlog4j.configuration=file:/user/rquilici/home/ProActive/scripts/proactive-log4j org.objectweb.proactive.core.runtime.StartRuntime Renderer //sea.inria.fr/PA_JVM986939693_sea.inria.fr 1 globus_jvm Jvm4')(jobType=multiple)(count=5)";
+        // String RSL = "& (executable = /user/rquilici/home/ProActive/scripts/unix/cluster/startRuntime.sh )(arguments='/user/rquilici/home/j2sdk1.4.2_05/bin/java -Dproactive.jobid=JOB-986939693  -cp /user/rquilici/home/ProActive/classes:/user/rquilici/home/ProActive/lib/asm.jar:/user/rquilici/home/ProActive/lib/log4j.jar:/user/rquilici/home/ProActive/lib/components/fractal.jar:/user/rquilici/home/ProActive/lib/xercesImpl.jar:/user/rquilici/home/ProActive/lib/bouncycastle.jar -Djava.security.policy=/user/rquilici/home/ProActive/dist/proactive.java.policy -Dlog4j.configuration=file:/user/rquilici/home/ProActive/dist/proactive-log4j org.objectweb.proactive.core.runtime.StartRuntime Renderer //sea.inria.fr/PA_JVM986939693_sea.inria.fr 1 globus_jvm Jvm4')(jobType=multiple)(count=5)";
         GridJob Job1 = new GridJob("viz-login.isi.edu/jobmanager-pbs", false);
 
         //GridJob Job1 = new GridJob("cluster.inria.fr", false);

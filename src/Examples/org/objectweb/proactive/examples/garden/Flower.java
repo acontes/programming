@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,20 +27,17 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.examples.garden;
 
-import net.sf.saxon.tree.NodeFactory;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import clover.edu.emory.mathcs.backport.java.util.concurrent.af;
 
 
 /**
@@ -87,6 +84,30 @@ public class Flower {
 
     public static void main(String[] args) {
         ProActiveConfiguration.load();
+
+        boolean gotVM2 = false;
+
+        for (int i = 0; i < 10 && !gotVM2; ++i) {
+            try {
+                logger.info("Waiting for nodes");
+                Node node = org.objectweb.proactive.core.node.NodeFactory.getNode("vm2");
+                gotVM2 = (node != null);
+
+            } catch (NodeException e1) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        if (gotVM2 == false) {
+            logger.info("nodes still not up after 10 seconds - aborting");
+            System.exit(1);
+        } else {
+            logger.info("Nodes are up");
+        }
+
         try {
             // It's springtime ! Let's create flowers everywhere !
             String nodeName1 = "vm1";

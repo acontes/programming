@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.ic2d.timit.actions;
 
@@ -59,7 +60,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  */
 public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
     public static final String GET_TIMER_SNAPSHOT = "Get timer snapshot";
-    private AbstractData object;
+    private AbstractData<?, ?> object;
     private BasicChartContainerObject container;
 
     public GetTimerSnapshotAction() {
@@ -101,7 +102,7 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
     /**
      * Implements IActionExtPoint setAbstractDataObject(AbstractDataObject) method
      */
-    public final void setAbstractDataObject(final AbstractData object) {
+    public final void setAbstractDataObject(final AbstractData<?, ?> object) {
         this.object = object;
 
         if (this.object instanceof WorldObject) {
@@ -112,7 +113,7 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
         }
     }
 
-    public void setActiveSelect(AbstractData ref) {
+    public void setActiveSelect(AbstractData<?, ?> ref) {
         if ((this.container != null) && (ref instanceof ActiveObject)) {
             BasicChartObject basicChartObject = this.container.getChartObjectById(((ActiveObject) ref)
                     .getUniqueID());
