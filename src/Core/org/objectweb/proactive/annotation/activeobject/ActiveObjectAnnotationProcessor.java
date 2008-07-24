@@ -48,9 +48,9 @@ import com.sun.mirror.declaration.Declaration;
 
 public class ActiveObjectAnnotationProcessor implements AnnotationProcessor {
 	
-	private AnnotationProcessorEnvironment _aoEnvironment;
-	private ActiveObjectVisitor _aoVisitor;
-	private AnnotationTypeDeclaration _aoDeclaration;
+	private final AnnotationProcessorEnvironment _aoEnvironment;
+	private final ActiveObjectVisitor _aoVisitor;
+	private final AnnotationTypeDeclaration _aoDeclaration;
 
 	public ActiveObjectAnnotationProcessor(AnnotationProcessorEnvironment env) {
 		

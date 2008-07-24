@@ -479,7 +479,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
      */
 	protected void unregisterRuntime() {
 		
-		// TODO use PARemoteObject, it seems to be protocol-independent
 		String partName = System.getProperty("proactive.runtime.name");
 		if( partName == null){
 			// then I assume there is no proactive runtime! => nothing to do
@@ -802,7 +801,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 		
 		// unset the properties that were set in ProActiveConfiguration static initializer
 		// see issue ProActive-433
-		ProActiveConfiguration.getInstance().unsetProperties();
+		// ProActiveConfiguration.getInstance().unsetProperties();
 
     }
 

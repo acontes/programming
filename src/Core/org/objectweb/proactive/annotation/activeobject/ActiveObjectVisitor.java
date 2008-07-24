@@ -83,15 +83,16 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	
 	private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
 	
-	private String ERROR_PREFIX;
+	private transient String ERROR_PREFIX;
 	
-	private Messager _compilerOutput;
+	private final Messager _compilerOutput;
 	
-	public ActiveObjectVisitor(Messager messager) {
+	public ActiveObjectVisitor(final Messager messager) {
+		super();
 		_compilerOutput = messager;
 	}
 	
-	private ClassDeclaration _containingClass;
+	private transient ClassDeclaration _containingClass;
 
 
 	@Override
@@ -114,12 +115,12 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		// super.visitClassDeclaration(classDeclaration);
 		// visit the subcomponents of this class
 		// this should have been already provided by the MirrorAPI. bad API, bad! :P
-		Collection<MethodDeclaration> methods = classDeclaration.getMethods();
+		final Collection<MethodDeclaration> methods = classDeclaration.getMethods();
 		for (MethodDeclaration methodDeclaration : methods) {
 			methodDeclaration.accept(this);
 		}
 		
-		Collection<FieldDeclaration> fields = classDeclaration.getFields();
+		final Collection<FieldDeclaration> fields = classDeclaration.getFields();
 		for (FieldDeclaration fieldDeclaration : fields) {
 			fieldDeclaration.accept(this);
 		}
@@ -149,9 +150,9 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
-	private boolean checkReturnType( MethodDeclaration methodDeclaration ) {
+	private boolean checkReturnType( final MethodDeclaration methodDeclaration ) {
 		// check the return type
-		TypeMirror returnType = methodDeclaration.getReturnType();
+		final TypeMirror returnType = methodDeclaration.getReturnType();
 		if( !isReifiable(returnType) ){
 			reportError( methodDeclaration, returnType + ErrorMessages.RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE );
 			return false;
@@ -265,7 +266,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		// remove eventual coding conventions
 		// TODO more precise?
 		String name;
-		if (fieldName.startsWith("_")) {
+		if ( fieldName.charAt(0) == '_' ) {
 			name = fieldName.substring(1).toLowerCase();
 		}
 		else {
@@ -274,17 +275,17 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		
 		reportWarning( _containingClass , "Checking the field:" + name);
 		
-		String getField = "get" + name;
+		final String getField = "get" + name;
 		boolean foundGet = false;
-		String setField = "set" + name;
+		final String setField = "set" + name;
 		boolean foundSet = false;
 		
 		Collection<MethodDeclaration> methods = _containingClass.getMethods();
 		for (MethodDeclaration methodDeclaration : methods) {
-			if( !foundGet && methodDeclaration.getSimpleName().toLowerCase().equals(getField) ) {
+			if( !foundGet && methodDeclaration.getSimpleName().equalsIgnoreCase(getField) ) {
 				foundGet = true;
 			}
-			if ( !foundSet && methodDeclaration.getSimpleName().toLowerCase().equals(setField) ) {
+			if ( !foundSet && methodDeclaration.getSimpleName().equalsIgnoreCase(setField) ) {
 				foundSet = true;
 			}
 			if( foundGet && foundSet )

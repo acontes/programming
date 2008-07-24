@@ -76,7 +76,7 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	private String ERROR_PREFIX;
 
 	// where we should signal the errors
-	private Messager _compilerOutput;
+	private final Messager _compilerOutput;
 	
 	public MigrationSignalVisitor(Messager messager) {
 		_compilerOutput = messager;

@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.migration.MigrationSignal;
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public abstract interface ErrorMessages {
+public interface ErrorMessages {
 
 	/*
 	 * Error Messages issued when checking classes annotated with the ActiveObject annotation
