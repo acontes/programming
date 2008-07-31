@@ -81,5 +81,39 @@
 	<classpathentry kind="lib" path="lib/winp-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/ssj.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/browser.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/checkconfigurationfile.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/checkser.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/classdep.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/classserver.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/computedigest.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/computehttpmdcodebase.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/destroy.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/envcheck.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/fiddler.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/group.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/jarwrapper.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/jini-core.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/jini-ext.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/jsk-debug-policy.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/jsk-lib.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/jsk-platform.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/jsk-resources.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/mahalo.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/mercury.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/norm.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/outrigger.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/outrigger-logstore.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/outrigger-snaplogstore.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/phoenix.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/phoenix-group.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/phoenix-init.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/prebuilt-outrigger-logstore.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/preferredlistgen.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/reggie.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/sharedvm.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/start.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/sun-util.jar"/>
+	<classpathentry kind="lib" path="/user/zdai/home/jini2_1/lib/tools.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -48,6 +48,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.JavaSpaceFactory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.MemoryFactory;
 import org.objectweb.proactive.extensions.masterworker.core.AOWorker;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -127,6 +128,11 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     private MemoryFactory memoryFactory;
 
     /**
+     * Initial javaspace of the workers
+     */
+    private JavaSpaceFactory javaspaceFactory;
+
+    /**
      * workers deployed so far
      */
     private Map<String, Worker> workers;
@@ -162,8 +168,10 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * @param masterVNNAme VN Name of the master (if any)
      */
     public AOWorkerManager(final WorkerMaster provider, final MemoryFactory memoryFactory,
-            final URL masterDescriptorURL, final GCMApplication applicationUsed, final String masterVNNAme) {
+            final JavaSpaceFactory javaspaceFactory, final URL masterDescriptorURL,
+            final GCMApplication applicationUsed, final String masterVNNAme) {
         this.provider = provider;
+        this.javaspaceFactory = javaspaceFactory;
         this.memoryFactory = memoryFactory;
         this.masterDescriptorURL = masterDescriptorURL;
         this.applicationUsed = applicationUsed;
@@ -263,9 +271,15 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                 String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
 
                 // Creates the worker which will automatically connect to the master
-                workers.put(workername, (Worker) PAActiveObject
-                        .newActive(AOWorker.class.getName(), new Object[] { workername,
-                                (WorkerMaster) provider, memoryFactory.newMemoryInstance() }, node));
+                if (null != javaspaceFactory) {
+                    workers.put(workername, (Worker) PAActiveObject.newActive(AOWorker.class.getName(),
+                            new Object[] { workername, (WorkerMaster) provider,
+                                    memoryFactory.newMemoryInstance(),
+                                    javaspaceFactory.newJavaSpaceInstance() }, node));
+                } else
+                    workers.put(workername, (Worker) PAActiveObject.newActive(AOWorker.class.getName(),
+                            new Object[] { workername, (WorkerMaster) provider,
+                                    memoryFactory.newMemoryInstance(), null }, node));
                 if (debug) {
                     logger.debug("Worker " + workername + " created on " + nodename);
                 }

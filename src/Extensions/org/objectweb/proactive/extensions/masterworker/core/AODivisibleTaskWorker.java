@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
+import net.jini.space.JavaSpace;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -81,10 +83,12 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
      * @param name name of the worker
      * @param provider the entity which will provide tasks to the worker
      * @param initialMemory initial memory of the worker
+     * @param space 
      */
     public AODivisibleTaskWorker(final String name, final WorkerMaster provider, final AOWorker parentWorker,
-            final Map<String, Serializable> initialMemory, final TaskIntern<Serializable> task) {
-        super(name, provider, initialMemory);
+            final Map<String, Serializable> initialMemory, final TaskIntern<Serializable> task,
+            JavaSpace space) {
+        super(name, provider, initialMemory, space);
         this.parentWorker = parentWorker;
         this.submaster = new SubMasterImpl(provider, name, parentWorker);
         this.task = task;

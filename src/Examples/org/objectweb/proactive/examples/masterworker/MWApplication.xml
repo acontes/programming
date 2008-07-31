@@ -16,6 +16,9 @@
 			<configuration>
 				<applicationClasspath>
 					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/jini-core.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/jini-ext.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/jsk-lib.jar"/>
 				</applicationClasspath>
 			</configuration>
 			<virtualNode id="Workers" capacity="4">

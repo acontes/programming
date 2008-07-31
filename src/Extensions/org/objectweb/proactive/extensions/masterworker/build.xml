@@ -8,6 +8,7 @@
 		<compile_extension module="masterworker" />	
 		<java classname="${stubgenerator.class}" fork="true">
 			<classpath refid="project.classpath" />
+			<jvmarg value="-Dlog4j.configuration=file:/auto/sea/u/sea/0/user/zdai/eclipse-3.3.2/workspace/SHORT_MW_Shared_Memory/compile/proactive-log4j"/>
 			<arg line="-srcDir ${cl.extensions.dir} -pkg org.objectweb.proactive.extensions.masterworker" />
 		</java>
 	</target>

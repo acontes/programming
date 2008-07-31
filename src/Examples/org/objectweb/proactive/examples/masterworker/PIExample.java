@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.masterworker;
 
 import java.util.List;
 import java.util.Vector;
+import net.jini.space.JavaSpace;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
@@ -41,10 +42,15 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.api.PALifeCycle;
 
+import org.objectweb.proactive.extensions.masterworker.ConstantJavaSpaceFactory;
+import org.objectweb.proactive.extensions.masterworker.interfaces.JavaSpaceFactory;
+import org.objectweb.proactive.extensions.masterworker.core.ShareMemoryEntry;
+import net.jini.core.entry.Entry;
+
 
 public class PIExample {
-    public static final long NUMBER_OF_EXPERIENCES = 1000000;
-    public static final int NUMBER_OF_TASKS = 30;
+    public static final long NUMBER_OF_EXPERIENCES = 10;
+    public static final int NUMBER_OF_TASKS = 1;
 
     public static void main(String[] args) throws TaskException, ProActiveException {
 
@@ -55,9 +61,31 @@ public class PIExample {
 
         // adding resources
         master.addResources(PIExample.class.getResource("MWApplication.xml"));
+
+        try {
+            /*	        ShareMemoryEntry msg = new ShareMemoryEntry();
+             msg.data = "Hello world is here";
+             msg.dataName = "Zhihui";
+             System.out.println("Searching for JavaSpace...");
+             JavaSpaceFactory spacef = new ConstantJavaSpaceFactory();
+             JavaSpace space = (JavaSpace) spacef.newJavaSpaceInstance();
+            
+             space.write(msg, null, 60 * 60 * 1000);
+            
+             ShareMemoryEntry template = new ShareMemoryEntry();
+             System.out.println("Read a message from the space...");
+             ShareMemoryEntry result = (ShareMemoryEntry) space.take((Entry) template, null, Long.MAX_VALUE);
+             System.out.println("The message read is: " + result.data + result.dataName);
+             */
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         //@snippet-end masterworker_montecarlopi_master_creation
         //@snippet-start masterworker_montecarlopi_tasks_submit
         // defining tasks
+
         Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();
         for (int i = 0; i < NUMBER_OF_TASKS; i++) {
             tasks.add(new ComputePIMonteCarlo());
@@ -121,6 +149,20 @@ public class PIExample {
                 if (experience()) {
                     successes++;
                 }
+            }
+            //test for javaspaces
+            try {
+
+                ShareMemoryEntry msg = new ShareMemoryEntry();
+                msg.data = "Hello world is there";
+                msg.dataName = "Yulai";
+
+                memory.save("m1", msg);
+                msg = (ShareMemoryEntry) memory.load("m1");
+                System.out.println("The message read is: " + msg.dataName);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             return successes;
         }

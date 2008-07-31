@@ -36,6 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
@@ -43,6 +44,7 @@ import org.objectweb.proactive.extensions.masterworker.core.AOMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.MemoryFactory;
+import org.objectweb.proactive.extensions.masterworker.interfaces.JavaSpaceFactory;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -89,6 +91,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
 
     protected AOMaster aomaster = null;
 
+    private JavaSpaceFactory javaspaceFactory = null;
+
     /** Creates a local master (you can add resources afterwards) */
     public ProActiveMaster()
     // try comment
@@ -119,9 +123,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     public ProActiveMaster(Node remoteNodeToUse, MemoryFactory memoryFactory)
     //@snippet-end masterworker_constructor_remote
     {
+        this.javaspaceFactory = new ConstantJavaSpaceFactory();
         try {
             aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    memoryFactory, null, null, null }, remoteNodeToUse);
+                    memoryFactory, javaspaceFactory, null, null, null }, remoteNodeToUse);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -134,10 +139,12 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      *
      * @param memoryFactory factory which will create memory for each new workers
      */
+
     public ProActiveMaster(MemoryFactory memoryFactory) {
         try {
+            this.javaspaceFactory = new ConstantJavaSpaceFactory();
             aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    memoryFactory, null, null, null });
+                    memoryFactory, this.javaspaceFactory, null, null, null });
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -166,6 +173,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     public ProActiveMaster(URL descriptorURL, String masterVNName, MemoryFactory memoryFactory) {
         try {
+            this.javaspaceFactory = new ConstantJavaSpaceFactory();
             GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
 
             GCMVirtualNode masterVN = pad.getVirtualNode(masterVNName);
@@ -175,7 +183,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
             Node masterNode = masterVN.getANode();
 
             aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    memoryFactory, descriptorURL, pad, masterVNName }, masterNode);
+                    memoryFactory, javaspaceFactory, descriptorURL, pad, masterVNName }, masterNode);
 
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);

@@ -376,10 +376,37 @@ public enum PAProperties {
     /**
      * Master/Worker compress tasks
      *
-     * Parameter which decides wether tasks should be compressed when they are saved inside the task repository
+     * Parameter which decides whether tasks should be compressed when they are saved inside the task repository
      * compressing increases CPU usage on the master side, but decrease memory usage, default to false
      */
     PA_MASTERWORKER_COMPRESSTASKS("proactive.masterworker.compresstasks", PAPropertiesType.BOOLEAN),
+    /**
+     * Master/Worker use javaspace
+     *
+     * Parameter which decides whether application use javaspace or not, default to false
+     */
+    PA_MASTERWORKER_USEJAVASPACE("proactive.masterworker.usejavaspace", PAPropertiesType.BOOLEAN),
+    /**
+     * Master/Worker javaspace server address
+     *
+     * Parameter which provides the address of the javaspace server
+     */
+    PA_MASTERWORKER_JAVASPACE_SERVER_ADDRESS("proactive.masterworker.javaspace.server.address",
+            PAPropertiesType.STRING),
+    /**
+     * Master/Worker javaspace server port
+     *
+     * Parameter which provides the port of the javaspace server, default is 4160
+     */
+    PA_MASTERWORKER_JAVASPACE_SERVER_PORT("proactive.masterworker.javaspace.server.port",
+            PAPropertiesType.INTEGER),
+    /**
+     * Master/Worker timeout value
+     *
+     * Parameter which provides the value of javaspace search timeout
+     */
+    PA_MASTERWORKER_JAVASPACE_TIMEOUT_VALUE("proactive.masterworker.javaspace.timeout.value",
+            PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  PEER TO PEER

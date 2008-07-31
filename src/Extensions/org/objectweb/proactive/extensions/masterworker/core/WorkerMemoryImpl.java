@@ -37,6 +37,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.jini.space.JavaSpace;
+
 
 /**
  * Implementation of the worker memory
@@ -50,33 +52,73 @@ public class WorkerMemoryImpl implements WorkerMemory {
     * e.g. connection to a database, file descriptor, etc ...
     */
     private Map<String, Object> memory;
+    private JavaSpace space;
 
-    public WorkerMemoryImpl(Map<String, Serializable> memory) {
+    public WorkerMemoryImpl(Map<String, Serializable> memory, JavaSpace space) {
         this.memory = new HashMap<String, Object>(memory);
+
+        if (null != space)
+            this.space = space;
+        else
+            this.space = null;
     }
 
     /**
      * {@inheritDoc}
      */
     public void save(final String dataName, final Object data) {
-        memory.put(dataName, data);
+
+        if (null != space) {
+            System.out.println("Writing an object to the space...");
+            ShareMemoryEntry msg = new ShareMemoryEntry();
+            msg.data = data;
+            msg.dataName = dataName;
+            try {
+                space.write(msg, null, 60 * 60 * 1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else
+            memory.put(dataName, data);
     }
 
     /**
          * {@inheritDoc}
          */
     public Object load(final String dataName) {
-        return memory.get(dataName);
+        if (null != space) {
+            System.out.println("Reading an object from the space...");
+            ShareMemoryEntry template = new ShareMemoryEntry();
+            ShareMemoryEntry result = null;
+            try {
+                result = (ShareMemoryEntry) space.read(template, null, 1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result.data;
+        } else
+            return memory.get(dataName);
     }
 
     /**
      * {@inheritDoc}
      */
     public void erase(final String dataName) {
-        memory.remove(dataName);
+        if (null != space) {
+            System.out.println("Taking an object from the space...");
+            ShareMemoryEntry template = new ShareMemoryEntry();
+            try {
+                space.take(template, null, 1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else
+            memory.remove(dataName);
     }
 
     public void clear() {
+        if (null != space)
+            return;
         memory.clear();
     }
 

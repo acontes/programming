@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
+import org.objectweb.proactive.extensions.masterworker.interfaces.JavaSpaceFactory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.MemoryFactory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
@@ -122,6 +123,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** Initial memory of the workers */
     private MemoryFactory memoryFactory;
+
+    /** Initial javaspace of the workers */
+    private Object javaspaceFactory;
 
     /** Stub to group of sleeping workers */
     private Worker sleepingGroupStub;
@@ -206,9 +210,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
      * @param applicationUsed     GCMapplication used to deploy the master (if any)
      * @param masterVNNAme        VN Name of the master (if any)
      */
-    public AOMaster(final MemoryFactory memoryFactory, final URL masterDescriptorURL,
-            final GCMApplication applicationUsed, final String masterVNNAme) {
+    public AOMaster(final MemoryFactory memoryFactory, final JavaSpaceFactory javaspaceFactory,
+            final URL masterDescriptorURL, final GCMApplication applicationUsed, final String masterVNNAme) {
         this.memoryFactory = memoryFactory;
+        this.javaspaceFactory = javaspaceFactory;
         this.masterDescriptorURL = masterDescriptorURL;
         this.applicationUsed = applicationUsed;
         this.masterVNNAme = masterVNNAme;
@@ -385,8 +390,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // These two objects are initiated inside the initActivity because of the need to the stub on this
             // The resource manager
             smanager = (AOWorkerManager) PAActiveObject.newActive(AOWorkerManager.class.getName(),
-                    new Object[] { stubOnThis, memoryFactory, masterDescriptorURL, applicationUsed,
-                            masterVNNAme });
+                    new Object[] { stubOnThis, memoryFactory, javaspaceFactory, masterDescriptorURL,
+                            applicationUsed, masterVNNAme });
 
             // The worker pinger
             pinger = (WorkerWatcher) PAActiveObject.newActive(AOPinger.class.getName(),
@@ -687,6 +692,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 service.serveAll("secondTerminate");
                 while (PAFuture.isAwaited(terminationResourceManagerAnswer)) {
                     service.serveAll(finalNotTerminateFilter);
+                    Thread.sleep(20);
                 }
                 service.serveAll("finalTerminate");
                 service.serveAll("awaitsTermination");

@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
+import net.jini.space.JavaSpace;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -98,12 +100,13 @@ public class AOWorker implements InitActive, Serializable, Worker {
      * @param name          name of the worker
      * @param provider      the entity which will provide tasks to the worker
      * @param initialMemory initial memory of the worker
+     * @param space 
      */
     public AOWorker(final String name, final WorkerMaster provider,
-            final Map<String, Serializable> initialMemory) {
+            final Map<String, Serializable> initialMemory, JavaSpace space) {
         this.name = name;
         this.provider = provider;
-        this.memory = new WorkerMemoryImpl(initialMemory);
+        this.memory = new WorkerMemoryImpl(initialMemory, space);
         this.initialMemory = initialMemory;
         this.pendingTasksFutures = new LinkedList<Queue<TaskIntern<Serializable>>>();
         this.pendingTasks = new LinkedList<TaskIntern<Serializable>>();
