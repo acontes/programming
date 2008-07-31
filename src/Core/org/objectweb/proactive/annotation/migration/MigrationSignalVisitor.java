@@ -101,25 +101,27 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	private final void resetVisitorStateReturn() {
 		_isNewMethodCall = false;
 	}
+	
+	private Element _methodPosition;
 
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
 		
 		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC;
+		Element _methodPosition = trees.getElement(getCurrentPath()) ;
 		
 		Element clazzElement = trees.getElement(getCurrentPath().getParentPath());
 		if ( !((clazzElement instanceof TypeElement) && (clazzElement.getKind().isClass()) ) ) {
 			// actually, this will be caught by javac. but nevertheless, we can also have a say...
 			_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, 
 					"Found a method declaration outside a class declaration. Interesting!" , 
-						trees.getElement(getCurrentPath()) );
+						_methodPosition );
 			return super.visitMethod(methodNode, trees);
 		}
 		
 		// the method must be within a class that is tagged with the ActiveObject annotation
 		if ( clazzElement.getAnnotation(ActiveObject.class) == null ) {
-			reportError(trees.getElement(getCurrentPath()), 
-					ErrorMessages.NOT_IN_ACTIVE_OBJECT_ERROR_MESSAGE);
+			reportError(_methodPosition, ErrorMessages.NOT_IN_ACTIVE_OBJECT_ERROR_MESSAGE);
 			return super.visitMethod(methodNode, trees);
 		}
 		
@@ -130,8 +132,7 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 		// let's see if we found that method call
 		if (_migrateToMethodCallNode == null) {
 			// not found
-			reportError(trees.getElement(getCurrentPath()),
-					ErrorMessages.MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE);
+			reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE);
 			return ret;
 		}
 		
@@ -152,8 +153,7 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 		}
 		
 		if (!foundPublic) {
-			reportWarning(trees.getElement(getCurrentPath()),
-					ErrorMessages.NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE);
+			reportWarning( _methodPosition, ErrorMessages.NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE);
 		}
 		
 		return super.visitModifiers(modifiersNode, trees);
@@ -184,6 +184,8 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	 */
 	private void checkPlacement(BlockTree blockBody, Trees trees) {
 		
+		System.out.format("#statemes in this block:%d;migrateTo place:%d.\n" , _expressionStatementsNumber , _migrateToMethodCallIndex );
+		
 		if (_expressionStatementsNumber == _migrateToMethodCallIndex) {
 			// perfekt!
 			return;
@@ -196,14 +198,12 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 			StatementTree lastStatement = methodStatements.get(methodsNo-1);
 
 			if(!checkReturnStatement(lastStatement)) {
-				reportWarning(trees.getElement(getCurrentPath()),
-						ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
+				reportWarning( _methodPosition,	ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
 			}
 		}
 		else {
 			// definitely not the last statement
-			reportWarning(trees.getElement(getCurrentPath()),
-					ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
+			reportWarning( _methodPosition , ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
 		}
 		
 	}
@@ -311,16 +311,13 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 				clazzName = ((MemberSelectTree)typeNameExpression).getIdentifier().toString();
 			}
 			else return false;
-			System.out.println("Method name is:"+methodName);
-			System.out.println("clazzName is:"+clazzName);
-			System.out.println("compared to:"+PAMobileAgent.class.getSimpleName());
 			return methodName.equals(MIGRATE_TO) && clazzName.equals(PAMobileAgent.class.getSimpleName());
 		}
 		else {
 			// is not a migrateTo call!
 			return false;
 		}
-		 
+		  
 	}
 
 	// error reporting methods
@@ -328,12 +325,14 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, 
 				ERROR_PREFIX + errorMsg + ERROR_SUFFIX , 
 					position );
+		System.out.println("Position is:" + position);
 	}
 	
 	private void reportWarning( Element position, String errorMsg ) {
-		_compilerOutput.printMessage(Diagnostic.Kind.WARNING	, 
+		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, // TODO find out how to catch warnings using the Java COmpiler API 
 				ERROR_PREFIX + errorMsg + ERROR_SUFFIX , 
 					position );
+		System.out.println("Position is:" + position);
 	}
 
 	

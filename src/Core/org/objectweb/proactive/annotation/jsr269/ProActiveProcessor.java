@@ -71,8 +71,8 @@ public class ProActiveProcessor extends AbstractProcessor {
 
 	
 	// because of BLEAH, absurdities continue...
-	private static final String ACTIVE_OBJECT_ANNOTATION = "org.objectweb.proactive.annotation.activeobject.ActiveObject";
-	private static final String MIGRATION_SIGNAL_ANNOTATION = "org.objectweb.proactive.annotation.migration.MigrationSignal"; 
+	public static final String ACTIVE_OBJECT_ANNOTATION = "org.objectweb.proactive.annotation.activeobject.ActiveObject";
+	public static final String MIGRATION_SIGNAL_ANNOTATION = "org.objectweb.proactive.annotation.migration.MigrationSignal"; 
 	
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations,
