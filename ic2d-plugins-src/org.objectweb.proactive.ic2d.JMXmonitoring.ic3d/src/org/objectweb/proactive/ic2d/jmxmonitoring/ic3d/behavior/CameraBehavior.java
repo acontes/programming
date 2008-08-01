@@ -17,8 +17,10 @@ import javax.media.j3d.WakeupCriterion;
 import javax.media.j3d.WakeupOnAWTEvent;
 import javax.media.j3d.WakeupOr;
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.ActiveObjectMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.HostMenu;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.NodeMenu;
@@ -30,15 +32,25 @@ import com.sun.j3d.utils.picking.PickTool;
 
 
 public abstract class CameraBehavior extends Behavior {
-    /* Must be set in every case */
+    /* The physical diplay of this camera */
     protected Canvas3D canvas3D;
+    
+    /* Needed for drag'n'dropping */
     protected PickCanvas pickCanvas;
+    
+    /* The translation rotation of the camera */
     protected TransformGroup transformGroup;
+    
+    /* The current position of mouse and backup */
     protected int x, y, y_last, x_last;
     protected WakeupOr mouseCriterion;
 
     /* Don't know if this is right place */
-    protected Shape3D selectedShape;
+    protected Shape3D selectedShape = null;
+    protected BranchGroup dragBranch;
+    protected DragObject dragObject;
+    
+    // TODO remove this part
     protected Vector3f selectedShapeTranslation;
 
     /* The point the camera does look At */
@@ -74,7 +86,7 @@ public abstract class CameraBehavior extends Behavior {
         }
     }
 
-
+    /* Set all the events to be threated */
     public void initialize() {
         WakeupCriterion[] mouseEvents = new WakeupCriterion[4];
         mouseEvents[0] = new WakeupOnAWTEvent(MouseEvent.MOUSE_DRAGGED);
@@ -180,12 +192,16 @@ public abstract class CameraBehavior extends Behavior {
 
     protected abstract void refresh();
 
+    /* Set the point the camera looks at */
     public abstract void setTarget(Point3d target);
 
+    
+    /* Return the branchGroup of the camera */
     public BranchGroup getBranchGroup() {
         return cameraBranch;
     }
 
+    /* Set up the camera */
     public void set(Canvas3D c3D, TransformGroup cameraTransform, BranchGroup localScene) {
         canvas3D = c3D;
         transformGroup = cameraTransform;
@@ -197,6 +213,12 @@ public abstract class CameraBehavior extends Behavior {
         refresh();
     }
     
+    public void set(Canvas3D c3D, TransformGroup cameraTransform, BranchGroup localScene, BranchGroup dragBranch) {
+    	this.dragBranch = dragBranch;
+    	set(c3D, cameraTransform, localScene);
+    }
+ 
+    /* Select the popup menu to popup */
     protected void popup() {
     	PopupMenu pop = popup;
     	if(selectedShape != null && selectedShape instanceof AbstractFigure3D) {

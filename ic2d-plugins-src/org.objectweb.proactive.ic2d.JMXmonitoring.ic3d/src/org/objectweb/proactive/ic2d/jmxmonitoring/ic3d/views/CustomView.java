@@ -4,6 +4,7 @@ import javax.media.j3d.AmbientLight;
 import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Canvas3D;
+import javax.media.j3d.Group;
 import javax.media.j3d.Locale;
 import javax.media.j3d.PhysicalBody;
 import javax.media.j3d.PhysicalEnvironment;
@@ -36,8 +37,12 @@ public class CustomView {
     /* View branch */
     protected BranchGroup viewBranch;
 
+    /* The transform of the camera */
     protected TransformGroup cameraTransform;
 
+    /* The Branch where to store drag objects */
+    protected BranchGroup dragBranch;
+    
     public CustomView() {
         canvas3D = new Canvas3D(SimpleUniverse.getPreferredConfiguration());
         buildView();
@@ -48,12 +53,23 @@ public class CustomView {
         viewBranch = new BranchGroup();
         viewBranch.setCapability(BranchGroup.ALLOW_DETACH);
         viewBranch.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
+        viewBranch.setCapability(Group.ALLOW_CHILDREN_READ);
+        viewBranch.setCapability(Group.ALLOW_CHILDREN_WRITE);
 
         /* Set up camera transform */
         cameraTransform = new TransformGroup();
         cameraTransform.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
         cameraTransform.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+        cameraTransform.setCapability(TransformGroup.ALLOW_CHILDREN_EXTEND);
         viewBranch.addChild(cameraTransform);
+        
+        /* Enables object dragging */
+        dragBranch = new BranchGroup();
+        dragBranch.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
+        dragBranch.setCapability(BranchGroup.ALLOW_DETACH);
+        dragBranch.setCapability(Group.ALLOW_CHILDREN_READ);
+        dragBranch.setCapability(Group.ALLOW_CHILDREN_WRITE);
+        cameraTransform.addChild(dragBranch);
         
         /* Set up light */
         TransformGroup lightTransform = new TransformGroup();
@@ -111,7 +127,7 @@ public class CustomView {
         if (camera != null)
             viewBranch.removeChild(camera.getBranchGroup());
         /* Set the local camera scene */
-        cameraToSet.set(canvas3D, cameraTransform, pickableGroup);
+        cameraToSet.set(canvas3D, cameraTransform, pickableGroup, dragBranch);
         camera = cameraToSet;
         viewBranch.addChild(camera.getBranchGroup());
     }
@@ -122,7 +138,7 @@ public class CustomView {
             viewBranch.removeChild(camera.getBranchGroup());
         
         /* Set the local camera scene */
-        cameraToSet.set(canvas3D, cameraTransform, pickableGroup);
+        cameraToSet.set(canvas3D, cameraTransform, pickableGroup, dragBranch);
         camera = cameraToSet;
         camera.setTarget(target);
         viewBranch.addChild(camera.getBranchGroup());

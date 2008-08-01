@@ -81,6 +81,140 @@ public class Monitoring3DView extends ViewPart {
         this.title = this.world.getName();
     }
 
+//    @Override
+//    public void createPartControl(final Composite parent) {
+//        parent.setLayout(new FillLayout());
+//
+//        // **********ADD TOOLBAR BUTTONS********************
+//        final IToolBarManager toolBarManager = this.getViewSite().getActionBars().getToolBarManager();
+//
+//        // Adds "Monitor a new Host" action to the view's toolbar
+//        final NewHostAction toolBarNewHost = new NewHostAction(parent.getDisplay(), this.world);
+//        toolBarManager.add(toolBarNewHost);
+//
+//        // Adds "Set depth" action to the view's toolbar
+//        final SetDepthAction toolBarSetDepth = new SetDepthAction(parent.getDisplay(), this.world);
+//        toolBarManager.add(toolBarSetDepth);
+//
+//        toolBarManager.add(new Separator());
+//
+//        // Adds "Set Time to refresh" action to the view's toolbar
+//        final SetTTRAction toolBarTTR = new SetTTRAction(parent.getDisplay(), this.world.getMonitorThread());
+//        toolBarManager.add(toolBarTTR);
+//
+//        // Adds enable/disable monitoring action to the view's toolbar
+//        final EnableDisableMonitoringAction toolBarEnableDisableMonitoring = new EnableDisableMonitoringAction(
+//            this.world);
+//        toolBarManager.add(toolBarEnableDisableMonitoring);
+//
+//        toolBarManager.add(new Separator());
+//
+//        // ******************************
+//
+//        // create swt container:
+//        final Composite SWT_AWT_container = new Composite(parent, SWT.EMBEDDED);
+//
+//        // set bounds (here showing bounds to cover parent's area)
+//        final Rectangle sh3dbnds = parent.getBounds();
+//        sh3dbnds.x = sh3dbnds.y = 0;
+//        SWT_AWT_container.setBounds(sh3dbnds);
+//
+//        // ----------------
+//        final Frame awt = SWT_AWT.new_Frame(SWT_AWT_container);
+//        
+//        // -----------------
+//        final Rectangle bounds = SWT_AWT_container.getBounds();
+//        awt.setBounds(0, 0, bounds.width, bounds.height);
+//
+//        awt.setLayout(new BorderLayout());
+//
+//        // create your scene:
+//        // awt.add(newGrid());
+//        // TODO hacky
+//        // *********** ADDED FOR MULTIPLE VIEWS *********
+//        // uncomment above to go back to the old view
+//        
+//        SiteBasket.init();
+//        final CustomUniverse universe = new CustomUniverse();
+//        final Universe3D universe3D = new Universe3D();
+//        universe.addGrid(universe3D.getRootBranch());
+//        
+//        // Creates the controllers
+//        final Grid3DController gcontroller = new Grid3DController(this.world, universe3D, null);
+//        //final LoadGrid3DController glcontroller = new LoadGrid3DController(this.world, universe3D, null);
+//        //final EarthGrid3DController egcontroller = new EarthGrid3DController(this.world, universe3D, null);
+//        
+//        // Fetch Grids
+//        final Grid3D detailedGrid = (Grid3D)gcontroller.getFigure();
+//        detailedGrid.setTranslation(new Vector3d(0, 0, 0));
+//        
+//        //final LoadGrid3D loadGrid = (LoadGrid3D)glcontroller.getFigure();
+//        //loadGrid.setTranslation(new Vector3d(0, 500, 0));
+//        
+//        //final EarthGrid3D earthGrid = (EarthGrid3D)egcontroller.getFigure();
+//        //earthGrid.setTranslation(new Vector3d(0, -500, 0));
+//        
+//        // three views
+//        final Canvas3D viewOne = universe.newView("one", new Point3d(0, 0, 0), detailedGrid.getRootBranch(),
+//                new FlatCameraBehavior());
+//        
+////        final Canvas3D viewTwo = universe.newView("two", new Point3d(0, 500, 0), loadGrid
+////                .getRootBranch(), new FlatCameraBehavior());
+////        
+////        final Canvas3D viewThree = universe.newView("three", new Point3d(0, -500, 0), earthGrid.getRootBranch(),
+////                new OrbitalCameraBehavior());
+////
+//        awt.add(viewOne);
+//
+//        awt.pack();
+//        
+//        awt.setVisible(false);
+//
+//        
+//        final Frame awt1 = SWT_AWT.new_Frame(SWT_AWT_container);
+//        
+//        
+//        // -----------------
+//        final Rectangle bounds1 = SWT_AWT_container.getBounds();
+//        awt1.setBounds(0, 0, bounds1.width, bounds1.height);
+//
+//        awt1.setLayout(new BorderLayout());
+//
+//        // create your scene:
+//        // awt.add(newGrid());
+//        // TODO hacky
+//        // *********** ADDED FOR MULTIPLE VIEWS *********
+//        // uncomment above to go back to the old view
+//        
+//        // Creates the controllers
+//        final LoadGrid3DController glcontroller = new LoadGrid3DController(this.world, universe3D, null);
+//        //final EarthGrid3DController egcontroller = new EarthGrid3DController(this.world, universe3D, null);
+//        
+//        // Fetch Grids
+//        final LoadGrid3D loadGrid = (LoadGrid3D)glcontroller.getFigure();
+//        loadGrid.setTranslation(new Vector3d(0, 500, 0));
+//        
+//        //final EarthGrid3D earthGrid = (EarthGrid3D)egcontroller.getFigure();
+//        //earthGrid.setTranslation(new Vector3d(0, -500, 0));
+//        
+//        // three views
+//        final Canvas3D viewTwo = universe.newView("two", new Point3d(0, 500, 0), loadGrid
+//                .getRootBranch(), new FlatCameraBehavior());
+////        
+////        final Canvas3D viewThree = universe.newView("three", new Point3d(0, -500, 0), earthGrid.getRootBranch(),
+////                new OrbitalCameraBehavior());
+////
+//        awt1.add(viewTwo);
+//
+//        awt1.pack();
+//        
+//        awt1.setVisible(true);
+//
+//        
+//        // awt.setSize(800, 600);
+//
+//    }
+    
     @Override
     public void createPartControl(final Composite parent) {
         parent.setLayout(new FillLayout());
@@ -121,7 +255,7 @@ public class Monitoring3DView extends ViewPart {
 
         // ----------------
         final Frame awt = SWT_AWT.new_Frame(SWT_AWT_container);
-
+        
         // -----------------
         final Rectangle bounds = SWT_AWT_container.getBounds();
         awt.setBounds(0, 0, bounds.width, bounds.height);

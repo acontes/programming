@@ -5,22 +5,30 @@ import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.media.j3d.Appearance;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.Point3d;
+import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.SiteBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.TownActionListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.detailed.ActiveObject3D;
 
 import com.sun.j3d.utils.picking.PickResult;
 
 
 public class FlatCameraBehavior extends CameraBehavior {
+	
     protected final static Vector3d up = new Vector3d(0, 1, 0);
-
+    
+    /* Attributes for spherical camera */
     private double phi;
     private double theta;
     private double distance;
@@ -52,9 +60,50 @@ public class FlatCameraBehavior extends CameraBehavior {
     @Override
     protected void mouse1Dragged() {
     	/* The only objects you can drag are activeObjects */
-        /* On a figure */
-        if ( selectedShape != null && selectedShape instanceof ActiveObject3D)
-        	dragSelected(x - x_last, y_last - y);
+        if ( selectedShape != null && selectedShape instanceof ActiveObject3D) {
+        	if(dragObject == null) {
+        		/* Fetching camera translation */
+        		Transform3D cameraT3D = new Transform3D();
+        		transformGroup.getTransform(cameraT3D);
+        		Vector3d cameraTranslation = new Vector3d();
+        		cameraT3D.get(cameraTranslation);
+        		
+        		/* Fetching object Translation */
+        		Transform3D objectT3D = new Transform3D();
+        		selectedShape.getLocalToVworld(objectT3D);
+        		Vector3d objectTranslation = new Vector3d();
+        		objectT3D.get(objectTranslation);
+        		Vector3d objectScale = new Vector3d();
+        		objectT3D.getScale(objectScale);
+        		
+        		/* Computing the offset from the camera to the object */
+        		/* Axis changing */
+        		objectTranslation.sub(cameraTranslation);
+        		cameraT3D.invert();
+        		cameraT3D.setTranslation(new Vector3d());
+        		cameraT3D.transform(objectTranslation);
+        		
+        		System.out.println("ot: "  + objectTranslation);
+
+        		dragObject = new DragObject(selectedShape.getGeometry(), dragBranch, objectTranslation);
+        		dragObject.setScale(objectScale);
+        		
+        		dragObject.setAppearance(selectedShape.getAppearance());
+        		
+        		// TODO Send a message to the active object to hide
+        	}
+        	
+        	// TODO Find the ratio pixel meter (+distance to camera) and use it as divider
+        	// Else the object doesn't follow the mouse
+        	double ratio_x,ratio_y;
+        	ratio_y = canvas3D.getHeight() * canvas3D.getPhysicalHeight();
+        	ratio_x = canvas3D.getWidth() * canvas3D.getPhysicalWidth();
+        	// TODO multiply distance
+        	
+        	//dragObject.move((float)(x - x_last)/(float)ratio_x, (float)(y_last - y)/(float)ratio_y, 0);
+
+        	dragObject.move((float)(x - x_last)/(float)ratio_x, (float)(y_last - y)/(float)ratio_y, 0);
+        }
         /* Outside a figure */
         else
         	cameraRotation(x - x_last, y - y_last);
@@ -68,7 +117,11 @@ public class FlatCameraBehavior extends CameraBehavior {
         	throw new NullPointerException("Pick Canvas not initialized");
         }
         pickCanvas.setShapeLocation(x, y);
+        
         try {
+        	/* Sometimes the matrix is not an affine Transform */
+        	/* But it doesn't depend on the shape just the time you access it */
+        	/* Really weird behavior */
         	pickResult = pickCanvas.pickClosest();
         }
         catch (Exception e) {
@@ -84,12 +137,20 @@ public class FlatCameraBehavior extends CameraBehavior {
     @Override
     protected void mouse1Released() {
         if (selectedShape != null && selectedShapeTranslation != null) {
+        	// TODO
+        	// Remove the shape from the camera branch
+        	// set the old shape visible
+        	// Send the message
             TransformGroup tg = (TransformGroup) selectedShape.getParent();
             Transform3D t3d = new Transform3D();
             tg.getTransform(t3d);
             t3d.setTranslation(selectedShapeTranslation);
             tg.setTransform(t3d);
             selectedShapeTranslation = null;
+        }
+        if(dragObject != null) {
+            dragObject.detachDragObject();
+            dragObject = null;
         }
     }
 
@@ -267,119 +328,14 @@ public class FlatCameraBehavior extends CameraBehavior {
 		mit.addActionListener(al);
 		popup.add(mit);
 		
-		mit = new MenuItem("Goto: Sophia");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println(SiteBasket.getTownLocation("sophia"));
-				targetPosition = SiteBasket.getTownLocation("sophia");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
+		String[] towns = { "sophia", "bordeaux", "grenoble", "lille", "nancy", "lyon", "paris", "orsay", "rennes", "toulouse" };
 		
-		mit = new MenuItem("Goto: Bordeaux");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("bordeaux");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
-		mit = new MenuItem("Goto: Grenoble");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("grenoble");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
-		mit = new MenuItem("Goto: Lille");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("lille");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
-		mit = new MenuItem("Goto: Lyon");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("lyon");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
-		mit = new MenuItem("Goto: Nancy");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("nancy");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
-		mit = new MenuItem("Goto: Paris");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("paris");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
-		mit = new MenuItem("Goto: Orsay");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("orsay");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
-		
-		mit = new MenuItem("Goto: Rennes");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("rennes");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
-		mit = new MenuItem("Goto: Toulouse");
-		al = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				targetPosition = SiteBasket.getTownLocation("toulouse");
-				refresh();
-			}
-			
-		};
-		mit.addActionListener(al);
-		popup.add(mit);
+		for(int i = 0; i < towns.length; i++) {
+			mit = new MenuItem("Goto: " + towns[i]);
+			al = new TownActionListener(this, towns[i]);
+			mit.addActionListener(al);
+			popup.add(mit);
+		}
 		
 		canvas3D.add(popup);
 	}
