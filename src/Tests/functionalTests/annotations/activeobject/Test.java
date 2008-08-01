@@ -1,16 +1,23 @@
 package functionalTests.annotations.activeobject;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.tools.DiagnosticCollector;
+import javax.tools.FileObject;
+import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.JavaFileObject.Kind;
 
 import junit.framework.Assert;
 
@@ -43,7 +50,6 @@ public class Test extends FunctionalTest{
 			proactive_home = getPAHomeFromClassPath(location); 
 		}
 		
-		System.out.println("proactive_home is:" + proactive_home);
 		INPUT_FILES_PATH = proactive_home + TEST_FILES_RELPATH;
 		PROC_PATH = buildAnnotationProcessorPath(proactive_home);
 		
@@ -78,7 +84,7 @@ public class Test extends FunctionalTest{
 	}
 
 	private JavaCompiler _compiler;
-	private StandardJavaFileManager _fileManager;
+	private NoClassOutputFileManager _fileManager;
 	private DiagnosticCollector<JavaFileObject> _nonFatalErrors;
 	
 	@org.junit.Before
@@ -86,8 +92,10 @@ public class Test extends FunctionalTest{
 		// get the compiler
 		_compiler = ToolProvider.getSystemJavaCompiler();
 		_nonFatalErrors = new DiagnosticCollector<JavaFileObject>();
-		_fileManager = _compiler.
+		// get the file manager
+		StandardJavaFileManager stdFileManager = _compiler.
 			getStandardFileManager(_nonFatalErrors, null, null); // go for the defaults
+		_fileManager = new NoClassOutputFileManager(stdFileManager);
 		
 	}
 	@org.junit.Test
@@ -139,32 +147,12 @@ public class Test extends FunctionalTest{
 				_fileManager, // the file manager 
 				diagnosticListener, // where to receive the errors from compilation 
 				Arrays.asList(compilerOptions),  // the compiler options 
-				Arrays.asList(annotationsClassNames), // related to annotations but I don't know what is it, yet...
+				Arrays.asList(annotationsClassNames), // classes on which to perform annotation processing
 				compilationUnits);
 		
 		// call the compilation task
-		System.out.println("Calling the compilation tasks on file:" + fileNames[0]);
 		boolean compilationSuccesful = compilationTask.call();
-		/*if( !compilationSuccesful  ) {
-			// get the fatal errors
-			for (Diagnostic<? extends JavaFileObject> diagnostic : 
-				diagnosticListener.getDiagnostics()) {
-					System.out.println("Error message is:" + diagnostic.getMessage(null)); 
-
-			}
-		}
-		else {
-			if(_nonFatalErrors.getDiagnostics().isEmpty()) {
-				System.out.println("Compilation completed succesfully!");
-			}
-			else {
-				for (Diagnostic<? extends JavaFileObject> diagnostic : 
-					_nonFatalErrors.getDiagnostics()) {
-						System.out.println("Non-fatal message message is:" + diagnostic.getMessage(null)); 
-				}
-			}
-		}*/
-		
+				
 		return compilationSuccesful && 
 			diagnosticListener.getDiagnostics().isEmpty() &&
 			_nonFatalErrors.getDiagnostics().isEmpty();
@@ -175,6 +163,79 @@ public class Test extends FunctionalTest{
 
 		// close the file manager
 		_fileManager.close();
+		
+	}
+	
+	// a JavaFileManager used in order to suppress any .class file generation in the compilation phase
+	final class NoClassOutputFileManager extends ForwardingJavaFileManager<JavaFileManager> {
+		
+		private final BlackHoleFileObject _blackHoleFileObject;
+		private final JavaFileManager _underlyingFileManager;
+
+		protected NoClassOutputFileManager(JavaFileManager fileManager) {
+			super(fileManager);
+			_underlyingFileManager = fileManager;
+			_blackHoleFileObject = new BlackHoleFileObject();
+		}
+		
+		public Iterable<? extends JavaFileObject> getJavaFileObjects(
+				String... fileNames) {
+			if ( !(_underlyingFileManager instanceof StandardJavaFileManager)) 
+				return null;
+			return ((StandardJavaFileManager)_underlyingFileManager).getJavaFileObjects(fileNames);
+		}
+
+		@Override
+		public JavaFileObject getJavaFileForOutput(Location location,
+				String className, Kind kind, FileObject sibling)
+				throws IOException {
+			
+			if ( kind == JavaFileObject.Kind.CLASS && isClassLocation(location) ) {
+				return _blackHoleFileObject;
+			}
+			
+			return super.getJavaFileForOutput(location, className, kind, sibling);
+		}
+
+		private boolean isClassLocation(Location location) {
+			
+			if(!location.isOutputLocation())
+				return false;
+			
+			if( location instanceof StandardLocation && ((StandardLocation)location) == StandardLocation.CLASS_OUTPUT )
+				return true;
+			
+			return false;
+		}
+		
+		// a FileObject that discards all output it receives
+		final class BlackHoleFileObject extends SimpleJavaFileObject {
+			
+			protected BlackHoleFileObject() {
+				this(URI.create("blabla"), JavaFileObject.Kind.CLASS);
+			}
+
+			protected BlackHoleFileObject(URI uri, Kind kind) {
+				super(uri, kind);
+			}
+			
+			@Override
+			public OutputStream openOutputStream() throws IOException {
+				return new BlackHoleOutputStream();
+			}
+			
+			// an OutputStream that discards all output it receives
+			final class BlackHoleOutputStream extends OutputStream {
+
+				@Override
+				public void write(int b) throws IOException {
+					// black hole - do nothing!
+					return;
+				}
+				
+			}
+			
+		}
 		
 	}
 	
