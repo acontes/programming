@@ -9,7 +9,18 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 public class ErrorPrivate {
 	// error - private method
 	@MigrationSignal
-	private void migrateTo3() throws MigrationException {
+	private void migrateTo1() throws MigrationException {
 		PAMobileAgent.migrateTo(new Object());
 	}
+	
+	@MigrationSignal
+	protected void migrateTo2() throws MigrationException {
+		PAMobileAgent.migrateTo(new Object());
+	}
+	
+	@MigrationSignal
+	void migrateTo3() throws MigrationException {
+		PAMobileAgent.migrateTo(new Object());
+	}
+	
 }

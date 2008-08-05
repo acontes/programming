@@ -5,9 +5,9 @@ import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 
 public class ErrorNotInActiveObject {
-	// OK
+	// the containig class is not annotated using ActiveObject
 	@MigrationSignal
-	public void migrateTo2() throws MigrationException {
+	public void migrateTo() throws MigrationException {
 		PAMobileAgent.migrateTo(new Object());
 	}
 }

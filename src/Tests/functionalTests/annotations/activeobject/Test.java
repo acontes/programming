@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Arrays;
 
+import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
@@ -102,19 +103,21 @@ public class Test extends FunctionalTest{
 	public void action() throws Exception {
 		
 		// checking conditions that should be seen as errors
-		Assert.assertFalse(checkFile("ErrorNotLast", TEST_TO_FAIL));
-		Assert.assertFalse(checkFile("ErrorNotLastBlock",TEST_TO_FAIL));
-		Assert.assertFalse(checkFile("ErrorPrivate", TEST_TO_FAIL));
-		Assert.assertFalse(checkFile("ErrorNotInActiveObject", TEST_TO_FAIL));
+		Assert.assertEquals(checkFile("ErrorPrivate", TEST_TO_FAIL), 3);
+		Assert.assertEquals(checkFile("ErrorNotInActiveObject", TEST_TO_FAIL), 1);
+		Assert.assertEquals(checkFile("ErrorNotLast", TEST_TO_FAIL), 1);
+		Assert.assertEquals(checkFile("ErrorNotLastBlock",TEST_TO_FAIL), 1);
+		Assert.assertEquals(checkFile("ErrorNoMigrateTo", TEST_TO_FAIL), 1);
 		
 		// checking conditions that should be ok
-		Assert.assertTrue(checkFile("AcceptSimple", TEST_TO_PASS));
+		Assert.assertTrue(checkFile("AcceptSimple", TEST_TO_PASS) == 0 );
 		
 	}
 	
 	// compile a single file
-	// return true if no compilation errors, false else
-	private boolean checkFile(String fileName , String expectedPrefix) {
+	// return number of compilation errors & warnings. 
+	// can be zero if compilation successful
+	private int checkFile(String fileName , String expectedPrefix) {
 		
 		final String[] fileNames = new String[] {
 			INPUT_FILES_PATH + expectedPrefix + "/" + fileName + ".java"
@@ -152,10 +155,25 @@ public class Test extends FunctionalTest{
 		
 		// call the compilation task
 		boolean compilationSuccesful = compilationTask.call();
-				
-		return compilationSuccesful && 
-			diagnosticListener.getDiagnostics().isEmpty() &&
-			_nonFatalErrors.getDiagnostics().isEmpty();
+		
+		if(compilationSuccesful) {
+			//System.out.println("Compilation succesfull!");
+			return 0;
+		}
+		else { 
+//			System.out.println("Compilation NOT succesfull!");
+//			System.out.println("# of error messages:" + diagnosticListener.getDiagnostics().size());
+//			for (Diagnostic<? extends JavaFileObject> diagnostic : 
+//				diagnosticListener.getDiagnostics()) {
+//					System.out.println("Error message is:" + diagnostic.getMessage(null)); 
+//
+//			}
+			return diagnosticListener.getDiagnostics().size();
+		}
+		
+//		return compilationSuccesful && 
+//			diagnosticListener.getDiagnostics().isEmpty() &&
+//			_nonFatalErrors.getDiagnostics().isEmpty();
 	}
 	
 	@org.junit.After

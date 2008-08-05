@@ -89,6 +89,8 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	private int _migrateToMethodCallIndex;
 	private boolean _isNewMethodCall;
 	
+	private Element _methodPosition = null;
+	
 	// final means try to inline it
 	private final void resetVisitorStateBlock() {
 		_expressionStatementsNumber = _migrateToMethodCallIndex = 0;
@@ -96,19 +98,18 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	
 	private final void resetVisitorStateMethod() {
 		_migrateToMethodCallNode = null;
-	}
-	
-	private final void resetVisitorStateReturn() {
 		_isNewMethodCall = false;
 	}
 	
-	private Element _methodPosition;
+	private final void dumpState() {
+		System.out.printf("Found #%d statements. the migrateto method call is #%d. The return statement is a method call:%b\n" , _expressionStatementsNumber , _migrateToMethodCallIndex , _isNewMethodCall );
+	}
 
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
 		
 		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC;
-		Element _methodPosition = trees.getElement(getCurrentPath()) ;
+		Element _methodPosition = trees.getElement(getCurrentPath());
 		
 		Element clazzElement = trees.getElement(getCurrentPath().getParentPath());
 		if ( !((clazzElement instanceof TypeElement) && (clazzElement.getKind().isClass()) ) ) {
@@ -125,8 +126,13 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 			return super.visitMethod(methodNode, trees);
 		}
 		
+		// the method must be public
+		if( !testModifiers(methodNode.getModifiers()) ){
+			reportWarning( _methodPosition, ErrorMessages.NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE);
+		}
+		
 		// we go by the default visit pattern, and do the checking when visiting enclosing blocks
-		resetVisitorStateMethod();
+		resetVisitorStateMethod();		
 		Void ret = super.visitMethod(methodNode, trees);
 		
 		// let's see if we found that method call
@@ -136,13 +142,13 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 			return ret;
 		}
 		
+		// not inside the method declaration anymore
+		//_methodPosition = null;
 		return ret;
 		
 	}
 	
-	@Override
-	public Void visitModifiers(ModifiersTree modifiersNode, Trees trees) {
-		
+	public boolean testModifiers(ModifiersTree modifiersNode) {
 		boolean foundPublic = false;
 		
 		for( Modifier methodModifier : modifiersNode.getFlags() ) {
@@ -152,11 +158,7 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 			}
 		}
 		
-		if (!foundPublic) {
-			reportWarning( _methodPosition, ErrorMessages.NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE);
-		}
-		
-		return super.visitModifiers(modifiersNode, trees);
+		return foundPublic;
 	}
 
 	/*
@@ -166,7 +168,7 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	public Void visitBlock(BlockTree blockNode, Trees trees) {
 
 		// let the visitor search for the MethodInvocation
-		resetVisitorStateBlock();
+		resetVisitorStateBlock();	
 		Void ret = super.visitBlock( blockNode , trees);
 
 		if( _migrateToMethodCallNode != null ) {
@@ -174,7 +176,7 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 			// if it is the last statement in the enclosing block
 			checkPlacement( blockNode, trees);
 		}
-		
+	
 		return ret;
 	}
 	
@@ -183,8 +185,6 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	 * the body of the method. 
 	 */
 	private void checkPlacement(BlockTree blockBody, Trees trees) {
-		
-		System.out.format("#statemes in this block:%d;migrateTo place:%d.\n" , _expressionStatementsNumber , _migrateToMethodCallIndex );
 		
 		if (_expressionStatementsNumber == _migrateToMethodCallIndex) {
 			// perfekt!
@@ -217,7 +217,6 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	 * @return: true, if it is a "simple" return statement.
 	 */
 	private boolean checkReturnStatement(StatementTree lastStatement) {
-		resetVisitorStateReturn();
 		if( !(lastStatement instanceof ReturnTree) ) {
 			return false;
 		}
@@ -325,14 +324,12 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, 
 				ERROR_PREFIX + errorMsg + ERROR_SUFFIX , 
 					position );
-		System.out.println("Position is:" + position);
 	}
 	
 	private void reportWarning( Element position, String errorMsg ) {
 		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, // TODO find out how to catch warnings using the Java COmpiler API 
 				ERROR_PREFIX + errorMsg + ERROR_SUFFIX , 
 					position );
-		System.out.println("Position is:" + position);
 	}
 
 	

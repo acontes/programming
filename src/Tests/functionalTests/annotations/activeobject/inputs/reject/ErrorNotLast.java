@@ -11,11 +11,22 @@ import org.objectweb.proactive.core.node.NodeFactory;
 
 @ActiveObject
 public class ErrorNotLast {
+	
 	// error - not last statement
 	@MigrationSignal
-	public void migrateTo4() throws MigrationException, NodeException, AlreadyBoundException {
+	public void migrateTo1() throws MigrationException, NodeException, AlreadyBoundException {
 		int i=0;
 		PAMobileAgent.migrateTo(NodeFactory.createNode(""));
 		i++; // muhahaw
 	}
+	
+	// a more subtle error - the return statement actually contains 
+	// another method call - the call to the Integer constructor
+	@MigrationSignal
+	public Integer migrateTo2() throws MigrationException, NodeException, AlreadyBoundException {
+		int i=0;
+		org.objectweb.proactive.api.PAMobileAgent.migrateTo(NodeFactory.createNode(""));
+		return new Integer(i);
+	}
+	
 }
