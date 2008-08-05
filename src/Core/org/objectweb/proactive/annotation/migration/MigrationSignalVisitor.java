@@ -81,35 +81,16 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	public MigrationSignalVisitor(Messager messager) {
 		_compilerOutput = messager;
 	}
-	
-	// this will hold all the necessary information on the position of the MigrateTo call
-	// the visitor will magically populate these fields, as it parses the AST
-	private StatementTree _migrateToMethodCallNode;
-	private int _expressionStatementsNumber;
-	private int _migrateToMethodCallIndex;
-	private boolean _isNewMethodCall;
-	
+
+	// marks the position of the method declaration inside the source code
+	// also a marker for the moment of finding a method declaration
 	private Element _methodPosition = null;
 	
-	// final means try to inline it
-	private final void resetVisitorStateBlock() {
-		_expressionStatementsNumber = _migrateToMethodCallIndex = 0;
-	}
-	
-	private final void resetVisitorStateMethod() {
-		_migrateToMethodCallNode = null;
-		_isNewMethodCall = false;
-	}
-	
-	private final void dumpState() {
-		System.out.printf("Found #%d statements. the migrateto method call is #%d. The return statement is a method call:%b\n" , _expressionStatementsNumber , _migrateToMethodCallIndex , _isNewMethodCall );
-	}
-
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
 		
-		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC;
-		Element _methodPosition = trees.getElement(getCurrentPath());
+		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC; 
+		_methodPosition = trees.getElement(getCurrentPath());
 		
 		Element clazzElement = trees.getElement(getCurrentPath().getParentPath());
 		if ( !((clazzElement instanceof TypeElement) && (clazzElement.getKind().isClass()) ) ) {
@@ -132,18 +113,9 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 		}
 		
 		// we go by the default visit pattern, and do the checking when visiting enclosing blocks
-		resetVisitorStateMethod();		
 		Void ret = super.visitMethod(methodNode, trees);
+		_methodPosition = null;
 		
-		// let's see if we found that method call
-		if (_migrateToMethodCallNode == null) {
-			// not found
-			reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE);
-			return ret;
-		}
-		
-		// not inside the method declaration anymore
-		//_methodPosition = null;
 		return ret;
 		
 	}
@@ -166,36 +138,37 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	 */
 	@Override
 	public Void visitBlock(BlockTree blockNode, Trees trees) {
-
-		// let the visitor search for the MethodInvocation
-		resetVisitorStateBlock();	
-		Void ret = super.visitBlock( blockNode , trees);
-
-		if( _migrateToMethodCallNode != null ) {
-			// we found it alright; now we should check to see 
-			// if it is the last statement in the enclosing block
-			checkPlacement( blockNode, trees);
-		}
-	
-		return ret;
-	}
-	
-	/*
-	 * Checks whether the (found!) migrateTo method call is really the last call in 
-	 * the body of the method. 
-	 */
-	private void checkPlacement(BlockTree blockBody, Trees trees) {
 		
-		if (_expressionStatementsNumber == _migrateToMethodCallIndex) {
+		if( _methodPosition == null ) {
+			return super.visitBlock( blockNode , trees);
+		}
+		
+		StatementTree migrateToStatement = null;
+		List<? extends StatementTree> statements = blockNode.getStatements(); 
+		for( StatementTree statement : statements ) {
+			if(isMigrateToCall(statement)){
+				migrateToStatement = statement;
+				break;
+			}
+		}
+		
+		if( migrateToStatement == null ) {
+			reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE);
+			return super.visitBlock( blockNode , trees);
+		}
+		
+		int migrateToPos = statements.indexOf(migrateToStatement);
+		int statementsNo = statements.size();
+		
+		// programmers count starting from 0
+		if (statementsNo - 1 == migrateToPos ) {
 			// perfekt!
-			return;
+			return super.visitBlock( blockNode , trees);
 		}
 		
-		if( _expressionStatementsNumber == _migrateToMethodCallIndex + 1 ) {
+		if( statementsNo - 1 == migrateToPos + 1 ) {
 			// get info on statements
-			List<? extends StatementTree> methodStatements = blockBody.getStatements();
-			int methodsNo = methodStatements.size();
-			StatementTree lastStatement = methodStatements.get(methodsNo-1);
+			StatementTree lastStatement = statements.get( statementsNo -1);
 
 			if(!checkReturnStatement(lastStatement)) {
 				reportWarning( _methodPosition,	ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
@@ -206,6 +179,9 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 			reportWarning( _methodPosition , ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
 		}
 		
+
+		return super.visitBlock( blockNode , trees);
+
 	}
 	
 	/*
@@ -220,46 +196,16 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 		if( !(lastStatement instanceof ReturnTree) ) {
 			return false;
 		}
-		// the visitor pattern to the rescue!
-		return !_isNewMethodCall;
-	}
-	
-
-	@Override
-	public Void visitReturn(ReturnTree retunrNode, Trees trees) {
-		_isNewMethodCall = false;
-		return super.visitReturn(retunrNode, trees);
-	}
-	
-	@Override
-	public Void visitMethodInvocation(MethodInvocationTree arg0, Trees arg1) {
-		_isNewMethodCall = true;
-		return super.visitMethodInvocation(arg0, arg1);
-	}
-	
-	@Override
-	public Void visitNewArray(NewArrayTree arg0, Trees arg1) {
-		_isNewMethodCall = true;
-		return super.visitNewArray(arg0, arg1);
-	}
-	
-	@Override
-	public Void visitNewClass(NewClassTree arg0, Trees arg1) {
-		_isNewMethodCall = true;
-		return super.visitNewClass(arg0, arg1);
-	}
-	
-	@Override
-	public Void visitExpressionStatement(ExpressionStatementTree statement, Trees trees) {
-		_expressionStatementsNumber++;
-		if( isMigrateToCall(statement) ){
-			_migrateToMethodCallNode = statement;
-			_migrateToMethodCallIndex = _expressionStatementsNumber;
-		}
 		
-		return super.visitExpressionStatement(statement, trees);
+		ReturnTree returnStatement = (ReturnTree)lastStatement;
+		
+		ExpressionTree returnExpression = returnStatement.getExpression();
+		
+		return !((returnExpression instanceof MethodInvocationTree) || 
+				 (returnExpression instanceof NewArrayTree) || 
+				 (returnExpression instanceof NewClassTree) );
 	}
-	
+
 	/*
 	 * This method tests whether the Java statement represented
 	 * by the given StatementTree parameter, is a method call statement,
@@ -278,10 +224,15 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	 * how to do it otherwise. 
 	 */
 	private static final String MIGRATE_TO = "migrateTo"; // i dunno how to do it elseway
-	private boolean isMigrateToCall(ExpressionStatementTree lastStatement) {
+	private boolean isMigrateToCall(StatementTree lastStatement) {
 
+		if( !(lastStatement instanceof ExpressionStatementTree) )
+			return false;
+		
+		ExpressionStatementTree lastStatementExpr = (ExpressionStatementTree)lastStatement;
+		
 		// the method call is an expression ...
-		ExpressionTree lastExpression = lastStatement.getExpression();
+		ExpressionTree lastExpression = lastStatementExpr.getExpression();
 		// ... of type MethodInvocationTree ...
 		if (!(lastExpression instanceof MethodInvocationTree)) {
 			return false;

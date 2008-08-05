@@ -105,8 +105,8 @@ public class Test extends FunctionalTest{
 		// checking conditions that should be seen as errors
 		Assert.assertEquals(checkFile("ErrorPrivate", TEST_TO_FAIL), 3);
 		Assert.assertEquals(checkFile("ErrorNotInActiveObject", TEST_TO_FAIL), 1);
-		Assert.assertEquals(checkFile("ErrorNotLast", TEST_TO_FAIL), 1);
-		Assert.assertEquals(checkFile("ErrorNotLastBlock",TEST_TO_FAIL), 1);
+		Assert.assertEquals(checkFile("ErrorNotLast", TEST_TO_FAIL), 4);
+		Assert.assertEquals(checkFile("ErrorNotLastBlock",TEST_TO_FAIL), 3);
 		Assert.assertEquals(checkFile("ErrorNoMigrateTo", TEST_TO_FAIL), 1);
 		
 		// checking conditions that should be ok
@@ -157,23 +157,12 @@ public class Test extends FunctionalTest{
 		boolean compilationSuccesful = compilationTask.call();
 		
 		if(compilationSuccesful) {
-			//System.out.println("Compilation succesfull!");
 			return 0;
 		}
 		else { 
-//			System.out.println("Compilation NOT succesfull!");
-//			System.out.println("# of error messages:" + diagnosticListener.getDiagnostics().size());
-//			for (Diagnostic<? extends JavaFileObject> diagnostic : 
-//				diagnosticListener.getDiagnostics()) {
-//					System.out.println("Error message is:" + diagnostic.getMessage(null)); 
-//
-//			}
 			return diagnosticListener.getDiagnostics().size();
 		}
 		
-//		return compilationSuccesful && 
-//			diagnosticListener.getDiagnostics().isEmpty() &&
-//			_nonFatalErrors.getDiagnostics().isEmpty();
 	}
 	
 	@org.junit.After

@@ -23,8 +23,8 @@ public class ErrorNotLastBlock {
 		} catch (MigrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "";
 		}
-		return "";
 	}
 	
 }

@@ -1,6 +1,7 @@
 package functionalTests.annotations.activeobject.inputs.reject;
 
 import java.rmi.AlreadyBoundException;
+import java.util.Random;
 
 import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.annotation.migration.MigrationSignal;
@@ -20,13 +21,29 @@ public class ErrorNotLast {
 		i++; // muhahaw
 	}
 	
+	@MigrationSignal
+	public void migrateTo2() throws MigrationException, NodeException, AlreadyBoundException {
+		int i=0;
+		PAMobileAgent.migrateTo(NodeFactory.createNode(""));
+		i++; // muhahaw
+		System.out.println("Migration done!");
+	}
+	
 	// a more subtle error - the return statement actually contains 
 	// another method call - the call to the Integer constructor
 	@MigrationSignal
-	public Integer migrateTo2() throws MigrationException, NodeException, AlreadyBoundException {
+	public Integer migrateTo3() throws MigrationException, NodeException, AlreadyBoundException {
 		int i=0;
 		org.objectweb.proactive.api.PAMobileAgent.migrateTo(NodeFactory.createNode(""));
 		return new Integer(i);
+	}
+	
+	// error - another method call after migrateTo call
+	@MigrationSignal
+	public int migrateTo4() throws MigrationException, NodeException, AlreadyBoundException {
+		Random r = new Random();
+		org.objectweb.proactive.api.PAMobileAgent.migrateTo(NodeFactory.createNode(""));
+		return r.nextInt();
 	}
 	
 }
