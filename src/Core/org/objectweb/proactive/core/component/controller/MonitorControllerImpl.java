@@ -1,11 +1,15 @@
 package org.objectweb.proactive.core.component.controller;
 
-
+import java.io.IOException;
 import java.lang.reflect.Method;
-
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.management.Notification;
+import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -15,148 +19,206 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
-import org.objectweb.proactive.core.event.MessageEvent;
-import org.objectweb.proactive.core.event.MessageEventListener;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
-public class MonitorControllerImpl extends AbstractProActiveController implements MonitorController, MessageEventListener 
-{
-	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
-	
-	private Map<String, MethodStatistics> serverMethodsToMonitor = null;
-    private Map<String, MethodStatistics> clientMethodsToMonitor = null;
-    
-    private String name = null;
-    
-    public MonitorControllerImpl(Component owner)
-    {
+public class MonitorControllerImpl extends AbstractProActiveController implements MonitorController,
+        NotificationListener {
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
+
+    private final String KEY_INFO_SEPARATOR = "-";
+
+    private JMXNotificationManager jmxNotificationManager;
+
+    private boolean started;
+
+    private Map<String, MethodStatistics> statistics;
+
+    private Map<String, String> keysList;
+
+    public MonitorControllerImpl(Component owner) {
         super(owner);
-        serverMethodsToMonitor = Collections.synchronizedMap(new HashMap<String, MethodStatistics>());
-        clientMethodsToMonitor = Collections.synchronizedMap(new HashMap<String, MethodStatistics>());
+        jmxNotificationManager = JMXNotificationManager.getInstance();
+        registerMethods();
+        startMonitoring();
     }
 
-    public void monitorInit()
-    {    	
-        PAActiveObject.getBodyOnThis().addMessageEventListener(this);
+    private void registerMethods() {
+        statistics = Collections.synchronizedMap(new HashMap<String, MethodStatistics>());
+        keysList = new HashMap<String, String>();
+        NameController nc = null;
         try {
-			name = ((NameController) owner.getFcInterface( Constants.NAME_CONTROLLER)).getFcName();
-		} catch (NoSuchInterfaceException e) {
-			e.printStackTrace();
-		}
-		registerMethods();
+            nc = (NameController) owner.getFcInterface(Constants.NAME_CONTROLLER);
+        } catch (NoSuchInterfaceException e1) {
+            e1.printStackTrace();
+        }
+        String name = nc.getFcName();
+        InterfaceType itfTypes[] = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
+        for (InterfaceType itfType : itfTypes) {
+            try {
+                Class<?> klass = ClassLoader.getSystemClassLoader().loadClass(itfType.getFcItfSignature());
+                Method[] methods = klass.getDeclaredMethods();
+                if (!itfType.getFcItfName().endsWith("-controller") &&
+                    !itfType.getFcItfName().equals("component")) {
+                    for (Method m : methods) {
+                        if (!itfType.isFcClientItf()) {
+                            Class<?>[] parametersTypes = m.getParameterTypes();
+                            String key = generateKey(itfType.getFcItfName(), m.getName(), parametersTypes)
+                                    .stringValue();
+                            keysList.put(m.getName(), key);
+                            statistics.put(key, new MethodStatisticsImpl(itfType.getFcItfName(), m.getName(),
+                                parametersTypes));
+                            logger.debug(m.getName() + " (server) added to monitoring on component " + name +
+                                "!!!");
+                        }
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
-    
-    protected void setControllerItfType()
-    {
+
+    protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MONITOR_CONTROLLER,
-                    MonitorController.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+                    MonitorController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
-    
-    public MethodStatistics getStatistics(String methodName, String type) throws Exception
-    {
-    	if (type.equals("client"))
-    		return clientMethodsToMonitor.get(methodName);
-    	else if (type.equals("server"))
-            return serverMethodsToMonitor.get(methodName);
-    	else
-    		return null;
+
+    public BooleanWrapper isMonitoringStarted() {
+        return new BooleanWrapper(started);
     }
-    
-    private void registerMethods()
-    {
-    	NameController nc = null;
-    	try {
-			nc = (NameController)owner.getFcInterface(Constants.NAME_CONTROLLER);
-		} catch (NoSuchInterfaceException e1) {
-			e1.printStackTrace();
-		}
-		String name = nc.getFcName();
-		InterfaceType itfTypes[] = ((ComponentType)owner.getFcType()).getFcInterfaceTypes();
-        for (InterfaceType itfType: itfTypes) { 
+
+    private void initMethodStatistics() {
+        String[] keys = statistics.keySet().toArray(new String[] {});
+        for (int i = 0; i < keys.length; i++) {
+            ((MethodStatisticsImpl) statistics.get(keys[i])).reset();
+        }
+    }
+
+    public void startMonitoring() {
+        if (!started) {
+            initMethodStatistics();
             try {
-                Class<?> klass = ClassLoader.getSystemClassLoader().loadClass(itfType.getFcItfSignature());
-                Method[] methods = klass.getDeclaredMethods();
-                if (!itfType.getFcItfName().endsWith("-controller") && !itfType.getFcItfName().equals("component")) {
-                		if (!itfType.isFcClientItf()) {
-                			for (Method met: methods) {
-                				serverMethodsToMonitor.put(met.getName(), new MethodStatistics());
-                				logger.debug(met.getName() + " (server) added to monitoring on component " + name + "!!!");
-                			}
-                		} else {
-                			for (Method met: methods) {
-                				clientMethodsToMonitor.put(met.getName(), new MethodStatistics());
-                				logger.debug(met.getName() + " (client) added to monitoring on component " + name + "!!!");
-                			}                	
-                		}
-                }
-            } catch (ClassNotFoundException e) {
+                jmxNotificationManager.subscribe(FactoryName.createActiveObjectName(PAActiveObject
+                        .getBodyOnThis().getID()), this, FactoryName.getCompleteUrl(ProActiveRuntimeImpl
+                        .getProActiveRuntime().getURL()));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }                   
-    }
-    
-    // ServerRequest Arrival
-    public void requestReceived(MessageEvent event)
-    {
-        if (serverMethodsToMonitor.containsKey(event.getMethodName())) {
-        	// String date = new SimpleDateFormat("mm:ss").format(new Date (event.getTimeStamp()));
-        	String date = "" + (event.getTimeStamp() % 10000);
-        	logger.debug(name + " component (" + date + "): service request with ID " + event.getSequenceNumber() + " of (server) method " + event.getMethodName() + " received");
-        	serverMethodsToMonitor.get(event.getMethodName()).recordArrival(event.getTimeStamp());
+            started = true;
         }
     }
 
-    // ServerRequest Served (with future)
-    public void replySent(MessageEvent event)
-    {
-    	// TODO: Should not happen
-    }
-
-    // ServerRequest Served (without future)
-    public void voidRequestServed(MessageEvent event)
-    {
-        if (serverMethodsToMonitor.containsKey(event.getMethodName())) {
-        	logger.debug(name + " component (" + event.getTimeStamp() + "): service request with ID " + event.getSequenceNumber() + " of (server) method " + event.getMethodName() + " served");
-        	serverMethodsToMonitor.get(event.getMethodName()).recordDeparture(event.getTimeStamp());
+    public void stopMonitoring() {
+        if (started) {
+            jmxNotificationManager.unsubscribe(FactoryName.createActiveObjectName(PAActiveObject
+                    .getBodyOnThis().getID()), this);
+            started = false;
         }
     }
 
-    // ServerRequest Out of Queue
-    public void servingStarted(MessageEvent event)
-    {
-        if (serverMethodsToMonitor.containsKey(event.getMethodName())) {
-        	logger.debug(name + " component (" + event.getTimeStamp() + "): service request with ID " + event.getSequenceNumber() + " of (server) method " + event.getMethodName() + " removed from waiting queue");
-        	// TODO: This measure seems to be very unreliable... Needs more investigation
-        }
+    public void resetMonitoring() {
+        stopMonitoring();
+        startMonitoring();
     }
-    
-    // Client reply arrival
-    public void replyReceived(MessageEvent event)
-    {
-        if (clientMethodsToMonitor.containsKey(event.getMethodName())) {
-        	logger.debug(name + " component (" + event.getTimeStamp() + "): client service reply with ID " + event.getSequenceNumber() + " of (client) method " + event.getMethodName() + " received");
-        	clientMethodsToMonitor.get(event.getMethodName()).recordArrival(event.getTimeStamp());
-        }
+
+    public MethodStatistics getStatistics(String itfName, String methodName) throws Exception {
+        return getStatistics(itfName, methodName, new Class<?>[] {});
     }
-    
-    // Client request departure
-    public void requestSent(MessageEvent event)
-    {
-    	if (clientMethodsToMonitor.containsKey(event.getMethodName())) {
-    		logger.debug(name + " component (" + event.getTimeStamp() + "): client service request with ID " + event.getSequenceNumber() + " of (client) method " + event.getMethodName() + " sent");
-    		clientMethodsToMonitor.get(event.getMethodName()).recordDeparture(event.getTimeStamp());
-    	}
+
+    public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes)
+            throws Exception {
+        String supposedCorrespondingKey = generateKey(itfName, methodName, parametersTypes).stringValue();
+        MethodStatistics methodStats = statistics.get(supposedCorrespondingKey);
+        if (methodStats != null)
+            return methodStats;
+        else if (parametersTypes.length == 0) {
+            String correspondingKey = null;
+            String[] keys = statistics.keySet().toArray(new String[] {});
+            for (int i = 0; i < keys.length; i++) {
+                if (keys[i].startsWith(supposedCorrespondingKey)) {
+                    if (correspondingKey == null)
+                        correspondingKey = keys[i];
+                    else
+                        // TODO Raise an ambiguous method exception?
+                        return null;
+                }
+            }
+            if (correspondingKey != null)
+                return statistics.get(correspondingKey);
+            else
+                // TODO Raise an method not found exception?
+                return null;
+        } else
+            // TODO Raise an method not found exception?
+            return null;
+    }
+
+    public Map<String, MethodStatistics> getAllStatistics() {
+        return statistics;
+    }
+
+    public StringWrapper generateKey(String itfName, String methodName, Class<?>[] parametersTypes) {
+        String key = itfName + KEY_INFO_SEPARATOR + methodName;
+
+        for (int i = 0; i < parametersTypes.length; i++) {
+            key += KEY_INFO_SEPARATOR + parametersTypes[i].getName();
+        }
+
+        return new StringWrapper(key);
+    }
+
+    public void handleNotification(Notification notification, Object handback) {
+        String type = notification.getType();
+        if (type.equals(NotificationType.requestReceived)) {
+            RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+            String key = keysList.get(data.getMethodName());
+            if (key != null)
+                ((MethodStatisticsImpl) statistics.get(key)).notifyArrivalOfRequest(notification
+                        .getTimeStamp());
+        } else if (type.equals(NotificationType.servingStarted)) {
+            RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+            String key = keysList.get(data.getMethodName());
+            if (key != null)
+                ((MethodStatisticsImpl) statistics.get(key)).notifyDepartureOfRequest(notification
+                        .getTimeStamp());
+        } else if (type.equals(NotificationType.replySent)) {
+            RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+            String key = keysList.get(data.getMethodName());
+            if (key != null)
+                ((MethodStatisticsImpl) statistics.get(key)).notifyReplyOfRequestSent(notification
+                        .getTimeStamp());
+        } else if (type.equals(NotificationType.voidRequestServed)) {
+            RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+            String key = keysList.get(data.getMethodName());
+            if (key != null)
+                ((MethodStatisticsImpl) statistics.get(key)).notifyReplyOfRequestSent(notification
+                        .getTimeStamp());
+        } else if (type.equals(NotificationType.setOfNotifications)) {
+            ConcurrentLinkedQueue<Notification> notificationsList = (ConcurrentLinkedQueue<Notification>) notification
+                    .getUserData();
+            for (Iterator<Notification> iterator = notificationsList.iterator(); iterator.hasNext();) {
+                handleNotification((Notification) iterator.next(), handback);
+            }
+        }
     }
 }

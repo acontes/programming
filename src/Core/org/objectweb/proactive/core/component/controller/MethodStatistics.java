@@ -1,184 +1,138 @@
 package org.objectweb.proactive.core.component.controller;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 
-public class MethodStatistics implements Serializable
-{
-	private static final long serialVersionUID = 1L;
-	
-	private RateMetric arrMetric = new RateMetric("Arrivals rate");
-    private RateMetric depMetric = new RateMetric("Departures rate");
-        
-    public MethodStatistics()
-    {
-    }
-    
-    public void reset()
-    {
-        arrMetric.reset();
-        depMetric.reset();
-    }
-    
-    public void recordArrival(long time)
-    {
-        arrMetric.record(time);
-    }
+public interface MethodStatistics {
+    /**
+     * Maximum number of requests saved.
+     */
+    public static int maxNbRequests = 10000;
 
-    public void recordDeparture(long time)
-    {
-        depMetric.record(time);
-    }
+    /**
+     * Get the current length of the requests incoming queue related to the monitored method.
+     * 
+     * @return The current number of pending request in the queue.
+     */
+    public int getCurrentLengthQueue();
 
-    public DoubleWrapper getMeanArrivalRate() 
-    {
-        return new DoubleWrapper(arrMetric.getMeanRate());
-    }
+    /**
+     * Get the average number of requests incoming queue per second related to the monitored
+     * method since the monitoring has been started.
+     * 
+     * @return The average number of requests per second.
+     */
+    public double getAverageLengthQueue();
 
-    public DoubleWrapper getMeanDepartureRate() 
-    {
-        return new DoubleWrapper(depMetric.getMeanRate());
-    }
+    /**
+     * Get the average number of requests incoming queue per second related to the monitored
+     * method in the last past X milliseconds.
+     * 
+     * @param pastXMilliseconds The last past X milliseconds.
+     * @return The average number of requests per second.
+     */
+    public double getAverageLengthQueue(long pastXMilliseconds);
 
-    public DoubleWrapper getMeanServiceRate()
-    {
-        // NOTE: This result is unreliable; it makes sense only if the server has no idle time
-        return getMeanDepartureRate();
-    }
+    /**
+     * Get the latest service time for the monitored method.
+     * 
+     * @return The latest service time in milliseconds.
+     */
+    public long getLatestServiceTime();
 
-    public DoubleWrapper getSampleArrivalRate(int n)
-    {
-        return new DoubleWrapper(arrMetric.getSampleMeanRate(n));
-    }
+    /**
+     * Get the average service time for the monitored method since the monitoring has been started.
+     * 
+     * @return The average service time in milliseconds.
+     */
+    public double getAverageServiceTime();
 
-    public DoubleWrapper getSampleDepartureRate(int n)
-    {
-        return new DoubleWrapper(depMetric.getSampleMeanRate(n));
-    }
+    /**
+     * Get the average service time for the monitored method during the last N method calls.
+     * 
+     * @param lastNRequest The last N method calls.
+     * @return The average service time in milliseconds.
+     */
+    public double getAverageServiceTime(int lastNRequest);
 
-    public DoubleWrapper getSampleServiceRate(int n)
-    {
-        // NOTE: This result is unreliable; it makes sense only if the server has no idle time
-        return new DoubleWrapper(depMetric.getSampleMeanRate(n));
-    }
-    
-    public DoubleWrapper getTimeArrivalRate(int millis)
-    {
-        return new DoubleWrapper(arrMetric.getTimeMeanRate(millis));
-    }
+    /**
+     * Get the average service time for the monitored method in the last past X milliseconds.
+     * 
+     * @param pastXMilliseconds The last past X milliseconds.
+     * @return The average service time in milliseconds.
+     */
+    public double getAverageServiceTime(long pastXMilliseconds);
 
-    public DoubleWrapper getTimeDepartureRate(int millis)
-    {
-        return new DoubleWrapper(depMetric.getTimeMeanRate(millis));
-    }
+    /**
+     * Get the latest inter-arrival time for the monitored method.
+     * 
+     * @return The latest inter-arrival time in milliseconds.
+     */
+    public long getLatestInterArrivalTime();
 
-    public DoubleWrapper getTimeServiceRate(int millis)
-    {
-        // NOTE: This result is unreliable; it makes sense only if the server has no idle time
-        return new DoubleWrapper(depMetric.getTimeMeanRate(millis));
-    }
-    
-    class RateMetric implements Serializable
-    {
-		private static final long serialVersionUID = 1L;
+    /**
+     * Get the average inter-arrival time for the monitored method since the monitoring has
+     * been started.
+     * 
+     * @return The average inter-arrival time in milliseconds.
+     */
+    public double getAverageInterArrivalTime();
 
-		private String name;
-        private List<Long> list = Collections.synchronizedList(new LinkedList<Long>());
-        private long duration = 0; // in millis
-        private int max_size = 1000;
+    /**
+     * Get the average inter-arrival time for the monitored method during the last
+     * N method calls.
+     * 
+     * @param lastNRequest The last N method calls.
+     * @return The average inter-arrival time in milliseconds.
+     */
+    public double getAverageInterArrivalTime(int lastNRequest);
 
-        
-        protected RateMetric()
-        {
-            this(null, 0);
-        }
+    /**
+     * Get the average inter-arrival time for the monitored method in the last past X
+     * milliseconds.
+     * 
+     * @param pastXMilliseconds The last past X milliseconds.
+     * @return The average inter-arrival time in milliseconds.
+     */
+    public double getAverageInterArrivalTime(long pastXMilliseconds);
 
-        protected RateMetric(String name) 
-        {
-            this(name, 0);
-        }
-        
-        public RateMetric(String name, int max_size) 
-        {
-            this.name = name;
-            if (max_size > 0)
-                this.max_size = max_size;
-        }
-        
-        public String getName()      { return name;    }
-        public String getDimension() { return "1/sec"; }
+    /**
+     * Get the average permanence time in the incoming queue for a request of the monitored method
+     * since the monitoring has been started.
+     * 
+     * @return The average permanence time in the incoming queue in milliseconds.
+     */
+    public double getAveragePermanenceTimeInQueue();
 
-        public void record(long time) 
-        {
-            if (list.size() > max_size)
-                list.remove(0);
-            list.add(time);
-            duration = time - list.get(0);
-            // System.err.println("****** " + name + " **** duration is " + duration);
-        }
+    /**
+     * Get the average permanence time in the incoming queue for a request of the monitored method
+     * during the last N method calls.
+     * 
+     * @param lastNRequest The last N method calls.
+     * @return The average permanence time in the incoming queue in milliseconds.
+     */
+    public double getAveragePermanenceTimeInQueue(int lastNRequest);
 
-        public void reset() 
-        {
-            list.clear();
-            duration = 0;
-        }
+    /**
+     * Get the average permanence time in the incoming queue for a request of the monitored method
+     * in the last past X milliseconds.
+     * 
+     * @param pastXMilliseconds The last past X milliseconds.
+     * @return The average permanence time in the incoming queue in milliseconds.
+     */
+    public double getAveragePermanenceTimeInQueue(long pastXMilliseconds);
 
-        public long getCount() 
-        {
-            return list.size();
-        }
+    /*
+     * The fourth information "the list of all the method calls (server interfaces) invoked by a
+     * given invocation" will be provided later with the DSO as described in Pisa. But, you can
+     * already dependencies
+     */
 
-        public double getDuration() 
-        {
-            return millisToSeconds(duration);
-        }
-
-        public double getRate()
-        {
-            int length = list.size();
-            if (length < 2) return 0;
-            return getSampleMeanRate(1);
-        }
-
-        public double getMeanRate() 
-        {
-            int length = list.size();
-            if (length < 2) return 0;
-            return (length - 1) / millisToSeconds(duration);
-        }
-        
-        public double getSampleMeanRate(int num)
-        {
-            if (num < 1) return 0;
-            int length = list.size();
-            if (num >= length - 1)
-                return getMeanRate();
-            long dt  = list.get(length - 1) - list.get(length - 1 - num);
-            return num / millisToSeconds(dt);
-        }
-        
-        public double getTimeMeanRate(int millis)
-        {
-            long end = System.currentTimeMillis() - millis;
-            int counter = 0;
-            for (Long t: list) {
-                if (t >= end)
-                    counter++;
-                else 
-                    break;
-            }
-            return counter / millisToSeconds(millis);
-        }
-        
-        private double millisToSeconds(long millis)
-        {
-            return (millis + 1000L/2)/(double)1000L;
-        }
-
-    }
-
+    /**
+     * Get the list of all the method calls (server interfaces) invoked by a given invocation.
+     * 
+     * @return The list of the used interfaces.
+     * TODO which kind of information do you need (Interface reference, name, ...?)
+     */
+    public List<String> getInvokedMethodList();
 }

@@ -182,14 +182,14 @@ public interface Body extends LocalBodyStrategy, UniversalBody {
     public void updateNodeURL(String newNodeURL);
 
     /**
-     * For setting an immediate service for this body. An immediate service is a method that will bw
-     * excecuted by the calling thread.
+     * For setting an immediate service for this body. An immediate service is a method that will be
+     * executed by the calling thread.
      */
     public void setImmediateService(String methodName);
 
     /**
-     * Removes an immediate service for this body An immediate service is a method that will bw
-     * excecuted by the calling thread.
+     * Removes an immediate service for this body An immediate service is a method that will be
+     * executed by the calling thread.
      * 
      * @param methodName
      *            the name of the method
@@ -199,8 +199,8 @@ public interface Body extends LocalBodyStrategy, UniversalBody {
     public void removeImmediateService(String methodName);
 
     /**
-     * Adds an immediate service for this body An immediate service is a method that will bw
-     * excecuted by the calling thread.
+     * Adds an immediate service for this body An immediate service is a method that will be
+     * executed by the calling thread.
      * 
      * @param methodName
      *            the name of the method
@@ -210,8 +210,8 @@ public interface Body extends LocalBodyStrategy, UniversalBody {
     public void setImmediateService(String methodName, Class<?>[] parametersTypes);
 
     /**
-     * Removes an immediate service for this body An immediate service is a method that will bw
-     * excecuted by the calling thread.
+     * Removes an immediate service for this body An immediate service is a method that will be
+     * executed by the calling thread.
      * 
      * @param methodName
      *            the name of the method

@@ -492,9 +492,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
             // JMX Notification
             if (!isProActiveInternalObject && (mbean != null)) {
-                mbean
-                        .sendNotification(NotificationType.servingStarted, new Integer(getRequestQueue()
-                                .size()));
+                RequestNotificationData data = new RequestNotificationData(request
+                        .getSourceBodyID(), request.getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+                        .getMethodName(), getRequestQueue().size());
+                mbean.sendNotification(NotificationType.servingStarted, data);
             }
 
             // END JMX Notification
@@ -513,8 +514,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
                 // JMX Notification
                 if (!isProActiveInternalObject && (mbean != null)) {
-                    mbean.sendNotification(NotificationType.voidRequestServed, new Integer(getRequestQueue()
-                            .size()));
+                    RequestNotificationData data = new RequestNotificationData(request
+                            .getSourceBodyID(), request.getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+                            .getMethodName(), getRequestQueue().size());
+                    mbean.sendNotification(NotificationType.voidRequestServed, data);
                 }
 
                 // END JMX Notification
@@ -527,7 +530,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
             // JMX Notification
             if (!isProActiveInternalObject && (mbean != null)) {
-                mbean.sendNotification(NotificationType.replySent, new Integer(getRequestQueue().size()));
+                RequestNotificationData data = new RequestNotificationData(request
+                        .getSourceBodyID(), request.getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+                        .getMethodName(), getRequestQueue().size());
+                mbean.sendNotification(NotificationType.replySent, data);
             }
 
             // END JMX Notification
