@@ -101,6 +101,10 @@
                 <fileset dir="${lib.dir}/jboss">
                         <include name="*.jar" />
                 </fileset>
+		<!-- recoder libs -->
+		<fileset dir="${lib.dir}/recoder">
+              <include name="*.jar" />
+        </fileset>
 
 	<!-- XXX ${dev.dir} is not included in the source release ! -->
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
