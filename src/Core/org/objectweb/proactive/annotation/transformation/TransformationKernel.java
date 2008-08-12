@@ -45,13 +45,16 @@ import recoder.service.ChangeHistory;
  */
 public abstract class TransformationKernel {
 	
-	protected ChangeHistory _changes;
+	protected final ChangeHistory _changes;
 	// all kernels will need to generate code
-	protected ProgramFactory _codeGen;
+	protected final ProgramFactory _codeGen;
+	// high-level code generation constructs
+	protected final CodeGenerationHelper _cgHelper;
 	
 	public TransformationKernel(ServiceConfiguration sc) {
 		_codeGen = sc.getProgramFactory();
 		_changes = sc.getChangeHistory();
+		_cgHelper = new CodeGenerationHelper(_codeGen , _changes);
 	}
 	
 	public abstract void generateAnnotationReplacement(

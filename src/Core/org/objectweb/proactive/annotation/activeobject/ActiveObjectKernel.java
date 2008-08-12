@@ -33,15 +33,18 @@ package org.objectweb.proactive.annotation.activeobject;
 import java.util.List;
 
 import org.jboss.logging.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
 import org.objectweb.proactive.annotation.transformation.TransformationKernel;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 
 import recoder.ServiceConfiguration;
 import recoder.java.Declaration;
 import recoder.java.Expression;
 import recoder.java.Identifier;
+import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
@@ -52,6 +55,7 @@ import recoder.java.reference.MethodReference;
 import recoder.java.reference.PackageReference;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
+import recoder.java.statement.Try;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
@@ -120,8 +124,14 @@ public class ActiveObjectKernel extends TransformationKernel {
 		
 		addTurnActive( enclosingBlock , annotatedDeclaration , turnActiveMethodCall );
 		
+		Class<? extends Exception>[] exceptionsList = new Class[]{
+			ActiveObjectCreationException.class,
+			NodeException.class
+		};
+		_cgHelper.surroundWithTryCatch(turnActiveMethodCall, exceptionsList);
+		
 	}
-
+	
 	private boolean testInitializer(Expression initializer) {
 		
 		if(initializer == null)
@@ -147,9 +157,7 @@ public class ActiveObjectKernel extends TransformationKernel {
 	private Statement createTurnActive( TypeReference variableType, String varName) {
 		
 		// create PAActiveObject, prefixed with the package name
-		ReferencePrefix apiClassName = _codeGen.createTypeReference(
-				createPackageReference(PAActiveObject.class.getPackage().getName()), 
-				_codeGen.createIdentifier(PAActiveObject.class.getSimpleName()));
+		ReferencePrefix apiClassName = _cgHelper.createTypeReference(PAActiveObject.class);
 		
 		// create turnActive identifier
 		Identifier methodName = _codeGen.createIdentifier(PA_API_METHOD_NAME);
@@ -172,23 +180,6 @@ public class ActiveObjectKernel extends TransformationKernel {
 		
 		return assignment;
 		
-	}
-
-	private PackageReference createPackageReference(String paApiPackage) {
-
-		PackageReference ret = null;
-		String[] packageComponents = paApiPackage.split("\\.");
-		for (String identifier : packageComponents) {
-			Identifier newId = _codeGen.createIdentifier(identifier); 
-			if(ret == null ) {
-				ret = _codeGen.createPackageReference(newId);
-			}
-			else{
-				ret = _codeGen.createPackageReference(ret, newId);
-			}
-		}
-		
-		return ret;
 	}
 
 }
