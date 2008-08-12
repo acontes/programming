@@ -73,30 +73,32 @@ public class AnnotationTransformationVisitor extends PrettyPrinter {
 	public void visitAnnotationUse(AnnotationUseSpecification a) {
 		
 		try {
+			
 			// test if the annotation is what we are looking for 
-			if( !_transformation.getAnnotation().getSimpleName().equals(a.getTypeReference().getName()) ) {
+			if( !_transformation.getAnnotation().getSimpleName().equals(a.getTypeReference().getName())) {
 				// not of interest
+				_logger.debug("The annotation:" + a.getTypeReference().getName() + "is not of interest.");
 				return;
 			}
-
+			
 			Declaration declaration = a.getParentDeclaration();
 			_logger.debug("I have found the annotation:" + a.getTypeReference().getName() 
 					+ " applied on the element:" + declaration.toSource() );
+
 
 			// use the kernel to generate the code
 			_kernel.generateAnnotationReplacement(declaration, a);
 
 			// detach the annotation, it is no longer needed
-			// detachAnnotation( a );
+			//TODO bug detachAnnotation( a );
 
 		}
 		catch(CodeGenerationException e){
 			_logger.error("An error occured while generating the code corresponding to the annotation:"
-					+ _transformation.getAnnotation().getName() +
-					".Code will NOT be generated."	, e);
+					+ _transformation.getAnnotation().getName() + ".Will notify the transformation which will report the error.");
+			_transformation.notifyVisitorError();
 		}
 		finally {
-			// is this still necessary??
 			super.visitAnnotationUse(a);
 		}
 	}

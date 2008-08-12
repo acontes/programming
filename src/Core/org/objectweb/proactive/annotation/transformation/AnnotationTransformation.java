@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.logging.Logger;
@@ -65,7 +66,7 @@ public class AnnotationTransformation extends Transformation {
 	// the class of the annotation which mark the to-be-processed elements
 	private final Class _annotationClass;
 	// the list of compilation units that will be processed
-	private final List<CompilationUnit> _compilationUnits;
+	private List<CompilationUnit> _compilationUnits;
 	// the transformation kernel, which will be used by the visitor to generate code
 	private final TransformationKernel _kernel;
 	
@@ -95,6 +96,7 @@ public class AnnotationTransformation extends Transformation {
 		
 		_annotationClass = annotationClass;
 		_kernel = kernel;
+		// load all the compilation units from path
 		_compilationUnits = serviceConfig.getSourceFileRepository().getCompilationUnits();
 		// there should be some compilation units...
 		if( _compilationUnits == null || _compilationUnits.isEmpty() ){
@@ -102,6 +104,44 @@ public class AnnotationTransformation extends Transformation {
 		}
 	}
 	
+	// this counstructor should be used if we want to process only part of the 
+	// compilation units from the input path
+	public AnnotationTransformation(CrossReferenceServiceConfiguration serviceConfig,
+			String[] processedClassNames,
+			Class annotationClass,
+			TransformationKernel kernel) {
+		
+		this(serviceConfig , annotationClass , kernel);
+		
+		List<CompilationUnit> compilationUnits = new ArrayList<CompilationUnit>();
+		for( String className : processedClassNames ) {
+			CompilationUnit cu = getCompilationUnit(className);
+			if( cu == null){
+				throw new IllegalArgumentException("Compilation unit " + className + " could not be loaded.");
+			}
+			compilationUnits.add(cu);
+		}
+		
+		// only hold the desired compilation units
+		_compilationUnits = compilationUnits;
+	}
+
+	/*
+	 * try to get the compilation unit for the given class name.
+	 * The compilation unit must be already loaded by the Service Configurator
+	 */
+	private CompilationUnit getCompilationUnit(String className) {
+		
+		for( CompilationUnit cu : _compilationUnits ){
+			if(cu.getPrimaryTypeDeclaration().getFullName().equals(className)){
+				return cu;
+			}
+		}
+		
+		return null;
+		
+	}
+
 	@Override
 	public ProblemReport execute() {
 

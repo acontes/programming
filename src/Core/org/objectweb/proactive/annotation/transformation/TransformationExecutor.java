@@ -38,6 +38,8 @@ import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.annotation.activeobject.ActiveObjectKernel;
 import org.objectweb.proactive.core.util.log.Loggers;
 
+import functionalTests.annotations.activeobject.transformation.TransformTest;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.convenience.Format;
@@ -66,34 +68,31 @@ public class TransformationExecutor {
 		_sourceFileRepo.getAllCompilationUnitsFromPath();
 	}
 	
-	public void execute(Transformation transform) {
+	public void execute(Transformation transform) 
+		throws CodeGenerationException, IOException {
 
-		try {
-			_logger.debug( "***execute the transformation***" );
-			ProblemReport report = transform.execute();
+		_logger.debug( "***execute the transformation***" );
+		ProblemReport report = transform.execute();
 
-			if (report instanceof Problem) {
-				_logger.error( "Errors in the transformation:" + report.toString() );
-			} else {		
-				_logger.debug("Transformation succeeded - writing results");
+		if (report instanceof Problem) {
+			_logger.error( "Errors in the transformation.");
+			throw new CodeGenerationException(report.toString());
+		} else {		
+			_logger.debug("Transformation succeeded - writing results");
 
-				List<CompilationUnit> units = _sourceFileRepo.getCompilationUnits();
+			List<CompilationUnit> units = _sourceFileRepo.getCompilationUnits();
 
-				for (int i = 0; i < units.size(); i += 1) {
-					CompilationUnit cu = units.get(i);
-					// only if the compilation unit is modified...
-					if (!_sourceFileRepo.isUpToDate(cu)) {
-						_logger.debug(Format.toString("%u [%f]", cu));
-						// ...write the results to the output file
-						_sourceConfig.getSourceFileRepository().print(cu);	
-					}
+			for (int i = 0; i < units.size(); i += 1) {
+				CompilationUnit cu = units.get(i);
+				// only if the compilation unit is modified...
+				if (!_sourceFileRepo.isUpToDate(cu)) {
+					_logger.debug(Format.toString("%u [%f]", cu));
+					// ...write the results to the output file
+					_sourceConfig.getSourceFileRepository().print(cu);	
 				}
 			}
-		} catch (IOException ioe) {
-			_logger.error("Error while trying to write the output of the preprocessor. Error details: " , ioe);
 		}
 
-		
 	}
 	
 	public static void main(String[] args) {
@@ -112,7 +111,12 @@ public class TransformationExecutor {
 		} catch (ParserException e) {
 			_logger.error("Cannot get the compilation units from the path: " + System.getProperty("input.path"), e );
 			return;
+		} catch (IOException ioe) {
+			_logger.error("Error while trying to write the output of the preprocessor. Error details: " , ioe);
+		} catch (CodeGenerationException e) {
+			_logger.error("Code was not generated. Reason:", e);
 		}
+
 	}
 		
 }

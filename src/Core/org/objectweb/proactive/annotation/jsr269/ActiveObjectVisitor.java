@@ -48,9 +48,14 @@ import java.util.List;
 
 /**
  * <p>This class implements a visitor for the ProActiveProcessor, according to the Pluggable Annotation Processing API(jsr269) specification</p>
- * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.annotation.activeobject.ActiveObject} 
+ * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.annotation.activeobject.ActiveObject}</p>
+ * <ul>
+ * 	<li> 
  * has no methods that return null. 
- * This is because null cannot be checked on the caller-side - the caller will have a reference to a future, which most probably will not be null.</p>
+ * This is because null cannot be checked on the caller-side - the caller will have a reference to a future, which most probably will not be null.
+ *  </li>
+ *  <li> TODO does not use <b>this</b> to reference the current active object; must use {@link org.objectweb.proactive.api.PAActiveObject.getStubOnThis()} instead </li>
+ * </ul>
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90

@@ -33,6 +33,7 @@ import functionalTests.FunctionalTest;
  */
 public class Test extends FunctionalTest{
 	
+	public static final String PROACTIVE_HOME;
 	public static final String INPUT_FILES_PATH;
 	public static final String PROC_PATH;
 	public static final String TEST_FILES_RELPATH = "/src/Tests/functionalTests/annotations/activeobject/inputs/";
@@ -41,18 +42,17 @@ public class Test extends FunctionalTest{
 	public static final String TEST_TO_FAIL = "reject";
 	
 	static {
-		String proactive_home;
 		if(PAProperties.PA_HOME.isSet()){
-			proactive_home = PAProperties.PA_HOME.getValue();
+			PROACTIVE_HOME = PAProperties.PA_HOME.getValue();
 		}
 		else {
 			// guess the value
 			String location = Test.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-			proactive_home = getPAHomeFromClassPath(location); 
+			PROACTIVE_HOME = getPAHomeFromClassPath(location); 
 		}
 		
-		INPUT_FILES_PATH = proactive_home + TEST_FILES_RELPATH;
-		PROC_PATH = buildAnnotationProcessorPath(proactive_home);
+		INPUT_FILES_PATH = PROACTIVE_HOME + TEST_FILES_RELPATH;
+		PROC_PATH = buildAnnotationProcessorPath(PROACTIVE_HOME);
 		
 	}
 	
@@ -67,7 +67,7 @@ public class Test extends FunctionalTest{
 		return sb;
 	}
 	
-	private static final String buildAnnotationProcessorPath(String proactive_home) {
+	public static final String buildAnnotationProcessorPath(String proactive_home) {
 
 		String proactive_classes = proactive_home + "/classes/";
 		StringBuilder buildProcPath = new StringBuilder();
