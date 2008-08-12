@@ -110,11 +110,24 @@ public class ActiveObjectKernel extends TransformationKernel {
 		VariableSpecification varSpec = variables.get(0);
 		Identifier varName = varSpec.getIdentifier();
 		
+		// verify whether the initializer of the object is really a constructor call
+		if( !testInitializer(varSpec.getInitializer())) {
+			throw new CodeGenerationException("The annotated variable declaration does not have an initializer that is a contructor call");
+		}
+		
 		Statement turnActiveMethodCall = 
 			createTurnActive( variableType , varName.getText() );
 		
 		addTurnActive( enclosingBlock , annotatedDeclaration , turnActiveMethodCall );
 		
+	}
+
+	private boolean testInitializer(Expression initializer) {
+		
+		if(initializer == null)
+			return false;
+		
+		return initializer instanceof recoder.java.expression.operator.New;
 	}
 
 	private void addTurnActive(StatementBlock enclosingBlock,
