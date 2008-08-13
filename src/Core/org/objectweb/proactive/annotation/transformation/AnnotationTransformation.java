@@ -77,6 +77,7 @@ public class AnnotationTransformation extends Transformation {
 
 	public Class getAnnotation() { return _annotationClass; }
 	public TransformationKernel getKernel() { return _kernel; }
+	public List<CompilationUnit> getCompilationUnits() { return _compilationUnits; }
 	
 	public AnnotationTransformation(CrossReferenceServiceConfiguration serviceConfig,
 			Class annotationClass,
@@ -105,41 +106,17 @@ public class AnnotationTransformation extends Transformation {
 	}
 	
 	// this counstructor should be used if we want to process only part of the 
-	// compilation units from the input path
+	// compilation units from the input path. 
+	// the compilation units are given as parameter, they are initialized elsewhere
 	public AnnotationTransformation(CrossReferenceServiceConfiguration serviceConfig,
-			String[] processedClassNames,
+			List<CompilationUnit> compilationUnits,
 			Class annotationClass,
 			TransformationKernel kernel) {
 		
 		this(serviceConfig , annotationClass , kernel);
 		
-		List<CompilationUnit> compilationUnits = new ArrayList<CompilationUnit>();
-		for( String className : processedClassNames ) {
-			CompilationUnit cu = getCompilationUnit(className);
-			if( cu == null){
-				throw new IllegalArgumentException("Compilation unit " + className + " could not be loaded.");
-			}
-			compilationUnits.add(cu);
-		}
-		
 		// only hold the desired compilation units
 		_compilationUnits = compilationUnits;
-	}
-
-	/*
-	 * try to get the compilation unit for the given class name.
-	 * The compilation unit must be already loaded by the Service Configurator
-	 */
-	private CompilationUnit getCompilationUnit(String className) {
-		
-		for( CompilationUnit cu : _compilationUnits ){
-			if(cu.getPrimaryTypeDeclaration().getFullName().equals(className)){
-				return cu;
-			}
-		}
-		
-		return null;
-		
 	}
 
 	@Override
@@ -157,7 +134,7 @@ public class AnnotationTransformation extends Transformation {
 			_visitorError = false;
 			compilationUnit.accept(annotationVisitor);
 			if (_visitorError) {
-				return setProblemReport(new AnnotationProblem()); 
+				return setProblemReport(new AnnotationProblem("Error while processing annotation " + _annotationClass.getSimpleName())); 
 			}
 		}
 		

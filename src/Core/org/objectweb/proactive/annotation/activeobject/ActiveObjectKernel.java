@@ -80,8 +80,6 @@ public class ActiveObjectKernel extends TransformationKernel {
 	// the API method
 	private static final String PA_API_METHOD_NAME = "turnActive";
 	
-	private static final Logger _logger = Logger.getLogger(Loggers.ANNOTATIONS); 
-	
 	public ActiveObjectKernel(ServiceConfiguration sc) {
 		super(sc);
 	}

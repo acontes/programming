@@ -39,5 +39,20 @@ import recoder.kit.Problem;
  * @since ProActive 4.00
  */
 public class AnnotationProblem extends Problem {
+	
+	private final String _errorMsg;
+	
+	public AnnotationProblem() {
+		_errorMsg = "";
+	}
+	
+	public AnnotationProblem(String errorMsg) {
+		_errorMsg = errorMsg;
+	}
+	
+	@Override
+	public String toString() {
+		return _errorMsg + ":" + super.toString();
+	}
 
 }

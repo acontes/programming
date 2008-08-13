@@ -12,8 +12,7 @@ import java.lang.annotation.Target;
  * it will be used to instantiate an active object, and therefore
  * should respect the active object guidelines.
  * </p>
- * <p> 
- * Usage: 
+ * <p>Usage:</p> 
  * 	<ul>
  * 		<li> When you create a class that you know you will use to instantiate an active object, annotate it using @ActiveObject</li>
  * 		<li> ProActive will check whether your object respect the ProActive coding guidelines - these can be found in the ProActive manual. 
@@ -32,7 +31,6 @@ import java.lang.annotation.Target;
  * 			</ul>   
  * 		</li>
  * 	</ul>
- * </p>
  * 
  * @author fabratu
  * @version %G%, %I%

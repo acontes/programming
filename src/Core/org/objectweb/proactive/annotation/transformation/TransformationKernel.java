@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.annotation.transformation;
 
+import org.jboss.logging.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
 import recoder.java.Declaration;
@@ -50,6 +53,8 @@ public abstract class TransformationKernel {
 	protected final ProgramFactory _codeGen;
 	// high-level code generation constructs
 	protected final CodeGenerationHelper _cgHelper;
+	
+	protected static final Logger _logger = Logger.getLogger(Loggers.ANNOTATIONS); 
 	
 	public TransformationKernel(ServiceConfiguration sc) {
 		_codeGen = sc.getProgramFactory();

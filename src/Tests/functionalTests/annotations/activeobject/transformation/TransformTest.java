@@ -8,6 +8,7 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.annotation.activeobject.ActiveObjectKernel;
+import org.objectweb.proactive.annotation.transformation.AllAnnotationsTransformation;
 import org.objectweb.proactive.annotation.transformation.AnnotationTransformation;
 import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
 import org.objectweb.proactive.annotation.transformation.TransformationExecutor;
@@ -205,11 +206,10 @@ public class TransformTest extends FunctionalTest {
 		
 		try {
 			
-			Transformation transform = new AnnotationTransformation(
+			Transformation transform = new AllAnnotationsTransformation(
 					_executor._sourceConfig ,
-					classNames ,
-					ActiveObject.class,
-					_kernel);
+					classNames 
+					);
 
 			_executor.execute(transform);
 		}
