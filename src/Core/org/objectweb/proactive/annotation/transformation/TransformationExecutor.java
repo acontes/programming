@@ -38,8 +38,6 @@ import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.annotation.activeobject.ActiveObjectKernel;
 import org.objectweb.proactive.core.util.log.Loggers;
 
-import functionalTests.annotations.activeobject.transformation.TransformTest;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.convenience.Format;
