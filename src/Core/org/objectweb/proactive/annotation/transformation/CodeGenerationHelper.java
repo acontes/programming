@@ -92,32 +92,25 @@ public class CodeGenerationHelper {
 		return enclosingTryBlock;
 	}
 	
-	public static final String EXCEPTION_VAR_NAME = "e";
+	// generate a try-catch block with the given exceptions caught
+	// the same code is used in all the catch blocks
 	public Try surroundWithTryCatch(Statement surroundedElement,
-				Class<? extends Exception>[] exceptionsList
+				Class<? extends Exception>[] exceptionsList,
+				String exceptionVarName,
+				StatementBlock catchBody
 			) 
 	{
 		Try enclosingTryBlock = surroundWithTry(surroundedElement);
 		ASTList<Branch> branches = new ASTArrayList<Branch>();
 		for (Class<? extends Exception> exceptionClazz : exceptionsList) {
 			Branch catchBranch = _codeGen.createCatch( 
-					generateCatchHeader(exceptionClazz , EXCEPTION_VAR_NAME), 
-					generateCatchBody() );
+					generateCatchHeader(exceptionClazz , exceptionVarName), 
+					catchBody );
 			branches.add(catchBranch);
 		}
 		
 		enclosingTryBlock.setBranchList(branches);
 		return enclosingTryBlock;
-	}
-	
-	private StatementBlock generateCatchBody() {
-		try {
-			return new StatementBlock(_codeGen.parseStatements("System.out.println(\"Error\");"));
-		} catch (ParserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
 	}
 
 	private ParameterDeclaration generateCatchHeader(

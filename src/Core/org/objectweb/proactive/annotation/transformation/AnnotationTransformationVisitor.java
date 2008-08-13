@@ -90,7 +90,7 @@ public class AnnotationTransformationVisitor extends PrettyPrinter {
 			_kernel.generateAnnotationReplacement(declaration, a);
 
 			// detach the annotation, it is no longer needed
-			//TODO bug detachAnnotation( a );
+			detachAnnotation( a );
 
 		}
 		catch(CodeGenerationException e){
@@ -117,7 +117,7 @@ public class AnnotationTransformationVisitor extends PrettyPrinter {
         }
         
         // notify the change history
-        _transformation.getServiceConfiguration().getChangeHistory().detached(annotation, position);
+        _kernel._changes.detached(annotation, position);
 		
 	}
 

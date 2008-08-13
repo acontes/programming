@@ -40,22 +40,21 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 
+import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.Declaration;
 import recoder.java.Expression;
 import recoder.java.Identifier;
-import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
+import recoder.java.declaration.AnnotationElementValuePair;
 import recoder.java.declaration.AnnotationUseSpecification;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.java.reference.MethodReference;
-import recoder.java.reference.PackageReference;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
-import recoder.java.statement.Try;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
@@ -128,8 +127,54 @@ public class ActiveObjectKernel extends TransformationKernel {
 			ActiveObjectCreationException.class,
 			NodeException.class
 		};
-		_cgHelper.surroundWithTryCatch(turnActiveMethodCall, exceptionsList);
 		
+		AnnotationAttributes attribs; 
+		if( annotation.getElementValuePairs() == null )
+			attribs = new AnnotationAttributes(); 
+		else
+			attribs	= new AnnotationAttributes(annotation);
+		
+		StatementBlock catchBlock = generateCatchBodyForActiveObject(
+				attribs._loggerName, ERROR_MESSAGE, EXCEPTION_VAR_NAME, varName.getText());
+		
+		if( catchBlock == null ) {
+			throw new CodeGenerationException("Could not generate the catch block to catch the exceptions fromthe call " + PA_API_METHOD_NAME);
+		}
+		
+		_cgHelper.surroundWithTryCatch( turnActiveMethodCall, exceptionsList, EXCEPTION_VAR_NAME, catchBlock );
+		
+	}
+	
+	private static final String ERROR_MESSAGE = "Error";
+	public static final String EXCEPTION_VAR_NAME = "e";
+	// the exceptions are eaten miam-miam; but they are logged to the specified logger
+	// it logger is null, the error is logged to System.err
+	private StatementBlock generateCatchBodyForActiveObject(String logger, // logger to report exceptions
+			String errorMessage, // error message
+			String exceptionVarName, // the name of the exception variable in the catch()
+			String aoVarName)    // the name of the active object variable
+	{
+		
+		String statementsText=null;
+		
+		try {
+			if(logger == null) {
+				// log error to System.err
+				statementsText =	"System.err.println(\"" + errorMessage + "\");\n" +
+						exceptionVarName + ".printStackTrace();\n" +
+						aoVarName + " = null;\n";
+			}
+			else {
+				// log error to the specified logger
+				statementsText = logger + ".error(\"" + errorMessage + "\" , " + exceptionVarName + ");\n" + 
+								aoVarName + " = null;\n";
+			}
+
+			return new StatementBlock(_codeGen.parseStatements(statementsText));
+		} catch (ParserException e) {
+			_logger.error("Could not generate statements for the folowing code text:" + statementsText , e);
+			return null;
+		}
 	}
 	
 	private boolean testInitializer(Expression initializer) {
@@ -179,6 +224,40 @@ public class ActiveObjectKernel extends TransformationKernel {
 				);
 		
 		return assignment;
+		
+	}
+	
+	class AnnotationAttributes {
+		
+		String _loggerName;
+		private static final String LOGGER_ATTR = "logger"; 
+		
+		public AnnotationAttributes() {
+			// load default values
+			_loggerName = null;
+		}
+		
+		public AnnotationAttributes(AnnotationUseSpecification annotation) {
+			// load default values
+			this();
+			// overwrite user-specified values
+			for( AnnotationElementValuePair pair : annotation.getElementValuePairs()) {
+				if(pair.getElementName().equals(LOGGER_ATTR)) {
+					_loggerName = getLoggerName(pair.getValue());
+				}
+			}
+		}
+
+		private String getLoggerName(Object value) {
+			if( value instanceof String == false )
+				return null;
+			String name = (String)value;
+			// trim eventual commas
+			if( name.startsWith("\"") )
+				name = name.substring(1, name.length()-1);
+			return name;
+		}
+
 		
 	}
 
