@@ -88,25 +88,22 @@ public class VirtualNodeKernel extends TransformationKernel {
 		
 		AnnotationElements attributes = new AnnotationElements(annotation);
 		
-		ASTList<Statement> virtualNodeCreationStatement = createVirtualNodeCreationStatements(attributes);		
+		StatementBlock catchBody = _cgHelper.generateCatchBody(
+				attributes._logger , CATCH_ERROR_MESSAGE + attributes._name , EXCEPTION_VAR_NAME, "mamaia");
+		
+		if( catchBody == null ) {
+			throw new CodeGenerationException("Could not generate the catch block to catch the exceptions from the virtual node creation");
+		}
+		
+		ASTList<Statement> virtualNodeCreationStatements = createVirtualNodeCreationStatements(attributes);		
 		
 		Class<? extends Exception>[] exceptionsList = new Class[]{
 				ProActiveException.class,
 				NodeException.class
 			};
 		
-		StatementBlock catchBody = _cgHelper.generateCatchBody(
-				"tataia", CATCH_ERROR_MESSAGE + attributes._name , EXCEPTION_VAR_NAME, "mamaia");
-		
-		if( catchBody == null ) {
-			throw new CodeGenerationException("Could not generate the catch block to catch the exceptions from the virtual node creation");
-		}
-		
-		Try vnodeCreation = _codeGen.createTry( 
-				_codeGen.createStatementBlock(virtualNodeCreationStatement));
-		
-		_cgHelper.attachCatchBranchesSameBody( vnodeCreation, 
-				exceptionsList, EXCEPTION_VAR_NAME, catchBody);
+		Try vnodeCreation = _cgHelper.surroundWithTryCatch(
+				virtualNodeCreationStatements, exceptionsList, EXCEPTION_VAR_NAME, catchBody);
 		
 		_cgHelper.addStatementBefore(enclosingBlock, annotatedDeclaration, vnodeCreation);
 		
@@ -139,19 +136,26 @@ public class VirtualNodeKernel extends TransformationKernel {
 	}
 
 	class AnnotationElements {
+		// elements
+		// required
 		String _name;
-		String _descriptorType;
 		String _descriptorFile;
+		// optional
+		String _descriptorType;
+		String _logger;
+		// generated
 		String _id;
 		
 		private static final String NAME_ELEMENT = "name";
 		private static final String DESCR_TYPE_ELEMENT = "descriptorType";
 		private static final String DESCR_FILE_ELEMENT = "descriptorFile";
+		private static final String LOGGER_ELEMENT = "logger";
 		
 		public AnnotationElements() {
 			_name = null;
 			_descriptorType = "gcm";
 			_descriptorFile = null;
+			_logger = null;
 		}
 		
 		public AnnotationElements(AnnotationUseSpecification annotation) 
@@ -171,6 +175,9 @@ public class VirtualNodeKernel extends TransformationKernel {
 				}
 				if(pair.getElementName().equals(DESCR_FILE_ELEMENT)) {
 					_descriptorFile = getStringValue(pair.getValue());
+				}
+				if(pair.getElementName().equals(LOGGER_ELEMENT)){
+					_logger = getStringValue(pair.getValue());
 				}
 			}
 			

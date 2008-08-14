@@ -55,4 +55,7 @@ public @interface VirtualNode {
 	// path to the location of the XML deployment descriptor file
 	String descriptorFile() default "";
 	
+	// the logger to which the errors will be reported
+	String logger() default "";
+	
 }

@@ -33,7 +33,6 @@ package org.objectweb.proactive.annotation.transformation;
 import java.util.List;
 
 import org.jboss.logging.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 
 import recoder.ParserException;
@@ -131,6 +130,27 @@ public class CodeGenerationHelper {
 		return enclosingTryBlock;
 	}
 	
+	public Try surroundWithTryCatch(ASTList<Statement> statementList,
+			Class<? extends Exception>[] exceptionsList,
+			String exceptionVarName,
+			StatementBlock catchBody
+		) 
+{
+	Try enclosingTryBlock = surroundWithTry(statementList);
+	
+	attachCatchBranchesSameBody( enclosingTryBlock, 
+					exceptionsList, exceptionVarName, catchBody);
+	return enclosingTryBlock;
+}
+	
+	public Try surroundWithTry(ASTList<Statement> statementList) {
+		StatementBlock block = generateBlockMultipleStatements(statementList); 
+		Try tryBlock = _codeGen.createTry(block);
+		_changes.attached(block);
+		
+		return tryBlock;
+	}
+
 	// generate a list of branches that treat the given exceptions with the same body of code
 	public void attachCatchBranchesSameBody(
 			Try enclosingTry,
@@ -171,15 +191,15 @@ public class CodeGenerationHelper {
 				// log error to System.err
 				statementsText =	"System.err.println(\"" + errorMessage + "\");\n" +
 						exceptionVarName + ".printStackTrace();\n" +
-						aoVarName + " = null;\n";
+						( aoVarName == null ? aoVarName + " = null;\n" : "" );
 			}
 			else {
 				// log error to the specified logger
 				statementsText = logger + ".error(\"" + errorMessage + "\" , " + exceptionVarName + ");\n" + 
-								aoVarName + " = null;\n";
+				( aoVarName == null ? aoVarName + " = null;\n" : "" );
 			}
 
-			return new StatementBlock(_codeGen.parseStatements(statementsText));
+			return generateBlockMultipleStatements(_codeGen.parseStatements(statementsText));
 		} catch (ParserException e) {
 			_logger.error("Could not generate statements for the folowing code text:" + statementsText , e);
 			return null;
