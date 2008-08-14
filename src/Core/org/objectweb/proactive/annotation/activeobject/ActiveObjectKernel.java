@@ -36,10 +36,12 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
 import org.objectweb.proactive.annotation.transformation.TransformationKernel;
 import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
+import org.objectweb.proactive.annotation.virtualnode.VirtualNodeAnnotationElements;
 import org.objectweb.proactive.annotation.virtualnode.VirtualNodeKernel;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
+import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.Declaration;
 import recoder.java.Expression;
@@ -130,7 +132,7 @@ public class ActiveObjectKernel extends TransformationKernel {
 		}
 		
 		Statement turnActiveMethodCall = 
-			createTurnActive( variableType , varName.getText() );
+			createTurnActive( variableType, varName.getText(), vnodeVarName );
 		
 		_cgHelper.addStatementAfter( enclosingBlock , annotatedDeclaration , turnActiveMethodCall );
 		
@@ -156,17 +158,15 @@ public class ActiveObjectKernel extends TransformationKernel {
 		
 		AnnotationUseSpecification vnAnnotation = getVirtualNodeAnnotation(annotatedDeclaration);
 		
-		/* TODO
-		String vnAnotName = VirtualNodeKernel.getVirtualNodeName(vnAnnotation);
+		VirtualNodeAnnotationElements attribs = new VirtualNodeAnnotationElements(vnAnnotation);
 		
-		if( !vnAnotName.equals(vnName) ) {
-			throw new CodeGenerationException( "The virtual node name " + vnAnotName + " in annotation " +
+		if( !attribs.getVirtualNodeName().equals(vnName) ) {
+			throw new CodeGenerationException( "The virtual node name " + attribs.getVirtualNodeName() + " in annotation " +
 					VirtualNode.class.getSimpleName() + " conflicts with the name " + vnName + 
 					" specified in annotation " + ActiveObject.class.getSimpleName());
 		}
-		*/
-		// TODO
-		return vnName;
+		
+		return attribs.getVnVarName();
 		
 	}
 
@@ -175,7 +175,7 @@ public class ActiveObjectKernel extends TransformationKernel {
 	{
 		
 		for (AnnotationUseSpecification annotation : annotatedDeclaration.getAnnotations()) {
-			if (annotation.getTypeReference().getName().equals(ActiveObject.class.getSimpleName())) 
+			if (annotation.getTypeReference().getName().equals(VirtualNode.class.getSimpleName())) 
 				return annotation;
 		}
 		
@@ -195,8 +195,23 @@ public class ActiveObjectKernel extends TransformationKernel {
 		return initializer instanceof recoder.java.expression.operator.New;
 	}
 
-	private Statement createTurnActive( TypeReference variableType, String varName) {
+	private Statement createTurnActive( TypeReference variableType, 
+			String varName, String vnodeVarName) 
+	{
 		
+		String turnActiveText = PAActiveObject.class.getName() + "." + PA_API_METHOD_NAME + 
+			"( " +  varName + 
+			( (vnodeVarName!=null) ? " , " +   vnodeVarName + ".getNode()" : "" ) 
+			+ ");\n" ;
+		
+		try{
+			return _codeGen.parseStatements(turnActiveText).get(0); // we know it is a single statement
+		} catch (ParserException e) {
+			_logger.error("Could not generate statements for the folowing code text:" + turnActiveText , e);
+			return null;
+		}
+	
+		/*
 		// create PAActiveObject, prefixed with the package name
 		ReferencePrefix apiClassName = _cgHelper.createTypeReference(PAActiveObject.class);
 		
@@ -208,7 +223,7 @@ public class ActiveObjectKernel extends TransformationKernel {
 				_codeGen.createVariableReference(
 						_codeGen.createIdentifier(varName))
 			); // arg #1 - variable reference, name = varName
-		// TODO args.add(_codeGen.createNullLiteral()); // arg #2 - for now, is null literal 
+		// arg #2 - Node 
 
 		// create the method call
 		MethodReference turnActiveMethodCall = _codeGen.createMethodReference(apiClassName, methodName, args);
@@ -220,6 +235,7 @@ public class ActiveObjectKernel extends TransformationKernel {
 				);
 		
 		return assignment;
+		*/
 		
 	}
 

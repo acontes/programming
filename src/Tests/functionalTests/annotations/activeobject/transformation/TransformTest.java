@@ -177,6 +177,7 @@ public class TransformTest extends FunctionalTest {
 			executeOnClasses(new String[] {
 					TEST_FILES_PACKAGE + "ActiveObjectAccept",
 					TEST_FILES_PACKAGE + "VirtualNodeAccept",
+					TEST_FILES_PACKAGE + "VirtualActiveAccept",
 				}
 			);
 			// must not throw exception
@@ -198,6 +199,7 @@ public class TransformTest extends FunctionalTest {
 		executeOnClasses(new String[] {
 				TEST_FILES_PACKAGE + "ActiveObjectReject",
 				TEST_FILES_PACKAGE + "VirtualNodeReject",
+				TEST_FILES_PACKAGE + "VirtualActiveReject",
 			}
 		);
 	}

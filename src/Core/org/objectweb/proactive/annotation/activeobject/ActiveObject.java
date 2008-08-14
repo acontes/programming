@@ -39,5 +39,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.TYPE , ElementType.LOCAL_VARIABLE })
 public @interface ActiveObject {  
+	
+	String virtualNode() default "";
+	
 	String logger() default "";
 }

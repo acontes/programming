@@ -69,6 +69,8 @@ public class VirtualNodeAnnotationElements extends AnnotationElements {
 		_logger = null;
 	}
 	
+	public String getVirtualNodeName() { return _name;	}
+	
 	public VirtualNodeAnnotationElements(AnnotationUseSpecification annotation) 
 		throws CodeGenerationException 
 	{
@@ -112,6 +114,8 @@ public class VirtualNodeAnnotationElements extends AnnotationElements {
 		_padVarName = "pad" + camel(fileName) + camel(_descriptorType);
 		_vnVarName = "vn" + camel(_name) + camel(fileName) + camel(_descriptorType) ;
 	}
+	
+	public String getVnVarName() { return _vnVarName; }
 
 	private String camel(String name) {
 		if (name.length() == 0) return name;
