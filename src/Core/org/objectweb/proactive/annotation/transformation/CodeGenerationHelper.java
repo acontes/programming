@@ -295,5 +295,29 @@ public class CodeGenerationHelper {
 		
 	}
 
+	// generates a shutdown hook. The code that will be executed
+	// inside the run method of the thread is given as a parameter
+	// in text form
+	public Statement createShutdownHook(String blockText) {
+		// java.lang.Runtime.getRuntime().addShutdownHook( 
+		//		new Thread() {
+		//			public void run() {
+		//				StatementBlock
+		//			}
+		// 		});
+			String sdhText = Runtime.class.getName() + ".getRuntime().addShutdownHook(\n" +
+				"new " + Thread.class.getName() +  "() {\n" +
+						"public void run() {\n" +
+							blockText +
+						"}\n" +
+				"});\n";
+		try{
+			return _codeGen.parseStatements(sdhText).get(0);
+		} catch (ParserException e) {
+			_logger.error("Could not generate statements for the folowing code text:" + sdhText , e);
+			return null;
+		}
+	}
+
 	
 }

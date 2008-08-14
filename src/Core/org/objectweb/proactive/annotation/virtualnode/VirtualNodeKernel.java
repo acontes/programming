@@ -98,9 +98,14 @@ public class VirtualNodeKernel extends TransformationKernel {
 		if( catchBody == null ) {
 			throw new CodeGenerationException("Could not generate the catch block to catch the exceptions from the virtual node creation");
 		}
-		
-		ASTList<Statement> virtualNodeCreationStatements = createVirtualNodeCreationStatements(attributes);
-		ASTList<Statement> virtualNodeDeclarations = createVirtualNodeDeclarations(attributes);
+
+		// variable declarations
+		ASTList<Statement> statementsOutsideTry = createVirtualNodeDeclarations(attributes);
+		// shutdown hook
+		Statement shutdownHook = createShutdownHook(attributes);
+		// node creation
+		ASTList<Statement> statementsInsideTry = createVirtualNodeCreationStatements(attributes);
+		statementsInsideTry.add(shutdownHook);
 		
 		Class<? extends Exception>[] exceptionsList = new Class[]{
 				ProActiveException.class,
@@ -108,14 +113,24 @@ public class VirtualNodeKernel extends TransformationKernel {
 			};
 		
 		Try vnodeCreation = _cgHelper.surroundWithTryCatch(
-				virtualNodeCreationStatements, exceptionsList, EXCEPTION_VAR_NAME, catchBody);
+				statementsInsideTry, exceptionsList, EXCEPTION_VAR_NAME, catchBody);
 		
-		
-		virtualNodeDeclarations.add(vnodeCreation);
-		_cgHelper.addStatementListBefore( enclosingBlock, annotatedDeclaration , virtualNodeDeclarations );
+		statementsOutsideTry.add(vnodeCreation);
+		_cgHelper.addStatementListBefore( enclosingBlock, annotatedDeclaration , statementsOutsideTry );
 		
 	}
 	
+	private Statement createShutdownHook(AnnotationElements attributes) {
+		String shutdownText = "";
+		if(attributes._descriptorType.equals("old")){
+			shutdownText = attributes._vnVarName + ".killAll(false);\n";
+		}
+		else if(attributes._descriptorType.equals("gcm")){
+			shutdownText = attributes._padVarName + ".kill();\n";
+		}
+		return _cgHelper.createShutdownHook(shutdownText);
+	}
+
 	private ASTList<Statement> createVirtualNodeDeclarations(
 			AnnotationElements attributes) {
 		
