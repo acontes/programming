@@ -10,13 +10,12 @@ import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
 import org.objectweb.proactive.core.util.log.Loggers;
 
-public class AcceptBasic {
+public class ActiveObjectAccept {
 	
 	private static final Logger _logger = Logger.getLogger(Loggers.ANNOTATIONS); 
 
 	void test() {
 		
-		@VirtualNode(name="workers",descriptorFile="ceva.xml",descriptorType="gcm")
 		@ActiveObject(logger="_logger")
 		String str = new String();
 		
@@ -47,7 +46,7 @@ public class AcceptBasic {
 					new OutputStreamWriter(System.out));
 
 			@ActiveObject
-			AcceptBasic basic = new AcceptBasic();
+			ActiveObjectAccept basic = new ActiveObjectAccept();
 
 			blackOut.close();
 		} catch (IOException e) {

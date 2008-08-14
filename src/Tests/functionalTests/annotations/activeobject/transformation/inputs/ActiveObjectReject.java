@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 
-public class RejectBasic {
+public class ActiveObjectReject {
 
 	void testNoNew() throws UnknownHostException {
 		

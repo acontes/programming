@@ -154,7 +154,6 @@ public class TransformTest extends FunctionalTest {
 		// input.path is where recoder reads info about the processed compilation units
 		String inputPath = INPUT_FILES_PATH + File.pathSeparator + JAVA_RT + File.pathSeparator + 
 			RECODER_LIBS + File.pathSeparator + Test.PROC_PATH + proactiveLibs;
-		_logger.debug("the input path will be:" + inputPath);
 		System.setProperty("input.path" , inputPath);
 	}
 	
@@ -176,7 +175,8 @@ public class TransformTest extends FunctionalTest {
 		
 		try {
 			executeOnClasses(new String[] {
-					TEST_FILES_PACKAGE + "AcceptBasic"
+					TEST_FILES_PACKAGE + "ActiveObjectAccept",
+					TEST_FILES_PACKAGE + "VirtualNodeAccept",
 				}
 			);
 			// must not throw exception
@@ -196,7 +196,8 @@ public class TransformTest extends FunctionalTest {
 		}
 		
 		executeOnClasses(new String[] {
-				TEST_FILES_PACKAGE + "RejectBasic"
+				TEST_FILES_PACKAGE + "ActiveObjectReject",
+				TEST_FILES_PACKAGE + "VirtualNodeReject",
 			}
 		);
 	}
