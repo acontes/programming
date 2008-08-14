@@ -98,7 +98,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 		
 		StatementBlock enclosingBlock = (StatementBlock)parent;
 		
-		AnnotationElements attributes = new AnnotationElements(annotation);
+		VirtualNodeAnnotationElements attributes = new VirtualNodeAnnotationElements(annotation);
 		
 		StatementBlock catchBody = _cgHelper.generateCatchBody(
 				attributes._logger , CATCH_ERROR_MESSAGE + attributes._name , EXCEPTION_VAR_NAME, attributes._vnVarName);
@@ -129,7 +129,6 @@ public class VirtualNodeKernel extends TransformationKernel {
 	}
 	
 	private boolean hasActiveObjectAnnotation(LocalVariableDeclaration annotatedDeclaration) {
-		//_transformation.getAnnotation().getSimpleName().equals(a.getTypeReference().getName())
 		for (AnnotationUseSpecification annotation : annotatedDeclaration.getAnnotations()) {
 			if (annotation.getTypeReference().getName().equals(ActiveObject.class.getSimpleName())) 
 				return true;
@@ -138,7 +137,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 		return false;
 	}
 
-	private Statement createShutdownHook(AnnotationElements attributes) {
+	private Statement createShutdownHook(VirtualNodeAnnotationElements attributes) {
 		String shutdownText = "";
 		if(attributes._descriptorType.equals("old")){
 			shutdownText = attributes._vnVarName + ".killAll(false);\n";
@@ -150,7 +149,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 	}
 
 	private ASTList<Statement> createVirtualNodeDeclarations(
-			AnnotationElements attributes) {
+			VirtualNodeAnnotationElements attributes) {
 		
 		if(attributes._descriptorType.equals("old"))
 			return createVirtualNodeDeclarationsOld(attributes);
@@ -164,7 +163,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 
 
 	private ASTList<Statement> createVirtualNodeCreationStatements(
-			AnnotationElements attributes) {
+			VirtualNodeAnnotationElements attributes) {
 		
 		if(attributes._descriptorType.equals("old"))
 			return createVirtualNodeCreationStatementsOld(attributes);
@@ -176,7 +175,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 	}
 
 	private ASTList<Statement> createVirtualNodeCreationStatementsOld(
-			AnnotationElements attributes) {
+			VirtualNodeAnnotationElements attributes) {
 	
 		String vNodeCreationText =
 			// ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
@@ -200,7 +199,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 	}
 
 	private ASTList<Statement> createVirtualNodeDeclarationsOld(
-			AnnotationElements attributes) {
+			VirtualNodeAnnotationElements attributes) {
 
 		String vNodeDeclarationText = ProActiveDescriptor.class.getName() + " " + attributes._padVarName + ";\n" + 
 				VirtualNode.class.getName() + " " + attributes._vnVarName + ";\n";
@@ -214,7 +213,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 	}
 	
 	private ASTList<Statement> createVirtualNodeCreationStatementsGcm(
-			AnnotationElements attributes) {
+			VirtualNodeAnnotationElements attributes) {
 	
 		String vNodeCreationText =
 			// GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
@@ -237,7 +236,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 	}
 	
 	private ASTList<Statement> createVirtualNodeDeclarationsGcm(
-			AnnotationElements attributes) {
+			VirtualNodeAnnotationElements attributes) {
 		String vNodeDeclarationText = GCMApplication.class.getName() + " " + attributes._padVarName + ";\n" + 
 				GCMVirtualNode.class.getName() + " " + attributes._vnVarName + ";\n";
 		try {
@@ -246,92 +245,6 @@ public class VirtualNodeKernel extends TransformationKernel {
 			// we should never arrive here!
 			_logger.error("Cannot generate AST for the following code text:" + vNodeDeclarationText, e);
 			return null;
-		}
-	}
-
-	class AnnotationElements {
-		// elements
-		// required
-		String _name;
-		String _descriptorFile;
-		// optional
-		String _descriptorType;
-		String _logger;
-		// generated
-		String _padVarName;
-		String _vnVarName;
-		
-		private static final String NAME_ELEMENT = "name";
-		private static final String DESCR_TYPE_ELEMENT = "descriptorType";
-		private static final String DESCR_FILE_ELEMENT = "descriptorFile";
-		private static final String LOGGER_ELEMENT = "logger";
-		
-		public AnnotationElements() {
-			_name = null;
-			_descriptorType = "gcm";
-			_descriptorFile = null;
-			_logger = null;
-		}
-		
-		public AnnotationElements(AnnotationUseSpecification annotation) 
-			throws CodeGenerationException 
-		{
-			// load default values
-			this();
-			if( annotation.getElementValuePairs() == null || annotation.getElementValuePairs().isEmpty() )
-				throw new CodeGenerationException("The " + NAME_ELEMENT + " and " + DESCR_FILE_ELEMENT + " elements are mandatory for annotation " + VirtualNode.class.getSimpleName());
-			// overwrite user-specified values
-			for( AnnotationElementValuePair pair : annotation.getElementValuePairs()) {
-				if(pair.getElementName().equals(NAME_ELEMENT)){
-					_name = getStringValue(pair.getValue());
-				}
-				if(pair.getElementName().equals(DESCR_TYPE_ELEMENT)) {
-					_descriptorType = getStringValue(pair.getValue());
-					if(!supportedDescriptorType())
-						throw new CodeGenerationException("The value " + _descriptorType + " is not supported for the element " + DESCR_TYPE_ELEMENT);
-				}
-				if(pair.getElementName().equals(DESCR_FILE_ELEMENT)) {
-					_descriptorFile = getStringValue(pair.getValue());
-				}
-				if(pair.getElementName().equals(LOGGER_ELEMENT)){
-					_logger = getStringValue(pair.getValue());
-				}
-			}
-			
-			if(_name == null)
-				throw new CodeGenerationException("The " + NAME_ELEMENT + " element is mandatory for annotation " + VirtualNode.class.getSimpleName());
-			if(_descriptorFile == null)
-				throw new CodeGenerationException("The " + DESCR_FILE_ELEMENT + " element is mandatory for annotation " + VirtualNode.class.getSimpleName());
-			
-			// get only the file name without the extension
-			generateVarNames();
-			
-		}
-		
-		private void generateVarNames() {
-			File descr = new File(_descriptorFile);
-			String fileName = descr.getName();
-			fileName = fileName.substring(0, fileName.indexOf('.'));
-			
-			_padVarName = "pad" + camel(fileName) + camel(_descriptorType);
-			_vnVarName = "vn" + camel(_name) + camel(fileName) + camel(_descriptorType) ;
-		}
-
-		private String camel(String name) {
-			if (name.length() == 0) return name;
-	        return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
-		}
-
-		private boolean supportedDescriptorType() {
-			return _descriptorType.equals("old") || _descriptorType.equals("gcm");
-		}
-
-		private String getStringValue(Object value) {
-			if( value instanceof String == false )
-				return null;
-			String name = (String)value;
-			// trim eventual commas
-			return StringUtils.removeDoubleQuotes(name);
 		}
 	}
 

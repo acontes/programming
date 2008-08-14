@@ -32,15 +32,14 @@ package org.objectweb.proactive.annotation.activeobject;
 
 import java.util.List;
 
-import org.jboss.logging.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
 import org.objectweb.proactive.annotation.transformation.TransformationKernel;
+import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
+import org.objectweb.proactive.annotation.virtualnode.VirtualNodeKernel;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.Loggers;
 
-import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.Declaration;
 import recoder.java.Expression;
@@ -57,6 +56,7 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import recoder.util.StringUtils;
 
 /**
  * Code generation for the ActiveObject annotation
@@ -116,6 +116,19 @@ public class ActiveObjectKernel extends TransformationKernel {
 			throw new CodeGenerationException("The annotated variable declaration does not have an initializer that is a contructor call");
 		}
 		
+		ActiveObjectAnnotationElements attribs; 
+		if( annotation.getElementValuePairs() == null )
+			attribs = new ActiveObjectAnnotationElements(); 
+		else
+			attribs	= new ActiveObjectAnnotationElements(annotation);
+		
+		// if we have a virtual node name
+		String vnodeVarName = null;
+		if( attribs._virtualNode != null ) {
+			// search for the virtual node name in a previous annotation
+			vnodeVarName = searchVirtualNode( attribs._virtualNode , annotatedDeclaration);
+		}
+		
 		Statement turnActiveMethodCall = 
 			createTurnActive( variableType , varName.getText() );
 		
@@ -125,12 +138,6 @@ public class ActiveObjectKernel extends TransformationKernel {
 			ActiveObjectCreationException.class,
 			NodeException.class
 		};
-		
-		AnnotationElements attribs; 
-		if( annotation.getElementValuePairs() == null )
-			attribs = new AnnotationElements(); 
-		else
-			attribs	= new AnnotationElements(annotation);
 		
 		StatementBlock catchBlock = _cgHelper.generateCatchBody(
 				attribs._loggerName, CATCH_ERROR_MESSAGE + varName.getText() , EXCEPTION_VAR_NAME, varName.getText());
@@ -143,6 +150,40 @@ public class ActiveObjectKernel extends TransformationKernel {
 		
 	}
 	
+	private String searchVirtualNode( String vnName ,
+			LocalVariableDeclaration annotatedDeclaration) throws CodeGenerationException 
+	{
+		
+		AnnotationUseSpecification vnAnnotation = getVirtualNodeAnnotation(annotatedDeclaration);
+		
+		/* TODO
+		String vnAnotName = VirtualNodeKernel.getVirtualNodeName(vnAnnotation);
+		
+		if( !vnAnotName.equals(vnName) ) {
+			throw new CodeGenerationException( "The virtual node name " + vnAnotName + " in annotation " +
+					VirtualNode.class.getSimpleName() + " conflicts with the name " + vnName + 
+					" specified in annotation " + ActiveObject.class.getSimpleName());
+		}
+		*/
+		// TODO
+		return vnName;
+		
+	}
+
+	private AnnotationUseSpecification getVirtualNodeAnnotation(
+			LocalVariableDeclaration annotatedDeclaration) throws CodeGenerationException 
+	{
+		
+		for (AnnotationUseSpecification annotation : annotatedDeclaration.getAnnotations()) {
+			if (annotation.getTypeReference().getName().equals(ActiveObject.class.getSimpleName())) 
+				return annotation;
+		}
+		
+		throw new CodeGenerationException("Element " + ActiveObjectAnnotationElements.VIRTUAL_NODE_ELEMENT + 
+				" specified for the annotation " + ActiveObject.class.getSimpleName() + 
+				" but the virtual node was not defined using the " + VirtualNode.class.getSimpleName() + " annotation");
+	}
+
 	private static final String CATCH_ERROR_MESSAGE = "Error while creating the active object ";
 	private static final String EXCEPTION_VAR_NAME = "e";
 	
@@ -179,40 +220,6 @@ public class ActiveObjectKernel extends TransformationKernel {
 				);
 		
 		return assignment;
-		
-	}
-	
-	class AnnotationElements {
-		
-		String _loggerName;
-		private static final String LOGGER_ELEMENT = "logger"; 
-		
-		public AnnotationElements() {
-			// load default values
-			_loggerName = null;
-		}
-		
-		public AnnotationElements(AnnotationUseSpecification annotation) {
-			// load default values
-			this();
-			// overwrite user-specified values
-			for( AnnotationElementValuePair pair : annotation.getElementValuePairs()) {
-				if(pair.getElementName().equals(LOGGER_ELEMENT)) {
-					_loggerName = getLoggerName(pair.getValue());
-				}
-			}
-		}
-
-		private String getLoggerName(Object value) {
-			if( value instanceof String == false )
-				return null;
-			String name = (String)value;
-			// trim eventual commas
-			if( name.startsWith("\"") )
-				name = name.substring(1, name.length()-1);
-			return name;
-		}
-
 		
 	}
 
