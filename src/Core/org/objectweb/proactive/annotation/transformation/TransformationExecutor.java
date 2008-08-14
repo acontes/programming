@@ -69,7 +69,7 @@ public class TransformationExecutor {
 	public void execute(Transformation transform) 
 		throws CodeGenerationException, IOException {
 
-		_logger.debug( "***execute the transformation***" );
+		_logger.debug( "***execute transformation " + transform.getClass().getSimpleName() +  "***" );
 		ProblemReport report = transform.execute();
 
 		if (report instanceof Problem) {

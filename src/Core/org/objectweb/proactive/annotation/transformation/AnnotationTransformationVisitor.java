@@ -96,7 +96,7 @@ public class AnnotationTransformationVisitor extends PrettyPrinter {
 		catch(CodeGenerationException e){
 			_logger.error("An error occured while generating the code corresponding to the annotation:"
 					+ _transformation.getAnnotation().getName() + ".Will notify the transformation which will report the error.");
-			_transformation.notifyVisitorError();
+			_transformation.notifyVisitorError(e.getMessage());
 		}
 		finally {
 			super.visitAnnotationUse(a);

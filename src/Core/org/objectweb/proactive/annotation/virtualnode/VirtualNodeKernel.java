@@ -33,6 +33,7 @@ package org.objectweb.proactive.annotation.virtualnode;
 import java.io.File;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
 import org.objectweb.proactive.annotation.transformation.TransformationKernel;
 import org.objectweb.proactive.api.PADeployment;
@@ -83,6 +84,13 @@ public class VirtualNodeKernel extends TransformationKernel {
 		
 		LocalVariableDeclaration annotatedDeclaration = (LocalVariableDeclaration)parentDeclaration;
 		
+		// check if the ActiveObject annotation also exists
+		if( !hasActiveObjectAnnotation(annotatedDeclaration) ){
+			throw new CodeGenerationException("The annotation " + 
+					org.objectweb.proactive.annotation.virtualnode.VirtualNode.class.getSimpleName() + 
+					" can only be applied on elements already annotated with " + ActiveObject.class.getSimpleName());
+		}
+		
 		ProgramElement parent = annotatedDeclaration.getASTParent();
 		if( ! (parent instanceof StatementBlock) ) {
 			throw new CodeGenerationException(" Found a variable declaration outside a statement block");
@@ -120,6 +128,16 @@ public class VirtualNodeKernel extends TransformationKernel {
 		
 	}
 	
+	private boolean hasActiveObjectAnnotation(LocalVariableDeclaration annotatedDeclaration) {
+		//_transformation.getAnnotation().getSimpleName().equals(a.getTypeReference().getName())
+		for (AnnotationUseSpecification annotation : annotatedDeclaration.getAnnotations()) {
+			if (annotation.getTypeReference().getName().equals(ActiveObject.class.getSimpleName())) 
+				return true;
+		}
+		
+		return false;
+	}
+
 	private Statement createShutdownHook(AnnotationElements attributes) {
 		String shutdownText = "";
 		if(attributes._descriptorType.equals("old")){

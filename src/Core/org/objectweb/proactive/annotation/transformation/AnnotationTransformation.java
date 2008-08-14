@@ -72,8 +72,13 @@ public class AnnotationTransformation extends Transformation {
 	
 	private static final Logger _logger = Logger.getLogger(Loggers.ANNOTATIONS); 
 	
+	// error reporting hak
 	private boolean _visitorError;
-	public void notifyVisitorError() { _visitorError = true; }
+	private String _errorMsg;
+	public void notifyVisitorError(String errorMsg) { 
+		_visitorError = true;
+		_errorMsg = errorMsg;
+	}
 
 	public Class getAnnotation() { return _annotationClass; }
 	public TransformationKernel getKernel() { return _kernel; }
@@ -134,7 +139,7 @@ public class AnnotationTransformation extends Transformation {
 			_visitorError = false;
 			compilationUnit.accept(annotationVisitor);
 			if (_visitorError) {
-				return setProblemReport(new AnnotationProblem("Error while processing annotation " + _annotationClass.getSimpleName())); 
+				return setProblemReport(new AnnotationProblem(_errorMsg)); 
 			}
 		}
 		

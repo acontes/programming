@@ -59,8 +59,16 @@ public class AllAnnotationsTransformation extends Transformation {
 	private final List<AnnotationTransformation> _knownTransformations 
 		= new ArrayList<AnnotationTransformation>();
 	
-	private final Map<Class , TransformationKernel> _knownAnnotations = 
-		new HashMap<Class , TransformationKernel>();
+	class Pair {
+		public Pair(Class clazz, TransformationKernel kernel) {
+			_type = clazz;
+			_kernel = kernel;
+		}
+		Class _type;
+		TransformationKernel _kernel; 
+	}
+	
+	private final List<Pair> _knownAnnotations = new ArrayList<Pair>();
 	
 	public AllAnnotationsTransformation(CrossReferenceServiceConfiguration serviceConfig) {
 		super(serviceConfig);
@@ -83,17 +91,21 @@ public class AllAnnotationsTransformation extends Transformation {
 		// TODO add here other implementations for code generation annotations
 		
 		//VirtualNode
-		_knownAnnotations.put(VirtualNode.class, new VirtualNodeKernel(serviceConfig));
+		_knownAnnotations.add(
+				new Pair(VirtualNode.class, 
+						new VirtualNodeKernel(serviceConfig)));
 		//ActiveObject
-		_knownAnnotations.put(ActiveObject.class, new ActiveObjectKernel(serviceConfig));
+		_knownAnnotations.add(
+				new Pair(ActiveObject.class, 
+						new ActiveObjectKernel(serviceConfig)));
 	}
 
 	private void populateKnownTransformations(
 			CrossReferenceServiceConfiguration serviceConfig) {
 
-		for( Map.Entry<Class, TransformationKernel> pair : _knownAnnotations.entrySet()) {
+		for( Pair pair : _knownAnnotations) {
 			_knownTransformations.add(new AnnotationTransformation( serviceConfig,
-					pair.getKey(),	pair.getValue()));
+					pair._type,	pair._kernel));
 		}
 		
 	}
@@ -119,9 +131,9 @@ public class AllAnnotationsTransformation extends Transformation {
 			compilationUnits.add(cu);
 		}
 		
-		for( Map.Entry<Class, TransformationKernel> pair : _knownAnnotations.entrySet()) {
+		for( Pair pair : _knownAnnotations) {
 			_knownTransformations.add(new AnnotationTransformation( serviceConfig,
-					compilationUnits, pair.getKey(), pair.getValue()));
+					compilationUnits , pair._type,	pair._kernel));
 		}
 		
 	}
