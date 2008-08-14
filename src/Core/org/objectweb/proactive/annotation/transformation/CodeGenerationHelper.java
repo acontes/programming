@@ -30,7 +30,11 @@
  */
 package org.objectweb.proactive.annotation.transformation;
 
+import java.util.List;
+
+import org.jboss.logging.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.log.Loggers;
 
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -42,6 +46,7 @@ import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.reference.PackageReference;
 import recoder.java.reference.TypeReference;
 import recoder.java.statement.Branch;
+import recoder.java.statement.Catch;
 import recoder.java.statement.Try;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -59,6 +64,8 @@ public class CodeGenerationHelper {
 	private final ProgramFactory _codeGen;
 	private final ChangeHistory _changes;
 	
+	protected static final Logger _logger = Logger.getLogger(Loggers.ANNOTATIONS); 
+	
 	public CodeGenerationHelper( ProgramFactory codeGen,
 			 ChangeHistory hist) {
 		_codeGen = codeGen;
@@ -66,10 +73,27 @@ public class CodeGenerationHelper {
 	}
 	
 	// create a statement block that contains
-	public  StatementBlock generateSingleBlockStatement(Statement statement) {
+	// a single statement
+	public  StatementBlock generateBlockSingleStatement(Statement statement) {
 		ASTList<Statement> statementList = new ASTArrayList<Statement>();
 		statementList.add(statement);
-		return _codeGen.createStatementBlock(statementList);
+		StatementBlock block = _codeGen.createStatementBlock(statementList);
+		// notify the change
+		_changes.attached(statement);
+		
+		return block;
+	}
+	
+	// create a statement block that contains
+	// the given list of statements
+	public StatementBlock generateBlockMultipleStatements(ASTList<Statement> statementList) {
+		StatementBlock block = _codeGen.createStatementBlock(statementList);
+		// notify the changes
+		for (Statement statement : statementList) {
+			_changes.attached(statement);
+		}
+		
+		return block;
 	}
 	
 	// surround the given statement with Try
@@ -82,7 +106,7 @@ public class CodeGenerationHelper {
 		}
 		else {
 			// create a new try block
-			StatementBlock enclosingBlock = generateSingleBlockStatement(surroundedElement);
+			StatementBlock enclosingBlock = generateBlockSingleStatement(surroundedElement);
 			enclosingTryBlock = _codeGen.createTry(enclosingBlock); 
 			// replace the statement block with the try block
 			oldParent.replaceChild(surroundedElement, enclosingTryBlock);
@@ -101,16 +125,65 @@ public class CodeGenerationHelper {
 			) 
 	{
 		Try enclosingTryBlock = surroundWithTry(surroundedElement);
-		ASTList<Branch> branches = new ASTArrayList<Branch>();
+		
+		attachCatchBranchesSameBody( enclosingTryBlock, 
+						exceptionsList, exceptionVarName, catchBody);
+		return enclosingTryBlock;
+	}
+	
+	// generate a list of branches that treat the given exceptions with the same body of code
+	public void attachCatchBranchesSameBody(
+			Try enclosingTry,
+			Class<? extends Exception>[] exceptionsList,
+			String exceptionVarName,
+			StatementBlock catchBody) 
+	{
+		// get parent branches list
+		ASTList<Branch> branches = enclosingTry.getBranchList();
+		if( branches == null ) {
+			branches = new ASTArrayList<Branch>();
+			enclosingTry.setBranchList(branches);
+		}
+		
+		// add our branches
 		for (Class<? extends Exception> exceptionClazz : exceptionsList) {
-			Branch catchBranch = _codeGen.createCatch( 
+			Catch catchBranch = _codeGen.createCatch( 
 					generateCatchHeader(exceptionClazz , exceptionVarName), 
 					catchBody );
 			branches.add(catchBranch);
+			catchBranch.setParent(enclosingTry);
+			_changes.attached(catchBranch);
 		}
+	}
+	
+	// the exceptions are eaten miam-miam; but they are logged to the specified logger
+	// it logger is null, the error is logged to System.err
+	public StatementBlock generateCatchBody(String logger, // logger to report exceptions
+			String errorMessage, // error message
+			String exceptionVarName, // the name of the exception variable in the catch()
+			String aoVarName)    // the name of the active object variable
+	{
 		
-		enclosingTryBlock.setBranchList(branches);
-		return enclosingTryBlock;
+		String statementsText=null;
+		
+		try {
+			if(logger == null) {
+				// log error to System.err
+				statementsText =	"System.err.println(\"" + errorMessage + "\");\n" +
+						exceptionVarName + ".printStackTrace();\n" +
+						aoVarName + " = null;\n";
+			}
+			else {
+				// log error to the specified logger
+				statementsText = logger + ".error(\"" + errorMessage + "\" , " + exceptionVarName + ");\n" + 
+								aoVarName + " = null;\n";
+			}
+
+			return new StatementBlock(_codeGen.parseStatements(statementsText));
+		} catch (ParserException e) {
+			_logger.error("Could not generate statements for the folowing code text:" + statementsText , e);
+			return null;
+		}
 	}
 
 	private ParameterDeclaration generateCatchHeader(
@@ -142,6 +215,38 @@ public class CodeGenerationHelper {
 		}
 		
 		return ret;
+	}
+	
+	// add the statement newStatement into the statement block enclosingBlock
+	// after the element afterWhich
+	public void addStatementAfter(StatementBlock enclosingBlock,
+			Statement afterWhich,
+			Statement newStatement) {
+		
+		List<Statement> statements = enclosingBlock.getBody(); 
+		int index = statements.indexOf(afterWhich);
+		// add the new method call
+		statements.add( index + 1, newStatement);
+		//notify the change
+		newStatement.setStatementContainer(enclosingBlock);
+		_changes.attached(newStatement);
+		
+	}
+	
+	// add the statement newStatement into the statement block enclosingBlock
+	// after the element afterWhich
+	public void addStatementBefore(StatementBlock enclosingBlock,
+			Statement beforeWhich,
+			Statement newStatement) {
+		
+		List<Statement> statements = enclosingBlock.getBody(); 
+		int index = statements.indexOf(beforeWhich);
+		// add the new method call
+		statements.add( index, newStatement);
+		//notify the change
+		newStatement.setStatementContainer(enclosingBlock);
+		_changes.attached(newStatement);
+		
 	}
 	
 }

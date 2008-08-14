@@ -37,6 +37,8 @@ import java.util.Map;
 
 import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.annotation.activeobject.ActiveObjectKernel;
+import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
+import org.objectweb.proactive.annotation.virtualnode.VirtualNodeKernel;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
@@ -79,6 +81,9 @@ public class AllAnnotationsTransformation extends Transformation {
 	private void populateKnownAnnotations(
 			CrossReferenceServiceConfiguration serviceConfig) {
 		// TODO add here other implementations for code generation annotations
+		
+		//VirtualNode
+		_knownAnnotations.put(VirtualNode.class, new VirtualNodeKernel(serviceConfig));
 		//ActiveObject
 		_knownAnnotations.put(ActiveObject.class, new ActiveObjectKernel(serviceConfig));
 	}

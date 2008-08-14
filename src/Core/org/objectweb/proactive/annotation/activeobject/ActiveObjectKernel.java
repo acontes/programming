@@ -119,21 +119,21 @@ public class ActiveObjectKernel extends TransformationKernel {
 		Statement turnActiveMethodCall = 
 			createTurnActive( variableType , varName.getText() );
 		
-		addTurnActive( enclosingBlock , annotatedDeclaration , turnActiveMethodCall );
+		_cgHelper.addStatementAfter( enclosingBlock , annotatedDeclaration , turnActiveMethodCall );
 		
 		Class<? extends Exception>[] exceptionsList = new Class[]{
 			ActiveObjectCreationException.class,
 			NodeException.class
 		};
 		
-		AnnotationAttributes attribs; 
+		AnnotationElements attribs; 
 		if( annotation.getElementValuePairs() == null )
-			attribs = new AnnotationAttributes(); 
+			attribs = new AnnotationElements(); 
 		else
-			attribs	= new AnnotationAttributes(annotation);
+			attribs	= new AnnotationElements(annotation);
 		
-		StatementBlock catchBlock = generateCatchBodyForActiveObject(
-				attribs._loggerName, ERROR_MESSAGE, EXCEPTION_VAR_NAME, varName.getText());
+		StatementBlock catchBlock = _cgHelper.generateCatchBody(
+				attribs._loggerName, CATCH_ERROR_MESSAGE + varName.getText() , EXCEPTION_VAR_NAME, varName.getText());
 		
 		if( catchBlock == null ) {
 			throw new CodeGenerationException("Could not generate the catch block to catch the exceptions fromthe call " + PA_API_METHOD_NAME);
@@ -143,37 +143,8 @@ public class ActiveObjectKernel extends TransformationKernel {
 		
 	}
 	
-	private static final String ERROR_MESSAGE = "Error";
-	public static final String EXCEPTION_VAR_NAME = "e";
-	// the exceptions are eaten miam-miam; but they are logged to the specified logger
-	// it logger is null, the error is logged to System.err
-	private StatementBlock generateCatchBodyForActiveObject(String logger, // logger to report exceptions
-			String errorMessage, // error message
-			String exceptionVarName, // the name of the exception variable in the catch()
-			String aoVarName)    // the name of the active object variable
-	{
-		
-		String statementsText=null;
-		
-		try {
-			if(logger == null) {
-				// log error to System.err
-				statementsText =	"System.err.println(\"" + errorMessage + "\");\n" +
-						exceptionVarName + ".printStackTrace();\n" +
-						aoVarName + " = null;\n";
-			}
-			else {
-				// log error to the specified logger
-				statementsText = logger + ".error(\"" + errorMessage + "\" , " + exceptionVarName + ");\n" + 
-								aoVarName + " = null;\n";
-			}
-
-			return new StatementBlock(_codeGen.parseStatements(statementsText));
-		} catch (ParserException e) {
-			_logger.error("Could not generate statements for the folowing code text:" + statementsText , e);
-			return null;
-		}
-	}
+	private static final String CATCH_ERROR_MESSAGE = "Error while creating the active object ";
+	private static final String EXCEPTION_VAR_NAME = "e";
 	
 	private boolean testInitializer(Expression initializer) {
 		
@@ -181,20 +152,6 @@ public class ActiveObjectKernel extends TransformationKernel {
 			return false;
 		
 		return initializer instanceof recoder.java.expression.operator.New;
-	}
-
-	private void addTurnActive(StatementBlock enclosingBlock,
-			Statement afterWhich,
-			Statement turnActiveMethodCall) {
-		
-		List<Statement> statements = enclosingBlock.getBody(); 
-		int index = statements.indexOf(afterWhich);
-		// add the new method call
-		statements.add( index + 1, turnActiveMethodCall);
-		//notify the change
-		turnActiveMethodCall.setStatementContainer(enclosingBlock);
-		_changes.attached(turnActiveMethodCall);
-		
 	}
 
 	private Statement createTurnActive( TypeReference variableType, String varName) {
@@ -225,22 +182,22 @@ public class ActiveObjectKernel extends TransformationKernel {
 		
 	}
 	
-	class AnnotationAttributes {
+	class AnnotationElements {
 		
 		String _loggerName;
-		private static final String LOGGER_ATTR = "logger"; 
+		private static final String LOGGER_ELEMENT = "logger"; 
 		
-		public AnnotationAttributes() {
+		public AnnotationElements() {
 			// load default values
 			_loggerName = null;
 		}
 		
-		public AnnotationAttributes(AnnotationUseSpecification annotation) {
+		public AnnotationElements(AnnotationUseSpecification annotation) {
 			// load default values
 			this();
 			// overwrite user-specified values
 			for( AnnotationElementValuePair pair : annotation.getElementValuePairs()) {
-				if(pair.getElementName().equals(LOGGER_ATTR)) {
+				if(pair.getElementName().equals(LOGGER_ELEMENT)) {
 					_loggerName = getLoggerName(pair.getValue());
 				}
 			}

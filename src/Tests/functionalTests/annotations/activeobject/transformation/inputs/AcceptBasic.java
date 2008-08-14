@@ -1,24 +1,58 @@
 package functionalTests.annotations.activeobject.transformation.inputs;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
+import org.objectweb.proactive.core.util.log.Loggers;
 
 public class AcceptBasic {
+	
+	private static final Logger _logger = Logger.getLogger(Loggers.ANNOTATIONS); 
 
 	void test() {
 		
-		@ActiveObject
+		@VirtualNode(name="workers",descriptorFile="ceva.xml",descriptorType="gcm")
+		@ActiveObject(logger="_logger")
 		String str = new String();
-		
-		{
-			@ActiveObject
-			java.lang.StringBuffer strBuf = new java.lang.StringBuffer();
-		}
 		
 	}
 	
 	void test2() {
-		@org.objectweb.proactive.annotation.activeobject.ActiveObject
+		
+		test();
+		
+		@org.objectweb.proactive.annotation.activeobject.ActiveObject(logger="_logger")
 		java.math.BigDecimal number = new java.math.BigDecimal(123); 
+	}
+	
+	void test3() {
+		
+		test();
+		test2();
+		
+		@ActiveObject
+		java.lang.StringBuffer strBuf = new java.lang.StringBuffer(20);	
+	}
+	
+	void test4() {
+		
+		try {
+			Writer blackOut
+			= new BufferedWriter(
+					new OutputStreamWriter(System.out));
+
+			@ActiveObject
+			AcceptBasic basic = new AcceptBasic();
+
+			blackOut.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private int alttest() {
@@ -26,12 +60,12 @@ public class AcceptBasic {
 		int nbActiveObjects = 0;
 		
 		@ActiveObject
-		String toto = new String();
+		String toto = new String("toto");
 		
 		nbActiveObjects++;
 		
-		@ActiveObject
-		String tata = new String();
+		@ActiveObject(logger="_logger")
+		String tata = new String("tata");
 		
 		nbActiveObjects++;
 		
