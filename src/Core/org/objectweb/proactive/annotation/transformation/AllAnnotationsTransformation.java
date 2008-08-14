@@ -32,15 +32,11 @@ package org.objectweb.proactive.annotation.transformation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.saxon.om.VirtualNode;
-
 import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.annotation.activeobject.ActiveObjectKernel;
-import org.objectweb.proactive.annotation.virtualnode.VirtualNodeKernel;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
