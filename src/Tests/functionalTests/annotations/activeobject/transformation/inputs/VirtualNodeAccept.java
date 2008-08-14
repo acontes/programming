@@ -11,7 +11,7 @@ public class VirtualNodeAccept {
 
 	void test() {
 		
-		@VirtualNode(name="workers",descriptorFile="ceva.xml",descriptorType="gcm")
+		@VirtualNode(name="workers",descriptorFile="ceva.xml",descriptorType="old")
 		@ActiveObject(logger="_logger")
 		String str = new String();
 		
@@ -19,7 +19,7 @@ public class VirtualNodeAccept {
 	
 	// the descriptorType parameter is optional 
 	void test2() {
-		@VirtualNode(name="workers",descriptorFile="ceva.xml")
+		@VirtualNode(name="workers", descriptorFile="ceva.xml",logger="_logger")
 		@ActiveObject(logger="_logger")
 		String str = new String();
 	}

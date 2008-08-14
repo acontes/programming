@@ -90,7 +90,7 @@ public class AnnotationTransformationVisitor extends PrettyPrinter {
 			_kernel.generateAnnotationReplacement(declaration, a);
 
 			// detach the annotation, it is no longer needed
-			detachAnnotation( a );
+			//detachAnnotation( a );
 
 		}
 		catch(CodeGenerationException e){

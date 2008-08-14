@@ -28,6 +28,12 @@ public class VirtualNodeReject {
 		@ActiveObject(logger="_logger")
 		String str = new String();
 	}
+	
+	// invalid argument for descriptorType
+	void testZ() {
+		@VirtualNode(name="workers",descriptorFile="ceva.xml",descriptorType="zaza")
+		String str = new String();
+	}
 
 	
 }

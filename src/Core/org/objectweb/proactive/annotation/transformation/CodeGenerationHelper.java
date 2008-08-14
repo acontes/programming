@@ -41,6 +41,7 @@ import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
+import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.reference.PackageReference;
 import recoder.java.reference.TypeReference;
@@ -191,12 +192,12 @@ public class CodeGenerationHelper {
 				// log error to System.err
 				statementsText =	"System.err.println(\"" + errorMessage + "\");\n" +
 						exceptionVarName + ".printStackTrace();\n" +
-						( aoVarName == null ? aoVarName + " = null;\n" : "" );
+						( aoVarName != null ? aoVarName + " = null;\n" : "" );
 			}
 			else {
 				// log error to the specified logger
 				statementsText = logger + ".error(\"" + errorMessage + "\" , " + exceptionVarName + ");\n" + 
-				( aoVarName == null ? aoVarName + " = null;\n" : "" );
+				( aoVarName != null ? aoVarName + " = null;\n" : "" );
 			}
 
 			return generateBlockMultipleStatements(_codeGen.parseStatements(statementsText));
@@ -243,13 +244,8 @@ public class CodeGenerationHelper {
 			Statement afterWhich,
 			Statement newStatement) {
 		
-		List<Statement> statements = enclosingBlock.getBody(); 
-		int index = statements.indexOf(afterWhich);
-		// add the new method call
-		statements.add( index + 1, newStatement);
-		//notify the change
-		newStatement.setStatementContainer(enclosingBlock);
-		_changes.attached(newStatement);
+		int position = enclosingBlock.getBody().indexOf(afterWhich) + 1;
+		addStatementAtPosition(enclosingBlock, position , newStatement);
 		
 	}
 	
@@ -259,14 +255,45 @@ public class CodeGenerationHelper {
 			Statement beforeWhich,
 			Statement newStatement) {
 		
+		int position = enclosingBlock.getBody().indexOf(beforeWhich);
+		addStatementAtPosition(enclosingBlock, position , newStatement);
+		
+	}
+	
+	public void addStatementAtPosition(StatementBlock enclosingBlock,
+			int position,
+			Statement newStatement) {
 		List<Statement> statements = enclosingBlock.getBody(); 
-		int index = statements.indexOf(beforeWhich);
-		// add the new method call
-		statements.add( index, newStatement);
+		// add the new statement
+		statements.add( position , newStatement);
 		//notify the change
 		newStatement.setStatementContainer(enclosingBlock);
 		_changes.attached(newStatement);
+	}
+
+	public void addStatementListBefore(StatementBlock enclosingBlock,
+			Statement beforeWhich,
+			ASTList<Statement> newStatements) {
+		
+		int position = enclosingBlock.getBody().indexOf(beforeWhich);
+		addStatementListAtPosition(enclosingBlock, position, newStatements);
 		
 	}
+	
+	public void addStatementListAtPosition(StatementBlock enclosingBlock,
+			int position,
+			ASTList<Statement> newStatements) {
+		
+		List<Statement> statements = enclosingBlock.getBody(); 
+		// add the new statement
+		statements.addAll( position , newStatements);
+		//notify the change
+		for(Statement newStatement : newStatements ) {
+			newStatement.setStatementContainer(enclosingBlock);
+			_changes.attached(newStatement);
+		}
+		
+	}
+
 	
 }
