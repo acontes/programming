@@ -22,8 +22,8 @@ import javax.tools.JavaFileObject.Kind;
 
 import junit.framework.Assert;
 
-import org.objectweb.proactive.annotation.jsr269.ProActiveProcessor;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.extra.annotation.jsr269.ProActiveProcessor;
 
 import functionalTests.FunctionalTest;
 

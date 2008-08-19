@@ -28,44 +28,19 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.activeobject;
-
-import com.sun.mirror.apt.AnnotationProcessor;
-import com.sun.mirror.apt.AnnotationProcessorEnvironment;
-import com.sun.mirror.declaration.AnnotationTypeDeclaration;
-import com.sun.mirror.declaration.Declaration;
+package org.objectweb.proactive.extra.annotation.transformation;
 
 /**
- * The AnnotationProcessor that processes the ActiveObject annotation.
- * It processes only objects.
- * For every object encountered, the ActiveObjectVisitor is used to 
- * visit the declaration.
- * 
+ * Generic exception that will be thrown whenever weird shit will be going on 
+ * during the code generation phase of the annotation processing
  * @author fabratu
  * @version %G%, %I%
- * @since ProActive 3.90
+ * @since ProActive 4.00
  */
+public class CodeGenerationException extends Exception {
 
-public class ActiveObjectAnnotationProcessor implements AnnotationProcessor {
-	
-	private final AnnotationProcessorEnvironment _aoEnvironment;
-	private final ActiveObjectVisitor _aoVisitor;
-	private final AnnotationTypeDeclaration _aoDeclaration;
-
-	public ActiveObjectAnnotationProcessor(AnnotationProcessorEnvironment env) {
-		
-		_aoEnvironment = env;
-		_aoDeclaration = (AnnotationTypeDeclaration) _aoEnvironment
-				.getTypeDeclaration(ActiveObject.class.getName());
-		_aoVisitor = new ActiveObjectVisitor(_aoEnvironment.getMessager());
-		
+	public CodeGenerationException(String msg) {
+		super(msg);
 	}
-
-	@Override
-	public void process() {
-		for( Declaration typeDeclaration : _aoEnvironment.getDeclarationsAnnotatedWith(_aoDeclaration) ) {
-			typeDeclaration.accept(_aoVisitor);
-		}
-	}	
-
+	
 }

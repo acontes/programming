@@ -28,13 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.virtualnode;
+package org.objectweb.proactive.extra.annotation.virtualnode;
 
 import java.io.File;
 
-import org.objectweb.proactive.annotation.transformation.AnnotationElements;
-import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.extra.annotation.transformation.AnnotationElements;
+import org.objectweb.proactive.extra.annotation.transformation.CodeGenerationException;
 
 import recoder.java.declaration.AnnotationElementValuePair;
 import recoder.java.declaration.AnnotationUseSpecification;

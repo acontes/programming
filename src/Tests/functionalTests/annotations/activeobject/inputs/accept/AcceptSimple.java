@@ -1,9 +1,9 @@
 package functionalTests.annotations.activeobject.inputs.accept;
 
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.annotation.migration.MigrationSignal;
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.migration.MigrationSignal;
 
 @ActiveObject
 public class AcceptSimple {

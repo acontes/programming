@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.migration;
+package org.objectweb.proactive.extra.annotation.migration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -44,7 +44,7 @@ import java.lang.annotation.Target;
  * When a method is annotated with <code>@MigrationSignal</code> , the behaviour  is the following:
  * <ul>
  * 	<li> If the enclosing class definition is not annotated with the 
- * 		{@link org.objectweb.proactive.annotation.activeobject.ActiveObject}
+ * 		{@link org.objectweb.proactive.extra.annotation.activeobject.ActiveObject}
  * 		annotation, then we conclude that the user doesn't want to use the object 
  * 		as an active object, so migration has no meaning on this object. We signal this 
  * 		to the user.

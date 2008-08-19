@@ -6,9 +6,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.virtualnode.VirtualNode;
 
 public class ActiveObjectAccept {
 	
@@ -25,7 +25,7 @@ public class ActiveObjectAccept {
 		
 		test();
 		
-		@org.objectweb.proactive.annotation.activeobject.ActiveObject(logger="_logger")
+		@org.objectweb.proactive.extra.annotation.activeobject.ActiveObject(logger="_logger")
 		java.math.BigDecimal number = new java.math.BigDecimal(123); 
 	}
 	

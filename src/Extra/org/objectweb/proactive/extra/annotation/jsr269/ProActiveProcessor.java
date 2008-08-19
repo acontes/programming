@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.jsr269;
+package org.objectweb.proactive.extra.annotation.jsr269;
 
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
@@ -44,7 +44,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
-import org.objectweb.proactive.annotation.migration.MigrationSignalVisitor;
+import org.objectweb.proactive.extra.annotation.migration.MigrationSignalVisitor;
 
 
 import com.sun.source.util.TreePath;

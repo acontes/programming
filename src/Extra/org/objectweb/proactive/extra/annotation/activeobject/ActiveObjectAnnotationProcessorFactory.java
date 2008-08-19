@@ -1,4 +1,4 @@
-package org.objectweb.proactive.annotation.activeobject;
+package org.objectweb.proactive.extra.annotation.activeobject;
 /*
  * ################################################################
  *

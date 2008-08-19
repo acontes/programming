@@ -28,34 +28,44 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.virtualnode;
+package org.objectweb.proactive.extra.annotation.activeobject;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.sun.mirror.apt.AnnotationProcessor;
+import com.sun.mirror.apt.AnnotationProcessorEnvironment;
+import com.sun.mirror.declaration.AnnotationTypeDeclaration;
+import com.sun.mirror.declaration.Declaration;
 
 /**
+ * The AnnotationProcessor that processes the ActiveObject annotation.
+ * It processes only objects.
+ * For every object encountered, the ActiveObjectVisitor is used to 
+ * visit the declaration.
+ * 
  * @author fabratu
  * @version %G%, %I%
- * @since ProActive 4.00
+ * @since ProActive 3.90
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.LOCAL_VARIABLE)
-public @interface VirtualNode {
 
-	// the virtual node name
-	String name() default "";
+public class ActiveObjectAnnotationProcessor implements AnnotationProcessor {
 	
-	/* The type of deployment descriptor. Can be "gcm" for the new GCM deployment descriptor,
-	 * or "old" for the legacy XML deployment descriptor 
-	 * */
-	String descriptorType() default "gcm"; 
-	
-	// path to the location of the XML deployment descriptor file
-	String descriptorFile() default "";
-	
-	// the logger to which the errors will be reported
-	String logger() default "";
-	
+	private final AnnotationProcessorEnvironment _aoEnvironment;
+	private final ActiveObjectVisitor _aoVisitor;
+	private final AnnotationTypeDeclaration _aoDeclaration;
+
+	public ActiveObjectAnnotationProcessor(AnnotationProcessorEnvironment env) {
+		
+		_aoEnvironment = env;
+		_aoDeclaration = (AnnotationTypeDeclaration) _aoEnvironment
+				.getTypeDeclaration(ActiveObject.class.getName());
+		_aoVisitor = new ActiveObjectVisitor(_aoEnvironment.getMessager());
+		
+	}
+
+	@Override
+	public void process() {
+		for( Declaration typeDeclaration : _aoEnvironment.getDeclarationsAnnotatedWith(_aoDeclaration) ) {
+			typeDeclaration.accept(_aoVisitor);
+		}
+	}	
+
 }

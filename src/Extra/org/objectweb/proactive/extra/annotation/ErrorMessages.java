@@ -28,10 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation;
+package org.objectweb.proactive.extra.annotation;
 
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.annotation.migration.MigrationSignal;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.migration.MigrationSignal;
 
 /**
  * This interface centralizes all the error messages reported by the annotation processors

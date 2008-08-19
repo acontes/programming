@@ -28,12 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.activeobject;
+package org.objectweb.proactive.extra.annotation.activeobject;
 
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.objectweb.proactive.annotation.ErrorMessages;
+import org.objectweb.proactive.extra.annotation.ErrorMessages;
 
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.ClassDeclaration;
@@ -54,7 +54,7 @@ import com.sun.mirror.util.SourcePosition;
 
 /**
  * <p> This class implements a visitor for the ActiveObjectAnnotationProcessor, conforming to the Mirror API(jsr199)</p>
- * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.annotation.activeobject.ActiveObject} 
+ * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extra.annotation.activeobject.ActiveObject} 
  * respects the following rules:</p>
  * <ul>
  * 		<li>must have a no-arg constructor</li>

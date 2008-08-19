@@ -28,19 +28,44 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.transformation;
+package org.objectweb.proactive.extra.annotation.activeobject;
+
+import org.objectweb.proactive.extra.annotation.transformation.AnnotationElements;
+
+import recoder.java.declaration.AnnotationElementValuePair;
+import recoder.java.declaration.AnnotationUseSpecification;
 
 /**
- * Generic exception that will be thrown whenever weird shit will be going on 
- * during the code generation phase of the annotation processing
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.00
  */
-public class CodeGenerationException extends Exception {
-
-	public CodeGenerationException(String msg) {
-		super(msg);
+public class ActiveObjectAnnotationElements extends AnnotationElements {
+	
+	String _loggerName;
+	String _virtualNode;
+	
+	public static final String LOGGER_ELEMENT = "logger";
+	public static final String VIRTUAL_NODE_ELEMENT = "virtualNode";
+	
+	public ActiveObjectAnnotationElements() {
+		// load default values
+		_loggerName = null;
+		_virtualNode = null;
+	}
+	
+	public ActiveObjectAnnotationElements(AnnotationUseSpecification annotation) {
+		// load default values
+		this();
+		// overwrite user-specified values
+		for( AnnotationElementValuePair pair : annotation.getElementValuePairs()) {
+			if(pair.getElementName().equals(LOGGER_ELEMENT)) {
+				_loggerName = getStringValue(pair.getValue());
+			}
+			if(pair.getElementName().equals(VIRTUAL_NODE_ELEMENT)) {
+				_virtualNode = getStringValue(pair.getValue());
+			}
+		}
 	}
 	
 }

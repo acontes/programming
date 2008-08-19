@@ -28,12 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.jsr269;
+package org.objectweb.proactive.extra.annotation.jsr269;
 
 import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic;
 
-import org.objectweb.proactive.annotation.ErrorMessages;
+import org.objectweb.proactive.extra.annotation.ErrorMessages;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
@@ -48,7 +48,7 @@ import java.util.List;
 
 /**
  * <p>This class implements a visitor for the ProActiveProcessor, according to the Pluggable Annotation Processing API(jsr269) specification</p>
- * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.annotation.activeobject.ActiveObject}</p>
+ * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extra.annotation.activeobject.ActiveObject}</p>
  * <ul>
  * 	<li> 
  * has no methods that return null. 

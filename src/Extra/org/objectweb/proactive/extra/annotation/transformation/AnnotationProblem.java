@@ -28,25 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.transformation;
+package org.objectweb.proactive.extra.annotation.transformation;
 
-import recoder.util.StringUtils;
+import recoder.kit.Problem;
 
 /**
- * Class that holds and processes the elements of an annotation
- * The particular annotation implementations should derive from this class
- * and define their processing
+ * generic problem encountered while generating code for the annotations
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.00
  */
-public abstract class AnnotationElements {
+public class AnnotationProblem extends Problem {
 	
-	protected String getStringValue(Object value) {
-		if( value instanceof String == false )
-			return null;
-		String name = (String)value;
-		// trim eventual commas
-		return StringUtils.removeDoubleQuotes(name);
+	private final String _errorMsg;
+	
+	public AnnotationProblem() {
+		_errorMsg = "";
 	}
+	
+	public AnnotationProblem(String errorMsg) {
+		_errorMsg = errorMsg;
+	}
+	
+	@Override
+	public String toString() {
+		return _errorMsg + ":" + super.toString();
+	}
+
 }

@@ -3,7 +3,7 @@ package functionalTests.annotations.activeobject.transformation.inputs;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 public class ActiveObjectReject {
 
@@ -13,7 +13,7 @@ public class ActiveObjectReject {
 		@ActiveObject
 		String str;
 		
-		@org.objectweb.proactive.annotation.activeobject.ActiveObject
+		@org.objectweb.proactive.extra.annotation.activeobject.ActiveObject
 		String papa = "papa";
 		
 		@ActiveObject

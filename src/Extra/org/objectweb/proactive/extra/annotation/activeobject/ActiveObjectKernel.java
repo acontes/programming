@@ -28,18 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.activeobject;
+package org.objectweb.proactive.extra.annotation.activeobject;
 
 import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
-import org.objectweb.proactive.annotation.transformation.TransformationKernel;
-import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
-import org.objectweb.proactive.annotation.virtualnode.VirtualNodeAnnotationElements;
-import org.objectweb.proactive.annotation.virtualnode.VirtualNodeKernel;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.annotation.transformation.CodeGenerationException;
+import org.objectweb.proactive.extra.annotation.transformation.TransformationKernel;
+import org.objectweb.proactive.extra.annotation.virtualnode.VirtualNode;
+import org.objectweb.proactive.extra.annotation.virtualnode.VirtualNodeAnnotationElements;
+import org.objectweb.proactive.extra.annotation.virtualnode.VirtualNodeKernel;
 
 import recoder.ParserException;
 import recoder.ServiceConfiguration;

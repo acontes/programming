@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.transformation;
+package org.objectweb.proactive.extra.annotation.transformation;
 
 import java.io.Writer;
 import java.util.Properties;

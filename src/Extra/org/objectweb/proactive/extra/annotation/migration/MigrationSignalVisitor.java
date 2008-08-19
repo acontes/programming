@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.migration;
+package org.objectweb.proactive.extra.annotation.migration;
 
 import java.util.List;
 
@@ -38,9 +38,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
-import org.objectweb.proactive.annotation.ErrorMessages;
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.api.PAMobileAgent;
+import org.objectweb.proactive.extra.annotation.ErrorMessages;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ExpressionStatementTree;

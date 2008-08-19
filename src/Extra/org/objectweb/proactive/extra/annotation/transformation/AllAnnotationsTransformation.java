@@ -28,17 +28,17 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.transformation;
+package org.objectweb.proactive.extra.annotation.transformation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.annotation.activeobject.ActiveObjectKernel;
-import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
-import org.objectweb.proactive.annotation.virtualnode.VirtualNodeKernel;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectKernel;
+import org.objectweb.proactive.extra.annotation.virtualnode.VirtualNode;
+import org.objectweb.proactive.extra.annotation.virtualnode.VirtualNodeKernel;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;

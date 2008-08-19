@@ -6,13 +6,13 @@ import java.io.IOException;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.annotation.activeobject.ActiveObjectKernel;
-import org.objectweb.proactive.annotation.transformation.AllAnnotationsTransformation;
-import org.objectweb.proactive.annotation.transformation.AnnotationTransformation;
-import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
-import org.objectweb.proactive.annotation.transformation.TransformationExecutor;
-import org.objectweb.proactive.annotation.transformation.TransformationKernel;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectKernel;
+import org.objectweb.proactive.extra.annotation.transformation.AllAnnotationsTransformation;
+import org.objectweb.proactive.extra.annotation.transformation.AnnotationTransformation;
+import org.objectweb.proactive.extra.annotation.transformation.CodeGenerationException;
+import org.objectweb.proactive.extra.annotation.transformation.TransformationExecutor;
+import org.objectweb.proactive.extra.annotation.transformation.TransformationKernel;
 
 import com.sun.source.tree.AssertTree;
 

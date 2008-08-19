@@ -28,44 +28,34 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.activeobject;
+package org.objectweb.proactive.extra.annotation.virtualnode;
 
-import org.objectweb.proactive.annotation.transformation.AnnotationElements;
-
-import recoder.java.declaration.AnnotationElementValuePair;
-import recoder.java.declaration.AnnotationUseSpecification;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.00
  */
-public class ActiveObjectAnnotationElements extends AnnotationElements {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.LOCAL_VARIABLE)
+public @interface VirtualNode {
+
+	// the virtual node name
+	String name() default "";
 	
-	String _loggerName;
-	String _virtualNode;
+	/* The type of deployment descriptor. Can be "gcm" for the new GCM deployment descriptor,
+	 * or "old" for the legacy XML deployment descriptor 
+	 * */
+	String descriptorType() default "gcm"; 
 	
-	public static final String LOGGER_ELEMENT = "logger";
-	public static final String VIRTUAL_NODE_ELEMENT = "virtualNode";
+	// path to the location of the XML deployment descriptor file
+	String descriptorFile() default "";
 	
-	public ActiveObjectAnnotationElements() {
-		// load default values
-		_loggerName = null;
-		_virtualNode = null;
-	}
-	
-	public ActiveObjectAnnotationElements(AnnotationUseSpecification annotation) {
-		// load default values
-		this();
-		// overwrite user-specified values
-		for( AnnotationElementValuePair pair : annotation.getElementValuePairs()) {
-			if(pair.getElementName().equals(LOGGER_ELEMENT)) {
-				_loggerName = getStringValue(pair.getValue());
-			}
-			if(pair.getElementName().equals(VIRTUAL_NODE_ELEMENT)) {
-				_virtualNode = getStringValue(pair.getValue());
-			}
-		}
-	}
+	// the logger to which the errors will be reported
+	String logger() default "";
 	
 }

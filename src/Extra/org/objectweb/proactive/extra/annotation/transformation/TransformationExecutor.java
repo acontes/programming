@@ -28,15 +28,15 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.transformation;
+package org.objectweb.proactive.extra.annotation.transformation;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.jboss.logging.Logger;
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.annotation.activeobject.ActiveObjectKernel;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectKernel;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;

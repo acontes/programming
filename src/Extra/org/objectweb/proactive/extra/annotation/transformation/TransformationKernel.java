@@ -28,31 +28,42 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.transformation;
+package org.objectweb.proactive.extra.annotation.transformation;
 
-import recoder.kit.Problem;
+import org.jboss.logging.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+
+import recoder.ProgramFactory;
+import recoder.ServiceConfiguration;
+import recoder.java.Declaration;
+import recoder.java.declaration.AnnotationUseSpecification;
+import recoder.service.ChangeHistory;
 
 /**
- * generic problem encountered while generating code for the annotations
+ * This interface specifies the general contract for how an annotation transformation
+ * should generate code which should replace the annotation 
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.00
  */
-public class AnnotationProblem extends Problem {
+public abstract class TransformationKernel {
 	
-	private final String _errorMsg;
+	protected final ChangeHistory _changes;
+	// all kernels will need to generate code
+	protected final ProgramFactory _codeGen;
+	// high-level code generation constructs
+	protected final CodeGenerationHelper _cgHelper;
 	
-	public AnnotationProblem() {
-		_errorMsg = "";
+	protected static final Logger _logger = Logger.getLogger(Loggers.ANNOTATIONS); 
+	
+	public TransformationKernel(ServiceConfiguration sc) {
+		_codeGen = sc.getProgramFactory();
+		_changes = sc.getChangeHistory();
+		_cgHelper = new CodeGenerationHelper(_codeGen , _changes);
 	}
 	
-	public AnnotationProblem(String errorMsg) {
-		_errorMsg = errorMsg;
-	}
-	
-	@Override
-	public String toString() {
-		return _errorMsg + ":" + super.toString();
-	}
-
+	public abstract void generateAnnotationReplacement(
+			Declaration parentDeclaration, // the annotated declaration
+			AnnotationUseSpecification annotation)
+			throws CodeGenerationException;
 }

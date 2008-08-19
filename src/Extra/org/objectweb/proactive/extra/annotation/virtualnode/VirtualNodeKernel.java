@@ -28,20 +28,20 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.annotation.virtualnode;
+package org.objectweb.proactive.extra.annotation.virtualnode;
 
 import java.io.File;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.annotation.transformation.CodeGenerationException;
-import org.objectweb.proactive.annotation.transformation.TransformationKernel;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.transformation.CodeGenerationException;
+import org.objectweb.proactive.extra.annotation.transformation.TransformationKernel;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -60,7 +60,7 @@ import recoder.util.StringUtils;
 
 /**
  * Code generation for the VirtualNode annotation
- * see {@link org.objectweb.proactive.annotation.virtualnode.VirtualNode} for a description of the usage of the annotation
+ * see {@link org.objectweb.proactive.extra.annotation.virtualnode.VirtualNode} for a description of the usage of the annotation
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.00
@@ -87,7 +87,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 		// check if the ActiveObject annotation also exists
 		if( !hasActiveObjectAnnotation(annotatedDeclaration) ){
 			throw new CodeGenerationException("The annotation " + 
-					org.objectweb.proactive.annotation.virtualnode.VirtualNode.class.getSimpleName() + 
+					org.objectweb.proactive.extra.annotation.virtualnode.VirtualNode.class.getSimpleName() + 
 					" can only be applied on elements already annotated with " + ActiveObject.class.getSimpleName());
 		}
 		

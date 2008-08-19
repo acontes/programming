@@ -1,7 +1,7 @@
 package functionalTests.annotations.activeobject.transformation.inputs;
 
-import org.objectweb.proactive.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.annotation.virtualnode.VirtualNode;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.virtualnode.VirtualNode;
 
 public class VirtualActiveReject {
 
