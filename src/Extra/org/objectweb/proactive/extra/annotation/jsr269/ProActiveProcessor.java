@@ -62,8 +62,8 @@ import com.sun.source.util.Trees;
 //cannot use ${Annotation}.class.getName() the value must be a constant expression BLEAH!
 @SupportedAnnotationTypes(
 		{
-			"org.objectweb.proactive.annotation.activeobject.ActiveObject",
-			"org.objectweb.proactive.annotation.migration.MigrationSignal"
+			"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
+			"org.objectweb.proactive.extra.annotation.migration.MigrationSignal"
 		}
 	) 
 @SupportedOptions("enableTypeGenerationInEditor")
@@ -71,8 +71,8 @@ public class ProActiveProcessor extends AbstractProcessor {
 
 	
 	// because of BLEAH, absurdities continue...
-	public static final String ACTIVE_OBJECT_ANNOTATION = "org.objectweb.proactive.annotation.activeobject.ActiveObject";
-	public static final String MIGRATION_SIGNAL_ANNOTATION = "org.objectweb.proactive.annotation.migration.MigrationSignal"; 
+	public static final String ACTIVE_OBJECT_ANNOTATION = "org.objectweb.proactive.extra.annotation.activeobject.ActiveObject";
+	public static final String MIGRATION_SIGNAL_ANNOTATION = "org.objectweb.proactive.extra.annotation.migration.MigrationSignal"; 
 	
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations,
