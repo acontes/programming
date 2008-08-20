@@ -101,7 +101,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 		VirtualNodeAnnotationElements attributes = new VirtualNodeAnnotationElements(annotation);
 		
 		StatementBlock catchBody = _cgHelper.generateCatchBody(
-				attributes._logger , CATCH_ERROR_MESSAGE + attributes._name , EXCEPTION_VAR_NAME, attributes._vnVarName);
+				attributes._logger , CATCH_ERROR_MESSAGE + attributes._name , EXCEPTION_VAR_NAME, null);
 		
 		if( catchBody == null ) {
 			throw new CodeGenerationException("Could not generate the catch block to catch the exceptions from the virtual node creation");
@@ -117,7 +117,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 		
 		Class<? extends Exception>[] exceptionsList = new Class[]{
 				ProActiveException.class,
-				NodeException.class
+				//NodeException.class
 			};
 		
 		Try vnodeCreation = _cgHelper.surroundWithTryCatch(
@@ -140,7 +140,11 @@ public class VirtualNodeKernel extends TransformationKernel {
 	private Statement createShutdownHook(VirtualNodeAnnotationElements attributes) {
 		String shutdownText = "";
 		if(attributes._descriptorType.equals("old")){
-			shutdownText = attributes._vnVarName + ".killAll(false);\n";
+			shutdownText = "try {\n" +
+				attributes._padVarName + ".killall(false);\n"
+				+ "} catch(" +  ProActiveException.class.getName() + " " + EXCEPTION_VAR_NAME + "){\n" 
+				// nothing!
+				+ "}\n";
 		}
 		else if(attributes._descriptorType.equals("gcm")){
 			shutdownText = attributes._padVarName + ".kill();\n";
@@ -201,8 +205,8 @@ public class VirtualNodeKernel extends TransformationKernel {
 	private ASTList<Statement> createVirtualNodeDeclarationsOld(
 			VirtualNodeAnnotationElements attributes) {
 
-		String vNodeDeclarationText = ProActiveDescriptor.class.getName() + " " + attributes._padVarName + ";\n" + 
-				VirtualNode.class.getName() + " " + attributes._vnVarName + ";\n";
+		String vNodeDeclarationText = "final " +  ProActiveDescriptor.class.getName() + " " + attributes._padVarName + ";\n" + 
+				VirtualNode.class.getName() + " " + attributes._vnVarName + "= null" + ";\n";
 		try {
 			return _codeGen.parseStatements(vNodeDeclarationText);
 		} catch (ParserException e) {
@@ -237,8 +241,8 @@ public class VirtualNodeKernel extends TransformationKernel {
 	
 	private ASTList<Statement> createVirtualNodeDeclarationsGcm(
 			VirtualNodeAnnotationElements attributes) {
-		String vNodeDeclarationText = GCMApplication.class.getName() + " " + attributes._padVarName + ";\n" + 
-				GCMVirtualNode.class.getName() + " " + attributes._vnVarName + ";\n";
+		String vNodeDeclarationText = "final " + GCMApplication.class.getName() + " " + attributes._padVarName + ";\n" + 
+				GCMVirtualNode.class.getName() + " " + attributes._vnVarName + "= null" + ";\n";
 		try {
 			return _codeGen.parseStatements(vNodeDeclarationText);
 		} catch (ParserException e) {

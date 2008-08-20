@@ -126,13 +126,16 @@ public class ActiveObjectKernel extends TransformationKernel {
 		
 		// if we have a virtual node name
 		String vnodeVarName = null;
+		String type = null;
 		if( attribs._virtualNode != null ) {
 			// search for the virtual node name in a previous annotation
-			vnodeVarName = searchVirtualNode( attribs._virtualNode , annotatedDeclaration);
+			VirtualNodeAnnotationElements elems = searchVirtualNode( attribs._virtualNode , annotatedDeclaration);
+			vnodeVarName = elems.getVnVarName();
+			type = elems.getType();
 		}
 		
 		Statement turnActiveMethodCall = 
-			createTurnActive( variableType, varName.getText(), vnodeVarName );
+			createTurnActive( variableType, varName.getText(), vnodeVarName , type );
 		
 		_cgHelper.addStatementAfter( enclosingBlock , annotatedDeclaration , turnActiveMethodCall );
 		
@@ -152,7 +155,7 @@ public class ActiveObjectKernel extends TransformationKernel {
 		
 	}
 	
-	private String searchVirtualNode( String vnName ,
+	private VirtualNodeAnnotationElements searchVirtualNode( String vnName ,
 			LocalVariableDeclaration annotatedDeclaration) throws CodeGenerationException 
 	{
 		
@@ -166,7 +169,7 @@ public class ActiveObjectKernel extends TransformationKernel {
 					" specified in annotation " + ActiveObject.class.getSimpleName());
 		}
 		
-		return attribs.getVnVarName();
+		return attribs;
 		
 	}
 
@@ -196,12 +199,13 @@ public class ActiveObjectKernel extends TransformationKernel {
 	}
 
 	private Statement createTurnActive( TypeReference variableType, 
-			String varName, String vnodeVarName) 
+			String varName, String vnodeVarName, String type) 
 	{
 		
 		String turnActiveText = PAActiveObject.class.getName() + "." + PA_API_METHOD_NAME + 
 			"( " +  varName + 
-			( (vnodeVarName!=null) ? " , " +   vnodeVarName + ".getNode()" : "" ) 
+			( (vnodeVarName!=null) ? " , " +   vnodeVarName + 
+					 "." +  getNodeMethodName(type) + "()" : "" ) 
 			+ ");\n" ;
 		
 		try{
@@ -210,33 +214,16 @@ public class ActiveObjectKernel extends TransformationKernel {
 			_logger.error("Could not generate statements for the folowing code text:" + turnActiveText , e);
 			return null;
 		}
-	
-		/*
-		// create PAActiveObject, prefixed with the package name
-		ReferencePrefix apiClassName = _cgHelper.createTypeReference(PAActiveObject.class);
-		
-		// create turnActive identifier
-		Identifier methodName = _codeGen.createIdentifier(PA_API_METHOD_NAME);
-		//create args list
-		ASTList<Expression> args = new ASTArrayList<Expression>();
-		args.add(
-				_codeGen.createVariableReference(
-						_codeGen.createIdentifier(varName))
-			); // arg #1 - variable reference, name = varName
-		// arg #2 - Node 
+			
+	}
 
-		// create the method call
-		MethodReference turnActiveMethodCall = _codeGen.createMethodReference(apiClassName, methodName, args);
-		// create the assignment statement
-		Statement assignment = _codeGen.createCopyAssignment(
-				_codeGen.createVariableReference(
-						_codeGen.createIdentifier(varName)),
-				_codeGen.createTypeCast( turnActiveMethodCall , variableType)
-				);
-		
-		return assignment;
-		*/
-		
+	private String getNodeMethodName(String type) {
+		String ret = null;
+		if(type.equals("old"))
+			ret = "getNode";
+		else if(type.equals("gcm"))
+			ret = "getANode";
+		return ret;
 	}
 
 }
