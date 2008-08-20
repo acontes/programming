@@ -273,8 +273,6 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 			name = fieldName.toLowerCase();
 		}
 		
-		reportWarning( _containingClass , "Checking the field:" + name);
-		
 		final String getField = "get" + name;
 		boolean foundGet = false;
 		final String setField = "set" + name;
