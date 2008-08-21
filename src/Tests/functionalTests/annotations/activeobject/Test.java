@@ -108,6 +108,7 @@ public class Test extends FunctionalTest{
 		Assert.assertEquals(checkFile("ErrorNotLast", TEST_TO_FAIL), 4);
 		Assert.assertEquals(checkFile("ErrorNotLastBlock",TEST_TO_FAIL), 3);
 		Assert.assertEquals(checkFile("ErrorNoMigrateTo", TEST_TO_FAIL), 1);
+		Assert.assertEquals(checkFile("ErrorReturnsNull", TEST_TO_FAIL), 1);
 		
 		// checking conditions that should be ok
 		Assert.assertTrue(checkFile("AcceptSimple", TEST_TO_PASS) == 0 );
