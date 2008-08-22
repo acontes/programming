@@ -75,7 +75,7 @@ public interface ErrorMessages {
 	// the migration method is not public
 	public static final String NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE = " The method is not public. It does not make sense to have a migration signal that cannot be used from outside the class definition.\n";
 	// the migrateTo call is not the last one in the method
-	public static final String MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE = " The migrateTo call is not the last statement in the body of the method.\nThis can cause undefined behaviour. You should put your migrateTo call at the end of the method.\n";
+	public static final String MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE = " The migrateTo call is not the last method call in the body of the method.\nThis can cause undefined behaviour. You should put your migrateTo call at the end of the method.\n";
 	// the migrateTo call can not be found in the migrateTo method
 	public static final String MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE = " The migrateTo call could not be found inside the body of the method.\n ";
 }
