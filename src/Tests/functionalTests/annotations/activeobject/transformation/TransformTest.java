@@ -158,11 +158,9 @@ public class TransformTest extends FunctionalTest {
 	}
 	
 	private TransformationExecutor _executor = null;
-	private TransformationKernel _kernel;
 	
 	private void transformationInit() throws ParserException {
 		_executor = new TransformationExecutor();
-		_kernel = new ActiveObjectKernel(_executor._sourceConfig); 
 	}
 
 	@org.junit.Test
