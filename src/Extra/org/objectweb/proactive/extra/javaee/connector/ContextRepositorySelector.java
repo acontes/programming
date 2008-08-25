@@ -104,10 +104,7 @@ public class ContextRepositorySelector implements RepositorySelector
 		// clear old config
 		hierarchy.resetConfiguration();
 		conf.doConfigure(log4jConfigFile, hierarchy);
-		
-		// let's test now the configuration, shall we?
-		//System.out.println("Proactive is logging to file:" + ((FileAppender)hierarchy.getRootLogger().getAppender("FILE")).getFile());
-		
+				
 		return hierarchy; 
 		
 	}
