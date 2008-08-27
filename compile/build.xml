@@ -251,7 +251,10 @@
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
-		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" excludes="functionalTests/annotations/activeobject/inputs/** functionalTests/annotations/activeobject/transformation/inputs/**" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" 
+			includes="functionalTests/**" 
+			excludes="functionalTests/annotations/activeobject/inputs/** functionalTests/annotations/activeobject/transformation/inputs/** functionalTests/annotations/activeobject/apt/inputs/**" 
+			deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="performanceTests/**" deprecation="on" source="${source}" debug="${debug}">
