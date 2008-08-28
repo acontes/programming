@@ -47,12 +47,13 @@ public class Test extends FunctionalTest {
 	
 	@org.junit.Before
 	public void init() {
-		_aptCommand = new String[6];
+		_aptCommand = new String[7];
 		_aptCommand[0] = getAptCommand();
 		_aptCommand[1] = "-factorypath";
 		_aptCommand[2] = PROC_PATH;
 		_aptCommand[3] = "-factory";
 		_aptCommand[4] = ActiveObjectAnnotationProcessorFactory.class.getName();
+		_aptCommand[5] = "-nocompile";
 		
 		_classpath = PROC_PATH;
 	}
@@ -62,11 +63,16 @@ public class Test extends FunctionalTest {
 	public void test() {
 		
 		try {
+			// basic checks
+			Assert.assertEquals( checkFile("WarningGettersSetters"), WARNING);
+			Assert.assertEquals( checkFile("ErrorFinalClass"), ERROR);
+			Assert.assertEquals( checkFile("ErrorFinalMethods"), ERROR);
 			Assert.assertEquals( checkFile("ErrorNoArgConstructor"), ERROR);
 			Assert.assertEquals( checkFile("WarningNoSerializable"), WARNING);
-			//Assert.assertEquals( checkFile("ErrorGettersSetters"), ERROR);
-			//Assert.assertEquals( checkFile("ErrorFinalClass"), ERROR);
+			Assert.assertEquals( checkFile("ErrorSynchronizationPrimitives"), new Result(2,0));
 			
+			// more complicated scenarios
+			Assert.assertEquals( checkFile("ErrorReturnTypes"), new Result(4,0));
 			Assert.assertEquals( checkFile("Reject"), new Result(5,2));
 			Assert.assertEquals( checkFile("CorrectedReject"), OK);
 		} catch (IOException e) {
@@ -81,7 +87,7 @@ public class Test extends FunctionalTest {
 	 */
 	private Result checkFile(String fileName) throws IOException {
 		
-		_aptCommand[5] = INPUT_FILES_PATH + File.separator +  fileName + ".java";// the input file
+		_aptCommand[6] = INPUT_FILES_PATH + File.separator +  fileName + ".java";// the input file
 		
 		ProcessBuilder processBuilder = new ProcessBuilder( Arrays.asList(_aptCommand) );
 		Map<String, String> env = processBuilder.environment();
