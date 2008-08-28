@@ -221,6 +221,9 @@ public class TransformationExecutor {
 		System.out.println("Usage: java " + TransformationExecutor.class.getSimpleName() + " inputFilesPath outputPath" );
 		System.out.println("\tinputFilesPath is the path to the files that need to be processed.");
 		System.out.println("\toutputPath is the path where the output will be written to.");
+		System.out.println(" Before running, the following configurations must be done:");
+		System.out.println("\tthe JAVA_HOME environment variable must be set, pointing to the root of the JDK distribution");
+		System.out.println("\tthe proactive.home Java property, or PROACTIVE_HOME system property, must be set, pointing to the root of the ProActive distribution.");
 	}
 	
 	public static void main(String[] args) {
@@ -228,26 +231,49 @@ public class TransformationExecutor {
 		if( args.length != 2){
 			System.out.println("Invalid number of args:" + args.length);
 			printUsage();
+			System.exit(1);
 		}
 		
-		String inputFilesPath = args[0];
-		String outputFiles = args[1];
-		
 		try {
+			String inputFilesPath = args[0];
+			String outputFiles = args[1];
+			
+			// test the provided input
+			testDirName(inputFilesPath);
+			testDirName(outputFiles);
+			
 			TransformationExecutor firestarter = new TransformationExecutor(inputFilesPath , outputFiles);
 			Transformation transform = new AllAnnotationsTransformation( firestarter._sourceConfig);
 			firestarter.execute(transform);
+			System.exit(0);
 		} catch (ParserException e) {
 			_logger.error("Cannot get the compilation units from the path: " + System.getProperty("input.path"), e );
-			return;
+			printUsage();
+			System.exit(1);
 		} catch (IOException ioe) {
 			_logger.error("Error while trying to write the output of the preprocessor. Error details: " , ioe);
+			System.exit(1);
 		} catch (CodeGenerationException e) {
 			_logger.error("Code was not generated. Reason:", e);
+			System.exit(1);
 		} catch (MissingConfigurationParameterException e) {
 			_logger.error("Recoder was not initialized due to missing configuration parameter.Details:", e);
+			printUsage();
+			System.exit(1);
+		} catch(IllegalArgumentException e){
+			_logger.error("Error on the input provided:" , e);
+			printUsage();
+			System.exit(1);
 		}
 
+	}
+
+	private static void testDirName(String path) {
+		File inputTest = new File(path);
+		if(!inputTest.exists())
+			throw new IllegalArgumentException("The directory " + path + " does not exist.");
+		if(!inputTest.isDirectory())
+			throw new IllegalArgumentException(path + " is not a directory.");
 	}
 		
 }
