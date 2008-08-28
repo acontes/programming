@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.annotation.transformation;
 
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 
 import recoder.ProgramFactory;
