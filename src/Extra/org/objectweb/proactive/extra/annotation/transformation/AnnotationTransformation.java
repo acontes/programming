@@ -38,7 +38,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 
 import recoder.CrossReferenceServiceConfiguration;

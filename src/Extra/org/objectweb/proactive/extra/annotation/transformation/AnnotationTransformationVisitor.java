@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.annotation.transformation;
 import java.io.Writer;
 import java.util.Properties;
 
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 
 import recoder.java.Declaration;
@@ -117,7 +117,7 @@ public class AnnotationTransformationVisitor extends PrettyPrinter {
         }
         
         // notify the change history
-        _kernel._changes.detached(annotation, position);
+        _kernel._changes.detached(annotation, parent, position);
 		
 	}
 

@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.annotation.transformation;
 
 import java.util.List;
 
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 
 import recoder.ParserException;
@@ -41,7 +41,6 @@ import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.reference.PackageReference;
 import recoder.java.reference.TypeReference;
