@@ -31,7 +31,11 @@
 package org.objectweb.proactive.extra.annotation.transformation;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -44,6 +48,9 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectKernel;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.convenience.Format;
+import recoder.convenience.Naming;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
 import recoder.io.SourceFileRepository;
 import recoder.java.CompilationUnit;
 import recoder.kit.Problem;
@@ -71,6 +78,7 @@ public class TransformationExecutor {
 	}
 	
 	private EnvironmentConfiguration _recoderCfg;
+	private String _outputPath;
 	// this is to be used if Recoder also has to be configured
 	// arguments of the constructor:
 	//	-> inputFilesPath - the path to the directory that contains the definition of the input class files
@@ -81,6 +89,7 @@ public class TransformationExecutor {
 		_recoderCfg = new EnvironmentConfiguration();
 		_recoderCfg.addToInputPath(inputFilesPath);
 		String inputPath = _recoderCfg.getInputPath();
+		_outputPath = outputPath;
 		// set the system properties
 		System.setProperty("input.path" , inputPath);
 		System.setProperty("output.path" , outputPath);
@@ -112,11 +121,46 @@ public class TransformationExecutor {
 					// ...write the results to the output file
 					_sourceConfig.getSourceFileRepository().print(cu);	
 				}
+				else {
+					DataLocation dl = cu.getDataLocation();
+					// if we are dealing with source code file...
+					if( dl.getType().equals(DataFileLocation.LOCATION_TYPE_FILE)) {
+						// ... then copy the file as-is to the output dir
+						DataFileLocation dfl = (DataFileLocation)dl;
+						File oldLocation = dfl.getFile();
+
+						String filename = Naming.toCanonicalFilename(cu);
+						File newLocation = new File( _outputPath , filename);
+						copyFile( oldLocation , newLocation );
+					}
+				}
 			}
 		}
 
 	}
 	
+	private void copyFile(File oldLocation, File newLocation) {
+		
+		try {
+			FileChannel inputChannel = new FileInputStream(oldLocation).getChannel();
+			FileChannel outputChannel = new FileOutputStream(newLocation).getChannel();
+			// Copy file contents from source to destination
+	        outputChannel.transferFrom( inputChannel, 0, inputChannel.size());
+	    
+	        // Close the channels
+	        inputChannel.close();
+	        outputChannel.close();
+		} catch (FileNotFoundException e) {
+			_logger.error( "Error while copying file " 
+					+ oldLocation.getAbsolutePath() + " to the new location " 
+					+ newLocation.getAbsolutePath(), e);
+		} catch (IOException e) {
+			_logger.error( "Error while copying file " 
+				+ oldLocation.getAbsolutePath() + " to the new location " 
+				+ newLocation.getAbsolutePath(), e);
+		}
+	}
+
 	/*
 	 * This is to ease the configuration of Recoder, especially its input.path 
 	 */
