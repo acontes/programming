@@ -184,7 +184,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 		String vNodeCreationText =
 			// ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
 			attributes._padVarName + " = " + PADeployment.class.getName() + 
-				".getProactiveDescriptor(\" " +  attributes._descriptorFile +  " \");\n" +
+				".getProactiveDescriptor( \"" +  attributes._descriptorFile +  "\" );\n" +
 			// VirtualNode vn = pad.getVirtualNode("workers");
 			attributes._vnVarName + " = " + attributes._padVarName +
 				".getVirtualNode(\"" + attributes._name + "\");\n" +
@@ -222,7 +222,7 @@ public class VirtualNodeKernel extends TransformationKernel {
 		String vNodeCreationText =
 			// GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
 			attributes._padVarName + " = " + PAGCMDeployment.class.getName() + 
-				".loadApplicationDescriptor(new java.io.File(\" " +  attributes._descriptorFile +  " \"));\n" +
+				".loadApplicationDescriptor(new java.io.File( \"" +  attributes._descriptorFile +  "\" ));\n" +
 			// pad.startDeployment();
 			attributes._padVarName + ".startDeployment();\n"	+
 			// GCMVirtualNode vn = pad.getVirtualNode("name");
