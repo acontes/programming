@@ -30,10 +30,13 @@
  */
 package org.objectweb.proactive.extra.annotation.transformation;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectKernel;
@@ -60,7 +63,28 @@ public class TransformationExecutor {
 	public final CrossReferenceServiceConfiguration _sourceConfig;
 	public final SourceFileRepository _sourceFileRepo;
 	
+	// this is to be used if Recoder is configured "outside"
 	public TransformationExecutor() throws ParserException {
+		_sourceConfig = new CrossReferenceServiceConfiguration();
+		_sourceFileRepo = _sourceConfig.getSourceFileRepository();
+		_sourceFileRepo.getAllCompilationUnitsFromPath();
+	}
+	
+	private EnvironmentConfiguration _recoderCfg;
+	// this is to be used if Recoder also has to be configured
+	// arguments of the constructor:
+	//	-> inputFilesPath - the path to the directory that contains the definition of the input class files
+	//  -> outputPath     - the path to the directory where the files resulted will be written to
+	public TransformationExecutor(String inputFilesPath, String outputPath) 
+		throws ParserException, MissingConfigurationParameterException {
+		
+		_recoderCfg = new EnvironmentConfiguration();
+		_recoderCfg.addToInputPath(inputFilesPath);
+		String inputPath = _recoderCfg.getInputPath();
+		// set the system properties
+		System.setProperty("input.path" , inputPath);
+		System.setProperty("output.path" , outputPath);
+		
 		_sourceConfig = new CrossReferenceServiceConfiguration();
 		_sourceFileRepo = _sourceConfig.getSourceFileRepository();
 		_sourceFileRepo.getAllCompilationUnitsFromPath();
@@ -93,19 +117,126 @@ public class TransformationExecutor {
 
 	}
 	
+	/*
+	 * This is to ease the configuration of Recoder, especially its input.path 
+	 */
+	final class EnvironmentConfiguration {
+		
+		private final String _javaHome;  // path to the root of the JDK
+		private static final String JAVA_RT_RELPATH = "/jre/lib/rt.jar";
+		
+		private final String _proActiveHome; // path to the ProActive distribution
+		private static final String PROACTIVE_LIBS_RELPATH = "/dist/lib/";
+		
+		private final String _recoderHome; // path to where the Recoder libraries are 
+		private static final String RECODER_LIBS_RELPATH = "/lib/recoder/";
+		
+		private String _inputPath; // the contents that will be put in the input.path configuration of Recoder 
+		
+		public String getInputPath() { 
+			return _inputPath; 
+		}
+		
+		public void addToInputPath(String pathComponent) {
+			_inputPath = pathComponent + File.pathSeparator + _inputPath;
+		}
+		
+		public EnvironmentConfiguration() throws MissingConfigurationParameterException {
+
+			// "guess" the environment properties
+			_javaHome = System.getenv("JAVA_HOME");
+			if(_javaHome == null)
+				throw new MissingConfigurationParameterException("JAVA_HOME" , " system property ");
+			
+			if(PAProperties.PA_HOME.isSet()){
+				_proActiveHome = PAProperties.PA_HOME.getValue();
+			}
+			else{
+				// try with the environment variable
+				_proActiveHome = System.getenv("PROACTIVE_HOME");
+				if( _proActiveHome == null )
+				throw new MissingConfigurationParameterException( "proactive.home" , " Java property " );
+			}
+			
+			_recoderHome = _proActiveHome + RECODER_LIBS_RELPATH;
+			
+			// initialize all the rest of the paths
+			_inputPath = initInputPath();
+			
+		}
+		
+		public EnvironmentConfiguration(String javaHome, String proActiveHome, String recoderHome) {
+			
+			_javaHome = javaHome;
+			_proActiveHome = proActiveHome;
+			_recoderHome = recoderHome;
+			
+			_inputPath = initInputPath();
+		}
+		
+		// the common part pf the constructors. We are guaranteed to have 
+		// proactive_home, java_home and recoder_home initialized
+		private String initInputPath() {
+			
+			// the JRE lib
+			String jreLib = _javaHome + JAVA_RT_RELPATH;
+			
+			// the ProActive libs
+			String proActiveLibDir = _proActiveHome + PROACTIVE_LIBS_RELPATH;
+			String proActiveLibs = getJarsFromDir(proActiveLibDir);
+			
+			// the Recoder libs
+			String recoderLibDir = _recoderHome;
+			String recoderLibs = getJarsFromDir(recoderLibDir);
+			
+			return jreLib + File.pathSeparator + recoderLibs + proActiveLibs;
+			
+		}
+
+		private String getJarsFromDir(String libDir) {
+			
+			File dir = new File(libDir);
+			if(!dir.exists())
+				throw new IllegalArgumentException("The directory " + libDir + " does not exist.");
+			if(!dir.isDirectory())
+				throw new IllegalArgumentException(libDir + " is not a directory.");
+			
+			File[] dirContents = dir.listFiles();
+			if( dirContents == null )
+				throw new IllegalArgumentException( "Could not list the contents of the directory " + libDir);
+			
+			StringBuilder jarsPath = new StringBuilder(dirContents.length * 42);
+			for (File file : dirContents) {
+				if( file.isFile() && Pattern.matches(".+\\.jar", file.getName()) ){
+					jarsPath.append(file.getAbsolutePath() + File.pathSeparator);
+				}
+			}
+			
+			return jarsPath.toString();
+		}
+	}
+	
+	public static final int ARGS_NO = 2;
+	public static void printUsage() {
+		System.out.println("Usage: java " + TransformationExecutor.class.getSimpleName() + " inputFilesPath outputPath" );
+		System.out.println("\tinputFilesPath is the path to the files that need to be processed.");
+		System.out.println("\toutputPath is the path where the output will be written to.");
+	}
+	
 	public static void main(String[] args) {
 
+		if( args.length != 2){
+			System.out.println("Invalid number of args:" + args.length);
+			printUsage();
+		}
+		
+		String inputFilesPath = args[0];
+		String outputFiles = args[1];
+		
 		try {
-			TransformationExecutor firestarter = new TransformationExecutor();
-
-			TransformationKernel kernel = new ActiveObjectKernel(firestarter._sourceConfig); 
-			Transformation transform = new AnnotationTransformation(
-					firestarter._sourceConfig , 
-					ActiveObject.class,
-					kernel);
-
+			TransformationExecutor firestarter = new TransformationExecutor(inputFilesPath , outputFiles);
+			Transformation transform = new AllAnnotationsTransformation( firestarter._sourceConfig);
 			firestarter.execute(transform);
-
 		} catch (ParserException e) {
 			_logger.error("Cannot get the compilation units from the path: " + System.getProperty("input.path"), e );
 			return;
@@ -113,6 +244,8 @@ public class TransformationExecutor {
 			_logger.error("Error while trying to write the output of the preprocessor. Error details: " , ioe);
 		} catch (CodeGenerationException e) {
 			_logger.error("Code was not generated. Reason:", e);
+		} catch (MissingConfigurationParameterException e) {
+			_logger.error("Recoder was not initialized due to missing configuration parameter.Details:", e);
 		}
 
 	}
