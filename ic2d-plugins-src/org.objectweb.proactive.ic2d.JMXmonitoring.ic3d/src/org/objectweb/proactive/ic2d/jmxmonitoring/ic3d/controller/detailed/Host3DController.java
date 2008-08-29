@@ -7,6 +7,7 @@ import java.util.Observable;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.MenuAction;
@@ -62,29 +63,31 @@ public class Host3DController extends AbstractHost3DController {
     		super.update(o, arg);
     	}
     	else {
-    		MenuAction menuAction = (MenuAction)arg;
-    		HostObject host = (HostObject)this.getModelObject();
-    		switch (menuAction) {
-				case HOST_REFRESH:
-					host.explore();
-					break;
-				case HOST_STOP_MONITORING:
-					host.stopMonitoring(true);
-					break;
-//				case HOST_CHARTIT:
-//					// TODO understand why this part mess up all
-//					/* IResourceDescriptor resourceDescriptor;
-//					try {
-//						resourceDescriptor = new AbstractDataDescriptor(host);
-//						ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor); 
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					} catch (PartInitException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					} */
-//					break;
+    		if(arg instanceof MenuAction) {
+    			MenuAction menuAction = (MenuAction)arg;
+    			HostObject host = (HostObject)this.getModelObject();
+    			switch (menuAction) {
+    				case HOST_REFRESH:
+    					host.explore();
+    					break;
+					case HOST_STOP_MONITORING:
+						host.stopMonitoring(true);
+						break;
+//					case HOST_CHARTIT:
+//						// TODO understand why this part mess up all
+//						/* IResourceDescriptor resourceDescriptor;
+//						try {
+//							resourceDescriptor = new AbstractDataDescriptor(host);
+//							ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor); 
+//						} catch (IOException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						} catch (PartInitException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						} */
+//						break;
+    			}
     		}
     	}
     }

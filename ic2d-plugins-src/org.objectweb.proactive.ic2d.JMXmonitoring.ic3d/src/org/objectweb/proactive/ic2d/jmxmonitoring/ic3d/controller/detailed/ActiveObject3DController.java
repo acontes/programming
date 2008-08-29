@@ -4,7 +4,6 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.detailed;
 
 import java.util.Observable;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.eclipse.ui.PartInitException;
@@ -14,6 +13,7 @@ import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.ChartItAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.MenuAction;
@@ -62,7 +62,9 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
      */
     @Override
     protected AbstractFigure3D createFigure(final String name) {
-        return new ActiveObject3D(name);
+    	ActiveObject3D ao = new ActiveObject3D(name);
+    	ao.addObserver(this);
+        return ao;
     }
 
     /*
@@ -171,27 +173,40 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
             		super.update(o, arg);
         	}
     	}
+    	
     	else {
-    		MenuAction menuAction = (MenuAction)arg;
-    		ActiveObject ao = (ActiveObject)this.getModelObject();
-    		switch (menuAction) {
-				case AO_CHARTIT:
-					try {
-						final IResourceDescriptor descriptor = new AbstractDataDescriptor(ao);
-						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-							public void run() {
-								try {
-									ChartItDataEditor.openNewFromResourceDescriptor(descriptor,ChartItAction.PARUNTIME_CHARTIT_CONFIG_FILENAME);
-								} catch (PartInitException e) {									
-									e.printStackTrace();
+    		logger.trace("Active Object controller receving message from the view");
+    		System.out.println("Active Object controller receving message from the view");
+    		// Context menu
+    		if(arg instanceof MenuAction) {
+    			MenuAction menuAction = (MenuAction)arg;
+    			ActiveObject ao = (ActiveObject)this.getModelObject();
+    			switch (menuAction) {
+					case AO_CHARTIT:
+						try {
+							final IResourceDescriptor descriptor = new AbstractDataDescriptor(ao);
+							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+								public void run() {
+									try {
+										ChartItDataEditor.openNewFromResourceDescriptor(descriptor,ChartItAction.PARUNTIME_CHARTIT_CONFIG_FILENAME);
+									} catch (PartInitException e) {									
+										e.printStackTrace();
+									}
 								}
-							}
-						});											
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
+							});											
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						break;
+    			}
+    		}
+    		// ActiveObject Migration
+    		else if(arg instanceof AbstractFigure3D && ((AbstractFigure3D)arg).getType() == FigureType.NODE) {
+    			System.out.println(this.getModelObject() + "Dropping on a node");
+    			// When a node receive an active object he migrates it to itself
+    			((AbstractFigure3D)arg).notifyObservers(this.getModelObject());
+    			// TODO retrieve the URL of the target Node and migrate the active object
     		}
     	}
     }

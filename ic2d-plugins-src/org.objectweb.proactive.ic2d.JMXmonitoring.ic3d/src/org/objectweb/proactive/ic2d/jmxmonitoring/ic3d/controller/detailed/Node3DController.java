@@ -7,10 +7,12 @@ import java.util.Observable;
 
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.ChartItAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController;
@@ -68,32 +70,45 @@ public class Node3DController extends AbstractNode3DController {
     		super.update(o, arg);
     	}
     	else {
-    		MenuAction menuAction = (MenuAction)arg;
-    		NodeObject node = (NodeObject)this.getModelObject();
-    		switch (menuAction) {
-				case NODE_REFRESH:
-					node.explore();
-					break;
-				case NODE_STOP_MONITORING:
-					node.stopMonitoring(true);
-					break;
-				case NODE_CHARTIT:
-					try {
-						final IResourceDescriptor descriptor = new AbstractDataDescriptor(node);
-						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-							public void run() {
-								try {
-									ChartItDataEditor.openNewFromResourceDescriptor(descriptor,ChartItAction.PARUNTIME_CHARTIT_CONFIG_FILENAME);
-								} catch (PartInitException e) {									
-									e.printStackTrace();
+    		if( arg instanceof MenuAction) {
+    			MenuAction menuAction = (MenuAction)arg;
+    			NodeObject node = (NodeObject)this.getModelObject();
+    			switch (menuAction) {
+					case NODE_REFRESH:
+						node.explore();
+						break;
+					case NODE_STOP_MONITORING:
+						node.stopMonitoring(true);
+						break;
+					case NODE_CHARTIT:
+						try {
+							final IResourceDescriptor descriptor = new AbstractDataDescriptor(node);
+							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+								public void run() {
+									try {
+										ChartItDataEditor.openNewFromResourceDescriptor(descriptor,ChartItAction.PARUNTIME_CHARTIT_CONFIG_FILENAME);
+									} catch (PartInitException e) {									
+										e.printStackTrace();
+									}
 								}
-							}
-						});											
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
+							});											
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						break;
+    			}
+    		}
+    		else if ( arg instanceof ActiveObject) {
+    			ActiveObject ao = (ActiveObject)arg;
+    			NodeObject no = (NodeObject)this.getModelObject();
+    			System.out.println(no.getUrl());
+    			try {
+    				ao.migrateTo(no.getUrl());
+    			} catch (Exception migrationException) {
+    				migrationException
+    				.printStackTrace();
+    			}
     		}
     	}
     }

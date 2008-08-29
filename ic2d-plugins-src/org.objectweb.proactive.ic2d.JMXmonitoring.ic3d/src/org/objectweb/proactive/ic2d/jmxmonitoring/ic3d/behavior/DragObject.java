@@ -57,6 +57,15 @@ public class DragObject extends Shape3D {
 		translate.setTransform(t3d);
 	}
 	
+	public void move(double x, double y) {
+		translation.x = x;
+		translation.y = y;
+		Transform3D t3d = new Transform3D();
+		translate.getTransform(t3d);
+		t3d.setTranslation(translation);
+		translate.setTransform(t3d);
+	}
+	
 	public void setScale(Vector3d objectScale) {
 		Transform3D t3d = new Transform3D();
 		translate.getTransform(t3d);

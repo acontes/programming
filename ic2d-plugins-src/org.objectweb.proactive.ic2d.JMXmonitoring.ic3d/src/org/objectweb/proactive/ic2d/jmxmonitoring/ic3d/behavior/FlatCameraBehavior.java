@@ -15,6 +15,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.AppearanceBasket;
+import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.FigureType;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.SiteBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.menu.TownActionListener;
@@ -95,14 +96,15 @@ public class FlatCameraBehavior extends CameraBehavior {
         	
         	// TODO Find the ratio pixel meter (+distance to camera) and use it as divider
         	// Else the object doesn't follow the mouse
-        	double ratio_x,ratio_y;
-        	ratio_y = canvas3D.getHeight() * canvas3D.getPhysicalHeight();
-        	ratio_x = canvas3D.getWidth() * canvas3D.getPhysicalWidth();
-        	// TODO multiply distance
+        	float ratio_x,ratio_y;
+        	ratio_y = (float)(y_last - y) / canvas3D.getHeight();
+        	ratio_x = (float)(x - x_last) / canvas3D.getWidth();
+        	ratio_x *= canvas3D.getPhysicalWidth();
+        	ratio_y *= canvas3D.getPhysicalHeight();
         	
-        	//dragObject.move((float)(x - x_last)/(float)ratio_x, (float)(y_last - y)/(float)ratio_y, 0);
+        	dragObject.move(ratio_x * 10f, ratio_y * 10f, 0);
 
-        	dragObject.move((float)(x - x_last)/(float)ratio_x, (float)(y_last - y)/(float)ratio_y, 0);
+        	//dragObject.move((float)(x - x_last)/(float)ratio_x, (float)(y_last - y)/(float)ratio_y, 0);
         }
         /* Outside a figure */
         else
@@ -148,9 +150,42 @@ public class FlatCameraBehavior extends CameraBehavior {
             tg.setTransform(t3d);
             selectedShapeTranslation = null;
         }
+        
+        /* try to drag the object */
         if(dragObject != null) {
-            dragObject.detachDragObject();
+            System.out.println("Beginning to drag");
+        	
+        	dragObject.detachDragObject();
             dragObject = null;
+            
+            /* Left click -> Selects a shape */
+            PickResult pickResult = null;
+            if (pickCanvas == null) {
+            	throw new NullPointerException("Pick Canvas not initialized");
+            }
+            pickCanvas.setShapeLocation(x, y);
+            
+            try {
+            	/* Sometimes the matrix is not an affine Transform */
+            	/* But it doesn't depend on the shape just the time you access it */
+            	/* Really weird behavior */
+            	pickResult = pickCanvas.pickClosest();
+            }
+            catch (Exception e) {
+            	e.printStackTrace();
+            }
+            
+            /* Select the nearest shape */
+            Shape3D nearest = ((Shape3D) pickResult.getNode(PickResult.SHAPE3D));
+            /* Drag it if the nearest object is a node */
+            if(nearest instanceof AbstractFigure3D) {
+            	AbstractFigure3D figure = (AbstractFigure3D)nearest;
+				if( figure.getType() == FigureType.NODE ) {
+					System.out.println("Sending the message");
+					// Launch the drop procedure if we are on a node
+					((ActiveObject3D)selectedShape).notifyObservers(figure);
+				}
+			}
         }
     }
 
