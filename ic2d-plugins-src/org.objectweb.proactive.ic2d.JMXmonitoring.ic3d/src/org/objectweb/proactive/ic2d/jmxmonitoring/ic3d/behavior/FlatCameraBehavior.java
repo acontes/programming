@@ -84,8 +84,6 @@ public class FlatCameraBehavior extends CameraBehavior {
         		cameraT3D.setTranslation(new Vector3d());
         		cameraT3D.transform(objectTranslation);
         		
-        		System.out.println("ot: "  + objectTranslation);
-
         		dragObject = new DragObject(selectedShape.getGeometry(), dragBranch, objectTranslation);
         		dragObject.setScale(objectScale);
         		
@@ -153,9 +151,7 @@ public class FlatCameraBehavior extends CameraBehavior {
         
         /* try to drag the object */
         if(dragObject != null) {
-            System.out.println("Beginning to drag");
-        	
-        	dragObject.detachDragObject();
+            dragObject.detachDragObject();
             dragObject = null;
             
             /* Left click -> Selects a shape */
@@ -168,10 +164,11 @@ public class FlatCameraBehavior extends CameraBehavior {
             try {
             	/* Sometimes the matrix is not an affine Transform */
             	/* But it doesn't depend on the shape just the time you access it */
-            	/* Really weird behavior */
+            	/* Really weird behavior ( can happen between 2 frames even if nothing has been moved )*/
             	pickResult = pickCanvas.pickClosest();
             }
             catch (Exception e) {
+            	/* Avoid the current thread to stop */
             	e.printStackTrace();
             }
             
@@ -181,7 +178,6 @@ public class FlatCameraBehavior extends CameraBehavior {
             if(nearest instanceof AbstractFigure3D) {
             	AbstractFigure3D figure = (AbstractFigure3D)nearest;
 				if( figure.getType() == FigureType.NODE ) {
-					System.out.println("Sending the message");
 					// Launch the drop procedure if we are on a node
 					((ActiveObject3D)selectedShape).notifyObservers(figure);
 				}

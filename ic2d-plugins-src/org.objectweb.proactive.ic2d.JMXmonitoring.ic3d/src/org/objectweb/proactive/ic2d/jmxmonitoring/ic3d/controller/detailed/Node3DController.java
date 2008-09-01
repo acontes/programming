@@ -102,7 +102,6 @@ public class Node3DController extends AbstractNode3DController {
     		else if ( arg instanceof ActiveObject) {
     			ActiveObject ao = (ActiveObject)arg;
     			NodeObject no = (NodeObject)this.getModelObject();
-    			System.out.println(no.getUrl());
     			try {
     				ao.migrateTo(no.getUrl());
     			} catch (Exception migrationException) {

@@ -354,7 +354,7 @@ public final class AppearanceBasket {
             textureUnitState[0].setTextureAttributes(texAttr1);
             appear.setTextureUnitState(textureUnitState);
         } catch (Exception ex) {
-            System.out.println("imgeURL1 - texture null !");
+            logger.trace("imgeURL1 - texture null !");
             ex.printStackTrace();
         }
 
@@ -400,7 +400,7 @@ public final class AppearanceBasket {
             textureUnitState[0].setTextureAttributes(texAttr1);
             appear.setTextureUnitState(textureUnitState);
         } catch (Exception ex) {
-            System.out.println("imgeURL1 - texture null !");
+            logger.trace("imgeURL1 - texture null !");
             ex.printStackTrace();
         }
 
@@ -697,7 +697,7 @@ public final class AppearanceBasket {
             textureUnitState[0].setTextureAttributes(texAttr1);
             appear.setTextureUnitState(textureUnitState);
         } catch (Exception ex) {
-            System.out.println("imgeURL1 - texture null !");
+            logger.trace("imgeURL1 - texture null !");
             ex.printStackTrace();
         }
 

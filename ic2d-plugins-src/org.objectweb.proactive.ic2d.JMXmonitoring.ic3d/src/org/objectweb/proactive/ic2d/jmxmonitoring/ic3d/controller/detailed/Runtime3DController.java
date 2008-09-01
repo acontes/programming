@@ -77,7 +77,6 @@ public class Runtime3DController extends AbstractRuntime3DController {
     		switch (menuAction) {
 				case RUNTIME_CHARTIT:
 					try {
-						System.out.println("ICici");
 						final IResourceDescriptor descriptor = new AbstractDataDescriptor(runtime);
 						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 							public void run() {

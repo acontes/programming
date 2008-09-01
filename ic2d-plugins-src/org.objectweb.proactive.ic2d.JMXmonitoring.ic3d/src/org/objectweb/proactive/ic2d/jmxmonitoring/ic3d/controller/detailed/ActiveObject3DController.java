@@ -104,7 +104,6 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
             	}
             	case ACTIVE_OBJECT_ADD_COMMUNICATION: {
             		//Never executed because ACTIVE_OBJECT_ADD_COMMUNICATION never notified
-//            					System.out.println("ADD_COMMUNICATION");
 //                				//remove because the global registry of figures has been removed
 //                				//FIXME create alternative implementation
 //                				// new Thread(new Runnable() {
@@ -176,7 +175,6 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
     	
     	else {
     		logger.trace("Active Object controller receving message from the view");
-    		System.out.println("Active Object controller receving message from the view");
     		// Context menu
     		if(arg instanceof MenuAction) {
     			MenuAction menuAction = (MenuAction)arg;
@@ -203,7 +201,7 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
     		}
     		// ActiveObject Migration
     		else if(arg instanceof AbstractFigure3D && ((AbstractFigure3D)arg).getType() == FigureType.NODE) {
-    			System.out.println(this.getModelObject() + "Dropping on a node");
+    			logger.trace(this.getModelObject() + "Dropping on a node");
     			// When a node receive an active object he migrates it to itself
     			((AbstractFigure3D)arg).notifyObservers(this.getModelObject());
     			// TODO retrieve the URL of the target Node and migrate the active object

@@ -97,7 +97,6 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
     		switch (menuAction) {
 				case RUNTIME_CHARTIT:
 					try {
-						System.out.println("ICici");
 						IResourceDescriptor descriptor = new AbstractDataDescriptor(runtime);
 						ChartItDataEditor.openNewFromResourceDescriptor(descriptor);
 					} catch (Exception e) {

@@ -132,7 +132,7 @@ public abstract class AbstractFigure3DController implements Observer, Figure3DCo
                 break;
             }
             case ACTIVE_OBJECT_ADD_COMMUNICATION: {
-            	System.out.println("ADD_COMMUNICATION");
+            	logger.trace("ADD_COMMUNICATION");
             	break;
             }
 

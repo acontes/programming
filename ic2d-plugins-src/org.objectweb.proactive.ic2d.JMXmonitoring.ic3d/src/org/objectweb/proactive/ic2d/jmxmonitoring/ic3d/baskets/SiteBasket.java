@@ -25,7 +25,6 @@ public class SiteBasket {
 			site = hostname.substring(dot + 1, hostname.length());
 			dot = site.indexOf('.');
 			site = site.substring(0, dot);
-			System.out.println(site);
 		}
 		if(site != null)
 			return site;

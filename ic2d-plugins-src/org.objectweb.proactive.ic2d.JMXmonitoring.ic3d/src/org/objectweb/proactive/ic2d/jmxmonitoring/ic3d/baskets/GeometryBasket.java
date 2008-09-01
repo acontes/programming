@@ -980,7 +980,7 @@ public final class GeometryBasket {
             // y = y*Math.cos(distance2 * i + ao1.y);
 
             pts[i] = new Point3d(x, y, z);
-            System.out.println((distance1 * i + ao1.x) + ":" + (distance2 * i + ao1.y));
+            logger.trace((distance1 * i + ao1.x) + ":" + (distance2 * i + ao1.y));
             // System.out.println(pts[i]);
         }
 

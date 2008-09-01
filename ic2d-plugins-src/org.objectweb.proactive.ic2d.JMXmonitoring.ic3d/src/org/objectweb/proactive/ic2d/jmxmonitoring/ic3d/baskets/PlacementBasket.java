@@ -175,8 +175,7 @@ public class PlacementBasket {
      */
     public static void matrixGridArrangement(final int figureIndex, final Figure3D figure, final int figureCount, final Vector3f offset) {
         /* Setting up our variables */
-    	System.out.println(offset);
-        double x, z; /* Our host 2D placement */
+    	double x, z; /* Our host 2D placement */
         int figureIndexSquareRoot, c, xCountSquareRoot, zCountSquareRoot;
         /* Checking parameters */
         if (figureIndex < 1) {

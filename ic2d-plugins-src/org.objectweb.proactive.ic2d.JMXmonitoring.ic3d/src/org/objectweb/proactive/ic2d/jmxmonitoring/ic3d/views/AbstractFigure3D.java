@@ -562,8 +562,7 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
     @Override
     public void notifyObservers(Object arg) {
     	for (Observer observer : observers) {
-    		System.out.println(arg  + "notify" + observer);
-			observer.update(null, arg);
+    		observer.update(null, arg);
 		}
     }
     
