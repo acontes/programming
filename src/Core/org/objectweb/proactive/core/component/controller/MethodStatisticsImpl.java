@@ -28,7 +28,7 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
         this.methodName = methodName;
         this.parametersTypes = parametersTypes;
         this.requestsStats = Collections.synchronizedList(new ArrayList<RequestStatistics>());
-        this.startTime = System.currentTimeMillis();
+        this.startTime = System.nanoTime() / 1000;
         this.indexNextDepartureRequest = 0;
         this.indexNextReply = 0;
         this.currentLengthQueue = 0;
@@ -39,7 +39,7 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
      */
     public void reset() {
         requestsStats.clear();
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime() / 1000;
         indexNextDepartureRequest = 0;
         indexNextReply = 0;
         currentLengthQueue = 0;
@@ -62,21 +62,22 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     /*
      * Notify the arrival of a new request in the incoming queue related to the monitored method.
      * 
-     * @param time Time of the arrival of the request.
+     * @param time Time of the arrival of the request in microseconds.
      */
     public void notifyArrivalOfRequest(long arrivalTime) {
+        System.err.println("Notify arrival for " + methodName);
         if (!requestsStats.isEmpty()) {
             requestsStats.add(new RequestStatistics(arrivalTime, requestsStats.get(requestsStats.size() - 1)
                     .getArrivalTime()));
         } else
-            requestsStats.add(new RequestStatistics(arrivalTime, 0));
+            requestsStats.add(new RequestStatistics(arrivalTime, startTime));
         currentLengthQueue++;
     }
 
     /*
      * Notify the departure of a request in the incoming queue related to the monitored method.
      * 
-     * @param time Time of the departure of the request.
+     * @param time Time of the departure of the request in microseconds.
      */
     public void notifyDepartureOfRequest(long departureTime) {
         requestsStats.get(indexNextDepartureRequest).setDepartureTime(departureTime);
@@ -87,7 +88,7 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     /*
      * Notify that the reply to a request related to the monitored method has been sent.
      * 
-     * @param time Time of the reply to a request has been sent.
+     * @param time Time of the reply to a request has been sent in microseconds.
      */
     public void notifyReplyOfRequestSent(long replyTime) {
         requestsStats.get(indexNextReply).setReplyTime(replyTime);
@@ -95,9 +96,9 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     }
 
     private int findNumberOfRequests(long time, int indexToStart) {
-        long currentTime = System.currentTimeMillis();
+        long currentTime = System.nanoTime() / 1000;
         for (int i = indexToStart - 1; i >= 0; i--) {
-            if ((currentTime - requestsStats.get(i).getArrivalTime()) > time)
+            if (((currentTime - requestsStats.get(i).getArrivalTime()) / 1000) > time)
                 return indexToStart - (i + 1);
         }
 
@@ -109,19 +110,17 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     }
 
     public double getAverageLengthQueue() {
-        return getAverageLengthQueue(System.currentTimeMillis() - startTime);
+        return getAverageLengthQueue((System.nanoTime() / 1000 - startTime) / 1000);
     }
 
     public double getAverageLengthQueue(long pastXMilliseconds) {
         // TODO Is the correct definition of the average length of the queue?
-        double div = pastXMilliseconds / 1000;
-        if (div == 0)
-            div = 1;
-        return findNumberOfRequests(pastXMilliseconds, requestsStats.size()) / div;
+        return findNumberOfRequests(pastXMilliseconds, requestsStats.size()) /
+            (((double) pastXMilliseconds) / 1000);
     }
 
     public long getLatestServiceTime() {
-        return requestsStats.get(indexNextReply - 1).getServiceTime();
+        return requestsStats.get(indexNextReply - 1).getServiceTime() / 1000;
     }
 
     public double getAverageServiceTime() {
@@ -132,11 +131,10 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
         if (lastNRequest != 0) {
             double res = 0;
             int indexToReach = Math.max(indexNextReply - 1 - lastNRequest, 0);
-            for (int i = indexNextReply - 1; i > indexToReach; i--) {
+            for (int i = indexNextReply - 1; i >= indexToReach; i--)
                 res += requestsStats.get(i).getServiceTime();
-            }
 
-            return res / lastNRequest;
+            return res / lastNRequest / 1000;
         } else
             return 0;
     }
@@ -146,7 +144,7 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     }
 
     public long getLatestInterArrivalTime() {
-        return requestsStats.get(requestsStats.size() - 1).getInterArrivalTime();
+        return requestsStats.get(requestsStats.size() - 1).getInterArrivalTime() / 1000;
     }
 
     public double getAverageInterArrivalTime() {
@@ -157,11 +155,10 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
         if (lastNRequest != 0) {
             double res = 0;
             int indexToReach = Math.max(requestsStats.size() - 1 - lastNRequest, 0);
-            for (int i = requestsStats.size() - 1; i > indexToReach; i--) {
+            for (int i = requestsStats.size() - 1; i >= indexToReach; i--)
                 res += requestsStats.get(i).getInterArrivalTime();
-            }
 
-            return res / lastNRequest;
+            return res / lastNRequest / 1000;
         } else
             return 0;
     }
@@ -178,11 +175,10 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
         if (lastNRequest != 0) {
             double res = 0;
             int indexToReach = Math.max(indexNextDepartureRequest - 1 - lastNRequest, 0);
-            for (int i = indexNextDepartureRequest - 1; i > indexToReach; i--) {
+            for (int i = indexNextDepartureRequest - 1; i >= indexToReach; i--)
                 res += requestsStats.get(i).getPermanenceTimeInQueue();
-            }
 
-            return res / lastNRequest;
+            return res / lastNRequest / 1000;
         } else
             return 0;
     }
@@ -231,10 +227,7 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
             this.arrivalTime = arrivalTime;
             this.departureTime = 0;
             this.replyTime = 0;
-            if (prevArrivalTime != 0)
-                this.interArrivalTime = arrivalTime - prevArrivalTime;
-            else
-                this.interArrivalTime = 0;
+            this.interArrivalTime = arrivalTime - prevArrivalTime;
             this.serviceTime = 0;
             this.permanenceTimeInQueue = 0;
         }
