@@ -5,15 +5,44 @@ import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
 public class Client2Impl implements Runner, BindingController {
-    Service2 service2;
-    Service3 service3;
+    private static final int NB_ITERATIONS = 100;
+    private Service2 service2;
+    private Service3 service3;
+
+    private void sleep() {
+        try {
+            Thread.sleep((int) (Math.random()*10));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void run() {
-        // TODO Auto-generated method stub
-
+        int methodNum;
+        for (int i = 0; i < NB_ITERATIONS; i++) {
+            sleep();
+            methodNum = ((int) (Math.random() * 10)) % 4;
+            switch (methodNum) {
+                case 0:
+                    service2.doAnotherThing();
+                    break;
+                case 1:
+                    service2.getDouble();
+                    break;
+                case 2:
+                    service3.foo(new IntMutableWrapper(2));
+                    break;
+                case 3:
+                    service3.executeAlone();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,

@@ -15,6 +15,8 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
 
     private List<RequestStatistics> requestsStats;
 
+    private long startTime;
+
     private int indexNextDepartureRequest;
 
     private int indexNextReply;
@@ -26,6 +28,7 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
         this.methodName = methodName;
         this.parametersTypes = parametersTypes;
         this.requestsStats = Collections.synchronizedList(new ArrayList<RequestStatistics>());
+        this.startTime = System.currentTimeMillis();
         this.indexNextDepartureRequest = 0;
         this.indexNextReply = 0;
         this.currentLengthQueue = 0;
@@ -36,6 +39,7 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
      */
     public void reset() {
         requestsStats.clear();
+        startTime = System.currentTimeMillis();
         indexNextDepartureRequest = 0;
         indexNextReply = 0;
         currentLengthQueue = 0;
@@ -105,12 +109,15 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     }
 
     public double getAverageLengthQueue() {
-        return getAverageLengthQueue(requestsStats.size());
+        return getAverageLengthQueue(System.currentTimeMillis() - startTime);
     }
 
     public double getAverageLengthQueue(long pastXMilliseconds) {
         // TODO Is the correct definition of the average length of the queue?
-        return findNumberOfRequests(pastXMilliseconds, requestsStats.size()) / (pastXMilliseconds / 1000);
+        double div = pastXMilliseconds / 1000;
+        if (div == 0)
+            div = 1;
+        return findNumberOfRequests(pastXMilliseconds, requestsStats.size()) / div;
     }
 
     public long getLatestServiceTime() {
@@ -122,13 +129,16 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     }
 
     public double getAverageServiceTime(int lastNRequest) {
-        double res = 0;
-        int indexToReach = Math.max(indexNextReply - 1 - lastNRequest, 0);
-        for (int i = indexNextReply - 1; i > indexToReach; i--) {
-            res += requestsStats.get(i).getServiceTime();
-        }
+        if (lastNRequest != 0) {
+            double res = 0;
+            int indexToReach = Math.max(indexNextReply - 1 - lastNRequest, 0);
+            for (int i = indexNextReply - 1; i > indexToReach; i--) {
+                res += requestsStats.get(i).getServiceTime();
+            }
 
-        return res / lastNRequest;
+            return res / lastNRequest;
+        } else
+            return 0;
     }
 
     public double getAverageServiceTime(long pastXMilliseconds) {
@@ -144,13 +154,16 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     }
 
     public double getAverageInterArrivalTime(int lastNRequest) {
-        double res = 0;
-        int indexToReach = Math.max(requestsStats.size() - 1 - lastNRequest, 0);
-        for (int i = requestsStats.size() - 1; i > indexToReach; i--) {
-            res += requestsStats.get(i).getInterArrivalTime();
-        }
+        if (lastNRequest != 0) {
+            double res = 0;
+            int indexToReach = Math.max(requestsStats.size() - 1 - lastNRequest, 0);
+            for (int i = requestsStats.size() - 1; i > indexToReach; i--) {
+                res += requestsStats.get(i).getInterArrivalTime();
+            }
 
-        return res / lastNRequest;
+            return res / lastNRequest;
+        } else
+            return 0;
     }
 
     public double getAverageInterArrivalTime(long pastXMilliseconds) {
@@ -162,17 +175,21 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
     }
 
     public double getAveragePermanenceTimeInQueue(int lastNRequest) {
-        double res = 0;
-        int indexToReach = Math.max(indexNextDepartureRequest - 1 - lastNRequest, 0);
-        for (int i = indexNextDepartureRequest - 1; i > indexToReach; i--) {
-            res += requestsStats.get(i).getPermanenceTimeInQueue();
-        }
+        if (lastNRequest != 0) {
+            double res = 0;
+            int indexToReach = Math.max(indexNextDepartureRequest - 1 - lastNRequest, 0);
+            for (int i = indexNextDepartureRequest - 1; i > indexToReach; i--) {
+                res += requestsStats.get(i).getPermanenceTimeInQueue();
+            }
 
-        return res / lastNRequest;
+            return res / lastNRequest;
+        } else
+            return 0;
     }
 
     public double getAveragePermanenceTimeInQueue(long pastXMilliseconds) {
-        return getAveragePermanenceTimeInQueue(findNumberOfRequests(pastXMilliseconds, indexNextDepartureRequest));
+        return getAveragePermanenceTimeInQueue(findNumberOfRequests(pastXMilliseconds,
+                indexNextDepartureRequest));
     }
 
     public List<String> getInvokedMethodList() {
@@ -190,9 +207,9 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
         }
         res += ") of the interface " + itfName + ":\n";
         res += "Average length of the queue: " + getAverageLengthQueue() + "\n";
-        res += "Average service time of the queue: " + getAverageServiceTime() + "\n";
+        res += "Average service time: " + getAverageServiceTime() + "\n";
         res += "Average inter-arrival time: " + getAverageInterArrivalTime() + "\n";
-        res += "Average permanence time: " + getAveragePermanenceTimeInQueue() + "\n";
+        res += "Average permanence time in queue: " + getAveragePermanenceTimeInQueue() + "\n";
 
         return res;
     }

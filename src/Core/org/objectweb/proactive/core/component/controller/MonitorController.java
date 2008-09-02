@@ -26,6 +26,8 @@ public interface MonitorController {
      */
     public BooleanWrapper isMonitoringStarted();
 
+    public void registerMethods();
+    
     /**
      * Start the monitoring of the component.
      */

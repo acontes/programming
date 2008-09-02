@@ -51,11 +51,11 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     public MonitorControllerImpl(Component owner) {
         super(owner);
         jmxNotificationManager = JMXNotificationManager.getInstance();
-        registerMethods();
-        startMonitoring();
+        //registerMethods();
+        //startMonitoring();
     }
 
-    private void registerMethods() {
+    public void registerMethods() {
         statistics = Collections.synchronizedMap(new HashMap<String, MethodStatistics>());
         keysList = new HashMap<String, String>();
         NameController nc = null;

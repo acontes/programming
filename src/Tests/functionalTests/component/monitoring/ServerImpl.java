@@ -8,42 +8,42 @@ import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
+
 public class ServerImpl implements Service1, Service2, Service3Gathercast {
 
-    public void doSomething() {
+    private void sleep() {
         try {
-            Thread.sleep(10000);
+            Thread.sleep((int) (Math.random()*100));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
+    public void doSomething() {
+        sleep();
+    }
+
     public IntWrapper getInt() {
+        sleep();
         return new IntWrapper(1);
     }
 
     public StringWrapper hello() {
+        sleep();
         return new StringWrapper("hello world");
     }
 
     public void doAnotherThing() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep();
     }
 
     public DoubleWrapper getDouble() {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep();
         return new DoubleWrapper(1.0);
     }
 
     public List<StringWrapper> executeAlone() {
+        sleep();
         List<StringWrapper> list = new ArrayList<StringWrapper>();
         list.add(new StringWrapper("hello"));
         list.add(new StringWrapper(" world"));
@@ -51,12 +51,7 @@ public class ServerImpl implements Service1, Service2, Service3Gathercast {
     }
 
     public void foo(List<IntMutableWrapper> i) {
-        try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        sleep();
     }
 
 }

@@ -9,5 +9,5 @@
 
   <content class="functionalTests.component.monitoring.ServerImpl"/>
 
-  <controller desc="primitive"/>
+  <controller desc="/functionalTests/component/monitoring/adl/config.xml"/>
 </definition>
