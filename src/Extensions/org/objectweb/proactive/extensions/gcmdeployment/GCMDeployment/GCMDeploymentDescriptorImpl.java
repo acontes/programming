@@ -45,6 +45,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbu
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.acquisition.P2PEntry;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.JavaGroup;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
@@ -66,6 +67,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         startLocal(commandBuilder, gcma);
 
         startGroups(commandBuilder, gcma);
+        startJavaGroups(commandBuilder, gcma);
         startBridges(commandBuilder, gcma);
 
         for (P2PEntry p2pAcq : acquisitions.getP2PEntries()) {
@@ -98,6 +100,14 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
+    private void startJavaGroups(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
+        List<JavaGroup> javaGroups = resources.getJavaGroups();
+        for (JavaGroup javaGroup : javaGroups) {
+            Runnable javaJob = javaGroup.buildJavaJob();
+            Executor.getExecutor().submit(javaJob);
+        }
+    }
+    
     private void startBridges(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         List<Bridge> bridges = resources.getBridges();
         for (Bridge bridge : bridges) {

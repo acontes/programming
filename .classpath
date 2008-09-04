@@ -81,5 +81,6 @@
 	<classpathentry kind="lib" path="lib/winp-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/ssj.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
+	<classpathentry kind="lib" path="lib/amazon-ec2-2008-05-05-java-library.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

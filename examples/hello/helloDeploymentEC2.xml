@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /home/glaurent/workspace/amazon_ec2_integration/src/Extensions/org/objectweb/proactive/extensions/gcmdeployment/schema/ExtensionSchemas.xsd">
+
+	<environment>
+		<javaPropertyVariable name="user.dir" />
+		<javaPropertyDescriptorDefault name="os" value="windows" />
+	</environment>
+
+	<resources>
+		<group refid="ec2test">
+			<host refid="dummy" />
+		</group>
+	</resources>
+
+	<infrastructure>
+
+		<groups>
+			<ec2Group id="ec2test"></ec2Group>
+		</groups>
+
+		<hosts>
+			<host id="dummy" os="unix">
+				<homeDirectory base="root" relpath="dummy" />
+			</host>
+		</hosts>
+
+	</infrastructure>
+</GCMDeployment>

@@ -37,16 +37,22 @@ import java.util.List;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.JavaGroup;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
 public class GCMDeploymentResources {
     private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
+    private List<JavaGroup> javaGroups = Collections.synchronizedList(new ArrayList<JavaGroup>());
     private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
     private HostInfo hostInfo;
 
     public List<Group> getGroups() {
         return groups;
+    }
+
+    public List<JavaGroup> getJavaGroups() {
+        return javaGroups;
     }
 
     public List<Bridge> getBridges() {
@@ -55,6 +61,10 @@ public class GCMDeploymentResources {
 
     public void addGroup(Group group) {
         groups.add(group);
+    }
+
+    public void addJavaGroup(JavaGroup javaGroup) {
+        javaGroups.add(javaGroup);        
     }
 
     public void addBridge(Bridge bridge) {
@@ -79,4 +89,5 @@ public class GCMDeploymentResources {
 
         hostInfo.check();
     }
+
 }

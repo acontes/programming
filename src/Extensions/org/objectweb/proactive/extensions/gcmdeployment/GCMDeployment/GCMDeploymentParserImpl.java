@@ -29,6 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
+
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment;
 
 import static org.objectweb.proactive.core.mop.Utils.makeDeepCopy;
@@ -65,6 +66,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bri
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.BridgeRSHParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.BridgeSSHParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.AbstractGroup;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.AbstractJavaGroup;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupCCSParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupEC2Parser;
@@ -78,6 +80,8 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Grou
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupPrunParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupRSHParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupSSHParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.JavaGroup;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.JavaGroupParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.unsupported.GroupARCParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.unsupported.GroupCGSPParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.unsupported.GroupFuraParser;
@@ -145,6 +149,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected List<String> schemas;
     protected Map<String, GroupParser> groupParserMap;
     protected Map<String, BridgeParser> bridgeParserMap;
+    protected Map<String, JavaGroupParser> javaGroupParserMap;
     protected GCMDeploymentInfrastructure infrastructure;
 
     // protected GCMDeploymentEnvironment environment;
@@ -169,6 +174,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         this.acquisitions = new GCMDeploymentAcquisition();
         this.groupParserMap = new HashMap<String, GroupParser>();
         this.bridgeParserMap = new HashMap<String, BridgeParser>();
+        this.javaGroupParserMap = new HashMap<String, JavaGroupParser>();
         this.variableContract = new VariableContractImpl();
         this.schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
 
@@ -178,6 +184,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerUserGroupParsers();
         registerDefaultBridgeParsers();
         registerUserBridgeParsers();
+        registerDefaultJavaGroupParsers();
+
         try {
             InputSource processedInputSource = Environment.replaceVariables(descriptor, vContract, xpath,
                     GCM_DEPLOYMENT_NAMESPACE_PREFIX);
@@ -209,7 +217,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerGroupParser(new GroupARCParser());
         registerGroupParser(new GroupCCSParser());
         registerGroupParser(new GroupCGSPParser());
-        registerGroupParser(new GroupEC2Parser());
         registerGroupParser(new GroupFuraParser());
         registerGroupParser(new GroupGLiteParser());
         registerGroupParser(new GroupGlobusParser());
@@ -234,6 +241,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerBridgeParser(new BridgeRSHParser());
         registerBridgeParser(new BridgeOARSHParser());
         // TODO add other bridge parsers here
+    }
+
+    /**
+     * Register all pre-installed bridge parsers
+     */
+    protected void registerDefaultJavaGroupParsers() {
+        registerJavaGroupParser(new GroupEC2Parser());
     }
 
     /**
@@ -431,10 +445,18 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         } else if (nodeName.equals(PA_GROUP)) {
             Group group = getGroup(refid);
             if (group == null) {
-                throw new RuntimeException("no group with refid " + refid + " has been defined");
+
+                // try a JavaGroup
+                JavaGroup javaGroup = getJavaGroup(refid);
+                if (javaGroup == null) {
+                    throw new RuntimeException("no group with refid " + refid + " has been defined");
+                } else {
+                    resources.addJavaGroup(javaGroup);
+                }
+            } else {
+                parseGroupResource(resourceNode, group);
+                resources.addGroup(group);
             }
-            parseGroupResource(resourceNode, group);
-            resources.addGroup(group);
         } else if (nodeName.equals(PA_HOST)) {
             HostInfo hostInfo = getHostInfo(refid);
             if (hostInfo == null) {
@@ -453,6 +475,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected Group getGroup(String refid) throws IOException {
         Group group = infrastructure.getGroups().get(refid);
         return (Group) makeDeepCopy(group);
+    }
+
+    protected JavaGroup getJavaGroup(String refid) throws IOException {
+        JavaGroup javaGroup = infrastructure.getJavaGroups().get(refid);
+        return (JavaGroup) makeDeepCopy(javaGroup);
     }
 
     protected Bridge getBridge(String refid) throws IOException {
@@ -478,11 +505,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      */
     protected void parseGroupResource(Node resourceNode, Group group) throws XPathExpressionException,
             IOException {
+
+        // Get the host node child of this resource node
         Node hostNode = (Node) xpath.evaluate(XPATH_HOST, resourceNode, XPathConstants.NODE);
 
+        // Get the host node's refid attribute
         String refid = GCMParserHelper.getAttributeValue(hostNode, "refid");
 
+        // get the corresponding hostinfo object
         HostInfo hostInfo = getHostInfo(refid);
+
+        // associate it to the group
         group.setHostInfo(hostInfo);
     }
 
@@ -562,8 +595,16 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             Node groupNode = groups.item(i);
             GroupParser groupParser = groupParserMap.get(groupNode.getNodeName());
             if (groupParser == null) {
-                GCMDeploymentLoggers.GCMD_LOGGER.warn("No group parser registered for node <" +
-                    groupNode.getNodeName() + ">");
+
+                // try a JavaGroupParser
+                JavaGroupParser javaGroupParser = javaGroupParserMap.get(groupNode.getNodeName());
+                if (javaGroupParser == null) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.warn("No group parser registered for node <" +
+                        groupNode.getNodeName() + ">");
+                } else {
+                    AbstractJavaGroup javaGroup = javaGroupParser.parseGroupNode(groupNode, xpath);
+                    infrastructure.addJavaGroup(javaGroup);
+                }
             } else {
                 AbstractGroup group = groupParser.parseGroupNode(groupNode, xpath);
                 infrastructure.addGroup(group);
@@ -617,6 +658,20 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 "' already registered");
         }
         bridgeParserMap.put(bridgeParser.getNodeName(), bridgeParser);
+    }
+
+    /**
+     * JavaGroupParser registration A JavaGroupParser must be registered to be taken
+     * into account when parsing a descriptor.
+     * 
+     * @param javaGroupParser
+     */
+    public void registerJavaGroupParser(JavaGroupParser javaGroupParser) {
+        if (javaGroupParserMap.containsKey(javaGroupParser.getNodeName())) {
+            GCMDeploymentLoggers.GCMD_LOGGER.error("JavaGroup parser for '" + javaGroupParser.getNodeName() +
+                "' already registered");
+        }
+        javaGroupParserMap.put(javaGroupParser.getNodeName(), javaGroupParser);
     }
 
     /**

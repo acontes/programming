@@ -36,6 +36,7 @@ import java.util.Map;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.JavaGroup;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
@@ -50,11 +51,13 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.H
  */
 public class GCMDeploymentInfrastructure {
     private Map<String, Group> groups;
+    private Map<String, JavaGroup> javaGroups;
     private Map<String, Bridge> bridges;
     private Map<String, HostInfo> hosts;
 
     public GCMDeploymentInfrastructure() {
         groups = new HashMap<String, Group>();
+        javaGroups = new HashMap<String, JavaGroup>();
         bridges = new HashMap<String, Bridge>();
         hosts = new HashMap<String, HostInfo>();
     }
@@ -63,6 +66,10 @@ public class GCMDeploymentInfrastructure {
         return groups;
     }
 
+    public Map<String, JavaGroup> getJavaGroups() {
+        return javaGroups;
+    }
+    
     public Map<String, Bridge> getBridges() {
         return bridges;
     }
@@ -73,6 +80,10 @@ public class GCMDeploymentInfrastructure {
 
     public void addGroup(Group group) {
         groups.put(group.getId(), group);
+    }
+
+    public void addJavaGroup(JavaGroup group) {
+        javaGroups.put(group.getId(), group);
     }
 
     public void addBrige(Bridge bridge) {

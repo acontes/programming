@@ -31,43 +31,9 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-
-
-public interface Group extends Serializable {
+public interface JavaGroup {
     public String getId();
-
-    /**
-     * Set environment variables for this cluster
-     * @param env environment variables
-     */
-    public void setEnvironment(Map<String, String> env);
-
-    /**
-     * Set the command path to override the default one
-     * @param commandPath path to the command
-     */
-    public void setCommandPath(String commandPath);
-
-    /**
-     * Set the HostInfo
-     *
-     * @param hostInfo
-     */
-    public void setHostInfo(HostInfo hostInfo);
-
-    /**
-     * Get the HostInfo
-     *
-     * @return if set the HostInfo is returned. null is returned otherwise
-     */
-    public HostInfo getHostInfo();
 
     /**
      * Check that this group is in a consistent state and is ready to be
@@ -83,5 +49,6 @@ public interface Group extends Serializable {
      * @param commandBuilder The final command builder
      * @return The command to be used to start this group
      */
-    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationInternal gcma);
+    public Runnable buildJavaJob(); // TODO - find what args to pass
+
 }

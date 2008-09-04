@@ -10,8 +10,9 @@
 		<xs:complexContent>
 			<xs:extension base="abstractGroupElementType">
 				<xs:sequence>
-					<xs:element name="privateKey" type="pathElementType" minOccurs="0" maxOccurs="1" />
-					<xs:element name="certification" type="pathElementType" minOccurs="0" maxOccurs="1" />
+					<xs:element name="imageName" type="xs:string" minOccurs="0" maxOccurs="1" />
+					<xs:element name="accessKeyId" type="xs:string" minOccurs="0" maxOccurs="1" />
+					<xs:element name="secretAccessKey" type="xs:string" minOccurs="0" maxOccurs="1" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>

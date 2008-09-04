@@ -91,6 +91,20 @@ public class Executor {
         }
     }
 
+    public void submit(Runnable jobRequest) {
+        Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT + ".job." + jobId);
+        jobId++;
+
+        Thread job = new Thread(jobRequest);
+        
+        try {
+            job.run();
+            job.join();
+        } catch (InterruptedException e) {
+            logger.warn("Failed to run job", e);
+        }
+    }
+    
     private enum MonitorType {
         STDOUT, STDERR;
     }
