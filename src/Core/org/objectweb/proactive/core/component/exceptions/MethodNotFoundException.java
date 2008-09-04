@@ -31,29 +31,30 @@
 package org.objectweb.proactive.core.component.exceptions;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
 /**
- * Exception thrown when a named component cannot be found
+ * Exception thrown if the search of a method has failed.
  *
  * @author The ProActive Team
  *
  */
 @PublicAPI
-public class NoSuchComponentException extends Exception {
-    public NoSuchComponentException() {
+public class MethodNotFoundException extends ProActiveRuntimeException {
+    public MethodNotFoundException() {
         super();
     }
 
-    public NoSuchComponentException(String message) {
-        super(message);
-    }
-
-    public NoSuchComponentException(String message, Throwable cause) {
+    public MethodNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NoSuchComponentException(Throwable cause) {
+    public MethodNotFoundException(String message) {
+        super(message);
+    }
+
+    public MethodNotFoundException(Throwable cause) {
         super(cause);
     }
 }

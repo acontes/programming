@@ -9,24 +9,31 @@ import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
 public class Client2Impl implements Runner, BindingController {
+    private static final long SLEEP_TIME = 50;
+    private static final String[] ITF_NAMES_FOR_EACH_METHOD = { "service2", "service2", "service2" }; // , "service3", "service3" };
+    private static final String[] METHOD_NAMES = { "doAnotherThing", "getDouble", "getBoolean" }; //, "foo", "executeAlone" };
     private static final int NB_ITERATIONS = 100;
     private Service2 service2;
     private Service3 service3;
+    private int[] nbCallsPerMethod = new int[METHOD_NAMES.length];
 
     private void sleep() {
         try {
-            Thread.sleep((int) (Math.random()*10));
+            Thread.sleep(SLEEP_TIME);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public void run() {
-        int methodNum;
+        for (int i = 0; i < METHOD_NAMES.length; i++) {
+            nbCallsPerMethod[i] = 0;
+        }
         for (int i = 0; i < NB_ITERATIONS; i++) {
             sleep();
-            methodNum = ((int) (Math.random() * 10)) % 4;
-            switch (methodNum) {
+            int indexMethod = i % METHOD_NAMES.length;
+            nbCallsPerMethod[indexMethod]++;
+            switch (indexMethod) {
                 case 0:
                     service2.doAnotherThing();
                     break;
@@ -34,15 +41,38 @@ public class Client2Impl implements Runner, BindingController {
                     service2.getDouble();
                     break;
                 case 2:
-                    service3.foo(new IntMutableWrapper(2));
+                    service2.getBoolean();
                     break;
                 case 3:
+                    service3.foo(new IntMutableWrapper(2));
+                    break;
+                case 4:
                     service3.executeAlone();
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    public int getTotalNbMethodCalls() {
+        return NB_ITERATIONS;
+    }
+
+    public long getSleepTime() {
+        return SLEEP_TIME;
+    }
+
+    public String[] getItfNamesForEachMethod() {
+        return ITF_NAMES_FOR_EACH_METHOD;
+    }
+
+    public String[] getMethodNames() {
+        return METHOD_NAMES;
+    }
+
+    public int[] getNbCallsPerMethod() {
+        return nbCallsPerMethod;
     }
 
     public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,

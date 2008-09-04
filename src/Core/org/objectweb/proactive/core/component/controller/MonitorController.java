@@ -3,8 +3,9 @@ package org.objectweb.proactive.core.component.controller;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.component.exceptions.AmbiguousMethodNameException;
+import org.objectweb.proactive.core.component.exceptions.MethodNotFoundException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 /**
@@ -13,8 +14,13 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
  * <br>
  * The statistics of a given method are stored in a {@link org.objectweb.proactive.core.component.controller.MethodStatistics}
  * object.
+ * <br>
+ * The implementation class org.objectweb.proactive.core.component.controller.MonitorControllerImpl provides in
+ * immediate services the following methods: getStatistics(String itfName, String methodName),
+ * getStatistics(String itfName, String methodName, Class<?>[] parametersTypes), getAllStatistics(). 
  * 
  * @author The ProActive Team
+ * @see org.objectweb.proactive.core.component.controller.MonitorControllerImpl
  *
  */
 @PublicAPI
@@ -26,8 +32,6 @@ public interface MonitorController {
      */
     public BooleanWrapper isMonitoringStarted();
 
-    public void registerMethods();
-    
     /**
      * Start the monitoring of the component.
      */
@@ -51,7 +55,8 @@ public interface MonitorController {
      * @return MethodStatistics instance containing all the statistics of the desired methods.
      * @throws Exception MethodNotFoundException
      */
-    public MethodStatistics getStatistics(String itfName, String methodName) throws Exception;
+    public MethodStatistics getStatistics(String itfName, String methodName) throws MethodNotFoundException,
+            AmbiguousMethodNameException;
 
     /**
      * Get the statistics of a method exposed by a component server interface.
@@ -63,7 +68,7 @@ public interface MonitorController {
      * @throws Exception MethodNotFoundException
      */
     public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes)
-            throws Exception;
+            throws MethodNotFoundException, AmbiguousMethodNameException;
 
     /**
      * Get the statistics for each methods exposed by the component server interfaces.
@@ -72,18 +77,7 @@ public interface MonitorController {
      * 
      * @return All the statistics in a map structured like this
      *      Map<itfName-MethodName-ClassNameParam1-ClassNameParam2-..., MethodStatistics>.
-     * @see org.objectweb.proactive.core.component.controller.MonitorController.generateKey
+     * @see org.objectweb.proactive.core.component.controller.MonitorControllerHelper.generateKey
      */
     public Map<String, MethodStatistics> getAllStatistics();
-
-    /**
-     * Generate an unique key according to the name of the server interface, the name of the method
-     * and the class names of the parameters of the method.
-     *
-     * @param itfName Name of the server interface where the method is exposed.
-     * @param methodName Name of the method.
-     * @param parametersTypes Types of the parameters of the method.
-     * @return Key built like this itfName-MethodName-ClassNameParam1-ClassNameParam2-...
-     */
-    public StringWrapper generateKey(String itfName, String methodName, Class<?>[] parametersTypes);
 }

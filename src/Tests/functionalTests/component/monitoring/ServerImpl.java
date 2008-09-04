@@ -1,8 +1,8 @@
 package functionalTests.component.monitoring;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -10,10 +10,11 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public class ServerImpl implements Service1, Service2, Service3Gathercast {
+    public static final long EXECUTION_TIME = 100;
 
     private void sleep() {
         try {
-            Thread.sleep((int) (Math.random()*100));
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -25,12 +26,12 @@ public class ServerImpl implements Service1, Service2, Service3Gathercast {
 
     public IntWrapper getInt() {
         sleep();
-        return new IntWrapper(1);
+        return null;
     }
 
     public StringWrapper hello() {
         sleep();
-        return new StringWrapper("hello world");
+        return null;
     }
 
     public void doAnotherThing() {
@@ -39,15 +40,17 @@ public class ServerImpl implements Service1, Service2, Service3Gathercast {
 
     public DoubleWrapper getDouble() {
         sleep();
-        return new DoubleWrapper(1.0);
+        return null;
+    }
+
+    public BooleanWrapper getBoolean() {
+        sleep();
+        return null;
     }
 
     public List<StringWrapper> executeAlone() {
         sleep();
-        List<StringWrapper> list = new ArrayList<StringWrapper>();
-        list.add(new StringWrapper("hello"));
-        list.add(new StringWrapper(" world"));
-        return list;
+        return null;
     }
 
     public void foo(List<IntMutableWrapper> i) {

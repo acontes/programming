@@ -22,6 +22,8 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.exceptions.AmbiguousMethodNameException;
+import org.objectweb.proactive.core.component.exceptions.MethodNotFoundException;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -31,14 +33,11 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public class MonitorControllerImpl extends AbstractProActiveController implements MonitorController,
         NotificationListener {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
-
-    private final String KEY_INFO_SEPARATOR = "-";
 
     private JMXNotificationManager jmxNotificationManager;
 
@@ -51,11 +50,23 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     public MonitorControllerImpl(Component owner) {
         super(owner);
         jmxNotificationManager = JMXNotificationManager.getInstance();
-        //registerMethods();
-        //startMonitoring();
     }
 
-    public void registerMethods() {
+    protected void setControllerItfType() {
+        try {
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MONITOR_CONTROLLER,
+                    MonitorController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
+        } catch (InstantiationException e) {
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), e);
+        }
+    }
+
+    private void registerMethods() {
+        PAActiveObject.setImmediateService("getStatistics", new Class[] { String.class, String.class });
+        PAActiveObject.setImmediateService("getStatistics", new Class[] { String.class, String.class,
+                (new Class<?>[] {}).getClass() });
+        PAActiveObject.setImmediateService("getAllStatistics");
         statistics = Collections.synchronizedMap(new HashMap<String, MethodStatistics>());
         keysList = new HashMap<String, String>();
         NameController nc = null;
@@ -75,8 +86,8 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     for (Method m : methods) {
                         if (!itfType.isFcClientItf()) {
                             Class<?>[] parametersTypes = m.getParameterTypes();
-                            String key = generateKey(itfType.getFcItfName(), m.getName(), parametersTypes)
-                                    .stringValue();
+                            String key = MonitorControllerHelper.generateKey(itfType.getFcItfName(),
+                                    m.getName(), parametersTypes).stringValue();
                             keysList.put(m.getName(), key);
                             statistics.put(key, new MethodStatisticsImpl(itfType.getFcItfName(), m.getName(),
                                 parametersTypes));
@@ -86,19 +97,9 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     }
                 }
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new ProActiveRuntimeException("The interface " + itfType.getFcItfSignature() +
+                    "cannot be found", e);
             }
-        }
-    }
-
-    protected void setControllerItfType() {
-        try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MONITOR_CONTROLLER,
-                    MonitorController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE));
-        } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 
@@ -114,6 +115,8 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     }
 
     public void startMonitoring() {
+        if (statistics == null)
+            registerMethods();
         if (!started) {
             initMethodStatistics();
             try {
@@ -121,8 +124,8 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                         .getBodyOnThis().getID()), this, FactoryName.getCompleteUrl(ProActiveRuntimeImpl
                         .getProActiveRuntime().getURL()));
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new ProActiveRuntimeException("JMX subscribtion for the MonitorController has failed",
+                    e);
             }
             started = true;
         }
@@ -141,13 +144,15 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         startMonitoring();
     }
 
-    public MethodStatistics getStatistics(String itfName, String methodName) throws Exception {
+    public MethodStatistics getStatistics(String itfName, String methodName) throws MethodNotFoundException,
+            AmbiguousMethodNameException {
         return getStatistics(itfName, methodName, new Class<?>[] {});
     }
 
     public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes)
-            throws Exception {
-        String supposedCorrespondingKey = generateKey(itfName, methodName, parametersTypes).stringValue();
+            throws MethodNotFoundException, AmbiguousMethodNameException {
+        String supposedCorrespondingKey = MonitorControllerHelper.generateKey(itfName, methodName,
+                parametersTypes).stringValue();
         MethodStatistics methodStats = statistics.get(supposedCorrespondingKey);
         if (methodStats != null)
             return methodStats;
@@ -159,32 +164,29 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     if (correspondingKey == null)
                         correspondingKey = keys[i];
                     else
-                        // TODO Raise an ambiguous method exception?
-                        return null;
+                        throw new AmbiguousMethodNameException("The method name: " + methodName +
+                            " of the interface " + itfName + " is ambiguous: more than 1 method found");
                 }
             }
             if (correspondingKey != null)
                 return statistics.get(correspondingKey);
             else
-                // TODO Raise an method not found exception?
-                return null;
-        } else
-            // TODO Raise an method not found exception?
-            return null;
+                throw new MethodNotFoundException("The method: " + methodName + "() of the interface " +
+                    itfName + " cannot be found so no statistics are available");
+        } else {
+            String msg = "The method: " + methodName + "(";
+            for (int i = 0; i < parametersTypes.length; i++) {
+                msg += parametersTypes[i].getName();
+                if (i + 1 < parametersTypes.length)
+                    msg += ", ";
+            }
+            msg += ") of the interface " + itfName + " cannot be found so no statistics are available";
+            throw new MethodNotFoundException(msg);
+        }
     }
 
     public Map<String, MethodStatistics> getAllStatistics() {
         return statistics;
-    }
-
-    public StringWrapper generateKey(String itfName, String methodName, Class<?>[] parametersTypes) {
-        String key = itfName + KEY_INFO_SEPARATOR + methodName;
-
-        for (int i = 0; i < parametersTypes.length; i++) {
-            key += KEY_INFO_SEPARATOR + parametersTypes[i].getName();
-        }
-
-        return new StringWrapper(key);
     }
 
     public void handleNotification(Notification notification, Object handback) {
@@ -214,11 +216,11 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                 ((MethodStatisticsImpl) statistics.get(key)).notifyReplyOfRequestSent(notification
                         .getTimeStamp());
         } else if (type.equals(NotificationType.setOfNotifications)) {
+            @SuppressWarnings("unchecked")
             ConcurrentLinkedQueue<Notification> notificationsList = (ConcurrentLinkedQueue<Notification>) notification
                     .getUserData();
-            for (Iterator<Notification> iterator = notificationsList.iterator(); iterator.hasNext();) {
-                handleNotification((Notification) iterator.next(), handback);
-            }
+            for (Iterator<Notification> iterator = notificationsList.iterator(); iterator.hasNext();)
+                handleNotification(iterator.next(), handback);
         }
     }
 }

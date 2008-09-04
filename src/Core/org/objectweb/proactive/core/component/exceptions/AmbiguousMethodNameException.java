@@ -31,29 +31,30 @@
 package org.objectweb.proactive.core.component.exceptions;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
 /**
- * Exception thrown when a named component cannot be found
+ * Exception thrown if the search of one method returns more than one method (ie. the returned methods have the same name but different parameters).
  *
  * @author The ProActive Team
  *
  */
 @PublicAPI
-public class NoSuchComponentException extends Exception {
-    public NoSuchComponentException() {
+public class AmbiguousMethodNameException extends ProActiveRuntimeException {
+    public AmbiguousMethodNameException() {
         super();
     }
 
-    public NoSuchComponentException(String message) {
-        super(message);
-    }
-
-    public NoSuchComponentException(String message, Throwable cause) {
+    public AmbiguousMethodNameException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NoSuchComponentException(Throwable cause) {
+    public AmbiguousMethodNameException(String message) {
+        super(message);
+    }
+
+    public AmbiguousMethodNameException(Throwable cause) {
         super(cause);
     }
 }
