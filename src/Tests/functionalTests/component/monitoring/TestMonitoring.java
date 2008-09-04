@@ -47,7 +47,6 @@ public class TestMonitoring extends ComponentTest {
     }
 
     @org.junit.Test
-    @Ignore
     public void testMonitoringCompositeComponent() throws Exception {
         factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map<Object, Object> context = new HashMap<Object, Object>();

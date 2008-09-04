@@ -2,42 +2,29 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
-public class MethodStatisticsImpl implements MethodStatistics, Serializable {
-    private String itfName;
+public abstract class MethodStatisticsAbstract implements MethodStatistics, Serializable {
+    protected String itfName;
 
-    private String methodName;
+    protected String methodName;
 
-    private Class<?>[] parametersTypes;
+    protected Class<?>[] parametersTypes;
 
-    private List<RequestStatistics> requestsStats;
+    protected List<RequestStatistics> requestsStats;
 
-    private long startTime;
+    protected long startTime;
 
-    private int indexNextDepartureRequest;
+    protected int indexNextDepartureRequest;
 
-    private int indexNextReply;
+    protected int indexNextReply;
 
-    private int currentLengthQueue;
+    protected int currentLengthQueue;
 
     // Sometimes a replySent notification is received before the corresponding servingStarted notification
     // Therefore the notification is stored and will be used when the corresponding servingStarted notification will be received
-    private ArrayList<Long> replyInAdvance;
-
-    public MethodStatisticsImpl(String itfName, String methodName, Class<?>[] parametersTypes) {
-        this.itfName = itfName;
-        this.methodName = methodName;
-        this.parametersTypes = parametersTypes;
-        this.requestsStats = Collections.synchronizedList(new ArrayList<RequestStatistics>());
-        this.startTime = System.nanoTime() / 1000;
-        this.indexNextDepartureRequest = 0;
-        this.indexNextReply = 0;
-        this.currentLengthQueue = 0;
-        this.replyInAdvance = new ArrayList<Long>();
-    }
+    protected ArrayList<Long> replyInAdvance;
 
     /*
      * Reset all the statistics for the monitored method.
@@ -112,7 +99,7 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
         }
     }
 
-    private int findNumberOfRequests(long time, int indexToStart) {
+    protected int findNumberOfRequests(long time, int indexToStart) {
         long currentTime = System.nanoTime() / 1000;
         for (int i = indexToStart - 1; i >= 0; i--) {
             if (((currentTime - requestsStats.get(i).getArrivalTime()) / 1000) > time)
@@ -134,31 +121,6 @@ public class MethodStatisticsImpl implements MethodStatistics, Serializable {
         // TODO Is the correct definition of the average length of the queue?
         return findNumberOfRequests(pastXMilliseconds, requestsStats.size()) /
             (((double) pastXMilliseconds) / 1000);
-    }
-
-    public long getLatestServiceTime() {
-        return requestsStats.get(indexNextReply - 1).getServiceTime() / 1000;
-    }
-
-    public double getAverageServiceTime() {
-        return getAverageServiceTime(indexNextReply);
-    }
-
-    public double getAverageServiceTime(int lastNRequest) {
-        if (lastNRequest != 0) {
-            double res = 0;
-            int indexToReach = Math.max(indexNextReply - 1 - lastNRequest, 0); // To avoid to have negative index
-            for (int i = indexNextReply - 1; i >= indexToReach; i--) {
-                res += requestsStats.get(i).getServiceTime();
-            }
-
-            return res / lastNRequest / 1000;
-        } else
-            return 0;
-    }
-
-    public double getAverageServiceTime(long pastXMilliseconds) {
-        return getAverageServiceTime(findNumberOfRequests(pastXMilliseconds, indexNextReply));
     }
 
     public long getLatestInterArrivalTime() {

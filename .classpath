@@ -31,8 +31,8 @@
 	<classpathentry kind="lib" path="lib/cryptix32.jar"/>
 	<classpathentry kind="lib" path="lib/cryptix-asn1.jar"/>
 	<classpathentry kind="lib" path="lib/dtdparser.jar"/>
-	<classpathentry kind="lib" path="lib/fractal.jar"/>
-	<classpathentry kind="lib" path="lib/fractal-adl.jar"/>
+	<classpathentry kind="lib" path="lib/fractal.jar" sourcepath="/user/bsauvan/home/local/src/fractal-2.0.1/src"/>
+	<classpathentry kind="lib" path="lib/fractal-adl.jar" sourcepath="/user/bsauvan/home/local/src/fractaladl-2.1.5/src"/>
 	<classpathentry kind="lib" path="lib/trilead-ssh2.jar"/>
 	<classpathentry kind="lib" path="lib/glite-wms-jdlj.jar"/>
 	<classpathentry kind="lib" path="lib/http.jar"/>

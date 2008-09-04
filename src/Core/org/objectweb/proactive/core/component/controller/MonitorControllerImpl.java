@@ -13,15 +13,16 @@ import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.factory.InstantiationException;
-import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.AmbiguousMethodNameException;
 import org.objectweb.proactive.core.component.exceptions.MethodNotFoundException;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
@@ -76,29 +77,47 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
             e1.printStackTrace();
         }
         String name = nc.getFcName();
-        InterfaceType itfTypes[] = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
-        for (InterfaceType itfType : itfTypes) {
+        Object[] itfs = owner.getFcInterfaces();
+        for (int i = 0; i < itfs.length; i++) {
+            Interface itf = (Interface) itfs[i];
+            InterfaceType itfType = (InterfaceType) itf.getFcItfType();
             try {
-                Class<?> klass = ClassLoader.getSystemClassLoader().loadClass(itfType.getFcItfSignature());
-                Method[] methods = klass.getDeclaredMethods();
-                if (!itfType.getFcItfName().endsWith("-controller") &&
-                    !itfType.getFcItfName().equals("component")) {
-                    for (Method m : methods) {
-                        if (!itfType.isFcClientItf()) {
-                            Class<?>[] parametersTypes = m.getParameterTypes();
-                            String key = MonitorControllerHelper.generateKey(itfType.getFcItfName(),
-                                    m.getName(), parametersTypes).stringValue();
-                            keysList.put(m.getName(), key);
-                            statistics.put(key, new MethodStatisticsImpl(itfType.getFcItfName(), m.getName(),
-                                parametersTypes));
-                            logger.debug(m.getName() + " (server) added to monitoring on component " + name +
-                                "!!!");
+                if (!itf.getFcItfName().endsWith("-controller") && !itf.getFcItfName().equals("component") &&
+                    (!itfType.isFcClientItf())) {
+                    MonitorController monitorSubComponent = null;
+                    if (isComposite()) {
+                        Component bindedComponent = ((ProActiveInterface) ((ProActiveInterface) itf)
+                                .getFcItfImpl()).getFcItfOwner();
+                        try {
+                            monitorSubComponent = (MonitorController) bindedComponent
+                                    .getFcInterface(Constants.MONITOR_CONTROLLER);
+                            monitorSubComponent.startMonitoring();
+                        } catch (NoSuchInterfaceException e) {
+                            throw new ProActiveRuntimeException(
+                                "No monitor controller found for the component" + bindedComponent, e);
                         }
+                    }
+                    Class<?> klass = ClassLoader.getSystemClassLoader()
+                            .loadClass(itfType.getFcItfSignature());
+                    Method[] methods = klass.getDeclaredMethods();
+                    for (Method m : methods) {
+                        Class<?>[] parametersTypes = m.getParameterTypes();
+                        String key = MonitorControllerHelper.generateKey(itf.getFcItfName(), m.getName(),
+                                parametersTypes).stringValue();
+                        keysList.put(m.getName(), key);
+                        if (monitorSubComponent == null)
+                            statistics.put(key, new MethodStatisticsPrimitiveImpl(itf.getFcItfName(), m
+                                    .getName(), parametersTypes));
+                        else {
+                            statistics.put(key, new MethodStatisticsCompositeImpl(itf.getFcItfName(), m
+                                    .getName(), parametersTypes, monitorSubComponent));
+                        }
+                        logger.debug(m.getName() + " (server) added to monitoring on component " + name +
+                            "!!!");
                     }
                 }
             } catch (ClassNotFoundException e) {
-                throw new ProActiveRuntimeException("The interface " + itfType.getFcItfSignature() +
-                    "cannot be found", e);
+                throw new ProActiveRuntimeException("The interface " + itfType + "cannot be found", e);
             }
         }
     }
@@ -110,7 +129,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     private void initMethodStatistics() {
         String[] keys = statistics.keySet().toArray(new String[] {});
         for (int i = 0; i < keys.length; i++) {
-            ((MethodStatisticsImpl) statistics.get(keys[i])).reset();
+            ((MethodStatisticsAbstract) statistics.get(keys[i])).reset();
         }
     }
 
@@ -195,25 +214,25 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             String key = keysList.get(data.getMethodName());
             if (key != null)
-                ((MethodStatisticsImpl) statistics.get(key)).notifyArrivalOfRequest(notification
+                ((MethodStatisticsAbstract) statistics.get(key)).notifyArrivalOfRequest(notification
                         .getTimeStamp());
         } else if (type.equals(NotificationType.servingStarted)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             String key = keysList.get(data.getMethodName());
             if (key != null)
-                ((MethodStatisticsImpl) statistics.get(key)).notifyDepartureOfRequest(notification
+                ((MethodStatisticsAbstract) statistics.get(key)).notifyDepartureOfRequest(notification
                         .getTimeStamp());
         } else if (type.equals(NotificationType.replySent)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             String key = keysList.get(data.getMethodName());
             if (key != null)
-                ((MethodStatisticsImpl) statistics.get(key)).notifyReplyOfRequestSent(notification
+                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
                         .getTimeStamp());
         } else if (type.equals(NotificationType.voidRequestServed)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             String key = keysList.get(data.getMethodName());
             if (key != null)
-                ((MethodStatisticsImpl) statistics.get(key)).notifyReplyOfRequestSent(notification
+                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
                         .getTimeStamp());
         } else if (type.equals(NotificationType.setOfNotifications)) {
             @SuppressWarnings("unchecked")
