@@ -2,9 +2,11 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -25,7 +27,9 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.AmbiguousMethodNameException;
 import org.objectweb.proactive.core.component.exceptions.MethodNotFoundException;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
@@ -73,8 +77,8 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         NameController nc = null;
         try {
             nc = (NameController) owner.getFcInterface(Constants.NAME_CONTROLLER);
-        } catch (NoSuchInterfaceException e1) {
-            e1.printStackTrace();
+        } catch (NoSuchInterfaceException e) {
+            e.printStackTrace();
         }
         String name = nc.getFcName();
         Object[] itfs = owner.getFcInterfaces();
@@ -84,18 +88,34 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
             try {
                 if (!itf.getFcItfName().endsWith("-controller") && !itf.getFcItfName().equals("component") &&
                     (!itfType.isFcClientItf())) {
-                    MonitorController monitorSubComponent = null;
+                    List<MonitorController> subcomponentMonitors = new ArrayList<MonitorController>();
                     if (isComposite()) {
-                        Component bindedComponent = ((ProActiveInterface) ((ProActiveInterface) itf)
-                                .getFcItfImpl()).getFcItfOwner();
-                        try {
-                            monitorSubComponent = (MonitorController) bindedComponent
-                                    .getFcInterface(Constants.MONITOR_CONTROLLER);
-                            monitorSubComponent.startMonitoring();
-                        } catch (NoSuchInterfaceException e) {
-                            throw new ProActiveRuntimeException(
-                                "No monitor controller found for the component" + bindedComponent, e);
+                        Iterator<ProActiveInterface> bindedProActiveinterfaces = null;
+                        if (!((ProActiveInterfaceType) itfType).isFcMulticastItf()) {
+                            List<ProActiveInterface> bindedProActiveinterface = new ArrayList<ProActiveInterface>();
+                            bindedProActiveinterface.add((ProActiveInterface) itf);
+                            bindedProActiveinterfaces = bindedProActiveinterface.iterator();
                         }
+                        else {
+                            try {
+                                MulticastControllerImpl multicastController = (MulticastControllerImpl) owner.getFcInterface(Constants.MULTICAST_CONTROLLER);
+                                bindedProActiveinterfaces = multicastController.getDelegatee(itf.getFcItfName()).iterator();
+                            } catch (NoSuchInterfaceException e) {
+                                e.printStackTrace();
+                            }                            
+                        }
+                        try {
+                            while (bindedProActiveinterfaces.hasNext()) {
+                                MonitorController monitor = (MonitorController) ((ProActiveInterface) bindedProActiveinterfaces.next()
+                                        .getFcItfImpl()).getFcItfOwner()
+                                        .getFcInterface(Constants.MONITOR_CONTROLLER);
+                                monitor.startMonitoring();
+                                subcomponentMonitors.add(monitor);
+                            }
+                        } catch (NoSuchInterfaceException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                     Class<?> klass = ClassLoader.getSystemClassLoader()
                             .loadClass(itfType.getFcItfSignature());
@@ -105,12 +125,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                         String key = MonitorControllerHelper.generateKey(itf.getFcItfName(), m.getName(),
                                 parametersTypes).stringValue();
                         keysList.put(m.getName(), key);
-                        if (monitorSubComponent == null)
+                        if (subcomponentMonitors.isEmpty())
                             statistics.put(key, new MethodStatisticsPrimitiveImpl(itf.getFcItfName(), m
                                     .getName(), parametersTypes));
                         else {
                             statistics.put(key, new MethodStatisticsCompositeImpl(itf.getFcItfName(), m
-                                    .getName(), parametersTypes, monitorSubComponent));
+                                    .getName(), parametersTypes, subcomponentMonitors));
                         }
                         logger.debug(m.getName() + " (server) added to monitoring on component " + name +
                             "!!!");
