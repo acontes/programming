@@ -7,13 +7,16 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 
+
 public abstract class AbstractComponentRepresentiveObject implements Serializable,
-		ComponentRepresentiveObject {
-	
-	
-	public abstract GenericTypeWrapper<?> getMetricByName(String MetricName);
-	public abstract String[] listMetricName();
-	public abstract Component[] listSubComponents();
-	public abstract void refresh();
+        ComponentRepresentiveObject {
+
+    public abstract GenericTypeWrapper<?> getMetricByName(String MetricName);
+
+    public abstract String[] listMetricName();
+
+    public abstract Component[] listSubComponents();
+
+    public abstract void refresh();
 
 }

@@ -37,94 +37,85 @@ import org.eclipse.gef.editparts.AbstractTreeEditPart;
 import org.eclipse.swt.widgets.Tree;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
+
 /**
  * This abstract class represents a controller part of the JobMonitoring plugin.<p>
  * The generic parameter <code>T</code> represents a model associated to this controller (see MVC pattern).
  * @author The ProActive Team
  *
  */
-public abstract class ComponentMonitorTreeEditPart<T extends AbstractData> extends AbstractTreeEditPart implements Observer, Runnable
-{
-	//
-	// -- CONSTRUCTOR ------------------------------------------------
-	//
-	public ComponentMonitorTreeEditPart(T model)
-	{
-		super(model);
-	}
+public abstract class ComponentMonitorTreeEditPart<T extends AbstractData> extends AbstractTreeEditPart
+        implements Observer, Runnable {
+    //
+    // -- CONSTRUCTOR ------------------------------------------------
+    //
+    public ComponentMonitorTreeEditPart(T model) {
+        super(model);
+    }
 
-	//
-	// -- PUBLIC METHODS ----------------------------------------------
-	//
+    //
+    // -- PUBLIC METHODS ----------------------------------------------
+    //
 
-	/**
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run()
-	{
-		this.refresh();
-	}
+    /**
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+        this.refresh();
+    }
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#activate()
-	 */
-	@Override
-	public void activate()
-	{
-		if (!isActive())
-		{
-			this.getCastedModel().addObserver(this);
-		}
-		super.activate();
-	}
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#activate()
+     */
+    @Override
+    public void activate() {
+        if (!isActive()) {
+            this.getCastedModel().addObserver(this);
+        }
+        super.activate();
+    }
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#deactivate()
-	 */
-	@Override
-	public void deactivate()
-	{
-		if (isActive())
-		{
-			this.getCastedModel().deleteObserver(this);
-		}
-		super.deactivate();
-	}
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#deactivate()
+     */
+    @Override
+    public void deactivate() {
+        if (isActive()) {
+            this.getCastedModel().deleteObserver(this);
+        }
+        super.deactivate();
+    }
 
-	//
-	// -- PROTECTED METHODS -------------------------------------------
-	//
+    //
+    // -- PROTECTED METHODS -------------------------------------------
+    //
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
-	 */
-	@Override
-	protected String getText()
-	{
-		return this.getCastedModel().getName();
-	}
+    /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
+     */
+    @Override
+    protected String getText() {
+        return this.getCastedModel().getName();
+    }
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#refreshVisuals()
-	 */
-	@Override
-	protected void refreshVisuals()
-	{
-		if (getWidget() instanceof Tree)
-		{
-			return;
-		}
-		setWidgetImage(getImage());
-		setWidgetText(getText());
-	}
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#refreshVisuals()
+     */
+    @Override
+    protected void refreshVisuals() {
+        if (getWidget() instanceof Tree) {
+            return;
+        }
+        setWidgetImage(getImage());
+        setWidgetText(getText());
+    }
 
-	/**
-	 * Returns the casted model associated to this controller.
-	 * @return The the casted model
-	 */
-	@SuppressWarnings("unchecked")
-	protected final T getCastedModel()
-	{
-		return (T) super.getModel();
-	}
+    /**
+     * Returns the casted model associated to this controller.
+     * @return The the casted model
+     */
+    @SuppressWarnings("unchecked")
+    protected final T getCastedModel() {
+        return (T) super.getModel();
+    }
 }

@@ -70,16 +70,16 @@ import com.vladium.emma.runCommand;
  * component metaobject (ProActiveComponent).
  */
 public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
-	
-	static final long serialVersionUID = -5412084782552441752L;
-	
+
+    static final long serialVersionUID = -5412084782552441752L;
+
     private ProActiveComponent componentIdentity = null;
     private Map<String, Shortcut> shortcutsOnThis = null; // key = functionalItfName, value = shortcut
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private boolean insideFunctionalActivity = false;
 
-//    private ComponentWrapper cmbean;
-    
+    //    private ComponentWrapper cmbean;
+
     public ComponentBodyImpl() {
         super();
     }
@@ -106,9 +106,9 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         Map<String, Object> factory_parameters = factory.getParameters();
         if ((null != factory_parameters)) {
             if (null != factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY)) {
-            	
+
                 if (factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters) {
-                	
+
                     if (logger.isDebugEnabled()) {
                         logger.debug("creating metaobject component identity");
                     }
@@ -117,99 +117,89 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                     /**
                      * change the super.mbean into ComponentWrapperMBean if this is a component
                      */
-                 // JMX registration  
-                    
-                    
-                   
-                        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-                        System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has "+mbs.getMBeanCount()+" mbean before register");
-                        ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
-                        if (!mbs.isRegistered(oname)) {
-                        	
-//                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs does not have oname:"+oname.toString());
-//                            this.cmbean = new ComponentWrapper(oname, this);
-                        	super.mbean = new ComponentWrapper(oname, this);
-                            try {
-//                                mbs.registerMBean(cmbean, oname);
-                                mbs.registerMBean(super.mbean, oname);
-                            } catch (InstanceAlreadyExistsException e) {
-                                bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
-                            } catch (MBeanRegistrationException e) {
-                                bodyLogger.error("Can't register the MBean of the body", e);
-                            } catch (NotCompliantMBeanException e) {
-                                bodyLogger.error("The MBean of the body is not JMX compliant", e);
-                            }
+                    // JMX registration  
+
+                    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                    System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has " +
+                        mbs.getMBeanCount() + " mbean before register");
+                    ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
+                    if (!mbs.isRegistered(oname)) {
+
+                        //                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs does not have oname:"+oname.toString());
+                        //                            this.cmbean = new ComponentWrapper(oname, this);
+                        super.mbean = new ComponentWrapper(oname, this);
+                        try {
+                            //                                mbs.registerMBean(cmbean, oname);
+                            mbs.registerMBean(super.mbean, oname);
+                        } catch (InstanceAlreadyExistsException e) {
+                            bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
+                        } catch (MBeanRegistrationException e) {
+                            bodyLogger.error("Can't register the MBean of the body", e);
+                        } catch (NotCompliantMBeanException e) {
+                            bodyLogger.error("The MBean of the body is not JMX compliant", e);
                         }
-                        else
-                        {
-                        	try
-                        	{
-                        		mbs.unregisterMBean(oname);
-                        	}catch(InstanceNotFoundException e)
-                        	{
-                        		bodyLogger.error("The specified MBean does not exist in the repository. The specified MBean does not exist in the repository.", e);
-                        	}catch (MBeanRegistrationException e) {
-                                bodyLogger.error("Can't register the MBean of the body", e);
-                            }
-                        	
-//                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has already has oname:"+oname.toString());
-                        	
-//                        	this.cmbean = new ComponentWrapper(oname, this);
-                        	super.mbean = new ComponentWrapper(oname, this);
-                            try {
-//                                mbs.registerMBean(cmbean, oname);
-                            	mbs.registerMBean(super.mbean, oname);
-                            } catch (InstanceAlreadyExistsException e) {
-                                bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
-                            } catch (MBeanRegistrationException e) {
-                                bodyLogger.error("Can't register the MBean of the body", e);
-                            } catch (NotCompliantMBeanException e) {
-                                bodyLogger.error("The MBean of the body is not JMX compliant", e);
-                            }
-                        	
+                    } else {
+                        try {
+                            mbs.unregisterMBean(oname);
+                        } catch (InstanceNotFoundException e) {
+                            bodyLogger
+                                    .error(
+                                            "The specified MBean does not exist in the repository. The specified MBean does not exist in the repository.",
+                                            e);
+                        } catch (MBeanRegistrationException e) {
+                            bodyLogger.error("Can't register the MBean of the body", e);
                         }
-                        
-//                        System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has "+mbs.getMBeanCount()+" mbean after register");
-                    
-                    
+
+                        //                        	System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has already has oname:"+oname.toString());
+
+                        //                        	this.cmbean = new ComponentWrapper(oname, this);
+                        super.mbean = new ComponentWrapper(oname, this);
+                        try {
+                            //                                mbs.registerMBean(cmbean, oname);
+                            mbs.registerMBean(super.mbean, oname);
+                        } catch (InstanceAlreadyExistsException e) {
+                            bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
+                        } catch (MBeanRegistrationException e) {
+                            bodyLogger.error("Can't register the MBean of the body", e);
+                        } catch (NotCompliantMBeanException e) {
+                            bodyLogger.error("The MBean of the body is not JMX compliant", e);
+                        }
+
+                    }
+
+                    //                        System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has "+mbs.getMBeanCount()+" mbean after register");
+
                     // change activity into a component activity
                     // activity = new ComponentActivity(activity, reifiedObject);
-                        
-//                        new Thread(){
-//                        	public void run(){
-//                        		while(true)
-//                        		{
-//                        		try {
-//                					Thread.sleep(3000);
-//                				} catch (InterruptedException e1) {
-//                					// TODO Auto-generated catch block
-//                					e1.printStackTrace();
-//                				}
-////                        		cmbean.sendNotification(NotificationType.waitForRequest);
-////                        		System.out.println("ComponentBodyImpl.ComponentBodyImpl() cmbean"+cmbean.toString()+" send Notification->" +NotificationType.waitForRequest);
-//                        		
-//                				mbean.sendNotification(NotificationType.waitForRequest+" in ComponentBodyImpl");
-//                        		System.out.println("ComponentBodyImpl.ComponentBodyImpl() cmbean"+mbean.toString()+" send Notification->" +NotificationType.waitForRequest);
-//                        		
-//                        	}
-//                        	}
-//                        }.start();
-                        
-                        
-                        
-                        
+
+                    //                        new Thread(){
+                    //                        	public void run(){
+                    //                        		while(true)
+                    //                        		{
+                    //                        		try {
+                    //                					Thread.sleep(3000);
+                    //                				} catch (InterruptedException e1) {
+                    //                					// TODO Auto-generated catch block
+                    //                					e1.printStackTrace();
+                    //                				}
+                    ////                        		cmbean.sendNotification(NotificationType.waitForRequest);
+                    ////                        		System.out.println("ComponentBodyImpl.ComponentBodyImpl() cmbean"+cmbean.toString()+" send Notification->" +NotificationType.waitForRequest);
+                    //                        		
+                    //                				mbean.sendNotification(NotificationType.waitForRequest+" in ComponentBodyImpl");
+                    //                        		System.out.println("ComponentBodyImpl.ComponentBodyImpl() cmbean"+mbean.toString()+" send Notification->" +NotificationType.waitForRequest);
+                    //                        		
+                    //                        	}
+                    //                        	}
+                    //                        }.start();
+
                 } else {
                     logger
                             .error("component parameters for the components factory are not of type ComponentParameters");
                 }
-                
-                
-                
+
             }
         }
-        
-        
-        
+
     }
 
     /**

@@ -85,9 +85,7 @@ public class MonitorNewHostDialog extends Dialog {
     /** Host name */
     String initialHostValue = "localhost";
 
-    
-    private 
-    // Name of the file
+    private// Name of the file
     String file = ".urls";
     // <hostName,url>
     Map<String, String> urls = new HashMap<String, String>();
@@ -341,7 +339,7 @@ public class MonitorNewHostDialog extends Dialog {
                     reader.close();
                 } catch (IOException e) {
                     e.printStackTrace();
-//                    Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+                    //                    Console.getInstance(Activator.CONSOLE_NAME).logException(e);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -382,7 +380,7 @@ public class MonitorNewHostDialog extends Dialog {
                 bw.close();
             } catch (IOException e) {
                 e.printStackTrace();
-//                Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+                //                Console.getInstance(Activator.CONSOLE_NAME).logException(e);
             }
         }
     }

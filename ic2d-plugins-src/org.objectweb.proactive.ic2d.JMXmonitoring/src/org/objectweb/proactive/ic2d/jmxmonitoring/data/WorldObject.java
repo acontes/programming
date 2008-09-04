@@ -60,14 +60,9 @@ public class WorldObject extends AbstractData {
     public final static String REMOVE_VN_MESSAGE = "Remove a virtual node";
 
     //public ComponentHolderModel CHolder;
-    
-    
-    
-    private HashMap<HolderTypes,AbstractHolder> holders;
-    
-    
-    
-    
+
+    private HashMap<HolderTypes, AbstractHolder> holders;
+
     // 60 s
     public static int MAX_AUTO_RESET_TIME = 60;
 
@@ -133,23 +128,21 @@ public class WorldObject extends AbstractData {
 
         // Creates a notification manager
         notificationManager = JMXNotificationManager.getInstance();
-        
+
     }
 
     /**
      * It replaces the holder if its type already exists in the list
      * @param h
      */
-    public void addHolder(AbstractHolder h)
-    {
-    	holders.put(h.getHolderType(), h);
+    public void addHolder(AbstractHolder h) {
+        holders.put(h.getHolderType(), h);
     }
-    
-    public AbstractHolder getHolder(HolderTypes ht)
-    {
-    	return holders.get(ht);
+
+    public AbstractHolder getHolder(HolderTypes ht) {
+        return holders.get(ht);
     }
-    
+
     // -------------------------------------------
     // --- Methods -------------------------------
     // -------------------------------------------
@@ -445,7 +438,7 @@ public class WorldObject extends AbstractData {
         }
         return n;
     }
-    
+
     /**
      * build the components hierachical
      */

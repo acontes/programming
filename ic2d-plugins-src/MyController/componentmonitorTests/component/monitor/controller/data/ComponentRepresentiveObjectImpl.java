@@ -14,185 +14,168 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.ProActiveInterface;
-//import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.ProActiveInterface; //import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 
 import componentmonitorTests.component.monitor.controller.AbstractComponentMonitorController;
 import componentmonitorTests.component.monitor.controller.itf.ComponentMonitorController;
 
-public class ComponentRepresentiveObjectImpl extends
-		AbstractComponentRepresentiveObject implements NotificationListener,
-		Serializable {
 
-	private static final long serialVersionUID = -7541362340216315513L;
+public class ComponentRepresentiveObjectImpl extends AbstractComponentRepresentiveObject implements
+        NotificationListener, Serializable {
 
-	public HashMap<String, GenericTypeWrapper> MnameToMvalue = new HashMap<String, GenericTypeWrapper>();
+    private static final long serialVersionUID = -7541362340216315513L;
 
-	private HashMap<String, ProActiveInterface> itfNameToItf = new HashMap<String, ProActiveInterface>();
+    public HashMap<String, GenericTypeWrapper> MnameToMvalue = new HashMap<String, GenericTypeWrapper>();
 
-	private HashMap<Component, ComponentMonitorController> CompToMonitorCtr = new HashMap<Component, ComponentMonitorController>();
+    private HashMap<String, ProActiveInterface> itfNameToItf = new HashMap<String, ProActiveInterface>();
 
-	private boolean isControllerInitialized = false;
+    private HashMap<Component, ComponentMonitorController> CompToMonitorCtr = new HashMap<Component, ComponentMonitorController>();
 
-	private ContentController ownerCC = null;
+    private boolean isControllerInitialized = false;
 
-	private LifeCycleController ownerLCC = null;
+    private ContentController ownerCC = null;
 
-	private Component owner = null;
+    private LifeCycleController ownerLCC = null;
 
-	public ComponentRepresentiveObjectImpl(Component owner)
-			throws NoSuchInterfaceException, IllegalLifeCycleException,
-			IllegalContentException {
-		// initial these hash maps by owner, use the other controllers to get
-		// the information
-		// infuture, use Jmx to monitor more metrics
-		this.owner =  owner;
-		initializeController();
+    private Component owner = null;
 
-		// just test
-	}
+    public ComponentRepresentiveObjectImpl(Component owner) throws NoSuchInterfaceException,
+            IllegalLifeCycleException, IllegalContentException {
+        // initial these hash maps by owner, use the other controllers to get
+        // the information
+        // infuture, use Jmx to monitor more metrics
+        this.owner = owner;
+        initializeController();
 
-	/**
-	 * initialize the some controller and the monitor controller of subcomponent
-	 * 
-	 */
-	private void initializeController() throws 
-			IllegalLifeCycleException, IllegalContentException {
-		// Initialize the controller: ContentController and LifeCycleController
-		// Maybe infuture for other controllers
-		try {
-			ownerLCC = (LifeCycleController) owner
-					.getFcInterface(Constants.LIFECYCLE_CONTROLLER);
-		} 
-		catch (NoSuchInterfaceException e) {
-//			e.printStackTrace();
-		}
-		
+        // just test
+    }
 
-		try {
-			ownerCC = (ContentController) owner
-					.getFcInterface(Constants.CONTENT_CONTROLLER);
-		} catch (NoSuchInterfaceException e) {
-//			e.printStackTrace();
-		}
+    /**
+     * initialize the some controller and the monitor controller of subcomponent
+     * 
+     */
+    private void initializeController() throws IllegalLifeCycleException, IllegalContentException {
+        // Initialize the controller: ContentController and LifeCycleController
+        // Maybe infuture for other controllers
+        try {
+            ownerLCC = (LifeCycleController) owner.getFcInterface(Constants.LIFECYCLE_CONTROLLER);
+        } catch (NoSuchInterfaceException e) {
+            //			e.printStackTrace();
+        }
 
-		isControllerInitialized = true;
+        try {
+            ownerCC = (ContentController) owner.getFcInterface(Constants.CONTENT_CONTROLLER);
+        } catch (NoSuchInterfaceException e) {
+            //			e.printStackTrace();
+        }
 
-		// Component[] cmps = ownerCC.getFcSubComponents();
-		// for (Component c : cmps) {
-		//
-		// if (c instanceof ProActiveComponent) {
-		// ProActiveComponentRepresentative cRep;
-		// cRep = (ProActiveComponentRepresentative) ((ProActiveComponent) c)
-		// .getRepresentativeOnThis();
-		//
-		// try {
-		// ComponentMonitorController cmc;
-		// cmc = (ComponentMonitorController) cRep
-		// .getFcInterface(ComponentMonitorController.CONTROLLER_NAME);
-		// CompToMonitorCtr.put(c, cmc);
-		// } catch (NoSuchInterfaceException e) {
-		//
-		// }
-		// }
-		// }
-	}
+        isControllerInitialized = true;
 
-	private void setFcName() throws NoSuchInterfaceException {
-		NameController NameC = (NameController) this.owner
-				.getFcInterface(Constants.NAME_CONTROLLER);
-		MnameToMvalue.put(AbstractComponentMonitorController.COMPONENT_NAME,
-				new GenericTypeWrapper<String>(NameC.getFcName()));
-	}
+        // Component[] cmps = ownerCC.getFcSubComponents();
+        // for (Component c : cmps) {
+        //
+        // if (c instanceof ProActiveComponent) {
+        // ProActiveComponentRepresentative cRep;
+        // cRep = (ProActiveComponentRepresentative) ((ProActiveComponent) c)
+        // .getRepresentativeOnThis();
+        //
+        // try {
+        // ComponentMonitorController cmc;
+        // cmc = (ComponentMonitorController) cRep
+        // .getFcInterface(ComponentMonitorController.CONTROLLER_NAME);
+        // CompToMonitorCtr.put(c, cmc);
+        // } catch (NoSuchInterfaceException e) {
+        //
+        // }
+        // }
+        // }
+    }
 
-	private void setFcStatus() {
-		try {
-			if (!isControllerInitialized)
-				initializeController();
-			if (ownerLCC != null) {
-				MnameToMvalue.put(
-						AbstractComponentMonitorController.COMPONENT_STATUS,
-						new GenericTypeWrapper<String>(ownerLCC.getFcState()));
-			} else {
-				MnameToMvalue.put(
-								AbstractComponentMonitorController.COMPONENT_STATUS,
-								new GenericTypeWrapper<String>(
-										AbstractComponentMonitorController.UNAVAILABLE));
-			}
-		} catch (Exception e) {
-			MnameToMvalue.put(
-					AbstractComponentMonitorController.COMPONENT_STATUS,
-					new GenericTypeWrapper<String>(
-							AbstractComponentMonitorController.UNAVAILABLE));
-		}
-	}
+    private void setFcName() throws NoSuchInterfaceException {
+        NameController NameC = (NameController) this.owner.getFcInterface(Constants.NAME_CONTROLLER);
+        MnameToMvalue.put(AbstractComponentMonitorController.COMPONENT_NAME, new GenericTypeWrapper<String>(
+            NameC.getFcName()));
+    }
 
-//	private void setHierarchicalType() throws NoSuchInterfaceException {
-//		String HierarchicalType = ((ComponentParametersController) this.owner
-//				.getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER))
-//				.getComponentParameters().getHierarchicalType();
-//		MnameToMvalue.put(
-//				AbstractComponentMonitorController.COMPONENT_HIERARCHIAL_TYPE,
-//				new GenericTypeWrapper<String>(HierarchicalType));
-//	}
+    private void setFcStatus() {
+        try {
+            if (!isControllerInitialized)
+                initializeController();
+            if (ownerLCC != null) {
+                MnameToMvalue.put(AbstractComponentMonitorController.COMPONENT_STATUS,
+                        new GenericTypeWrapper<String>(ownerLCC.getFcState()));
+            } else {
+                MnameToMvalue.put(AbstractComponentMonitorController.COMPONENT_STATUS,
+                        new GenericTypeWrapper<String>(AbstractComponentMonitorController.UNAVAILABLE));
+            }
+        } catch (Exception e) {
+            MnameToMvalue.put(AbstractComponentMonitorController.COMPONENT_STATUS,
+                    new GenericTypeWrapper<String>(AbstractComponentMonitorController.UNAVAILABLE));
+        }
+    }
 
-	@Override
-	public GenericTypeWrapper<?> getMetricByName(String MetricName) {
-		// TODO Auto-generated method stub
-		return MnameToMvalue.get(MetricName);
-	}
+    //	private void setHierarchicalType() throws NoSuchInterfaceException {
+    //		String HierarchicalType = ((ComponentParametersController) this.owner
+    //				.getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER))
+    //				.getComponentParameters().getHierarchicalType();
+    //		MnameToMvalue.put(
+    //				AbstractComponentMonitorController.COMPONENT_HIERARCHIAL_TYPE,
+    //				new GenericTypeWrapper<String>(HierarchicalType));
+    //	}
 
-	@Override
-	public Component[] listSubComponents() {
-		// TODO Auto-generated method stub
-		try {
-			if (!isControllerInitialized)
-				initializeController();
-		} catch (Exception e) {
-			return null;
-		}
-		if (this.ownerCC == null) {
-			// this is primitive component
-			return null;
-		}
-		return this.ownerCC.getFcSubComponents();
-	}
+    @Override
+    public GenericTypeWrapper<?> getMetricByName(String MetricName) {
+        // TODO Auto-generated method stub
+        return MnameToMvalue.get(MetricName);
+    }
 
-	@Override
-	public String[] listMetricName() {
-		// TODO Auto-generated method stub
-		return this.MnameToMvalue.keySet().toArray(
-				new String[MnameToMvalue.size()]);
-	}
+    @Override
+    public Component[] listSubComponents() {
+        // TODO Auto-generated method stub
+        try {
+            if (!isControllerInitialized)
+                initializeController();
+        } catch (Exception e) {
+            return null;
+        }
+        if (this.ownerCC == null) {
+            // this is primitive component
+            return null;
+        }
+        return this.ownerCC.getFcSubComponents();
+    }
 
-	@Override
-	/**
-	 * refresh the metric values
-	 */
-	public void refresh() {
-		// TODO Auto-generated method stub
-		
-		try
-		{
-			setFcName();
-			setFcStatus();
-//			setHierarchicalType();
-		}
-		catch(Exception e)
-		{
-			
-		}
-		
-	}
+    @Override
+    public String[] listMetricName() {
+        // TODO Auto-generated method stub
+        return this.MnameToMvalue.keySet().toArray(new String[MnameToMvalue.size()]);
+    }
 
-	/**
-	 * handle the notification from the MBean, parser the information and store
-	 * them in the MnameToMvalue
-	 */
-	public void handleNotification(Notification noti, Object handback) {
+    @Override
+    /**
+     * refresh the metric values
+     */
+    public void refresh() {
+        // TODO Auto-generated method stub
 
-	}
+        try {
+            setFcName();
+            setFcStatus();
+            //			setHierarchicalType();
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    /**
+     * handle the notification from the MBean, parser the information and store
+     * them in the MnameToMvalue
+     */
+    public void handleNotification(Notification noti, Object handback) {
+
+    }
 
 }

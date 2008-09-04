@@ -7,5 +7,5 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
  */
 public interface AbstractHolder {
 
-	public abstract HolderTypes getHolderType();
+    public abstract HolderTypes getHolderType();
 }

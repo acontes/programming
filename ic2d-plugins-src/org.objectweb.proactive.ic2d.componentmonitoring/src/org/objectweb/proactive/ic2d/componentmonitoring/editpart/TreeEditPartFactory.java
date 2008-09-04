@@ -6,37 +6,30 @@ import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentHolderMode
 import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModel;
 import org.objectweb.proactive.ic2d.componentmonitoring.view.ComponentTreeView;
 
-public class TreeEditPartFactory implements EditPartFactory
-{
-	private ComponentTreeView ComponentTreeView;
 
-	public TreeEditPartFactory(final ComponentTreeView ComponentTreeView)
-	{
-		this.ComponentTreeView = ComponentTreeView;
-	}
-	
-	public TreeEditPartFactory()
-	{
-	}
+public class TreeEditPartFactory implements EditPartFactory {
+    private ComponentTreeView ComponentTreeView;
 
-	public final EditPart createEditPart(final EditPart context, final Object model)
-	{
-		EditPart part = null;
-	
-		if (model instanceof ComponentHolderModel)
-		{
-			part = new ComponentHolderEditPart((ComponentHolderModel) model);
-		}
-		else if (model instanceof ComponentModel)
-		{
-			part = new ComponentEditPart((ComponentModel) model);
-		}
-		if (part != null)
-		{
-			part.setModel(model);
+    public TreeEditPartFactory(final ComponentTreeView ComponentTreeView) {
+        this.ComponentTreeView = ComponentTreeView;
+    }
 
-		}
+    public TreeEditPartFactory() {
+    }
 
-		return part;
-	}
+    public final EditPart createEditPart(final EditPart context, final Object model) {
+        EditPart part = null;
+
+        if (model instanceof ComponentHolderModel) {
+            part = new ComponentHolderEditPart((ComponentHolderModel) model);
+        } else if (model instanceof ComponentModel) {
+            part = new ComponentEditPart((ComponentModel) model);
+        }
+        if (part != null) {
+            part.setModel(model);
+
+        }
+
+        return part;
+    }
 }

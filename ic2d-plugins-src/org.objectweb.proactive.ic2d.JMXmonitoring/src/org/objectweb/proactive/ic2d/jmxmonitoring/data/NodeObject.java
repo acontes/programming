@@ -58,7 +58,7 @@ public class NodeObject extends AbstractData {
     private final RuntimeObject parent;
     private final VirtualNodeObject vnParent;
     private final String url;
-    
+
     // Warning: Don't use this variavle directly, use getProxyNodeMBean().
     private NodeWrapperMBean proxyNodeMBean;
 
@@ -70,11 +70,11 @@ public class NodeObject extends AbstractData {
         this.parent = parent;
         this.vnParent = vnParent;
         this.url = FactoryName.getCompleteUrl(url);
-      
+
         /*
          * initial the component Holder Model
          */
-      
+
     }
 
     @SuppressWarnings("unchecked")
@@ -152,17 +152,16 @@ public class NodeObject extends AbstractData {
         final Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
 
         final List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
-        
-//        ComponentModel[] componentmodels = new ComponentModel[activeObjectNames.size()]; 
+
+        //        ComponentModel[] componentmodels = new ComponentModel[activeObjectNames.size()]; 
         int index = 0;
-        
+
         for (final ObjectName oname : activeObjectNames) {
             final BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler
                     .newProxyInstance(getProActiveConnection(), oname, BodyWrapperMBean.class, false);
 
-//            System.out.println("[YYL Test OutPut:]"+"in NodeObject "+" begin to create component model 2");
-            
-            
+            //            System.out.println("[YYL Test OutPut:]"+"in NodeObject "+" begin to create component model 2");
+
             // Since the id is already contained as a String in the ObjectName
             // this call can be avoid if the UniqueID can be built from a string
             final UniqueID id = proxyBodyMBean.getID();
@@ -180,68 +179,60 @@ public class NodeObject extends AbstractData {
                 final String activeObjectName = proxyBodyMBean.getName();
                 child = new ActiveObject(this, id, activeObjectName, oname, proxyBodyMBean);
                 childrentoAdd.add(child);
-                
-                
-                
-               
-                
+
             }//  for (final ObjectName oname : activeObjectNames)
 
             // Removes from the model the not monitored or termined aos.
             childrenToRemoved.remove(idString);
-            
-            
-            
-           /**
-             * create component model here
-//             */
+
+            /**
+              * create component model here
+            //             */
             String activeObjectName = proxyBodyMBean.getName();
-//            ComponentWrapperMBean proxyComponentMBean = (ComponentWrapperMBean) MBeanServerInvocationHandler
-//            .newProxyInstance(getProActiveConnection(), oname, ComponentWrapperMBean.class, false);
-//            try
-//            {
-//                ComponentModel Cchild = new ComponentModel(this,id,activeObjectName,oname,proxyComponentMBean);
-//                
-//                
-//                Cchild.setName(activeObjectName);
-//                
-//                //using hashmap
-//                if(! getWorldObject().components.containsKey(id))
-//                      getWorldObject().components.put(id, Cchild);
-//                
-////                componentmodels[index++] = Cchild;
-//            }
-//            catch(Exception e)
-//            {
-//            	e.printStackTrace();
-//            }
-//            
-//           
-            
+            //            ComponentWrapperMBean proxyComponentMBean = (ComponentWrapperMBean) MBeanServerInvocationHandler
+            //            .newProxyInstance(getProActiveConnection(), oname, ComponentWrapperMBean.class, false);
+            //            try
+            //            {
+            //                ComponentModel Cchild = new ComponentModel(this,id,activeObjectName,oname,proxyComponentMBean);
+            //                
+            //                
+            //                Cchild.setName(activeObjectName);
+            //                
+            //                //using hashmap
+            //                if(! getWorldObject().components.containsKey(id))
+            //                      getWorldObject().components.put(id, Cchild);
+            //                
+            ////                componentmodels[index++] = Cchild;
+            //            }
+            //            catch(Exception e)
+            //            {
+            //            	e.printStackTrace();
+            //            }
+            //            
+            //           
+
         }
-//
-//        // re build the relation ship of these components
-////        ComponentHierarchicalRebuild(componentmodels);
-//        ComponentHierarchicalRebuild(getWorldObject().components);
-        
+        //
+        //        // re build the relation ship of these components
+        ////        ComponentHierarchicalRebuild(componentmodels);
+        //        ComponentHierarchicalRebuild(getWorldObject().components);
+
         /**
          * ----->>>>   finishes : create component model here
-//         */
-        
-        
+        //         */
+
         // add all children
         this.addChildren(childrentoAdd);
         // Some child have to be removed
         for (final AbstractData child : childrenToRemoved.values()) {
             org.objectweb.proactive.ic2d.console.Console.getInstance(Activator.CONSOLE_NAME).log(
                     "Active object " + child.getName() + " is no longer visible");
-            if(child instanceof ActiveObject)
-            ((ActiveObject) child).stopMonitoring(true); // unsubscribes
+            if (child instanceof ActiveObject)
+                ((ActiveObject) child).stopMonitoring(true); // unsubscribes
             // listener for this
             // child object
         }
-        
-        
+
     }
 
     @Override
@@ -327,167 +318,167 @@ public class NodeObject extends AbstractData {
         this.notifyObservers(null);
     }
 
-//    private void ComponentHierarchicalRebuild(Map<UniqueID,ComponentModel> componentmodels)
-//    {
-//    	Set<UniqueID> keys = componentmodels.keySet();
-//    	for(UniqueID key : keys)
-//    	{
-//    		ComponentModel currentModel = componentmodels.get(key);
-//    		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
-//    		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
-//    		if(subComponents!=null)
-//    		{
-//    			addSubComponents(currentModel,subComponents,componentmodels);
-//    		}
-//    	}
-//    	for(UniqueID key : keys)
-//    	{
-//    		ComponentModel currentModel = componentmodels.get(key);
-//    		if(currentModel.getParent() instanceof NodeObject)
-//    		{
-//    			currentModel.setParent(this.CHolder);
-//    			this.CHolder.addChild(currentModel);
-//    		}
-//    	}
-//    	
-//    	getWorldObject().CHolder = this.CHolder;
-////    	showComponentHierachical(getWorldObject().CHolder);
-//    }
-//    
-//    
-//    
-//    
-//    private void ComponentHierarchicalRebuild(ComponentModel[] componentmodels)
-//    {
-//    	for(int i=0;i<componentmodels.length;i++)
-//    	{
-//    		
-//    		ComponentModel currentModel = componentmodels[i];
-//    		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
-//    		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
-//    		
-//            if(subComponents!=null)
-//    		{
-//    			addSubComponents(currentModel,subComponents,componentmodels);
-//    			currentModel.setHierachical("Composite");
-//    		}
-//            else
-//            {
-//            	currentModel.setHierachical("primitive");
-//    		}
-//    	}
-//    	  	
-//    	for(ComponentModel currentModel:componentmodels)
-//    	{
-//    		if(currentModel.getParent() instanceof NodeObject)
-//    		{
-//    			currentModel.setParent(this.CHolder);
-//    			this.CHolder.addChild(currentModel);
-//    		}
-//    	}
-//    	
-//    	getWorldObject().CHolder = this.CHolder;
-//    	showComponentHierachical(getWorldObject().CHolder);
-//    	
-////    	AbstractData parent = getParent();
-////    	while(!(parent instanceof WorldObject))
-////    		parent = parent.getParent();
-////    	parent.addChild(this.CHolder);
-////    	
-//    	
-//    }
-//    
-//    private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,Map<UniqueID,ComponentModel> componentmodels)
-//    {
-//    	for(ProActiveComponent child:subcomponents)
-//    	{
-//    		UniqueID childID = child.getID();
-//    		Set<UniqueID> keys = componentmodels.keySet();
-//        	for(UniqueID key : keys)
-//        	{
-//        		if(key.equals(childID))
-//        		{
-//        			//find one child.
-//        			//if this child is not primitive one, first add its children..
-//        			ComponentModel currentModel = componentmodels.get(key);
-//            		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
-//            		ProActiveComponent[] subsubComponents = proxyMBean.getSubComponents();
-//            		if(subsubComponents!=null)
-//            		{
-//            			addSubComponents(currentModel,subsubComponents,componentmodels);
-//            			currentModel.setHierachical("Composite");
-//            		}
-//            		else
-//            		{
-//            			currentModel.setHierachical("primitive");
-//            		}
-//            		//then add it to the parent
-//        			currentModel.setParent(parent);
-//        			parent.addChild(currentModel);
-//        			componentmodels.put(parent.getID(), parent);
-//        			componentmodels.put(currentModel.getID(), currentModel);
-//        			
-//        			//if this one used to be the root, now it has its parent, delete from CHolder
-//        			
-//        			getWorldObject().CHolder.monitoredChildren.remove(currentModel.getKey());
-//            		
-//        			break;
-//        		}
-//        	}
-//    	}
-//    	
-//    	// after add all the subcomponents return;
-//    }
-//    
-//    private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,ComponentModel[] componentmodels)
-//    {
-//    	for(ProActiveComponent child:subcomponents)
-//    	{
-//    		UniqueID childID = child.getID();
-//    		for(ComponentModel CM:componentmodels)
-//    		{
-//    			if(CM.getComponentWrapperMBean().getID().equals(childID))
-//    			{
-//    				CM.setParent(parent);
-//    				parent.addChild(CM);
-//    				break;
-//    			}
-//    		}
-//    	}
-//    }
-//    
-//    private void showComponentHierachical(ComponentHolderModel CHolder)
-//    {
-////    	System.out.println("[YYL Test OutPut:]"+"in NodeObject"+"this.CHolder has "+CHolder.getMonitoredChildrenSize()+" children");
-//    	List<AbstractData> childrens = CHolder.getMonitoredChildrenAsList();
-//    	if(childrens!=null)
-//    	{
-//    		for(AbstractData child:childrens)
-//    		{
-//    			ComponentModel tmpChild = (ComponentModel)child;
-//    			showComponent(tmpChild,CHolder.getName());
-//    		}
-//    	}
-//    	
-//    }
-//    
-//    private void showComponent(ComponentModel model,String parent)
-//    {
-//    	System.out.println("[YYL Test OutPut:]"+"in NodeObject "+model.getName()+" parent ="+parent);
-//    	List<AbstractData> childrens = model.getMonitoredChildrenAsList();
-//    	if(childrens!=null)
-//    	{
-//    		for(AbstractData child:childrens)
-//    		{
-//    			ComponentModel tmpChild = (ComponentModel)child;
-//    			showComponent(tmpChild,model.getName());
-//    		}
-//    	}
-//    }
-//    
-//    public ComponentHolderModel getComponentHolderModel()
-//    {
-//    	return this.CHolder;
-//    }
-   
+    //    private void ComponentHierarchicalRebuild(Map<UniqueID,ComponentModel> componentmodels)
+    //    {
+    //    	Set<UniqueID> keys = componentmodels.keySet();
+    //    	for(UniqueID key : keys)
+    //    	{
+    //    		ComponentModel currentModel = componentmodels.get(key);
+    //    		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
+    //    		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
+    //    		if(subComponents!=null)
+    //    		{
+    //    			addSubComponents(currentModel,subComponents,componentmodels);
+    //    		}
+    //    	}
+    //    	for(UniqueID key : keys)
+    //    	{
+    //    		ComponentModel currentModel = componentmodels.get(key);
+    //    		if(currentModel.getParent() instanceof NodeObject)
+    //    		{
+    //    			currentModel.setParent(this.CHolder);
+    //    			this.CHolder.addChild(currentModel);
+    //    		}
+    //    	}
+    //    	
+    //    	getWorldObject().CHolder = this.CHolder;
+    ////    	showComponentHierachical(getWorldObject().CHolder);
+    //    }
+    //    
+    //    
+    //    
+    //    
+    //    private void ComponentHierarchicalRebuild(ComponentModel[] componentmodels)
+    //    {
+    //    	for(int i=0;i<componentmodels.length;i++)
+    //    	{
+    //    		
+    //    		ComponentModel currentModel = componentmodels[i];
+    //    		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
+    //    		ProActiveComponent[] subComponents = proxyMBean.getSubComponents();
+    //    		
+    //            if(subComponents!=null)
+    //    		{
+    //    			addSubComponents(currentModel,subComponents,componentmodels);
+    //    			currentModel.setHierachical("Composite");
+    //    		}
+    //            else
+    //            {
+    //            	currentModel.setHierachical("primitive");
+    //    		}
+    //    	}
+    //    	  	
+    //    	for(ComponentModel currentModel:componentmodels)
+    //    	{
+    //    		if(currentModel.getParent() instanceof NodeObject)
+    //    		{
+    //    			currentModel.setParent(this.CHolder);
+    //    			this.CHolder.addChild(currentModel);
+    //    		}
+    //    	}
+    //    	
+    //    	getWorldObject().CHolder = this.CHolder;
+    //    	showComponentHierachical(getWorldObject().CHolder);
+    //    	
+    ////    	AbstractData parent = getParent();
+    ////    	while(!(parent instanceof WorldObject))
+    ////    		parent = parent.getParent();
+    ////    	parent.addChild(this.CHolder);
+    ////    	
+    //    	
+    //    }
+    //    
+    //    private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,Map<UniqueID,ComponentModel> componentmodels)
+    //    {
+    //    	for(ProActiveComponent child:subcomponents)
+    //    	{
+    //    		UniqueID childID = child.getID();
+    //    		Set<UniqueID> keys = componentmodels.keySet();
+    //        	for(UniqueID key : keys)
+    //        	{
+    //        		if(key.equals(childID))
+    //        		{
+    //        			//find one child.
+    //        			//if this child is not primitive one, first add its children..
+    //        			ComponentModel currentModel = componentmodels.get(key);
+    //            		ComponentWrapperMBean proxyMBean = currentModel.getComponentWrapperMBean();
+    //            		ProActiveComponent[] subsubComponents = proxyMBean.getSubComponents();
+    //            		if(subsubComponents!=null)
+    //            		{
+    //            			addSubComponents(currentModel,subsubComponents,componentmodels);
+    //            			currentModel.setHierachical("Composite");
+    //            		}
+    //            		else
+    //            		{
+    //            			currentModel.setHierachical("primitive");
+    //            		}
+    //            		//then add it to the parent
+    //        			currentModel.setParent(parent);
+    //        			parent.addChild(currentModel);
+    //        			componentmodels.put(parent.getID(), parent);
+    //        			componentmodels.put(currentModel.getID(), currentModel);
+    //        			
+    //        			//if this one used to be the root, now it has its parent, delete from CHolder
+    //        			
+    //        			getWorldObject().CHolder.monitoredChildren.remove(currentModel.getKey());
+    //            		
+    //        			break;
+    //        		}
+    //        	}
+    //    	}
+    //    	
+    //    	// after add all the subcomponents return;
+    //    }
+    //    
+    //    private void addSubComponents(ComponentModel parent,ProActiveComponent[] subcomponents,ComponentModel[] componentmodels)
+    //    {
+    //    	for(ProActiveComponent child:subcomponents)
+    //    	{
+    //    		UniqueID childID = child.getID();
+    //    		for(ComponentModel CM:componentmodels)
+    //    		{
+    //    			if(CM.getComponentWrapperMBean().getID().equals(childID))
+    //    			{
+    //    				CM.setParent(parent);
+    //    				parent.addChild(CM);
+    //    				break;
+    //    			}
+    //    		}
+    //    	}
+    //    }
+    //    
+    //    private void showComponentHierachical(ComponentHolderModel CHolder)
+    //    {
+    ////    	System.out.println("[YYL Test OutPut:]"+"in NodeObject"+"this.CHolder has "+CHolder.getMonitoredChildrenSize()+" children");
+    //    	List<AbstractData> childrens = CHolder.getMonitoredChildrenAsList();
+    //    	if(childrens!=null)
+    //    	{
+    //    		for(AbstractData child:childrens)
+    //    		{
+    //    			ComponentModel tmpChild = (ComponentModel)child;
+    //    			showComponent(tmpChild,CHolder.getName());
+    //    		}
+    //    	}
+    //    	
+    //    }
+    //    
+    //    private void showComponent(ComponentModel model,String parent)
+    //    {
+    //    	System.out.println("[YYL Test OutPut:]"+"in NodeObject "+model.getName()+" parent ="+parent);
+    //    	List<AbstractData> childrens = model.getMonitoredChildrenAsList();
+    //    	if(childrens!=null)
+    //    	{
+    //    		for(AbstractData child:childrens)
+    //    		{
+    //    			ComponentModel tmpChild = (ComponentModel)child;
+    //    			showComponent(tmpChild,model.getName());
+    //    		}
+    //    	}
+    //    }
+    //    
+    //    public ComponentHolderModel getComponentHolderModel()
+    //    {
+    //    	return this.CHolder;
+    //    }
+
 }

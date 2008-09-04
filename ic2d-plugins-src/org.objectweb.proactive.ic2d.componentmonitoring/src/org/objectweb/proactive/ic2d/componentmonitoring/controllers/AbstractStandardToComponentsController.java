@@ -12,14 +12,14 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
-public abstract class AbstractStandardToComponentsController implements Observer, StandardToComponentsController {
-    private static final Logger logger = Logger.getLogger(AbstractStandardToComponentsController.class.getName());
+public abstract class AbstractStandardToComponentsController implements Observer,
+        StandardToComponentsController {
+    private static final Logger logger = Logger.getLogger(AbstractStandardToComponentsController.class
+            .getName());
     /**
      * The figure of the parent controller
      */
-    
 
-   
     private final AbstractData modelObject; // model object
 
     /**
@@ -38,7 +38,7 @@ public abstract class AbstractStandardToComponentsController implements Observer
      * @param parentFigure3D
      * @param parent
      */
-    public AbstractStandardToComponentsController(final AbstractData modelObject, 
+    public AbstractStandardToComponentsController(final AbstractData modelObject,
             final StandardToComponentsController parent) {
         this.modelObject = modelObject;
         this.parent = parent;
@@ -47,8 +47,8 @@ public abstract class AbstractStandardToComponentsController implements Observer
     }
 
     public void update(final Observable observable, final Object arg) {
-//    	System.out.println("AbstractStandardToComponentsController.update()");
-    	
+        //    	System.out.println("AbstractStandardToComponentsController.update()");
+
         // get the notification data
         final MVCNotification mvcNotif = (MVCNotification) arg;
         final MVCNotificationTag mvcNotifTag = mvcNotif.getMVCNotification();
@@ -65,11 +65,12 @@ public abstract class AbstractStandardToComponentsController implements Observer
                         .getMonitoredChild(figureKey);
 
                 // System.out.println("----------->> new host added: "+hostKey);
-                final StandardToComponentsController controller = this.createChildController(childModelObject);
+                final StandardToComponentsController controller = this
+                        .createChildController(childModelObject);
                 this.addChildController(controller);
                 //			AbstractFigure3DController.registry.put(childModelObject,
                 //					controller);
-//                System.out.println("in AbstractStandardToComponentsController get Notification : add Child");
+                //                System.out.println("in AbstractStandardToComponentsController get Notification : add Child");
 
                 break;
             }
@@ -81,40 +82,43 @@ public abstract class AbstractStandardToComponentsController implements Observer
                     final String modelObjectKey = keys.get(k);
                     final AbstractData childModelObject = this.modelObject.getChild(modelObjectKey);
 
-                    final StandardToComponentsController controller = this.createChildController(childModelObject);
+                    final StandardToComponentsController controller = this
+                            .createChildController(childModelObject);
                     this.addChildController(controller);
                     //				AbstractFigure3DController.registry.put(childModelObject,
                     //						controller);
                 } // [for all keys]
-                
-//                System.out.println("in AbstractStandardToComponentsController get Notification : add Children");
+
+                //                System.out.println("in AbstractStandardToComponentsController get Notification : add Children");
                 break;
             } // [case ADD_CHILDREN]
             case REMOVE_CHILD: {
                 final String figureKey = (String) mvcNotif.getData();
-                final StandardToComponentsController childController = this.getChildControllerByKey(figureKey);
-                AbstractStandardToComponentsController.logger.debug("Removing child controller: " + "key [" + figureKey +
-                    "]" + " controller [" + childController + "]...");
+                final StandardToComponentsController childController = this
+                        .getChildControllerByKey(figureKey);
+                AbstractStandardToComponentsController.logger.debug("Removing child controller: " + "key [" +
+                    figureKey + "]" + " controller [" + childController + "]...");
                 if (childController == null) {
                     AbstractStandardToComponentsController.logger.debug("Child already removed " + figureKey);
                     return;
                 }
 
                 childController.remove();
-                AbstractStandardToComponentsController.logger.debug("Child controller: " + "key [" + figureKey + "]" +
-                    " controller [" + childController + "] removed");
+                AbstractStandardToComponentsController.logger.debug("Child controller: " + "key [" +
+                    figureKey + "]" + " controller [" + childController + "] removed");
                 break;
             }
-            //TODO: see if we need this in the component view 
+                //TODO: see if we need this in the component view 
             case REMOVE_CHILD_FROM_MONITORED_CHILDREN: {
                 final String figureKey = (String) mvcNotif.getData();
-                final StandardToComponentsController childController = this.getChildControllerByKey(figureKey);
+                final StandardToComponentsController childController = this
+                        .getChildControllerByKey(figureKey);
                 if (childController == null) {
                     AbstractStandardToComponentsController.logger.debug("Child already removed " + figureKey);
                     return;
                 }
-                AbstractStandardToComponentsController.logger
-                        .debug("Removing child:" + figureKey + ":" + childController);
+                AbstractStandardToComponentsController.logger.debug("Removing child:" + figureKey + ":" +
+                    childController);
 
                 childController.remove();
                 break;
@@ -129,19 +133,19 @@ public abstract class AbstractStandardToComponentsController implements Observer
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.Figure3DController#remove()
      */
     public void remove() {
-        AbstractStandardToComponentsController.logger.debug("Trying to remove all the children for controller [" 
-        		+ this.toString() + "]");
+        AbstractStandardToComponentsController.logger
+                .debug("Trying to remove all the children for controller [" + this.toString() + "]");
         this.removeChildren();
-        AbstractStandardToComponentsController.logger.debug("All children removed for controller [" 
-        		+ this.toString() + "]");
+        AbstractStandardToComponentsController.logger.debug("All children removed for controller [" +
+            this.toString() + "]");
         AbstractStandardToComponentsController.logger.debug("Unsubscribing as a listener... ");
 
         // unsubscribe itself as observer
         this.modelObject.deleteObserver(this);
-        AbstractStandardToComponentsController.logger.debug("I'm removing myself from the controller registry... ");
-      
+        AbstractStandardToComponentsController.logger
+                .debug("I'm removing myself from the controller registry... ");
 
-       }
+    }
 
     /*
      * (non-Javadoc)
@@ -150,8 +154,8 @@ public abstract class AbstractStandardToComponentsController implements Observer
      */
     public void removeChildren() {
         for (final StandardToComponentsController c : this.childrenControllers) {
-            if(c != null)
-            	c.remove();
+            if (c != null)
+                c.remove();
         }
     }
 
@@ -190,15 +194,14 @@ public abstract class AbstractStandardToComponentsController implements Observer
             return null;
         }
         for (final StandardToComponentsController c : this.childrenControllers) {
-            if( c == null)
-            	return null;
-        	if (key.equals(c.getModelObject().getKey())) {
+            if (c == null)
+                return null;
+            if (key.equals(c.getModelObject().getKey())) {
                 return c;
             }
         }
         return null;
     }
-
 
     // use it to create the appropriate child controller
     protected abstract StandardToComponentsController createChildController(AbstractData figure);

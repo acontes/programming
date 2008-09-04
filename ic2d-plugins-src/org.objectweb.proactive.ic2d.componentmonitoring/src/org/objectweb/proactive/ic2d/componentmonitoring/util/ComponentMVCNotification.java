@@ -31,7 +31,6 @@ package org.objectweb.proactive.ic2d.componentmonitoring.util;
  * ################################################################
  */
 
-
 /**
  * ComponentMVCNotifications are used in the IC2D MVC Pattern. The model objects
  * send ComponentMVCNotifications which are treated by the EditParts.
@@ -61,4 +60,3 @@ public class ComponentMVCNotification {
         return data;
     }
 }
-

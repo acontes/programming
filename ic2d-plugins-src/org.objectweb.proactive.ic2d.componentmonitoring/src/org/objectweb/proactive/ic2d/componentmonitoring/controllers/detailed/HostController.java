@@ -10,19 +10,15 @@ import org.objectweb.proactive.ic2d.componentmonitoring.controllers.StandardToCo
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
 
-
 /**
  * @author vjuresch
  * 
  */
 public class HostController extends AbstractStandardToComponentsController {
-    public HostController(final AbstractData modelObject,
-            final StandardToComponentsController parent) {
-        super(modelObject,  parent);
+    public HostController(final AbstractData modelObject, final StandardToComponentsController parent) {
+        super(modelObject, parent);
         // TODO Auto-generated constructor stub
     }
-
-
 
     /*
      * (non-Javadoc)
@@ -36,12 +32,12 @@ public class HostController extends AbstractStandardToComponentsController {
 
     @Override
     protected AbstractStandardToComponentsController createChildController(final AbstractData modelObject) {
-        return new RuntimeController(modelObject,  this);
+        return new RuntimeController(modelObject, this);
     }
-    
+
     @Override
     public void update(final Observable o, final Object arg) {
-    	System.out.println("HostController.update()");
-    	super.update(o, arg);
+        System.out.println("HostController.update()");
+        super.update(o, arg);
     }
 }
