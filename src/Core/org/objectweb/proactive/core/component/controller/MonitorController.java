@@ -3,8 +3,7 @@ package org.objectweb.proactive.core.component.controller;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.exceptions.AmbiguousMethodNameException;
-import org.objectweb.proactive.core.component.exceptions.MethodNotFoundException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
@@ -55,8 +54,7 @@ public interface MonitorController {
      * @return MethodStatistics instance containing all the statistics of the desired methods.
      * @throws Exception MethodNotFoundException
      */
-    public MethodStatistics getStatistics(String itfName, String methodName) throws MethodNotFoundException,
-            AmbiguousMethodNameException;
+    public MethodStatistics getStatistics(String itfName, String methodName) throws ProActiveRuntimeException;
 
     /**
      * Get the statistics of a method exposed by a component server interface.
@@ -68,7 +66,7 @@ public interface MonitorController {
      * @throws Exception MethodNotFoundException
      */
     public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes)
-            throws MethodNotFoundException, AmbiguousMethodNameException;
+            throws ProActiveRuntimeException;
 
     /**
      * Get the statistics for each methods exposed by the component server interfaces.

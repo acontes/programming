@@ -25,11 +25,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.exceptions.AmbiguousMethodNameException;
-import org.objectweb.proactive.core.component.exceptions.MethodNotFoundException;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
-import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
@@ -183,13 +180,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         startMonitoring();
     }
 
-    public MethodStatistics getStatistics(String itfName, String methodName) throws MethodNotFoundException,
-            AmbiguousMethodNameException {
+    public MethodStatistics getStatistics(String itfName, String methodName) throws ProActiveRuntimeException {
         return getStatistics(itfName, methodName, new Class<?>[] {});
     }
 
     public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes)
-            throws MethodNotFoundException, AmbiguousMethodNameException {
+            throws ProActiveRuntimeException {
         String supposedCorrespondingKey = MonitorControllerHelper.generateKey(itfName, methodName,
                 parametersTypes).stringValue();
         MethodStatistics methodStats = statistics.get(supposedCorrespondingKey);
@@ -203,14 +199,14 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     if (correspondingKey == null)
                         correspondingKey = keys[i];
                     else
-                        throw new AmbiguousMethodNameException("The method name: " + methodName +
+                        throw new ProActiveRuntimeException("The method name: " + methodName +
                             " of the interface " + itfName + " is ambiguous: more than 1 method found");
                 }
             }
             if (correspondingKey != null)
                 return statistics.get(correspondingKey);
             else
-                throw new MethodNotFoundException("The method: " + methodName + "() of the interface " +
+                throw new ProActiveRuntimeException("The method: " + methodName + "() of the interface " +
                     itfName + " cannot be found so no statistics are available");
         } else {
             String msg = "The method: " + methodName + "(";
@@ -220,7 +216,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     msg += ", ";
             }
             msg += ") of the interface " + itfName + " cannot be found so no statistics are available";
-            throw new MethodNotFoundException(msg);
+            throw new ProActiveRuntimeException(msg);
         }
     }
 
