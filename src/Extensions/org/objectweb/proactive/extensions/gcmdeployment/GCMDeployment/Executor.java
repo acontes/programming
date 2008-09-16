@@ -31,29 +31,36 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment;
 
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
 
 public class Executor {
     final static private Executor singleton = new Executor();
     private List<Thread> threads;
     private long jobId;
+    private ThreadPoolExecutor threadPool;
 
     private Executor() {
         GCMD_LOGGER.trace("Executor started");
         threads = new ArrayList<Thread>();
         jobId = 0;
+        threadPool = new ThreadPoolExecutor(2, Integer.MAX_VALUE, 1, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>());
     }
 
     static public synchronized Executor getExecutor() {
@@ -95,16 +102,10 @@ public class Executor {
         Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT + ".job." + jobId);
         jobId++;
 
-        Thread job = new Thread(jobRequest);
-        
-        try {
-            job.run();
-            job.join();
-        } catch (InterruptedException e) {
-            logger.warn("Failed to run job", e);
-        }
+        logger.trace("Job started: " + jobId);
+        threadPool.submit(jobRequest);
     }
-    
+
     private enum MonitorType {
         STDOUT, STDERR;
     }

@@ -103,7 +103,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private void startJavaGroups(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         List<JavaGroup> javaGroups = resources.getJavaGroups();
         for (JavaGroup javaGroup : javaGroups) {
-            Runnable javaJob = javaGroup.buildJavaJob();
+            Runnable javaJob = javaGroup.buildJavaJob(gcma);
             Executor.getExecutor().submit(javaJob);
         }
     }

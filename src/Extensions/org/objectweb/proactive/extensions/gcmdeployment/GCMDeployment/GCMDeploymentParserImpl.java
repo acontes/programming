@@ -451,6 +451,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 if (javaGroup == null) {
                     throw new RuntimeException("no group with refid " + refid + " has been defined");
                 } else {
+                    // no need to parse the group node itself, the hostinfo is irrelevant in this case
                     resources.addJavaGroup(javaGroup);
                 }
             } else {

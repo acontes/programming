@@ -1,36 +1,60 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
+
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
 
-import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
+import java.util.List;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 
 import com.amazonaws.ec2.AmazonEC2;
 import com.amazonaws.ec2.AmazonEC2Exception;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+import com.amazonaws.ec2.model.Reservation;
 import com.amazonaws.ec2.model.RunInstancesRequest;
 import com.amazonaws.ec2.model.RunInstancesResponse;
+import com.amazonaws.ec2.model.RunInstancesResult;
+import com.amazonaws.ec2.model.RunningInstance;
 
 
 public class GroupEC2 extends AbstractJavaGroup {
 
-    public static final String EC2_NAMESPACE = "http://ec2.amazonaws.com/doc/2008-05-05";
-    private PathElement privateKey;
-    private PathElement certification;
-    private String imageName;
+    private String imageId;
     private String accessKeyId;
     private String secretAccessKey;
-
-    //    @Override
-    //    public List<String> internalBuildCommands() {
-    //        List<String> res = new ArrayList<String>();
-    //        
-    //        StringBuffer command = new StringBuffer();
-    //        
-    //        command.append(getCommandPath());
-    //        command.append(" ec2-run-instances ");
-    //        command.append(imageName);
-    //        // TODO - or use soap API ?
-    //        res.add(command.toString());
-    //        return res;
-    //    }
+    private String hostCapacity = "1";
+    private String vmCapacity = "1";
 
     static protected class EC2InstanceRunner implements Runnable {
         AmazonEC2 service;
@@ -48,6 +72,24 @@ public class GroupEC2 extends AbstractJavaGroup {
 
             try {
                 response = service.runInstances(request);
+
+                if (response.isSetRunInstancesResult()) {
+                    RunInstancesResult runInstancesResult = response.getRunInstancesResult();
+                    if (runInstancesResult.isSetReservation()) {
+                        Reservation reservation = runInstancesResult.getReservation();
+                        List<RunningInstance> runningInstanceList = reservation.getRunningInstance();
+                        for (RunningInstance runningInstance : runningInstanceList) {
+                            if (runningInstance.isSetInstanceId()) {
+                                System.out.print("                    InstanceId");
+                                System.out.println();
+                                System.out
+                                        .print("                        " + runningInstance.getInstanceId());
+                                System.out.println();
+                            }
+                        }
+                    }
+                }
+
             } catch (AmazonEC2Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -60,28 +102,51 @@ public class GroupEC2 extends AbstractJavaGroup {
     }
 
     @Override
-    public Runnable buildJavaJob() {
-
-//        String accessKeyId = "1K6JVRSE482QZZ8N7302";
-//        String secretAccessKey = "QUItsO2PiZoFATBv6wdFFeyst3LIO+0l4XqtfaS5";
+    public Runnable buildJavaJob(GCMApplicationInternal gcma) {
 
         RunInstancesRequest request = new RunInstancesRequest();
 
-        StringBuffer userData = new StringBuffer();
+        request.setImageId(imageId);
 
-        request.setUserData(userData.toString());
+        try {
+            StringBuffer userData = new StringBuffer();
+            String parentURL = RuntimeFactory.getDefaultRuntime().getURL();
 
-        EC2InstanceRunner instanceRunner = new EC2InstanceRunner(accessKeyId, secretAccessKey, request);
-        
-        return new Thread(instanceRunner);
+            // set root node access data in the instance's user data, one item per line,
+            // according to the following sequence :
+            //
+            // 1 parentURL
+            // 2 hostCapacity
+            // 3 vmCapacity
+            // 4 deploymentId
+            // 
+            userData.append(parentURL);
+            userData.append('\n');
+            userData.append(hostCapacity);
+            userData.append('\n');
+            userData.append(vmCapacity);
+            userData.append('\n');
+            userData.append(gcma.getDeploymentId());
+            userData.append('\n');
+
+            request.setUserData(userData.toString());
+
+            EC2InstanceRunner instanceRunner = new EC2InstanceRunner(accessKeyId, secretAccessKey, request);
+
+            return instanceRunner;
+            
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
     }
 
     public void setAccessKeyId(String accessKeyId) {
-        this.accessKeyId = accessKeyId;        
+        this.accessKeyId = accessKeyId;
     }
 
     public void setSecretAccessKey(String secretAccessKey) {
@@ -91,7 +156,23 @@ public class GroupEC2 extends AbstractJavaGroup {
     @Override
     public void check() throws IllegalStateException {
         // TODO Auto-generated method stub
-        
+
+    }
+
+    public String getHostCapacity() {
+        return hostCapacity;
+    }
+
+    public void setHostCapacity(String hostCapacity) {
+        this.hostCapacity = hostCapacity;
+    }
+
+    public String getVmCapacity() {
+        return vmCapacity;
+    }
+
+    public void setVmCapacity(String vmCapacity) {
+        this.vmCapacity = vmCapacity;
     }
 
 }

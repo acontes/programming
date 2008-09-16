@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
 
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
+
 
 public interface JavaGroup {
     public String getId();
@@ -45,10 +47,11 @@ public interface JavaGroup {
 
     /**
      * Build the command to start the group
+     * @param gcma 
      *
      * @param commandBuilder The final command builder
      * @return The command to be used to start this group
      */
-    public Runnable buildJavaJob(); // TODO - find what args to pass
+    public Runnable buildJavaJob(GCMApplicationInternal gcma);
 
 }

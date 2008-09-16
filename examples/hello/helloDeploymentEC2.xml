@@ -4,6 +4,8 @@
 
 	<environment>
 		<javaPropertyVariable name="user.dir" />
+		<javaPropertyVariable name="ec2.accessKeyId" />
+		<javaPropertyVariable name="ec2.secretAccessKey" />
 		<javaPropertyDescriptorDefault name="os" value="windows" />
 	</environment>
 
@@ -16,11 +18,15 @@
 	<infrastructure>
 
 		<groups>
-			<ec2Group id="ec2test"></ec2Group>
+			<ec2Group id="ec2test">
+				<imageId>ami-60a54009</imageId> <!-- change this to new image -->
+				<accessKeyId>${ec2.accessKeyId}</accessKeyId>
+				<secretAccessKey>${ec2.secretAccessKey}</secretAccessKey>
+			</ec2Group>
 		</groups>
 
 		<hosts>
-			<host id="dummy" os="unix">
+			<host id="dummy" os="unix" hostCapacity="2" vmCapacity="2">
 				<homeDirectory base="root" relpath="dummy" />
 			</host>
 		</hosts>
