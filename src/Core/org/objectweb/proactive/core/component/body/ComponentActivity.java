@@ -43,6 +43,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.ActiveBody;
+import org.objectweb.proactive.core.component.reconfiguration.tagrequest.ComponentService;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -152,7 +153,7 @@ public class ComponentActivity implements RunActive, InitActive, EndActive, Seri
             // activity
             // that can be redefined on the reified object.
             try {
-                Service componentService = new Service(body);
+                ComponentService componentService = new ComponentService(body);
                 NFRequestFilterImpl nfRequestFilter = new NFRequestFilterImpl();
                 while (body.isActive()) {
                     ComponentBody componentBody = (ComponentBody) body;
@@ -222,7 +223,7 @@ public class ComponentActivity implements RunActive, InitActive, EndActive, Seri
 
     private class ComponentFIFORunActive implements RunActive, Serializable {
         public void runActivity(Body body) {
-            new Service(body).fifoServing();
+            new ComponentService(body).fifoServing();
         }
     }
 
