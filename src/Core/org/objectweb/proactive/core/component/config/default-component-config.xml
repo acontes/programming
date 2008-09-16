@@ -41,11 +41,12 @@
             <interface>org.objectweb.proactive.core.component.reconfiguration.tagrequest.ProActiveAOPLikeController</interface>
             <implementation>org.objectweb.proactive.core.component.reconfiguration.tagrequest.ProActiveAOPLikeControllerImpl</implementation>
         </controller>
-        
-        <!--controller input-interceptor="true" output-interceptor="true">
+             
+        <controller input-interceptor="true" output-interceptor="true">
             <interface>org.objectweb.proactive.core.component.reconfiguration.tagrequest.DefaultInputOutputInterceptor</interface>
-            <implementation>org.objectweb.proactive.core.component.reconfiguration.tagrequest.DefaultInputOutputInterceptor</implementation>
-        </controller-->
+            <implementation>org.objectweb.proactive.core.component.reconfiguration.tagrequest.DefaultInputOutputInterceptorImpl</implementation>
+        </controller>
+        
     </controllers>
     
 </componentConfiguration>
