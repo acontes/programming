@@ -52,7 +52,7 @@ public interface MonitorController {
      * @param itfName Name of the server interface where the method is exposed.
      * @param methodName Name of the method.
      * @return MethodStatistics instance containing all the statistics of the desired methods.
-     * @throws Exception MethodNotFoundException
+     * @throws Exception If the method cannot be identified or found.
      */
     public MethodStatistics getStatistics(String itfName, String methodName) throws ProActiveRuntimeException;
 
@@ -63,14 +63,14 @@ public interface MonitorController {
      * @param methodName Name of the method.
      * @param parametersTypes Types of the parameters of the method.
      * @return MethodStatistics instance containing all the statistics of the desired methods.
-     * @throws Exception MethodNotFoundException
+     * @throws Exception If the method cannot be identified or found.
      */
     public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes)
             throws ProActiveRuntimeException;
 
     /**
      * Get the statistics for each methods exposed by the component server interfaces.
-     * Use the {@link  org.objectweb.proactive.core.component.controller.MonitorController.generateKey}
+     * Use the {@link  org.objectweb.proactive.core.component.controller.MonitorControllerHelper.generateKey}
      * method to retrieve desired method statistics.
      * 
      * @return All the statistics in a map structured like this

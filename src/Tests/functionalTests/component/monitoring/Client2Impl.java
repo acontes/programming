@@ -9,7 +9,7 @@ import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
 public class Client2Impl implements Runner, BindingController {
-    private static final long SLEEP_TIME = 50;
+    private static final long SLEEP_TIME = 20;
     private static final String[] ITF_NAMES_FOR_EACH_METHOD = { "service2", "service2", "service2" }; // , "service3", "service3" };
     private static final String[] METHOD_NAMES = { "doAnotherThing", "getDouble", "getBoolean" }; //, "foo", "executeAlone" };
     private static final int NB_ITERATIONS = 100;

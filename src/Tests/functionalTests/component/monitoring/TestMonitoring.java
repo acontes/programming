@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.NameController;
@@ -24,6 +23,7 @@ import functionalTests.ComponentTest;
  * @author The ProActive Team
  */
 public class TestMonitoring extends ComponentTest {
+    private static final long OVERHEAD = 1000;
     private Factory factory;
     private Component root;
     private MonitorController monitor;
@@ -35,14 +35,6 @@ public class TestMonitoring extends ComponentTest {
         root = (Component) factory.newComponent("functionalTests.component.monitoring.adl.TestPrimitive",
                 context);
 
-        Component[] subComponents = Fractal.getContentController(root).getFcSubComponents();
-        for (int i = 0; i < subComponents.length; i++) {
-            if (((NameController) subComponents[i].getFcInterface(Constants.NAME_CONTROLLER)).getFcName()
-                    .equals("server"))
-                monitor = (MonitorController) subComponents[i].getFcInterface(Constants.MONITOR_CONTROLLER);
-        }
-
-        Fractal.getLifeCycleController(root).startFc();
         start();
     }
 
@@ -53,35 +45,51 @@ public class TestMonitoring extends ComponentTest {
         root = (Component) factory.newComponent("functionalTests.component.monitoring.adl.TestComposite",
                 context);
 
-        Component[] subComponents = Fractal.getContentController(root).getFcSubComponents();
-        for (int i = 0; i < subComponents.length; i++) {
-            if (((NameController) subComponents[i].getFcInterface(Constants.NAME_CONTROLLER)).getFcName()
-                    .equals("servercomposite"))
-                monitor = (MonitorController) subComponents[i].getFcInterface(Constants.MONITOR_CONTROLLER);
-        }
+        start();
+    }
 
-        Fractal.getLifeCycleController(root).startFc();
+    @org.junit.Test
+    public void testMonitoringCompositeComponentWithMulticast() throws Exception {
+        factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+        Map<Object, Object> context = new HashMap<Object, Object>();
+        root = (Component) factory.newComponent(
+                "functionalTests.component.monitoring.adl.TestCompositeMulticast", context);
+
         start();
     }
 
     private void printStats() {
         Iterator<MethodStatistics> stats = monitor.getAllStatistics().values().iterator();
-        while (stats.hasNext())
+        while (stats.hasNext()) {
             System.out.println(stats.next().toString());
+        }
     }
 
-    private boolean checkTime(double supposedTime, double realTime) {
-        return ((supposedTime * 0.70) <= realTime);
+    private void checkTime(double supposedTime, double realTime) {
+        assertTrue("Measured time is lesser than expected (" + realTime + " instead of " +
+            (supposedTime * 0.7) + ")", (supposedTime * 0.7) <= realTime);
+        assertTrue("Measured time is greater than expected (" + realTime + " instead of " +
+            ((supposedTime * 1.3) + OVERHEAD) + ")", realTime <= ((supposedTime * 1.3) + OVERHEAD));
     }
 
     private void checkMethodStatistics(String itfName, String methodName, int nbCalls, int nbMethods,
-            long sleepTimeCallMethod) {
+            long sleepTimeCallMethod) throws Exception {
         MethodStatistics methodStats = monitor.getStatistics(itfName, methodName);
-        assertTrue(checkTime(ServerImpl.EXECUTION_TIME, methodStats.getAverageServiceTime()));
-        assertTrue(checkTime(nbMethods * sleepTimeCallMethod, methodStats.getAverageInterArrivalTime()));
+        checkTime(ServerImpl.EXECUTION_TIME, methodStats.getAverageServiceTime());
+        checkTime(nbMethods * sleepTimeCallMethod, methodStats.getAverageInterArrivalTime());
     }
 
     public void start() throws Exception {
+        Component[] subComponents = Fractal.getContentController(root).getFcSubComponents();
+        for (int i = 0; i < subComponents.length; i++) {
+            if (((NameController) subComponents[i].getFcInterface(Constants.NAME_CONTROLLER)).getFcName()
+                    .equals("server")) {
+                monitor = (MonitorController) subComponents[i].getFcInterface(Constants.MONITOR_CONTROLLER);
+            }
+        }
+
+        Fractal.getLifeCycleController(root).startFc();
+
         Runner runner1 = ((Runner) root.getFcInterface("runner1"));
         Runner runner2 = ((Runner) root.getFcInterface("runner2"));
         monitor.startMonitoring();

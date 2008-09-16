@@ -10,11 +10,11 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public class ServerImpl implements Service1, Service2, Service3Gathercast {
-    public static final long EXECUTION_TIME = 100;
+    public static final long EXECUTION_TIME = 50;
 
     private void sleep() {
         try {
-            Thread.sleep(100);
+            Thread.sleep(EXECUTION_TIME);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

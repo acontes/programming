@@ -1,8 +1,16 @@
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
+/**
+ * Useful methods for the monitor controller.
+ * 
+ * @author The ProActive Team
+ * @see org.objectweb.proactive.core.component.controller.MonitorController
+ *
+ */
+@PublicAPI
 public class MonitorControllerHelper {
     private static final String KEY_INFO_SEPARATOR = "-";
 
@@ -15,13 +23,13 @@ public class MonitorControllerHelper {
      * @param parametersTypes Types of the parameters of the method.
      * @return Key built like this itfName-MethodName-ClassNameParam1-ClassNameParam2-...
      */
-    public static StringWrapper generateKey(String itfName, String methodName, Class<?>[] parametersTypes) {
+    public static String generateKey(String itfName, String methodName, Class<?>[] parametersTypes) {
         String key = itfName + KEY_INFO_SEPARATOR + methodName;
 
         for (int i = 0; i < parametersTypes.length; i++) {
             key += KEY_INFO_SEPARATOR + parametersTypes[i].getName();
         }
 
-        return new StringWrapper(key);
+        return key;
     }
 }

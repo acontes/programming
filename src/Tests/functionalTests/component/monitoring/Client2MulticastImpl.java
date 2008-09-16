@@ -5,16 +5,14 @@ import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
-public class Client1Impl implements Runner, BindingController {
+public class Client2MulticastImpl implements Runner, BindingController {
     private static final long SLEEP_TIME = 20;
-    private static final String[] ITF_NAMES_FOR_EACH_METHOD = { "service1", "service1", "service1" }; //, "service3", "service3" };
-    private static final String[] METHOD_NAMES = { "getInt", "doSomething", "hello" }; //, "foo", "executeAlone" };
+    private static final String[] ITF_NAMES_FOR_EACH_METHOD = { "service2", "service2", "service2" };
+    private static final String[] METHOD_NAMES = { "doAnotherThing", "getDouble", "getBoolean" };
     private static final int NB_ITERATIONS = 100;
-    private Service1 service1;
-    private Service3 service3;
+    private Service2Multicast service2;
     private int[] nbCallsPerMethod = new int[METHOD_NAMES.length];
 
     private void sleep() {
@@ -35,19 +33,13 @@ public class Client1Impl implements Runner, BindingController {
             nbCallsPerMethod[indexMethod]++;
             switch (indexMethod) {
                 case 0:
-                    service1.getInt();
+                    service2.doAnotherThing();
                     break;
                 case 1:
-                    service1.doSomething();
+                    service2.getDouble();
                     break;
                 case 2:
-                    service1.hello();
-                    break;
-                case 3:
-                    service3.foo(new IntMutableWrapper(1));
-                    break;
-                case 4:
-                    service3.executeAlone();
+                    service2.getBoolean();
                     break;
                 default:
                     break;
@@ -77,24 +69,20 @@ public class Client1Impl implements Runner, BindingController {
 
     public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
             IllegalBindingException, IllegalLifeCycleException {
-        if ("service1".equals(clientItfName)) {
-            service1 = (Service1) serverItf;
-        } else if ("service3".equals(clientItfName)) {
-            service3 = (Service3) serverItf;
+        if ("service2".equals(clientItfName)) {
+            service2 = (Service2Multicast) serverItf;
         } else {
             throw new NoSuchInterfaceException(clientItfName);
         }
     }
 
     public String[] listFc() {
-        return new String[] { "service1", "service3" };
+        return new String[] { "service2", "service3" };
     }
 
     public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
-        if ("service1".equals(clientItfName)) {
-            return service1;
-        } else if ("service3".equals(clientItfName)) {
-            return service3;
+        if ("service2".equals(clientItfName)) {
+            return service2;
         } else {
             throw new NoSuchInterfaceException(clientItfName);
         }

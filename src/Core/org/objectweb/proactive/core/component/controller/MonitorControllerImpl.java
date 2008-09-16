@@ -41,7 +41,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         NotificationListener {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
-    private JMXNotificationManager jmxNotificationManager;
+    private transient JMXNotificationManager jmxNotificationManager;
 
     private boolean started;
 
@@ -69,6 +69,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         PAActiveObject.setImmediateService("getStatistics", new Class[] { String.class, String.class,
                 (new Class<?>[] {}).getClass() });
         PAActiveObject.setImmediateService("getAllStatistics");
+
         statistics = Collections.synchronizedMap(new HashMap<String, MethodStatistics>());
         keysList = new HashMap<String, String>();
         NameController nc = null;
@@ -87,25 +88,31 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     (!itfType.isFcClientItf())) {
                     List<MonitorController> subcomponentMonitors = new ArrayList<MonitorController>();
                     if (isComposite()) {
-                        Iterator<ProActiveInterface> bindedProActiveinterfaces = null;
+                        Iterator<Component> bindedComponentsIterator = null;
                         if (!((ProActiveInterfaceType) itfType).isFcMulticastItf()) {
-                            List<ProActiveInterface> bindedProActiveinterface = new ArrayList<ProActiveInterface>();
-                            bindedProActiveinterface.add((ProActiveInterface) itf);
-                            bindedProActiveinterfaces = bindedProActiveinterface.iterator();
-                        }
-                        else {
+                            List<Component> bindedComponent = new ArrayList<Component>();
+                            bindedComponent.add(((ProActiveInterface) ((ProActiveInterface) itf)
+                                    .getFcItfImpl()).getFcItfOwner());
+                            bindedComponentsIterator = bindedComponent.iterator();
+                        } else {
                             try {
-                                MulticastControllerImpl multicastController = (MulticastControllerImpl) owner.getFcInterface(Constants.MULTICAST_CONTROLLER);
-                                bindedProActiveinterfaces = multicastController.getDelegatee(itf.getFcItfName()).iterator();
+                                MulticastControllerImpl multicastController = (MulticastControllerImpl) ((ProActiveInterface) owner
+                                        .getFcInterface(Constants.MULTICAST_CONTROLLER)).getFcItfImpl();
+                                Iterator<ProActiveInterface> delegatee = multicastController.getDelegatee(
+                                        itf.getFcItfName()).iterator();
+                                List<Component> bindedComponents = new ArrayList<Component>();
+                                while (delegatee.hasNext()) {
+                                    bindedComponents.add(delegatee.next().getFcItfOwner());
+                                }
+                                bindedComponentsIterator = bindedComponents.iterator();
                             } catch (NoSuchInterfaceException e) {
                                 e.printStackTrace();
-                            }                            
+                            }
                         }
                         try {
-                            while (bindedProActiveinterfaces.hasNext()) {
-                                MonitorController monitor = (MonitorController) ((ProActiveInterface) bindedProActiveinterfaces.next()
-                                        .getFcItfImpl()).getFcItfOwner()
-                                        .getFcInterface(Constants.MONITOR_CONTROLLER);
+                            while (bindedComponentsIterator.hasNext()) {
+                                MonitorController monitor = (MonitorController) bindedComponentsIterator
+                                        .next().getFcInterface(Constants.MONITOR_CONTROLLER);
                                 monitor.startMonitoring();
                                 subcomponentMonitors.add(monitor);
                             }
@@ -120,12 +127,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     for (Method m : methods) {
                         Class<?>[] parametersTypes = m.getParameterTypes();
                         String key = MonitorControllerHelper.generateKey(itf.getFcItfName(), m.getName(),
-                                parametersTypes).stringValue();
+                                parametersTypes);
                         keysList.put(m.getName(), key);
-                        if (subcomponentMonitors.isEmpty())
+                        if (subcomponentMonitors.isEmpty()) {
                             statistics.put(key, new MethodStatisticsPrimitiveImpl(itf.getFcItfName(), m
                                     .getName(), parametersTypes));
-                        else {
+                        } else {
                             statistics.put(key, new MethodStatisticsCompositeImpl(itf.getFcItfName(), m
                                     .getName(), parametersTypes, subcomponentMonitors));
                         }
@@ -151,8 +158,9 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     }
 
     public void startMonitoring() {
-        if (statistics == null)
+        if (statistics == null) {
             registerMethods();
+        }
         if (!started) {
             initMethodStatistics();
             try {
@@ -187,33 +195,36 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes)
             throws ProActiveRuntimeException {
         String supposedCorrespondingKey = MonitorControllerHelper.generateKey(itfName, methodName,
-                parametersTypes).stringValue();
+                parametersTypes);
         MethodStatistics methodStats = statistics.get(supposedCorrespondingKey);
-        if (methodStats != null)
+        if (methodStats != null) {
             return methodStats;
-        else if (parametersTypes.length == 0) {
+        } else if (parametersTypes.length == 0) {
             String correspondingKey = null;
             String[] keys = statistics.keySet().toArray(new String[] {});
             for (int i = 0; i < keys.length; i++) {
                 if (keys[i].startsWith(supposedCorrespondingKey)) {
-                    if (correspondingKey == null)
+                    if (correspondingKey == null) {
                         correspondingKey = keys[i];
-                    else
+                    } else {
                         throw new ProActiveRuntimeException("The method name: " + methodName +
                             " of the interface " + itfName + " is ambiguous: more than 1 method found");
+                    }
                 }
             }
-            if (correspondingKey != null)
+            if (correspondingKey != null) {
                 return statistics.get(correspondingKey);
-            else
+            } else {
                 throw new ProActiveRuntimeException("The method: " + methodName + "() of the interface " +
                     itfName + " cannot be found so no statistics are available");
+            }
         } else {
             String msg = "The method: " + methodName + "(";
             for (int i = 0; i < parametersTypes.length; i++) {
                 msg += parametersTypes[i].getName();
-                if (i + 1 < parametersTypes.length)
+                if (i + 1 < parametersTypes.length) {
                     msg += ", ";
+                }
             }
             msg += ") of the interface " + itfName + " cannot be found so no statistics are available";
             throw new ProActiveRuntimeException(msg);
@@ -229,33 +240,46 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         if (type.equals(NotificationType.requestReceived)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             String key = keysList.get(data.getMethodName());
-            if (key != null)
+            if (key != null) {
                 ((MethodStatisticsAbstract) statistics.get(key)).notifyArrivalOfRequest(notification
                         .getTimeStamp());
+            }
         } else if (type.equals(NotificationType.servingStarted)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             String key = keysList.get(data.getMethodName());
-            if (key != null)
+            if (key != null) {
                 ((MethodStatisticsAbstract) statistics.get(key)).notifyDepartureOfRequest(notification
                         .getTimeStamp());
+            }
         } else if (type.equals(NotificationType.replySent)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             String key = keysList.get(data.getMethodName());
-            if (key != null)
+            if (key != null) {
                 ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
                         .getTimeStamp());
+            }
         } else if (type.equals(NotificationType.voidRequestServed)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             String key = keysList.get(data.getMethodName());
-            if (key != null)
+            if (key != null) {
                 ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
                         .getTimeStamp());
+            }
         } else if (type.equals(NotificationType.setOfNotifications)) {
             @SuppressWarnings("unchecked")
             ConcurrentLinkedQueue<Notification> notificationsList = (ConcurrentLinkedQueue<Notification>) notification
                     .getUserData();
-            for (Iterator<Notification> iterator = notificationsList.iterator(); iterator.hasNext();)
+            for (Iterator<Notification> iterator = notificationsList.iterator(); iterator.hasNext();) {
                 handleNotification(iterator.next(), handback);
+            }
         }
+    }
+
+    /*
+     * ---------- PRIVATE METHODS FOR SERIALIZATION ----------
+     */
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        jmxNotificationManager = JMXNotificationManager.getInstance();
     }
 }

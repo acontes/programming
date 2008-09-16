@@ -5,16 +5,14 @@ import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
-public class Client1Impl implements Runner, BindingController {
+public class Client1MulticastImpl implements Runner, BindingController {
     private static final long SLEEP_TIME = 20;
-    private static final String[] ITF_NAMES_FOR_EACH_METHOD = { "service1", "service1", "service1" }; //, "service3", "service3" };
-    private static final String[] METHOD_NAMES = { "getInt", "doSomething", "hello" }; //, "foo", "executeAlone" };
+    private static final String[] ITF_NAMES_FOR_EACH_METHOD = { "service1", "service1", "service1" };
+    private static final String[] METHOD_NAMES = { "getInt", "doSomething", "hello" };
     private static final int NB_ITERATIONS = 100;
-    private Service1 service1;
-    private Service3 service3;
+    private Service1Multicast service1;
     private int[] nbCallsPerMethod = new int[METHOD_NAMES.length];
 
     private void sleep() {
@@ -42,12 +40,6 @@ public class Client1Impl implements Runner, BindingController {
                     break;
                 case 2:
                     service1.hello();
-                    break;
-                case 3:
-                    service3.foo(new IntMutableWrapper(1));
-                    break;
-                case 4:
-                    service3.executeAlone();
                     break;
                 default:
                     break;
@@ -78,9 +70,7 @@ public class Client1Impl implements Runner, BindingController {
     public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
             IllegalBindingException, IllegalLifeCycleException {
         if ("service1".equals(clientItfName)) {
-            service1 = (Service1) serverItf;
-        } else if ("service3".equals(clientItfName)) {
-            service3 = (Service3) serverItf;
+            service1 = (Service1Multicast) serverItf;
         } else {
             throw new NoSuchInterfaceException(clientItfName);
         }
@@ -93,8 +83,6 @@ public class Client1Impl implements Runner, BindingController {
     public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         if ("service1".equals(clientItfName)) {
             return service1;
-        } else if ("service3".equals(clientItfName)) {
-            return service3;
         } else {
             throw new NoSuchInterfaceException(clientItfName);
         }
