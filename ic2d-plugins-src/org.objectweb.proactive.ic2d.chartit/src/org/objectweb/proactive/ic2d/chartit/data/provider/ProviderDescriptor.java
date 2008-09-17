@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.chartit.data.provider;
 
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.FloatArrayDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.LoadedClassCountDataProvider;
+import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.MachineLoadDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.StringArrayDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.ThreadCountDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.UsedHeapMemoryDataProvider;
@@ -73,7 +74,9 @@ public enum ProviderDescriptor {
 
     STRING_ARRAY(StringArrayDataProvider.NAME, StringArrayDataProvider.class),
 
-    DOUBLE_ARRAY(FloatArrayDataProvider.NAME, FloatArrayDataProvider.class);
+    DOUBLE_ARRAY(FloatArrayDataProvider.NAME, FloatArrayDataProvider.class),
+    
+    MACHINE_LOAD(MachineLoadDataProvider.NAME, MachineLoadDataProvider.class);
 
     /** The name of the provider */
     private final String name;

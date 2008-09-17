@@ -40,6 +40,7 @@ import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.FloatArrayDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.LoadedClassCountDataProvider;
+import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.MachineLoadDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.StringArrayDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.ThreadCountDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.UsedHeapMemoryDataProvider;
@@ -70,7 +71,7 @@ public final class ResourceDataBuilder {
 
             /** Some custom data providers */
             final IDataProvider[] customDataProviders = new IDataProvider[] { new ThreadCountDataProvider(),
-                    new LoadedClassCountDataProvider(), new UsedHeapMemoryDataProvider(),
+                    new LoadedClassCountDataProvider(), new UsedHeapMemoryDataProvider(), new MachineLoadDataProvider(),
                     new StringArrayDataProvider(), new FloatArrayDataProvider() };
 
             public String getHostUrlServer() {
