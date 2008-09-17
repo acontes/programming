@@ -47,8 +47,21 @@ public class ComponentMethodCallMetadata implements Serializable {
     protected Shortcut shortcut = null;
     protected short priority;
     private ItfID senderItfID = null;
+    private Object tag = null;
+    
+    public boolean isTagged(){
+    	return tag != null;
+    }
 
-    public void shortcutNotification(UniversalBody sender, UniversalBody intermediate) {
+    public Object getTag() {
+		return tag;
+	}
+
+	public void setTag(Object tag) {
+		this.tag = tag;
+	}
+
+	public void shortcutNotification(UniversalBody sender, UniversalBody intermediate) {
         if (shortcut == null) {
             // store only first sender?
             shortcut = new Shortcut(getComponentInterfaceName(), sender, intermediate);
