@@ -43,7 +43,7 @@ public class FScriptInterpreterForProActive extends FScriptInterpreter
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	} 
 
 	public void addVariables(Map<String, Object> varibles) {
 		// TODO Auto-generated method stub

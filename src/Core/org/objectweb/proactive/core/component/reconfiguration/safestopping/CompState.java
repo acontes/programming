@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 public class CompState implements Serializable {
 	private static final long serialVersionUID = -8693948560981426314L;
-	private static final int START=0;
-	private static final int WAITFORSTOPPING=1;
-	private static final int STOPPING=2;
-	private static final int READY2STOP=3;
-	private static final int STOPPED=4;
+	public static final int START=0;
+	public static final int WAITFORSTOPPING=1;
+	public static final int STOPPING=2;
+	public static final int READY2STOP=3;
+	public static final int STOPPED=4;
 	private int state;
 	
 	public CompState(){
@@ -45,6 +45,10 @@ public class CompState implements Serializable {
 	}
 	public boolean isStopped(){
 		return state==STOPPED;
+	}
+
+	public int getState() {
+		return state;
 	}
 	
 	

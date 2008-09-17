@@ -46,6 +46,9 @@ import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.component.reconfiguration.tagrequest.ComponentService;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.component.reconfiguration.safestopping.CompState;
+
+
 
 
 /**
@@ -66,6 +69,8 @@ public class ComponentActivity implements RunActive, InitActive, EndActive, Seri
     protected InitActive functionalInitActive;
     protected RunActive functionalRunActive;
     protected EndActive functionalEndActive;
+    protected CompState state;
+
 
     public ComponentActivity() {
         // default component activity
@@ -144,54 +149,79 @@ public class ComponentActivity implements RunActive, InitActive, EndActive, Seri
      *
      */
     public void runActivity(Body body) {
-        if ((componentRunActive != null) && (componentRunActive != this)) {
-            componentRunActive.runActivity(body);
-        } else {
-            // this is the default activity of the active object
-            // the activity of the component has been initialized and started, now
-            // what we have to do is to manage the life cycle, i.e. start and stop the
-            // activity
-            // that can be redefined on the reified object.
-            try {
-                ComponentService componentService = new ComponentService(body);
-                NFRequestFilterImpl nfRequestFilter = new NFRequestFilterImpl();
-                while (body.isActive()) {
-                    ComponentBody componentBody = (ComponentBody) body;
-                    while (LifeCycleController.STOPPED.equals(Fractal.getLifeCycleController(
-                            componentBody.getProActiveComponentImpl()).getFcState())) {
-                        componentService.blockingServeOldest(nfRequestFilter);
-                        if (!body.isActive()) {
-                            // in case of a migration 
-                            break;
-                        }
-                    }
-                    if (!body.isActive()) {
-                        // in case of a migration 
-                        break;
-                    }
+    	if ((componentRunActive != null) && (componentRunActive != this)) {
+    		componentRunActive.runActivity(body);
+    	} else {
+    		// this is the default activity of the active object
+    		// the activity of the component has been initialized and started, now
+    		// what we have to do is to manage the life cycle, i.e. start and stop the
+    		// activity
+    		// that can be redefined on the reified object.
+    		try {
+    			ComponentService componentService = new ComponentService(body);
+    			NFRequestFilterImpl nfRequestFilter = new NFRequestFilterImpl();
+    			while (body.isActive()) {
+    				ComponentBody componentBody = (ComponentBody) body;
+    				switch(state.getState()){
+    				case CompState.START:
+    					if (true) {
+    						//
+    					}
+    					break;
+    				case CompState.WAITFORSTOPPING:
+    					if (true) {
+    						//
+    					}
+    				case CompState.STOPPING:
+    					if (true) {
+    						//
+    					}
+    				case CompState.READY2STOP:
+    					if (true) {
+    						//
+    					}
+    				case CompState.STOPPED:
+    					if (true) {
+    						//
+    					}
+    				}
 
-                    // 3.1. init object Activity
-                    // life cycle started : starting activity of the object
-                    if (functionalInitActive != null) {
-                        functionalInitActive.initActivity(activeBody);
-                        //functionalInitActive = null; // we won't do it again
-                    }
+    				while (LifeCycleController.STOPPED.equals(Fractal.getLifeCycleController(
+    						componentBody.getProActiveComponentImpl()).getFcState())) {
+    					componentService.blockingServeOldest(nfRequestFilter);
+    					if (!body.isActive()) {
+    						while (body.isActive()) {
 
-                    ((ComponentBody) body).startingFunctionalActivity();
-                    // 3.2 while object activity
-                    // componentServe (includes filter on priority)
-                    functionalRunActive.runActivity(body);
-                    ((ComponentBody) body).finishedFunctionalActivity();
-                    if (functionalEndActive != null) {
-                        functionalEndActive.endActivity(body);
-                    }
-                }
-            } catch (NoSuchInterfaceException e) {
-                logger
-                        .error("could not retreive an interface, probably the life cycle controller of this component; terminating the component. Error message is : " +
-                            e.getMessage());
-            }
-        }
+    						}
+    					}
+    					if (!body.isActive()) {
+    						// in case of a migration 
+    						break;
+    					}
+
+    					// 3.1. init object Activity
+    					// life cycle started : starting activity of the object
+    					if (functionalInitActive != null) {
+    						functionalInitActive.initActivity(activeBody);
+    						//functionalInitActive = null; // we won't do it again
+    					}
+
+    					((ComponentBody) body).startingFunctionalActivity();
+    					// 3.2 while object activity
+    					// componentServe (includes filter on priority)
+    					functionalRunActive.runActivity(body);
+    					((ComponentBody) body).finishedFunctionalActivity();
+    					if (functionalEndActive != null) {
+    						functionalEndActive.endActivity(body);
+    					}
+    				}
+    			}
+    		} catch (NoSuchInterfaceException e) {
+    			logger
+    			.error("could not retrieve an interface, probably the life cycle controller of this component; terminating the component. Error message is : " +
+    					e.getMessage());
+    		}
+    	}
     }
 
     /*
