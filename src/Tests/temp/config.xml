@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<componentConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../../../org/objectweb/proactive/core/component/config/component-config.xsd" name="interception">
+    <controllers>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveBindingController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl</implementation>
+        </controller>
+        <!--controller>
+            <interface>org.objectweb.proactive.core.component.controller.ComponentParametersController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl</implementation>
+        </controller-->
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveContentController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveSuperController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.fractal.api.control.NameController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveNameController</implementation>
+        </controller>
+        
+        <!-- specific controllers & interceptors -->
+        
+        <controller>
+            <interface>org.objectweb.proactive.core.component.reconfiguration.tagrequest.ProActiveAOPLikeController</interface>
+            <implementation>org.objectweb.proactive.core.component.reconfiguration.tagrequest.ProActiveAOPLikeControllerImpl</implementation>
+        </controller>
+        
+        <!-- controller>
+            <interface>org.objectweb.proactive.core.component.reconfiguration.ProActiveReconfigurationController</interface>
+            <implementation>org.objectweb.proactive.core.component.reconfiguration.ProActiveReconfigurationControllerImpl</implementation>
+        </controller -->
+        
+        <controller input-interceptor="true" output-interceptor="true">
+            <interface>org.objectweb.proactive.core.component.reconfiguration.tagrequest.DefaultInputOutputInterceptor</interface>
+            <implementation>org.objectweb.proactive.core.component.reconfiguration.tagrequest.DefaultInputOutputInterceptorImpl</implementation>
+        </controller>
+        
+    </controllers>
+    
+</componentConfiguration>
+    
+
