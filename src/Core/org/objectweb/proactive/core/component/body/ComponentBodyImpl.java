@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.body;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,11 +43,15 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.migration.MigratableBody;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.reconfiguration.tagrequest.ProActiveAOPLikeController;
+import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -162,4 +167,24 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         }
         this.shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
     }
+    
+    @Override
+	public int receiveRequest(Request request) throws IOException,
+			RenegotiateSessionException {
+		// TODO Auto-generated method stub
+		if (!((ComponentRequest)request).isControllerRequest()){
+			try {
+				ProActiveAOPLikeController aopLikeController = (ProActiveAOPLikeController) (this)
+					.getProActiveComponentImpl()
+					.getFcInterface(
+							ProActiveAOPLikeController.AOP_LIKE_CONTROLLER_NAME);
+				aopLikeController.getRequestTagUtilities().whenReceiveRequest(
+					request.getMethodCall().getComponentMetadata().getTag());
+			} catch (NoSuchInterfaceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+		}
+		return super.receiveRequest(request);
+	}
 }
