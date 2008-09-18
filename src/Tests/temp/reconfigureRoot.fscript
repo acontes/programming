@@ -1,0 +1,46 @@
+action reconfigure(froot) { 		
+   	change_client('$root');
+   	remote_call($froot/child::subRoot,'echo','hi');   	
+}
+
+action change_client(exprFPathRoot) {
+	//  argument is evaluated to node
+	cs = eval($exprFPathRoot);
+
+	//  unbinds old client
+	client = $cs/child::client;
+	intf-cs-r = $cs/interface::r;
+	unbind($client/interface::s);
+	unbind($intf-cs-r);
+	
+	//  creates a new client
+	client2 = new('org.objectweb.fractal.fscript.model.test.proactive.ClientImpl');
+	set-name($client2,"client2");
+	
+	//  adds new client
+	add($cs,$client2);
+	
+	//  binds the new client
+	intf-client2-r = $client2/interface::r;
+	intf-client2-s = $client2/interface::s;
+	bind($intf-client2-s,$cs/child::server/interface::s);
+	bind($intf-cs-r,$intf-client2-r);
+	
+	//  verifies connections 
+	verify_connections($cs);
+}
+
+action verify_connections(froot){
+	verdict = bound($froot/child::client2/interface::s) &&
+					not(bound($froot/child::client/interface::s)) &&
+					size($froot/interface::r/binding::*) > 0;
+					
+	echo($froot);
+	echo('verdict = ');
+   	echo($verdict);
+}
+action my_echo(){
+    echo('me: ');
+	echo($root);
+}
+
