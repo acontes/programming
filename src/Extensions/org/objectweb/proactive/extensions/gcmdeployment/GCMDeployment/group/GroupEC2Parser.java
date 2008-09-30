@@ -44,7 +44,7 @@ public class GroupEC2Parser extends AbstractJavaGroupParser {
 
     private static final String NODE_NAME = "ec2Group";
 
-    private static final String XPATH_IMAGENAME = "dep:imageName";
+    private static final String XPATH_IMAGEID = "dep:imageId";
     private static final String XPATH_ACCESSKEYID = "dep:accessKeyId";
     private static final String XPATH_SECRETACCESSKEY = "dep:secretAccessKey";
 
@@ -65,7 +65,7 @@ public class GroupEC2Parser extends AbstractJavaGroupParser {
         
         try {
 
-            Node imageName = (Node) xpath.evaluate(XPATH_IMAGENAME, groupNode, XPathConstants.NODE);
+            Node imageName = (Node) xpath.evaluate(XPATH_IMAGEID, groupNode, XPathConstants.NODE);
             Node accessKeyId = (Node) xpath.evaluate(XPATH_ACCESSKEYID, groupNode, XPathConstants.NODE);
             Node secretAccessKey = (Node) xpath.evaluate(XPATH_SECRETACCESSKEY, groupNode, XPathConstants.NODE);
 

@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 
 import com.amazonaws.ec2.AmazonEC2;
+import com.amazonaws.ec2.AmazonEC2Client;
 import com.amazonaws.ec2.AmazonEC2Exception;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
 import com.amazonaws.ec2.model.Reservation;
@@ -62,8 +63,8 @@ public class GroupEC2 extends AbstractJavaGroup {
         private RunInstancesResponse response;
 
         public EC2InstanceRunner(String accessKeyId, String secretAccessKey, RunInstancesRequest request) {
-            //            service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-            service = new AmazonEC2Mock();
+            service = new AmazonEC2Client(accessKeyId, secretAccessKey);
+//            service = new AmazonEC2Mock();
             this.request = request;
             this.response = null;
         }
@@ -107,6 +108,8 @@ public class GroupEC2 extends AbstractJavaGroup {
         RunInstancesRequest request = new RunInstancesRequest();
 
         request.setImageId(imageId);
+        request.setMinCount(1);
+        request.setMaxCount(1);
 
         try {
             StringBuffer userData = new StringBuffer();
@@ -129,8 +132,13 @@ public class GroupEC2 extends AbstractJavaGroup {
             userData.append(gcma.getDeploymentId());
             userData.append('\n');
 
-            request.setUserData(userData.toString());
+            byte[] charArray = userData.toString().getBytes();
+            byte[] encodedData = org.apache.commons.codec.binary.Base64.encodeBase64(charArray, false);
+            
+            request.setUserData(new String(encodedData));
 
+            System.err.println("EC2 request user data : " + userData.toString());
+            
             EC2InstanceRunner instanceRunner = new EC2InstanceRunner(accessKeyId, secretAccessKey, request);
 
             return instanceRunner;

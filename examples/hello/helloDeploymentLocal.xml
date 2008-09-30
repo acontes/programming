@@ -5,7 +5,7 @@
 
 	<environment>
 		<javaPropertyVariable name="user.dir" />
-		<javaPropertyDescriptorDefault name="os" value="windows" />
+		<javaPropertyDescriptorDefault name="os" value="unix" />
 	</environment>
 
 	<resources>
