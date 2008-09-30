@@ -1,24 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?><info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive <systemitem role="VERSION"/> Documentation</title>
-<subtitle role="motto">An Open Source Middleware For
-Parallel, Distributed, Multicore Computing</subtitle>
-<subtitle role="main">ProActive Programming &amp; ProActive Optimizing</subtitle> 
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+<!DOCTYPE info SYSTEM "../../../../../user/vjuresch/home/workspace/ProActive/doc-src/docbook.dtd"> -->
+<info>
+  <cover xml:id="topcover">
+    <mediaobject>
+      <imageobject>
+        <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/Logo-ProActive.png"
+          format="PNG"/>
+      </imageobject>
+    </mediaobject>
+  </cover>
+  <title>ProActive <systemitem role="VERSION"/> Documentation</title>
+  <subtitle>An Open Source Middleware For Parallel, Distributed, Multicore Computing</subtitle>
+  <subtitle>ProActive Programming &amp; ProActive Optimizing</subtitle>
 
-<!-- to change the version and date look in the html.xsl 
+  <!-- to change the version and date look in the html.xsl 
 and compile/build.xml as the date
 and version is passed as a parameter in the ant task 
 to -->
-  
- <!--if you want to change the title in the html version on
+
+  <!--if you want to change the title in the html version on
  change the subtitle tag in the  xsl/html.xsl
  
  changing here applies only to the pdf  -->
-  
 
-  <author><personname><surname>The OASIS Research Team and ActiveEon Company</surname></personname></author>
 
-  <author><orgname/></author>
+  <author>
+    <personname>
+      <surname>The OASIS Research Team and ActiveEon Company</surname>
+    </personname>
+  </author>
 
-<copyright>
+  <!--<author><orgname/></author> -->
+  <cover xml:id="bottomcover">
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/logo-INRIA.png"/>
+      </imageobject>
+    </mediaobject>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="  images/logo-UNSA.png"/>
+      </imageobject>
+    </mediaobject>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/logo-CNRS.png"/>
+      </imageobject>
+    </mediaobject>
+  </cover>
+
+  <copyright>
     <year>1997-2008</year>
 
     <holder>INRIA</holder>
@@ -32,9 +66,10 @@ to -->
 
   <mediaobject>
     <imageobject>
-      <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/Logo-ProActive.png" format="PNG"/>
+      <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/Logo-ProActive.png"
+        format="PNG"/>
     </imageobject>
   </mediaobject>
 
-  
+
 </info>

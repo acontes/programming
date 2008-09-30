@@ -156,16 +156,28 @@
 
 			<classpath>
 				<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-${docbook.version}.zip-->
-				<pathelement location="${docs.docbook}/docbook-xsl-${docbook.version}.zip" />
+				<pathelement location="${docs.docbook}/docbook-xsl-${docbook.version}" />
 			</classpath>
 
-			<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="${docs.docbook.dtd}" />
-			<dtd publicId="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="${docs.docbook.dtd}"/>
+			<dtd publicid="-//OASIS//DTD DocBook XML V5.0//EN" location="${docs.docbook.dtd}" />
+			<dtd publicid="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="${docs.docbook.dtd}"/>
 
 			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/profiling/profile.xsl" location="docbook-xsl-${docbook.version}/profiling/profile.xsl" />
 			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/chunk.xsl" location="docbook-xsl-${docbook.version}/html/chunk.xsl" />
+			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/onechunk.xsl" location="docbook-xsl-${docbook.version}/html/onechunk.xsl" />
+		
 			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/docbook.xsl" location="docbook-xsl-${docbook.version}/html/docbook.xsl" />
 			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/fo/docbook.xsl" location="docbook-xsl-${docbook.version}/fo/docbook.xsl" />
+		
+		
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/highlight.xsl" location="docbook-xsl-${docbook.version}/html/highlight.xsl" />
+
+
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/highlighting/xslthl-config.xml" location="file:///user/vjuresch/home/workspace/ProActive/dev/lib/docbook/docbook-xsl-ns-1.74.0/highlighting/xslthl-config.xml" />
+		
+
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/fo/highlight.xsl" location="docbook-xsl-${docbook.version}/fo/highlight.xsl" />
+		
 		</xmlcatalog>
 
 	
@@ -191,26 +203,27 @@
 			</classpath>
 		</xslt>
 
-		<!-- Do the real conversion, docbook to pdf or html -->
-		<xslt basedir="${doc.src}" in="${docs.tmp.dir}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
-			<xmlcatalog refid="docbookcatalog" />
-			<param name="TODAY" expression="${TODAY}" />
-			<!-- the date for the first page -->
-			<param name="VERSION" expression="${version}" />
-			<!-- the version number, for the first page -->
 
-			<!-- Output dir for the chunked stylesheet-->
-			<param name="base.dir" expression="${docs.html.multiple.dir}"/>
+<!--java -cp …;c:\path\to\xslthl.jar -Dxslthl.config=file:///c:/docbook-xsl/highlighting/xslthl-config.xml … com.icl.saxon.StyleSheet …-->
+		
+	
+			
+		<java classname="com.icl.saxon.StyleSheet" dir="${doc.src}" fork="true">
+				<classpath>
+					<fileset dir="/user/vjuresch/home/workspace/ProActive/dev/lib/docbook/saxon/">
+						<include name="**/*.jar" />
+					</fileset>
+				</classpath> 
+				<sysproperty key="xslthl.config"
+					value="file:///user/vjuresch/home/workspace/ProActive/dev/lib/docbook/docbook-xsl-ns-1.74.0/highlighting/xslthl-config.xml"	/>
+				
+<!--			<arg line="-o ${docbookOutputFile} ${docs.tmp.dir}/profiled.xml  ${docs.docbook}/docbook-xsl-${docbook.version}/fo/docbook.xsl"/>-->
+			<arg line="-o ${docbookOutputFile} ${docs.tmp.dir}/profiled.xml  ${doc.src}/xsl/pdf.xsl"/>
+			
+		</java>
 
-			<classpath>
-				<fileset dir="${lib.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-				<fileset dir="${base.dir}/dev/lib">
-					<include name="**/*.jar" />
-				</fileset>
-			</classpath>
-		</xslt>
+		<echo>Highlighted</echo>
+
 	</target>
 	
 	<!-- ==================================================================== -->
@@ -279,6 +292,7 @@
 
 		<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
 		<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
+			
 			<classpath>
 				<fileset dir="${docs.docbook}">
 					<include name="*.jar" />
@@ -290,7 +304,7 @@
 		<!-- Then use the newly defined fop task to translate fo into pdf -->
 		<fop format="application/pdf" fofile="${fo.output}" outfile="${pdfOutputFile}" basedir="${doc.src}" />
 
-		<delete file="${fo.output}" />
+		<!--<delete file="${fo.output}" /> -->
 	</target>
 
 
@@ -450,11 +464,11 @@
 			</fileset>
 		</copy>
 
-		<!-- Decorate the code a bit (code examples in programlistings) -->
+		<!-- Decorate the code a bit (code examples in programlistings) 
 		<antcall target="-docbookBeautify">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 		</antcall>
-
+-->
 	</target>
 
 

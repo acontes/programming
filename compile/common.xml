@@ -56,7 +56,7 @@
 	<property name="docs.xsl"	value="${doc.src}/xsl" />
 
 	<property name="docs.api.complete.dir"	value="${docs.dir}/javadoc/api_complete" />
-	<property name="docs.api.published.dir"	value="${docs.dir}/javadoc/api_published" />
+	<property name="docs.api.published.dir"	value="${docs.dir}/javadoc/" />
 	<property name="docs.docbook"	value="${base.dir}/dev/lib/docbook" />
 	
 	<property name="docs.html.multiple.dir"	value="${docs.dir}/manual/ProActive_Manual_html/" />
@@ -129,7 +129,7 @@
 	<property name="config.dir" value="${cl.proactive.dir}/${proactive.core.path}/config" />
 
 	<!-- DocBook -->
-	<property name="docbook.version" value="1.73.2" />
+	<property name="docbook.version" value="ns-1.74.0" />
 	
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->

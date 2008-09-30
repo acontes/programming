@@ -157,7 +157,7 @@
 	
 		The Monitoring agent class is a regular Java class  
 	</para>	
-	 <programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/fullCMA.snip"/></textobject></programlisting>
+	 <programlisting language="java"><textobject><textdata fileref="./automatic_snippets/fullCMA.snip"/></textobject></programlisting>
 	<para>with only one method.</para>
 	
 	<para>

@@ -4,8 +4,17 @@
  exclude-result-prefixes="date" version="1.0">
 
  <xsl:import href="common.xsl" />
+  <xsl:import
+    href="http://docbook.sourceforge.net/release/xsl-ns/1.74.0/html/highlight.xsl" />
+  <xsl:param name="use.extensions" select="'1'" />	
+  <xsl:param name="textinsert.extension" select="'1'" />
+  	<xsl:param name="highlight.source" select="'1'"/>
+    <xsl:param name="linenumbering.everyNth" select="'1'"/>
+    <xsl:param name="linenumbering.separator" select="':'"/>
+    <xsl:param name="tablecolumns.extension" select="'1'" />
+    <xsl:param name="linenumbering.extension" select="'1'" />
 
- <!-- Configure the html stylesheet to use -->
+  <!-- Configure the html stylesheet to use -->
  <xsl:param name="html.stylesheet" select="'ProActive.css'" />
  <!-- Just use the image size for the html output. Width=... has no effect. -->
  <xsl:param name="ignore.image.scaling">1</xsl:param>
