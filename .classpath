@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="classes/Core" path="src/Core"/>
+	<classpathentry kind="src" output="classes/EC2" path="src/EC2"/>
 	<classpathentry kind="src" output="classes/Benchmarks" path="src/Benchmarks"/>
 	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" output="classes/Examples" path="src/Examples"/>
 	<classpathentry kind="src" output="classes/Extensions" path="src/Extensions"/>
@@ -83,6 +84,12 @@
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/concurrent.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Amazon EC2 lib"/>
+	<classpathentry kind="lib" path="lib/amazon-ec2/third-party/commons-codec-1.3/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/amazon-ec2/third-party/commons-httpclient-3.0.1/commons-httpclient-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/amazon-ec2/third-party/commons-logging-1.1/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/amazon-ec2/third-party/jaxb-ri-2.1/jaxb-impl.jar"/>
+	<classpathentry kind="lib" path="lib/amazon-ec2/third-party/jaxb-ri-2.1/jaxb-xjc.jar"/>
+	<classpathentry kind="lib" path="lib/amazon-ec2/third-party/jaxb-ri-2.1/jsr173_1.0_api.jar"/>
+	<classpathentry kind="lib" path="lib/amazon-ec2/amazon-ec2-2008-05-05-java-library.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

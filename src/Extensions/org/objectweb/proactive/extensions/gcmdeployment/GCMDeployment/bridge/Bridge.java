@@ -37,6 +37,7 @@ import java.util.List;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.JavaGroup;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
@@ -95,12 +96,26 @@ public interface Bridge extends Serializable {
     public void addGroup(Group group);
 
     /**
+     * Add a group to children elements
+     *
+     * @param group The child group
+     */
+    public void addJavaGroup(JavaGroup group);
+    
+    /**
      * Returns all children of type Group
      *
      * @return
      */
     public List<Group> getGroups();
 
+    /**
+     * Returns all children of type JavaGroup
+     *
+     * @return
+     */
+    public List<JavaGroup> getJavaGroups();
+    
     /**
      * Set the HostInfo
      *

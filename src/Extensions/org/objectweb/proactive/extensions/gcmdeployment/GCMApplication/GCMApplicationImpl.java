@@ -64,6 +64,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploym
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentResources;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.JavaGroup;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
@@ -375,6 +376,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                     buildGroupTreeNode(rootNode, rootNode, group, nodeProvider, gdd);
                 }
 
+                for (JavaGroup group : resources.getJavaGroups()) {
+                    buildJavaGroupTreeNode(rootNode, rootNode, group, nodeProvider, gdd);
+                }
+
                 for (Bridge bridge : resources.getBridges()) {
                     buildBridgeTree(rootNode, rootNode, bridge, nodeProvider, gdd);
                 }
@@ -415,6 +420,13 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         popDeploymentPath();
     }
 
+    private void buildJavaGroupTreeNode(TopologyRootImpl rootNode, TopologyImpl parentNode, JavaGroup group,
+            NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
+        pushDeploymentPath(group.getId());
+        buildHostInfoTreeNode(rootNode, parentNode, group.getHostInfo(), nodeProvider, gcmd);
+        popDeploymentPath();
+    }
+
     private void buildBridgeTree(TopologyRootImpl rootNode, TopologyImpl parentNode, Bridge bridge,
             NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
         pushDeploymentPath(bridge.getId());
@@ -436,6 +448,14 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             }
         }
 
+        // then java groups...
+        //
+        if (bridge.getJavaGroups() != null) {
+            for (JavaGroup group : bridge.getJavaGroups()) {
+                buildJavaGroupTreeNode(rootNode, node, group, nodeProvider, gcmd);
+            }
+        }
+        
         // then bridges (and recurse)
         if (bridge.getBridges() != null) {
             for (Bridge subBridge : bridge.getBridges()) {

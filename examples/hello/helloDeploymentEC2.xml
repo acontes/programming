@@ -26,8 +26,8 @@
 		</hosts>
 
 		<groups>
-			<ec2Group id="remoteEC2">
-				<imageId>ami-3bd63252</imageId> 
+			<ec2Group id="remoteEC2" hostCapacity="1" vmCapacity="1">
+				<imageId>ami-9cda3ef5</imageId> 
 				<accessKeyId>1K6JVRSE482QZZ8N7302</accessKeyId>
 				<secretAccessKey>JRJxPd2RcWjPCaBbtfjsY71vf8VryHl0ikLunhoj</secretAccessKey>
 			</ec2Group>				

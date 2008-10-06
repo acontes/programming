@@ -37,10 +37,9 @@ import java.util.Map;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
-public interface Group extends Serializable {
+public interface Group extends GroupHostInfo {
     public String getId();
 
     /**
@@ -54,20 +53,6 @@ public interface Group extends Serializable {
      * @param commandPath path to the command
      */
     public void setCommandPath(String commandPath);
-
-    /**
-     * Set the HostInfo
-     *
-     * @param hostInfo
-     */
-    public void setHostInfo(HostInfo hostInfo);
-
-    /**
-     * Get the HostInfo
-     *
-     * @return if set the HostInfo is returned. null is returned otherwise
-     */
-    public HostInfo getHostInfo();
 
     /**
      * Check that this group is in a consistent state and is ready to be

@@ -72,6 +72,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Grou
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupEC2Parser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupGLiteParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupGridEngineParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupHostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupLSFParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupLoadLevelerParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.GroupOARParser;
@@ -452,6 +453,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                     throw new RuntimeException("no group with refid " + refid + " has been defined");
                 } else {
                     // no need to parse the group node itself, the hostinfo is irrelevant in this case
+                    parseGroupResource(resourceNode, javaGroup);
                     resources.addJavaGroup(javaGroup);
                 }
             } else {
@@ -504,7 +506,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * @throws XPathExpressionException
      * @throws IOException
      */
-    protected void parseGroupResource(Node resourceNode, Group group) throws XPathExpressionException,
+    protected void parseGroupResource(Node resourceNode, GroupHostInfo group) throws XPathExpressionException,
             IOException {
 
         // Get the host node child of this resource node

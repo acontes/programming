@@ -14,8 +14,6 @@
 					<xs:element name="accessKeyId" type="xs:string" minOccurs="1" maxOccurs="1" />
 					<xs:element name="secretAccessKey" type="xs:string" minOccurs="1" maxOccurs="1" />
 				</xs:sequence>
-				<xs:attribute name="hostCapacity" type="PosintOrVariableType" default="1"/>
-				<xs:attribute name="vmCapacity" type="PosintOrVariableType" default="1" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

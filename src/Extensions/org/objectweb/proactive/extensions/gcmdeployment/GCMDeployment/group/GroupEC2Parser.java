@@ -73,12 +73,6 @@ public class GroupEC2Parser extends AbstractJavaGroupParser {
             ec2Group.setAccessKeyId(GCMParserHelper.getElementValue(accessKeyId));
             ec2Group.setSecretAccessKey(GCMParserHelper.getElementValue(secretAccessKey));
             
-            String hostCapacity = GCMParserHelper.getAttributeValue(groupNode, "dep:hostCapacity");
-            String vmCapacity = GCMParserHelper.getAttributeValue(groupNode, "dep:vmCapacity");
-            
-            ec2Group.setHostCapacity(hostCapacity);
-            ec2Group.setVmCapacity(vmCapacity);
-
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
         }

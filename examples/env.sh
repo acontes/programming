@@ -45,7 +45,11 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extra
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Examples
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Benchmarks
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/EC2
     for i in $PROACTIVE/lib/*.jar ; do
+      CLASSPATH=$CLASSPATH:$i
+    done
+    for i in $PROACTIVE/lib/amazon-ec2/third-party/*/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
 else
@@ -58,6 +62,7 @@ export CLASSPATH
 
 
 JAVACMD=$JAVA_HOME/bin/java"\
+    -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8066 \
 	-Djava.security.manager \
 	-Djava.security.policy=$PROACTIVE/examples/proactive.java.policy \
 	-Dlog4j.configuration=file:${PROACTIVE}/examples/proactive-log4j \

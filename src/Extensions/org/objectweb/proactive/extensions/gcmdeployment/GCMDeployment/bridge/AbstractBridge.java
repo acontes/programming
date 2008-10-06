@@ -38,6 +38,7 @@ import java.util.List;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.JavaGroup;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 
@@ -94,6 +95,7 @@ public abstract class AbstractBridge implements Bridge {
      */
     private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
     private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
+    private List<JavaGroup> javaGroups = Collections.synchronizedList(new ArrayList<JavaGroup>());
     private HostInfo hostInfo = null;
 
     public void addBridge(Bridge bridge) {
@@ -104,12 +106,20 @@ public abstract class AbstractBridge implements Bridge {
         groups.add(group);
     }
 
+    public void addJavaGroup(JavaGroup group) {
+        javaGroups.add(group);
+    }
+    
     public List<Bridge> getBridges() {
         return bridges;
     }
 
     public List<Group> getGroups() {
         return groups;
+    }
+
+    public List<JavaGroup> getJavaGroups() {
+        return javaGroups;
     }
 
     public HostInfo getHostInfo() {

@@ -54,8 +54,6 @@ public class GroupEC2 extends AbstractJavaGroup {
     private String imageId;
     private String accessKeyId;
     private String secretAccessKey;
-    private String hostCapacity = "1";
-    private String vmCapacity = "1";
 
     static protected class EC2InstanceRunner implements Runnable {
         AmazonEC2 service;
@@ -63,8 +61,8 @@ public class GroupEC2 extends AbstractJavaGroup {
         private RunInstancesResponse response;
 
         public EC2InstanceRunner(String accessKeyId, String secretAccessKey, RunInstancesRequest request) {
-            service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-//            service = new AmazonEC2Mock();
+//            service = new AmazonEC2Client(accessKeyId, secretAccessKey);
+            service = new AmazonEC2Mock();
             this.request = request;
             this.response = null;
         }
@@ -125,24 +123,26 @@ public class GroupEC2 extends AbstractJavaGroup {
             // 
             userData.append(parentURL);
             userData.append('\n');
-            userData.append(hostCapacity);
+            userData.append(getHostInfo().getHostCapacity());
             userData.append('\n');
-            userData.append(vmCapacity);
+            userData.append(getHostInfo().getVmCapacity());
             userData.append('\n');
             userData.append(gcma.getDeploymentId());
+            userData.append('\n');
+            userData.append(getHostInfo().getToplogyId());
             userData.append('\n');
 
             byte[] charArray = userData.toString().getBytes();
             byte[] encodedData = org.apache.commons.codec.binary.Base64.encodeBase64(charArray, false);
-            
+
             request.setUserData(new String(encodedData));
 
             System.err.println("EC2 request user data : " + userData.toString());
-            
+
             EC2InstanceRunner instanceRunner = new EC2InstanceRunner(accessKeyId, secretAccessKey, request);
 
             return instanceRunner;
-            
+
         } catch (ProActiveException e) {
             e.printStackTrace();
             return null;
@@ -165,22 +165,6 @@ public class GroupEC2 extends AbstractJavaGroup {
     public void check() throws IllegalStateException {
         // TODO Auto-generated method stub
 
-    }
-
-    public String getHostCapacity() {
-        return hostCapacity;
-    }
-
-    public void setHostCapacity(String hostCapacity) {
-        this.hostCapacity = hostCapacity;
-    }
-
-    public String getVmCapacity() {
-        return vmCapacity;
-    }
-
-    public void setVmCapacity(String vmCapacity) {
-        this.vmCapacity = vmCapacity;
     }
 
 }

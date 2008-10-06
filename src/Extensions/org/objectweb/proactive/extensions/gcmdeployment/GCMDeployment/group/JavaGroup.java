@@ -34,7 +34,7 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 
 
-public interface JavaGroup {
+public interface JavaGroup extends GroupHostInfo {
     public String getId();
 
     /**
