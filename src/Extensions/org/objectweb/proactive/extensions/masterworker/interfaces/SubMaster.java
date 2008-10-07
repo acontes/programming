@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.extensions.masterworker.interfaces;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -58,7 +88,6 @@ public interface SubMaster<T extends Task<R>, R extends Serializable> {
      * <b>Warning</b>: the master keeps a track of task objects that have been submitted to it and which are currently computing.<br>
      * Submitting two times the same task object without waiting for the result of the first computation is not allowed.
      * @param tasks list of tasks
-     * @throws org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException if a task is submitted twice
      */
     void solve(List<T> tasks);
 
@@ -80,6 +109,16 @@ public interface SubMaster<T extends Task<R>, R extends Serializable> {
      * @throws TaskException if the task threw an Exception
      */
     R waitOneResult() throws TaskException;
+
+    /**
+    * Wait for at least one result is available <br>
+    * If there are more results availables at the time the request is executed, then every currently available results are returned 
+    * Note that in SubmittedOrder mode, the method will block until the next result in submission order is available and will return
+    * as many successive results as possible<br>
+    * @return a collection of objects containing the results
+    * @throws TaskException if the task threw an Exception
+    */
+    List<R> waitSomeResults() throws TaskException;
 
     /**
      * Wait for a number of results<br>

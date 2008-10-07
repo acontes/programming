@@ -73,7 +73,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * Implementation of the
  * {@link org.objectweb.fractal.api.control.BindingController BindingController} interface.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProActiveBindingControllerImpl extends AbstractProActiveController implements
@@ -169,7 +169,10 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                         " is not a subtype of the client interface type " + c.getName());
                 }
             } catch (ClassNotFoundException e) {
-                throw new IllegalBindingException("Cannot find type of interface : " + e.getMessage());
+                IllegalBindingException ibe = new IllegalBindingException("Cannot find type of interface : " +
+                    e.getMessage());
+                ibe.initCause(e);
+                throw ibe;
             }
         }
 
@@ -301,10 +304,11 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                 controllerLogger.error("could not generate output interceptor for client interface " +
                     clientItfName + " : " + e.getMessage());
 
-                e.printStackTrace();
-                throw new IllegalBindingException(
+                IllegalBindingException ibe = new IllegalBindingException(
                     "could not generate output interceptor for client interface " + clientItfName + " : " +
                         e.getMessage());
+                ibe.initCause(e);
+                throw ibe;
             }
         }
 
@@ -639,31 +643,42 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         return new ControllerState(bindings);
     }
 
-    private Object[] filterServerItfs(Object[] itfs) {
-        ArrayList<Object> newListItfs = new ArrayList<Object>();
+    private Interface[] filterServerItfs(Object[] itfs) {
+        ArrayList<Interface> newListItfs = new ArrayList<Interface>();
         for (int i = 0; i < itfs.length; i++) {
-            if (!((ProActiveInterfaceType) ((Interface) itfs[i]).getFcItfType()).isFcClientItf())
-                newListItfs.add(itfs[i]);
+            Interface curItf = (Interface) itfs[i];
+            if (!((ProActiveInterfaceType) curItf.getFcItfType()).isFcClientItf())
+                newListItfs.add(curItf);
         }
-        return newListItfs.toArray();
+        return newListItfs.toArray(new Interface[] {});
     }
 
     public Boolean isBoundTo(Component component) {
-        Object[] serverItfsComponent = filterServerItfs(component.getFcInterfaces());
+        Interface[] serverItfsComponent = filterServerItfs(component.getFcInterfaces());
         Object[] itfs = getFcItfOwner().getFcInterfaces();
         for (int i = 0; i < itfs.length; i++) {
             Interface curItf = (Interface) itfs[i];
-            for (int j = 0; j < serverItfsComponent.length; j++) {
-                Interface curServerItf = (Interface) serverItfsComponent[j];
-                Binding binding = (Binding) getBinding(curItf.getFcItfName());
-                if ((binding != null) &&
-                    binding.getServerInterface().getFcItfOwner().equals(curServerItf.getFcItfOwner()) &&
-                    binding.getServerInterface().getFcItfType().equals(curServerItf.getFcItfType())) {
-                    return new Boolean(true);
+            if (!((ProActiveInterfaceType) curItf.getFcItfType()).isFcMulticastItf()) {
+                for (int j = 0; j < serverItfsComponent.length; j++) {
+                    Interface curServerItf = serverItfsComponent[j];
+                    Binding binding = (Binding) getBinding(curItf.getFcItfName());
+                    if ((binding != null) &&
+                        binding.getServerInterface().getFcItfOwner().equals(curServerItf.getFcItfOwner()) &&
+                        binding.getServerInterface().getFcItfType().equals(curServerItf.getFcItfType())) {
+                        return new Boolean(true);
+                    }
+                }
+            } else {
+                try {
+                    MulticastController mc = (MulticastController) getFcItfOwner().getFcInterface(
+                            Constants.MULTICAST_CONTROLLER);
+                    if (mc.isBoundTo(curItf, serverItfsComponent))
+                        return new Boolean(true);
+                } catch (NoSuchInterfaceException e) {
+                    // TODO: handle exception
                 }
             }
         }
         return new Boolean(false);
     }
-
 }

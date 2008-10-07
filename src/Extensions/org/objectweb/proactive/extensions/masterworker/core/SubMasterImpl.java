@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.extensions.masterworker.core;
 
 import org.objectweb.proactive.api.PAFuture;
@@ -5,10 +35,7 @@ import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.MasterIntern;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,10 +50,13 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
 
     private final MasterIntern master;
     private final String originatorName;
+    private boolean initCalled = false;
+    private AOWorker parentWorker;
 
-    public SubMasterImpl(MasterIntern master, String originatorName) {
+    public SubMasterImpl(MasterIntern master, String originatorName, AOWorker parentWorker) {
         this.master = master;
         this.originatorName = originatorName;
+        this.parentWorker = parentWorker;
     }
 
     public void setResultReceptionOrder(OrderingMode mode) {
@@ -37,7 +67,11 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     * {@inheritDoc}
     */
     public void solve(List<Task<Serializable>> tasks) {
+        if (tasks.size() == 0) {
+            throw new IllegalArgumentException("empty list");
+        }
         master.solveIntern(originatorName, tasks);
+        initCalled = true;
     }
 
     /**
@@ -45,25 +79,23 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     */
     @SuppressWarnings("unchecked")
     public List<Serializable> waitAllResults() throws TaskException {
-        if (master.isEmpty(originatorName)) {
-            throw new IllegalStateException("Master is empty, call to this method will wait forever");
+        if (!initCalled) {
+            throw new IllegalStateException("A call to solve should occur before this call.");
         }
-        List<ResultIntern<Serializable>> completed = (List<ResultIntern<Serializable>>) PAFuture
-                .getFutureValue(master.waitAllResults(originatorName));
-        List<Serializable> results = new ArrayList<Serializable>();
-        for (ResultIntern<Serializable> res : completed) {
-            if (res.threwException()) {
-                throw new TaskException(res.getException());
-            }
 
-            Serializable obj = res.getResult();
-            if (obj != null) {
-                results.add(obj);
-            } else {
-                results.add(null);
-            }
-
+        List<Serializable> results = null;
+        Object future = master.waitAllResults(originatorName);
+        //parentWorker.resumeWork();
+        try {
+            results = (List<Serializable>) PAFuture.getFutureValue(future);
+        } catch (RuntimeException e) {
+            Throwable texp = findTaskException(e);
+            if (texp != null) {
+                throw (TaskException) texp;
+            } else
+                throw e;
         }
+        //parentWorker.suspendWork();
 
         return results;
     }
@@ -73,21 +105,46 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     */
     @SuppressWarnings("unchecked")
     public Serializable waitOneResult() throws TaskException {
-        if (master.isEmpty(originatorName)) {
-            throw new IllegalStateException("Master is empty, call to this method will wait forever");
+        if (!initCalled) {
+            throw new IllegalStateException("A call to solve should occur before this call.");
         }
-        ResultIntern<Serializable> completed = (ResultIntern<Serializable>) PAFuture.getFutureValue(master
-                .waitOneResult(originatorName));
-        if (completed.threwException()) {
-            throw new TaskException(completed.getException());
+        Serializable result = null;
+        Object future = master.waitOneResult(originatorName);
+        //parentWorker.resumeWork();
+        try {
+            result = (Serializable) PAFuture.getFutureValue(future);
+        } catch (RuntimeException e) {
+            Throwable texp = findTaskException(e);
+            if (texp != null) {
+                throw (TaskException) texp;
+            } else
+                throw e;
         }
 
-        Serializable obj = completed.getResult();
-        if (obj != null) {
-            return obj;
+        //parentWorker.suspendWork();
+        return result;
+
+    }
+
+    public List<Serializable> waitSomeResults() throws TaskException {
+        if (!initCalled) {
+            throw new IllegalStateException("A call to solve should occur before this call.");
         }
 
-        return null;
+        List<Serializable> results = null;
+        Object future = master.waitSomeResults(originatorName);
+        // parentWorker.resumeWork();
+        try {
+            results = (List<Serializable>) PAFuture.getFutureValue(future);
+        } catch (RuntimeException e) {
+            Throwable texp = findTaskException(e);
+            if (texp != null) {
+                throw (TaskException) texp;
+            } else
+                throw e;
+        }
+        // parentWorker.suspendWork();
+        return results;
     }
 
     /**
@@ -95,27 +152,26 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     */
     @SuppressWarnings("unchecked")
     public List<Serializable> waitKResults(int k) throws TaskException {
+        if (!initCalled) {
+            throw new IllegalStateException("A call to solve should occur before this call.");
+        }
         if (master.countPending(originatorName) < k) {
             throw new IllegalStateException("Number of tasks submitted previously is strictly less than " +
                 k + ": call to this method will wait forever");
         }
-        List<ResultIntern<Serializable>> completed = (List<ResultIntern<Serializable>>) PAFuture
-                .getFutureValue(master.waitKResults(originatorName, k));
-        List<Serializable> results = new ArrayList<Serializable>();
-        for (ResultIntern<Serializable> res : completed) {
-            if (res.threwException()) {
-                throw new TaskException(res.getException());
-            }
-
-            Serializable obj = res.getResult();
-            if (obj != null) {
-                results.add(obj);
-            } else {
-                results.add(null);
-            }
-
+        List<Serializable> results = null;
+        Object future = master.waitKResults(originatorName, k);
+        //  parentWorker.resumeWork();
+        try {
+            results = (List<Serializable>) PAFuture.getFutureValue(future);
+        } catch (RuntimeException e) {
+            Throwable texp = findTaskException(e);
+            if (texp != null) {
+                throw (TaskException) texp;
+            } else
+                throw e;
         }
-
+        //  parentWorker.suspendWork();
         return results;
     }
 
@@ -124,6 +180,9 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     */
     @SuppressWarnings("unchecked")
     public boolean isEmpty() {
+        if (!initCalled) {
+            throw new IllegalStateException("A call to solve should occur before this call.");
+        }
         return master.isEmpty(originatorName);
     }
 
@@ -132,6 +191,20 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     */
     @SuppressWarnings("unchecked")
     public int countAvailableResults() {
+        if (!initCalled) {
+            throw new IllegalStateException("A call to solve should occur before this call.");
+        }
         return master.countAvailableResults(originatorName);
+    }
+
+    private Throwable findTaskException(Throwable e) {
+        if (e instanceof TaskException) {
+            return e;
+        }
+        if (e.getCause() != null) {
+            return findTaskException(e.getCause());
+        } else {
+            return null;
+        }
     }
 }

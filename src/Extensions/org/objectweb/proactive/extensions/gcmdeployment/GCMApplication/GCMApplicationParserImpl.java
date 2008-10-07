@@ -54,6 +54,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
@@ -108,6 +109,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, GCMVirtualNodeInternal> virtualNodes;
     protected Map<String, ApplicationParser> applicationParsersMap;
     protected TechnicalServicesProperties appTechnicalServices;
+    protected ProActiveSecurityManager proactiveApplicationSecurityManager;
 
     public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract) throws Exception {
         this(descriptor, vContract, null);
@@ -243,7 +245,13 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                     if (schemeFound) {
                         // if it's an url starting with file: we remove the protocol
-                        path = path.substring(5);
+                        URL urlWithFile = new URL(path);
+                        if (urlWithFile.getHost().length() != 0) {
+                            throw new IOException(
+                                urlWithFile +
+                                    " is using the form <host>/<path> which is not supported. Other possibility is that the url is of the form file:/<path> and it should be file://<path>");
+                        }
+                        path = urlWithFile.getPath();
                     }
                     File file = new File(path);
 
@@ -266,7 +274,23 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                     } else {
                         // We can handle the last case by using URI resolve method
                         URI uriDescriptor = descriptor.toURI();
-                        URI fullUri = uriDescriptor.resolve(new URI(file.getPath()));
+
+                        // This ugly code is here for the following reasons:
+                        // 1) We need to escape illegal characters which appear in File paths
+                        // 2) The toURI() method returns an absolute path and here the File path is relative, so it will prepent to the path the current directory
+                        // 3) we need to remove this prepended directory to have the final relative path as an relative URI
+                        File basef = new File("");
+                        URI messedup = file.toURI();
+                        URI baseuri = basef.toURI();
+                        String cleaner = messedup.toString().substring(baseuri.toString().length());
+                        URI cleaneruri = new URI(cleaner);
+
+                        if (cleaneruri.isAbsolute()) {
+                            throw new IOException("Internal error: " + cleaneruri +
+                                " is absolute and should be relative");
+                        }
+                        // now that we have a clean relative, we can resolve it against the base url
+                        URI fullUri = uriDescriptor.resolve(cleaneruri);
                         fullURL = fullUri.toURL();
                     }
                 }
@@ -420,5 +444,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     public TechnicalServicesProperties getAppTechnicalServices() {
         return appTechnicalServices;
+    }
+
+    public ProActiveSecurityManager getProactiveApplicationSecurityManager() {
+        return proactiveApplicationSecurityManager;
+    }
+
+    public void setProactiveApplicationSecurityManager(
+            ProActiveSecurityManager proactiveApplicationSecurityManager) {
+        this.proactiveApplicationSecurityManager = proactiveApplicationSecurityManager;
     }
 }

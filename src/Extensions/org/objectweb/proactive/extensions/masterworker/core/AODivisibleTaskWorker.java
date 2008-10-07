@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.extensions.masterworker.core;
 
 import org.apache.log4j.Logger;
@@ -30,8 +60,8 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
     private static final boolean debug = logger.isDebugEnabled();
 
     private SubMasterImpl submaster;
+    private AOWorker parentWorker;
     private TaskIntern<Serializable> task;
-    private String parentName;
 
     /**
      * ProActive no-arg constructor
@@ -51,10 +81,11 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
      * @param provider the entity which will provide tasks to the worker
      * @param initialMemory initial memory of the worker
      */
-    public AODivisibleTaskWorker(final String name, final WorkerMaster provider,
+    public AODivisibleTaskWorker(final String name, final WorkerMaster provider, final AOWorker parentWorker,
             final Map<String, Serializable> initialMemory, final TaskIntern<Serializable> task) {
         super(name, provider, initialMemory);
-        this.submaster = new SubMasterImpl(provider, name);
+        this.parentWorker = parentWorker;
+        this.submaster = new SubMasterImpl(provider, name, parentWorker);
         this.task = task;
 
     }
@@ -78,15 +109,22 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
     public void handleTask() {
         Serializable resultObj = null;
         boolean gotCancelled = false;
-        ResultInternImpl result = new ResultInternImpl(task);
+        ResultInternImpl result = new ResultInternImpl(task.getId());
         // We run the task and listen to exception thrown by the task itself
         try {
             if (debug) {
                 logger.debug(name + " runs task " + task.getId() + "...");
             }
 
+            //parentWorker.suspendWork();
             resultObj = task.run(memory, submaster);
-        } catch (IsClearingException ex) {
+            if (debug) {
+                logger.debug(name + " task " + task.getId() + " is finished");
+            }
+        } catch (IsClearingError ex) {
+            gotCancelled = true;
+
+        } catch (MWFTError ex) {
             gotCancelled = true;
 
         } catch (Exception e) {
@@ -107,6 +145,7 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
             BooleanWrapper wrap = provider.sendResult(result, name);
             // We synchronize the answer to avoid a BodyTerminatedException (the AO terminates right after this call)
             PAFuture.waitFor(wrap);
+            // parentWorker.resumeWork();
         }
     }
 }

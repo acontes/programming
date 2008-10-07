@@ -30,14 +30,15 @@
  */
 package org.objectweb.proactive.gcmdeployment;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.net.URL;
 import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.xml.VariableContract;
 
 
@@ -122,7 +123,10 @@ public interface GCMApplication {
      *            a GCMVirtualNode name
      * @return A GCMVirtualNode is the identifier is known, null otherwise.
      */
+    // @snippet-start GCMApplication_getVirtualNode
     public GCMVirtualNode getVirtualNode(String vnName);
+
+    // @snippet-end GCMApplication_getVirtualNode
 
     public Set<String> getVirtualNodeNames();
 
@@ -132,7 +136,10 @@ public interface GCMApplication {
      * 
      * @return All the Virtual Nodes known by this application
      */
+    // @snippet-start GCMApplication_getVirtualNodes
     public Map<String, GCMVirtualNode> getVirtualNodes();
+
+    // @snippet-end GCMApplication_getVirtualNodes
 
     /**
      * Returns the variable contract associated to this application
@@ -205,4 +212,9 @@ public interface GCMApplication {
      * @return descriptor url
      */
     public URL getDescriptorURL();
+
+    public ProActiveSecurityManager getProActiveApplicationSecurityManager();
+
+    public void setProActiveApplicationSecurityManager(
+            ProActiveSecurityManager proactiveApplicationSecurityManager);
 }

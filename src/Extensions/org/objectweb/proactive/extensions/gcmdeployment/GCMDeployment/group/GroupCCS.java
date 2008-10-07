@@ -37,7 +37,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderProActive;
 
 
 public class GroupCCS extends AbstractGroup {
@@ -62,16 +61,11 @@ public class GroupCCS extends AbstractGroup {
         command.append("/tasks:" + cpus);
         command.append(" ");
 
-        String cbCommand = ((CommandBuilderProActive) commandBuilder).buildCommand(hostInfo, gcma);
+        String cbCommand = commandBuilder.buildCommand(hostInfo, gcma);
         cbCommand = Helpers.escapeWindowsCommand(cbCommand);
         cbCommand += " -c 1 ";
         command.append(" ");
         command.append("/application:\"" + cbCommand + "\"");
-        command.append(" ");
-
-        String classpath = ((CommandBuilderProActive) commandBuilder).getClasspath(hostInfo);
-        command.append(" ");
-        command.append("/classpath:" + classpath);
         command.append(" ");
 
         if (getStdout() != null) {

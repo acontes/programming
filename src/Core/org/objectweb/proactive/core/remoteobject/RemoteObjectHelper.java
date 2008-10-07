@@ -31,14 +31,12 @@
 package org.objectweb.proactive.core.remoteobject;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.mop.ReifiedCastException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
@@ -56,7 +54,7 @@ public class RemoteObjectHelper {
     public static int getDefaultPortForProtocol(String protocol) throws UnknownProtocolException {
         if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(protocol)) {
             // http port could change according the availability of the default port when activated
-            // so we first instantiante the factory which will set the new port if necessary
+            // so we first instantiate the factory which will set the new port if necessary
             getRemoteObjectFactory(protocol);
 
             if (PAProperties.PA_XMLHTTP_PORT.getValue() != null) {
@@ -121,15 +119,6 @@ public class RemoteObjectHelper {
     }
 
     /**
-     * @param url url of the registry
-     * @return return the list of objects (not only remote objects) registered in the registry identified by the param url
-     * @throws ProActiveException
-     */
-    public static URI[] list(URI url) throws ProActiveException {
-        return getFactoryFromURL(url).list(expandURI(url));
-    }
-
-    /**
      * make the url 'absolute' by explicitly setting all the possibly not set default values
      * @param uri
      * @return the uri with all values set
@@ -150,23 +139,14 @@ public class RemoteObjectHelper {
      * register a remote object at the endpoint identified by the url
      * @param target the remote object to register
      * @param url the url where to register the remote object
-     * @param replacePreviousBinding true if any previous bindng as to be replaced
+     * @param replacePreviousBinding true if any previous binding as to be replaced
      * @return return a remote reference on the remote object (aka a RemoteRemoteObject)
      * @throws ProActiveException
      */
-    public static RemoteRemoteObject register(RemoteObject target, URI url, boolean replacePreviousBinding)
+    public static RemoteRemoteObject register(RemoteObject<?> target, URI url, boolean replacePreviousBinding)
             throws ProActiveException {
         return getFactoryFromURL(url).register(new InternalRemoteRemoteObjectImpl(target), expandURI(url),
                 replacePreviousBinding);
-    }
-
-    /**
-     * unregister the object located at the endpoint identified by the url
-     * @param url
-     * @throws ProActiveException
-     */
-    public static void unregister(URI url) throws ProActiveException {
-        getFactoryFromURL(url).unregister(expandURI(url));
     }
 
     /**
@@ -206,27 +186,8 @@ public class RemoteObjectHelper {
             } else {
                 return reifiedObjectStub;
             }
-        } catch (ClassNotReifiableException e) {
-            e.printStackTrace();
-        } catch (ReifiedCastException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new ProActiveException(e);
         }
-        return null;
     }
 }

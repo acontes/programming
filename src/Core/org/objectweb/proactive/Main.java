@@ -44,7 +44,7 @@ public class Main {
      * @return String
      */
     public static String getProActiveVersion() {
-        return "$Id$";
+        return "2008-07-11 14:56:17";
     }
 
     public static void main(String[] args) {
