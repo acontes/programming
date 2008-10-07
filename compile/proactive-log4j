@@ -4,7 +4,7 @@
 # The default logging level is INFO
 # The root logger logs in the test.log file
 
-log4j.rootLogger=INFO,CONSOLE
+log4j.rootLogger=TRACE,CONSOLE
 log4j.logger.testsuite=INFO,CONSOLE
 
 #log4j.logger.testsuite = TRACE

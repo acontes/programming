@@ -136,9 +136,9 @@
 
 	<target name="compile.core" depends="-configurationCopy" description="Compile ProActive core classes">
 		<!-- update ProActive.getVersion(). If -Dversion is not set, then ${version} is a timestamp for this build -->
-		<replaceregexp file="${src.proactive.dir}/${proactive.path}/Main.java" match="\$ID.*\$" replace="${version}" byline="true" />
-		<replaceregexp file="${base.dir}/README.html" match="\$ID.*\$" replace="${version}" byline="true" />
-		<replaceregexp file="${base.dir}/README.txt" match="\$ID.*\$" replace="${version}" byline="true" />
+		<replaceregexp file="${src.proactive.dir}/${proactive.path}/Main.java" match="\$Id.*\$" replace="${version}" byline="true" />
+		<replaceregexp file="${base.dir}/README.html" match="\$Id.*\$" replace="${version}" byline="true" />
+		<replaceregexp file="${base.dir}/README.txt" match="\$Id.*\$" replace="${version}" byline="true" />
 
 		<javac srcdir="${src.proactive.dir}:${src.utils.dir}" destdir="${cl.proactive.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
@@ -172,6 +172,8 @@
 			<classpath refid="project.classpath" />
 			<arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/body/UniversalBody" />
 		</java>
+
+	    <antcall target="ibis"/>
 
 		<!-- XXX: MPI should be in Extensions -->
 		<if>
@@ -243,13 +245,10 @@
 
 
 	<target name="compile.tests" depends="compile.core, compile.extensions, compile.extra" description="Compile functional and unit tests classes">
-        <available property="jsr_scripting_ok" classname="javax.script.Bindings" classpathref="compile.libs"/>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
-			<exclude name="functionalTests/resourcemanager/**" unless="jsr_scripting_ok"/>
-			<exclude name="functionalTests/scheduler/**" unless="jsr_scripting_ok"/>
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="performanceTests/**" deprecation="on" source="${source}" debug="${debug}">
@@ -353,36 +352,18 @@
 			<fileset dir="${osgi.manifest.dir}" includes="Manifest.mf" />
 		</concat>
 
-		<if name="isRelease" exists="true">
-			<!-- Extra is not packaged in the release -->
-			<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
-				<fileset dir="${cl.proactive.dir}" includes="**" />
-				<fileset dir="${cl.extensions.dir}" includes="**" />
-				<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
-				<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
-				<indexjars>
-					<fileset dir="${lib.dir}">
-						<include name="*.jar" />
+		<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar" index="true">
+			<fileset dir="${cl.proactive.dir}" includes="**" />
+			<fileset dir="${cl.extensions.dir}" includes="**" />
+			<fileset dir="${cl.extra.dir}" includes="**" />
+			<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
+			<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+			<indexjars>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
 				</fileset>
 			</indexjars>
-			</jar>
-
-			<else>
-
-				<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar" index="true">
-					<fileset dir="${cl.proactive.dir}" includes="**" />
-					<fileset dir="${cl.extensions.dir}" includes="**" />
-					<fileset dir="${cl.extra.dir}" includes="**" />
-					<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
-					<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
-					<indexjars>
-						<fileset dir="${lib.dir}">
-						<include name="*.jar" />
-					</fileset>
-				</indexjars>
-				</jar>
-			</else>
-		</if>
+		</jar>
 
 		<copy todir="${deploy.lib.dir}">
 			<!-- Copy all libs -->
@@ -415,6 +396,12 @@
 		</jar>
 	</target>
 
+	<target name="deploy.tests" depends="deploy" description="Add examples.jar to the dist/ directory">
+		<jar destfile="${deploy.lib.dir}/ProActive_tests.jar">
+			<fileset dir="${cl.test.dir}" />
+		</jar>
+	</target>
+
 	<target name="-deploy.mkdir">
 		<!-- Make deploy directories -->
 		<mkdir dir="${deploy.dir}" />
@@ -423,7 +410,7 @@
 	</target>
 
 
-	<target name="deploy.all" depends="deploy.examples" description="Populate dist/ (with ProActive_examples.jar)" />
+	<target name="deploy.all" depends="deploy.examples, deploy.tests" description="Populate dist/ (with ProActive_examples.jar)" />
 
 
 
@@ -446,7 +433,13 @@
 				<jvmarg value="-Dproactive.home=${base.dir}" />
 
 				<classpath>
-					<additionalClasspath />
+					<additionalClasspath >
+						<!--  it  is mandatory to explicity include the ibis jar in the
+			     classpath. Ibis is not able to find the classes if they are
+			     not directly accessible through the classpath.
+			     i.e. we cannot use the jar index tip -->
+						<pathelement location="${lib.dir}/ibis-1.4.jar" />
+					</additionalClasspath>
 					<path refid="test.classpath" />
 				</classpath>
 
@@ -604,85 +597,6 @@
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" testsuite="performancesuite"/>
 	</target>
 
-
-
-
-	<!-- ************
-		Release		
-	-->
-
-	<target name="-release.mkdir">
-
-		<!-- Make release directories -->
-		<mkdir dir="${release.dir}" />
-	</target>
-
-	<target name="release.bin" depends="deploy.all, manualPdf, -release.mkdir" description="Binary Release: dist + docs">
-		<tar destfile="${release.dir}/ProActive-bin_${version}.tar" longfile="gnu">
-			<tarfileset dir="${base.dir}" prefix="ProActive_${version}">
-				<include name="dist/**" />
-				<include name="scripts/**" />
-
-				<include name="docs/pdf/**" />
-				<include name="descriptors/**" />
-
-				<include name="LICENSE.txt" />
-				<include name="README.txt" />
-				<include name="README.html" />
-			</tarfileset>
-		</tar>
-
-		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
-
-		<zip destfile="${release.dir}/ProActive-bin_${version}.zip">
-			<tarfileset src="${release.dir}/ProActive-bin_${version}.tar" />
-		</zip>
-
-		<bzip2 src="${release.dir}/ProActive-bin_${version}.tar" destfile="${release.dir}/ProActive-bin_${version}.tar.bz2" />
-	</target>
-
-	<target name="release.src" depends="-release.mkdir, manualPdf" description="Source Release: sources + docs">
-		<tar destfile="${release.dir}/ProActive-src_${version}.tar" longfile="gnu">
-			<tarfileset dir="${base.dir}" prefix="ProActive_${version}">
-				<include name="compile/**" />
-				<include name="scripts/**" />
-
-				<include name="descriptors/**" />
-				<include name="docs/pdf/**" />
-				<include name="lib/**" />
-				<include name="daemon/**" />
-				<include name="src/**" />
-				<!-- Extra is not released -->
-				<exclude name="src/Extra/*/**" />
-
-				<include name="ic2d-plugins-src/**" />
-				<include name="infrastructure-manager-src/**" />
-				<include name="scheduler-plugins-src/**" />
-
-				<include name="LICENSE.txt" />
-				<include name="README.txt" />
-				<include name="README.html" />
-			</tarfileset>
-
-		</tar>
-
-		<zip destfile="${release.dir}/ProActive-src_${version}.zip">
-			<tarfileset src="${release.dir}/ProActive-src_${version}.tar" />
-		</zip>
-
-		<bzip2 src="${release.dir}/ProActive-bin_${version}.tar" destfile="${release.dir}/ProActive-bin_${version}.tar.bz2" />
-	</target>
-
-
-	<target name="release" depends="release.bin, release.src" description="Source and Binary Releases" />
-
-
-	<target name="release.all" depends="release" description="Source and Binary Releases" />
-
-
-
-
-
 	<!-- ************
 		Source file handling		
 	-->
@@ -692,7 +606,7 @@
 
 
 	<target name="update_copyright_and_version" depends="compile.util" description="Update Copyright and Version in every text files">
-		<java classname="sources.UpdateCopyrightAndVersion" fork="true">
+		<java classname="sources.UpdateCopyrightAndVersion" fork="false">
 			<classpath refid="project.classpath" />
 			<!--  base dir -->
 			<arg value="${base.dir}" />
@@ -736,8 +650,6 @@
 			<sourcefileset>
 				<fileset dir="${src.dir}" includes="**/*.java" />
 				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
-				<fileset dir="${scheduler-plugin.dir}" includes="**/*.java" />
-				<fileset dir="${resourcemanager-plugin.dir}" includes="**/*.java" />
 			</sourcefileset>
 		</eclipse_format_m>
 	</target>
@@ -751,8 +663,6 @@
 			</fileset>
 			<!-- 
 				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
-				<fileset dir="${scheduler-plugin.dir}" includes="**/*.java" />
-				<fileset dir="${resourcemanager-plugin.dir}" includes="**/*.java" />			
 				-->
 		</copy>
 
@@ -955,7 +865,7 @@
 		<property name="x" value="" />
 		<echo message="Starting the performance test." />
 		<java classname="${performanceTestClass}" fork="true">
-			<classpath refid="project.classpath" />
+			<classpath refid="project.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 			<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
 			<arg value="-n" />
@@ -1002,37 +912,6 @@
 		</war>
 	</target>
 
-	<!-- ================================================================ -->
-	<!--  Scheduler Specific - Convert Schemas from Relax NG to XMLSchema -->
-	<!-- ================================================================ -->
-	<!-- MUST BE CALLED FROM AN INRIA MACHINE ON PRODUCTION NETWORK -->
-	<target name="convertSchemas" description="convert Schemas from Relax NG Compact Syntax to Relax NG XML Syntax and to XMLSchema inside the scheduler.">
-		<property name="schedulerSchemas.website.dir" value="/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/0.91" />
-		<property name="schedulerSchemas.job.name" value="schedulerjob" />
-		<taskdef name="trang" classname="net.amadan.trang.ant.TrangTask">
-			<classpath>
-				<fileset dir="${base.dir}/dev/lib/trang">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</taskdef>
-		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
-		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rng" />
-
-		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
-		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
-		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" />
-		<delete>
-			<fileset dir="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/">
-				<include name="xsi.xsd" />
-				<include name="schedulerjob.xsd" />
-			</fileset>
-		</delete>
-		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
-		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" tofile="${schedulerSchemas.website.dir}/${schedulerSchemas.job.name}.xsd" />
-	</target>
-
-
 	<!-- MUST BE CALLED FROM AN INRIA MACHINE ON PRODUCTION NETWORK -->
 	<target name="uploadSchemas" description="upload schemas on web site">
 		<property name="schemas.website.dir" value="/net/servers/www-sop/teams/oasis/proactive/schemas/gcm/1.0/" />
@@ -1042,6 +921,9 @@
 				<include name="*.xsd" />
 			</fileset>
 			<fileset dir="${src.extensions.dir}/${extensions.path}/gcmdeployment/GCMDeployment/bridge">
+				<include name="*.xsd" />
+			</fileset>
+			<fileset dir="${src.extensions.dir}/${extensions.path}/gcmdeployment/GCMApplication/commandbuilder">
 				<include name="*.xsd" />
 			</fileset>
 			<fileset dir="${src.extensions.dir}/${extensions.path}/gcmdeployment/schema">

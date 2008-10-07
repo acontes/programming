@@ -126,13 +126,11 @@
                 PROACTIVE/scripts/unix/scilab/README :
             </para>
 
-            <para>
-                <programlisting xml:lang="txt">
+                <programlisting xml:lang="screen">
                     <textobject>
                         <textdata fileref="../scripts/unix/scilab/README"/>
                     </textobject>
                 </programlisting>
-            </para>
         </section>
         <section xml:id="SciMat_Matlab_Installation">
             <info>
@@ -754,6 +752,7 @@
                     <title>Example: Interface Matlab/Scilab</title>
                 </info>
 
+            </example>
 
                 <programlisting xml:lang="java">
                     <textobject>
@@ -761,20 +760,18 @@
                                 fileref="../src/Extensions/org/objectweb/proactive/extensions/scilab/test/SciTest2.java"/>
                     </textobject>
                 </programlisting>
-            </example>
 
             <example xml:id="sciex2">
                 <info>
                     <title>Descriptor deployment</title>
                 </info>
-
+            </example>
 
                 <programlisting xml:lang="xml">
                     <textobject>
                         <textdata fileref="../scripts/unix/scilab/ProActiveScilab.xml"/>
                     </textobject>
                 </programlisting>
-            </example>
         </section>
     </section>
 </chapter>

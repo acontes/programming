@@ -72,9 +72,8 @@
 	  <!ENTITY extendingIC2D SYSTEM "ic2d/extendingIC2D.xml">
 	  <!ENTITY glossary SYSTEM "glossary.xml">
 	  <!ENTITY reference SYSTEM "definitions.xml">
-	  <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
 	  <!ENTITY HighLevelAPITutorial SYSTEM "high_level_api_tutorial.xml">
-	  <!ENTITY SchedulerTutorial SYSTEM "scheduler_tutorial.xml">
+	  <!ENTITY ComponentsTutorial SYSTEM "ComponentsTutorial.xml">
 	  
 	   <!ENTITY GCMDeployment SYSTEM "GCMDeployment.xml">
 ]>
@@ -99,7 +98,7 @@
   <!--  
   &hands_on_programming_PRIMES; --> 
   &HighLevelAPITutorial;
-  &SchedulerTutorial;
+  &ComponentsTutorial;
     <!-- TODO to be removed, have been included in capabilities-intro --> 
 <!--    &StepByStepPi;
    &OOSPMDJacobiexample;
@@ -132,7 +131,6 @@
     &Descriptor;
     &VariableContract;
     &FileTransfer;
-    &ProActive_Scheduler;
     &SSHTunneling;
     &technicalService;
    </part>
@@ -177,7 +175,7 @@
     &MOP;
    </part>
      
-   <part xml:id="Unsupported"><info><title>Unsupported And Deprecated Extensions</title></info>
+   <part xml:id="Unsupported"><info><title>Extensions Under Development  </title></info>
     &bnb;
     &p2p;
    </part>
