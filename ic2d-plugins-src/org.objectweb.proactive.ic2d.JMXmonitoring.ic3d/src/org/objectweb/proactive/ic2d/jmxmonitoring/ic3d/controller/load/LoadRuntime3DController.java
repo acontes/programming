@@ -44,7 +44,7 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createChildController(org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData)
      */
-    @Override
+    
     protected AbstractFigure3DController createChildController(final AbstractData modelObject) {
         return null;
     }
@@ -54,7 +54,7 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createFigure(java.lang.String)
      */
-    @Override
+    
     protected AbstractFigure3D createFigure(final String name) {
     	LoadRuntime3D runtime = new LoadRuntime3D(name);
     	runtime.addObserver(this);
@@ -66,7 +66,7 @@ public class LoadRuntime3DController extends AbstractLoadRuntime3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#removeFigure(java.lang.String)
      */
-    @Override
+    
     public void removeFigure(final String key) { }
 
     public void update(final Observable o, final Object arg) {

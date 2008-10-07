@@ -47,7 +47,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
         // rot.setEnable(false);
     }
 
-    @Override
+    
     protected Appearance createAppearance() {
         return AppearanceBasket.defaultActiveObjectAppearance;
     }
@@ -57,7 +57,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setQueueSize(int)
      */
-    @Override
+    
     public void setQueueSize(final int size) {
         // TODO hacky, change
         if (this.noQueue) {
@@ -81,7 +81,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
      */
-    @Override
+    
     public void arrangeSubFigures() {
     }
 
@@ -90,7 +90,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
      */
-    @Override
+    
     protected Geometry createGeometry() {
         return GeometryBasket.getDefaultActiveObjectGeometry();
     }
@@ -100,7 +100,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
      */
-    @Override
+    
     protected TransformGroup createTextBranch() {
         return TextStylesBasket.activeObjectText(this.getShortenedName(10));
     } /*
@@ -109,7 +109,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setStateMigrating()
      */
 
-    @Override
+    
     public void setStateMigrating() {
 
         this.setAppearance(AppearanceBasket.objectMigratingAppearance);
@@ -120,7 +120,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setStateServingRequest()
      */
-    @Override
+    
     public void setStateServingRequest() {
         // Transform3D t = new Transform3D();
         // t.set(new AxisAngle4d(0d, 1d, 1d, Math.PI));
@@ -134,7 +134,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setStateWaitingForRequest()
      */
-    @Override
+    
     public void setStateWaitingForRequest() {
         // rot.setEnable(false);
         this.setAppearance(AppearanceBasket.waitingForRequestAppearance);
@@ -145,12 +145,12 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractActiveObject3D#setStateActive()
      */
-    @Override
+    
     public void setStateActive() {
     	this.setAppearance(AppearanceBasket.defaultActiveObjectAppearance);
     }
     
-    @Override
+    
     public void setStateUnkown() {
     	// TODO Auto-generated method stub
     	//super.setStateUnkown();
@@ -162,7 +162,7 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
      */
-    @Override
+    
     public void animateCreation() {
         new AnimationBasket().fadeInto(this, 2000);
     }
@@ -173,12 +173,12 @@ public class ActiveObject3D extends AbstractActiveObject3D {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setArrow(javax.vecmath.Vector3f,
      *      javax.vecmath.Vector3f)
      */
-    @Override
+    
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         return null;
     }
 
-	@Override
+	
 	public FigureType getType() {
 		return FigureType.ACTIVEOBJECT;
 	}

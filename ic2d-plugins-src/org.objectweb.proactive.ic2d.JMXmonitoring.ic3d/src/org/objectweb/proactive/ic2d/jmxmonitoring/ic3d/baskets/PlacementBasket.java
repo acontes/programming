@@ -236,6 +236,71 @@ public class PlacementBasket {
     	figure.placeSubFigure(figure, x, 0, z);
     }
     
+    
+    // TODO
+    public static void matrixSphereArrangement(final int figureIndex, final Figure3D figure, final int figureCount, final Vector3f offset) {
+        /* Setting up our variables */
+    	double x, z; /* Our host 2D placement */
+        int figureIndexSquareRoot, c, xCountSquareRoot, zCountSquareRoot;
+        /* Checking parameters */
+        if (figureIndex < 1) {
+            throw new IllegalArgumentException("The figure index must be larger than 0");
+        }
+        figureIndexSquareRoot = (int) Math.sqrt(figureIndex);
+        c = figureIndexSquareRoot + 1;
+        
+        xCountSquareRoot = (int) Math.sqrt(figureCount);
+        if ( xCountSquareRoot * xCountSquareRoot < figureCount )
+        	xCountSquareRoot++;
+        zCountSquareRoot = xCountSquareRoot;
+        if( figureCount <= xCountSquareRoot * xCountSquareRoot - xCountSquareRoot)
+        	zCountSquareRoot--;
+        
+        
+        /* Short sample of the 2D placement policy */
+        /*
+         * Could have been easier but maintains an order relation. Moreover you
+         * can find the index with the 2D coordinates.
+         * 
+         * 1 2 5 10 17 3 4 6 11 18 7 8 9 12 19 13 14 15 16 20 21 22 23 24 25
+         */
+
+        /* Our index is a square so x and y coordinates are the same */
+        if (figureIndexSquareRoot * figureIndexSquareRoot == figureIndex) {
+            x = figureIndexSquareRoot;
+            z = figureIndexSquareRoot;
+        }
+        /*
+         * Our index is lower or equal than the middle of next and previous
+         * squares (N)
+         */
+        else if (figureIndex <= (figureIndexSquareRoot * figureIndexSquareRoot + c * c) / 2) {
+            x = c;
+            z = Math.abs(figureIndexSquareRoot * figureIndexSquareRoot - figureIndex);
+        }
+        /* The index is greater than the middle of next and previous squares (N) */
+        else {
+            x = c - Math.abs(c * c - figureIndex);
+            z = c;
+        }
+        
+        /* Align figures to the center */
+    	x -= (double)((xCountSquareRoot - 1 )/ 2d);
+    	z -= (double)((zCountSquareRoot - 1 )/ 2d);
+    	x--;
+    	z--;
+    	
+        /* Scale the offset and set a padding */
+        x *= GeometryBasket.FIGURE_SCALE * 1.2;
+        z *= GeometryBasket.FIGURE_SCALE * 1.2;
+        
+        /* Offset the figure according their location */
+    	x += offset.x;
+    	z += offset.z;
+    	
+    	figure.placeSubFigure(figure, x, 0, z);
+    }
+    
     /**
      * Arranges figures in matrix You can find index of the figure with:
      * 
@@ -343,6 +408,112 @@ public class PlacementBasket {
         figureTransform.setTransform(figureTransform3D);
     }
     
+    /**
+     * Arranges figures in matrix You can find index of the figure with:
+     * 
+     * <br/> x == y -> idx = x^2,
+     * 
+     * <br/> ( x < y ) -> y^2 - y + x,
+     * 
+     * <br/> ( x > y ) -> x^2 -2x + y <br/>
+     * 
+     * 
+     * 
+     * @param figureIndex
+     * @param figure
+     */
+    public static void matrixArrangement2(final int figureIndex, final Figure3D figure, final int figureCount, final Vector3f scales) {
+        /* Setting up our variables */
+        double x, z; /* Our host 2D placement */
+        int figureIndexSquareRoot, figureIndexUpperSquareRoot, xCountSquareRoot, zCountSquareRoot;
+        Vector3d figureScale;
+        
+        /* Checking parameters */
+        if (figureIndex < 1) {
+            throw new IllegalArgumentException("The figure index must be larger than 0");
+        }
+        
+        if (figureCount < 1) {
+        	throw new IllegalArgumentException("If you pass at least one figure this count should be at least 1");
+        }
+        
+        figureIndexSquareRoot = (int) Math.sqrt(figureIndex);
+        figureIndexUpperSquareRoot = figureIndexSquareRoot + 1;
+        
+        xCountSquareRoot = (int) Math.sqrt(figureCount);
+        if ( xCountSquareRoot * xCountSquareRoot < figureCount )
+        	xCountSquareRoot++;
+        zCountSquareRoot = xCountSquareRoot;
+        if( figureCount <= xCountSquareRoot * xCountSquareRoot - xCountSquareRoot)
+        	zCountSquareRoot--;
+        
+        /* Short sample of the 2D placement policy */
+        /*
+         * Could have been easier but maintains an order relation. Moreover you
+         * can find the index with the 2D coordinates.
+         * 
+         *  1  2  5 10 17
+         *  3  4  6 11 18
+         *  7  8  9 12 19
+         * 13 14 15 16 20
+         * 21 22 23 24 25
+         */
+
+        /* Our index is a square so x and y coordinates are the same */
+        if (figureIndexSquareRoot * figureIndexSquareRoot == figureIndex) {
+            x = figureIndexSquareRoot;
+            z = figureIndexSquareRoot;
+        }
+        /*
+         * Our index is lower or equal than the middle of next and previous
+         * squares (N)
+         */
+        else if (figureIndex <= (figureIndexSquareRoot * figureIndexSquareRoot + figureIndexUpperSquareRoot * figureIndexUpperSquareRoot) / 2) {
+            x = figureIndexUpperSquareRoot;
+            z = Math.abs(figureIndexSquareRoot * figureIndexSquareRoot - figureIndex);
+        }
+        /* The index is greater than the middle of next and previous squares (N) */
+        else {
+            x = figureIndexUpperSquareRoot - Math.abs(figureIndexUpperSquareRoot * figureIndexUpperSquareRoot - figureIndex);
+            z = figureIndexUpperSquareRoot;
+        }
+        
+        /* Offset to 0 */
+    	x--;
+    	z--;
+    	
+    	/* Last row placement behavior */
+    	if( xCountSquareRoot == zCountSquareRoot
+    			&& zCountSquareRoot == z + 1 
+    			&& figureCount < xCountSquareRoot * xCountSquareRoot ) {
+    		/* Scale the last figures */
+    		//xCountSquareRoot = xCountSquareRoot * xCountSquareRoot - figureCount;
+    		/* centered */
+    		x += (double)(xCountSquareRoot * xCountSquareRoot - figureCount ) / (double)xCountSquareRoot;
+    	}
+    	
+    	/* Align figures to the center */
+    	x -= (double)((xCountSquareRoot - 1 )/ 2d);
+    	z -= (double)((zCountSquareRoot - 1 )/ 2d);
+    	
+    	/* Set the scale */
+    	x /= xCountSquareRoot;
+    	z /= zCountSquareRoot;
+    	
+    	/* Set the unit scale value */
+    	x *= GeometryBasket.FIGURE_SCALE;
+    	z *= GeometryBasket.FIGURE_SCALE;
+    	
+    	/* Scale the figure */
+    	figureScale = new Vector3d(1f /(xCountSquareRoot * 1.1f), scales.y, 1f / (zCountSquareRoot * 1.1f));
+        
+    	TransformGroup figureTransform = figure.getTranslateScaleTransform();
+        Transform3D figureTransform3D = new Transform3D();
+        figureTransform.getTransform(figureTransform3D);
+        figureTransform3D.setTranslation(new Vector3d(x, 0.1d, z));
+        figureTransform3D.setScale(figureScale);
+        figureTransform.setTransform(figureTransform3D);
+    }
 
 
     /**
@@ -552,11 +723,11 @@ public class PlacementBasket {
         phi %= Math.PI;
         theta %= Math.PI * 2;
         //get the coordinates in a plane 
-        double z = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.075;
-        double x = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.075;
+        double z = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
+        double x = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
 
         //get the z coordinate
-        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS * 1.075;
+        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
 
         // Create the lookAt Transform Matrix
         TransformGroup rotation = figure.getRotationTransform();
@@ -580,5 +751,138 @@ public class PlacementBasket {
         rotation.setTransform(lookAtTransform);
         figure.placeSubFigure(figure, x, y, z);
     }
+
+	public static void sphereArrangement(double theta, double phi, Figure3D figure,
+			double yoffset ) {
+		// Phi should be [0,PI] and theta between [0, 2PI] 
+        theta %= Math.PI * 2;
+        phi %= Math.PI;
+        //get the coordinates in a plane 
+        double z = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
+        double x = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
+
+        //get the z coordinate
+        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
+
+        // Create the lookAt Transform Matrix
+        TransformGroup rotation = figure.getRotationTransform();
+        Transform3D lookAtTransform = new Transform3D();
+        lookAtTransform.lookAt(new Point3d(), new Point3d(x, y, z), new Vector3d(0, 1, 0));
+        lookAtTransform.invert(); // Keep it else wont work ( java3d failure )
+
+        // Rotate the lookAt Matrix the right way
+        Transform3D rotationMatrix = new Transform3D();
+        rotationMatrix.rotX(-Math.PI / 2);
+        
+        // Add the second transform
+        lookAtTransform.mul(rotationMatrix);
+        lookAtTransform.normalize();
+        
+        rotationMatrix.rotY(Math.PI);
+        lookAtTransform.mul(rotationMatrix);
+        lookAtTransform.normalize();
+
+        // And commit the changes
+        rotation.setTransform(lookAtTransform);
+        figure.placeSubFigure(figure, x, y, z);
+        //figure.placeSubFigure(figure, x, y + yoffset, z);
+	}
+	public static void sphereMatrixArrangement(double theta, double phi, Figure3D figure,
+			double yoffset, int figureIndex, int figureCount ) {
+		double xoffset, zoffset; /* The theta and phi offset */
+        int figureIndexSquareRoot, figureIndexUpperSquareRoot, xCountSquareRoot, zCountSquareRoot;
+        
+        /* Checking parameters */
+        if (figureIndex < 1) {
+            throw new IllegalArgumentException("The figure index must be larger than 0");
+        }
+        
+        if (figureCount < 1) {
+        	throw new IllegalArgumentException("If you pass at least one figure this count should be at least 1");
+        }
+        
+        figureIndexSquareRoot = (int) Math.sqrt(figureIndex);
+        figureIndexUpperSquareRoot = figureIndexSquareRoot + 1;
+        
+        xCountSquareRoot = (int) Math.sqrt(figureCount);
+        if ( xCountSquareRoot * xCountSquareRoot < figureCount )
+        	xCountSquareRoot++;
+        zCountSquareRoot = xCountSquareRoot;
+        if( figureCount <= xCountSquareRoot * xCountSquareRoot - xCountSquareRoot)
+        	zCountSquareRoot--;
+        
+        /* Short sample of the 2D placement policy */
+        /*
+         * Could have been easier but maintains an order relation. Moreover you
+         * can find the index with the 2D coordinates.
+         * 
+         *  1  2  5 10 17
+         *  3  4  6 11 18
+         *  7  8  9 12 19
+         * 13 14 15 16 20
+         * 21 22 23 24 25
+         */
+
+        /* Our index is a square so x and y coordinates are the same */
+        if (figureIndexSquareRoot * figureIndexSquareRoot == figureIndex) {
+            xoffset = figureIndexSquareRoot;
+            zoffset = figureIndexSquareRoot;
+        }
+        /*
+         * Our index is lower or equal than the middle of next and previous
+         * squares (N)
+         */
+        else if (figureIndex <= (figureIndexSquareRoot * figureIndexSquareRoot + figureIndexUpperSquareRoot * figureIndexUpperSquareRoot) / 2) {
+            xoffset = figureIndexUpperSquareRoot;
+            zoffset = Math.abs(figureIndexSquareRoot * figureIndexSquareRoot - figureIndex);
+        }
+        /* The index is greater than the middle of next and previous squares (N) */
+        else {
+            xoffset = figureIndexUpperSquareRoot - Math.abs(figureIndexUpperSquareRoot * figureIndexUpperSquareRoot - figureIndex);
+            zoffset = figureIndexUpperSquareRoot;
+        }
+        
+        /* Offset to 0 */
+    	xoffset--;
+    	zoffset--;
+    	double angleValue = 1.1f * GeometryBasket.FIGURE_SCALE / ( GeometryBasket.EARTH_RADIUS * Math.PI * 2);
+    	xoffset *= angleValue;
+    	zoffset *= angleValue;
+		
+    	// Phi should be [0,PI] and theta between [0, 2PI] 
+        theta %= Math.PI * 2;
+        phi %= Math.PI;
+        theta += xoffset;
+        phi += zoffset;
+        //get the coordinates in a plane 
+        double z = Math.cos(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
+        double x = Math.sin(theta) * Math.sin(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
+        
+        //get the z coordinate
+        double y = Math.cos(phi) * GeometryBasket.EARTH_RADIUS * 1.005;
+
+        // Create the lookAt Transform Matrix
+        TransformGroup rotation = figure.getRotationTransform();
+        Transform3D lookAtTransform = new Transform3D();
+        lookAtTransform.lookAt(new Point3d(), new Point3d(x, y, z), new Vector3d(0, 1, 0));
+        lookAtTransform.invert(); // Keep it else wont work ( java3d failure )
+
+        // Rotate the lookAt Matrix the right way
+        Transform3D rotationMatrix = new Transform3D();
+        rotationMatrix.rotX(-Math.PI / 2);
+        
+        // Add the second transform
+        lookAtTransform.mul(rotationMatrix);
+        lookAtTransform.normalize();
+        
+        rotationMatrix.rotY(Math.PI);
+        lookAtTransform.mul(rotationMatrix);
+        lookAtTransform.normalize();
+
+        // And commit the changes
+        rotation.setTransform(lookAtTransform);
+        figure.placeSubFigure(figure, x, y, z);
+        //figure.placeSubFigure(figure, x, y + yoffset, z);
+	}
 
 }

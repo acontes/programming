@@ -16,43 +16,43 @@ public class Cluster3D extends AbstractCluster3D {
         // TODO Auto-generated constructor stub
     }
 
-    @Override
+    
     public void animateCreation() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
+    
     public void arrangeSubFigures() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
+    
     protected Appearance createAppearance() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
+    
     protected Geometry createGeometry() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
+    
     protected TransformGroup createTextBranch() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
+    
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
         return null;
     }
 
-	@Override
+	
 	public FigureType getType() {
 		// TODO Auto-generated method stub
 		return FigureType.CLUSTER;

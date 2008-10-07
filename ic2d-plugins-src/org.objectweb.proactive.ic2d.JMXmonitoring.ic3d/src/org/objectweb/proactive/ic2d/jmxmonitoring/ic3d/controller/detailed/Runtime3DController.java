@@ -39,7 +39,7 @@ public class Runtime3DController extends AbstractRuntime3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createChildController(org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData)
      */
-    @Override
+    
     protected AbstractFigure3DController createChildController(final AbstractData modelObject) {
         return new Node3DController(modelObject, this.getFigure(), this);
     }
@@ -49,7 +49,7 @@ public class Runtime3DController extends AbstractRuntime3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createFigure(java.lang.String)
      */
-    @Override
+    
     protected AbstractFigure3D createFigure(final String name) {
     	Runtime3D runtime = new Runtime3D(name);
     	runtime.addObserver(this);
@@ -61,12 +61,12 @@ public class Runtime3DController extends AbstractRuntime3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#removeFigure(java.lang.String)
      */
-    @Override
+    
     public void removeFigure(final String key) {
         // TODO Auto-generated method stub
     }
     
-    @Override
+    
     public void update(final Observable o, final Object arg) {
     	if ( o != null) {
     		super.update(o, arg);

@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3f;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.LocalAttribute;
+
 public class SiteBasket {
 	
 	private static HashMap<String, String> hostSites = new HashMap<String, String>();
@@ -47,27 +49,49 @@ public class SiteBasket {
 		//luxembourg
 		//portoalegre
 		grid5000Pattern = Pattern.compile(".*grid5000.*");
-		Vector3f sophia = new Vector3f(28f,0,23f);
-		Vector3f paris = new Vector3f(3f,0f,-23f);
-		Vector3f bordeaux = new Vector3f(-20f,0f,19.5f);
-		Vector3f toulouse = new Vector3f(-5.5f,0f,32.5f);
-		Vector3f lyon = new Vector3f(18.5f, 0f, 11f);
-		Vector3f lille = new Vector3f(1.5f, 0f, -33.5f);
-		Vector3f orsay = new Vector3f(0f,0f,-19.5f);;
-		Vector3f grenoble = new Vector3f(26.5f, 0f, 16f);
-		Vector3f nancy = new Vector3f(29f, 0f, -21.5f);
-		Vector3f rennes = new Vector3f(-26.5f, 0f, -15.5f);;
+//		Vector3f sophia = new Vector3f(28f,0,23f);
+//		Vector3f paris = new Vector3f(3f,0f,-23f);
+//		Vector3f bordeaux = new Vector3f(-20f,0f,19.5f);
+//		Vector3f toulouse = new Vector3f(-5.5f,0f,32.5f);
+//		Vector3f lyon = new Vector3f(18.5f, 0f, 11f);
+//		Vector3f lille = new Vector3f(1.5f, 0f, -33.5f);
+//		Vector3f orsay = new Vector3f(0f,0f,-19.5f);;
+//		Vector3f grenoble = new Vector3f(26.5f, 0f, 16f);
+//		Vector3f nancy = new Vector3f(29f, 0f, -21.5f);
+//		Vector3f rennes = new Vector3f(-26.5f, 0f, -15.5f);;
+		Vector3f bordeaux = new Vector3f(-0.56f, 44.83f, 0f); // D: -0.56 O ; 44.83
+		Vector3f grenoble = new Vector3f(5.71f, 45.16f, 0f); // D: 5.71 E ; 45.16
+		Vector3f lille = new Vector3f(3.06f, 50.63f, 0f); // D: 3.06 E; 50.63
+		Vector3f lyon = new Vector3f(4.85f, 45.75f, 0f); // D: 4.85 E ; 45.75
+		Vector3f nancy = new Vector3f(6.2f, 48.68f, 0f); // D: 6.2 E; 48.68
+		Vector3f orsay = new Vector3f(2.18f, 48.7f, 0f); // D: 2.18E; 48.7
+		Vector3f paris = new Vector3f(2.33f,48.86f,0f); // D: 2.33 E , 48.86
+		Vector3f rennes = new Vector3f(-1.68f, 48.08f, 0f); // D:-1.68 O; 48.08
+		Vector3f sophia = new Vector3f(7f, 43.63f, 0f); // D: 7.0 E, 43.63
+		Vector3f toulouse = new Vector3f(1.43f, 43.6f, 0f); // D: 1.43 E   ; 43.6
 		
-		siteFlatLocation.put("bordeaux", bordeaux);
-		siteFlatLocation.put("grenoble", grenoble);
-		siteFlatLocation.put("lille", lille);
-		siteFlatLocation.put("lyon", lyon);
-		siteFlatLocation.put("nancy", nancy);
-		siteFlatLocation.put("orsay", orsay);
-		siteFlatLocation.put("paris", paris);
-		siteFlatLocation.put("rennes", rennes);
-		siteFlatLocation.put("sophia", sophia);
-		siteFlatLocation.put("toulouse", toulouse);
+		siteFlatLocation.put("bordeaux", toFlat(bordeaux));
+		siteFlatLocation.put("grenoble", toFlat(grenoble));
+		siteFlatLocation.put("lille", toFlat(lille));
+		siteFlatLocation.put("lyon", toFlat(lyon));
+		siteFlatLocation.put("nancy", toFlat(nancy));
+		siteFlatLocation.put("orsay", toFlat(orsay));
+		siteFlatLocation.put("paris", toFlat(paris));
+		siteFlatLocation.put("rennes", toFlat(rennes));
+		siteFlatLocation.put("sophia", toFlat(sophia));
+		siteFlatLocation.put("toulouse", toFlat(toulouse));
+		
+		siteSphereLocation.put("bordeaux", toSphere(bordeaux));
+		siteSphereLocation.put("grenoble", toSphere(grenoble));
+		siteSphereLocation.put("lille", toSphere(lille));
+		siteSphereLocation.put("lyon", toSphere(lyon));
+		siteSphereLocation.put("nancy", toSphere(nancy));
+		siteSphereLocation.put("orsay", toSphere(orsay));
+		siteSphereLocation.put("paris", toSphere(paris));
+		siteSphereLocation.put("rennes", toSphere(rennes));
+		siteSphereLocation.put("sophia", toSphere(sophia));
+		siteSphereLocation.put("toulouse", toSphere(toulouse));
+		
 		hostSites.put("segfault.inria.fr", "rennes");
 		hostSites.put("saturn.inria.fr", "paris");
 		hostSites.put("cobreloa.inria.fr", "grenoble");
@@ -184,6 +208,29 @@ public class SiteBasket {
 		hostSites.put("aglae", "sophia");
 		hostSites.put("adrar", "sophia");
 	}
+
+	private static Vector3f toFlat(Vector3f location) {
+		Vector3f flatLocation = new Vector3f();
+		flatLocation.x = location.x * GeometryBasket.MAP_TILE * GeometryBasket.TILE_X / 360;
+		flatLocation.z = -location.y * GeometryBasket.MAP_TILE * GeometryBasket.TILE_Y / 180;
+		return(flatLocation);
+	}
+	
+	private static Vector3f toSphere(Vector3f location) {
+		Vector3f sphereLocation = new Vector3f();
+		
+		//sphereLocation.x = location.x;
+		//if ( location.x < 0 ) sphereLocation.x += 360f;
+		sphereLocation.x = location.x / 180f;
+		sphereLocation.x *= (float)Math.PI;
+		
+		//if(sphereLocation.x < 0) sphereLocation.x += 2 * Math.PI;
+		sphereLocation.y = 90 - location.y;
+		sphereLocation.y /= 180f;
+		sphereLocation.y *= Math.PI;
+		return(sphereLocation);
+	}
+	
 
 	public static Point3d getTownLocation(String string) {
 		Vector3f toReturn = siteFlatLocation.get(string);

@@ -37,18 +37,18 @@ public class HoverInfo extends PickMouseBehavior {
      * @see com.sun.j3d.utils.pickfast.behaviors.PickMouseBehavior#updateScene(int,
      *      int)
      */
-    @Override
+    
     public void updateScene(final int xpos, final int ypos) {
         // TODO Auto-generated method stub
     }
 
-    @Override
+    
     public void initialize() {
         // TODO Auto-generated method stub
         super.initialize();
     }
 
-    @Override
+    
     public void processStimulus(final Enumeration criteria) {
         final WakeupCriterion wakeup;
         final AWTEvent[] evt = null;

@@ -51,7 +51,7 @@ public abstract class AbstractActiveObject3D extends AbstractFigure3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State)
      */
-    @Override
+    
     public void setState(final State state) {
         switch (state) {
             case SERVING_REQUEST:

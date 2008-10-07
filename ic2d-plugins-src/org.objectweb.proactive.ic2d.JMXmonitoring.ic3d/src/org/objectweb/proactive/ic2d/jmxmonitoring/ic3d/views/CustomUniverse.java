@@ -37,14 +37,37 @@ public class CustomUniverse {
         locale = new Locale(universe);
         scene = new BranchGroup();
         scene.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
-        TransformGroup mapTG = new TransformGroup();
-        Transform3D mapT = new Transform3D();
-        mapT.setTranslation(new Vector3d(0d, -0.05d, 0d));
-        mapTG.setTransform(mapT);
-        Shape3D map = new Shape3D(GeometryBasket.getFlatMap());
-        map.setAppearance(AppearanceBasket.flatMap);
-        mapTG.addChild(map);
-        scene.addChild(mapTG);
+//        TransformGroup mapTG = new TransformGroup();
+//        Transform3D mapT = new Transform3D();
+//        mapT.setTranslation(new Vector3d(0d, -0.05d, 0d));
+//        mapTG.setTransform(mapT);
+        int xmax = GeometryBasket.TILE_X;
+        int ymax = GeometryBasket.TILE_Y;
+        //int xmax = 4;
+        //int ymax = 2;
+      
+        for(int y = 0; y < ymax; y++) {
+        	double yoffset = ((double)y - (double)ymax/2) * (double)GeometryBasket.MAP_TILE + (double)GeometryBasket.MAP_TILE / 2d;
+        	for(int x = 0; x < xmax; x++) {
+        		TransformGroup mapTG = new TransformGroup();
+                Transform3D mapT = new Transform3D();
+                Vector3d trans = new Vector3d(
+                		((double)x - (double)xmax/2) * (double)GeometryBasket.MAP_TILE + (double)GeometryBasket.MAP_TILE / 2,
+                		-0.05d,
+                		yoffset
+						);
+                mapT.setTranslation(trans);
+                mapTG.setTransform(mapT);
+                Shape3D map = new Shape3D(GeometryBasket.getSquare());
+                map.setAppearance(AppearanceBasket.map(y * xmax + x));
+                mapTG.addChild(map);
+                scene.addChild(mapTG);
+        	}
+        }
+//        Shape3D map = new Shape3D(GeometryBasket.getFlatMap());
+//        map.setAppearance(AppearanceBasket.flatMap);
+//        mapTG.addChild(map);
+//        scene.addChild(mapTG);
 
         // create background
         Background bkgrd = new Background();

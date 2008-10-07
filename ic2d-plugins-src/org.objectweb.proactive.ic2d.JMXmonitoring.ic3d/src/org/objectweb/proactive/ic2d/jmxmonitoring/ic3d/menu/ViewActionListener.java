@@ -21,7 +21,7 @@ public class ViewActionListener implements ActionListener {
 		this.popup  = popup;
 		this.action = action;
 	}
-	@Override
+	
 	public void actionPerformed(ActionEvent e) {
 		canvas.remove(popup);
 		figure.notifyObservers(action);

@@ -49,7 +49,7 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createChildController(org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData)
      */
-    @Override
+    
     protected AbstractFigure3DController createChildController(final AbstractData figure) {
         ActiveObject3DController.logger.debug("No children have been implemented for ActiveObjects");
         throw new NotImplementedException();
@@ -60,7 +60,7 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createFigure(java.lang.String)
      */
-    @Override
+    
     protected AbstractFigure3D createFigure(final String name) {
     	ActiveObject3D ao = new ActiveObject3D(name);
     	ao.addObserver(this);
@@ -72,7 +72,7 @@ public class ActiveObject3DController extends AbstractActiveObject3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#removeFigure(java.lang.String)
      */
-    @Override
+    
     public void removeFigure(final String key) {
         // TODO Auto-generated method stub
     }

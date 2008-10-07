@@ -33,7 +33,7 @@ public class Host3DController extends AbstractHost3DController {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#addFigureByKey(java.lang.String,
      *      java.lang.String)
      */
-    @Override
+    
     protected AbstractFigure3D createFigure(final String name) {
         // Logger.getRootLogger().log(Priority.INFO_INT, "Creating figure for
         // host controller:"+name);
@@ -47,17 +47,17 @@ public class Host3DController extends AbstractHost3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#removeFigure(java.lang.String)
      */
-    @Override
+    
     public void removeFigure(final String key) {
         // TODO Auto-generated method stub
     }
 
-    @Override
+    
     protected AbstractFigure3DController createChildController(final AbstractData modelObject) {
         return new Runtime3DController(modelObject, this.getFigure(), this);
     }
     
-    @Override
+    
     public void update(final Observable o, final Object arg) {
     	if ( o != null) {
     		super.update(o, arg);

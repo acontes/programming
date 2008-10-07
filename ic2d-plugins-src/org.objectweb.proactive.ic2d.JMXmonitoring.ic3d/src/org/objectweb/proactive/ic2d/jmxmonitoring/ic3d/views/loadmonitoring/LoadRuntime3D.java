@@ -16,6 +16,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.TextStylesBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 
+import com.sun.j3d.utils.geometry.Sphere;
+
 
 /**
  * @author vjuresch
@@ -34,7 +36,7 @@ public class LoadRuntime3D extends AbstractLoadRuntime3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
      */
-    @Override
+    
     public void arrangeSubFigures() { }
 
     /*
@@ -42,8 +44,10 @@ public class LoadRuntime3D extends AbstractLoadRuntime3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
      */
-    @Override
+    
     protected Geometry createGeometry() {
+    	//Sphere a = new Sphere();
+        //return a.getShape().getGeometry();
         return GeometryBasket.getBarMonitorGeometry();
     }
 
@@ -52,7 +56,7 @@ public class LoadRuntime3D extends AbstractLoadRuntime3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
      */
-    @Override
+    
     protected TransformGroup createTextBranch() {
         return TextStylesBasket.runtimeLoadText(this.getShortenedName(8));
     }
@@ -62,7 +66,7 @@ public class LoadRuntime3D extends AbstractLoadRuntime3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
      */
-    @Override
+    
     public void animateCreation() {
     	return;
     }
@@ -72,9 +76,10 @@ public class LoadRuntime3D extends AbstractLoadRuntime3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createAppearance()
      */
-    @Override
+    
     protected Appearance createAppearance() {
         return AppearanceBasket.monitor;
+    	//return null;
     }
 
     /*
@@ -83,13 +88,13 @@ public class LoadRuntime3D extends AbstractLoadRuntime3D {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setArrow(javax.vecmath.Vector3f,
      *      javax.vecmath.Vector3f)
      */
-    @Override
+    
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
         return null;
     }
 
-	@Override
+	
 	public FigureType getType() {
 		// TODO Auto-generated method stub
 		return FigureType.RUNTIME;

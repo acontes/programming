@@ -34,7 +34,7 @@ public class MonitorHost3D extends AbstractFigure3D implements Figure3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
      */
-    @Override
+    
     public void arrangeSubFigures() {
     	int figureIndex = 1;
         for (final Figure3D host : this.getSubFigures().values()) {
@@ -50,7 +50,7 @@ public class MonitorHost3D extends AbstractFigure3D implements Figure3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
      */
-    @Override
+    
     protected Geometry createGeometry() {
         return GeometryBasket.getBarMonitorGeometry();
     }
@@ -61,7 +61,7 @@ public class MonitorHost3D extends AbstractFigure3D implements Figure3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createAppearance()
      */
-    @Override
+    
     protected Appearance createAppearance() {
         return AppearanceBasket.defaultHostAppearance;
     }
@@ -71,7 +71,7 @@ public class MonitorHost3D extends AbstractFigure3D implements Figure3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
      */
-    @Override
+    
     protected TransformGroup createTextBranch() {
         return null;
     }
@@ -81,12 +81,12 @@ public class MonitorHost3D extends AbstractFigure3D implements Figure3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
      */
-    @Override
+    
     public void animateCreation() {
         // new AnimationBasket().fadeInto(this, 2000);
     }
 
-    @Override
+    
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
         return null;
@@ -119,7 +119,7 @@ public class MonitorHost3D extends AbstractFigure3D implements Figure3D {
 
     }
     
-    @Override
+    
     public FigureType getType() {
     	// TODO Auto-generated method stub
     	return FigureType.HOST;

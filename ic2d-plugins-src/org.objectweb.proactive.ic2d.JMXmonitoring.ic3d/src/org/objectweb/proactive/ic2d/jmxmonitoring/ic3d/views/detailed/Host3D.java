@@ -38,7 +38,7 @@ public class Host3D extends AbstractHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
      */
-    @Override
+    
     public void arrangeSubFigures() {
         int i = 1; // to count the runtimes
         for (final Figure3D runtime : this.getSubFigures().values()) {
@@ -54,7 +54,7 @@ public class Host3D extends AbstractHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
      */
-    @Override
+    
     protected Geometry createGeometry() {
         return GeometryBasket.getSmoothHostGeometry();
     }
@@ -65,7 +65,7 @@ public class Host3D extends AbstractHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createAppearance()
      */
-    @Override
+    
     protected Appearance createAppearance() {
         return AppearanceBasket.defaultHostAppearance;
     }
@@ -75,7 +75,7 @@ public class Host3D extends AbstractHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
      */
-    @Override
+    
     protected TransformGroup createTextBranch() {
         return TextStylesBasket.hostText(this.getShortenedName(15));
     }
@@ -85,7 +85,7 @@ public class Host3D extends AbstractHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
      */
-    @Override
+    
     public void animateCreation() {
         // new AnimationBasket().fadeInto(this, 2000);
     }
@@ -96,13 +96,13 @@ public class Host3D extends AbstractHost3D {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setArrow(java.lang.String,
      *      javax.vecmath.Vector3f, javax.vecmath.Vector3f)
      */
-    @Override
+    
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
         return new Arrow3D("", start, stop);
     }
 
-	@Override
+	
 	public FigureType getType() {
 		// TODO Auto-generated method stub
 		return FigureType.HOST;

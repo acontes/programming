@@ -501,7 +501,7 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
         this.rootBranch.addChild(arrow.getRootBranch());
         // set destruction time
         final TimerTask arrowDestruction = new TimerTask() {
-            @Override
+            
             public void run() {
                 AbstractFigure3D.this.removeArrow(key);
             }
@@ -554,12 +554,12 @@ public abstract class AbstractFigure3D extends Shape3D implements Figure3D, IObs
         return trans;
     }
     
-    @Override
+    
     public void addObserver(Observer o) {
     	observers.add(o);
     }
     
-    @Override
+    
     public void notifyObservers(Object arg) {
     	for (Observer observer : observers) {
     		observer.update(null, arg);

@@ -45,7 +45,7 @@ public class FlatCameraBehavior extends CameraBehavior {
      * Focus on the selected shape
      * \todo zoom to make the shape fit to the screen
      */
-    @Override
+    
     protected void mouse1DoubleClick() {
         /* Left double click > Focus on selected shape */
         if (selectedShape != null) {
@@ -58,7 +58,7 @@ public class FlatCameraBehavior extends CameraBehavior {
         }
     }
 
-    @Override
+    
     protected void mouse1Dragged() {
     	/* The only objects you can drag are activeObjects */
         if ( selectedShape != null && selectedShape instanceof ActiveObject3D) {
@@ -109,7 +109,7 @@ public class FlatCameraBehavior extends CameraBehavior {
         	cameraRotation(x - x_last, y - y_last);
     }
 
-    @Override
+    
     protected void mouse1Pressed() {
         /* Left click -> Selects a shape */
         PickResult pickResult = null;
@@ -134,7 +134,7 @@ public class FlatCameraBehavior extends CameraBehavior {
             selectedShape = ((Shape3D) pickResult.getNode(PickResult.SHAPE3D));
     }
 
-    @Override
+    
     protected void mouse1Released() {
         if (selectedShape != null && selectedShapeTranslation != null) {
         	// TODO
@@ -185,13 +185,13 @@ public class FlatCameraBehavior extends CameraBehavior {
         }
     }
 
-    @Override
+    
     protected void mouse2DoubleClick() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
+    
     protected void mouse2Dragged() {
         /* Move on the x-z plane ( mouse 2 ) */
         double x_diff, y_diff;
@@ -202,31 +202,31 @@ public class FlatCameraBehavior extends CameraBehavior {
         refresh();
     }
 
-    @Override
+    
     protected void mouse2Pressed() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
+    
     protected void mouse2Released() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
+    
     protected void mouse3DoubleClick() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
+    
     protected void mouse3Dragged() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
+    
     protected void mouse3Pressed() {
         /* Right click > Pop up context menu */
         mouse1Pressed();
@@ -250,13 +250,13 @@ public class FlatCameraBehavior extends CameraBehavior {
 //        pop.show(canvas3D, x, y);
     }
 
-    @Override
+    
     protected void mouse3Released() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
+    
     protected void mouseWheel(int amount, int direction) {
         distance += (double) (amount * direction) / 6d;
         if (distance < 1.5)
@@ -304,7 +304,7 @@ public class FlatCameraBehavior extends CameraBehavior {
         refresh();
     }
 
-    @Override
+    
     public void setTarget(Point3d target) {
         this.targetPosition = target;
         refresh();
@@ -314,7 +314,7 @@ public class FlatCameraBehavior extends CameraBehavior {
      * Generic method used each time a parameter of the camera has moved
      * Shouldn't appear in the call graph more than once per mouse event
      */
-    @Override
+    
     protected void refresh() {
         double x, y, z;
         Point3d position;
@@ -341,7 +341,7 @@ public class FlatCameraBehavior extends CameraBehavior {
         refresh();
     }
 
-	@Override
+	
 	protected void initCameraDefaultMenu() {
 		ActionListener al;
 		MenuItem mit;
@@ -349,7 +349,7 @@ public class FlatCameraBehavior extends CameraBehavior {
 		
 		mit = new MenuItem("Reset");
 		al = new ActionListener() {
-			@Override
+			
 			public void actionPerformed(ActionEvent e) {
 				targetPosition = new Point3d();
 				refresh();

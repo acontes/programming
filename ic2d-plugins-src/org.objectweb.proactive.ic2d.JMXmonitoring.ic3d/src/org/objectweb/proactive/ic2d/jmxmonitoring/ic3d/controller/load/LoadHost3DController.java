@@ -33,7 +33,7 @@ public class LoadHost3DController extends AbstractLoadHost3DController {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#addFigureByKey(java.lang.String,
      *      java.lang.String)
      */
-    @Override
+    
     protected AbstractFigure3D createFigure(final String name) {
     	AbstractLoadHost3D loadHost = null;
     	switch (((LoadGrid3DController)this.getParent()).getGridMode()) {
@@ -52,12 +52,12 @@ public class LoadHost3DController extends AbstractLoadHost3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#removeFigure(java.lang.String)
      */
-    @Override
+    
     public void removeFigure(final String key) {
         // TODO Auto-generated method stub
     }
 
-    @Override
+    
     protected Figure3DController createChildController(AbstractData figure) {
     	LoadRuntime3DController loadRuntime3DController = null;
     	switch (((LoadGrid3DController)this.getParent()).getGridMode()) {
@@ -68,7 +68,7 @@ public class LoadHost3DController extends AbstractLoadHost3DController {
         return loadRuntime3DController;
     }
     
-    @Override
+    
     public void update(final Observable o, final Object arg) {
     	if ( o != null) {
     		super.update(o, arg);

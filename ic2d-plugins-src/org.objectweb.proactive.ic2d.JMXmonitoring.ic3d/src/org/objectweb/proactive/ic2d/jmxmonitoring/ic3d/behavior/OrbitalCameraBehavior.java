@@ -43,7 +43,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
      * Focus on the selected shape
      * \todo zoom to make the shape fit to the screen
      */
-    @Override
+    
     protected void mouse1DoubleClick() {
         /* Left double click > Focus on selected shape */
         if (selectedShape != null) {
@@ -68,7 +68,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         }
     }
 
-    @Override
+    
     protected void mouse1Dragged() {
         /* On a figure  drag it */
     	// TODO add test for draggable shapes
@@ -79,7 +79,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         cameraRotation(x - x_last, y - y_last);
     }
 
-    @Override
+    
     protected void mouse1Pressed() {
         /* Pick the shape */
         PickResult pickResult = null;
@@ -100,30 +100,30 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         }
     }
 
-    @Override
+    
     protected void mouse1Released() {
     	// TODO Drop properly the active Objects
     }
 
-    @Override
+    
     protected void mouse2DoubleClick() { return; }
 
-    @Override
+    
     protected void mouse2Dragged() { return; }
 
-    @Override
+    
     protected void mouse2Pressed() { return; }
 
-    @Override
+    
     protected void mouse2Released() { return; }
 
-    @Override
+    
     protected void mouse3DoubleClick() { return; }
 
-    @Override
+    
     protected void mouse3Dragged() { return; }
 
-    @Override
+    
     protected void mouse3Pressed() {
         /* Right click > Pop up context menu */
         mouse1Pressed();
@@ -145,10 +145,10 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         popup();
     }
 
-    @Override
+    
     protected void mouse3Released() { return; }
 
-    @Override
+    
     protected void mouseWheel(int amount, int direction) {
     	// Adjust the distance of the camera
         distance += (double) (amount * direction) / 6d;
@@ -232,7 +232,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         refresh();
     }
 
-    @Override
+    
     public void setTarget(Point3d target) {
         this.targetPosition = target;
         refresh();
@@ -242,7 +242,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
      * Generic method used each time a parameter of the camera has moved
      * Shouldn't appear in the call graph more than once per mouse event
      */
-    @Override
+    
     protected void refresh() {
         double x, y, z;
         Point3d position;
@@ -269,7 +269,7 @@ public class OrbitalCameraBehavior extends CameraBehavior {
         refresh();
     }
 
-	@Override
+	
 	protected void initCameraDefaultMenu() {
 		popup = new PopupMenu("Camera");
 		popup.add(new MenuItem("Reset"));

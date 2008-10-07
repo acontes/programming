@@ -40,7 +40,7 @@ public class Grid3D extends AbstractGrid3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
      */
-    @Override
+    
     public void arrangeSubFigures() {
     	//for (final Figure3D site : this.getSubFigures().values()) {
 		//	site.arrangeSubFigures();
@@ -69,7 +69,7 @@ public class Grid3D extends AbstractGrid3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
      */
-    @Override
+    
     protected Geometry createGeometry() {
         //return GeometryBasket.getCoordinatesGeometry();
         return null;
@@ -80,7 +80,7 @@ public class Grid3D extends AbstractGrid3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
      */
-    @Override
+    
     protected TransformGroup createTextBranch() {
         // TODO Auto-generated method stub
         return null;
@@ -91,7 +91,7 @@ public class Grid3D extends AbstractGrid3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
      */
-    @Override
+    
     public void animateCreation() {
         // TODO Auto-generated method stub
 
@@ -102,7 +102,7 @@ public class Grid3D extends AbstractGrid3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createAppearance()
      */
-    @Override
+    
     protected Appearance createAppearance() {
         //return AppearanceBasket.coordinatesAppearance;
         return null;
@@ -114,13 +114,13 @@ public class Grid3D extends AbstractGrid3D {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setArrow(javax.vecmath.Vector3f,
      *      javax.vecmath.Vector3f)
      */
-    @Override
+    
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
         return new Arrow3D("", start, stop);
     }
 
-	@Override
+	
 	public FigureType getType() {
 		// TODO Auto-generated method stub
 		return FigureType.GRID;

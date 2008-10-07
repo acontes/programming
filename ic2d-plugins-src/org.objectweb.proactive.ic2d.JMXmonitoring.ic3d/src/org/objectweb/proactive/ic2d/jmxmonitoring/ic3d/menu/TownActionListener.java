@@ -16,7 +16,7 @@ public class TownActionListener implements ActionListener {
 		this.camera = camera;
 	}
 
-	@Override
+	
 	public void actionPerformed(ActionEvent e) {
 		camera.setTarget(SiteBasket.getTownLocation(town));
 	}

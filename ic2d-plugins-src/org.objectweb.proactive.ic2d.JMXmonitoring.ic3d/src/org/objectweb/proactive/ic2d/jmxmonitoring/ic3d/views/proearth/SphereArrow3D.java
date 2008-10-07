@@ -63,7 +63,7 @@ public class SphereArrow3D extends AbstractArrow3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.AbstractFigure3D#arrangeSubFigures()
      */
-    @Override
+    
     public void arrangeSubFigures() {
         // TODO Auto-generated method stub
 
@@ -74,7 +74,7 @@ public class SphereArrow3D extends AbstractArrow3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.AbstractFigure3D#createAppearance()
      */
-    @Override
+    
     protected Appearance createAppearance() {
         return AppearanceBasket.defaultLineAppearance;
     }
@@ -84,7 +84,7 @@ public class SphereArrow3D extends AbstractArrow3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.AbstractFigure3D#createGeometry()
      */
-    @Override
+    
     protected Geometry createGeometry() {
         // TODO Auto-generated method stub
         return null;
@@ -95,7 +95,7 @@ public class SphereArrow3D extends AbstractArrow3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.AbstractFigure3D#createTextBranch()
      */
-    @Override
+    
     protected TransformGroup createTextBranch() {
         // TODO Auto-generated method stub
         return null;
@@ -106,7 +106,7 @@ public class SphereArrow3D extends AbstractArrow3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.AbstractFigure3D#animateCreation()
      */
-    @Override
+    
     public void animateCreation() {
         // TODO Auto-generated method stub
 
@@ -118,13 +118,13 @@ public class SphereArrow3D extends AbstractArrow3D {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setArrow(java.lang.String,
      *      javax.vecmath.Vector3f, javax.vecmath.Vector3f)
      */
-    @Override
+    
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
+    
     public FigureType getType() {
     	// TODO Auto-generated method stub
     	return FigureType.ARROW;

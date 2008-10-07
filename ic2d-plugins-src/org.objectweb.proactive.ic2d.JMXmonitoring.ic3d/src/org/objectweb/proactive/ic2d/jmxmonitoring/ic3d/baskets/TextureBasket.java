@@ -2,15 +2,9 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 
 import javax.imageio.ImageIO;
-import javax.media.j3d.Texture;
-import javax.media.j3d.Texture2D;
-
-import org.j3d.renderer.java3d.geom.Torus;
-import org.j3d.renderer.java3d.texture.J3DTextureCacheFactory;
-import org.j3d.texture.TextureCache;
-import org.j3d.texture.TextureCacheFactory;
 
 
 public class TextureBasket {
@@ -59,5 +53,17 @@ public class TextureBasket {
             
             return bufferedImage;
         }
+    }
+    
+    public static BufferedImage mapImage(int i) {
+    	DecimalFormat form = new DecimalFormat("0000");
+    	String fname = path + "world_" + String.valueOf(form.format(i)) + ".png";
+    	//String fname = path + String.valueOf(form.format(i)) + ".png";
+    	
+    	//DecimalFormat form = new DecimalFormat("000");
+    	
+    	//String fname = path + "AO_" + String.valueOf(form.format(i)) + ".png";
+    	//System.out.println(fname);
+    	return(loadImage(fname));
     }
 }

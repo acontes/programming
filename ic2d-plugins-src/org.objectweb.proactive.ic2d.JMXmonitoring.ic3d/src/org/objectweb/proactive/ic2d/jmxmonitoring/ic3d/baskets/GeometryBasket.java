@@ -36,6 +36,9 @@ public final class GeometryBasket {
      */
     public static final float FIGURE_SCALE = 1f;
     public static final int EARTH_RADIUS = 150;
+    public static final float MAP_TILE = 10f;
+    public static final int TILE_X = 54;
+    public static final int TILE_Y = 27;
     
     //default geometries
     private static Geometry nodeGeometry = smoothNodeGeometry();
@@ -53,6 +56,7 @@ public final class GeometryBasket {
     private static Geometry smoothHostGeometry = smoothHostGeometry();
     private static Geometry smoothNodeGeometry = smoothNodeGeometry();
     private static Geometry smoothRuntimeGeometry = smoothRuntimeGeometry();
+    private static Geometry square = square();
 
     /** Private constructor as this class should never be instantiated */
     private GeometryBasket() {
@@ -204,6 +208,62 @@ public final class GeometryBasket {
         return geoInfo.getGeometryArray();
         
 
+    }
+    
+    private static Geometry square() {
+        float length = MAP_TILE / 2;
+        //-------------GEOMETRY POINTS--------------
+        Point3f a = new Point3f(-length, 0f, -length);
+        Point3f b = new Point3f(-length, 0f, length);
+        Point3f c = new Point3f(length, 0f, length);
+        Point3f d = new Point3f(length, 0f, -length);
+
+        //------------------------------------------
+        //create the points
+        Point3f[] pts = new Point3f[4];
+        //create the 6 face
+
+        //front
+        pts[0] = a;
+        pts[1] = b;
+        pts[2] = c;
+        pts[3] = d;
+
+        TexCoord2f[] coords = new TexCoord2f[4];
+        coords[0] = new TexCoord2f(0f, 1f);
+        coords[1] = new TexCoord2f(0f, 0f);
+        coords[2] = new TexCoord2f(1f, 0f);
+        coords[3] = new TexCoord2f(1f, 1f);
+        
+        /*QuadArray quad = new QuadArray(4, QuadArray.COORDINATES | QuadArray.TEXTURE_COORDINATE_2);
+        quad.setCoordinates(0, pts);
+        quad.setTextureCoordinates(0, 0, coords);
+        return quad;*/
+     // say what points belong to the shape
+        final int[] stripCount = new int[1];
+        stripCount[0] = 4;
+        
+        // say what the faces are
+        final int[] contourCount = new int[1];
+        contourCount[0] = 1;
+        
+        // build the geometry
+        final GeometryInfo geoInfo = new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
+        geoInfo.setCoordinates(pts);
+        geoInfo.setTextureCoordinateParams(1, 2);
+        geoInfo.setTextureCoordinates(0, coords);
+        geoInfo.setStripCounts(stripCount);
+        geoInfo.setContourCounts(contourCount);
+        // needed for lighting and shading the object
+        final NormalGenerator normGen = new NormalGenerator();
+        // the angle beyond which the normal generator will not smooth the
+        // angles
+        //normGen.setCreaseAngle((float) Math.toRadians(90));
+        // generate the normals
+        normGen.generateNormals(geoInfo);
+        Stripifier strip = new Stripifier();
+        strip.stripify(geoInfo);
+        return geoInfo.getGeometryArray();
     }
     
     private static Geometry flatMap2() {
@@ -1163,5 +1223,9 @@ public final class GeometryBasket {
 	
 	public static Geometry getSmoothRuntimeGeometry() {
 		return smoothRuntimeGeometry;
+	}
+	
+	public static Geometry getSquare() {
+		return square;
 	}
 }

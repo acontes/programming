@@ -81,7 +81,7 @@ public class Monitoring3DView extends ViewPart {
         this.title = this.world.getName();
     }
 
-//    @Override
+//    
 //    public void createPartControl(final Composite parent) {
 //        parent.setLayout(new FillLayout());
 //
@@ -215,7 +215,7 @@ public class Monitoring3DView extends ViewPart {
 //
 //    }
     
-    @Override
+    
     public void createPartControl(final Composite parent) {
         parent.setLayout(new FillLayout());
 
@@ -276,27 +276,27 @@ public class Monitoring3DView extends ViewPart {
         // Creates the controllers
         final Grid3DController gcontroller = new Grid3DController(this.world, universe3D, null);
         final LoadGrid3DController glcontroller = new LoadGrid3DController(this.world, universe3D, null);
-        final EarthGrid3DController egcontroller = new EarthGrid3DController(this.world, universe3D, null);
+        //final EarthGrid3DController egcontroller = new EarthGrid3DController(this.world, universe3D, null);
         
         // Fetch Grids
         final Grid3D detailedGrid = (Grid3D)gcontroller.getFigure();
         detailedGrid.setTranslation(new Vector3d(0, 0, 0));
         
         final LoadGrid3D loadGrid = (LoadGrid3D)glcontroller.getFigure();
-        loadGrid.setTranslation(new Vector3d(0, 500, 0));
+        loadGrid.setTranslation(new Vector3d(0, LoadGrid3D.YOFFSET, 0));
         
-        final EarthGrid3D earthGrid = (EarthGrid3D)egcontroller.getFigure();
-        earthGrid.setTranslation(new Vector3d(0, -500, 0));
+        //final EarthGrid3D earthGrid = (EarthGrid3D)egcontroller.getFigure();
+        //earthGrid.setTranslation(new Vector3d(0, -500, 0));
         
         // three views
         final Canvas3D viewOne = universe.newView("one", new Point3d(0, 0, 0), detailedGrid.getRootBranch(),
                 new FlatCameraBehavior());
         
-        final Canvas3D viewTwo = universe.newView("two", new Point3d(0, 500, 0), loadGrid
-                .getRootBranch(), new FlatCameraBehavior());
-        
-        final Canvas3D viewThree = universe.newView("three", new Point3d(0, -500, 0), earthGrid.getRootBranch(),
-                new OrbitalCameraBehavior());
+        final Canvas3D viewTwo = universe.newView("two", new Point3d(0, LoadGrid3D.YOFFSET, 0), loadGrid
+        //        .getRootBranch(), new FlatCameraBehavior());
+        			.getRootBranch(), new OrbitalCameraBehavior());
+        //final Canvas3D viewThree = universe.newView("three", new Point3d(0, -500, 0), earthGrid.getRootBranch(),
+        //        new OrbitalCameraBehavior());
 
         // create layout 65/35
         final GridBagConstraints constr = new GridBagConstraints();
@@ -304,7 +304,7 @@ public class Monitoring3DView extends ViewPart {
         final JPanel main = new JPanel(mainLay);
 
         // create layout in the 35 side with three rows
-        final JPanel side = new JPanel(new GridLayout(2, 1, 1, 1));
+        final JPanel side = new JPanel(new GridLayout(1, 1, 1, 1));
         final JPanel left = new JPanel(new GridLayout(1, 1, 1, 1));
 
         left.setBackground(new Color(0, 0, 0));
@@ -330,7 +330,7 @@ public class Monitoring3DView extends ViewPart {
         left.add(viewOne);
 
         side.add(viewTwo);
-        side.add(viewThree);
+        //side.add(viewThree);
         awt.add(main);
 
         awt.pack();
@@ -354,7 +354,7 @@ public class Monitoring3DView extends ViewPart {
         return grid.newView("11111");
     }
 
-    @Override
+    
     public void setFocus() {
         // TODO Auto-generated method stub
     }

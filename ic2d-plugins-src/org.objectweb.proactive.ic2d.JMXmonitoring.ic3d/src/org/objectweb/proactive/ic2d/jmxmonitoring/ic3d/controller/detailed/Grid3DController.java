@@ -24,26 +24,26 @@ public class Grid3DController extends AbstractGrid3DController {
         // TODO Auto-generated constructor stub
     }
 
-    @Override
+    
     public void update(final Observable o, final Object arg) {
     	if ( o != null) {
     		super.update(o, arg);
     	}
     }
 
-    @Override
+    
     protected AbstractFigure3D createFigure(final String name) {
         // TODO Auto-generated method stub
         // the grid has no name in the current implementation
         return new Grid3D();
     }
 
-    @Override
+    
     public void removeFigure(final String key) {
         // TODO Auto-generated method stub
     }
 
-    @Override
+    
     protected AbstractFigure3DController createChildController(final AbstractData figure) {
         // TODO Auto-generated method stub
         return new Host3DController(figure, this.getFigure(), this);

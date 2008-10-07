@@ -14,6 +14,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.GeometryBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.baskets.PlacementBasket;
 import org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.Figure3D;
 
+import com.sun.j3d.utils.geometry.Sphere;
+
 
 /**
  * @author vjuresch
@@ -30,11 +32,11 @@ public class EmptyLoadHost3D extends AbstractLoadHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#arrangeSubFigures()
      */
-    @Override
+    
     public void arrangeSubFigures() {
         int i = 1;
         for (final Figure3D runtime : this.getSubFigures().values()) {
-            PlacementBasket.matrixArrangement(i, runtime, this.getSubFigures().size(), new Vector3f(0f, 1f, 0f));
+            PlacementBasket.matrixArrangement2(i, runtime, this.getSubFigures().size(), new Vector3f(0f, 1f, 0f));
             i++;
             runtime.arrangeSubFigures();
         }
@@ -45,9 +47,9 @@ public class EmptyLoadHost3D extends AbstractLoadHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createGeometry()
      */
-    @Override
+    
     protected Geometry createGeometry() {
-        return null;
+   	return GeometryBasket.getSmoothHostGeometry();
     }
 
     /*
@@ -55,7 +57,7 @@ public class EmptyLoadHost3D extends AbstractLoadHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createTextBranch()
      */
-    @Override
+    
     protected TransformGroup createTextBranch() {
         return null;
     }
@@ -65,7 +67,7 @@ public class EmptyLoadHost3D extends AbstractLoadHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#animateCreation()
      */
-    @Override
+    
     public void animateCreation() {
     }
 
@@ -74,9 +76,9 @@ public class EmptyLoadHost3D extends AbstractLoadHost3D {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#createAppearance()
      */
-    @Override
+    
     protected Appearance createAppearance() {
-        return null;
+        return AppearanceBasket.defaultHostAppearance;
     }
 
     /*
@@ -85,13 +87,13 @@ public class EmptyLoadHost3D extends AbstractLoadHost3D {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.views.AbstractFigure3D#setArrow(javax.vecmath.Vector3f,
      *      javax.vecmath.Vector3f)
      */
-    @Override
+    
     protected Figure3D setArrow(final String name, final Vector3f start, final Vector3f stop) {
         // TODO Auto-generated method stub
         return null;
     }
 
-	@Override
+	
 	public FigureType getType() {
 		// TODO Auto-generated method stub
 		return FigureType.HOST;

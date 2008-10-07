@@ -38,7 +38,7 @@ public class Node3DController extends AbstractNode3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createChildController(org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData)
      */
-    @Override
+    
     protected AbstractFigure3DController createChildController(final AbstractData modelObject) {
         return new ActiveObject3DController(modelObject, this.getFigure(), this);
     }
@@ -48,7 +48,7 @@ public class Node3DController extends AbstractNode3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#createFigure(java.lang.String)
      */
-    @Override
+    
     protected AbstractFigure3D createFigure(final String name) {
     	Node3D node = new Node3D(name);
     	node.addObserver(this);
@@ -60,11 +60,11 @@ public class Node3DController extends AbstractNode3DController {
      * 
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.ic3d.controller.AbstractFigure3DController#removeFigure(java.lang.String)
      */
-    @Override
+    
     public void removeFigure(final String key) {
     }
     
-    @Override
+    
     public void update(final Observable o, final Object arg) {
     	if ( o != null) {
     		super.update(o, arg);
