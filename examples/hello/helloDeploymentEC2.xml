@@ -8,6 +8,8 @@
 		<descriptorVariable name="HOST" value="localhost" />
 		<javaPropertyDescriptorDefault name="os" value="windows" />
 		<javaPropertyVariable name="user.dir" />
+		<javaPropertyVariable name="ec2.accessKeyId" />
+		<javaPropertyVariable name="ec2.secretAccessKey" />		
 	</environment>
 
 	<resources>
@@ -28,8 +30,8 @@
 		<groups>
 			<ec2Group id="remoteEC2">
 				<imageId>ami-4727c32e</imageId> 
-				<accessKeyId>1K6JVRSE482QZZ8N7302</accessKeyId>
-				<secretAccessKey>JRJxPd2RcWjPCaBbtfjsY71vf8VryHl0ikLunhoj</secretAccessKey>
+				<accessKeyId>${ec2.accessKeyId}</accessKeyId>
+				<secretAccessKey>${ec2.secretAccessKey}</secretAccessKey>
 			</ec2Group>				
 		</groups>
 
