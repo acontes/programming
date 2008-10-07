@@ -6,7 +6,6 @@
 	<environment>
 		<!-- CHANGE THIS -->
 		<descriptorVariable name="HOST" value="localhost" />
-		<javaPropertyDescriptorDefault name="os" value="windows" />
 		<javaPropertyVariable name="user.dir" />
 		<javaPropertyVariable name="ec2.accessKeyId" />
 		<javaPropertyVariable name="ec2.secretAccessKey" />		
@@ -21,8 +20,8 @@
 	<infrastructure>
 
 		<hosts>
-			<host id="host" os="${os}" hostCapacity="1" vmCapacity="1">
-				<homeDirectory base="root" relpath="${user.dir}" />
+			<host id="host" os="unix" hostCapacity="1" vmCapacity="1">
+				<homeDirectory base="root" relpath="proactive" />
 			</host>
 
 		</hosts>
