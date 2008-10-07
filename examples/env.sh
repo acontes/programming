@@ -66,6 +66,8 @@ JAVACMD=$JAVA_HOME/bin/java"\
 	-Djava.security.manager \
 	-Djava.security.policy=$PROACTIVE/examples/proactive.java.policy \
 	-Dlog4j.configuration=file:${PROACTIVE}/examples/proactive-log4j \
+	-Dproactive.communication.protocol=http \
+	-Dproactive.http.port=8080 \
 	-Dproactive.home=$PROACTIVE \
 	-Dos=unix"
 
