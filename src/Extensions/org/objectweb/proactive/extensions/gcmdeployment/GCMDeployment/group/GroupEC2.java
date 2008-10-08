@@ -35,6 +35,7 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
 import java.util.List;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 
@@ -90,8 +91,7 @@ public class GroupEC2 extends AbstractJavaGroup {
                 }
 
             } catch (AmazonEC2Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new ProActiveRuntimeException("EC2 RunInstances request failed", e);
             }
         }
 
@@ -106,8 +106,12 @@ public class GroupEC2 extends AbstractJavaGroup {
         RunInstancesRequest request = new RunInstancesRequest();
 
         request.setImageId(imageId);
-        request.setMinCount(1);
-        request.setMaxCount(1);
+        int hostCapacity = getHostInfo().getHostCapacity();
+        
+        // request for the number of instances equal to host capacity
+        //
+        request.setMinCount(hostCapacity);
+        request.setMaxCount(hostCapacity);
 
         try {
             StringBuffer userData = new StringBuffer();
@@ -120,10 +124,11 @@ public class GroupEC2 extends AbstractJavaGroup {
             // 2 hostCapacity
             // 3 vmCapacity
             // 4 deploymentId
+            // 5 topologyId
             // 
             userData.append(parentURL);
             userData.append('\n');
-            userData.append(getHostInfo().getHostCapacity());
+            userData.append(hostCapacity);
             userData.append('\n');
             userData.append(getHostInfo().getVmCapacity());
             userData.append('\n');
@@ -144,8 +149,7 @@ public class GroupEC2 extends AbstractJavaGroup {
             return instanceRunner;
 
         } catch (ProActiveException e) {
-            e.printStackTrace();
-            return null;
+            throw new ProActiveRuntimeException("Couldn't get default ProActive runtime", e);
         }
     }
 
