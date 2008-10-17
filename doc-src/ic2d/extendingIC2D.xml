@@ -2209,7 +2209,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
 			</section>
 		</section>
 		
-		<section xml:id="RCPLinks"><info><title>Useful links</title></info>
+		<section xml:id="RCPLinks"><info><title>UseFul links</title></info>
 			
 			<itemizedlist>
 				<listitem><para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/articles/Article-RCP-1/tutorial1.html">Rich Client Tutorial</link></para></listitem>
