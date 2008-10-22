@@ -1624,7 +1624,7 @@
 					org.objectweb.proactive.core.component.controller.PriorityController
 				</literal>
 				, has to be used:
-				<programlisting xml:lang="java"><textobject><textdata fileref="core/component/controller/PriorityController.java"/></textobject></programlisting>
+				<programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/prioritycontroller.snip"/></textobject></programlisting>
 			</para>
 		</section>
 
