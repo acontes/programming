@@ -1,36 +1,4 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
- */
-//@snippet-start primes_distributed_manager
+
 package org.objectweb.proactive.examples.userguide.primes.distributed;
 
 import java.util.Vector;
@@ -89,31 +57,26 @@ public class CMAgentPrimeManager {
             int workerIndex = i % workers.size();
             CMAgentPrimeWorker worker = workers.get(workerIndex);
 
+            
             //TODO 1. Send asynchronous method call to the worker 
-
-            // Send asynchronous method call to the worker
-            BooleanWrapper res = worker.isPrime(number, begin, end);
-
+            
             //TODO 2. Add the future result to the vector of answers 
-
-            // Adds the future to the vector
-            answers.add(res);
-
-            // Update the begin and the end of the interval
+            
+          // Update the begin and the end of the interval
             begin = end + 1;
             end += INTERVAL_SIZE;
         }
         // Once all requests was sent
         boolean prime = true;
-        int intervalNumber = 0;
+
         // Loop until a worker returns false or vector is empty (all results have been checked)
+        int intervalNumber = 0;
         while (!answers.isEmpty() && prime) {
+
 
             // TODO 3. Block until a new response is available 
             // by using a static method from org.objectweb.proactive.api.PAFuture 
-            // Will block until a new response is available                             
-            intervalNumber = PAFuture.waitForAny(answers);
-
+        	
             // Check the answer
             prime = answers.get(intervalNumber).booleanValue();
 
@@ -134,4 +97,4 @@ public class CMAgentPrimeManager {
         this.workers.add(worker);
     }
 }
-// @snippet-end primes_distributed_manager
+

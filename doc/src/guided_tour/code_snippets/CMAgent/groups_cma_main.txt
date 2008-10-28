@@ -1,34 +1,3 @@
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
- */
 package org.objectweb.proactive.examples.userguide.cmagent.groups;
 
 import java.io.BufferedReader;
@@ -57,7 +26,7 @@ public class Main {
     private static GCMApplication pad;
 
     private static GCMVirtualNode deploy(String descriptor) throws NodeException, ProActiveException {
-
+        
         //Create object representation of the deployment file
         pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
         //Activate all Virtual Nodes
@@ -69,29 +38,27 @@ public class Main {
         GCMVirtualNode vn = pad.getVirtualNodes().values().iterator().next();
 
         return vn;
-    }
+}
 
-    //@snippet-start groups_cma_full
+    
     public static void main(String args[]) {
         try {
             Vector<CMAgentMigrator> agents = new Vector<CMAgentMigrator>();
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(System.in));
             GCMVirtualNode vn = deploy(args[0]);
-            //@snippet-start groups_group_creation	
+            
             //TODO 1. Create a new empty group
-            CMAgentMigrator monitorsGroup = (CMAgentMigrator) PAGroup.newGroup(CMAgentMigrator.class
-                    .getName());
+            CMAgentMigrator monitorsGroup = null;
 
             //TODO 2. Create a collection of active objects with on object on each node
             for (Node node : vn.getCurrentNodes()) {
-                CMAgentMigrator ao = (CMAgentMigrator) PAActiveObject.newActive(CMAgentMigrator.class
-                        .getName(), new Object[] {}, node);
+                CMAgentMigrator ao = null;
                 agents.add(ao);
             }
 
             //TODO 3. Get a management representation of the monitors group
-            Group<CMAgentMigrator> gA = PAGroup.getGroup(monitorsGroup);
-            //@snippet-end groups_group_creation	
+            Group<CMAgentMigrator> gA = null;
+            
             //ask for adding or removing nodes
             //get statistics
             int k = 1;
@@ -104,9 +71,9 @@ public class Main {
                     if (gA.contains(agent))
 
                         //TODO 5. Print the node URL
-                        System.out.println(" " + k + ".* " + PAActiveObject.getActiveObjectNodeUrl(agent));
+                        System.out.println(" " + k + ".* " + " TODO: write node url here");
                     else
-                        System.out.println(" " + k + ".  " + PAActiveObject.getActiveObjectNodeUrl(agent));
+                        System.out.println(" " + k + ".  " + "TODO: write node url here");
                     k++;
                 }
                 System.out.println("-1.  Display statistics for monitored nodes");
@@ -128,10 +95,10 @@ public class Main {
 
                     State resultsGroup = monitorsGroup.getCurrentState();
                     while (PAGroup.size(resultsGroup) > 0) {
-                        //@snippet-start groups_wbn
-                        //TODO 5. Use PAGroup.waitAndGetOneThenRemoveIt() to control the list of State futures
-                        State statistic = (State) PAGroup.waitAndGetOneThenRemoveIt(resultsGroup);
-                        //@snippet-end groups_wbn
+                        
+                        //TODO 6. Use PAGroup.waitAndGetOneThenRemoveIt() to control the list of State futures
+                        State statistic = null;
+                        
                         System.out.println(statistic.toString());
                     }
                 } else {
@@ -153,14 +120,14 @@ public class Main {
         } catch (ClassNotFoundException e) {
             System.err.println(e.getMessage());
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
+			// TODO Auto-generated catch block
             System.err.println(e.getMessage());
-        } finally {
+        }
+        finally{
             //stopping all the objects and JVMS
-            if (pad != null)
-                pad.kill();
+        	if (pad!=null) pad.kill();
             PALifeCycle.exitSuccess();
         }
     }
-    //@snippet-end groups_cma_full
+    
 }
