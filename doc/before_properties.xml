@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="doc_before_properties">
+    <property name="doc.name"	value="ProActive" />
+</project>    
