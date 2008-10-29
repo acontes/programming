@@ -28,7 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.activeobject;
+package org.objectweb.proactive.extra.annotation;
+
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorAPT;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;
@@ -49,7 +52,7 @@ import com.sun.mirror.declaration.Declaration;
 public class ActiveObjectAnnotationProcessor implements AnnotationProcessor {
 	
 	private final AnnotationProcessorEnvironment _aoEnvironment;
-	private final ActiveObjectVisitor _aoVisitor;
+	private final ActiveObjectVisitorAPT _aoVisitor;
 	private final AnnotationTypeDeclaration _aoDeclaration;
 
 	public ActiveObjectAnnotationProcessor(AnnotationProcessorEnvironment env) {
@@ -57,7 +60,7 @@ public class ActiveObjectAnnotationProcessor implements AnnotationProcessor {
 		_aoEnvironment = env;
 		_aoDeclaration = (AnnotationTypeDeclaration) _aoEnvironment
 				.getTypeDeclaration(ActiveObject.class.getName());
-		_aoVisitor = new ActiveObjectVisitor(_aoEnvironment.getMessager());
+		_aoVisitor = new ActiveObjectVisitorAPT(_aoEnvironment.getMessager());
 		
 	}
 

@@ -60,7 +60,7 @@ import com.sun.mirror.util.SourcePosition;
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
+public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	
 	// error messages
 	private static final String ERROR_PREFIX_STATIC = " is annotated using the " 
@@ -72,7 +72,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	
 	private final Messager _compilerOutput;
 	
-	public ActiveObjectVisitor(final Messager messager) {
+	public ActiveObjectVisitorAPT(final Messager messager) {
 		super();
 		_compilerOutput = messager;
 	}
