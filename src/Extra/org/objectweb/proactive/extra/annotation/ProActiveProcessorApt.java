@@ -49,13 +49,13 @@ import com.sun.mirror.declaration.Declaration;
  * @since ProActive 3.90
  */
 
-public class ActiveObjectAnnotationProcessor implements AnnotationProcessor {
+public class ProActiveProcessorApt implements AnnotationProcessor {
 	
 	private final AnnotationProcessorEnvironment _aoEnvironment;
 	private final ActiveObjectVisitorAPT _aoVisitor;
 	private final AnnotationTypeDeclaration _aoDeclaration;
 
-	public ActiveObjectAnnotationProcessor(AnnotationProcessorEnvironment env) {
+	public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
 		
 		_aoEnvironment = env;
 		_aoDeclaration = (AnnotationTypeDeclaration) _aoEnvironment

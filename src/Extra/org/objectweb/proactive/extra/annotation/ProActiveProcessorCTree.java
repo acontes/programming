@@ -69,7 +69,7 @@ import com.sun.source.util.Trees;
 		}
 	) 
 @SupportedOptions("enableTypeGenerationInEditor")
-public class ProActiveProcessor extends AbstractProcessor {
+public class ProActiveProcessorCTree extends AbstractProcessor {
 
 	Trees _trees;
 	Messager _messager;
