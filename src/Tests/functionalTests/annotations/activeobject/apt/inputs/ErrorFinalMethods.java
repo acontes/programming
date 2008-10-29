@@ -1,11 +1,9 @@
 package functionalTests.annotations.activeobject.apt.inputs;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
-public class ErrorFinalMethods implements Serializable{
+public class ErrorFinalMethods{
 
 	public final void doSomething() {}
 }

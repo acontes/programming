@@ -1,4 +1,4 @@
-package functionalTests.annotations.activeobject.inputs.reject;
+package functionalTests.annotations.activeobject.cta.inputs.reject;
 
 import java.rmi.AlreadyBoundException;
 import java.util.Random;

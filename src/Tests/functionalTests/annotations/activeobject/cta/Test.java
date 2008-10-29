@@ -1,4 +1,4 @@
-package functionalTests.annotations.activeobject;
+package functionalTests.annotations.activeobject.cta;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +92,9 @@ public class Test extends FunctionalTest{
 	public void initTest() {
 		// get the compiler
 		_compiler = ToolProvider.getSystemJavaCompiler();
+		if(_compiler==null) {
+			// TODO 
+		}
 		_nonFatalErrors = new DiagnosticCollector<JavaFileObject>();
 		// get the file manager
 		StandardJavaFileManager stdFileManager = _compiler.
