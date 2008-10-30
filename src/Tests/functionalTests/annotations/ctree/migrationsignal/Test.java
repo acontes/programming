@@ -50,6 +50,10 @@ public class Test extends CTreeTest {
 	
 	@org.junit.Test
 	public void action() throws Exception {
+		
+		// misplaced annotation
+		Assert.assertEquals(checkFile("MisplacedAnnotation"), ERROR);
+		
 		// checking conditions that should be seen as errors
 		Assert.assertEquals(checkFile("ErrorNotInActiveObject"), ERROR);
 		Assert.assertEquals(checkFile("ErrorNotLast"), new Result(4,0));

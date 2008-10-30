@@ -49,6 +49,9 @@ public class Test extends AptTest {
 	
 	@org.junit.Test
 	public void action() throws Exception {
+		// misplaced annotation
+		Assert.assertEquals(checkFile("MisplacedAnnotation"), ERROR);
+		
 		// basic checks
 		Assert.assertEquals( checkFile("WarningGettersSetters"), WARNING);
 		Assert.assertEquals( checkFile("ErrorFinalClass"), ERROR);
