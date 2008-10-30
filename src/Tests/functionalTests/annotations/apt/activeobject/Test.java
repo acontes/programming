@@ -61,8 +61,8 @@ public class Test extends AptTest {
 		Assert.assertEquals( checkFile("ErrorClassNotPublic"), ERROR);
 
 		// more complicated scenarios
-		Assert.assertEquals( checkFile("ErrorReturnTypes"), new Result(4,0));
-		Assert.assertEquals( checkFile("Reject"), new Result(3,1));
+		Assert.assertEquals( checkFile("ErrorReturnTypes"), OK);
+		Assert.assertEquals( checkFile("Reject"), new Result(2,1));
 		Assert.assertEquals( checkFile("CorrectedReject"), OK);
 
 	}

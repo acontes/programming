@@ -1,3 +1,4 @@
+//// 	it is not an error
 package functionalTests.annotations.apt.activeobject.inputs;
 
 import java.io.Serializable;

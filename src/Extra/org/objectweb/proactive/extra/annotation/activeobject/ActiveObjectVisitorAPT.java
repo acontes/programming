@@ -117,7 +117,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		
 		testMethodModifiers(methodDeclaration);
 		
-		checkReturnType(methodDeclaration);
+		//checkReturnType(methodDeclaration); - REMOVED
 		
 		super.visitMethodDeclaration(methodDeclaration);
 	}
@@ -350,7 +350,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 				return true;
 			}
 			
-			// TODO can we verify if the constructor is empty?
 		}
 		
 		return false;
