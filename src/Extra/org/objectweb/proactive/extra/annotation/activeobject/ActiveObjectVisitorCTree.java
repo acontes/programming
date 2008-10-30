@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.annotation.activeobject;
 import java.util.List;
 
 import javax.annotation.processing.Messager;
+import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
@@ -40,6 +41,7 @@ import org.objectweb.proactive.extra.annotation.ErrorMessages;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePathScanner;
@@ -61,15 +63,25 @@ import com.sun.source.util.Trees;
  */
 public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	
-	private Messager _compilerOutput;
+	private Messager compilerOutput;
 	
 	public ActiveObjectVisitorCTree(Messager messager) {
-		_compilerOutput = messager;
+		compilerOutput = messager;
 	}
 	
 	@Override
 	public Void visitClass(ClassTree clazzTree, Trees trees) {
 		
+		testClassModifiers(clazzTree, trees);
+
+		if (!hasNoArgEmptyConstructor(clazzTree)) {
+			compilerOutput.printMessage(
+					Diagnostic.Kind.ERROR ,
+					ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE,
+					trees.getElement(getCurrentPath())
+			);
+		}
+
 		// we have to do something in order not to visit the inner classes twice
 		Void ret=null;
 		List<? extends Tree> clazzMembers = clazzTree.getMembers();
@@ -83,6 +95,15 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		
 		return ret;		
 	}
+
+	@Override
+	public Void visitMethod(MethodTree methodNode, Trees trees) {
+
+		testMethodModifiers(methodNode, trees);
+
+		return super.visitMethod(methodNode	, trees);
+	}
+
 	
 	@Override
 	public Void visitReturn(ReturnTree returnNode, Trees trees) {
@@ -95,38 +116,73 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		}
 		
 		if (returnExpression.getKind().equals(Tree.Kind.NULL_LITERAL)) {
-			_compilerOutput.printMessage(Diagnostic.Kind.ERROR , 
+			compilerOutput.printMessage(Diagnostic.Kind.ERROR ,
 					ErrorMessages.NO_NULL_RETURN_ERROR_MSG , trees.getElement(getCurrentPath()) ); 
 		}
 		return super.visitReturn(returnNode	, trees);
 	}
-	
-	// since we have no ConstructorTree in the API, we must resort to this...
-	@Override
-	public Void visitMethod(MethodTree methodNode, Trees trees) {
-		
-		// if it is a constructor
-		if(isConstructor(methodNode)){
-			// with no parameters
-			if( methodNode.getParameters().isEmpty() ){
-				// then it must have an empty body!
-				if(!methodNode.getBody().getStatements().isEmpty()) {
-					// report error
-					_compilerOutput.printMessage(Diagnostic.Kind.ERROR , 
-							"I've found a constructor with no arguments, but that does not have an empty body!" 
-							+ ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE , trees.getElement(getCurrentPath()) ); 
+
+	private void testClassModifiers(ClassTree clazzTree, Trees trees) {
+		ModifiersTree modifiers = clazzTree.getModifiers();
+
+		boolean isPublic = false;
+		for (Modifier modifier : modifiers.getFlags()) {
+			if (modifier.equals(Modifier.FINAL)) {
+
+				compilerOutput.printMessage(
+						Diagnostic.Kind.ERROR ,
+						ErrorMessages.IS_FINAL_ERROR_MESSAGE,
+						trees.getElement(getCurrentPath())
+				);
+			}
+
+			if(modifier.equals(Modifier.PUBLIC)){
+				isPublic = true;
+			}
+		}
+
+		if(!isPublic){
+			compilerOutput.printMessage(
+					Diagnostic.Kind.ERROR ,
+					ErrorMessages.IS_NOT_PUBLIC_ERROR_MESSAGE,
+					trees.getElement(getCurrentPath())
+			);
+		}
+	}
+
+
+	private boolean hasNoArgEmptyConstructor(ClassTree clazzTree) {
+
+		for (Tree member: clazzTree.getMembers()) {
+			if (member instanceof MethodTree) {
+				MethodTree potentialEmptyConstructor = (MethodTree)member;
+				if (potentialEmptyConstructor.getReturnType()==null) {
+					// it is constructor
+					if (potentialEmptyConstructor.getParameters().size()==0 &&
+						potentialEmptyConstructor.getBody().getStatements().size() == 0	)
+					{
+						// found it
+						return true;
+					}
 				}
 			}
 		}
-		
-		return super.visitMethod(methodNode, trees);
 	}
 
-	// hack
-	private boolean isConstructor(MethodTree methodNode) {
-		// TypeElement enclosingClass = trees.getScope(getCurrentPath()).getEnclosingClass();
-		return methodNode.getName().toString().equals("<init>");
+	private void testMethodModifiers(MethodTree methodNode, Trees trees) {
+		ModifiersTree modifiers = methodNode.getModifiers();
+
+		for (Modifier modifier : modifiers.getFlags()) {
+			if (modifier.equals(Modifier.FINAL)) {
+				compilerOutput.printMessage(
+						Diagnostic.Kind.ERROR ,
+						" The class declares the final method "+ methodNode.getName() + ".\n"
+						+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE ,
+						trees.getElement(getCurrentPath())
+				);
+			}
+		}
+
 	}
-	
 }
 
