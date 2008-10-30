@@ -1,11 +1,6 @@
 package functionalTests.annotations.activeobject.cta.inputs.reject;
 
-import java.rmi.AlreadyBoundException;
-
-import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.MigrationSignal;
 

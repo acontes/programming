@@ -21,6 +21,7 @@ public class ErrorNotLast {
 		i++; // muhahaw
 	}
 	
+	// obvious error
 	@MigrationSignal
 	public void migrateTo2() throws MigrationException, NodeException, AlreadyBoundException {
 		int i=0;
