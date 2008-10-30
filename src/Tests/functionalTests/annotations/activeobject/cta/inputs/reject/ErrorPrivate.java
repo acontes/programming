@@ -1,4 +1,4 @@
-package functionalTests.annotations.activeobject.inputs.reject;
+package functionalTests.annotations.activeobject.cta.inputs.reject;
 
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -12,15 +12,15 @@ public class ErrorPrivate {
 	private void migrateTo1() throws MigrationException {
 		PAMobileAgent.migrateTo(new Object());
 	}
-	
+
 	@MigrationSignal
 	protected void migrateTo2() throws MigrationException {
 		PAMobileAgent.migrateTo(new Object());
 	}
-	
+
 	@MigrationSignal
 	void migrateTo3() throws MigrationException {
 		PAMobileAgent.migrateTo(new Object());
 	}
-	
+
 }

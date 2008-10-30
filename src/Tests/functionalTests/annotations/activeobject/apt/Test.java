@@ -34,11 +34,11 @@ public class Test extends FunctionalTest {
 		}
 		else {
 			// guess the value
-			PROACTIVE_HOME = functionalTests.annotations.activeobject.Test.PROACTIVE_HOME; 
+			PROACTIVE_HOME = functionalTests.annotations.activeobject.cta.Test.PROACTIVE_HOME;
 		}
 		
 		INPUT_FILES_PATH = PROACTIVE_HOME + TEST_FILES_RELPATH;
-		PROC_PATH = functionalTests.annotations.activeobject.Test.PROC_PATH;
+		PROC_PATH = functionalTests.annotations.activeobject.cta.Test.PROC_PATH;
 		
 	}
 	
@@ -67,13 +67,12 @@ public class Test extends FunctionalTest {
 			Assert.assertEquals( checkFile("WarningGettersSetters"), WARNING);
 			Assert.assertEquals( checkFile("ErrorFinalClass"), ERROR);
 			Assert.assertEquals( checkFile("ErrorFinalMethods"), ERROR);
+			Assert.assertEquals( checkFile("ErrorFinalFields"), ERROR);
 			Assert.assertEquals( checkFile("ErrorNoArgConstructor"), ERROR);
-			Assert.assertEquals( checkFile("WarningNoSerializable"), WARNING);
-			Assert.assertEquals( checkFile("ErrorSynchronizationPrimitives"), new Result(2,0));
 			
 			// more complicated scenarios
 			Assert.assertEquals( checkFile("ErrorReturnTypes"), new Result(4,0));
-			Assert.assertEquals( checkFile("Reject"), new Result(5,2));
+			Assert.assertEquals( checkFile("Reject"), new Result(3,1));
 			Assert.assertEquals( checkFile("CorrectedReject"), OK);
 		} catch (IOException e) {
 			_logger.error("Cannot execute the command " + compressCommand(_aptCommand), e );

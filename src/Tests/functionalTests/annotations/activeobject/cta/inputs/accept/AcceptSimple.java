@@ -1,4 +1,4 @@
-package functionalTests.annotations.activeobject.inputs.accept;
+package functionalTests.annotations.activeobject.cta.inputs.accept;
 
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -12,16 +12,16 @@ public class AcceptSimple {
 	public void migrateTo1() throws MigrationException {
 		PAMobileAgent.migrateTo(new Object());
 	}
-	
+
 	@MigrationSignal
 	public void migrateTo2() throws MigrationException {
 		org.objectweb.proactive.api.PAMobileAgent.migrateTo(new Object());
 	}
-	
+
 	@MigrationSignal
 	public int migrateTo3() throws MigrationException {
 		PAMobileAgent.migrateTo(new Object());
 		return 0;
 	}
-	
+
 }
