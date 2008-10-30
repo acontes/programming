@@ -67,7 +67,7 @@ import com.sun.source.util.Trees;
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
+public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	
 	// error messages
 	private static final String ERROR_PREFIX_STATIC = " method is annotated using the " 
@@ -78,7 +78,7 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	// where we should signal the errors
 	private final Messager _compilerOutput;
 	
-	public MigrationSignalVisitor(Messager messager) {
+	public MigrationSignalVisitorCTree(Messager messager) {
 		_compilerOutput = messager;
 	}
 

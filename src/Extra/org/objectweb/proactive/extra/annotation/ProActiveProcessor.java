@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.jsr269;
+package org.objectweb.proactive.extra.annotation;
 
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
@@ -45,7 +45,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
-import org.objectweb.proactive.extra.annotation.migration.MigrationSignalVisitor;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorCTree;
+import org.objectweb.proactive.extra.annotation.migration.MigrationSignalVisitorCTree;
 
 
 import com.sun.source.util.TreePath;
@@ -72,8 +73,8 @@ public class ProActiveProcessor extends AbstractProcessor {
 
 	Trees _trees;
 	Messager _messager;
-	MigrationSignalVisitor _migrationVisitor;
-	ActiveObjectVisitor _aoVisitor;
+	MigrationSignalVisitorCTree _migrationVisitor;
+	ActiveObjectVisitorCTree _aoVisitor;
 	
 	
 	// because of BLEAH, absurdities continue...
@@ -85,8 +86,8 @@ public class ProActiveProcessor extends AbstractProcessor {
 		super.init(processingEnv);
 		_trees = Trees.instance(processingEnv);
 		_messager = processingEnv.getMessager();
-		_migrationVisitor = new MigrationSignalVisitor(_messager);
-		_aoVisitor = new ActiveObjectVisitor(_messager);
+		_migrationVisitor = new MigrationSignalVisitorCTree(_messager);
+		_aoVisitor = new ActiveObjectVisitorCTree(_messager);
 	}
 	
 	@Override

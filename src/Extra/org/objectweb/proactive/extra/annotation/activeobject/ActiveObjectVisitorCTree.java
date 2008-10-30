@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.jsr269;
+package org.objectweb.proactive.extra.annotation.activeobject;
 
 import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic;
@@ -60,11 +60,11 @@ import java.util.List;
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class ActiveObjectVisitor extends TreePathScanner<Void,Trees> {
+public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	
 	private Messager _compilerOutput;
 	
-	public ActiveObjectVisitor(Messager messager) {
+	public ActiveObjectVisitorCTree(Messager messager) {
 		_compilerOutput = messager;
 	}
 	
