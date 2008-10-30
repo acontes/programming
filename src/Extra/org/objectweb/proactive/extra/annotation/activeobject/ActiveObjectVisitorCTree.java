@@ -153,11 +153,13 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 
 	private boolean hasNoArgEmptyConstructor(ClassTree clazzTree) {
 
+		boolean hasAnyConstructors = false;
 		for (Tree member: clazzTree.getMembers()) {
 			if (member instanceof MethodTree) {
 				MethodTree potentialEmptyConstructor = (MethodTree)member;
 				if (potentialEmptyConstructor.getReturnType()==null) {
 					// it is constructor
+					hasAnyConstructors = true;
 					if (potentialEmptyConstructor.getParameters().size()==0 &&
 						potentialEmptyConstructor.getBody().getStatements().size() == 0	)
 					{
@@ -167,6 +169,14 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 				}
 			}
 		}
+		
+		if (hasAnyConstructors == false) {
+			// class does not have any constructors
+			// it means that default empty constructor will be generated
+			return true;
+		}
+		
+		return false;
 	}
 
 	private void testMethodModifiers(MethodTree methodNode, Trees trees) {
