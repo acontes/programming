@@ -10,4 +10,12 @@ public class ErrorEmptyConstructor {
 		String tata="mama";
 		tata.substring(3);
 	}
+	
+	public ErrorEmptyConstructor(String z) {
+		
+	}
+	
 }
+
+@ActiveObject
+class Empty {}
