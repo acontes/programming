@@ -54,29 +54,29 @@ import com.sun.mirror.util.SourcePosition;
 
 /**
  * <p> This class implements a visitor for the ActiveObjectAnnotationProcessor, conforming to the Mirror API(jsr199)</p>
- * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extra.annotation.activeobject.ActiveObject} 
+ * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extra.annotation.activeobject.ActiveObject}
  * respects the rules specified <a href="http://confluence.activeeon.com/display/PROG/Feature+Compile+time+annotations">here</a></p>
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
-	
+public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
+
 	// error messages
-	private static final String ERROR_PREFIX_STATIC = " is annotated using the " 
+	private static final String ERROR_PREFIX_STATIC = " is annotated using the "
 		+ ActiveObject.class.getSimpleName() + " annotation.\n";
-	
+
 	private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
-	
+
 	private transient String ERROR_PREFIX;
-	
+
 	private final Messager _compilerOutput;
-	
-	public ActiveObjectVisitor(final Messager messager) {
+
+	public ActiveObjectVisitorAPT(final Messager messager) {
 		super();
 		_compilerOutput = messager;
 	}
-	
+
 	private transient ClassDeclaration _containingClass;
 
 
@@ -84,11 +84,11 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	public void visitClassDeclaration(ClassDeclaration classDeclaration) {
 
 		_containingClass = classDeclaration;
-		
+
 		ERROR_PREFIX = classDeclaration.getSimpleName() + ERROR_PREFIX_STATIC;
-		
+
 		testClassModifiers(classDeclaration);
-		
+
 		if (!hasNoArgConstructor(classDeclaration)) {
 			reportError(classDeclaration, ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE);
 		}
@@ -96,7 +96,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 //		if (!implementsSerializable(classDeclaration)) {
 //			reportWarning(classDeclaration, ErrorMessages.NO_SERIALIZABLE_ERROR_MESSAGE);
 //		}
-		
+
 		// super.visitClassDeclaration(classDeclaration);
 		// visit the subcomponents of this class
 		// this should have been already provided by the MirrorAPI. bad API, bad! :P
@@ -104,32 +104,32 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		for (MethodDeclaration methodDeclaration : methods) {
 			methodDeclaration.accept(this);
 		}
-		
+
 		final Collection<FieldDeclaration> fields = classDeclaration.getFields();
 		for (FieldDeclaration fieldDeclaration : fields) {
 			fieldDeclaration.accept(this);
 		}
-		
+
 	}
-	
+
 	@Override
 	public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
-		
+
 		testMethodModifiers(methodDeclaration);
-		
+
 		checkReturnType(methodDeclaration);
-		
+
 		super.visitMethodDeclaration(methodDeclaration);
 	}
-	
+
 	@Override
 	public void visitFieldDeclaration(FieldDeclaration fieldDeclaration) {
-		
+
 		testFieldModifiers(fieldDeclaration);
-		
+
 		super.visitFieldDeclaration(fieldDeclaration);
 	}
-	
+
 	/*
 	 * Test if the return type of the method can be made a Future Object
 	 * @return: true , is the class cannot be an active object
@@ -171,9 +171,9 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		}
 		return true;
 	}
-	
+
 	/*
-	 * Test whether the object defined by the given class declaration 
+	 * Test whether the object defined by the given class declaration
 	 * can be the type of a ProActive Future
 	 * TODO what are the prereqs?
 	 * @return: true , is the class cannot be an active object
@@ -184,7 +184,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		boolean ret = testClassModifiers(classDeclaration);
 		// test the contained fields and methods
 		super.visitClassDeclaration(classDeclaration);
-		
+
 		return ret;
 	}
 
@@ -197,7 +197,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	 */
 	private boolean testClassModifiers(ClassDeclaration classDeclaration) {
 		Collection<Modifier> modifiers = classDeclaration.getModifiers();
-		
+
 		for (Modifier modifier : modifiers) {
 			if (modifier.equals(Modifier.FINAL)) {
 				reportError(classDeclaration, ErrorMessages.IS_FINAL_ERROR_MESSAGE);
@@ -210,7 +210,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		}
 		return true;
 	}
-	
+
 	/*
 	 * test the modifiers of a FieldDeclaration
 	 * 		- must not be final
@@ -220,11 +220,11 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	 */
 	private boolean testFieldModifiers(FieldDeclaration fieldDeclaration) {
 		Collection<Modifier> modifiers = fieldDeclaration.getModifiers();
-		
+
 		for (Modifier modifier : modifiers) {
 			if (modifier.equals(Modifier.FINAL)) {
 				reportError(fieldDeclaration, "The class declares the final field "
-						+ fieldDeclaration.getSimpleName() + ".\n" 
+						+ fieldDeclaration.getSimpleName() + ".\n"
 						+ ErrorMessages.IS_FINAL_ERROR_MESSAGE);
 				return false;
 			}
@@ -232,23 +232,23 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 			if (modifier.equals(Modifier.PUBLIC)) {
 				if( !checkGettersSetters(fieldDeclaration.getSimpleName()) ) {
 					reportWarning( fieldDeclaration , "The class declares the public field"
-							+ fieldDeclaration.getSimpleName() + ".\n" 
+							+ fieldDeclaration.getSimpleName() + ".\n"
 								+ ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE );
 				}
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	/*
-	 * Test whether there are getters/setters defined for the given public field 
+	 * Test whether there are getters/setters defined for the given public field
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
 	private boolean checkGettersSetters(String fieldName) {
-		
+
 		// remove eventual coding conventions
 		// TODO more precise?
 		String name;
@@ -258,12 +258,12 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		else {
 			name = fieldName.toLowerCase();
 		}
-		
+
 		final String getField = "get" + name;
 		boolean foundGet = false;
 		final String setField = "set" + name;
 		boolean foundSet = false;
-		
+
 		Collection<MethodDeclaration> methods = _containingClass.getMethods();
 		for (MethodDeclaration methodDeclaration : methods) {
 			if( !foundGet && methodDeclaration.getSimpleName().equalsIgnoreCase(getField) ) {
@@ -275,9 +275,9 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 			if( foundGet && foundSet )
 				return true;
 		}
-		
+
 		return false;
-		
+
 	}
 
 
@@ -289,19 +289,19 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	 */
 	private boolean testMethodModifiers(MethodDeclaration methodDeclaration) {
 		Collection<Modifier> modifiers = methodDeclaration.getModifiers();
-		
+
 		for (Modifier modifier : modifiers) {
 			if (modifier.equals(Modifier.FINAL)) {
-				reportError(methodDeclaration, " The class declares the final method " 
-						+ methodDeclaration.getSimpleName() + ".\n" 
+				reportError(methodDeclaration, " The class declares the final method "
+						+ methodDeclaration.getSimpleName() + ".\n"
 							+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE );
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	/*
 	 * test whether a class implements the serializable interface
 	 * @return: true , is the class cannot be an active object
@@ -329,14 +329,14 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	 * 			false, if the object can be an active object
 	 */
 	private boolean hasNoArgConstructor(ClassDeclaration classDeclaration) {
-		
+
 		Collection<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
-		
+
 		if (constructors.isEmpty()) {
 			// has no constructors at all! son of a butch!
 			return false;
 		}
-		
+
 		// one of the constructors must have no args
 		for (ConstructorDeclaration constructorDeclaration : constructors) {
 			if (constructorDeclaration.getParameters().isEmpty()) {
@@ -346,15 +346,15 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 
 			// TODO can we verify if the constructor is empty?
 		}
-		
+
 		return false;
 	}
-	
+
 	private void reportError( Declaration declaration , String msg ) {
 		SourcePosition classPos = declaration.getPosition();
 		_compilerOutput.printError( classPos , "[ERROR]" + ERROR_PREFIX + msg + ERROR_SUFFIX);
 	}
-	
+
 	private void reportWarning( Declaration declaration, String msg) {
 		SourcePosition classPos = declaration.getPosition();
 		_compilerOutput.printWarning( classPos , "[WARNING]" + ERROR_PREFIX + msg + ERROR_SUFFIX);

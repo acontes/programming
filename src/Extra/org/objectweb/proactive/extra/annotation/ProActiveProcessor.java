@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.jsr269;
+package org.objectweb.proactive.extra.annotation;
 
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
@@ -45,16 +45,17 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
-import org.objectweb.proactive.extra.annotation.migration.MigrationSignalVisitor;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorCTree;
+import org.objectweb.proactive.extra.annotation.migration.MigrationSignalVisitorCTree;
 
 
 import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
 
 /**
- * This class implements a Processor for annotations, according to the 
+ * This class implements a Processor for annotations, according to the
  * Pluggable Annotation Processing API(jsr269) specification.
- *  
+ *
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
@@ -66,38 +67,38 @@ import com.sun.source.util.Trees;
 			"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
 			"org.objectweb.proactive.extra.annotation.migration.MigrationSignal"
 		}
-	) 
+	)
 @SupportedOptions("enableTypeGenerationInEditor")
 public class ProActiveProcessor extends AbstractProcessor {
 
 	Trees _trees;
 	Messager _messager;
-	MigrationSignalVisitor _migrationVisitor;
-	ActiveObjectVisitor _aoVisitor;
-	
-	
+	MigrationSignalVisitorCTree _migrationVisitor;
+	ActiveObjectVisitorCTree _aoVisitor;
+
+
 	// because of BLEAH, absurdities continue...
 	public static final String ACTIVE_OBJECT_ANNOTATION = "org.objectweb.proactive.extra.annotation.activeobject.ActiveObject";
 	public static final String MIGRATION_SIGNAL_ANNOTATION = "org.objectweb.proactive.extra.annotation.migration.MigrationSignal";
-	
+
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
 		super.init(processingEnv);
 		_trees = Trees.instance(processingEnv);
 		_messager = processingEnv.getMessager();
-		_migrationVisitor = new MigrationSignalVisitor(_messager);
-		_aoVisitor = new ActiveObjectVisitor(_messager);
+		_migrationVisitor = new MigrationSignalVisitorCTree(_messager);
+		_aoVisitor = new ActiveObjectVisitorCTree(_messager);
 	}
-	
+
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations,
 			RoundEnvironment roundEnv) {
-		
+
 		if (annotations.isEmpty()) {
 			// called with no annotations
 			return true;
 		}
-		
+
 		for (TypeElement annotationElement : annotations) {
 			if ( annotationElement.getQualifiedName().toString().equals(ACTIVE_OBJECT_ANNOTATION) ) {
 				processActiveObjectAnnotation(roundEnv, annotationElement);
@@ -106,56 +107,56 @@ public class ProActiveProcessor extends AbstractProcessor {
 				processMigrationSignalAnnotation(roundEnv, annotationElement);
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	private void processMigrationSignalAnnotation(RoundEnvironment roundEnv,
 			TypeElement migrartionSignalAnnotationElem) {
-		
-		Set<? extends Element> annotatedElements = 
+
+		Set<? extends Element> annotatedElements =
 			roundEnv.getElementsAnnotatedWith(migrartionSignalAnnotationElem);
 		for( Element element : annotatedElements ) {
-			
+
 			if ( !((element instanceof ExecutableElement) && (element.getKind().equals(ElementKind.METHOD)) ) ) {
-				_messager.printMessage(Diagnostic.Kind.ERROR	, 
-						"The @MigrationSignal annotation can only be used on method definitions" , 
+				_messager.printMessage(Diagnostic.Kind.ERROR	,
+						"The @MigrationSignal annotation can only be used on method definitions" ,
 							element );
 				// carry on with the next annotated element
 				continue;
 			}
-			
+
 			ExecutableElement methodElement = (ExecutableElement)element;
 			TreePath methodTree = _trees.getPath(methodElement);
-			
+
 			// let's visit this tree!
 			_migrationVisitor.scan( methodTree , _trees);
 		}
-		
+
 	}
 
 	private void processActiveObjectAnnotation(RoundEnvironment roundEnv,
 			TypeElement proActiveAnotElement) {
-		
-	
-		Set<? extends Element> annotatedElements = 
+
+
+		Set<? extends Element> annotatedElements =
 			roundEnv.getElementsAnnotatedWith(proActiveAnotElement);
 		for( Element element : annotatedElements ) {
-			
+
 			if ( !((element instanceof TypeElement) && (element.getKind().isClass()) ) ) {
-				_messager.printMessage(Diagnostic.Kind.ERROR	, 
-						"The @ActiveObject annotation can only be used on class definitions" , 
+				_messager.printMessage(Diagnostic.Kind.ERROR	,
+						"The @ActiveObject annotation can only be used on class definitions" ,
 							element );
 				// carry on with the next annotated element
 				continue;
 			}
-			
+
 			TypeElement clazzElement = (TypeElement)element;
 			TreePath clazzTree = _trees.getPath(clazzElement);
-			
+
 			// let's visit this tree!
 			_aoVisitor.scan( clazzTree , _trees);
 		}
 	}
-	
+
 }

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.annotation.activeobject;
+package org.objectweb.proactive.extra.annotation;
 /*
  * ################################################################
  *
@@ -35,6 +35,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;
 import com.sun.mirror.apt.AnnotationProcessorFactory;
@@ -42,26 +44,26 @@ import com.sun.mirror.apt.AnnotationProcessors;
 import com.sun.mirror.declaration.AnnotationTypeDeclaration;
 
 /**
- * This is the factory that provides the ActiveObjectAnnotationProcessor 
+ * This is the factory that provides the ActiveObjectAnnotationProcessor
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
  */
 public class ActiveObjectAnnotationProcessorFactory implements
 		AnnotationProcessorFactory {
-	
+
 	// annotation factory supported options
-	private static final Collection<String> _supportedOptions = 
+	private static final Collection<String> _supportedOptions =
 		Collections.unmodifiableCollection(Arrays.asList(
 				"enableTypeGenerationInEditor" // Eclipse IDE option
 				));
 	// the annotations for which this factory provides processors
 	private static final Collection<String> _supportedAnnotations =
 		Collections.singletonList(ActiveObject.class.getName());
-	
+
 	// empty no-arg constructor required by the Mirror API
 	public ActiveObjectAnnotationProcessorFactory() {
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -71,13 +73,13 @@ public class ActiveObjectAnnotationProcessorFactory implements
 	public AnnotationProcessor getProcessorFor(
 			Set<AnnotationTypeDeclaration> annotations,
 			AnnotationProcessorEnvironment env) {
-		
+
 		if (annotations.isEmpty()) {
 			return AnnotationProcessors.NO_OP;
 		} else {
 			return new ActiveObjectAnnotationProcessor(env);
 		}
-		
+
 	}
 
 	/* (non-Javadoc)

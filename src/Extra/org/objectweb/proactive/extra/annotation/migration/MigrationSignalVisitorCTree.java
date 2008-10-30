@@ -59,77 +59,77 @@ import com.sun.source.util.Trees;
 
 /**
  * <p>This class implements a visitor for the ProActiveProcessor, according to the Pluggable Annotation Processing API(jsr269) specification</p>
- * <p>It implements the checks for the 
- * {@link org.objectweb.proactive.annotation.migration.MigratableSignal} 
+ * <p>It implements the checks for the
+ * {@link org.objectweb.proactive.annotation.migration.MigratableSignal}
  * annotation. See the annotation javadoc for the description of the checks performed.
  * </p>
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
-	
+public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
+
 	// error messages
-	private static final String ERROR_PREFIX_STATIC = " method is annotated using the " 
+	private static final String ERROR_PREFIX_STATIC = " method is annotated using the "
 		+ MigrationSignal.class.getSimpleName() + " annotation.\n";
 	private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
 	private String ERROR_PREFIX;
 
 	// where we should signal the errors
 	private final Messager _compilerOutput;
-	
-	public MigrationSignalVisitor(Messager messager) {
+
+	public MigrationSignalVisitorCTree(Messager messager) {
 		_compilerOutput = messager;
 	}
 
 	// marks the position of the method declaration inside the source code
 	// also a marker for the moment of finding a method declaration
 	private Element _methodPosition = null;
-	
+
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
-		
-		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC; 
+
+		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC;
 		_methodPosition = trees.getElement(getCurrentPath());
-		
+
 		Element clazzElement = trees.getElement(getCurrentPath().getParentPath());
 		if ( !((clazzElement instanceof TypeElement) && (clazzElement.getKind().isClass()) ) ) {
 			// actually, this will be caught by javac. but nevertheless, we can also have a say...
-			_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, 
-					"Found a method declaration outside a class declaration. Interesting!" , 
+			_compilerOutput.printMessage(Diagnostic.Kind.ERROR	,
+					"Found a method declaration outside a class declaration. Interesting!" ,
 						_methodPosition );
 			return super.visitMethod(methodNode, trees);
 		}
-		
+
 		// the method must be within a class that is tagged with the ActiveObject annotation
 		if ( clazzElement.getAnnotation(ActiveObject.class) == null ) {
 			reportError(_methodPosition, ErrorMessages.NOT_IN_ACTIVE_OBJECT_ERROR_MESSAGE);
 			return super.visitMethod(methodNode, trees);
 		}
-		
+
 		// the method must be public
 		if( !testModifiers(methodNode.getModifiers()) ){
 			reportWarning( _methodPosition, ErrorMessages.NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE);
 		}
-		
+
 		// we go by the default visit pattern, and do the checking when visiting enclosing blocks
 		Void ret = super.visitMethod(methodNode, trees);
 		_methodPosition = null;
-		
+
 		return ret;
-		
+
 	}
-	
+
 	public boolean testModifiers(ModifiersTree modifiersNode) {
 		boolean foundPublic = false;
-		
+
 		for( Modifier methodModifier : modifiersNode.getFlags() ) {
 			if (methodModifier.equals(Modifier.PUBLIC)) {
 				foundPublic = true;
 				break;
 			}
 		}
-		
+
 		return foundPublic;
 	}
 
@@ -138,34 +138,34 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	 */
 	@Override
 	public Void visitBlock(BlockTree blockNode, Trees trees) {
-		
+
 		if( _methodPosition == null ) {
 			return super.visitBlock( blockNode , trees);
 		}
-		
+
 		StatementTree migrateToStatement = null;
-		List<? extends StatementTree> statements = blockNode.getStatements(); 
+		List<? extends StatementTree> statements = blockNode.getStatements();
 		for( StatementTree statement : statements ) {
 			if(isMigrateToCall(statement)){
 				migrateToStatement = statement;
 				break;
 			}
 		}
-		
+
 		if( migrateToStatement == null ) {
 			reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE);
 			return super.visitBlock( blockNode , trees);
 		}
-		
+
 		int migrateToPos = statements.indexOf(migrateToStatement);
 		int statementsNo = statements.size();
-		
+
 		// programmers count starting from 0
 		if (statementsNo - 1 == migrateToPos ) {
 			// perfekt!
 			return super.visitBlock( blockNode , trees);
 		}
-		
+
 		if( statementsNo - 1 == migrateToPos + 1 ) {
 			// get info on statements
 			StatementTree lastStatement = statements.get( statementsNo -1);
@@ -178,17 +178,17 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 			// definitely not the last statement
 			reportWarning( _methodPosition , ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
 		}
-		
+
 
 		return super.visitBlock( blockNode , trees);
 
 	}
-	
+
 	/*
 	 * this method check whether the given statement is a return statement, and the
-	 * expression of the return statement is not another method call , 
-	 * ie it does not generate another stack frame. This is done using the visitor pattern 
-	 * actually - a precondition is that before calling checkReturnStatement, the enclosing block 
+	 * expression of the return statement is not another method call ,
+	 * ie it does not generate another stack frame. This is done using the visitor pattern
+	 * actually - a precondition is that before calling checkReturnStatement, the enclosing block
 	 * has already been visited by the current visitor.
 	 * @return: true, if it is a "simple" return statement.
 	 */
@@ -196,13 +196,13 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 		if( !(lastStatement instanceof ReturnTree) ) {
 			return false;
 		}
-		
+
 		ReturnTree returnStatement = (ReturnTree)lastStatement;
-		
+
 		ExpressionTree returnExpression = returnStatement.getExpression();
-		
-		return !((returnExpression instanceof MethodInvocationTree) || 
-				 (returnExpression instanceof NewArrayTree) || 
+
+		return !((returnExpression instanceof MethodInvocationTree) ||
+				 (returnExpression instanceof NewArrayTree) ||
 				 (returnExpression instanceof NewClassTree) );
 	}
 
@@ -210,27 +210,27 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 	 * This method tests whether the Java statement represented
 	 * by the given StatementTree parameter, is a method call statement,
 	 * which represents a call to the static method ${PAMobileAgent}.${MIGRATE_TO}.
-	 * see JLS sect. 15.12 for the format of a Java method call. The following two forms 
+	 * see JLS sect. 15.12 for the format of a Java method call. The following two forms
 	 * of method call statements are considered as a potential match for the call ${PAMobileAgent}.${MIGRATE_TO}:
 	 * <ul>
 	 * 	<li> MethodName ( ArgumentList_opt )</li>
 	 * 	<li> TypeName . Identifier ( ArgumentList_opt ) </li>
 	 * </ul>
-	 * where MethodName/Identifier must be ${MIGRATE_TO}, and TypeName must be 
+	 * where MethodName/Identifier must be ${MIGRATE_TO}, and TypeName must be
 	 * the identifier [${package.name}]${PAMobileAgent}
-	 * The ${package.name} and ${PAMobileAgent} names can be changed by refactoring without modifying 
-	 * 	the source code of this visitor, but the ${MIGRATE_TO} method name is hardcoded 
+	 * The ${package.name} and ${PAMobileAgent} names can be changed by refactoring without modifying
+	 * 	the source code of this visitor, but the ${MIGRATE_TO} method name is hardcoded
 	 * - see the declaration below - and it must be changed if the API changes. This is because I don't know yet
-	 * how to do it otherwise. 
+	 * how to do it otherwise.
 	 */
 	private static final String MIGRATE_TO = "migrateTo"; // i dunno how to do it elseway
 	private boolean isMigrateToCall(StatementTree lastStatement) {
 
 		if( !(lastStatement instanceof ExpressionStatementTree) )
 			return false;
-		
+
 		ExpressionStatementTree lastStatementExpr = (ExpressionStatementTree)lastStatement;
-		
+
 		// the method call is an expression ...
 		ExpressionTree lastExpression = lastStatementExpr.getExpression();
 		// ... of type MethodInvocationTree ...
@@ -267,21 +267,21 @@ public class MigrationSignalVisitor extends TreePathScanner<Void,Trees> {
 			// is not a migrateTo call!
 			return false;
 		}
-		  
+
 	}
 
 	// error reporting methods
 	private void reportError( Element position, String errorMsg ) {
-		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, 
-				ERROR_PREFIX + errorMsg + ERROR_SUFFIX , 
-					position );
-	}
-	
-	private void reportWarning( Element position, String errorMsg ) {
-		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, // TODO find out how to catch warnings using the Java COmpiler API 
-				ERROR_PREFIX + errorMsg + ERROR_SUFFIX , 
+		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	,
+				ERROR_PREFIX + errorMsg + ERROR_SUFFIX ,
 					position );
 	}
 
-	
+	private void reportWarning( Element position, String errorMsg ) {
+		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, // TODO find out how to catch warnings using the Java COmpiler API
+				ERROR_PREFIX + errorMsg + ERROR_SUFFIX ,
+					position );
+	}
+
+
 }

@@ -28,7 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.activeobject;
+package org.objectweb.proactive.extra.annotation;
+
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorAPT;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;
@@ -38,27 +41,27 @@ import com.sun.mirror.declaration.Declaration;
 /**
  * The AnnotationProcessor that processes the ActiveObject annotation.
  * It processes only objects.
- * For every object encountered, the ActiveObjectVisitor is used to 
+ * For every object encountered, the ActiveObjectVisitor is used to
  * visit the declaration.
- * 
+ *
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
  */
 
 public class ActiveObjectAnnotationProcessor implements AnnotationProcessor {
-	
+
 	private final AnnotationProcessorEnvironment _aoEnvironment;
-	private final ActiveObjectVisitor _aoVisitor;
+	private final ActiveObjectVisitorAPT _aoVisitor;
 	private final AnnotationTypeDeclaration _aoDeclaration;
 
 	public ActiveObjectAnnotationProcessor(AnnotationProcessorEnvironment env) {
-		
+
 		_aoEnvironment = env;
 		_aoDeclaration = (AnnotationTypeDeclaration) _aoEnvironment
 				.getTypeDeclaration(ActiveObject.class.getName());
-		_aoVisitor = new ActiveObjectVisitor(_aoEnvironment.getMessager());
-		
+		_aoVisitor = new ActiveObjectVisitorAPT(_aoEnvironment.getMessager());
+
 	}
 
 	@Override
@@ -66,6 +69,6 @@ public class ActiveObjectAnnotationProcessor implements AnnotationProcessor {
 		for( Declaration typeDeclaration : _aoEnvironment.getDeclarationsAnnotatedWith(_aoDeclaration) ) {
 			typeDeclaration.accept(_aoVisitor);
 		}
-	}	
+	}
 
 }

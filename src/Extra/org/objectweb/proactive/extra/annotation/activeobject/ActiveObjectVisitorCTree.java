@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.jsr269;
+package org.objectweb.proactive.extra.annotation.activeobject;
 
 import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic;
@@ -50,8 +50,8 @@ import java.util.List;
  * <p>This class implements a visitor for the ProActiveProcessor, according to the Pluggable Annotation Processing API(jsr269) specification</p>
  * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extra.annotation.activeobject.ActiveObject}</p>
  * <ul>
- * 	<li> 
- * has no methods that return null. 
+ * 	<li>
+ * has no methods that return null.
  * This is because null cannot be checked on the caller-side - the caller will have a reference to a future, which most probably will not be null.
  *  </li>
  *  <li> TODO does not use <b>this</b> to reference the current active object; must use {@link org.objectweb.proactive.api.PAActiveObject.getStubOnThis()} instead </li>
@@ -60,17 +60,17 @@ import java.util.List;
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class ActiveObjectVisitor extends TreePathScanner<Void,Trees> {
-	
+public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
+
 	private Messager _compilerOutput;
-	
-	public ActiveObjectVisitor(Messager messager) {
+
+	public ActiveObjectVisitorCTree(Messager messager) {
 		_compilerOutput = messager;
 	}
-	
+
 	@Override
 	public Void visitClass(ClassTree clazzTree, Trees trees) {
-		
+
 		// we have to do something in order not to visit the inner classes twice
 		Void ret=null;
 		List<? extends Tree> clazzMembers = clazzTree.getMembers();
@@ -81,26 +81,25 @@ public class ActiveObjectVisitor extends TreePathScanner<Void,Trees> {
 			}
 			ret = scan(clazzMember, trees);
 		}
-		
-		return ret;		
+
+		return ret;
 	}
-	
+
 	@Override
 	public Void visitReturn(ReturnTree returnNode, Trees trees) {
-		
+
 		ExpressionTree returnExpression = returnNode.getExpression();
-		
+
 		if ( returnExpression == null) {
 			// no return value. good.
 			return super.visitReturn(returnNode	, trees);
 		}
-		
+
 		if (returnExpression.getKind().equals(Tree.Kind.NULL_LITERAL)) {
-			_compilerOutput.printMessage(Diagnostic.Kind.ERROR , 
-					ErrorMessages.NO_NULL_RETURN_ERROR_MSG , trees.getElement(getCurrentPath()) ); 
+			_compilerOutput.printMessage(Diagnostic.Kind.ERROR ,
+					ErrorMessages.NO_NULL_RETURN_ERROR_MSG , trees.getElement(getCurrentPath()) );
 		}
 		return super.visitReturn(returnNode	, trees);
 	}
-	
-}
 
+}
