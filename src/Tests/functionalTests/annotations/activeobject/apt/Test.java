@@ -69,6 +69,7 @@ public class Test extends FunctionalTest {
 			Assert.assertEquals( checkFile("ErrorFinalMethods"), ERROR);
 			Assert.assertEquals( checkFile("ErrorFinalFields"), ERROR);
 			Assert.assertEquals( checkFile("ErrorNoArgConstructor"), ERROR);
+			Assert.assertEquals( checkFile("ErrorClassNotPublic"), ERROR);
 			
 			// more complicated scenarios
 			Assert.assertEquals( checkFile("ErrorReturnTypes"), new Result(4,0));

@@ -198,16 +198,22 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	private boolean testClassModifiers(ClassDeclaration classDeclaration) {
 		Collection<Modifier> modifiers = classDeclaration.getModifiers();
 		
+		boolean isPublic = false;
 		for (Modifier modifier : modifiers) {
 			if (modifier.equals(Modifier.FINAL)) {
 				reportError(classDeclaration, ErrorMessages.IS_FINAL_ERROR_MESSAGE);
 				return false;
 			}
-			if(modifier.equals(Modifier.PRIVATE) || modifier.equals(Modifier.PROTECTED)){
-				reportError(classDeclaration, ErrorMessages.IS_NOT_PUBLIC_ERROR_MESSAGE);
-				return false;
+			if(modifier.equals(Modifier.PUBLIC)){
+				isPublic = true;
 			}
 		}
+		
+		if(!isPublic){
+			reportError(classDeclaration, ErrorMessages.IS_NOT_PUBLIC_ERROR_MESSAGE);
+			return false;
+		}
+		
 		return true;
 	}
 	
