@@ -55,22 +55,7 @@ import com.sun.mirror.util.SourcePosition;
 /**
  * <p> This class implements a visitor for the ActiveObjectAnnotationProcessor, conforming to the Mirror API(jsr199)</p>
  * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extra.annotation.activeobject.ActiveObject} 
- * respects the following rules:</p>
- * <ul>
- * 		<li>must have a no-arg constructor</li>
- * 		<li>must implement the Serializable interface</li>
- * 		<li>must be subclassable
- * 			<ul>
- * 				<li>must not be final</li> 
- * 				<li>must not have final methods</li>
- * 				<li>must be public</li>
- * 			</ul>
- * 		</li>
- * 		<li>should not use standard Java synchronization primitives, eg volatile/synchronized keywords</li>
- * 		<li>must not use non-reifiable types for return values, eg instead of primitive types, just use ProActive primitive wrappers
- * 				this is because the return type also needs to be subclassed(a PAFuture will be created)</li>
- * 		<li>must use getters/setters in order to access fields of Active Objects</li>
- * </ul> 
+ * respects the rules specified <a href="http://confluence.activeeon.com/display/PROG/Feature+Compile+time+annotations">here</a></p>
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
@@ -108,9 +93,9 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 			reportError(classDeclaration, ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE);
 		}
 
-		if (!implementsSerializable(classDeclaration)) {
-			reportWarning(classDeclaration, ErrorMessages.NO_SERIALIZABLE_ERROR_MESSAGE);
-		}
+//		if (!implementsSerializable(classDeclaration)) {
+//			reportWarning(classDeclaration, ErrorMessages.NO_SERIALIZABLE_ERROR_MESSAGE);
+//		}
 		
 		// super.visitClassDeclaration(classDeclaration);
 		// visit the subcomponents of this class
@@ -228,7 +213,7 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	
 	/*
 	 * test the modifiers of a FieldDeclaration
-	 * 		- should not be volatile
+	 * 		- must not be final
 	 * 		- if public, should have getters/setters for accessing the value
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
@@ -237,12 +222,13 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 		Collection<Modifier> modifiers = fieldDeclaration.getModifiers();
 		
 		for (Modifier modifier : modifiers) {
-			if(modifier.equals(Modifier.VOLATILE)){
-				reportError(fieldDeclaration, "The class declares the volatile field " 
+			if (modifier.equals(Modifier.FINAL)) {
+				reportError(fieldDeclaration, "The class declares the final field "
 						+ fieldDeclaration.getSimpleName() + ".\n" 
-							+ ErrorMessages.HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
+						+ ErrorMessages.IS_FINAL_ERROR_MESSAGE);
 				return false;
 			}
+
 			if (modifier.equals(Modifier.PUBLIC)) {
 				if( !checkGettersSetters(fieldDeclaration.getSimpleName()) ) {
 					reportWarning( fieldDeclaration , "The class declares the public field"
@@ -298,7 +284,6 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	/*
 	 * test the modifiers of a MethodDeclaration
 	 * 		- must not be final
-	 * 		- should not be synchronized
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
@@ -312,12 +297,6 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 							+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE );
 				return false;
 			}
-			if(modifier.equals(Modifier.SYNCHRONIZED)){
-				reportError(methodDeclaration, "The class declares the synchronized method " 
-						+ methodDeclaration.getSimpleName() + ".\n" 
-							+ ErrorMessages.HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE );
-				return false;
-			}
 		}
 		
 		return true;
@@ -328,20 +307,20 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 	 * @return: true , is the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
-	private boolean implementsSerializable(ClassDeclaration classDeclaration) {
-		
-		Collection<InterfaceType> implementedInterfaces = classDeclaration.getSuperinterfaces();
-		// one of the implemented interfaces must be Serializable
-		for (InterfaceType interfaceType : implementedInterfaces) {
-			if (Serializable.class.getName().equals(
-					interfaceType.getDeclaration().getQualifiedName()
-					)) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
+//	private boolean implementsSerializable(ClassDeclaration classDeclaration) {
+//
+//		Collection<InterfaceType> implementedInterfaces = classDeclaration.getSuperinterfaces();
+//		// one of the implemented interfaces must be Serializable
+//		for (InterfaceType interfaceType : implementedInterfaces) {
+//			if (Serializable.class.getName().equals(
+//					interfaceType.getDeclaration().getQualifiedName()
+//					)) {
+//				return true;
+//			}
+//		}
+//
+//		return false;
+//	}
 
 
 	/*
@@ -364,6 +343,8 @@ public class ActiveObjectVisitor extends SimpleDeclarationVisitor {
 				// we have a no-arg constructor
 				return true;
 			}
+
+			// TODO can we verify if the constructor is empty?
 		}
 		
 		return false;
