@@ -1,0 +1,69 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
+package unitTests.gcmdeployment.variablecontract;
+
+import java.io.File;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
+
+
+public class TestVariableContract {
+    static final String VAR_NAME = "VARIABLE";
+    static final String VAR_VALUE = "value";
+    static final String VAR_DEFAULTVALUE = "plop";
+
+    @Test
+    public void test() throws ProActiveException {
+        File desc = new File(this.getClass().getResource("TestVariableContractApplication.xml").getFile());
+
+        VariableContractImpl vContractRes;
+        GCMApplicationImpl gcmad;
+
+        gcmad = new GCMApplicationImpl(Helpers.fileToURL(desc));
+        vContractRes = gcmad.getVariableContract();
+        Assert.assertEquals(VAR_DEFAULTVALUE, vContractRes.getValue(VAR_NAME));
+
+        VariableContractImpl vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(VAR_NAME, VAR_VALUE, VariableContractType.DescriptorDefaultVariable);
+        gcmad = new GCMApplicationImpl(Helpers.fileToURL(desc), vContract);
+        vContractRes = gcmad.getVariableContract();
+        Assert.assertEquals(VAR_VALUE, vContractRes.getValue(VAR_NAME));
+
+    }
+}
