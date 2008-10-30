@@ -30,13 +30,21 @@
  */
 package org.objectweb.proactive.extra.annotation;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorAPT;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;
+import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.AnnotationTypeDeclaration;
 import com.sun.mirror.declaration.Declaration;
+import com.sun.mirror.util.SimpleDeclarationVisitor;
 
 /**
  * The AnnotationProcessor that processes the ActiveObject annotation.
@@ -51,24 +59,54 @@ import com.sun.mirror.declaration.Declaration;
 
 public class ProActiveProcessorApt implements AnnotationProcessor {
 	
-	private final AnnotationProcessorEnvironment _aoEnvironment;
-	private final ActiveObjectVisitorAPT _aoVisitor;
-	private final AnnotationTypeDeclaration _aoDeclaration;
+	private final AnnotationProcessorEnvironment _environment;
+	
+	private final Map<Class, SimpleDeclarationVisitor> _annotationVisitors = 
+		new HashMap<Class, SimpleDeclarationVisitor>();
 
 	public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
 		
-		_aoEnvironment = env;
-		_aoDeclaration = (AnnotationTypeDeclaration) _aoEnvironment
-				.getTypeDeclaration(ActiveObject.class.getName());
-		_aoVisitor = new ActiveObjectVisitorAPT(_aoEnvironment.getMessager());
+		_environment = env;
+		Messager messager = _environment.getMessager();
+
+		_annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(messager));
 		
 	}
 
 	@Override
 	public void process() {
-		for( Declaration typeDeclaration : _aoEnvironment.getDeclarationsAnnotatedWith(_aoDeclaration) ) {
-			typeDeclaration.accept(_aoVisitor);
+		for( Entry<Class, SimpleDeclarationVisitor> av_pair : _annotationVisitors.entrySet()) {
+			Class annotation = av_pair.getKey();
+			String annotName = annotation.getName();
+			AnnotationTypeDeclaration annotDeclaration = 
+				(AnnotationTypeDeclaration)_environment.getTypeDeclaration(annotName);
+			Target applicableOn = annotDeclaration.getAnnotation(Target.class);
+			SimpleDeclarationVisitor visitor = av_pair.getValue();
+			
+			if(visitor == null)
+				return;
+			
+			for( Declaration typeDeclaration : _environment.getDeclarationsAnnotatedWith(annotDeclaration) ) {
+				
+				if(!testSuitableDeclaration( typeDeclaration , applicableOn)) {
+					_environment.getMessager().printError(typeDeclaration.getPosition(), 
+							"[ERROR] The @" + annotation.getSimpleName() + " annotation is not applicable for this type of Java construct.");
+				}
+				
+				// check using the visitor
+				typeDeclaration.accept(visitor);
+			}
 		}
+	}
+
+	private boolean testSuitableDeclaration(Declaration typeDeclaration,
+			Target applicableOn) {
+		
+		for( ElementType applicableType : applicableOn.value() ) {
+			if(Utils.applicableOnDeclaration(applicableType,typeDeclaration))
+				return true;
+		}
+		return false;
 	}	
 
 }
