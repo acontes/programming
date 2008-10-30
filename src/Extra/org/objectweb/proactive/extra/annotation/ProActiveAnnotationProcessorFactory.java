@@ -49,7 +49,7 @@ import com.sun.mirror.declaration.AnnotationTypeDeclaration;
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class ActiveObjectAnnotationProcessorFactory implements
+public class ProActiveAnnotationProcessorFactory implements
 		AnnotationProcessorFactory {
 
 	// annotation factory supported options
@@ -62,7 +62,7 @@ public class ActiveObjectAnnotationProcessorFactory implements
 		Collections.singletonList(ActiveObject.class.getName());
 
 	// empty no-arg constructor required by the Mirror API
-	public ActiveObjectAnnotationProcessorFactory() {
+	public ProActiveAnnotationProcessorFactory() {
 
 	}
 
@@ -77,7 +77,7 @@ public class ActiveObjectAnnotationProcessorFactory implements
 		if (annotations.isEmpty()) {
 			return AnnotationProcessors.NO_OP;
 		} else {
-			return new ActiveObjectAnnotationProcessor(env);
+			return new ProActiveProcessorApt(env);
 		}
 
 	}

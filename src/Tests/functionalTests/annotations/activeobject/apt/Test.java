@@ -15,7 +15,7 @@ import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectAnnotationProcessorFactory;
+import org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory;
 
 public class Test extends FunctionalTest {
 	
@@ -52,7 +52,7 @@ public class Test extends FunctionalTest {
 		_aptCommand[1] = "-factorypath";
 		_aptCommand[2] = PROC_PATH;
 		_aptCommand[3] = "-factory";
-		_aptCommand[4] = ActiveObjectAnnotationProcessorFactory.class.getName();
+		_aptCommand[4] = ProActiveAnnotationProcessorFactory.class.getName();
 		_aptCommand[5] = "-nocompile";
 		
 		_classpath = PROC_PATH;
