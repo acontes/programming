@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.annotation.activeobject;
 
+import java.util.List;
+
 import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic;
 
@@ -39,12 +41,9 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.util.Trees;
 import com.sun.source.util.TreePathScanner;
-
-import java.util.List;
+import com.sun.source.util.Trees;
 
 /**
  * <p>This class implements a visitor for the ProActiveProcessor, according to the Pluggable Annotation Processing API(jsr269) specification</p>
@@ -100,6 +99,33 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 					ErrorMessages.NO_NULL_RETURN_ERROR_MSG , trees.getElement(getCurrentPath()) ); 
 		}
 		return super.visitReturn(returnNode	, trees);
+	}
+	
+	// since we have no ConstructorTree in the API, we must resort to this...
+	@Override
+	public Void visitMethod(MethodTree methodNode, Trees trees) {
+		
+		// if it is a constructor
+		if(isConstructor(methodNode)){
+			// with no parameters
+			if( methodNode.getParameters().isEmpty() ){
+				// then it must have an empty body!
+				if(!methodNode.getBody().getStatements().isEmpty()) {
+					// report error
+					_compilerOutput.printMessage(Diagnostic.Kind.ERROR , 
+							"I've found a constructor with no arguments, but that does not have an empty body!" 
+							+ ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE , trees.getElement(getCurrentPath()) ); 
+				}
+			}
+		}
+		
+		return super.visitMethod(methodNode, trees);
+	}
+
+	// hack
+	private boolean isConstructor(MethodTree methodNode) {
+		// TypeElement enclosingClass = trees.getScope(getCurrentPath()).getEnclosingClass();
+		return methodNode.getName().toString().equals("<init>");
 	}
 	
 }
