@@ -89,11 +89,13 @@ public class Test extends FunctionalTest{
 	private DiagnosticCollector<JavaFileObject> _nonFatalErrors;
 
 	@org.junit.Before
-	public void initTest() {
+	public void initTest() throws NoCompilerDetectedException {
 		// get the compiler
 		_compiler = ToolProvider.getSystemJavaCompiler();
 		if(_compiler==null) {
-			// TODO
+			logger.error("Cannot detect the system Java compiler. Check for your JDK settings(btw, you DO have a JDK installed, right?)");
+			// this test can no longer continue...
+			throw new NoCompilerDetectedException("The annotations test will not be run, because a Java compiler was not detected.");
 		}
 		_nonFatalErrors = new DiagnosticCollector<JavaFileObject>();
 		// get the file manager
@@ -248,6 +250,15 @@ public class Test extends FunctionalTest{
 
 		}
 
+	}
+
+}
+
+// if I don't find a compiler...
+class NoCompilerDetectedException extends Exception {
+
+	public NoCompilerDetectedException(String message) {
+		super(message);
 	}
 
 }
