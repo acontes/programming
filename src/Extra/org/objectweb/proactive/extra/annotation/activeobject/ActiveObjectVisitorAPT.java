@@ -130,12 +130,21 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
 		
 		testMethodModifiers(methodDeclaration);
+		testParameterTypes(methodDeclaration);
 		
 		//checkReturnType(methodDeclaration); - REMOVED
 		
 		super.visitMethodDeclaration(methodDeclaration);
 	}
 	
+	private void testParameterTypes(MethodDeclaration methodDeclaration) {
+		if(!methodDeclaration.getModifiers().contains(Modifier.PRIVATE) && 
+				!paramsSerializable(methodDeclaration.getParameters())){
+			reportError( methodDeclaration, ErrorMessages.NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE);
+		}
+	}
+
+
 	@Override
 	public void visitFieldDeclaration(FieldDeclaration fieldDeclaration) {
 		
@@ -354,7 +363,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		for (ConstructorDeclaration constructorDeclaration : constructors) {
 			
 			ccr.hasNoArgConstructor = ccr.hasNoArgConstructor | constructorDeclaration.getParameters().isEmpty();
-			if(!paramsSerializable(constructorDeclaration)) {
+			if(!paramsSerializable(constructorDeclaration.getParameters())) {
 				ccr.allParamsSerializable = false;
 				ccr.offendingConstructors.add(constructorDeclaration);
 			}
@@ -382,8 +391,8 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	}
 	
 	// all the constructor parameters must implement Serializable interface
-	private boolean paramsSerializable(ConstructorDeclaration constructorDeclaration) {
-		for( ParameterDeclaration param: constructorDeclaration.getParameters() ){
+	private boolean paramsSerializable(Collection<ParameterDeclaration> params) {
+		for( ParameterDeclaration param:params ){
 			// trust me! I know it's a DeclaredType! :P
 			if(param.getType() instanceof DeclaredType) {
 				DeclaredType paramType = (DeclaredType)param.getType();
