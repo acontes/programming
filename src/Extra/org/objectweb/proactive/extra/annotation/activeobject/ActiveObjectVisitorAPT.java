@@ -276,10 +276,10 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		
 		Collection<MethodDeclaration> methods = _containingClass.getMethods();
 		for (MethodDeclaration methodDeclaration : methods) {
-			if( !foundGet && methodDeclaration.getSimpleName().equalsIgnoreCase(getField) ) {
+			if( !foundGet && methodDeclaration.getSimpleName().equals(getField) ) {
 				foundGet = true;
 			}
-			if ( !foundSet && methodDeclaration.getSimpleName().equalsIgnoreCase(setField) ) {
+			if ( !foundSet && methodDeclaration.getSimpleName().equals(setField) ) {
 				foundSet = true;
 			}
 			if( foundGet && foundSet )
