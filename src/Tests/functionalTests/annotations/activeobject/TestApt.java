@@ -54,7 +54,7 @@ public class TestApt extends AptTest {
 		Assert.assertEquals( ERROR , checkFile("MisplacedAnnotation") );
 		
 		// basic checks
-		Assert.assertEquals( WARNING , checkFile("WarningGettersSetters"));
+		Assert.assertEquals( new Result(0,2) , checkFile("WarningGettersSetters"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalMethods"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalFields"));
@@ -63,7 +63,7 @@ public class TestApt extends AptTest {
 		Assert.assertEquals( new Result(3,0) , checkFile("ErrorConstructorArgsNotSerializable"));
 
 		// more complicated scenarios
-		Assert.assertEquals( OK , checkFile("ErrorReturnTypes"));
+		Assert.assertEquals( WARNING , checkFile("ErrorReturnTypes")); // because of getter/setter
 		Assert.assertEquals( new Result(2,1) , checkFile("Reject"));
 		Assert.assertEquals( OK , checkFile("CorrectedReject"));
 

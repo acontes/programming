@@ -11,7 +11,7 @@ public class WarningGettersSetters implements Serializable{
 
 	public int error;
 	
-	// OK, should recognize coding conventions
+	// ERROR according to the new algorithm, should be get/set_counter
 	public int _counter;
 	public void setCounter(IntWrapper counter) { _counter = counter.intValue(); }
 	public IntWrapper getCounter() { return new IntWrapper(_counter); }
