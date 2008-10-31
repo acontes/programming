@@ -354,9 +354,10 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		for (ConstructorDeclaration constructorDeclaration : constructors) {
 			
 			ccr.hasNoArgConstructor = ccr.hasNoArgConstructor | constructorDeclaration.getParameters().isEmpty();
-			ccr.allParamsSerializable = ccr.allParamsSerializable & paramsSerializable(constructorDeclaration);
-			if(!ccr.allParamsSerializable)
-				ccr.offendingConstructors.add(constructorDeclaration); 
+			if(!paramsSerializable(constructorDeclaration)) {
+				ccr.allParamsSerializable = false;
+				ccr.offendingConstructors.add(constructorDeclaration);
+			}
 						
 		}
 		
@@ -386,25 +387,26 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 			// trust me! I know it's a DeclaredType! :P
 			if(param.getType() instanceof DeclaredType) {
 				DeclaredType paramType = (DeclaredType)param.getType();
-				boolean isSerializable = false;
-				// one of the implemented interfaces must be Serializable
-				for( InterfaceType implementedInterface : paramType.getSuperinterfaces() ){
-					System.out.println(paramType.getDeclaration().getSimpleName() +  " implements interface:" + implementedInterface.toString());
-					if(Serializable.class.getName().equals(
-							implementedInterface.getDeclaration().getQualifiedName()
-							)) {
-						isSerializable = true;
-						break;
-					}
-				}
-				// if the parameter is not serializable fail
-				if(!isSerializable) {
-					System.out.println(paramType.getDeclaration().getSimpleName() + " is not serializable!");
+				if(!implementsSerializable(paramType)) {
 					return false;
 				}
 			}
 		}
 		return true;
+	}
+
+
+	// check if the given type implements Serializable
+	private boolean implementsSerializable(DeclaredType paramType) {
+		for( InterfaceType implementedInterface : paramType.getSuperinterfaces() ){
+			if(Serializable.class.getName().equals(
+					implementedInterface.getDeclaration().getQualifiedName()
+					)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 
