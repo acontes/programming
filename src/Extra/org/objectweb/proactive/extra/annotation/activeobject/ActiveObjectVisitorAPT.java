@@ -30,7 +30,9 @@
  */
 package org.objectweb.proactive.extra.annotation.activeobject;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
 import org.objectweb.proactive.extra.annotation.Utils;
@@ -42,8 +44,10 @@ import com.sun.mirror.declaration.Declaration;
 import com.sun.mirror.declaration.FieldDeclaration;
 import com.sun.mirror.declaration.MethodDeclaration;
 import com.sun.mirror.declaration.Modifier;
+import com.sun.mirror.declaration.ParameterDeclaration;
 import com.sun.mirror.type.ArrayType;
 import com.sun.mirror.type.ClassType;
+import com.sun.mirror.type.DeclaredType;
 import com.sun.mirror.type.EnumType;
 import com.sun.mirror.type.PrimitiveType;
 import com.sun.mirror.type.TypeMirror;
@@ -88,10 +92,18 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		
 		testClassModifiers(classDeclaration);
 		
-		if (!hasNoArgConstructor(classDeclaration)) {
+		ConstructorCheckResult ccr = verifyConstructors(classDeclaration);
+		
+		if (!ccr.hasNoArgConstructor) {
 			reportError(classDeclaration, ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE);
 		}
-
+		
+		if(!ccr.allParamsSerializable){
+			for (ConstructorDeclaration offendingConstructor : ccr.offendingConstructors) {
+				reportError(offendingConstructor, ErrorMessages.NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE);
+			}
+		}
+		
 //		if (!implementsSerializable(classDeclaration)) {
 //			reportWarning(classDeclaration, ErrorMessages.NO_SERIALIZABLE_ERROR_MESSAGE);
 //		}
@@ -110,7 +122,8 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		}
 		
 	}
-	
+
+
 	@Override
 	public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
 		
@@ -317,33 +330,75 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 //		return false;
 //	}
 
-
+	
 	/*
-	 * test whether a class has a no-arg constructor
-	 * @return: true , is the class cannot be an active object
+	 * test for the criteria that must be met by the class constructors:
+	 * * there must be the empty no-arg constructor
+	 * * constructor parameters must be serializable 
+	 * @return: true , if the class cannot be an active object
 	 * 			false, if the object can be an active object
 	 */
-	private boolean hasNoArgConstructor(ClassDeclaration classDeclaration) {
+	private ConstructorCheckResult verifyConstructors(ClassDeclaration classDeclaration) {
+		
+		ConstructorCheckResult ccr = new ConstructorCheckResult();
 		
 		Collection<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
 		
 		if (constructors.isEmpty()) {
 			// has no constructors at all! son of a butch!
-			return false;
+			ccr.hasNoArgConstructor = true; // TODO ongoing debate about this...
+			return ccr;
 		}
 		
 		// one of the constructors must have no args
 		for (ConstructorDeclaration constructorDeclaration : constructors) {
-			if (constructorDeclaration.getParameters().isEmpty()) {
-				// we have a no-arg constructor
-				return true;
-			}
 			
+			ccr.hasNoArgConstructor = ccr.hasNoArgConstructor | constructorDeclaration.getParameters().isEmpty();
+			ccr.allParamsSerializable = ccr.allParamsSerializable & paramsSerializable(constructorDeclaration);
+			if(!ccr.allParamsSerializable)
+				ccr.offendingConstructors.add(constructorDeclaration); 
+						
 		}
 		
-		return false;
+		return ccr;
 	}
 	
+	final class ConstructorCheckResult {
+		
+		public ConstructorCheckResult() {
+			hasNoArgConstructor = false;
+			allParamsSerializable = true;
+		}
+		
+		public ConstructorCheckResult(boolean hasNoArgs, boolean allParams) {
+			hasNoArgConstructor = hasNoArgs;
+			allParamsSerializable = allParams; 
+		}
+		
+		public boolean hasNoArgConstructor;
+		public boolean allParamsSerializable;
+		public List<ConstructorDeclaration> offendingConstructors = new ArrayList<ConstructorDeclaration>();
+	}
+	
+	// all the constructor parameters must implement Serializable interface
+	private boolean paramsSerializable(ConstructorDeclaration constructorDeclaration) {
+		for( ParameterDeclaration param: constructorDeclaration.getParameters() ){
+			// trust me! I know it's a DeclaredType! :P
+			if(param.getType() instanceof DeclaredType) {
+				DeclaredType paramType = (DeclaredType)param.getType();
+				for( InterfaceType implementedInterface : paramType.getSuperinterfaces() ){
+					if(!Serializable.class.getName().equals(
+							implementedInterface.getDeclaration().getQualifiedName()
+							)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+
 	private void reportError( Declaration declaration , String msg ) {
 		SourcePosition classPos = declaration.getPosition();
 		_compilerOutput.printError( classPos , "[ERROR]" + ERROR_PREFIX + msg + ERROR_SUFFIX);
