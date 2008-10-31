@@ -32,7 +32,6 @@ package functionalTests.annotations.activeobject;
 
 import junit.framework.Assert;
 import functionalTests.annotations.CTreeTest;
-import functionalTests.annotations.AnnotationTest.Result;
 
 /**
  * @author fabratu
@@ -59,7 +58,7 @@ public class TestCTree extends CTreeTest {
 		// basic checks
 		Assert.assertEquals( new Result(0,5) , checkFile("WarningGettersSetters"));		
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
-		Assert.assertEquals( ERROR , checkFile("ErrorFinalMethods"));
+		Assert.assertEquals( new Result(2,0), checkFile("ErrorFinalMethods"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalFields"));
 		Assert.assertEquals( ERROR , checkFile("ErrorNoArgConstructor"));
 		Assert.assertEquals( ERROR , checkFile("ErrorClassNotPublic"));
@@ -67,7 +66,7 @@ public class TestCTree extends CTreeTest {
 
 		// more complicated scenarios
 		Assert.assertEquals( WARNING , checkFile("ErrorReturnTypes")); // because of getter/setter
-		Assert.assertEquals( new Result(2,1) , checkFile("Reject"));
+		Assert.assertEquals( new Result(1,1) , checkFile("Reject"));
 		Assert.assertEquals( OK , checkFile("CorrectedReject"));
 		
 		// CTREE - specific

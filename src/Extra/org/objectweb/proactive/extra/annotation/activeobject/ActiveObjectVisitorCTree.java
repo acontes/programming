@@ -151,7 +151,8 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
 
-		if (methodNode.getModifiers().getFlags().contains(Modifier.FINAL)) {
+		if (methodNode.getModifiers().getFlags().contains(Modifier.FINAL) &&
+			!methodNode.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
 			compilerOutput.printMessage(
 					Diagnostic.Kind.ERROR ,
 					" The class declares the final method "+ methodNode.getName() + ".\n"
