@@ -1,4 +1,4 @@
-package functionalTests.annotations.ctree.activeobject.inputs;
+package functionalTests.annotations.activeobject.inputs;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 

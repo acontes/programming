@@ -28,17 +28,17 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.apt.activeobject;
+package functionalTests.annotations.activeobject;
 
 import junit.framework.Assert;
-import functionalTests.annotations.apt.AptTest;
+import functionalTests.annotations.AptTest;
 
 /**
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class Test extends AptTest {
+public class TestApt extends AptTest {
 
 	@org.junit.Before
 	public void init() throws Exception {

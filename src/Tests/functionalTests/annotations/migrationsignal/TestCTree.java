@@ -28,18 +28,18 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.ctree.migrationsignal;
+package functionalTests.annotations.migrationsignal;
 
 import junit.framework.Assert;
+import functionalTests.annotations.CTreeTest;
 import functionalTests.annotations.AnnotationTest.Result;
-import functionalTests.annotations.ctree.CTreeTest;
 
 /**
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class Test extends CTreeTest {
+public class TestCTree extends CTreeTest {
 
 	@org.junit.Before
 	public void init() throws Exception {

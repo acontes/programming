@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.ctree;
+package functionalTests.annotations;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +51,6 @@ import javax.tools.JavaFileObject.Kind;
 
 import org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree;
 
-import functionalTests.annotations.AnnotationTest;
 
 /**
  * Root class for tests for annotation implemented using JDK 1.6 - the Compiler Tree API

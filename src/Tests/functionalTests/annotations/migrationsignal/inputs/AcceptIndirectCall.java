@@ -1,4 +1,4 @@
-package functionalTests.annotations.ctree.migrationsignal.inputs;
+package functionalTests.annotations.migrationsignal.inputs;
 
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -6,8 +6,8 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.MigrationSignal;
 
 @ActiveObject
-public class AcceptSimple {
-	// OK
+public class AcceptIndirectCall {
+
 	@MigrationSignal
 	public void migrateTo1() throws MigrationException {
 		PAMobileAgent.migrateTo(new Object());
@@ -15,13 +15,7 @@ public class AcceptSimple {
 	
 	@MigrationSignal
 	public void migrateTo2() throws MigrationException {
-		org.objectweb.proactive.api.PAMobileAgent.migrateTo(new Object());
+		// calling another method that migrates
+		migrateTo1();
 	}
-	
-	@MigrationSignal
-	public int migrateTo3() throws MigrationException {
-		PAMobileAgent.migrateTo(new Object());
-		return 0;
-	}
-	
 }

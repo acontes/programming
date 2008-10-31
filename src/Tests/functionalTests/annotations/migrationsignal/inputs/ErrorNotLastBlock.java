@@ -1,4 +1,4 @@
-package functionalTests.annotations.ctree.migrationsignal.inputs;
+package functionalTests.annotations.migrationsignal.inputs;
 
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;

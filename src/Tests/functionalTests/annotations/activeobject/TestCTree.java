@@ -28,17 +28,17 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.ctree.activeobject;
+package functionalTests.annotations.activeobject;
 
 import junit.framework.Assert;
-import functionalTests.annotations.ctree.CTreeTest;
+import functionalTests.annotations.CTreeTest;
 
 /**
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class Test extends CTreeTest {
+public class TestCTree extends CTreeTest {
 
 	@org.junit.Before
 	public void init() throws Exception {

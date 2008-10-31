@@ -1,4 +1,4 @@
-package functionalTests.annotations.apt.activeobject.inputs;
+package functionalTests.annotations.activeobject.inputs;
 
 import java.io.Serializable;
 import java.util.List;

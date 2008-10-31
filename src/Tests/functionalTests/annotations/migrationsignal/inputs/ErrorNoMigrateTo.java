@@ -1,4 +1,4 @@
-package functionalTests.annotations.ctree.migrationsignal.inputs;
+package functionalTests.annotations.migrationsignal.inputs;
 
 import java.rmi.AlreadyBoundException;
 

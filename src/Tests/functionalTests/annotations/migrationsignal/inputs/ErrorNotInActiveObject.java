@@ -1,4 +1,4 @@
-package functionalTests.annotations.ctree.migrationsignal.inputs;
+package functionalTests.annotations.migrationsignal.inputs;
 
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;

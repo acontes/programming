@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.apt;
+package functionalTests.annotations;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
 import org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory;
 
 import functionalTests.FunctionalTest;
-import functionalTests.annotations.AnnotationTest;
 
 /**
  * Root class for tests for annotation implemented using apt + the Mirror API
