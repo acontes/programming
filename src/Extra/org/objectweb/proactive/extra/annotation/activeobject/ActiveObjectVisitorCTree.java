@@ -37,7 +37,6 @@ import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
-import org.objectweb.proactive.extra.annotation.Utils;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
@@ -128,16 +127,15 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	private boolean hasAccessors(String fieldName, List<? extends Tree> clazzMembers) {
 		boolean hasSetter = false;
 		boolean hasGetter = false;
-		
 		String getterName = GenerateGettersSetters.getterName(fieldName);
 		String setterName = GenerateGettersSetters.setterName(fieldName);
 		
 		for (Tree member: clazzMembers) {
 			if (member.getKind().equals(Kind.METHOD)) {
-				if (((MethodTree)member).getName().equals(getterName)) {
+				if (((MethodTree)member).getName().toString().equals(getterName)) {
 					hasGetter = true;
 				}
-				if (((MethodTree)member).getName().equals(setterName)) {
+				if (((MethodTree)member).getName().toString().equals(setterName)) {
 					hasSetter = true;
 				}
 				
@@ -177,7 +175,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		}
 		
 		if (returnExpression.getKind().equals(Tree.Kind.NULL_LITERAL)) {
-			compilerOutput.printMessage(Diagnostic.Kind.ERROR ,
+			compilerOutput.printMessage(Diagnostic.Kind.ERROR,
 					ErrorMessages.NO_NULL_RETURN_ERROR_MSG , trees.getElement(getCurrentPath()) ); 
 		}
 		return super.visitReturn(returnNode	, trees);
@@ -230,9 +228,6 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 						hasNonArgsConstructor = true;
 					} else {
 						// TODO check that parameters are serializable
-						for (VariableTree var :potentialEmptyConstructor.getParameters()) {
-
-						}
 					}
 				}
 			}

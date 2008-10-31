@@ -30,9 +30,12 @@
  */
 package functionalTests.annotations;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 
@@ -50,7 +53,6 @@ import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject.Kind;
 
 import org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree;
-
 
 /**
  * Root class for tests for annotation implemented using JDK 1.6 - the Compiler Tree API
@@ -125,27 +127,41 @@ public abstract class CTreeTest extends AnnotationTest {
 				TEST_FILES_PACKAGE + fileName
 		};
 
+
+		StringWriter output = new StringWriter();
+
 		// create the compilation task
-		CompilationTask compilationTask = _compiler.getTask( null, // where to write error messages 
+		CompilationTask compilationTask = _compiler.getTask(output, // where to write error messages
 				_fileManager, // the file manager 
-				diagnosticListener, // where to receive the errors from compilation 
+				//diagnosticListener, // where to receive the errors from compilation
+				null,
 				Arrays.asList(compilerOptions),  // the compiler options 
 				Arrays.asList(annotationsClassNames), // classes on which to perform annotation processing
 				compilationUnits);
 
-		// call the compilation task
-		boolean compilationSuccesful = compilationTask.call();
 
-		if(compilationSuccesful) {
-			return OK;
+		// call the compilation task
+		compilationTask.call();
+
+		int errors = 0;
+		int warnings = 0;
+		BufferedReader reader = new BufferedReader(new StringReader(output.toString()));
+		String line = null;
+
+		try {
+			while ((line=reader.readLine())!=null) {
+				if (line.contains("error:")) {
+					errors++;
+				}
+				if (line.contains("warning:")) {
+					warnings++;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		else { 
-			// TODO problem with reporting warnings for the Compiler Tree API
-			//				for( Diagnostic<? extends JavaFileObject> diag : diagnosticListener.getDiagnostics()) {
-			//					System.out.println("Here is an error:" + diag.toString());
-			//				}
-			return new Result(diagnosticListener.getDiagnostics().size(),0);
-		}
+
+		return new Result(errors, warnings);
 	}
 
 	// a JavaFileManager used in order to suppress any .class file generation in the compilation phase
