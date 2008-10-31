@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.extra.annotation.activeobject;
 
-import java.io.Serializable;
 import java.util.Collection;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
+import org.objectweb.proactive.extra.annotation.Utils;
 
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.ClassDeclaration;
@@ -45,7 +45,6 @@ import com.sun.mirror.declaration.Modifier;
 import com.sun.mirror.type.ArrayType;
 import com.sun.mirror.type.ClassType;
 import com.sun.mirror.type.EnumType;
-import com.sun.mirror.type.InterfaceType;
 import com.sun.mirror.type.PrimitiveType;
 import com.sun.mirror.type.TypeMirror;
 import com.sun.mirror.type.VoidType;
@@ -255,19 +254,9 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	 */
 	private boolean checkGettersSetters(String fieldName) {
 		
-		// remove eventual coding conventions
-		// TODO more precise?
-		String name;
-		if ( fieldName.charAt(0) == '_' ) {
-			name = fieldName.substring(1).toLowerCase();
-		}
-		else {
-			name = fieldName.toLowerCase();
-		}
-		
-		final String getField = "get" + name;
+		final String getField = Utils.getterName(fieldName);
 		boolean foundGet = false;
-		final String setField = "set" + name;
+		final String setField = Utils.setterName(fieldName);
 		boolean foundSet = false;
 		
 		Collection<MethodDeclaration> methods = _containingClass.getMethods();

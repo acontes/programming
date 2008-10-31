@@ -34,9 +34,11 @@ import java.util.List;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
+import org.objectweb.proactive.extra.annotation.Utils;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
@@ -44,6 +46,8 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 
@@ -90,17 +94,82 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 				// inner class detected, skipping
 				continue;
 			}
-			ret = scan(clazzMember, trees);
+			
+			// it's not clear how to visit class fields
+			// so do it from here
+			// TODO change it! 
+			if (clazzMember.getKind().equals(Kind.VARIABLE)) {
+				VariableTree fieldNode = (VariableTree)clazzMember; 
+
+				if (fieldNode.getModifiers().getFlags().contains(Modifier.FINAL)) {
+					compilerOutput.printMessage(
+							Diagnostic.Kind.ERROR ,
+							"The class declares the final field " + fieldNode.getName() + ".\n" 
+							+ ErrorMessages.IS_FINAL_ERROR_MESSAGE,
+							trees.getElement(getCurrentPath())
+					);					
+				}				
+
+				if (fieldNode.getModifiers().getFlags().contains(Modifier.PUBLIC) && 
+					!hasAccessors(fieldNode.getName().toString(), clazzMembers)) 
+				{
+					compilerOutput.printMessage(
+							Diagnostic.Kind.WARNING,
+							"The class declares the public field "
+							+ fieldNode.getName() + ".\n" 
+							+ ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE,
+							trees.getElement(getCurrentPath())
+					);										
+				}
+				
+			} else {
+				
+				ret = scan(clazzMember, trees);
+				
+			}
 		}
 		
 		return ret;		
 	}
 
+	
+	private boolean hasAccessors(String fieldName, List<? extends Tree> clazzMembers) {
+		boolean hasSetter = false;
+		boolean hasGetter = false;
+		
+		String getterName = Utils.getterName(fieldName);
+		String setterName = Utils.setterName(fieldName);
+		
+		for (Tree member: clazzMembers) {
+			if (member.getKind().equals(Kind.METHOD)) {
+				if (((MethodTree)member).getName().equals(getterName)) {
+					hasGetter = true;
+				}
+				if (((MethodTree)member).getName().equals(setterName)) {
+					hasSetter = true;
+				}
+				
+				if (hasGetter && hasSetter) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
 
-		testMethodModifiers(methodNode, trees);
-
+		if (methodNode.getModifiers().getFlags().contains(Modifier.FINAL)) {
+			compilerOutput.printMessage(
+					Diagnostic.Kind.ERROR ,
+					" The class declares the final method "+ methodNode.getName() + ".\n"
+					+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE ,
+					trees.getElement(getCurrentPath())
+			);
+		}
+		
 		return super.visitMethod(methodNode	, trees);
 	}
 
@@ -179,20 +248,5 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		return false;
 	}
 
-	private void testMethodModifiers(MethodTree methodNode, Trees trees) {
-		ModifiersTree modifiers = methodNode.getModifiers();
-
-		for (Modifier modifier : modifiers.getFlags()) {
-			if (modifier.equals(Modifier.FINAL)) {
-				compilerOutput.printMessage(
-						Diagnostic.Kind.ERROR ,
-						" The class declares the final method "+ methodNode.getName() + ".\n"
-						+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE ,
-						trees.getElement(getCurrentPath())
-				);
-			}
-		}
-
-	}
 }
 
