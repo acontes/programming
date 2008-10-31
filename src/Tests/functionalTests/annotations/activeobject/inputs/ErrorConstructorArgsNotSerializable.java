@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
-interface SerTest implements Serializable {}
+interface SerTest extends Serializable {}
 }
 
 @ActiveObject
