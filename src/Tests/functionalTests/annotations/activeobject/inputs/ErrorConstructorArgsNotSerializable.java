@@ -8,7 +8,6 @@ import java.io.Serializable;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 interface SerTest extends Serializable {}
-}
 
 @ActiveObject
 public class ErrorConstructorArgsNotSerializable {
