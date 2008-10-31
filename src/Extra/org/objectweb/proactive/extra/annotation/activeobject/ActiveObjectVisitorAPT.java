@@ -299,14 +299,12 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	 */
 	private boolean testMethodModifiers(MethodDeclaration methodDeclaration) {
 		Collection<Modifier> modifiers = methodDeclaration.getModifiers();
-		
-		for (Modifier modifier : modifiers) {
-			if (modifier.equals(Modifier.FINAL)) {
-				reportError(methodDeclaration, " The class declares the final method " 
-						+ methodDeclaration.getSimpleName() + ".\n" 
-							+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE );
-				return false;
-			}
+
+		if(modifiers.contains(Modifier.FINAL)&&!modifiers.contains(Modifier.PRIVATE)){
+			reportError(methodDeclaration, " The class declares the final method " 
+					+ methodDeclaration.getSimpleName() + ".\n" 
+					+ ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE );
+			return false;
 		}
 		
 		return true;
@@ -388,12 +386,21 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 			// trust me! I know it's a DeclaredType! :P
 			if(param.getType() instanceof DeclaredType) {
 				DeclaredType paramType = (DeclaredType)param.getType();
+				boolean isSerializable = false;
+				// one of the implemented interfaces must be Serializable
 				for( InterfaceType implementedInterface : paramType.getSuperinterfaces() ){
-					if(!Serializable.class.getName().equals(
+					System.out.println(paramType.getDeclaration().getSimpleName() +  " implements interface:" + implementedInterface.toString());
+					if(Serializable.class.getName().equals(
 							implementedInterface.getDeclaration().getQualifiedName()
 							)) {
-						return false;
+						isSerializable = true;
+						break;
 					}
+				}
+				// if the parameter is not serializable fail
+				if(!isSerializable) {
+					System.out.println(paramType.getDeclaration().getSimpleName() + " is not serializable!");
+					return false;
 				}
 			}
 		}
