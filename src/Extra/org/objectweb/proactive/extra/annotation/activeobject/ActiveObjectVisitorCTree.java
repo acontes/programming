@@ -34,7 +34,6 @@ import java.util.List;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
@@ -77,14 +76,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	public Void visitClass(ClassTree clazzTree, Trees trees) {
 		
 		testClassModifiers(clazzTree, trees);
-
-		if (!hasNoArgEmptyConstructor(clazzTree)) {
-			compilerOutput.printMessage(
-					Diagnostic.Kind.ERROR ,
-					ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE,
-					trees.getElement(getCurrentPath())
-			);
-		}
+		testClassConstructors(clazzTree, trees);
 
 		// we have to do something in order not to visit the inner classes twice
 		Void ret=null;
@@ -219,33 +211,41 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		}
 	}
 
+	/**
+	 *
+	 * Checks that an empty no-argument constructor is defined
+	 * Arguments of constructors must be Serializable
+	 *
+	 */
+	private void testClassConstructors(ClassTree clazzTree, Trees trees) {
 
-	private boolean hasNoArgEmptyConstructor(ClassTree clazzTree) {
-
-		boolean hasAnyConstructors = false;
+		boolean hasNonArgsConstructor = false;
 		for (Tree member: clazzTree.getMembers()) {
 			if (member instanceof MethodTree) {
 				MethodTree potentialEmptyConstructor = (MethodTree)member;
 				if (potentialEmptyConstructor.getReturnType()==null) {
 					// it is constructor
-					hasAnyConstructors = true;
-					if (potentialEmptyConstructor.getParameters().size()==0 &&
-						potentialEmptyConstructor.getBody().getStatements().size() == 0	)
+					if (potentialEmptyConstructor.getParameters().size()==0)
 					{
-						// found it
-						return true;
+						hasNonArgsConstructor = true;
+					} else {
+						// TODO check that parameters are serializable
+						for (VariableTree var :potentialEmptyConstructor.getParameters()) {
+
+						}
 					}
 				}
 			}
 		}
-		
-		if (hasAnyConstructors == false) {
-			// class does not have any constructors
-			// it means that default empty constructor will be generated
-			return true;
+
+		if (!hasNonArgsConstructor) {
+			compilerOutput.printMessage(
+					Diagnostic.Kind.ERROR ,
+					ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE,
+					trees.getElement(getCurrentPath())
+			);
 		}
-		
-		return false;
+
 	}
 
 }
