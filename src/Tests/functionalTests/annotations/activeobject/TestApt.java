@@ -61,6 +61,8 @@ public class TestApt extends AptTest {
 		Assert.assertEquals( ERROR , checkFile("ErrorNoArgConstructor"));
 		Assert.assertEquals( ERROR , checkFile("ErrorClassNotPublic"));
 		Assert.assertEquals( new Result(2,0) , checkFile("ErrorConstructorArgsNotSerializable"));
+		Assert.assertEquals( ERROR , checkFile("PrivateEmptyConstructor"));
+		Assert.assertEquals( OK , checkFile("EmptyConstructor"));
 
 		// more complicated scenarios
 		Assert.assertEquals( WARNING , checkFile("ErrorReturnTypes")); // because of getter/setter

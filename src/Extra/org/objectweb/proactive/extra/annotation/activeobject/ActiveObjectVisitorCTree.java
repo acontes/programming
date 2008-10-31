@@ -218,7 +218,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	 */
 	private void testClassConstructors(ClassTree clazzTree, Trees trees) {
 
-		boolean hasNonArgsConstructor = false;
+		boolean hasNonArgsPublicConstructor = false;
 		for (Tree member: clazzTree.getMembers()) {
 			if (member instanceof MethodTree) {
 				MethodTree potentialEmptyConstructor = (MethodTree)member;
@@ -226,7 +226,14 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 					// it is constructor
 					if (potentialEmptyConstructor.getParameters().size()==0)
 					{
-						hasNonArgsConstructor = true;
+						hasNonArgsPublicConstructor = true;
+						if (potentialEmptyConstructor.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
+							compilerOutput.printMessage(
+									Diagnostic.Kind.ERROR ,
+									ErrorMessages.NO_NOARG_CONSTRUCTOR_CANNOT_BE_PRIVATE_MESSAGE,
+									trees.getElement(getCurrentPath())
+							);
+						}
 					} else {
 						// TODO check that parameters are serializable
 					}
@@ -234,7 +241,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 			}
 		}
 
-		if (!hasNonArgsConstructor) {
+		if (!hasNonArgsPublicConstructor) {
 			compilerOutput.printMessage(
 					Diagnostic.Kind.ERROR ,
 					ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE,

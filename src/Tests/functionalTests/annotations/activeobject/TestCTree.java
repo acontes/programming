@@ -62,6 +62,8 @@ public class TestCTree extends CTreeTest {
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalFields"));
 		Assert.assertEquals( ERROR , checkFile("ErrorNoArgConstructor"));
 		Assert.assertEquals( ERROR , checkFile("ErrorClassNotPublic"));
+		Assert.assertEquals( ERROR , checkFile("PrivateEmptyConstructor"));
+		Assert.assertEquals( OK , checkFile("EmptyConstructor"));
 		//Assert.assertEquals( new Result(3,0) , checkFile("ErrorConstructorArgsNotSerializable"));
 
 		// more complicated scenarios
