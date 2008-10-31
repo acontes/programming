@@ -54,7 +54,7 @@ public class TestApt extends AptTest {
 		Assert.assertEquals( ERROR , checkFile("MisplacedAnnotation") );
 		
 		// basic checks
-		Assert.assertEquals( new Result(0,2) , checkFile("WarningGettersSetters"));
+		Assert.assertEquals( new Result(0,5) , checkFile("WarningGettersSetters"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalMethods"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalFields"));

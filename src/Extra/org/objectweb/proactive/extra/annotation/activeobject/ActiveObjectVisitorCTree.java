@@ -94,7 +94,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 
 				if (fieldNode.getModifiers().getFlags().contains(Modifier.FINAL)) {
 					compilerOutput.printMessage(
-							Diagnostic.Kind.ERROR ,
+							Diagnostic.Kind.ERROR,
 							"The class declares the final field " + fieldNode.getName() + ".\n" 
 							+ ErrorMessages.IS_FINAL_ERROR_MESSAGE,
 							trees.getElement(getCurrentPath())

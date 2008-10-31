@@ -39,6 +39,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 
+import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
@@ -133,8 +134,7 @@ public abstract class CTreeTest extends AnnotationTest {
 		// create the compilation task
 		CompilationTask compilationTask = _compiler.getTask(output, // where to write error messages
 				_fileManager, // the file manager 
-				//diagnosticListener, // where to receive the errors from compilation
-				null,
+				diagnosticListener, // where to receive the errors from compilation
 				Arrays.asList(compilerOptions),  // the compiler options 
 				Arrays.asList(annotationsClassNames), // classes on which to perform annotation processing
 				compilationUnits);
@@ -143,24 +143,25 @@ public abstract class CTreeTest extends AnnotationTest {
 		// call the compilation task
 		compilationTask.call();
 
+		/**
+		 * 
+		 * All errors are accumulated in diagnosticListener
+		 * warning have to be found in the output separately
+		 * BTW errors cannot be found in the output because they are not marked explicitly as errors 
+		 * 
+		 */
+		
 		int errors = 0;
 		int warnings = 0;
-		BufferedReader reader = new BufferedReader(new StringReader(output.toString()));
-		String line = null;
-
-		try {
-			while ((line=reader.readLine())!=null) {
-				if (line.contains("error:")) {
-					errors++;
-				}
-				if (line.contains("warning:")) {
-					warnings++;
-				}
+		for (Diagnostic<? extends JavaFileObject> diagnistic : diagnosticListener.getDiagnostics()) {
+			if (diagnistic.getKind().equals(Diagnostic.Kind.ERROR)) {
+				errors++;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			if (diagnistic.getKind().equals(Diagnostic.Kind.WARNING)) {
+				warnings++;
+			}
 		}
-
+		
 		return new Result(errors, warnings);
 	}
 
