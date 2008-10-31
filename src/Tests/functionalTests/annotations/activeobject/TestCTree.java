@@ -32,6 +32,7 @@ package functionalTests.annotations.activeobject;
 
 import junit.framework.Assert;
 import functionalTests.annotations.CTreeTest;
+import functionalTests.annotations.AnnotationTest.Result;
 
 /**
  * @author fabratu
@@ -49,6 +50,27 @@ public class TestCTree extends CTreeTest {
 	
 	@org.junit.Test
 	public void action() throws Exception {
+		
+		// we cannot refactor - checkFile() has different implementation for apt and ctree tests
+		// APT
+		// misplaced annotation
+		Assert.assertEquals(checkFile("MisplacedAnnotation"), ERROR);
+		
+		// basic checks
+		Assert.assertEquals( checkFile("WarningGettersSetters"), WARNING);
+		Assert.assertEquals( checkFile("ErrorFinalClass"), ERROR);
+		Assert.assertEquals( checkFile("ErrorFinalMethods"), ERROR);
+		Assert.assertEquals( checkFile("ErrorFinalFields"), ERROR);
+		Assert.assertEquals( checkFile("ErrorNoArgConstructor"), ERROR);
+		Assert.assertEquals( checkFile("ErrorClassNotPublic"), ERROR);
+		Assert.assertEquals( checkFile("ErrorConstructorArgsNotSerializable"), new Result(3,0));
+
+		// more complicated scenarios
+		Assert.assertEquals( checkFile("ErrorReturnTypes"), OK);
+		Assert.assertEquals( checkFile("Reject"), new Result(2,1));
+		Assert.assertEquals( checkFile("CorrectedReject"), OK);
+		
+		// CTREE - specific
 		Assert.assertEquals( checkFile("ErrorReturnsNull"), new Result(2,0));
 		Assert.assertEquals( checkFile("ErrorEmptyConstructor"), ERROR);
 	}
