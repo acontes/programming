@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.annotation.activeobject;
 
 /**
+ * Abstracts away the algorithm used to test if a field has getters/setters
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10

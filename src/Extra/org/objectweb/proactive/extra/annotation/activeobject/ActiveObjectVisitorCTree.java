@@ -137,8 +137,8 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		boolean hasSetter = false;
 		boolean hasGetter = false;
 		
-		String getterName = Utils.getterName(fieldName);
-		String setterName = Utils.setterName(fieldName);
+		String getterName = GenerateGettersSetters.getterName(fieldName);
+		String setterName = GenerateGettersSetters.setterName(fieldName);
 		
 		for (Tree member: clazzMembers) {
 			if (member.getKind().equals(Kind.METHOD)) {

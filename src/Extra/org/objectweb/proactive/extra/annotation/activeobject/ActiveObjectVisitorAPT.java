@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.annotation.activeobject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +50,7 @@ import com.sun.mirror.type.ArrayType;
 import com.sun.mirror.type.ClassType;
 import com.sun.mirror.type.DeclaredType;
 import com.sun.mirror.type.EnumType;
+import com.sun.mirror.type.InterfaceType;
 import com.sun.mirror.type.PrimitiveType;
 import com.sun.mirror.type.TypeMirror;
 import com.sun.mirror.type.VoidType;
@@ -267,9 +269,9 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	 */
 	private boolean checkGettersSetters(String fieldName) {
 		
-		final String getField = Utils.getterName(fieldName);
+		final String getField = GenerateGettersSetters.getterName(fieldName);
 		boolean foundGet = false;
-		final String setField = Utils.setterName(fieldName);
+		final String setField = GenerateGettersSetters.setterName(fieldName);
 		boolean foundSet = false;
 		
 		Collection<MethodDeclaration> methods = _containingClass.getMethods();
