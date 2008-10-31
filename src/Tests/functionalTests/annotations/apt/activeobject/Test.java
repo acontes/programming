@@ -59,6 +59,7 @@ public class Test extends AptTest {
 		Assert.assertEquals( checkFile("ErrorFinalFields"), ERROR);
 		Assert.assertEquals( checkFile("ErrorNoArgConstructor"), ERROR);
 		Assert.assertEquals( checkFile("ErrorClassNotPublic"), ERROR);
+		Assert.assertEquals( checkFile("ErrorConstructorArgsNotSerializable"), new Result(3,0));
 
 		// more complicated scenarios
 		Assert.assertEquals( checkFile("ErrorReturnTypes"), OK);
