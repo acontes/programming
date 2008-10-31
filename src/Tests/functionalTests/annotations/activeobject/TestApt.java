@@ -32,6 +32,7 @@ package functionalTests.annotations.activeobject;
 
 import junit.framework.Assert;
 import functionalTests.annotations.AptTest;
+import functionalTests.annotations.AnnotationTest.Result;
 
 /**
  * @author fabratu
@@ -50,21 +51,21 @@ public class TestApt extends AptTest {
 	@org.junit.Test
 	public void action() throws Exception {
 		// misplaced annotation
-		Assert.assertEquals(checkFile("MisplacedAnnotation"), ERROR);
+		Assert.assertEquals( ERROR , checkFile("MisplacedAnnotation") );
 		
 		// basic checks
-		Assert.assertEquals( checkFile("WarningGettersSetters"), WARNING);
-		Assert.assertEquals( checkFile("ErrorFinalClass"), ERROR);
-		Assert.assertEquals( checkFile("ErrorFinalMethods"), ERROR);
-		Assert.assertEquals( checkFile("ErrorFinalFields"), ERROR);
-		Assert.assertEquals( checkFile("ErrorNoArgConstructor"), ERROR);
-		Assert.assertEquals( checkFile("ErrorClassNotPublic"), ERROR);
-		Assert.assertEquals( checkFile("ErrorConstructorArgsNotSerializable"), new Result(3,0));
+		Assert.assertEquals( WARNING , checkFile("WarningGettersSetters"));
+		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
+		Assert.assertEquals( ERROR , checkFile("ErrorFinalMethods"));
+		Assert.assertEquals( ERROR , checkFile("ErrorFinalFields"));
+		Assert.assertEquals( ERROR , checkFile("ErrorNoArgConstructor"));
+		Assert.assertEquals( ERROR , checkFile("ErrorClassNotPublic"));
+		Assert.assertEquals( new Result(3,0) , checkFile("ErrorConstructorArgsNotSerializable"));
 
 		// more complicated scenarios
-		Assert.assertEquals( checkFile("ErrorReturnTypes"), OK);
-		Assert.assertEquals( checkFile("Reject"), new Result(2,1));
-		Assert.assertEquals( checkFile("CorrectedReject"), OK);
+		Assert.assertEquals( OK , checkFile("ErrorReturnTypes"));
+		Assert.assertEquals( new Result(2,1) , checkFile("Reject"));
+		Assert.assertEquals( OK , checkFile("CorrectedReject"));
 
 	}
 	
