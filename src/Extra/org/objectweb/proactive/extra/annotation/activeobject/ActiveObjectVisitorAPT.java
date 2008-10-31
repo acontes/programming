@@ -100,6 +100,10 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 			reportError(classDeclaration, ErrorMessages.NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE);
 		}
 		
+		if(ccr.isFinalNoArgConstructor){
+			reportError(classDeclaration, ErrorMessages.NO_NOARG_CONSTRUCTOR_CANNOT_BE_PRIVATE_MESSAGE);
+		}
+		
 		if(!ccr.allParamsSerializable){
 			for (ConstructorDeclaration offendingConstructor : ccr.offendingConstructors) {
 				reportError(offendingConstructor, ErrorMessages.NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE);
@@ -355,14 +359,18 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		
 		if (constructors.isEmpty()) {
 			// has no constructors at all! son of a butch!
-			ccr.hasNoArgConstructor = true; // TODO ongoing debate about this...
+			ccr.hasNoArgConstructor = true; 
 			return ccr;
 		}
 		
 		// one of the constructors must have no args
 		for (ConstructorDeclaration constructorDeclaration : constructors) {
 			
-			ccr.hasNoArgConstructor = ccr.hasNoArgConstructor | constructorDeclaration.getParameters().isEmpty();
+			if(constructorDeclaration.getParameters().isEmpty()) {
+				ccr.hasNoArgConstructor = true;
+				if(constructorDeclaration.getModifiers().contains(Modifier.PRIVATE))
+					ccr.isFinalNoArgConstructor = true;
+			}
 			if(!paramsSerializable(constructorDeclaration.getParameters())) {
 				ccr.allParamsSerializable = false;
 				ccr.offendingConstructors.add(constructorDeclaration);
@@ -378,14 +386,17 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		public ConstructorCheckResult() {
 			hasNoArgConstructor = false;
 			allParamsSerializable = true;
+			isFinalNoArgConstructor = false;
 		}
 		
-		public ConstructorCheckResult(boolean hasNoArgs, boolean allParams) {
+		public ConstructorCheckResult(boolean hasNoArgs, boolean allParams, boolean isfinal) {
 			hasNoArgConstructor = hasNoArgs;
-			allParamsSerializable = allParams; 
+			allParamsSerializable = allParams;
+			isFinalNoArgConstructor = isfinal;
 		}
 		
 		public boolean hasNoArgConstructor;
+		public boolean isFinalNoArgConstructor;
 		public boolean allParamsSerializable;
 		public List<ConstructorDeclaration> offendingConstructors = new ArrayList<ConstructorDeclaration>();
 	}
