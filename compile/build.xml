@@ -247,7 +247,7 @@
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" 
 			includes="functionalTests/**"
-			excludes="functionalTests/annotations/apt/activeobject/inputs/** functionalTests/annotations/ctree/activeobject/inputs/** functionalTests/annotations/ctree/migrationsignal/inputs/**" 
+			excludes="functionalTests/annotations/activeobject/inputs/** functionalTests/annotations/migrationsignal/inputs/**" 
 			deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
