@@ -49,7 +49,7 @@ public class Test extends CTreeTest {
 	
 	@org.junit.Test
 	public void action() throws Exception {
-		Assert.assertEquals( checkFile("ErrorReturnsNull"), ERROR);
+		Assert.assertEquals( checkFile("ErrorReturnsNull"), new Result(2,0));
 		Assert.assertEquals( checkFile("ErrorEmptyConstructor"), ERROR);
 	}
 	

@@ -20,4 +20,24 @@ public class WarningGettersSetters implements Serializable{
 	public String name;
 	public StringWrapper getname() {return new StringWrapper(name);}
 	public void setName(String name) { }
+	
+	// OK
+	String test;
+	public String getTest() {
+		return test;
+	}
+
+	public void setTest(String test) {
+		this.test = test;
+	}
+
+	// OK
+	String _test;
+	public String get_test() {
+		return _test;
+	}
+
+	public void set_test(String _test) {
+		this._test = _test;
+	}
 }
