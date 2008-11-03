@@ -30,10 +30,19 @@
  */
 package org.objectweb.proactive.extra.annotation.activeobject;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
@@ -66,9 +75,11 @@ import com.sun.source.util.Trees;
 public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	
 	private Messager compilerOutput;
+	private Types typesUtil;
 	
-	public ActiveObjectVisitorCTree(Messager messager) {
-		compilerOutput = messager;
+	public ActiveObjectVisitorCTree(ProcessingEnvironment procEnv) {
+		compilerOutput = procEnv.getMessager();
+		typesUtil = procEnv.getTypeUtils();
 	}
 	
 	@Override
@@ -151,6 +162,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
 
+		// test modifiers
 		if (methodNode.getModifiers().getFlags().contains(Modifier.FINAL) &&
 			!methodNode.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
 			compilerOutput.printMessage(
@@ -161,7 +173,66 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 			);
 		}
 		
+		// test serializable args
+		Element methodElement = trees.getElement(getCurrentPath());
+		if(methodElement instanceof ExecutableElement) {
+		    ExecutableElement methodElem = (ExecutableElement)methodElement;
+		    if(!methodElem.getModifiers().contains(Modifier.PRIVATE) && 
+					!paramsSerializable(methodElem.getParameters())){
+		    	if(!isConstructor(methodNode)) 
+		    		compilerOutput.printMessage(
+						Diagnostic.Kind.ERROR ,
+						" The class declares the method "+ methodNode.getName() + ".\n"
+						+ ErrorMessages.NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE ,
+						trees.getElement(getCurrentPath())
+		    		);
+		    	else 
+		    		compilerOutput.printMessage(
+							Diagnostic.Kind.ERROR ,
+							" The class declares the constructor "+ methodNode.getName() + ".\n"
+							+ ErrorMessages.NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE,
+							trees.getElement(getCurrentPath())
+			    	);
+			}
+		}
+		
 		return super.visitMethod(methodNode	, trees);
+	}
+	
+	/*
+	 * Test for a MethodTree to see if it is a constructor or not 
+	 */
+	private final boolean isConstructor(MethodTree executable) {
+		// a constructor is a method that has returns nothing
+		return executable.getReturnType() == null;
+	}
+	
+	// all the constructor parameters must implement Serializable interface
+	private boolean paramsSerializable(List<? extends VariableElement> params) {
+		for( VariableElement param : params) {
+	    	if(param.asType().getKind().equals(TypeKind.DECLARED)) {
+	    		DeclaredType paramType =  (DeclaredType)param.asType();
+	    		if(!implementsSerializable(paramType)) {
+					return false;
+				}
+	    	}
+	    }
+		return true;
+	}
+
+
+	// check if the given type implements Serializable
+	private boolean implementsSerializable(DeclaredType paramType) {
+		for( TypeMirror m : typesUtil.directSupertypes(paramType)) {
+			// trust me on this one! :P
+			if(Serializable.class.getName().equals(
+					m.toString()
+					)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	
@@ -213,7 +284,6 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	/**
 	 *
 	 * Checks that an empty no-argument constructor is defined
-	 * Arguments of constructors must be Serializable
 	 *
 	 */
 	private void testClassConstructors(ClassTree clazzTree, Trees trees) {
@@ -222,7 +292,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		for (Tree member: clazzTree.getMembers()) {
 			if (member instanceof MethodTree) {
 				MethodTree potentialEmptyConstructor = (MethodTree)member;
-				if (potentialEmptyConstructor.getReturnType()==null) {
+				if (isConstructor(potentialEmptyConstructor)) {
 					// it is constructor
 					if (potentialEmptyConstructor.getParameters().size()==0)
 					{
@@ -234,8 +304,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 									trees.getElement(getCurrentPath())
 							);
 						}
-					} else {
-						// TODO check that parameters are serializable
+						return;
 					}
 				}
 			}
@@ -250,6 +319,6 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		}
 
 	}
-
+	
 }
 

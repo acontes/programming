@@ -86,7 +86,8 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
 		trees = Trees.instance(processingEnv);
 		messager = processingEnv.getMessager();
 		
-		scanners.put(ACTIVE_OBJECT_ANNOTATION, new ActiveObjectVisitorCTree(messager));
+		
+		scanners.put(ACTIVE_OBJECT_ANNOTATION, new ActiveObjectVisitorCTree(processingEnv));
 		scanners.put(MIGRATION_SIGNAL_ANNOTATION, new MigrationSignalVisitorCTree(messager));
 	}
 	
