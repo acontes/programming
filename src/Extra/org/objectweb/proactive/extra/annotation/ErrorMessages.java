@@ -49,6 +49,9 @@ public interface ErrorMessages {
 	// @ActiveObject
 	// the class doesn't have a no-arg constructor
 	public static final String NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE = "This object does not define a no-arg empty constructor.";
+
+	public static final String EMPTY_CONSTRUCTOR = "An active object non-args constructor should be empty";
+
 	// the class's  no-arg constructor is private
 	public static final String NO_NOARG_CONSTRUCTOR_CANNOT_BE_PRIVATE_MESSAGE = "An active object cannot have private non-args constructor";
 	// the class must have constructors with Serializable parameters

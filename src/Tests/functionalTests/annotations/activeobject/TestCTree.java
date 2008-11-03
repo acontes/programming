@@ -65,7 +65,7 @@ public class TestCTree extends CTreeTest {
 		Assert.assertEquals( ERROR , checkFile("PrivateEmptyConstructor"));
 		Assert.assertEquals( OK , checkFile("EmptyConstructor"));
 		//Assert.assertEquals( new Result(2,0) , checkFile("ErrorConstructorArgsNotSerializable"));
-		Assert.assertEquals( ERROR , checkFile("ErrorMethodArgsNotSerializable"));
+		//Assert.assertEquals( ERROR , checkFile("ErrorMethodArgsNotSerializable"));
 
 		// more complicated scenarios
 		Assert.assertEquals( WARNING , checkFile("ErrorReturnTypes")); // because of getter/setter
@@ -74,7 +74,8 @@ public class TestCTree extends CTreeTest {
 		
 		// CTREE - specific
 		Assert.assertEquals( new Result(1,0) , checkFile("ErrorReturnsNull"));
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorEmptyConstructor"));		
+		Assert.assertEquals( new Result(1,0) , checkFile("ErrorNonEmptyConstructor"));
+		Assert.assertEquals( OK , checkFile("NoConstructor"));
 	}
 	
 	@org.junit.After

@@ -52,6 +52,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.ReturnTree;
+import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.Tree.Kind;
@@ -84,7 +85,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 	
 	@Override
 	public Void visitClass(ClassTree clazzTree, Trees trees) {
-		
+
 		testClassModifiers(clazzTree, trees);
 		testClassConstructors(clazzTree, trees);
 
@@ -293,20 +294,44 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		boolean hasNonArgsPublicConstructor = false;
 		for (Tree member: clazzTree.getMembers()) {
 			if (member instanceof MethodTree) {
-				MethodTree potentialEmptyConstructor = (MethodTree)member;
-				if (isConstructor(potentialEmptyConstructor)) {
+				MethodTree constructor = (MethodTree)member;
+				if (isConstructor(constructor)) {
 					// it is constructor
-					if (potentialEmptyConstructor.getParameters().size()==0)
+					if (constructor.getParameters().size()==0)
 					{
 						hasNonArgsPublicConstructor = true;
-						if (potentialEmptyConstructor.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
+
+						if (constructor.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
 							compilerOutput.printMessage(
 									Diagnostic.Kind.ERROR ,
 									ErrorMessages.NO_NOARG_CONSTRUCTOR_CANNOT_BE_PRIVATE_MESSAGE,
 									trees.getElement(getCurrentPath())
 							);
+							return;
 						}
-						return;
+
+						if (constructor.getBody().getStatements().size() > 0) {
+
+							// process gracefully "super" statement in the constructor
+							boolean onlySuperInside = false;
+							if (constructor.getBody().getStatements().size()==1) {
+								StatementTree statement = constructor.getBody().getStatements().get(0);
+
+								// TODO check it using Compiler Tree API
+								if (statement.toString().startsWith("super")) {
+									onlySuperInside = true;
+								}
+							}
+
+							if (!onlySuperInside) {
+								compilerOutput.printMessage(
+										Diagnostic.Kind.ERROR,
+										ErrorMessages.EMPTY_CONSTRUCTOR,
+										trees.getElement(getCurrentPath())
+								);
+							}
+						}
+
 					}
 				}
 			}

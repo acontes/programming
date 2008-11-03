@@ -2,20 +2,15 @@ package functionalTests.annotations.activeobject.inputs;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
-// 1 error - constructor is not empty
+// 1 warning - constructor is not empty
 @ActiveObject
-public class ErrorEmptyConstructor {
+public class ErrorNonEmptyConstructor {
 
-	public ErrorEmptyConstructor() {
+	public ErrorNonEmptyConstructor() {
 		String tata="mama";
 		tata.substring(3);
 	}
-	
-	public ErrorEmptyConstructor(String z) {
-		
-	}
-	
-}
 
-@ActiveObject
-class Empty {}
+	public ErrorNonEmptyConstructor(String z) {
+	}
+}
