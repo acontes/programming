@@ -9,6 +9,10 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 interface SerTest extends Serializable {}
 
+class Beta implements SerTest{
+	
+}
+
 @ActiveObject
 public class ErrorConstructorArgsNotSerializable {
 
@@ -36,6 +40,9 @@ public class ErrorConstructorArgsNotSerializable {
 	
 	// this one too! 
 	public ErrorConstructorArgsNotSerializable(SerTest test) {}
+	
+	// this one should work!
+	public ErrorConstructorArgsNotSerializable(Beta test) {}
 	
 }
 
