@@ -70,7 +70,7 @@ public class TestApt extends AptTest {
 		Assert.assertEquals( new Result(1,1) , checkFile("Reject"));
 		Assert.assertEquals( OK , checkFile("CorrectedReject"));
 		
-		Assert.assertEquals( ERROR , checkFile("ErrorEmptyConstructor"));
+		Assert.assertEquals( OK , checkFile("ErrorNonEmptyConstructor"));
 
 	}
 	
