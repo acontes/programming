@@ -75,6 +75,7 @@
                 <!ENTITY reference SYSTEM "definitions.xml">
                 <!ENTITY HighLevelAPITutorial SYSTEM "high_level_api_tutorial.xml">
                 <!ENTITY ComponentsTutorial SYSTEM "ComponentsTutorial.xml">
+				<!ENTITY AnnotationProcessing SYSTEM "Annotations.xml">
                 
                 <!ENTITY GCMDeployment SYSTEM "GCMDeployment.xml">
                 ]>
@@ -152,6 +153,7 @@
   &faultTolerance;
   &Security;
   &WSDoc;
+  &AnnotationProcessing;
   &OSGi;
   &JMX;
   &JMXMBean;

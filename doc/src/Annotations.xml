@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Migration">
+	<info><title>Making ProActive programming easier: the ProActive Java Annotations System</title></info>
+	
+	<section><info><title>Annotation Overview</title></info>
+		<para>TODO</para>
+	</section>
+	
+	<section><info><title>Compile-time annotations</title></info>
+		
+		<section>
+			<info><title>Motivation</title></info>
+		<para>
+		These annotations provide a way to check at compile-time the constraints imposed 
+			on Java code by the ProActive library. Usually, these constraints are documented 
+			in the ProActive manual, and it is left to the responsability of the programmer to 
+			obey these rules. If the rules are broken, the effects are usually seen at runtime,
+			translated into specific runtime exceptions, which are difficult to interpret 
+			by the unexperienced ProActive programmers. The compile-time annotation system  
+			makes it possible to verify these rules at compile-time, in order to avoid long debugging
+			sessions made out of stacktraces eyeballing. Ideally, the runtime errors that the programmer
+			will receive will be more related to the logic of the application, and less 
+			to the misusage of the ProActive library...   
+		</para>
+		</section>
+		
+		<section>
+			<info><title>General usage</title></info>
+		<para>
+		First of all, note that the annotation system is *non-intrusive*. 
+			You can easily program using the ProActive library without bothering about annotations. 
+			They only serve as helpers for the developper, as mentioned previously.
+		</para>
+			<para>
+		Second of all, the compile-time annotations are implemented using tools provided 
+			in the standard JDK distribution, starting from version 1.5. 
+			The following backward-compatibility goal was kept in mind while developping 
+			the annotation system: the code written by the ProActive library user should compile using JDK 1.5.
+			But if you want the "full" power of the annotation system, it is advised to use JDK 1.6 or more. If you 
+		    (still) develop using JDK 1.5, some of the checks will not be performed. 
+			This documentation specifies which checks are disabled for 1.5.    
+			</para>
+			<para>
+		The compile-time checks are integrated into the compilation process. 
+			This means that the checks will be performed when you will compile your code, 
+			if you specify several command-line switches for the compilation command.
+			Depending on the JDK version you are using, different compilation commands must be used.
+			If you use JDK 1.5, you must compile using 
+		<link xmlns:xlink="http://www.w3.org/1999/xlink" 
+			xlink:href="http://java.sun.com/j2se/1.5.0/docs/guide/apt/GettingStarted.html">apt</link>. 
+			If you use JDK 1.6, you can simply use javac, with the appropriate command-line switches.
+			These will be described in the following paragraphs.
+			</para>
+		
+		<para>
+		The general way to use annotations is the following. 
+			For every annotation @Annotation provided by the ProActive library:
+			<itemizedlist>
+			   <listitem>
+				<para>
+					Annotate the applicable programming language construct with the @Annotation
+				</para>
+			   </listitem>
+			   <listitem>
+				<para>
+					When compiling, use one of the following compilation commands:
+					<itemizedlist>
+						<listitem>
+							<para>For JDK 1.5:
+							  <screen>$apt -factory org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
+							</para>
+						</listitem>
+							<para>For JDK 1.6:
+							  <screen>$javac -processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
+							</para>
+						<listitem>
+						</listitem>
+					</itemizedlist>
+					The above snippets assume that the ProActive distribution library and its dependencies are in the classpath, and that $JAVA_HOME environment variable points to you JDK distribution.
+				</para>
+			   </listitem>
+			   <listitem>
+				<para>
+					Correct the compile-time errors, and repeat. 
+				</para>
+			   </listitem>
+			</itemizedlist>  
+		</para>
+			
+		<para>
+			You can also use the annotation processing inside IDEs. 
+			Following is a description on how you can use it with major IDEs:
+			<itemizedlist>
+			  <listitem>
+				<para>
+					<emphasis role="bold">Eclipse</emphasis>
+				</para>
+			  </listitem>
+			</itemizedlist>
+			<itemizedlist>
+			  <listitem>
+				<para>
+					<emphasis role="bold">NetBeans</emphasis>
+					TODO Oleg
+				</para>
+			  </listitem>
+			</itemizedlist>
+			<itemizedlist>
+			  <listitem>
+				<para>
+					<emphasis role="bold">IntelliJ</emphasis>
+					TODO Oleg
+				</para>
+			  </listitem>
+			</itemizedlist>
+		</para>
+		</section>
+		
+		<section>
+			<info><title>@ActiveObject</title></info>
+		<para>
+			TODO specify:
+				* describe what the annotation checks
+				* describe the checks disabled for JDK 1.5
+				*
+		</para>
+		</section>
+		
+		<section>
+			<info><title>@RemoteObject</title></info>
+		<para>
+		</para>
+		</section>
+		
+		<section>
+			<info><title>@Migratable</title></info>
+		<para>
+			TODO
+		</para>
+		</section>
+		
+		<section>
+			<info><title>@MigrationSignal</title></info>
+		<para>
+		</para>
+		</section>
+		
+		<section>
+			<info><title>@MigrationStrategyManager</title></info>
+		<para>
+			TODO
+		</para>
+		</section>
+		
+		<section>
+			<info><title>@NodeAttchedCallback</title></info>
+		<para>
+			TODO
+		</para>
+		</section>
+		
+		<section>
+			<info><title>@VirtualNodesReadyCallback</title></info>
+		<para>
+			TODO
+		</para>
+		</section>
+	</section>
+	
+	<section><info><title>Run-time annotations</title></info>
+		<para>TODO</para>
+	</section>
+	
+</chapter>
