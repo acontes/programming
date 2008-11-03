@@ -28,7 +28,7 @@
 		<section>
 			<info><title>General usage</title></info>
 		<para>
-		First of all, note that the annotation system is *non-intrusive*. 
+		First of all, note that the annotation system is <emphasis role="bold">non-intrusive</emphasis>. 
 			You can easily program using the ProActive library without bothering about annotations. 
 			They only serve as helpers for the developper, as mentioned previously.
 		</para>
@@ -47,8 +47,7 @@
 			if you specify several command-line switches for the compilation command.
 			Depending on the JDK version you are using, different compilation commands must be used.
 			If you use JDK 1.5, you must compile using 
-		<link xmlns:xlink="http://www.w3.org/1999/xlink" 
-			xlink:href="http://java.sun.com/j2se/1.5.0/docs/guide/apt/GettingStarted.html">apt</link>. 
+		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/j2se/1.5.0/docs/guide/apt/GettingStarted.html">apt</link>. 
 			If you use JDK 1.6, you can simply use javac, with the appropriate command-line switches.
 			These will be described in the following paragraphs.
 			</para>
@@ -71,10 +70,10 @@
 							  <screen>$apt -factory org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
 							</para>
 						</listitem>
+						<listitem>
 							<para>For JDK 1.6:
 							  <screen>$javac -processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
 							</para>
-						<listitem>
 						</listitem>
 					</itemizedlist>
 					The above snippets assume that the ProActive distribution library and its dependencies are in the classpath, and that $JAVA_HOME environment variable points to you JDK distribution.
@@ -88,7 +87,7 @@
 			</itemizedlist>  
 		</para>
 			
-		<para>
+			<para>
 			You can also use the annotation processing inside IDEs. 
 			Following is a description on how you can use it with major IDEs:
 			<itemizedlist>
@@ -128,7 +127,8 @@
 </orderedlist>
 	Then, you can use the annotations, and when starting a compilation inside
       Eclipse, the violations of the Active Object constraints will appear as error markers inside the
-      IDE.
+      IDE. Note that this will only verify the constraints checked using apt - this is the 
+<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://dev.eclipse.org/newslists/news.eclipse.tools.jdt/msg22872.html">position of the Eclipse development team</link>.					
 				</para>
 			  </listitem>
 			</itemizedlist>
@@ -153,17 +153,50 @@
 		
 		<section>
 			<info><title>@ActiveObject</title></info>
-		<para>
-			TODO specify:
-				* describe what the annotation checks
-				* describe the checks disabled for JDK 1.5
-				*
-		</para>
+			<para>
+			The @ActiveObject annotation is applicable on a Java class definition, and it tests 
+			whether the class can be the type of an Active Object or not. As you can see in the
+			Active Object section of the manual, there are 
+			some constraints that a class definition should satisfy in order to be used as an active object type:
+			<itemizedlist>
+				<listitem>
+				   <para>non private no-argument constructor should be explicitly defined</para>
+			    </listitem>
+				<listitem>
+				   <para>the class should not be final</para>
+			    </listitem>
+				<listitem>
+				   <para>the class should be public</para>
+			    </listitem>
+				<listitem>
+				   <para>the class should not have final non-private methods nor final fields</para>
+			    </listitem>
+				<listitem>
+				   <para>a public field without setter and getter is not recommended</para>
+			    </listitem>
+				<listitem>
+				   <para>arguments of constructors must be Serializable, if they are not primitive types</para>
+			    </listitem>
+				<listitem>
+				   <para>arguments of non-private methods must be Serializable, if they are not primitive types</para>
+			    </listitem>
+				<listitem>
+				   <para>an Active Object method should not return null, as this literal cannot be checked on the caller side</para>
+			    </listitem>
+			</itemizedlist>
+			Using JDK 1.6, all the above-mentioned boints will be checked. 
+			If you use JDK 1.5, the last point will not be checked, and also only a test to see if a no-arg constructor 
+			is present will be run - will not test to see if the constructor has an empty body. 
+</para>
 		</section>
 		
 		<section>
 			<info><title>@RemoteObject</title></info>
 		<para>
+			TODO specify:
+				* applicable language construct
+				* describe what the annotation checks
+				* describe the checks disabled for JDK 1.5
 		</para>
 		</section>
 		
