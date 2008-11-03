@@ -1,5 +1,7 @@
 package functionalTests.annotations.activeobject.inputs;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.naming.directory.Attribute;
@@ -13,16 +15,20 @@ class Beta extends SerialParam{}
 @ActiveObject
 public class ErrorMethodArgsNotSerializable {
 
-	// ERROR
+	// Integer extends Number implements Serializable
 	public void doSomething(Integer in) {}
 
-	// OK
+	// String implements Serializable
 	void doSomething2(String str) {}
 	
-	// OK
+	// interface javax.naming.directory.Attribute extends Serializable
+	// SerialParam implements Serializable
 	private void doSomething3(Attribute attr, SerialParam sp ) {}
 	
-	// should work!
+	// Beta extends SerialParam implements Serializable
 	public void doSomethingg(Beta b) {}
+	
+	// FileInputStream NOT serializable
+	public void readInputFromFile(FileInputStream in) throws IOException {}
 	
 }

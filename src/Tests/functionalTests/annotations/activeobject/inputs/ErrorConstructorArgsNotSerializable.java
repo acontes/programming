@@ -3,6 +3,9 @@ package functionalTests.annotations.activeobject.inputs;
 import java.util.regex.Matcher;
 
 import javax.naming.directory.Attribute;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
@@ -20,29 +23,32 @@ public class ErrorConstructorArgsNotSerializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	// OK String serializable
+	// String implements Serializable
 	public ErrorConstructorArgsNotSerializable(String str){
 		
 	}
 	
-	// ERR INteger not serializable
+	// Integer extends Number implements Serializable
 	public ErrorConstructorArgsNotSerializable(Integer str){
 		
 	}
 	
-	// ERR Matcher
+	// ERR Matcher NOT Serializable
 	public ErrorConstructorArgsNotSerializable(Matcher str,StringBuilder blah){
 		
 	}
 	
-	// this one should pass!
+	// interface javax.naming.directory.Attribute extends Serializable
 	public ErrorConstructorArgsNotSerializable(Attribute attr) { }
 	
-	// this one too! 
+	// SerTest extends Serializable
 	public ErrorConstructorArgsNotSerializable(SerTest test) {}
 	
-	// this one should work!
+	// Beta implements SerTest extends Serializable
 	public ErrorConstructorArgsNotSerializable(Beta test) {}
+	
+	// FileInputStream NOT serializable
+	public ErrorConstructorArgsNotSerializable(FileInputStream in) throws IOException {}
 	
 }
 
