@@ -31,4 +31,7 @@ public class ErrorMethodArgsNotSerializable {
 	// FileInputStream NOT serializable
 	public void readInputFromFile(FileInputStream in) throws IOException {}
 	
+	// should work - primitive types can be active object method arguments
+	void setCounter(int counter, boolean onlyIfConditionMet) {}
+	
 }

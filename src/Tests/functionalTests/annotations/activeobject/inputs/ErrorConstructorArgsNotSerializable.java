@@ -22,6 +22,13 @@ public class ErrorConstructorArgsNotSerializable {
 	public ErrorConstructorArgsNotSerializable() {
 		// TODO Auto-generated constructor stub
 	}
+	
+	// should work - primitive types can be constructor arguments
+	public ErrorConstructorArgsNotSerializable(int gear,
+			double speed,
+			float acceleration,
+			boolean onlyIfConditionMet) {
+	}
 
 	// String implements Serializable
 	public ErrorConstructorArgsNotSerializable(String str){
