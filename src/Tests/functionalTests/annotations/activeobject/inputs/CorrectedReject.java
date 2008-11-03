@@ -3,6 +3,9 @@ package functionalTests.annotations.activeobject.inputs;
 import java.io.Serializable;
 import java.util.List;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+
+@ActiveObject
 public class CorrectedReject implements Serializable {
 	
 	public CorrectedReject() {}
@@ -15,9 +18,9 @@ public class CorrectedReject implements Serializable {
 	
 	private int dontOverrideMe() { return 0; }
 	
-	public int _counter;
+	public int counter;
 	
-	public int getCounter() { return _counter; }
+	public int getCounter() { return counter; }
 	
-	public void setCounter(int counter) { _counter = counter; }
+	public void setCounter(int counter) { this.counter = counter; }
 }
