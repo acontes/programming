@@ -432,6 +432,14 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 				implementsSerializable(implementedInterface) ;
 		}
 		
+		// now, verify its base class
+		if( paramType.getDeclaration() instanceof ClassDeclaration ) {
+			ClassDeclaration paramClass = (ClassDeclaration)paramType.getDeclaration();
+			// if we have a superclass...
+			if( paramClass.getSuperclass() != null )
+				isSerializable = isSerializable | implementsSerializable( paramClass.getSuperclass() );
+		}
+		
 		return isSerializable;
 	}
 
