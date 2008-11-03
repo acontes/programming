@@ -32,7 +32,6 @@ package functionalTests.annotations.activeobject;
 
 import junit.framework.Assert;
 import functionalTests.annotations.AptTest;
-import functionalTests.annotations.AnnotationTest.Result;
 
 /**
  * @author fabratu

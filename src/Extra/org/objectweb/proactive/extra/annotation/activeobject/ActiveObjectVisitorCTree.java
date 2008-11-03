@@ -67,7 +67,6 @@ import com.sun.source.util.Trees;
  * has no methods that return null. 
  * This is because null cannot be checked on the caller-side - the caller will have a reference to a future, which most probably will not be null.
  *  </li>
- *  <li> TODO does not use <b>this</b> to reference the current active object; must use {@link org.objectweb.proactive.api.PAActiveObject.getStubOnThis()} instead </li>
  * </ul>
  * @author fabratu
  * @version %G%, %I%
@@ -109,7 +108,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 							Diagnostic.Kind.ERROR,
 							"The class declares the final field " + fieldNode.getName() + ".\n" 
 							+ ErrorMessages.IS_FINAL_ERROR_MESSAGE,
-							trees.getElement(getCurrentPath())
+							trees.getElement(getCurrentPath()) // TODO point to correct element (field instead of class itself)
 					);					
 				}				
 
@@ -121,7 +120,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 							"The class declares the public field "
 							+ fieldNode.getName() + ".\n" 
 							+ ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE,
-							trees.getElement(getCurrentPath())
+							trees.getElement(getCurrentPath()) // TODO point to correct element (field instead of class itself)
 					);										
 				}
 				
@@ -132,7 +131,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 			}
 		}
 		
-		return ret;		
+		return ret;
 	}
 
 	

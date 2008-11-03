@@ -47,8 +47,12 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorCTree;
+import org.objectweb.proactive.extra.annotation.migration.MigrationSignal;
 import org.objectweb.proactive.extra.annotation.migration.MigrationSignalVisitorCTree;
+import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
+import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObjectVisitorCTree;
 
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
@@ -66,6 +70,7 @@ import com.sun.source.util.Trees;
 @SupportedAnnotationTypes(
 		{
 			"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
+			"org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject",
 			"org.objectweb.proactive.extra.annotation.migration.MigrationSignal"
 		}
 	) 
@@ -76,19 +81,15 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
 	Messager messager;
 	HashMap<String, TreePathScanner<Void,Trees>> scanners = new HashMap<String, TreePathScanner<Void,Trees>>();
 	
-	// because of BLEAH, absurdities continue...
-	public static final String ACTIVE_OBJECT_ANNOTATION = "org.objectweb.proactive.extra.annotation.activeobject.ActiveObject";
-	public static final String MIGRATION_SIGNAL_ANNOTATION = "org.objectweb.proactive.extra.annotation.migration.MigrationSignal";
-	
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
 		super.init(processingEnv);
 		trees = Trees.instance(processingEnv);
 		messager = processingEnv.getMessager();
-		
-		
-		scanners.put(ACTIVE_OBJECT_ANNOTATION, new ActiveObjectVisitorCTree(processingEnv));
-		scanners.put(MIGRATION_SIGNAL_ANNOTATION, new MigrationSignalVisitorCTree(messager));
+
+		scanners.put(ActiveObject.class.getName(), new ActiveObjectVisitorCTree(processingEnv));
+		scanners.put(RemoteObject.class.getName(), new RemoteObjectVisitorCTree(processingEnv));
+		scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(messager));
 	}
 	
 	@Override
@@ -101,7 +102,7 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
 		}
 		
 		for (TypeElement annotation : annotations) {
-			
+
 			TreePathScanner<Void,Trees> scanner = scanners.get(annotation.getQualifiedName().toString());
 			if ( scanner == null ) {
 				// annotation is not intended to be used for code checking

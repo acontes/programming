@@ -36,7 +36,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
-import org.objectweb.proactive.extra.annotation.Utils;
 
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.ClassDeclaration;

@@ -28,17 +28,12 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.activeobject;
+package functionalTests.annotations.remoteobject;
 
 import junit.framework.Assert;
-import functionalTests.annotations.CTreeTest;
+import functionalTests.annotations.AptTest;
 
-/**
- * @author fabratu
- * @version %G%, %I%
- * @since ProActive 4.10
- */
-public class TestCTree extends CTreeTest {
+public class TestApt extends AptTest {
 
 	@org.junit.Before
 	public void init() throws Exception {
@@ -46,41 +41,35 @@ public class TestCTree extends CTreeTest {
 		inputFilesPathInit(this.getClass());
 		testInit();
 	}
-	
+
 	@org.junit.Test
 	public void action() throws Exception {
-		
-		// TODO how to refactor? - checkFile() has different implementation for apt and ctree tests
-		// APT
 		// misplaced annotation
 		Assert.assertEquals( ERROR , checkFile("MisplacedAnnotation") );
-		
+
 		// basic checks
-		Assert.assertEquals( new Result(0,5) , checkFile("WarningGettersSetters"));		
+		Assert.assertEquals( new Result(0,5) , checkFile("WarningGettersSetters"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
 		Assert.assertEquals( new Result(2,0), checkFile("ErrorFinalMethods"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalFields"));
 		Assert.assertEquals( ERROR , checkFile("ErrorNoArgConstructor"));
 		Assert.assertEquals( ERROR , checkFile("ErrorClassNotPublic"));
-		Assert.assertEquals( ERROR , checkFile("PrivateEmptyConstructor"));
-		Assert.assertEquals( OK , checkFile("EmptyConstructor"));
 		Assert.assertEquals( new Result(2,0) , checkFile("ErrorConstructorArgsNotSerializable"));
 		Assert.assertEquals( ERROR , checkFile("ErrorMethodArgsNotSerializable"));
+		Assert.assertEquals( ERROR , checkFile("PrivateEmptyConstructor"));
+		Assert.assertEquals( OK , checkFile("EmptyConstructor"));
 
 		// more complicated scenarios
 		Assert.assertEquals( WARNING , checkFile("ErrorReturnTypes")); // because of getter/setter
 		Assert.assertEquals( new Result(1,1) , checkFile("Reject"));
 		Assert.assertEquals( OK , checkFile("CorrectedReject"));
-		
-		// CTREE - specific
-		Assert.assertEquals( new Result(1,0) , checkFile("ErrorReturnsNull"));
-		Assert.assertEquals( new Result(1,0) , checkFile("ErrorNonEmptyConstructor"));
-		Assert.assertEquals( OK , checkFile("NoConstructor"));
+
+		Assert.assertEquals( ERROR , checkFile("ErrorEmptyConstructor"));
+
 	}
-	
+
 	@org.junit.After
 	public void endTest() throws Exception {
 		testCleanup();
 	}
-	
 }
