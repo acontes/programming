@@ -95,6 +95,40 @@
 			  <listitem>
 				<para>
 					<emphasis role="bold">Eclipse</emphasis>
+					To configure Eclipse, the following steps must be undertaken:
+<orderedlist>
+  <listitem>
+   <para>Right-click on the project you are working on, and select Properties to bring on the
+      Project Properties property page</para>
+  </listitem>
+<listitem>
+   <para>Go to Java Compiler ->Annotation Processing</para>
+  </listitem>
+<listitem>
+   <para>Check the 'Enable project specific settings', 'Enable annotation processing' and 'Enable
+      processing in editor' checkboxes</para>
+  </listitem>
+<listitem>
+   <para>Go to Factory Path under Annotation Processing</para>
+  </listitem>
+<listitem>
+   <para>Select 'Add External JARs' and navigate to the location of ProActive.jar</para>
+  </listitem>
+<listitem>
+   <para>Make sure the checkbox next to the ProActive jar is checked</para>
+  </listitem>
+<listitem>
+   <para>Click on apply. You will be prompted with a dialog box that will ask you whether you
+      want to do a full project rebuild. If this is what you want, click Yes, otherwise just hit
+      No.</para>
+  </listitem>
+<listitem>
+   <para>Click on the OK button.</para>
+  </listitem>
+</orderedlist>
+	Then, you can use the annotations, and when starting a compilation inside
+      Eclipse, the violations of the Active Object constraints will appear as error markers inside the
+      IDE.
 				</para>
 			  </listitem>
 			</itemizedlist>
