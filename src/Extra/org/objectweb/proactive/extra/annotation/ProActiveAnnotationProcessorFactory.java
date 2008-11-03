@@ -33,9 +33,11 @@ package org.objectweb.proactive.extra.annotation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;
@@ -58,12 +60,12 @@ public class ProActiveAnnotationProcessorFactory implements
 				"enableTypeGenerationInEditor" // Eclipse IDE option
 				));
 	// the annotations for which this factory provides processors
-	private static final Collection<String> _supportedAnnotations =
-		Collections.singletonList(ActiveObject.class.getName());
+	private static final Collection<String> _supportedAnnotations = new LinkedList<String>();
 	
 	// empty no-arg constructor required by the Mirror API
 	public ProActiveAnnotationProcessorFactory() {
-		
+		_supportedAnnotations.add(ActiveObject.class.getName());
+		_supportedAnnotations.add(RemoteObject.class.getName());
 	}
 
 	/* (non-Javadoc)

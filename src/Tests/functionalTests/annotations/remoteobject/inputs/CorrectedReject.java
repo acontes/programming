@@ -18,9 +18,9 @@ public class CorrectedReject implements Serializable {
 
 	private int dontOverrideMe() { return 0; }
 
-	public int _counter;
+	public int counter;
 
-	public int getCounter() { return _counter; }
+	public int getCounter() { return counter; }
 
-	public void setCounter(int counter) { _counter = counter; }
+	public void setCounter(int counter) { this.counter = counter; }
 }
