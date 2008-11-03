@@ -220,19 +220,21 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		return true;
 	}
 
-
 	// check if the given type implements Serializable
 	private boolean implementsSerializable(DeclaredType paramType) {
+		//System.out.println("Verifying if " + paramType.toString() + " is Serializable");
+		boolean isSerializable = false;
 		for( TypeMirror m : typesUtil.directSupertypes(paramType)) {
-			// trust me on this one! :P
-			if(Serializable.class.getName().equals(
-					m.toString()
-					)) {
-				return true;
-			}
+			isSerializable = isSerializable |
+			// the type is Serializable
+			Serializable.class.getName().equals( m.toString()) |
+			// the type implements Serializable
+			implementsSerializable((DeclaredType)m)
+			;
+			
 		}
 		
-		return false;
+		return isSerializable;
 	}
 
 	

@@ -418,15 +418,21 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 
 	// check if the given type implements Serializable
 	private boolean implementsSerializable(DeclaredType paramType) {
+		
+		boolean isSerializable = false;
+		
+		//System.out.println("Verifying if " + paramType.toString() + " is Serializable");
 		for( InterfaceType implementedInterface : paramType.getSuperinterfaces() ){
-			if(Serializable.class.getName().equals(
+			isSerializable = isSerializable |
+				// the interface is actually Serializable
+				Serializable.class.getName().equals(
 					implementedInterface.getDeclaration().getQualifiedName()
-					)) {
-				return true;
-			}
+					) |
+				// verify if one of the superclasses implements Serializable
+				implementsSerializable(implementedInterface) ;
 		}
 		
-		return false;
+		return isSerializable;
 	}
 
 
