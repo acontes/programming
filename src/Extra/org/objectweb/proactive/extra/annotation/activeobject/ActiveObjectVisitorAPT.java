@@ -42,9 +42,11 @@ import com.sun.mirror.declaration.ClassDeclaration;
 import com.sun.mirror.declaration.ConstructorDeclaration;
 import com.sun.mirror.declaration.Declaration;
 import com.sun.mirror.declaration.FieldDeclaration;
+import com.sun.mirror.declaration.InterfaceDeclaration;
 import com.sun.mirror.declaration.MethodDeclaration;
 import com.sun.mirror.declaration.Modifier;
 import com.sun.mirror.declaration.ParameterDeclaration;
+import com.sun.mirror.declaration.TypeDeclaration;
 import com.sun.mirror.type.ArrayType;
 import com.sun.mirror.type.ClassType;
 import com.sun.mirror.type.DeclaredType;
@@ -420,26 +422,43 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		
 		boolean isSerializable = false;
 		
-		//System.out.println("Verifying if " + paramType.toString() + " is Serializable");
-		for( InterfaceType implementedInterface : paramType.getSuperinterfaces() ){
-			isSerializable = isSerializable |
-				// the interface is actually Serializable
-				Serializable.class.getName().equals(
-					implementedInterface.getDeclaration().getQualifiedName()
-					) |
-				// verify if one of the superclasses implements Serializable
-				implementsSerializable(implementedInterface) ;
+		// now, verify its base class
+		TypeDeclaration paramTypeDecl = paramType.getDeclaration();
+		if( paramTypeDecl == null ){
+			_compilerOutput.printError( _containingClass.getPosition() , paramType.toString() + " type cannot be found.");
+			// no class definition => we cannot discuss about serialization
+			return true;
 		}
 		
-		// now, verify its base class
-		if( paramType.getDeclaration() instanceof ClassDeclaration ) {
-			ClassDeclaration paramClass = (ClassDeclaration)paramType.getDeclaration();
+		if( paramTypeDecl instanceof ClassDeclaration ) {
+			ClassDeclaration paramClass = (ClassDeclaration)paramTypeDecl;
 			// if we have a superclass...
 			if( paramClass.getSuperclass() != null )
 				isSerializable = isSerializable | implementsSerializable( paramClass.getSuperclass() );
 		}
 		
+		System.out.println("Verifying if " + paramType.toString() + " is Serializable");
+		for( InterfaceType implementedInterface : paramTypeDecl.getSuperinterfaces() ){
+			
+			System.out.println("testing interface:" + implementedInterface);
+			InterfaceDeclaration implementedInterfaceType = implementedInterface.getDeclaration();
+			if( implementedInterfaceType == null ){
+				_compilerOutput.printError( paramTypeDecl.getPosition() , implementedInterface.toString() + " type cannot be found.");
+				// if I found undefined interfaces, then maybe those interfaces implement Serializable!
+				return true;
+			}
+			
+			isSerializable = isSerializable |
+				// the interface is actually Serializable
+				Serializable.class.getName().equals(
+					implementedInterfaceType.getQualifiedName()
+					) |
+				// verify if one of the superclasses implements Serializable
+				implementsSerializable(implementedInterface) ;
+		}
+
 		return isSerializable;
+		
 	}
 
 
