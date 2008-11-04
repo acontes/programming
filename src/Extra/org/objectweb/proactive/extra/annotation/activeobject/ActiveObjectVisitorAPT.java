@@ -462,12 +462,12 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	}
 
 
-	private void reportError( Declaration declaration , String msg ) {
+	protected void reportError( Declaration declaration , String msg ) {
 		SourcePosition classPos = declaration.getPosition();
 		_compilerOutput.printError( classPos , "[ERROR]" + ERROR_PREFIX + msg + ERROR_SUFFIX);
 	}
 	
-	private void reportWarning( Declaration declaration, String msg) {
+	protected void reportWarning( Declaration declaration, String msg) {
 		SourcePosition classPos = declaration.getPosition();
 		_compilerOutput.printWarning( classPos , "[WARNING]" + ERROR_PREFIX + msg + ERROR_SUFFIX);
 	}

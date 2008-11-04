@@ -39,6 +39,7 @@ import java.util.Map.Entry;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorAPT;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
+import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObjectVisitorAPT;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;
@@ -71,7 +72,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 		Messager messager = _environment.getMessager();
 
 		_annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(messager));
-		_annotationVisitors.put(RemoteObject.class, new ActiveObjectVisitorAPT(messager));
+		_annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(messager));
 		
 	}
 

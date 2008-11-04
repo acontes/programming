@@ -30,38 +30,26 @@
  */
 package org.objectweb.proactive.extra.annotation.remoteobject;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorAPT;
 
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorCTree;
+import com.sun.mirror.apt.Messager;
+import com.sun.mirror.declaration.Declaration;
 
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.util.Trees;
-
-/**
- * <p>This class implements a visitor for the ProActiveProcessor, according to the Pluggable Annotation Processing API(jsr269) specification</p>
- */
-public class RemoteObjectVisitorCTree extends ActiveObjectVisitorCTree {
-
-	public RemoteObjectVisitorCTree(ProcessingEnvironment procEnv) {
-		super(procEnv);
-	}
-
-	@Override
-	public Void visitReturn(ReturnTree returnNode, Trees trees) {
-		return null;
-	}
-
-	protected void reportError(String msg, Element element) {
-		String newMsg = msg.replaceAll("active", "remote");
-		newMsg = newMsg.replaceAll("Active", "Remote");
-		super.reportError(newMsg, element);
-	}
-
-	protected void reportWarning(String msg, Element element) {
-		String newMsg = msg.replaceAll("active", "remote");
-		newMsg = newMsg.replaceAll("Active", "Remote");
-		super.reportWarning(newMsg, element);
+public class RemoteObjectVisitorAPT extends ActiveObjectVisitorAPT {
+	
+	public RemoteObjectVisitorAPT(final Messager messager) {
+		super(messager);
 	}
 	
+	protected void reportError( Declaration declaration , String msg ) {
+		String newMsg = msg.replaceAll("active", "remote");
+		newMsg = newMsg.replaceAll("Active", "Remote");
+		super.reportError(declaration, newMsg);
+	}
+	
+	protected void reportWarning( Declaration declaration, String msg) {
+		String newMsg = msg.replaceAll("active", "remote");
+		newMsg = newMsg.replaceAll("Active", "Remote");
+		super.reportWarning(declaration, newMsg);
+	}
 }
