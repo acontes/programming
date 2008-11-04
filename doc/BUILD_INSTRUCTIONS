@@ -1,15 +1,15 @@
-To build the manuals you will need the documentation
+To build the manuals you will need the documentation 
 toolchain in this folder.
 
-The toolchain is available through anonymous svn at
+The toolchain is available through anonymous svn at 
 
 svn://scm.gforge.inria.fr/svn/proactive/documentation/trunk
 
-for the current trunk version, and at
+for the current trunk version, and at 
 
 svn://scm.gforge.inria.fr/svn/proactive/documentation/tags/current_release
 
-for the current stable version.
+for the current stable version. 
 
 
 == SVN Users ==
@@ -32,7 +32,7 @@ After the download is finished the manual can be built from
 the compile folder for the project using build with the following
 targets:
 
-docs                          Constructs everything - the javadoc, the manual, and the zip archives
+docs                          Constructs everything - the javadoc, the manual, and the zip archives                      
 clean                         Remove all generated files
 
 javadoc.complete              Make complete Javadoc
@@ -47,4 +47,4 @@ manualSingleHtmlZip           Create a zip of the big html file in the manual
 manualHtmlZip                 Create a zip of the html filed in the manual
 javadoc.completeZip           Create a zip from the complete javadoc
 javadoc.publishedZip          Create a zip from the published javadoc
-doc.zips                      Construct all the zip archives
+doc.zips                      Construct all the zip archives                                         
