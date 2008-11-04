@@ -32,6 +32,7 @@ package functionalTests.annotations.remoteobject;
 
 import junit.framework.Assert;
 import functionalTests.annotations.CTreeTest;
+import functionalTests.annotations.AnnotationTest.Result;
 
 public class TestCTree extends CTreeTest {
 
@@ -61,6 +62,7 @@ public class TestCTree extends CTreeTest {
 		Assert.assertEquals( OK , checkFile("EmptyConstructor"));
 		Assert.assertEquals( new Result(2,0) , checkFile("ErrorConstructorArgsNotSerializable"));
 		Assert.assertEquals( ERROR , checkFile("ErrorMethodArgsNotSerializable"));
+		Assert.assertEquals( new Result(3,0), checkFile("ErrorMissingTypes"));
 
 		// more complicated scenarios
 		Assert.assertEquals( WARNING , checkFile("ErrorReturnTypes")); // because of getter/setter
