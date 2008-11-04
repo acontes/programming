@@ -136,15 +136,36 @@
 			  <listitem>
 				<para>
 					<emphasis role="bold">NetBeans</emphasis>
-					TODO Oleg
+					cannot be configured to use APT proactive annotation processor without manual editing of project's build.xml file.
+					<para>
+					In order to setup annotation processing using javac (applicable for JDK 6) goto
+					</para>
+					<para>
+					Project Properties -> Compiling -> Additional compiler options and add the following option
+					</para>
+					<para>
+					  <screen>-processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree</screen>
+					</para>
+					<para>
+					Then build the project.
+					</para>
 				</para>
 			  </listitem>
 			</itemizedlist>
 			<itemizedlist>
 			  <listitem>
 				<para>
-					<emphasis role="bold">IntelliJ</emphasis>
-					TODO Oleg
+					<emphasis role="bold">IntelliJ IDEA</emphasis>
+					<para>
+					To setup javac's annotation processor first make sure that javac compiler is chosen in
+					Project Settings -> Compiler.
+					</para>
+					<para>
+					Then add the following option to Additional command line parameters
+					</para>
+					<para>
+					  <screen>-processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree</screen>
+					</para>
 				</para>
 			  </listitem>
 			</itemizedlist>
