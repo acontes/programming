@@ -42,19 +42,19 @@ public class WarningGettersSetters implements Serializable{
 		this._test = _test;
 	}
 	
-	// OK (non public)
+	// WARNING package access
 	int test2;
 
 	// OK (non public)
 	private int test3;
 
-	// WARNING (inly getter)
+	// WARNING (only getter)
 	public int test4;
 	public int getTest4() {
 		return test4;
 	}
 	
-	// WARNING (inly setter)
+	// WARNING (only setter)
 	public int test5;
 	public void setTest5(int test5) {
 		this.test5 = test5;

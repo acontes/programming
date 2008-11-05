@@ -255,27 +255,29 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	private boolean testFieldModifiers(FieldDeclaration fieldDeclaration) {
 		Collection<Modifier> modifiers = fieldDeclaration.getModifiers();
 		
-		if(!modifiers.contains(Modifier.PUBLIC))
+		// must not worry for private/protected. cannot be accessed from outside.
+		if(modifiers.contains(Modifier.PROTECTED)||modifiers.contains(Modifier.PRIVATE))
 			return true;
-
-		for (Modifier modifier : modifiers) {
-			if (modifier.equals(Modifier.FINAL)) {
-				reportError(fieldDeclaration, "The class declares the final field "
+		
+		// no final public/package
+		if (modifiers.contains(Modifier.FINAL)) {
+				reportError(fieldDeclaration, "The class declares the final "
+						+ (modifiers.contains(Modifier.PUBLIC) ? "public" : "package") + " field " 
 						+ fieldDeclaration.getSimpleName() + ".\n" 
 						+ ErrorMessages.IS_FINAL_ERROR_MESSAGE);
 				return false;
 			}
-
-			if (modifier.equals(Modifier.PUBLIC)) {
-				if( !checkGettersSetters(fieldDeclaration.getSimpleName()) ) {
-					reportWarning( fieldDeclaration , "The class declares the public field"
-							+ fieldDeclaration.getSimpleName() + ".\n" 
-								+ ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE );
-				}
-				return false;
-			}
-		}
 		
+		// no public/package access without getters/setters
+		if( !checkGettersSetters(fieldDeclaration.getSimpleName()) ) {
+			reportWarning( fieldDeclaration , "The class declares the  "
+					+ (modifiers.contains(Modifier.PUBLIC) ? "public" : "package") + " field "
+					+ fieldDeclaration.getSimpleName() + ".\n" 
+					+ ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE );
+			return false;
+		}
+			
+
 		return true;
 	}
 	
@@ -440,10 +442,8 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 				isSerializable = isSerializable | implementsSerializable( paramClass.getSuperclass() );
 		}
 		
-		System.out.println("Verifying if " + paramType.toString() + " is Serializable");
 		for( InterfaceType implementedInterface : paramTypeDecl.getSuperinterfaces() ){
 			
-			System.out.println("testing interface:" + implementedInterface);
 			InterfaceDeclaration implementedInterfaceType = implementedInterface.getDeclaration();
 			if( implementedInterfaceType == null ){
 				_compilerOutput.printError( paramTypeDecl.getPosition() , implementedInterface.toString() + " type cannot be found.");
