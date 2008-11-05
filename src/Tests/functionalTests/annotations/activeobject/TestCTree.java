@@ -56,7 +56,6 @@ public class TestCTree extends CTreeTest {
 		Assert.assertEquals( ERROR , checkFile("MisplacedAnnotation") );
 		
 		// basic checks
-		Assert.assertEquals( new Result(0,6) , checkFile("WarningGettersSetters"));		
 		Assert.assertEquals( new Result(0,6) , checkFile("WarningGettersSetters"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
 		Assert.assertEquals( new Result(2,0), checkFile("ErrorFinalMethods"));

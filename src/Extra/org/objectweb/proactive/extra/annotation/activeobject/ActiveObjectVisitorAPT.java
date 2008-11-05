@@ -272,7 +272,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 		if( !checkGettersSetters(fieldDeclaration.getSimpleName()) ) {
 			reportWarning( fieldDeclaration , "The class declares the  "
 					+ (modifiers.contains(Modifier.PUBLIC) ? "public" : "package") + " field "
-					+ fieldDeclaration.getSimpleName() + ".\n" 
 					+ fieldDeclaration.getSimpleName() + ".\n"
 					+ ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE );
 			return false;
