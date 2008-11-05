@@ -28,46 +28,22 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.migrationstrategy;
+package org.objectweb.proactive.extra.annotation.migration.strategy;
 
-import junit.framework.Assert;
-import functionalTests.annotations.CTreeTest;
-import functionalTests.annotations.AnnotationTest.Result;
+import javax.annotation.processing.ProcessingEnvironment;
 
 /**
- * Test for the @OnDeparture/@OnArrival annotations; ctree version
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class TestCTree extends CTreeTest {
+public class OnArrivalVisitorCtree extends OnDepartureVisitorCtree {
 
-	@org.junit.Before
-	public void init() throws Exception {
-		envInit();
-		inputFilesPathInit(this.getClass());
-		testInit();
-	}
-	
-	@org.junit.Test
-	public void action() throws Exception {
+	public OnArrivalVisitorCtree(ProcessingEnvironment procEnv) {
+		super(procEnv);
 		
-		// misplaced annotation
-		Assert.assertEquals( new Result(2,0) , checkFile("MisplacedAnnotation") );
+		ERROR_PREFIX_STATIC = " is annotated using the " 
+			+ OnArrival.class.getSimpleName() + " annotation.\n";
+	}
 
-		// "simple" tests
-		Assert.assertEquals( OK , checkFile("SimpleAccept") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorReturnType") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorParameters") );
-		
-		// "complex" tests
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixedDeparture") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixedArrival") );
-	}
-	
-	@org.junit.After
-	public void endTest() throws Exception {
-		testCleanup();
-	}
-	
 }

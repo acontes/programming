@@ -51,12 +51,12 @@ import com.sun.source.util.Trees;
  */
 public class OnDepartureVisitorCtree extends TreePathScanner<Void,Trees> {
 	// error messages
-	private static final String ERROR_PREFIX_STATIC = " is annotated using the " 
+	protected String ERROR_PREFIX_STATIC = " is annotated using the " 
 		+ OnDeparture.class.getSimpleName() + " annotation.\n";
 	
-	private static final String ERROR_SUFFIX = "\nPlease refer to the ProActive manual for further help on implementing migration strategies.\n";
+	protected final String ERROR_SUFFIX = "\nPlease refer to the ProActive manual for further help on implementing migration strategies.\n";
 	
-	private transient String ERROR_PREFIX;
+	protected transient String ERROR_PREFIX;
 
 	private Messager compilerOutput;
 
