@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
 
 import com.sun.mirror.apt.AnnotationProcessor;
@@ -66,6 +67,7 @@ public class ProActiveAnnotationProcessorFactory implements
 	public ProActiveAnnotationProcessorFactory() {
 		_supportedAnnotations.add(ActiveObject.class.getName());
 		_supportedAnnotations.add(RemoteObject.class.getName());
+		_supportedAnnotations.add(OnDeparture.class.getName());
 	}
 
 	/* (non-Javadoc)
