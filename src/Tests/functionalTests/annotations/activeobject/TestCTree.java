@@ -57,6 +57,7 @@ public class TestCTree extends CTreeTest {
 		
 		// basic checks
 		Assert.assertEquals( new Result(0,6) , checkFile("WarningGettersSetters"));		
+		Assert.assertEquals( new Result(0,6) , checkFile("WarningGettersSetters"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
 		Assert.assertEquals( new Result(2,0), checkFile("ErrorFinalMethods"));
 		Assert.assertEquals( new Result(2,0), checkFile("ErrorFinalFields"));
