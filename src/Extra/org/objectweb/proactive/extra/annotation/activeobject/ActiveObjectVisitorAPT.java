@@ -249,12 +249,15 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	 * test the modifiers of a FieldDeclaration
 	 * 		- must not be final
 	 * 		- if public, should have getters/setters for accessing the value
-	 * @return: true , is the class cannot be an active object
-	 * 			false, if the object can be an active object
+	 * @return: true , if the class can be an active object
+	 * 			false, if the object cannot be an active object
 	 */
 	private boolean testFieldModifiers(FieldDeclaration fieldDeclaration) {
 		Collection<Modifier> modifiers = fieldDeclaration.getModifiers();
 		
+		if(!modifiers.contains(Modifier.PUBLIC))
+			return true;
+
 		for (Modifier modifier : modifiers) {
 			if (modifier.equals(Modifier.FINAL)) {
 				reportError(fieldDeclaration, "The class declares the final field "
