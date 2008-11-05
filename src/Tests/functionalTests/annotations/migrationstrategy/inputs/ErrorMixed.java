@@ -1,0 +1,13 @@
+package functionalTests.annotations.migrationstrategy.inputs;
+
+import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
+
+public class ErrorMixed {
+
+	// 2xERR :
+	// 1) has parameters
+	// 2) returns something
+	@OnDeparture
+	String leaving(String where) {  return where + " for Christmas"; }
+	
+}

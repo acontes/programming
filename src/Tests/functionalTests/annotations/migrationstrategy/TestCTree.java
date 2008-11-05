@@ -55,8 +55,13 @@ public class TestCTree extends CTreeTest {
 		// misplaced annotation
 		Assert.assertEquals( ERROR , checkFile("MisplacedAnnotation"));
 		
+		// "simple" tests
 		Assert.assertEquals( OK , checkFile("SimpleAccept") );
-
+		Assert.assertEquals( ERROR , checkFile("ErrorReturnType") );
+		Assert.assertEquals( new Result(2,0) , checkFile("ErrorParameters") );
+		
+		// "complex" tests
+		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixed") );
 	}
 	
 	@org.junit.After

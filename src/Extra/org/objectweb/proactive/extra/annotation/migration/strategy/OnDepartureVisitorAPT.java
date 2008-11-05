@@ -30,9 +30,12 @@
  */
 package org.objectweb.proactive.extra.annotation.migration.strategy;
 
+import org.objectweb.proactive.extra.annotation.ErrorMessages;
+
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.Declaration;
 import com.sun.mirror.declaration.MethodDeclaration;
+import com.sun.mirror.type.VoidType;
 import com.sun.mirror.util.SimpleDeclarationVisitor;
 import com.sun.mirror.util.SourcePosition;
 
@@ -50,7 +53,7 @@ public class OnDepartureVisitorAPT extends SimpleDeclarationVisitor {
 	private static final String ERROR_PREFIX_STATIC = " is annotated using the " 
 		+ OnDeparture.class.getSimpleName() + " annotation.\n";
 	
-	private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
+	private static final String ERROR_SUFFIX = "\nPlease refer to the ProActive manual for further help on implementing migration strategies.\n";
 	
 	private transient String ERROR_PREFIX;
 	
@@ -63,14 +66,21 @@ public class OnDepartureVisitorAPT extends SimpleDeclarationVisitor {
 	public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
 		
 		ERROR_PREFIX = methodDeclaration.getSimpleName() + ERROR_PREFIX_STATIC;
-		System.out.println("Visiting method:" + methodDeclaration.getSimpleName());
 		
-		//super.visitMethodDeclaration(methodDeclaration);
+		// return type must be void
+		if(!(methodDeclaration.getReturnType() instanceof VoidType) )
+			reportError(methodDeclaration, "the method shouldn't have any return value, but instead returns " + methodDeclaration.getReturnType().toString());
+		
+		// method must not have arguments
+		if(!methodDeclaration.getParameters().isEmpty())
+			reportError(methodDeclaration, "the method accepts parameters");
+		
 	}
 	
 	protected void reportError( Declaration declaration , String msg ) {
 		SourcePosition sourceCodePos = declaration.getPosition();
-		_compilerOutput.printError( sourceCodePos , "[ERROR]" + ERROR_PREFIX + msg + ERROR_SUFFIX);
+		_compilerOutput.printError( sourceCodePos , "[ERROR]" + ERROR_PREFIX 
+				+ ErrorMessages.INVALID_MIGRATION_STRATEGY_METHOD + ": " + msg + ERROR_SUFFIX);
 	}
 	
 	protected void reportWarning( Declaration declaration, String msg) {
