@@ -8,7 +8,7 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.extra.annotation.migration.MigrationSignal;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 @ActiveObject
 public class ErrorNotLast {

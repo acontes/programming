@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.migration;
+package org.objectweb.proactive.extra.annotation.migration.signal;
 
 import java.util.List;
 

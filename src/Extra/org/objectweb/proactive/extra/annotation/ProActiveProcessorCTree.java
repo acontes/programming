@@ -49,8 +49,8 @@ import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorCTree;
-import org.objectweb.proactive.extra.annotation.migration.MigrationSignal;
-import org.objectweb.proactive.extra.annotation.migration.MigrationSignalVisitorCTree;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignalVisitorCTree;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObjectVisitorCTree;
 
@@ -71,7 +71,7 @@ import com.sun.source.util.Trees;
 		{
 			"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
 			"org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject",
-			"org.objectweb.proactive.extra.annotation.migration.MigrationSignal"
+			"org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal"
 		}
 	) 
 @SupportedOptions("enableTypeGenerationInEditor")
