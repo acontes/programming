@@ -90,4 +90,8 @@ public interface ErrorMessages {
 	
 	// MigrationStrategy - @OnDeparture/@OnArrival
 	public static final String INVALID_MIGRATION_STRATEGY_METHOD = " Invalid signature for a method which implements a migration strategy";
+
+	// @VirtualNodeIsReadyCallback and @NodeAttachmentCallback
+	public static final String INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK = "Incorrect method signature. \nIsReady callback method must have the following signature: void method(String)";
+	public static final String INCORRECT_METHOD_SIGNATURE_FOR_NODE_ATTACHEMENT_CALLBACK = "Incorrect method signature. \nNode attachement callback method must have the following signature: void method(Node, String)";
 }

@@ -40,6 +40,10 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorAPT;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnArrivalVisitorAPT;
+import org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback;
+import org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallbackVisitorAPT;
+import org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback;
+import org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallbackVisitorAPT;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnDepartureVisitorAPT;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
@@ -79,6 +83,8 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 		_annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(messager));
 		_annotationVisitors.put(OnDeparture.class, new OnDepartureVisitorAPT(messager));
 		_annotationVisitors.put(OnArrival.class, new OnArrivalVisitorAPT(messager));
+		_annotationVisitors.put(NodeAttachmentCallback.class, new NodeAttachmentCallbackVisitorAPT(messager));
+		_annotationVisitors.put(VirtualNodeIsReadyCallback.class, new VirtualNodeIsReadyCallbackVisitorAPT(messager));
 		
 	}
 

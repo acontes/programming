@@ -38,6 +38,8 @@ import java.util.Set;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival;
+import org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback;
+import org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
 
@@ -70,6 +72,8 @@ public class ProActiveAnnotationProcessorFactory implements
 		_supportedAnnotations.add(RemoteObject.class.getName());
 		_supportedAnnotations.add(OnDeparture.class.getName());
 		_supportedAnnotations.add(OnArrival.class.getName());
+		_supportedAnnotations.add(NodeAttachmentCallback.class.getName());
+		_supportedAnnotations.add(VirtualNodeIsReadyCallback.class.getName());
 	}
 
 	/* (non-Javadoc)

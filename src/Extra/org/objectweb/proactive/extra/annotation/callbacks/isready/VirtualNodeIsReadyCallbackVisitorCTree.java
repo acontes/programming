@@ -28,11 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.migration.strategy;
+package org.objectweb.proactive.extra.annotation.callbacks.isready;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
 import javax.tools.Diagnostic;
 
@@ -44,43 +43,35 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 
-/**
- * @author fabratu
- * @version %G%, %I%
- * @since ProActive 4.10
- */
-public class OnDepartureVisitorCtree extends TreePathScanner<Void,Trees> {
-	// error messages
-	protected String ERROR_PREFIX_STATIC = " is annotated using the " 
-		+ OnDeparture.class.getSimpleName() + " annotation.\n";
-	
-	protected final String ERROR_SUFFIX = "\nPlease refer to the ProActive manual for further help on implementing migration strategies.\n";
-	
-	protected transient String ERROR_PREFIX;
+public class VirtualNodeIsReadyCallbackVisitorCTree extends TreePathScanner<Void,Trees> {
 
 	private Messager compilerOutput;
 
-	public OnDepartureVisitorCtree(ProcessingEnvironment procEnv) {
+	public VirtualNodeIsReadyCallbackVisitorCTree(ProcessingEnvironment procEnv) {
 		compilerOutput = procEnv.getMessager();
 	}
-	
+
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
-		
-		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC;
-		
-		if(!returnsVoid(methodNode))
-			reportError( "the method shouldn't have any return value," +
-					" but instead returns " + methodNode.getReturnType().toString(),
-					trees.getElement(getCurrentPath())
-					);
-		
-		if(!methodNode.getParameters().isEmpty())
-			reportError( "the method accepts parameters" , trees.getElement(getCurrentPath()));
-		
+
+		boolean correctSignature = false;
+
+		if(returnsVoid(methodNode) && methodNode.getParameters().size()==1) {
+			if (methodNode.getParameters().get(0).getType().toString().equals(String.class.getSimpleName())) {
+				correctSignature = true;
+			}
+		}
+
+		if (!correctSignature) {
+			compilerOutput.printMessage(
+					Diagnostic.Kind.ERROR,
+					ErrorMessages.INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK,
+					trees.getElement(getCurrentPath()));
+		}
+
 		return super.visitMethod(methodNode, trees);
 	}
-	
+
 	private boolean returnsVoid(MethodTree methodNode) {
 		if(methodNode.getReturnType().getKind().equals(Tree.Kind.PRIMITIVE_TYPE)){
 			PrimitiveTypeTree retType = (PrimitiveTypeTree)methodNode.getReturnType();
@@ -89,15 +80,4 @@ public class OnDepartureVisitorCtree extends TreePathScanner<Void,Trees> {
 		return false;
 	}
 
-	protected void reportError(String msg, Element element) {
-		compilerOutput.printMessage(Diagnostic.Kind.ERROR, 
-				"[ERROR]" + ERROR_PREFIX + ErrorMessages.INVALID_MIGRATION_STRATEGY_METHOD 
-				+ ": " + msg + ERROR_SUFFIX, element);
-	}
-
-	protected void reportWarning(String msg, Element element) {
-		compilerOutput.printMessage(Diagnostic.Kind.WARNING, 
-				"[ERROR]" + ERROR_PREFIX + ErrorMessages.INVALID_MIGRATION_STRATEGY_METHOD 
-				+ ": " + msg + ERROR_SUFFIX, element);
-	}
 }

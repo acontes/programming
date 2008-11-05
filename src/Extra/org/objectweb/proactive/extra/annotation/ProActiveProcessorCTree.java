@@ -49,6 +49,10 @@ import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorCTree;
+import org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback;
+import org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallbackVisitorCTree;
+import org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback;
+import org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallbackVisitorCTree;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignalVisitorCTree;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival;
@@ -78,6 +82,8 @@ import com.sun.source.util.Trees;
 			"org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal",
 			"org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture",
 			"org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival"
+			"org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback",
+			"org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback"
 		}
 	) 
 @SupportedOptions("enableTypeGenerationInEditor")
@@ -98,6 +104,8 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
 		scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(messager));
 		scanners.put(OnDeparture.class.getName(), new OnDepartureVisitorCtree(processingEnv));
 		scanners.put(OnArrival.class.getName(), new OnArrivalVisitorCtree(processingEnv));
+		scanners.put(VirtualNodeIsReadyCallback.class.getName(), new VirtualNodeIsReadyCallbackVisitorCTree(processingEnv));
+		scanners.put(NodeAttachmentCallback.class.getName(), new NodeAttachmentCallbackVisitorCTree(processingEnv));
 	}
 	
 	@Override
