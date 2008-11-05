@@ -230,13 +230,28 @@
 		<section>
 			<info><title>@MigrationSignal</title></info>
 		<para>
+			TODO
 		</para>
 		</section>
 		
 		<section>
-			<info><title>@MigrationStrategyManager</title></info>
+			<info><title>Migration Strategy</title></info>
 		<para>
-			TODO
+			When implementing mobile agents using ProActive, one can specify methods that should be executed when arriving to, or departing from, a site. The signature of these methods must be:
+			<screen>void methodName()</screen>
+			namely, the method must be parameterless and with no return value. For further details you can look 
+<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/userfiles/file/papers/Mobility.pdf">here</link>
+			This constraint is checked using two annotations: <emphasis role="bold">@OnDeparture</emphasis> and <emphasis role="bold">@OnArrival</emphasis>. 
+			Both of them are applicable on method definitions:
+			<itemizedlist>
+				<listitem>
+				   <para><emphasis role="bold">@OnDeparture</emphasis> marks the method that should be executed when the mobile agents departs from a site</para>
+			    </listitem>
+				<listitem>
+				   <para><emphasis role="bold">@OnArrival</emphasis> marks the method that should be executed when the mobile agents arrives to a site</para>
+			    </listitem>
+			</itemizedlist>
+			At compilation, the methods are checked to match the above-mentioned signature. The check is done for both JDK versions - 1.5 and 1.6. 
 		</para>
 		</section>
 		
