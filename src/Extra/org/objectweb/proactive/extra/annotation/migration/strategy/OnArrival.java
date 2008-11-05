@@ -28,45 +28,18 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.migrationstrategy;
+package org.objectweb.proactive.extra.annotation.migration.strategy;
 
-import junit.framework.Assert;
-import functionalTests.annotations.AptTest;
-import functionalTests.annotations.AnnotationTest.Result;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Test for the @OnDeparture/@OnArrival annotations; apt version
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class TestApt extends AptTest {
-
-	@org.junit.Before
-	public void init() throws Exception {
-		envInit();
-		inputFilesPathInit(this.getClass());
-		testInit();
-	}
-	
-	@org.junit.Test
-	public void action() throws Exception {
-		// misplaced annotation
-		Assert.assertEquals( new Result(2,0) , checkFile("MisplacedAnnotation") );
-
-		// "simple" tests
-		Assert.assertEquals( OK , checkFile("SimpleAccept") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorReturnType") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorParameters") );
-		
-		// "complex" tests
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixedDeparture") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixedArrival") );
-	}
-	
-	@org.junit.After
-	public void endTest() throws Exception {
-		testCleanup();
-	}
-	
-}
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.METHOD)
+public @interface OnArrival {}

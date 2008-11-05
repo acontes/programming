@@ -50,12 +50,12 @@ public class OnDepartureVisitorAPT extends SimpleDeclarationVisitor {
 	private final Messager _compilerOutput;
 	
 	// error messages
-	private static final String ERROR_PREFIX_STATIC = " is annotated using the " 
+	protected String ERROR_PREFIX_STATIC = " is annotated using the @" 
 		+ OnDeparture.class.getSimpleName() + " annotation.\n";
 	
-	private static final String ERROR_SUFFIX = "\nPlease refer to the ProActive manual for further help on implementing migration strategies.\n";
+	protected final String ERROR_SUFFIX = "\nPlease refer to the ProActive manual for further help on implementing migration strategies.\n";
 	
-	private transient String ERROR_PREFIX;
+	protected transient String ERROR_PREFIX;
 	
 	public OnDepartureVisitorAPT(final Messager messager) {
 		super();

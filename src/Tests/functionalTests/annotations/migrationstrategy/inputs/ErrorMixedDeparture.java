@@ -2,7 +2,7 @@ package functionalTests.annotations.migrationstrategy.inputs;
 
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
 
-public class ErrorMixed {
+public class ErrorMixedDeparture {
 
 	// 2xERR :
 	// 1) has parameters

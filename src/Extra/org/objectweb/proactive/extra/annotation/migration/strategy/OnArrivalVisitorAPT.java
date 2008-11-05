@@ -28,45 +28,22 @@
  *
  * ################################################################
  */
-package functionalTests.annotations.migrationstrategy;
+package org.objectweb.proactive.extra.annotation.migration.strategy;
 
-import junit.framework.Assert;
-import functionalTests.annotations.AptTest;
-import functionalTests.annotations.AnnotationTest.Result;
+import com.sun.mirror.apt.Messager;
 
 /**
- * Test for the @OnDeparture/@OnArrival annotations; apt version
+ * The visitor that implements the checks for the @OnArrival annotation
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class TestApt extends AptTest {
+public class OnArrivalVisitorAPT extends OnDepartureVisitorAPT {
 
-	@org.junit.Before
-	public void init() throws Exception {
-		envInit();
-		inputFilesPathInit(this.getClass());
-		testInit();
+	public OnArrivalVisitorAPT(Messager messager) {
+		super(messager);
+		ERROR_PREFIX_STATIC = " is annotated using the @" 
+			+ OnArrival.class.getSimpleName() + " annotation.\n";
 	}
-	
-	@org.junit.Test
-	public void action() throws Exception {
-		// misplaced annotation
-		Assert.assertEquals( new Result(2,0) , checkFile("MisplacedAnnotation") );
 
-		// "simple" tests
-		Assert.assertEquals( OK , checkFile("SimpleAccept") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorReturnType") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorParameters") );
-		
-		// "complex" tests
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixedDeparture") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixedArrival") );
-	}
-	
-	@org.junit.After
-	public void endTest() throws Exception {
-		testCleanup();
-	}
-	
 }

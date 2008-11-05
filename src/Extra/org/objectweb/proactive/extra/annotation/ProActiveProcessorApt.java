@@ -38,6 +38,8 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorAPT;
+import org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival;
+import org.objectweb.proactive.extra.annotation.migration.strategy.OnArrivalVisitorAPT;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
 import org.objectweb.proactive.extra.annotation.migration.strategy.OnDepartureVisitorAPT;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
@@ -76,6 +78,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 		_annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(messager));
 		_annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(messager));
 		_annotationVisitors.put(OnDeparture.class, new OnDepartureVisitorAPT(messager));
+		_annotationVisitors.put(OnArrival.class, new OnArrivalVisitorAPT(messager));
 		
 	}
 
