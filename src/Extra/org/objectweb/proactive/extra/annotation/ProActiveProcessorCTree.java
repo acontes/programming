@@ -51,6 +51,8 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitorCTree;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignalVisitorCTree;
+import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
+import org.objectweb.proactive.extra.annotation.migration.strategy.OnDepartureVisitorCtree;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObjectVisitorCTree;
 
@@ -71,7 +73,8 @@ import com.sun.source.util.Trees;
 		{
 			"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
 			"org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject",
-			"org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal"
+			"org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal",
+			"org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture"
 		}
 	) 
 @SupportedOptions("enableTypeGenerationInEditor")
@@ -90,6 +93,7 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
 		scanners.put(ActiveObject.class.getName(), new ActiveObjectVisitorCTree(processingEnv));
 		scanners.put(RemoteObject.class.getName(), new RemoteObjectVisitorCTree(processingEnv));
 		scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(messager));
+		scanners.put(OnDeparture.class.getName(), new OnDepartureVisitorCtree(processingEnv));
 	}
 	
 	@Override
