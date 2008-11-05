@@ -214,10 +214,9 @@
 		<section>
 			<info><title>@RemoteObject</title></info>
 		<para>
-			TODO specify:
-				* applicable language construct
-				* describe what the annotation checks
-				* describe the checks disabled for JDK 1.5
+			The @RemoteObject annotation is applicable on a Java class definition and it verifies limitations
+			of remote objects. The list of limitations is exactly the same as for active objects (see above) with only one exception -
+			remote object methods can return null.
 		</para>
 		</section>
 		
