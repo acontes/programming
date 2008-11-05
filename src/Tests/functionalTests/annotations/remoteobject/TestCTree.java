@@ -32,7 +32,6 @@ package functionalTests.annotations.remoteobject;
 
 import junit.framework.Assert;
 import functionalTests.annotations.CTreeTest;
-import functionalTests.annotations.AnnotationTest.Result;
 
 public class TestCTree extends CTreeTest {
 
@@ -55,7 +54,7 @@ public class TestCTree extends CTreeTest {
 		Assert.assertEquals( new Result(0,5) , checkFile("WarningGettersSetters"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
 		Assert.assertEquals( new Result(2,0), checkFile("ErrorFinalMethods"));
-		Assert.assertEquals( ERROR , checkFile("ErrorFinalFields"));
+		Assert.assertEquals( new Result(2,0) , checkFile("ErrorFinalFields"));
 		Assert.assertEquals( ERROR , checkFile("ErrorNoArgConstructor"));
 		Assert.assertEquals( ERROR , checkFile("ErrorClassNotPublic"));
 		Assert.assertEquals( ERROR , checkFile("PrivateEmptyConstructor"));

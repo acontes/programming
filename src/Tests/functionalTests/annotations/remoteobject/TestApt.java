@@ -32,7 +32,6 @@ package functionalTests.annotations.remoteobject;
 
 import junit.framework.Assert;
 import functionalTests.annotations.AptTest;
-import functionalTests.annotations.AnnotationTest.Result;
 
 public class TestApt extends AptTest {
 
@@ -52,7 +51,7 @@ public class TestApt extends AptTest {
 		Assert.assertEquals( new Result(0,5) , checkFile("WarningGettersSetters"));
 		Assert.assertEquals( ERROR , checkFile("ErrorFinalClass"));
 		Assert.assertEquals( new Result(2,0), checkFile("ErrorFinalMethods"));
-		Assert.assertEquals( ERROR , checkFile("ErrorFinalFields"));
+		Assert.assertEquals( new Result(2,0) , checkFile("ErrorFinalFields"));
 		Assert.assertEquals( ERROR , checkFile("ErrorNoArgConstructor"));
 		Assert.assertEquals( ERROR , checkFile("ErrorClassNotPublic"));
 		Assert.assertEquals( new Result(2,0) , checkFile("ErrorConstructorArgsNotSerializable"));
