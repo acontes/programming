@@ -81,7 +81,7 @@ import com.sun.source.util.Trees;
 			"org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject",
 			"org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal",
 			"org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture",
-			"org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival"
+			"org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival",
 			"org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback",
 			"org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback"
 		}
