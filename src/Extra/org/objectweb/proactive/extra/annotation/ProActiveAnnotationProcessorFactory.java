@@ -33,15 +33,7 @@ package org.objectweb.proactive.extra.annotation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Set;
-
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival;
-import org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback;
-import org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback;
-import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
-import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;
@@ -64,16 +56,10 @@ public class ProActiveAnnotationProcessorFactory implements
 				"enableTypeGenerationInEditor" // Eclipse IDE option
 				));
 	// the annotations for which this factory provides processors
-	private static final Collection<String> _supportedAnnotations = new LinkedList<String>();
+	private static final Collection<String> _supportedAnnotations = Collections.singletonList("*");
 	
 	// empty no-arg constructor required by the Mirror API
 	public ProActiveAnnotationProcessorFactory() {
-		_supportedAnnotations.add(ActiveObject.class.getName());
-		_supportedAnnotations.add(RemoteObject.class.getName());
-		_supportedAnnotations.add(OnDeparture.class.getName());
-		_supportedAnnotations.add(OnArrival.class.getName());
-		_supportedAnnotations.add(NodeAttachmentCallback.class.getName());
-		_supportedAnnotations.add(VirtualNodeIsReadyCallback.class.getName());
 	}
 
 	/* (non-Javadoc)
