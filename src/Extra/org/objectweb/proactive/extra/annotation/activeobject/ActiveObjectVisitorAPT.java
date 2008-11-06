@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.ClassDeclaration;
@@ -143,6 +144,12 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 	}
 	
 	private void testParameterTypes(MethodDeclaration methodDeclaration) {
+		
+		// a migration signal can have non-serializable parameters - for instance, the ProActive Node!
+		if(methodDeclaration.getAnnotation(MigrationSignal.class)!=null){
+			return;
+		}
+		
 		if(!methodDeclaration.getModifiers().contains(Modifier.PRIVATE) && 
 				!paramsSerializable(methodDeclaration.getParameters())){
 			reportError( methodDeclaration, ErrorMessages.NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE);

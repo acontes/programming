@@ -46,6 +46,7 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
@@ -176,6 +177,12 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		Element methodElement = trees.getElement(getCurrentPath());
 		if (methodElement instanceof ExecutableElement) {
 			ExecutableElement methodElem = (ExecutableElement) methodElement;
+			
+			// a migration signal can have non-serializable parameters - for instance, the ProActive Node!
+			if(methodElem.getAnnotation(MigrationSignal.class)!=null){
+				return super.visitMethod(methodNode, trees);
+			}
+			
 			if (!methodElem.getModifiers().contains(Modifier.PRIVATE)
 					&& !paramsSerializable(methodElem.getParameters())) {
 				if (!isConstructor(methodNode))

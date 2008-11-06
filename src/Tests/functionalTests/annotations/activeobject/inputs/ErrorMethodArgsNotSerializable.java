@@ -6,7 +6,10 @@ import java.io.Serializable;
 
 import javax.naming.directory.Attribute;
 
+import org.objectweb.proactive.api.PAMobileAgent;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 class SerialParam implements Serializable {}
 
@@ -33,5 +36,10 @@ public class ErrorMethodArgsNotSerializable {
 	
 	// should work - primitive types can be active object method arguments
 	void setCounter(int counter, boolean onlyIfConditionMet) {}
+	
+	@MigrationSignal
+	public void migrateTo(Node node) {
+		PAMobileAgent.migrateTo(node);
+	}
 	
 }
