@@ -54,6 +54,7 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.StatementTree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 
@@ -70,10 +71,10 @@ import com.sun.source.util.Trees;
 public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	
 	// error messages
-	private static final String ERROR_PREFIX_STATIC = " method is annotated using the " 
+	protected String ERROR_PREFIX_STATIC = " method is annotated using the " 
 		+ MigrationSignal.class.getSimpleName() + " annotation.\n";
-	private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
-	private String ERROR_PREFIX;
+	protected final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
+	protected String ERROR_PREFIX;
 
 	// where we should signal the errors
 	private final Messager _compilerOutput;
@@ -108,9 +109,9 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		}
 		
 		// the method must be public
-		if( !testModifiers(methodNode.getModifiers()) ){
-			reportWarning( _methodPosition, ErrorMessages.NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE);
-		}
+//		if( !testModifiers(methodNode.getModifiers()) ){
+//			reportWarning( _methodPosition, ErrorMessages.NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE);
+//		}
 		
 		// we go by the default visit pattern, and do the checking when visiting enclosing blocks
 		Void ret = super.visitMethod(methodNode, trees);
@@ -146,7 +147,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		StatementTree migrateToStatement = null;
 		List<? extends StatementTree> statements = blockNode.getStatements(); 
 		for( StatementTree statement : statements ) {
-			if(isMigrateToCall(statement)){
+			if(isMigrationCall(statement)){
 				migrateToStatement = statement;
 				break;
 			}
@@ -193,7 +194,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	 * @return: true, if it is a "simple" return statement.
 	 */
 	private boolean checkReturnStatement(StatementTree lastStatement) {
-		if( !(lastStatement instanceof ReturnTree) ) {
+		if( !(lastStatement.getKind().equals(Kind.RETURN)) ) {
 			return false;
 		}
 		
@@ -201,9 +202,38 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		
 		ExpressionTree returnExpression = returnStatement.getExpression();
 		
-		return !((returnExpression instanceof MethodInvocationTree) || 
-				 (returnExpression instanceof NewArrayTree) || 
-				 (returnExpression instanceof NewClassTree) );
+		return !((returnExpression.getKind().equals(Kind.METHOD_INVOCATION)) || 
+				 (returnExpression.getKind().equals(Kind.NEW_ARRAY)) || 
+				 (returnExpression.getKind().equals(Kind.NEW_CLASS)) );
+	}
+	
+	/** Testing whether a statement is either a migrateTo call, or a call to a 
+	 * migration signal - ie a method already annotated with @MigrationSignal
+	 * @param statement
+	 * @return
+	 */
+	private boolean isMigrationCall(StatementTree statement) {
+		
+		if( !(statement.getKind().equals(Kind.EXPRESSION_STATEMENT)) )
+			return false;
+		
+		ExpressionStatementTree lastStatementExpr = (ExpressionStatementTree)statement;
+		
+		// the method call is an expression ...
+		ExpressionTree lastExpression = lastStatementExpr.getExpression();
+		// ... of type MethodInvocationTree ...
+		if(!lastExpression.getKind().equals(Kind.METHOD_INVOCATION)) {
+			return false;
+		}
+		
+		MethodInvocationTree methodCall = (MethodInvocationTree)lastExpression;
+		
+		return isMigrationSignalCall(methodCall)||isMigrateToCall(methodCall);
+	}
+
+	private boolean isMigrationSignalCall(MethodInvocationTree methodCall) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/*
@@ -224,28 +254,17 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	 * how to do it otherwise. 
 	 */
 	private static final String MIGRATE_TO = "migrateTo"; // i dunno how to do it elseway
-	private boolean isMigrateToCall(StatementTree lastStatement) {
+	private boolean isMigrateToCall(MethodInvocationTree methodCall) {
 
-		if( !(lastStatement instanceof ExpressionStatementTree) )
-			return false;
-		
-		ExpressionStatementTree lastStatementExpr = (ExpressionStatementTree)lastStatement;
-		
-		// the method call is an expression ...
-		ExpressionTree lastExpression = lastStatementExpr.getExpression();
-		// ... of type MethodInvocationTree ...
-		if (!(lastExpression instanceof MethodInvocationTree)) {
-			return false;
-		}
 		// .. and the selection expression must be ...
-		ExpressionTree methodSelectionExpression = ((MethodInvocationTree)lastExpression).getMethodSelect();
+		ExpressionTree methodSelectionExpression = methodCall.getMethodSelect();
 		// ... either an identifier(can be a static import for example) ...
-		if ( methodSelectionExpression instanceof IdentifierTree ) {
+		if ( methodSelectionExpression.getKind().equals(Kind.IDENTIFIER) ) {
 			String methodName = ((IdentifierTree)methodSelectionExpression).getName().toString();
 			return methodName.equals(MIGRATE_TO);
 		}
 		// ... or a member selection expression(most common) ...
-		else if( methodSelectionExpression instanceof MemberSelectTree ) {
+		else if( methodSelectionExpression.getKind().equals(Kind.MEMBER_SELECT)) {
 			MemberSelectTree memberSelectionExpression = (MemberSelectTree)methodSelectionExpression;
 			String methodName = memberSelectionExpression.getIdentifier().toString();
 			ExpressionTree typeNameExpression = memberSelectionExpression.getExpression();
@@ -253,11 +272,11 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			// ClassName can be ...
 			String clazzName = null;
 			// ... either unqualified name, ie PAMobileAgent ...
-			if (typeNameExpression instanceof IdentifierTree) {
+			if (typeNameExpression.getKind().equals(Kind.IDENTIFIER)) {
 				clazzName = ((IdentifierTree)typeNameExpression).getName().toString();
 			}
 			// ... or qualified name, ie ${package.name}.PAMobileAgent.
-			else if( typeNameExpression instanceof MemberSelectTree ) {
+			else if( typeNameExpression.getKind().equals(Kind.MEMBER_SELECT)) {
 				clazzName = ((MemberSelectTree)typeNameExpression).getIdentifier().toString();
 			}
 			else return false;
