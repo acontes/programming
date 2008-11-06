@@ -34,6 +34,7 @@ import java.util.List;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
@@ -43,6 +44,8 @@ import org.objectweb.proactive.extra.annotation.ErrorMessages;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
@@ -54,7 +57,9 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.StatementTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 
@@ -86,12 +91,15 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	// marks the position of the method declaration inside the source code
 	// also a marker for the moment of finding a method declaration
 	private Element _methodPosition = null;
+	private ClassTree _containingClass;
+	private CompilationUnitTree _containingCompilationUnit;
 	
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
 		
 		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC; 
 		_methodPosition = trees.getElement(getCurrentPath());
+		_containingCompilationUnit = getCurrentPath().getCompilationUnit();
 		
 		Element clazzElement = trees.getElement(getCurrentPath().getParentPath());
 		if ( !((clazzElement instanceof TypeElement) && (clazzElement.getKind().isClass()) ) ) {
@@ -101,6 +109,8 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 						_methodPosition );
 			return super.visitMethod(methodNode, trees);
 		}
+		
+		_containingClass = (ClassTree)trees.getTree(clazzElement);
 		
 		// the method must be within a class that is tagged with the ActiveObject annotation
 		if ( clazzElement.getAnnotation(ActiveObject.class) == null ) {
@@ -147,7 +157,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		StatementTree migrateToStatement = null;
 		List<? extends StatementTree> statements = blockNode.getStatements(); 
 		for( StatementTree statement : statements ) {
-			if(isMigrationCall(statement)){
+			if(isMigrationCall(statement,trees)){
 				migrateToStatement = statement;
 				break;
 			}
@@ -212,7 +222,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	 * @param statement
 	 * @return
 	 */
-	private boolean isMigrationCall(StatementTree statement) {
+	private boolean isMigrationCall(StatementTree statement,Trees trees) {
 		
 		if( !(statement.getKind().equals(Kind.EXPRESSION_STATEMENT)) )
 			return false;
@@ -228,11 +238,37 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		
 		MethodInvocationTree methodCall = (MethodInvocationTree)lastExpression;
 		
-		return isMigrationSignalCall(methodCall)||isMigrateToCall(methodCall);
+		return isMigrationSignalCall(methodCall,trees)||isMigrateToCall(methodCall);
 	}
 
-	private boolean isMigrationSignalCall(MethodInvocationTree methodCall) {
-		// TODO Auto-generated method stub
+	private boolean isMigrationSignalCall(MethodInvocationTree methodCall,Trees trees) {
+		ExpressionTree methodSelectionExpression = methodCall.getMethodSelect();
+		// case 1 - identifier
+		if ( methodSelectionExpression.getKind().equals(Kind.IDENTIFIER) ) {
+			String methodName = ((IdentifierTree)methodSelectionExpression).getName().toString();
+			return classContainsMigrationSignal(methodName,trees);
+		}
+		return false;
+	}
+
+	/**
+	 * Verify if the containing class has a method with a given name 
+	 * and that is annotated with the @MigrationSignal annotation
+	 * @param methodName - the name of the searched method
+	 * @param trees - helper class
+	 * @return true if the containing class has a @MIgrationSignal with the given name
+	 */
+	private boolean classContainsMigrationSignal(String methodName,Trees trees) {
+		for( Tree classMember : _containingClass.getMembers()) {
+			if(classMember.getKind().equals(Kind.METHOD)){
+				MethodTree method = (MethodTree)classMember;
+				if( methodName.equals(method.getName().toString())) {
+					Element methodElem = trees.getElement(trees.getPath(_containingCompilationUnit, method));
+					if(methodElem.getAnnotation(MigrationSignal.class)!=null)
+						return true;
+				}
+			}
+		}
 		return false;
 	}
 

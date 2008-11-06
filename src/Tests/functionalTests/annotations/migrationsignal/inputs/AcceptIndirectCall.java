@@ -18,4 +18,5 @@ public class AcceptIndirectCall {
 		// calling another method that migrates
 		migrateTo1();
 	}
+	
 }

@@ -54,6 +54,11 @@ public class TestCTree extends CTreeTest {
 		// misplaced annotation
 		Assert.assertEquals( ERROR , checkFile("MisplacedAnnotation"));
 		
+		// checking conditions that should be ok
+		Assert.assertEquals( OK , checkFile("AcceptSimple"));
+		Assert.assertEquals( OK , checkFile("AcceptIndirectCall"));
+		Assert.assertEquals( new Result(3,0) , checkFile("AcceptInterClassCall")); // TODO not yet implemented
+		
 		// checking conditions that should be seen as errors
 		Assert.assertEquals( ERROR , checkFile("ErrorNotInActiveObject"));
 		Assert.assertEquals( new Result(4,0) , checkFile("ErrorNotLast"));
@@ -61,11 +66,6 @@ public class TestCTree extends CTreeTest {
 		// Assert.assertEquals( ERROR , checkFile("ErrorNotLastBlock"));
 		Assert.assertEquals( ERROR , checkFile("ErrorNoMigrateTo"));
 		Assert.assertEquals( ERROR , checkFile("ErrorReturnsNull"));
-		
-		// checking conditions that should be ok
-		Assert.assertEquals( OK , checkFile("AcceptSimple"));
-		Assert.assertEquals( ERROR , checkFile("AcceptIndirectCall")); // TODO feature not implemented yet
-		
 
 	}
 	
