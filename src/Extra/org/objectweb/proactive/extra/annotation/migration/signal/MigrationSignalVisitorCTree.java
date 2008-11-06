@@ -30,7 +30,11 @@
  */
 package org.objectweb.proactive.extra.annotation.migration.signal;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -44,8 +48,11 @@ import org.objectweb.proactive.extra.annotation.ErrorMessages;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.CatchTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.DoWhileLoopTree;
+import com.sun.source.tree.EnhancedForLoopTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
@@ -58,6 +65,7 @@ import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.TryTree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
@@ -94,6 +102,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	private ClassTree _containingClass;
 	private CompilationUnitTree _containingCompilationUnit;
 	
+	private Map<BlockTree,Boolean> visitedBlocks = new HashMap<BlockTree, Boolean>();
 	@Override
 	public Void visitMethod(MethodTree methodNode, Trees trees) {
 		
@@ -124,8 +133,11 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 //		}
 		
 		// we go by the default visit pattern, and do the checking when visiting enclosing blocks
+		visitedBlocks.clear();
 		Void ret = super.visitMethod(methodNode, trees);
 		_methodPosition = null;
+		
+		trees.getPath(_containingCompilationUnit, methodNode);
 		
 		return ret;
 		
@@ -147,34 +159,89 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	/*
 	 * In every block, check whether any migrateTo call is the last one
 	 */
+	
+	class BlockVisitInfo {
+		public boolean hasMigrateTo;
+		public boolean migrateIsLastStatement;
+		public BlockVisitInfo() {
+			hasMigrateTo = false;
+			migrateIsLastStatement = false;
+		}
+		
+		public BlockVisitInfo(boolean hasMT , boolean isLast) {
+			hasMigrateTo = hasMT;
+			migrateIsLastStatement = isLast;
+		}
+	}
+	
+	private Map<BlockTree,BlockVisitInfo> _visitedBlocks = new HashMap<BlockTree, BlockVisitInfo>();
 	@Override
 	public Void visitBlock(BlockTree blockNode, Trees trees) {
 		
+		// visit the descendants first
+		Void ret = super.visitBlock( blockNode , trees);; 
+		
 		if( _methodPosition == null ) {
-			return super.visitBlock( blockNode , trees);
+			// not in a method
+			return ret;
 		}
 		
 		StatementTree migrateToStatement = null;
+		boolean lastStatementInSubBlocks = true;
+		boolean hasInSubBlocks = false;
+		
 		List<? extends StatementTree> statements = blockNode.getStatements(); 
+		System.out.println("Visiting block with statements:" + statements.size());
 		for( StatementTree statement : statements ) {
-			if(isMigrationCall(statement,trees)){
-				migrateToStatement = statement;
-				break;
-			}
+
+			// is a migrateTo statement?
+			if(isMigrationCall(statement,trees))
+				if(migrateToStatement == null)
+					migrateToStatement = statement;
+			
+			// it is a statement that contains sub-blocks?
+			List<BlockTree> underlyingBlocks = statementContainsBlock(statement); 
+			if( !underlyingBlocks.isEmpty() ) 
+				for (BlockTree underlyingBlock : underlyingBlocks) 					
+					if(_visitedBlocks.containsKey(underlyingBlock)) {
+						BlockVisitInfo bvi = _visitedBlocks.get(underlyingBlock);
+						System.out.println("The subblock: hasInSB:" + bvi.hasMigrateTo + " isLast:" + bvi.migrateIsLastStatement);
+						hasInSubBlocks = hasInSubBlocks | bvi.hasMigrateTo;
+						lastStatementInSubBlocks = lastStatementInSubBlocks & bvi.migrateIsLastStatement;
+					}
 		}
 		
+		// case 1 - migrateTo not in this block
 		if( migrateToStatement == null ) {
-			reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE);
-			return super.visitBlock( blockNode , trees);
+			if(!hasInSubBlocks) {
+				reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE);
+				_visitedBlocks.put(blockNode, new BlockVisitInfo(false,false));
+				return ret;
+			}
+			if(!lastStatementInSubBlocks) {
+				reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
+				_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
+			} 
+			else {
+				_visitedBlocks.put(blockNode, new BlockVisitInfo(true,true));
+			}
+			return ret;
 		}
 		
+		// case 2 - migrateTo call in this block
+		// must not also be in sub-blocks
+		if(hasInSubBlocks) {
+			_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
+			return ret;
+		}
 		int migrateToPos = statements.indexOf(migrateToStatement);
 		int statementsNo = statements.size();
 		
 		// programmers count starting from 0
 		if (statementsNo - 1 == migrateToPos ) {
 			// perfekt!
-			return super.visitBlock( blockNode , trees);
+			_visitedBlocks.put(blockNode, new BlockVisitInfo(true,true));
+			return ret;
 		}
 		
 		if( statementsNo - 1 == migrateToPos + 1 ) {
@@ -182,19 +249,46 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			StatementTree lastStatement = statements.get( statementsNo -1);
 
 			if(!checkReturnStatement(lastStatement)) {
-				reportWarning( _methodPosition,	ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
+				reportError( _methodPosition ,	ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
+				_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
 			}
 		}
 		else {
 			// definitely not the last statement
-			reportWarning( _methodPosition , ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
+			reportError( _methodPosition , ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
+			_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
 		}
 		
-
-		return super.visitBlock( blockNode , trees);
+		_visitedBlocks.put(blockNode, new BlockVisitInfo(true,true));
+		return ret;
 
 	}
 	
+	private List<BlockTree> statementContainsBlock(StatementTree statement) {
+		
+		List<BlockTree> blocks = new ArrayList<BlockTree>();
+		Kind statementKind = statement.getKind();
+		if(statementKind.equals(Kind.BLOCK)) {
+			blocks.add((BlockTree)statement);
+		}
+		else if(statementKind.equals(Kind.TRY)){
+			TryTree tryTree = (TryTree)statement;
+			if(tryTree.getFinallyBlock() != null ) {
+				// in finally migrateTo should be the last
+				blocks.add(tryTree.getFinallyBlock());
+				return blocks;
+			}
+			if(tryTree.getBlock()!=null)
+				blocks.add(tryTree.getBlock());
+			for (CatchTree catchTree : tryTree.getCatches()) {
+				blocks.add(catchTree.getBlock());
+			}
+			
+		}
+		// TODO
+		return blocks;
+	}
+
 	/*
 	 * this method check whether the given statement is a return statement, and the
 	 * expression of the return statement is not another method call , 
@@ -333,7 +427,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	}
 	
 	private void reportWarning( Element position, String errorMsg ) {
-		_compilerOutput.printMessage(Diagnostic.Kind.ERROR	, // TODO find out how to catch warnings using the Java COmpiler API 
+		_compilerOutput.printMessage(Diagnostic.Kind.WARNING,  
 				ERROR_PREFIX + errorMsg + ERROR_SUFFIX , 
 					position );
 	}
