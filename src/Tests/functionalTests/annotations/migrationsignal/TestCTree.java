@@ -62,10 +62,14 @@ public class TestCTree extends CTreeTest {
 		// checking conditions that should be seen as errors
 		Assert.assertEquals( ERROR , checkFile("ErrorNotInActiveObject"));
 		Assert.assertEquals( new Result(4,0) , checkFile("ErrorNotLast"));
-		// TODO block checking is still erroneus 
-		// Assert.assertEquals( ERROR , checkFile("ErrorNotLastBlock"));
+
 		Assert.assertEquals( ERROR , checkFile("ErrorNoMigrateTo"));
-		Assert.assertEquals( ERROR , checkFile("ErrorReturnsNull"));
+
+		// block checking  
+		Assert.assertEquals( new Result(2,0) , checkFile("ErrorNotLastBlock"));
+		Assert.assertEquals( OK , checkFile("AcceptBlock"));
+		Assert.assertEquals( ERROR , checkFile("TryCatchFinally"));
+		Assert.assertEquals( ERROR , checkFile("Fi"));
 
 	}
 	

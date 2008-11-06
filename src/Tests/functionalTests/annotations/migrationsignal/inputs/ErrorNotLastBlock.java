@@ -1,6 +1,7 @@
 package functionalTests.annotations.migrationsignal.inputs;
 
 import static org.objectweb.proactive.api.PAMobileAgent.*;
+
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
@@ -9,17 +10,58 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
 
 @ActiveObject
 public class ErrorNotLastBlock {
-	
-	// error - not last statement
+
+	// error - one of the inner blocks is wrong
 	@MigrationSignal
-	public String migrateTo1(boolean onCondition) {
-		if(onCondition) {
-			org.objectweb.proactive.api.PAMobileAgent.migrateTo("");
-			return ""; // the sweet C-style hakz
-		} else {
-			System.out.println("I refuze to migrate!");
-			return "";
+	public void freakyShiet(Node node) throws MigrationException {
+		{
+			{
+				System.out.println();
+				System.out.println();
+				PAMobileAgent.migrateTo(node);
+				System.out.println();
+				System.out.println();
+			}
+		}
+		{
+			{
+				{
+					System.out.println();
+					System.out.println();
+					System.out.println();
+					migrateTo(node);
+				}
+			}
+			{
+				System.out.println();
+				System.out.println();
+				org.objectweb.proactive.api.PAMobileAgent.migrateTo(node);
+			}
 		}
 	}
 	
+	// error - if the inner block has the call, the outer block shouldn't have it
+	@MigrationSignal
+	public void blocksWrong(Node node) throws MigrationException {
+
+		{
+			System.out.println();
+			org.objectweb.proactive.api.PAMobileAgent.migrateTo(node);
+		}
+		
+		System.out.println();
+		PAMobileAgent.migrateTo(node);
+	}
+	
+	// OK - corrected above
+	@MigrationSignal
+	public void blocksRight(Node node) throws MigrationException {
+
+		{
+			System.out.println();
+		}
+		
+		System.out.println();
+		PAMobileAgent.migrateTo(node);
+	}
 }
