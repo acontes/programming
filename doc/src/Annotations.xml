@@ -258,14 +258,28 @@
 		<section>
 			<info><title>@NodeAttchedCallback</title></info>
 		<para>
-			TODO
+		    When a client subscribe to Node attachment notification, the method passed as parameter is invoked each time a Node is attached to the GCMVirtualNode. 
+		    The method must have the following signature: 
+		    
+		    <screen>void method(Node, String)</screen>		    
+			
+			This constrain is checked by using @NodeAttchedCallback annotation with a method definition. 
+			For more information about node attachment notification see 
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/trunk-doc/javadoc/publicApi/org/objectweb/proactive/gcmdeployment/GCMVirtualNode.html#subscribeNodeAttachment(java.lang.Object,%20java.lang.String,%20boolean)">org.objectweb.proactive.gcmdeployment.GCMVirtualNode.subscribeNodeAttachment(...)</link>
 		</para>
 		</section>
 		
 		<section>
 			<info><title>@VirtualNodesReadyCallback</title></info>
 		<para>
-			TODO
+			When a client subscribe to isReady notification, the method passed as parameter is invoked when the Virtual Node becomes Ready.
+			The method must have the following signature: 
+			
+			<screen>void method(String)</screen>			
+			
+			This constrain is checked by using @VirtualNodesReadyCallback annotation with a method definition. 
+			For more information about isReady notification see 
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/trunk-doc/javadoc/publicApi/org/objectweb/proactive/gcmdeployment/GCMVirtualNode.html#subscribeIsReady(java.lang.Object,%20java.lang.String)">org.objectweb.proactive.gcmdeployment.GCMVirtualNode.subscribeIsReady(...)</link>
 		</para>
 		</section>
 	</section>
