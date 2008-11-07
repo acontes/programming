@@ -56,25 +56,18 @@ public class ProActiveAnnotationProcessorFactory implements
 				"enableTypeGenerationInEditor" // Eclipse IDE option
 				));
 	// the annotations for which this factory provides processors
-<<<<<<< .mine
 	private static final Collection<String> _supportedAnnotations =
 		Collections.singletonList("org.objectweb.proactive.extra.annotation.*");
 		//new LinkedList<String>();
-=======
-	private static final Collection<String> _supportedAnnotations = Collections.singletonList("*");
->>>>>>> .r10552
 	
-	// empty no-arg constructor required by the Mirror API
+	// no-arg constructor required by the Mirror API
 	public ProActiveAnnotationProcessorFactory() {
-<<<<<<< .mine
 		/*_supportedAnnotations.add(ActiveObject.class.getName());
 		_supportedAnnotations.add(RemoteObject.class.getName());
 		_supportedAnnotations.add(OnDeparture.class.getName());
 		_supportedAnnotations.add(OnArrival.class.getName());
 		_supportedAnnotations.add(NodeAttachmentCallback.class.getName());
 		_supportedAnnotations.add(VirtualNodeIsReadyCallback.class.getName());*/
-=======
->>>>>>> .r10552
 	}
 
 	/* (non-Javadoc)
