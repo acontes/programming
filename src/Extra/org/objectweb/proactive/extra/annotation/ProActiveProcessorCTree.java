@@ -77,13 +77,14 @@ import com.sun.source.util.Trees;
 //cannot use ${Annotation}.class.getName() the value must be a constant expression BLEAH!
 @SupportedAnnotationTypes(
 		{
-			"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
+			"org.objectweb.proactive.extra.annotation.*"
+			/*"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
 			"org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject",
 			"org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal",
 			"org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture",
 			"org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival",
 			"org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback",
-			"org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback"
+			"org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback"*/
 		}
 	) 
 @SupportedOptions("enableTypeGenerationInEditor")
