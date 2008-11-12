@@ -49,8 +49,11 @@ import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CatchTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.DoWhileLoopTree;
+import com.sun.source.tree.EnhancedForLoopTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.ForLoopTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.IfTree;
 import com.sun.source.tree.MemberSelectTree;
@@ -61,6 +64,7 @@ import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TryTree;
+import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
@@ -134,7 +138,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		if(!bvi.hasMigrateTo){
 			reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE);
 		}
-		else if(!bvi.migrateIsLastStatement) {
+		else if(!bvi.migrationUsedCorrectly) {
 			reportError( _methodPosition, ErrorMessages.MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE);
 		}
 
@@ -162,20 +166,25 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	
 	class BlockVisitInfo {
 		public boolean hasMigrateTo;
-		public boolean migrateIsLastStatement;
+		public boolean migrationUsedCorrectly;
 		public BlockVisitInfo() {
 			hasMigrateTo = false;
-			migrateIsLastStatement = false;
+			migrationUsedCorrectly = false;
 		}
 		
 		public BlockVisitInfo(boolean hasMT , boolean isLast) {
 			hasMigrateTo = hasMT;
-			migrateIsLastStatement = isLast;
+			migrationUsedCorrectly = isLast;
 		}
 		@Override
 		public boolean equals(Object obj) {
 			BlockVisitInfo bvi = (BlockVisitInfo)obj;
-			return hasMigrateTo == bvi.hasMigrateTo && migrateIsLastStatement == bvi.migrateIsLastStatement;
+			return hasMigrateTo == bvi.hasMigrateTo && migrationUsedCorrectly == bvi.migrationUsedCorrectly;
+		}
+		
+		@Override
+		public String toString() {
+			return "Has a migrateTo call:" + hasMigrateTo + ";is used correctly:" + migrationUsedCorrectly;
 		}
 	}
 	
@@ -192,7 +201,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		}
 		
 		StatementTree migrateToStatement = null;
-		boolean lastStatementInSubBlocks = true;
+		boolean migrationUsedCorrectlyInSubBlocks = true;
 		boolean hasInSubBlocks = false;
 		
 		List<? extends StatementTree> statements = blockNode.getStatements(); 
@@ -203,14 +212,35 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 				if(migrateToStatement == null)
 					migrateToStatement = statement;
 			
-			// it is a statement that contains sub-blocks?
-			List<BlockTree> underlyingBlocks = statementContainsBlock(statement); 
+			List<BlockTree> underlyingBlocks = statementContainsBlock(statement);
+			
+			// is it a loop statement?
+			// the sweet C-style hakz! :P
+			StatementTree underlyingLoop;
+			if((underlyingLoop = isLoop(statement)) != null) {
+				// if it has the migrateTo call, then definitely a logical error of the control flow
+				if(underlyingLoop.getKind().equals(Kind.BLOCK)) {
+					markMisusedMigrateTo((BlockTree)underlyingLoop);
+					underlyingBlocks.add((BlockTree)underlyingLoop);
+				}
+				else {
+					// simple statement as a loop body
+					if(isMigrationCall(underlyingLoop, trees)){
+						// loop logical error
+						hasInSubBlocks = true;
+						migrationUsedCorrectlyInSubBlocks = false;
+						continue;
+					}
+				}
+			}
+			
+			// is it a statement that contains sub-blocks?
 			if( !underlyingBlocks.isEmpty() ) 
 				for (BlockTree underlyingBlock : underlyingBlocks) 					
 					if(_visitedBlocks.containsKey(underlyingBlock)) {
 						BlockVisitInfo bvi = _visitedBlocks.get(underlyingBlock);
 						hasInSubBlocks = hasInSubBlocks | bvi.hasMigrateTo;
-						lastStatementInSubBlocks = lastStatementInSubBlocks & bvi.migrateIsLastStatement;
+						migrationUsedCorrectlyInSubBlocks = migrationUsedCorrectlyInSubBlocks & bvi.migrationUsedCorrectly;
 					}
 		}
 		
@@ -220,7 +250,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 				_visitedBlocks.put(blockNode, new BlockVisitInfo(false,false));
 				return ret;
 			}
-			if(!lastStatementInSubBlocks) {
+			if(!migrationUsedCorrectlyInSubBlocks) {
 				_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
 			} 
 			else {
@@ -269,6 +299,8 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		
 		List<BlockTree> blocks = new ArrayList<BlockTree>();
 		Kind statementKind = statement.getKind();
+		BlockTree enclosingBlock = null;
+		
 		if(statementKind.equals(Kind.BLOCK)) {
 			blocks.add((BlockTree)statement);
 		}
@@ -293,8 +325,54 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			if( esle != null && esle.getKind().equals(Kind.BLOCK))
 				blocks.add((BlockTree)esle);
 		}
+
 		// TODO all kinds of statements with enclosing blocks!
 		return blocks;
+	}
+
+	/**
+	 * Verify if a statement is a loop type statement, 
+	 * and if it is, return the enclosing block - if it exists...
+	 * The problem with loops is that if you call PAMobile.migrateTo() inside
+	 * the loop block, then it means that you want to call it multiple times.
+	 * This is a logical error - migrateTo should only be called once.
+	 * @param statement
+	 * @return null - if the statement is not a loop, or it is a loop but without enclosing block
+	 * 			non-null - the enclosing block 
+	 */
+	private final StatementTree isLoop(StatementTree statement) {
+		Kind statementKind = statement.getKind();
+		System.out.println("Have a statement of kind:" + statementKind);
+		if(statementKind.equals(Kind.DO_WHILE_LOOP)){
+			return ((DoWhileLoopTree)statement).getStatement();
+		}
+		else if(statementKind.equals(Kind.FOR_LOOP)){
+			return ((ForLoopTree)statement).getStatement();
+		}
+		else if(statementKind.equals(Kind.ENHANCED_FOR_LOOP)){
+			return ((EnhancedForLoopTree)statement).getStatement();
+		}
+		else if(statementKind.equals(Kind.WHILE_LOOP)){
+			return ((WhileLoopTree)statement).getStatement();
+		}
+		
+		// else, not a loop
+		return null;
+	}
+	
+	/**
+	 * The problem with loops is that if you call PAMobile.migrateTo() inside
+	 * the loop block, then it means that you want to call it multiple times.
+	 * This is a logical error - migrateTo should only be called once.
+	 */
+	private void markMisusedMigrateTo(BlockTree block) {
+		BlockVisitInfo bvi = _visitedBlocks.get(block);
+		// if it contains migrateTo call
+		if(bvi.hasMigrateTo) {
+			// mark error
+			bvi.migrationUsedCorrectly = false;
+			_visitedBlocks.put(block, bvi);
+		}
 	}
 
 	/*
