@@ -193,7 +193,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	public Void visitBlock(BlockTree blockNode, Trees trees) {
 		
 		// visit the descendants first
-		Void ret = super.visitBlock( blockNode , trees);; 
+		Void ret = super.visitBlock( blockNode , trees); 
 		
 		if( _methodPosition == null ) {
 			// not in a method
@@ -212,36 +212,44 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 				if(migrateToStatement == null)
 					migrateToStatement = statement;
 			
-			List<BlockTree> underlyingBlocks = statementContainsBlock(statement);
+			List<UnderlyingStatementsInfo> underlyingBlocks = statementContainsBlock(statement);
 			
 			// is it a loop statement?
 			// the sweet C-style hakz! :P
-			StatementTree underlyingLoop;
-			if((underlyingLoop = isLoop(statement)) != null) {
-				// if it has the migrateTo call, then definitely a logical error of the control flow
-				if(underlyingLoop.getKind().equals(Kind.BLOCK)) {
-					markMisusedMigrateTo((BlockTree)underlyingLoop);
-					underlyingBlocks.add((BlockTree)underlyingLoop);
-				}
-				else {
-					// simple statement as a loop body
-					if(isMigrationCall(underlyingLoop, trees)){
-						// loop logical error
-						hasInSubBlocks = true;
-						migrationUsedCorrectlyInSubBlocks = false;
-						continue;
+//			StatementTree underlyingLoop;
+//			if((underlyingLoop = isLoop(statement)) != null) {
+//				// if it has the migrateTo call, then definitely a logical error of the control flow
+//				if(underlyingLoop.getKind().equals(Kind.BLOCK)) {
+//					markMisusedMigrateTo((BlockTree)underlyingLoop);
+//					underlyingBlocks.add((BlockTree)underlyingLoop);
+//				}
+//				else {
+//					// simple statement as a loop body
+//					if(isMigrationCall(underlyingLoop, trees)){
+//						// loop logical error
+//						hasInSubBlocks = true;
+//						migrationUsedCorrectlyInSubBlocks = false;
+//						continue;
+//					}
+//				}
+//			}
+			
+			// is it a statement that contains sub-blocks/sub-statements?
+			if( !underlyingBlocks.isEmpty() ){
+				for (UnderlyingStatementsInfo underInfo : underlyingBlocks) {
+					BlockVisitInfo bvi;
+					if(underInfo.underlyingKind.equals(Kind.BLOCK)) {
+						// we have underlying block
+						bvi = _visitedBlocks.get(underInfo.underlyingBlock);
 					}
+					else {
+						// we have underlying statement. it is always the last one in the sub-context of the super-construct
+						bvi = new BlockVisitInfo(isMigrationCall(underInfo.underlyingStatement, trees),true);
+					}
+					hasInSubBlocks = hasInSubBlocks | bvi.hasMigrateTo;
+					migrationUsedCorrectlyInSubBlocks = migrationUsedCorrectlyInSubBlocks & bvi.migrationUsedCorrectly;
 				}
 			}
-			
-			// is it a statement that contains sub-blocks?
-			if( !underlyingBlocks.isEmpty() ) 
-				for (BlockTree underlyingBlock : underlyingBlocks) 					
-					if(_visitedBlocks.containsKey(underlyingBlock)) {
-						BlockVisitInfo bvi = _visitedBlocks.get(underlyingBlock);
-						hasInSubBlocks = hasInSubBlocks | bvi.hasMigrateTo;
-						migrationUsedCorrectlyInSubBlocks = migrationUsedCorrectlyInSubBlocks & bvi.migrationUsedCorrectly;
-					}
 		}
 		
 		// case 1 - migrateTo not in this block
@@ -295,39 +303,86 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 
 	}
 	
-	private List<BlockTree> statementContainsBlock(StatementTree statement) {
+	class UnderlyingStatementsInfo {
+		public Kind underlyingKind;
+		BlockTree underlyingBlock = null;
+		StatementTree underlyingStatement = null;
 		
-		List<BlockTree> blocks = new ArrayList<BlockTree>();
+		public UnderlyingStatementsInfo() {
+			this.underlyingBlock = null;
+			this.underlyingKind = Kind.BLOCK;
+			this.underlyingStatement = null;
+		}
+		
+		public UnderlyingStatementsInfo(BlockTree underlyingBlock) {
+			super();
+			this.underlyingBlock = underlyingBlock;
+			this.underlyingKind = Kind.BLOCK;
+		}
+		
+		public UnderlyingStatementsInfo(StatementTree underlyingStatement) {
+			super();
+			this.underlyingStatement = underlyingStatement;
+			this.underlyingKind = Kind.EXPRESSION_STATEMENT;
+		}
+
+		
+		@Override
+		public String toString() {
+			StringBuilder ret = new StringBuilder();
+			
+			if (underlyingKind.equals(Kind.BLOCK)) {
+				ret.append("block:" + underlyingBlock);
+			}
+			else {
+				ret.append("statement:" + underlyingStatement);
+			}
+			
+			return ret.toString();
+		}
+		
+	}
+	
+	private List<UnderlyingStatementsInfo> statementContainsBlock(StatementTree statement) {
+		
+		List<UnderlyingStatementsInfo> statementInfo = new ArrayList<UnderlyingStatementsInfo>();
 		Kind statementKind = statement.getKind();
-		BlockTree enclosingBlock = null;
 		
 		if(statementKind.equals(Kind.BLOCK)) {
-			blocks.add((BlockTree)statement);
+			statementInfo.add(new UnderlyingStatementsInfo((BlockTree)statement));
 		}
 		else if(statementKind.equals(Kind.TRY)){
 			TryTree tryTree = (TryTree)statement;
 			if(tryTree.getFinallyBlock() != null ) {
 				// in finally migrateTo should be the last
-				blocks.add(tryTree.getFinallyBlock());
-				return blocks;
+				statementInfo.add(new UnderlyingStatementsInfo(tryTree.getFinallyBlock()));
+				return statementInfo;
 			}
 			if(tryTree.getBlock()!=null)
-				blocks.add(tryTree.getBlock());
+				statementInfo.add(new UnderlyingStatementsInfo(tryTree.getBlock()));
 			for (CatchTree catchTree : tryTree.getCatches()) {
-				blocks.add(catchTree.getBlock());
+				statementInfo.add(new UnderlyingStatementsInfo(catchTree.getBlock()));
 			}
 		}
 		else if(statementKind.equals(Kind.IF)){
 			IfTree fi = (IfTree)statement;
-			if(fi.getThenStatement().getKind().equals(Kind.BLOCK))
-				blocks.add((BlockTree)fi.getThenStatement());
+			StatementTree thenStatement = fi.getThenStatement();
+			if(thenStatement.getKind().equals(Kind.BLOCK)) {
+				statementInfo.add(new UnderlyingStatementsInfo((BlockTree)fi.getThenStatement()));
+			}
+			else {
+				statementInfo.add(new UnderlyingStatementsInfo(fi.getThenStatement()));
+			}
 			StatementTree esle = fi.getElseStatement(); 
-			if( esle != null && esle.getKind().equals(Kind.BLOCK))
-				blocks.add((BlockTree)esle);
+			if( esle != null )
+				if(esle.getKind().equals(Kind.BLOCK))
+					statementInfo.add(new UnderlyingStatementsInfo((BlockTree)esle));
+				else
+					statementInfo.add(new UnderlyingStatementsInfo(esle));
 		}
 
 		// TODO all kinds of statements with enclosing blocks!
-		return blocks;
+		return statementInfo;
 	}
 
 	/**

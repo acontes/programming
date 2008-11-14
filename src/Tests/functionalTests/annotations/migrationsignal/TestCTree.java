@@ -69,7 +69,7 @@ public class TestCTree extends CTreeTest {
 		Assert.assertEquals( new Result(2,0) , checkFile("ErrorNotLastBlock"));
 		Assert.assertEquals( OK , checkFile("AcceptBlock"));
 		Assert.assertEquals( ERROR , checkFile("TryCatchFinally"));
-		Assert.assertEquals( ERROR , checkFile("Fi"));
+		Assert.assertEquals( new Result(2,0) , checkFile("Fi"));
 
 	}
 	

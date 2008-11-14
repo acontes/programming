@@ -32,4 +32,36 @@ public class Fi {
 			return "";
 		}
 	}
+	
+	@MigrationSignal
+	public String migrateToStSt(boolean onCondition) throws MigrationException{
+		if(onCondition)
+			migrateToRight(onCondition);
+		else
+			migrateToWrong(onCondition);
+	}
+	
+	@MigrationSignal
+	public String migrateToBlSt(boolean onCondition) throws MigrationException{
+		if(onCondition) {
+			System.out.println("Ich will migrate");
+			migrateToRight(onCondition);
+		}
+		else
+			migrateToWrong(onCondition);
+		return "okay";
+	}
+	
+	// wrong on one of the branches
+	@MigrationSignal
+	public String migrateToStBl(boolean onCondition) throws MigrationException{
+		if(onCondition)
+			migrateToRight(onCondition);
+		else {
+			System.out.println("Ich will migrate");
+			migrateToWrong(onCondition);
+			System.out.println("I'll fuck everything up!");
+		}
+	}
+	
 }
