@@ -67,11 +67,12 @@ public class TestCTree extends CTreeTest {
 
 		// block checking  
 		Assert.assertEquals( new Result(2,0) , checkFile("ErrorNotLastBlock"));
-		Assert.assertEquals( OK , checkFile("AcceptBlock"));
+		Assert.assertEquals( OK , checkFile("AcceptBlock")); // for sickos
 		Assert.assertEquals( ERROR , checkFile("TryCatchFinally"));
 		Assert.assertEquals( OK , checkFile("CatchMigrationException"));
 		Assert.assertEquals( new Result(2,0) , checkFile("Fi"));
 		Assert.assertEquals( new Result(8,0) , checkFile("Loopz"));
+		Assert.assertEquals( OK , checkFile("Synchronized")); // for sickos
 
 	}
 	

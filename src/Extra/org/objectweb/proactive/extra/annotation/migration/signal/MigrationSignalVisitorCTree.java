@@ -377,6 +377,9 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			else 
 				statementInfo.add(new UnderlyingStatementsInfo(loopStatement));
 		}
+		else if(statementKind.equals(Kind.SYNCHRONIZED)){
+			statementInfo.add(new UnderlyingStatementsInfo(((SynchronizedTree)statement).getBlock()));
+		}
 
 		// TODO all kinds of statements with enclosing blocks!
 		return statementInfo;
