@@ -42,6 +42,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.api.PAMobileAgent;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
@@ -330,7 +331,8 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			if(tryTree.getBlock()!=null)
 				statementInfo.add(new UnderlyingStatementsInfo(tryTree.getBlock()));
 			for (CatchTree catchTree : tryTree.getCatches()) {
-				statementInfo.add(new UnderlyingStatementsInfo(catchTree.getBlock()));
+				if(!catchesMigrationException(catchTree))
+					statementInfo.add(new UnderlyingStatementsInfo(catchTree.getBlock()));
 			}
 		}
 		else if(statementKind.equals(Kind.IF)){
@@ -378,6 +380,16 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 
 		// TODO all kinds of statements with enclosing blocks!
 		return statementInfo;
+	}
+
+	private boolean catchesMigrationException(CatchTree catchTree) {
+		Tree type = catchTree.getParameter().getType();
+		if(type.getKind().equals(Kind.IDENTIFIER))
+			return ((IdentifierTree)type).getName().toString().equals(MigrationException.class.getSimpleName());
+		else if(type.getKind().equals(Kind.MEMBER_SELECT)) 
+			return type.toString().equals(MigrationException.class.getName());
+		
+		return false;
 	}
 
 	/**

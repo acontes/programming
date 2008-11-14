@@ -1,0 +1,50 @@
+package functionalTests.annotations.migrationsignal.inputs;
+
+import static org.objectweb.proactive.api.PAMobileAgent.migrateTo;
+
+import org.objectweb.proactive.api.PAMobileAgent;
+import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
+
+@ActiveObject
+public class CatchMigrationException {
+
+	// OK simple case
+	@MigrationSignal
+	public void migrateTo(Node where){
+		try{
+			PAMobileAgent.migrateTo(where);
+		}
+		catch(MigrationException migExcp){
+			System.err.println("Reporting the error");
+			migExcp.printStackTrace();
+		}
+	}
+	
+	@MigrationSignal
+	public void migrateTryCatch(Node node,String nr){
+		try{
+			Integer.parseInt(nr);
+			Object o = nr;
+			Double d = (Double)o;
+			PAMobileAgent.migrateTo(node);
+		}
+		catch(NumberFormatException e) {
+			migrateTo(node);
+		}
+		catch(ClassCastException e){
+			try {
+				org.objectweb.proactive.api.PAMobileAgent.migrateTo(node);
+			}
+			catch(MigrationException migExcp){
+				// freaky shiet
+			}
+		}
+		catch(org.objectweb.proactive.core.body.migration.MigrationException migExcp){
+			System.err.println("Reporting the error");
+			migExcp.printStackTrace();
+		}
+	}
+}
