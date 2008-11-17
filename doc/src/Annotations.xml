@@ -67,7 +67,7 @@
 					<itemizedlist>
 						<listitem>
 							<para>For JDK 1.5:
-							  <screen>$apt -factory org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
+							  <screen>$apt -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
 							</para>
 						</listitem>
 						<listitem>
@@ -84,7 +84,8 @@
 					Correct the compile-time errors, and repeat. 
 				</para>
 			   </listitem>
-			</itemizedlist>  
+			</itemizedlist>
+			ProActive.jar must already be in the classpath.  
 		</para>
 			
 			<para>
@@ -230,7 +231,9 @@
 		<section>
 			<info><title>@MigrationSignal</title></info>
 		<para>
-			TODO
+			@MigrationSignal is applied on a method definition, in order to mark the fact that the annotated method should be used as a migration signal. What is a migration signal? The most common way to implement migration using ProActive is for the active object to export a public method inside which to call <strong>PAMobileAgent.migrateTo()</strong>, and this call should be the last statement inside the method body. This kind of method will be called henceforth a *migration signal*.
+			The MigrationSignal annotation enforces the migration guidelines specified in the ProActive manual, section on mobility. At compilation, the annotated method is checked to see if migrateTo() is called, and if this is indeed the last statement.
+			Migration signals can be also defined by calling other methods that perform migration - and not directly through calling migrateTo(). 
 		</para>
 		</section>
 		
