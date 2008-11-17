@@ -149,15 +149,24 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	class BlockVisitInfo {
 		public boolean hasMigrateTo;
 		public boolean migrationUsedCorrectly;
+		public StatementTree migrationStatement;
 		public BlockVisitInfo() {
 			hasMigrateTo = false;
 			migrationUsedCorrectly = false;
+			migrationStatement = null;
 		}
 		
 		public BlockVisitInfo(boolean hasMT , boolean isLast) {
 			hasMigrateTo = hasMT;
 			migrationUsedCorrectly = isLast;
 		}
+		
+		public BlockVisitInfo(boolean hasMT , boolean isLast, StatementTree migrst) {
+			hasMigrateTo = hasMT;
+			migrationUsedCorrectly = isLast;
+			migrationStatement = migrst;
+		}
+		
 		@Override
 		public boolean equals(Object obj) {
 			BlockVisitInfo bvi = (BlockVisitInfo)obj;
@@ -170,23 +179,12 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		}
 	}
 	
-	private Map<BlockTree,BlockVisitInfo> _visitedBlocks = new HashMap<BlockTree, BlockVisitInfo>();
-	@Override
-	public Void visitBlock(BlockTree blockNode, Trees trees) {
+	private BlockVisitInfo verifyBlockStatements(List<? extends StatementTree> statements,Trees trees) {
 		
-		// visit the descendants first
-		Void ret = super.visitBlock( blockNode , trees); 
-		
-		if( _methodPosition == null ) {
-			// not in a method
-			return ret;
-		}
-		
-		StatementTree migrateToStatement = null;
 		boolean migrationUsedCorrectlyInSubBlocks = true;
 		boolean hasInSubBlocks = false;
+		StatementTree migrateToStatement = null;
 		
-		List<? extends StatementTree> statements = blockNode.getStatements(); 
 		for( StatementTree statement : statements ) {
 
 			// is a migrateTo statement?
@@ -194,6 +192,12 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 				if(migrateToStatement == null)
 					migrateToStatement = statement;
 			
+			// is a switch statement?
+			if (statement.getKind().equals(Kind.SWITCH)) {
+				// TODO
+			}
+			
+			// is a statement with underlying statements?
 			List<UnderlyingStatementsInfo> underlyingBlocks = getSubstatementsInfo(statement);
 			boolean isLoopStmt = isLoop(statement);
 			
@@ -216,8 +220,30 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			}
 		}
 		
+		return new BlockVisitInfo(hasInSubBlocks,migrationUsedCorrectlyInSubBlocks,migrateToStatement);
+	}
+	
+	private Map<BlockTree,BlockVisitInfo> _visitedBlocks = new HashMap<BlockTree, BlockVisitInfo>();
+	@Override
+	public Void visitBlock(BlockTree blockNode, Trees trees) {
+		
+		// visit the descendants first
+		Void ret = super.visitBlock( blockNode , trees); 
+		
+		if( _methodPosition == null ) {
+			// not in a method
+			return ret;
+		}
+		
+		List<? extends StatementTree> statements = blockNode.getStatements();
+		
+		// verify the statements of this block
+		BlockVisitInfo bvi = verifyBlockStatements(statements, trees);
+		boolean hasInSubBlocks = bvi.hasMigrateTo;
+		boolean migrationUsedCorrectlyInSubBlocks = bvi.migrationUsedCorrectly;
+		
 		// case 1 - migrateTo not in this block
-		if( migrateToStatement == null ) {
+		if( bvi.migrationStatement == null ) {
 			if(!hasInSubBlocks) {
 				_visitedBlocks.put(blockNode, new BlockVisitInfo(false,false));
 				return ret;
@@ -237,7 +263,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
 			return ret;
 		}
-		int migrateToPos = statements.indexOf(migrateToStatement);
+		int migrateToPos = statements.indexOf(bvi.migrationStatement);
 		int statementsNo = statements.size();
 		
 		// programmers count starting from 0
@@ -381,7 +407,6 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			statementInfo.add(new UnderlyingStatementsInfo(((SynchronizedTree)statement).getBlock()));
 		}
 
-		// TODO all kinds of statements with enclosing blocks!
 		return statementInfo;
 	}
 
