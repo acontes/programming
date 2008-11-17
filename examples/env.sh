@@ -60,9 +60,9 @@ fi
 #echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 
+#    -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8066 \
 
 JAVACMD=$JAVA_HOME/bin/java"\
-    -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8066 \
 	-Djava.security.manager \
 	-Djava.security.policy=$PROACTIVE/examples/proactive.java.policy \
 	-Dlog4j.configuration=file:${PROACTIVE}/examples/proactive-log4j \

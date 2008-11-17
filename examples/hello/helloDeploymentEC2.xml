@@ -28,7 +28,7 @@
 
 		<groups>
 			<ec2Group id="remoteEC2">
-				<imageId>ami-4727c32e</imageId> 
+				<imageId>ami-3f36d256</imageId> 
 				<accessKeyId>${ec2.accessKeyId}</accessKeyId>
 				<secretAccessKey>${ec2.secretAccessKey}</secretAccessKey>
 			</ec2Group>				

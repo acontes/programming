@@ -62,8 +62,8 @@ public class GroupEC2 extends AbstractJavaGroup {
         private RunInstancesResponse response;
 
         public EC2InstanceRunner(String accessKeyId, String secretAccessKey, RunInstancesRequest request) {
-//            service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-            service = new AmazonEC2Mock();
+            service = new AmazonEC2Client(accessKeyId, secretAccessKey);
+//            service = new AmazonEC2Mock();
             this.request = request;
             this.response = null;
         }
