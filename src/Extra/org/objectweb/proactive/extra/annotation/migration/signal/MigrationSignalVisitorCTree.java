@@ -46,7 +46,29 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
-import com.sun.source.tree.*;
+import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.CaseTree;
+import com.sun.source.tree.CatchTree;
+import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.DoWhileLoopTree;
+import com.sun.source.tree.EnhancedForLoopTree;
+import com.sun.source.tree.ExpressionStatementTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.ForLoopTree;
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.IfTree;
+import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ModifiersTree;
+import com.sun.source.tree.ReturnTree;
+import com.sun.source.tree.StatementTree;
+import com.sun.source.tree.SwitchTree;
+import com.sun.source.tree.SynchronizedTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.TryTree;
+import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
@@ -194,7 +216,14 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 			
 			// is a switch statement?
 			if (statement.getKind().equals(Kind.SWITCH)) {
-				// TODO
+				// check all underlying group of statements
+				BlockVisitInfo bviCase;
+				for( CaseTree someCase : ((SwitchTree)statement).getCases() ) {
+					bviCase = verifyBlockStatements( someCase.getStatements(), trees);
+					bviCase = checkMigrationCorrectness( bviCase , someCase.getStatements());
+					hasInSubBlocks = hasInSubBlocks | bviCase.hasMigrateTo;
+					migrationUsedCorrectlyInSubBlocks = migrationUsedCorrectlyInSubBlocks & bviCase.migrationUsedCorrectly;
+				}
 			}
 			
 			// is a statement with underlying statements?
@@ -223,12 +252,59 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		return new BlockVisitInfo(hasInSubBlocks,migrationUsedCorrectlyInSubBlocks,migrateToStatement);
 	}
 	
+	public BlockVisitInfo checkMigrationCorrectness(BlockVisitInfo bvi, 
+			List<? extends StatementTree> statements) {
+
+		boolean hasInSubBlocks = bvi.hasMigrateTo;
+		boolean migrationUsedCorrectlyInSubBlocks = bvi.migrationUsedCorrectly;
+		
+		// case 1 - migrateTo not in this block
+		if( bvi.migrationStatement == null ) {
+			if(!hasInSubBlocks) 
+				return new BlockVisitInfo(false,false);
+
+			if(!migrationUsedCorrectlyInSubBlocks) 
+				return new BlockVisitInfo(true,false);
+			else 
+				return new BlockVisitInfo(true,true);
+		}
+		
+		// case 2 - migrateTo call in this block
+		// must not also be in sub-blocks
+		if(hasInSubBlocks) 
+			return new BlockVisitInfo(true,false);
+		
+		int migrateToPos = statements.indexOf(bvi.migrationStatement);
+		int statementsNo = statements.size();
+		
+		// programmers count starting from 0
+		if (statementsNo - 1 == migrateToPos ) {
+			// perfekt!
+			return new BlockVisitInfo(true,true);
+		}
+		
+		if( statementsNo - 1 == migrateToPos + 1 ) {
+			// get info on statements
+			StatementTree lastStatement = statements.get( statementsNo -1);
+
+			if(!checkReturnStatement(lastStatement)) 
+				return new BlockVisitInfo(true,false);
+		}
+		else {
+			// definitely not the last statement
+			return new BlockVisitInfo(true,false);
+		}
+		
+		// migrateTo in this block, and used correctly
+		return new BlockVisitInfo(true,true);
+	}
+	
 	private Map<BlockTree,BlockVisitInfo> _visitedBlocks = new HashMap<BlockTree, BlockVisitInfo>();
 	@Override
 	public Void visitBlock(BlockTree blockNode, Trees trees) {
 		
 		// visit the descendants first
-		Void ret = super.visitBlock( blockNode , trees); 
+		Void ret = super.visitBlock( blockNode , trees);
 		
 		if( _methodPosition == null ) {
 			// not in a method
@@ -239,56 +315,11 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 		
 		// verify the statements of this block
 		BlockVisitInfo bvi = verifyBlockStatements(statements, trees);
-		boolean hasInSubBlocks = bvi.hasMigrateTo;
-		boolean migrationUsedCorrectlyInSubBlocks = bvi.migrationUsedCorrectly;
 		
-		// case 1 - migrateTo not in this block
-		if( bvi.migrationStatement == null ) {
-			if(!hasInSubBlocks) {
-				_visitedBlocks.put(blockNode, new BlockVisitInfo(false,false));
-				return ret;
-			}
-			if(!migrationUsedCorrectlyInSubBlocks) {
-				_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
-			} 
-			else {
-				_visitedBlocks.put(blockNode, new BlockVisitInfo(true,true));
-			}
-			return ret;
-		}
-		
-		// case 2 - migrateTo call in this block
-		// must not also be in sub-blocks
-		if(hasInSubBlocks) {
-			_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
-			return ret;
-		}
-		int migrateToPos = statements.indexOf(bvi.migrationStatement);
-		int statementsNo = statements.size();
-		
-		// programmers count starting from 0
-		if (statementsNo - 1 == migrateToPos ) {
-			// perfekt!
-			_visitedBlocks.put(blockNode, new BlockVisitInfo(true,true));
-			return ret;
-		}
-		
-		if( statementsNo - 1 == migrateToPos + 1 ) {
-			// get info on statements
-			StatementTree lastStatement = statements.get( statementsNo -1);
+		// according to the info for the sub-blocks, determine if migration is used correctly
+		BlockVisitInfo bvRet = checkMigrationCorrectness(bvi, statements);
 
-			if(!checkReturnStatement(lastStatement)) {
-				_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
-				return ret;
-			}
-		}
-		else {
-			// definitely not the last statement
-			_visitedBlocks.put(blockNode, new BlockVisitInfo(true,false));
-			return ret;
-		}
-		
-		_visitedBlocks.put(blockNode, new BlockVisitInfo(true,true));
+		_visitedBlocks.put(blockNode, bvRet);
 		return ret;
 
 	}
@@ -447,6 +478,11 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	 * @return: true, if it is a "simple" return statement.
 	 */
 	private boolean checkReturnStatement(StatementTree lastStatement) {
+		
+		if( !(lastStatement.getKind().equals(Kind.BREAK)) ) {
+			return true;
+		}
+		
 		if( !(lastStatement.getKind().equals(Kind.RETURN)) ) {
 			return false;
 		}

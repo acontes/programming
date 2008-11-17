@@ -73,6 +73,7 @@ public class TestCTree extends CTreeTest {
 		Assert.assertEquals( new Result(2,0) , checkFile("Fi"));
 		Assert.assertEquals( new Result(8,0) , checkFile("Loopz"));
 		Assert.assertEquals( OK , checkFile("Synchronized")); // for sickos
+		Assert.assertEquals( ERROR , checkFile("Switch"));
 
 	}
 	
