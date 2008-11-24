@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
+package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.mpi;
 
 import java.util.Map;
 
@@ -8,7 +8,8 @@ import javax.xml.xpath.XPathConstants;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.proactive.TechnicalServicesProperties;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -20,7 +21,7 @@ public class ApplicationParserExecutableMPI extends AbstractApplicationParser {
     private static final String XPATH_COMMAND = "app:command";
     private static final String XPATH_ARG = "app:arg";
 
-    protected static final String NODE_NAME = "mpi";
+
     private TechnicalServicesProperties applicationTechnicalServices;
 
     @Override
@@ -36,7 +37,7 @@ public class ApplicationParserExecutableMPI extends AbstractApplicationParser {
     @Override
     public void parseApplicationNode(Node appNode, GCMApplicationParser applicationParser, XPath xpath)
             throws Exception {
-        super.parseApplicationNode(appNode, applicationParser, xpath);
+        super.parseProActiveNode(appNode, applicationParser, xpath);
 
         CommandBuilderExecutableMPI commandBuilderMPI = (CommandBuilderExecutableMPI) commandBuilder;
 
@@ -45,7 +46,7 @@ public class ApplicationParserExecutableMPI extends AbstractApplicationParser {
             applicationTechnicalServices = GCMParserHelper
                     .parseTechnicalServicesNode(xpath, techServicesNode);
         } else {
-            applicationTechnicalServices = new TechnicalServicesProperties();
+            applicationTechnicalServices = new TechnicalServicesPropertie();
         }
 
         NodeList nodeProviderNodes;

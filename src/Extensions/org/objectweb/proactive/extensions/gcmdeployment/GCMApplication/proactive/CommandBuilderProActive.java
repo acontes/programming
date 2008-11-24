@@ -29,16 +29,12 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
+package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.proactive;
 
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -47,165 +43,22 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.Tool;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.Tools;
-import org.objectweb.proactive.extensions.gcmdeployment.PathElement.PathBase;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 
 
 public class CommandBuilderProActive implements CommandBuilder {
-
     final static String PROACTIVE_JAR = "ProActive.jar";
 
-    /** Path to the ProActive installation */
-    private PathElement proActivePath;
+    ApplicationProActiveConfigurationBean configBean;
+  
 
-    /** Declared Virtual nodes */
-    private Map<String, GCMVirtualNodeInternal> vns;
-
-    /** Path to ${java.home}/bin/java */
-    private PathElement javaPath = null;
-
-    /** Arguments to be passed to java */
-    private List<String> jvmArgs;
-
-    /**
-     * ProActive classpath
-     * 
-     * If not set, then the default classpath is used
-     */
-    private List<PathElement> proactiveClasspath;
-    private boolean overwriteClasspath;
-
-    /** Application classpath */
-    private List<PathElement> applicationClasspath;
-
-    /** Security Policy file */
-    private PathElement javaSecurityPolicy;
-
-    /** Log4j configuration file */
-    private PathElement log4jProperties;
-
-    /** User properties file */
-    private PathElement userProperties;
-
-    /** application security policy file */
-    private PathElement applicationPolicy;
-
-    /** runtime security policy file */
-    private PathElement runtimePolicy;
-
-    public CommandBuilderProActive() {
+    public CommandBuilderProActive(ApplicationProActiveConfigurationBean configBean) {
         GCMD_LOGGER.trace(this.getClass().getSimpleName() + " created");
-        vns = new HashMap<String, GCMVirtualNodeInternal>();
-        jvmArgs = new ArrayList<String>();
-    }
-
-    public void addVirtualNode(GCMVirtualNodeInternal vn) {
-        addVirtualNode(vn.getName(), vn);
-    }
-
-    public void addVirtualNode(String id, GCMVirtualNodeInternal vn) {
-        vns.put(id, vn);
-    }
-
-    public void addProActivePath(PathElement pe) {
-        if (proactiveClasspath == null) {
-            proactiveClasspath = new ArrayList<PathElement>();
-        }
-
-        proactiveClasspath.add(pe);
-    }
-
-    public void setProActiveClasspath(List<PathElement> pe) {
-        proactiveClasspath = pe;
-    }
-
-    public void addApplicationPath(PathElement pe) {
-        if (applicationClasspath == null) {
-            applicationClasspath = new ArrayList<PathElement>();
-        }
-
-        applicationClasspath.add(pe);
-    }
-
-    public void setApplicationClasspath(List<PathElement> pe) {
-        if (GCMD_LOGGER.isTraceEnabled()) {
-            GCMD_LOGGER.trace(" Set ApplicationClasspath to:");
-            for (PathElement e : pe) {
-                GCMD_LOGGER.trace("\t" + e);
-            }
-        }
-
-        applicationClasspath = pe;
-    }
-
-    public void setVirtualNodes(Map<String, GCMVirtualNodeInternal> vns) {
-        if (GCMD_LOGGER.isTraceEnabled()) {
-            GCMD_LOGGER.trace(" Set VirtualNodes to:");
-            for (String vn : vns.keySet()) {
-                GCMD_LOGGER.trace("\t" + vn);
-            }
-        }
-
-        this.vns = vns;
-    }
-
-    public void addJVMArg(String arg) {
-        if (arg != null) {
-            GCMD_LOGGER.trace(" Added " + arg + " to JavaArgs");
-            jvmArgs.add(arg);
-        }
-    }
-
-    public void setJavaPath(PathElement pe) {
-        if (pe != null) {
-            GCMD_LOGGER.trace(" Set JavaPath to " + pe);
-            javaPath = pe;
-        }
-    }
-
-    public void setLog4jProperties(PathElement pe) {
-        if (pe != null) {
-            GCMD_LOGGER.trace(" Set log4jProperties relpath to " + pe.getRelPath());
-            log4jProperties = pe;
-        }
-    }
-
-    public void setSecurityPolicy(PathElement pe) {
-        if (pe != null) {
-            GCMD_LOGGER.trace(" Set securityPolicy relpath to " + pe.getRelPath());
-            javaSecurityPolicy = pe;
-        }
-    }
-
-    public void setApplicationPolicy(PathElement pe) {
-        if (pe != null) {
-            GCMD_LOGGER.trace(" Set applicationPolicy relpath to " + pe.getRelPath());
-            applicationPolicy = pe;
-
-        }
-
-    }
-
-    public void setRuntimePolicy(PathElement pe) {
-        if (pe != null) {
-            GCMD_LOGGER.trace(" Set runtimePolicy relpath to " + pe.getRelPath());
-            runtimePolicy = pe;
-        }
-    }
-
-    public PathElement getUserProperties() {
-        return userProperties;
-    }
-
-    public void setUserProperties(PathElement userProperties) {
-        if (userProperties != null) {
-            GCMD_LOGGER.trace(" Set userProperties relpath to " + userProperties.getRelPath());
-            this.userProperties = userProperties;
-        }
+        this.configBean = configBean;
     }
 
     /**
@@ -222,6 +75,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     private String getJava(HostInfo hostInfo) {
         String javaCommand = "java";
 
+        PathElement javaPath = configBean.getJavaPath();
         if (javaPath != null) {
             javaCommand = javaPath.getFullPath(hostInfo, this);
         } else {
@@ -246,7 +100,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         StringBuilder sb = new StringBuilder();
         sb.append("-cp \"");
 
-        if (!overwriteClasspath) {
+        if (!configBean.isOverwriteClasspath()) {
             // ProActive.jar contains a JAR index
             // see: http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#JAR%20Index
             char fs = hostInfo.getOS().fileSeparator();
@@ -260,15 +114,15 @@ public class CommandBuilderProActive implements CommandBuilder {
             sb.append(hostInfo.getOS().pathSeparator());
         }
 
-        if (proactiveClasspath != null) {
-            for (PathElement pe : proactiveClasspath) {
+        if (configBean.getProactiveClasspath() != null) {
+            for (PathElement pe : configBean.getProactiveClasspath()) {
                 sb.append(pe.getFullPath(hostInfo, this));
                 sb.append(hostInfo.getOS().pathSeparator());
             }
         }
 
-        if (applicationClasspath != null) {
-            for (PathElement pe : applicationClasspath) {
+        if (configBean.getApplicationClasspath() != null) {
+            for (PathElement pe : configBean.getApplicationClasspath()) {
                 sb.append(pe.getFullPath(hostInfo, this));
                 sb.append(hostInfo.getOS().pathSeparator());
             }
@@ -280,7 +134,7 @@ public class CommandBuilderProActive implements CommandBuilder {
 
     public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma) {
 
-        if ((proActivePath == null) && (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
+        if ((configBean.getProActivePath() == null) && (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
             throw new IllegalStateException(
                 "ProActive installation path must be specified with the relpath attribute inside the proactive element (GCMA), or as tool in all hostInfo elements (GCMD). HostInfo=" +
                     hostInfo.getId());
@@ -297,7 +151,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         command.append(getJava(hostInfo));
         command.append(" ");
 
-        for (String arg : jvmArgs) {
+        for (String arg : configBean.getJvmArgs()) {
             command.append(arg);
             command.append(" ");
         }
@@ -326,6 +180,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         command.append(" ");
 
         // Log4j
+        PathElement log4jProperties = configBean.getLog4jProperties();
         if (log4jProperties != null) {
             command.append(PAProperties.LOG4J.getCmdLine());
             command.append("\"");
@@ -336,6 +191,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         }
 
         // Java Security Policy
+        PathElement javaSecurityPolicy = configBean.getJavaSecurityPolicy();
         if (javaSecurityPolicy != null) {
             command.append(PAProperties.JAVA_SECURITY_POLICY.getCmdLine());
             command.append("\"");
@@ -355,6 +211,7 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append(" ");
         }
 
+        PathElement runtimePolicy = configBean.getRuntimePolicy();
         if (runtimePolicy != null) {
             command.append(PAProperties.PA_RUNTIME_SECURITY.getCmdLine());
             command.append("\"");
@@ -439,18 +296,8 @@ public class CommandBuilderProActive implements CommandBuilder {
         return ret.toString();
     }
 
-    public void setProActivePath(String proActivePath) {
-        setProActivePath(proActivePath, PathBase.HOME.name());
-    }
-
-    public void setProActivePath(String proActivePath, String base) {
-        if (proActivePath != null) {
-            this.proActivePath = new PathElement(proActivePath, base);
-            GCMD_LOGGER.trace(" Set ProActive relpath to " + this.proActivePath.getRelPath());
-        }
-    }
-
     public String getPath(HostInfo hostInfo) {
+        PathElement proActivePath = configBean.getProActivePath();
         if (proActivePath != null) {
             return proActivePath.getFullPath(hostInfo, this);
         }
@@ -470,9 +317,4 @@ public class CommandBuilderProActive implements CommandBuilder {
             return path;
         }
     }
-
-    public void setOverwriteClasspath(boolean overwriteClasspath) {
-        this.overwriteClasspath = overwriteClasspath;
-    }
-
 }

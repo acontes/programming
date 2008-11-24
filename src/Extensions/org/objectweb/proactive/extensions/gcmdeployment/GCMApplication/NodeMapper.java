@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.proactive.ApplicationProActive;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 
@@ -58,6 +59,8 @@ public class NodeMapper implements NotificationListener {
     /** The GCM Application Descriptor associated to this Node Allocator */
     final private GCMApplicationInternal gcma;
 
+    final private ApplicationProActive appProActive;
+    
     /** All Virtual Nodes */
     final private List<GCMVirtualNodeInternal> virtualNodes;
 
@@ -79,9 +82,10 @@ public class NodeMapper implements NotificationListener {
      */
     final private Object dispatchMutex;
 
-    public NodeMapper(GCMApplicationImpl gcma, Collection<GCMVirtualNodeInternal> virtualNodes) {
+    public NodeMapper(GCMApplicationImpl gcma, ApplicationProActive appProActive, Collection<GCMVirtualNodeInternal> virtualNodes) {
         this.gcma = gcma;
-
+        this.appProActive = appProActive;
+        
         this.virtualNodes = new LinkedList<GCMVirtualNodeInternal>();
         this.virtualNodes.addAll(virtualNodes);
 

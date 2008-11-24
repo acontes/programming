@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
+package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.proactive;
 
 import java.util.HashMap;
 import java.util.Iterator;

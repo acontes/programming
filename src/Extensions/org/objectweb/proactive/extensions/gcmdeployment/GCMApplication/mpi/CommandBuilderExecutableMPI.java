@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
+package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.mpi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +37,13 @@ import java.util.List;
 import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
 public class CommandBuilderExecutableMPI implements CommandBuilder {
-
+    protected static final String NODE_NAME = "mpi";
+    
     /** List of providers to be used */
     private List<NodeProvider> providers;
     private String command;

@@ -60,10 +60,10 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParser;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserExecutable;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserExecutableMPI;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserProactive;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.Application;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.Application;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.Application;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.Application;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
@@ -86,18 +86,19 @@ import org.xml.sax.SAXException;
  * parsing in progress, wrap the Exception inside a ProActiveException and give it to the user.
  */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
+    private static final ApplicationFactory applicationFactory = new ApplicationFactory();
+    
     private static final String OLD_DESCRIPTOR_SCHEMA = "http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd";
-    private static final String XPATH_GCMAPP = "/app:GCMApplication/";
-    private static final String XPATH_VIRTUAL_NODE = XPATH_GCMAPP +
-        "app:application/app:proactive/app:virtualNode";
+    public static final String XPATH_GCMAPP = "/app:GCMApplication/";
+ 
     private static final String XPATH_NODE_PROVIDERS = XPATH_GCMAPP + "app:resources/app:nodeProvider";
     private static final String XPATH_APPLICATION = XPATH_GCMAPP + "app:application";
-    private static final String XPATH_NODE_PROVIDER = "app:nodeProvider";
+
     private static final String XPATH_TECHNICAL_SERVICES = "app:technicalServices";
     private static final String XPATH_FILE = "app:file";
 
     private static final String[] SUPPORTED_PROTOCOLS = { "file", "http", "http", "https", "jar", "ftp" };
-    public static final String ATTR_RP_CAPACITY = "capacity";
+
     protected URL descriptor;
     protected VariableContractImpl vContract;
 
@@ -106,12 +107,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected XPath xpath;
 
     protected List<String> schemas;
-    protected CommandBuilder commandBuilder;
+    protected Application application;
     protected Map<String, NodeProvider> nodeProvidersMap;
-    protected Map<String, GCMVirtualNodeInternal> virtualNodes;
-    protected Map<String, ApplicationParser> applicationParsersMap;
-    protected TechnicalServicesProperties appTechnicalServices;
-    protected ProActiveSecurityManager proactiveApplicationSecurityManager;
+//    protected Map<String, GCMVirtualNodeInternal> virtualNodes;
+
+//    protected TechnicalServicesProperties appTechnicalServices;
+//    protected ProActiveSecurityManager proactiveApplicationSecurityManager;
 
     public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract) throws Exception {
         this(descriptor, vContract, null);
@@ -121,15 +122,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             throws Exception {
         this.descriptor = descriptor;
         this.vContract = vContract;
-        this.appTechnicalServices = TechnicalServicesProperties.EMPTY;
+//        this.appTechnicalServices = TechnicalServicesProperties.EMPTY;
 
         this.nodeProvidersMap = null;
-        this.virtualNodes = null;
+//        this.virtualNodes = null;
         this.schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
-        this.applicationParsersMap = new HashMap<String, ApplicationParser>();
 
-        registerDefaultApplicationParsers();
-        registerUserApplicationParsers();
 
         setupJAXP();
 
@@ -140,11 +138,10 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             document = documentBuilder.parse(processedInputSource);
 
             // sanity check : make sure there isn't a ref to an old schema in the document
-            //
             String noNamespaceSchema = document.getDocumentElement().getAttribute(
                     "xsi:noNamespaceSchemaLocation");
             if (noNamespaceSchema != null && noNamespaceSchema.contains(OLD_DESCRIPTOR_SCHEMA)) {
-                throw new SAXException("Trying to parse an old descriptor");
+                throw new SAXException("Trying to parse a descriptor using the legacy Deployment Descriptor Schema");
             }
         } catch (SAXException e) {
             String msg = "parsing problem with document " + descriptor.toExternalForm();
@@ -158,21 +155,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     }
 
-    /**
-     * override me
-     */
-    protected void registerUserApplicationParsers() {
-    }
-
-    public void registerApplicationParser(ApplicationParser applicationParser) {
-        applicationParsersMap.put(applicationParser.getNodeName(), applicationParser);
-    }
-
-    private void registerDefaultApplicationParsers() {
-        registerApplicationParser(new ApplicationParserProactive());
-        registerApplicationParser(new ApplicationParserExecutable());
-        registerApplicationParser(new ApplicationParserExecutableMPI());
-    }
+  
 
     public void setupJAXP() throws IOException, ParserConfigurationException, SAXException {
         domFactory = DocumentBuilderFactory.newInstance();
@@ -320,9 +303,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         return nodeProvidersMap;
     }
 
-    public CommandBuilder getCommandBuilder() throws Exception {
-        if (commandBuilder != null) {
-            return commandBuilder;
+    public Application getApplication() throws Exception {
+        if (application != null) {
+            return application;
         }
 
         Node applicationNode = (Node) xpath.evaluate(XPATH_APPLICATION, document, XPathConstants.NODE);
@@ -335,126 +318,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 continue;
             }
 
-            ApplicationParser applicationParser = getApplicationParserForNode(commandNode);
-            if (applicationParser == null) {
-                GCMDeploymentLoggers.GCMA_LOGGER.warn("No application parser registered for node <" +
-                    commandNode.getNodeName() + ">");
-            } else {
-                applicationParser.parseApplicationNode(commandNode, this, xpath);
-                commandBuilder = applicationParser.getCommandBuilder();
-                appTechnicalServices = applicationParser.getTechnicalServicesProperties();
-            }
+            
+            Application application = applicationFactory.getApplicationParser(commandNode.getNodeName());
+            application.parse(commandNode, xpath);
         }
 
-        return commandBuilder;
-    }
-
-    private ApplicationParser getApplicationParserForNode(Node commandNode) {
-        ApplicationParser applicationParser = applicationParsersMap.get(commandNode.getNodeName());
-        return applicationParser;
-    }
-
-    synchronized public Map<String, GCMVirtualNodeInternal> getVirtualNodes() throws Exception {
-        if (virtualNodes != null) {
-            return virtualNodes;
-        }
-
-        virtualNodes = new HashMap<String, GCMVirtualNodeInternal>();
-
-        // make sure these are parsed
-        getCommandBuilder();
-        getNodeProviders();
-
-        NodeList nodes = (NodeList) xpath.evaluate(XPATH_VIRTUAL_NODE, document, XPathConstants.NODESET);
-
-        for (int i = 0; i < nodes.getLength(); ++i) {
-            Node xmlNode = nodes.item(i);
-
-            // get Id
-            //
-            GCMVirtualNodeImpl virtualNode = new GCMVirtualNodeImpl(appTechnicalServices);
-
-            String id = GCMParserHelper.getAttributeValue(xmlNode, "id");
-            virtualNode.setName(id);
-
-            // get capacity
-            //
-            String capacity = GCMParserHelper.getAttributeValue(xmlNode, ATTR_RP_CAPACITY);
-
-            virtualNode.setCapacity(capacityAsLong(capacity));
-
-            // get technical services (if any)
-            //
-            Node techServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, xmlNode, XPathConstants.NODE);
-            if (techServices != null) {
-                TechnicalServicesProperties vnodeTechnicalServices = GCMParserHelper
-                        .parseTechnicalServicesNode(xpath, techServices);
-                virtualNode.setTechnicalServicesProperties(vnodeTechnicalServices);
-            }
-
-            // get resource providers references
-            //
-            NodeList nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER, xmlNode,
-                    XPathConstants.NODESET);
-            if (nodeProviderNodes.getLength() == 0) {
-                // Add all the Node Providers to this Virtual Node
-                for (NodeProvider nodeProvider : NodeProvider.getAllNodeProviders()) {
-                    virtualNode.addNodeProviderContract(nodeProvider, TechnicalServicesProperties.EMPTY,
-                            GCMVirtualNode.MAX_CAPACITY);
-                }
-            } else {
-                for (int j = 0; j < nodeProviderNodes.getLength(); j++) {
-                    Node nodeProv = nodeProviderNodes.item(j);
-
-                    String refId = GCMParserHelper.getAttributeValue(nodeProv, "refid");
-                    capacity = GCMParserHelper.getAttributeValue(nodeProv, ATTR_RP_CAPACITY);
-
-                    NodeProvider nodeProvider = nodeProvidersMap.get(refId);
-
-                    Node nodeProviderTechServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, nodeProv,
-                            XPathConstants.NODE);
-                    TechnicalServicesProperties nodeProviderTechServicesProperties = TechnicalServicesProperties.EMPTY;
-                    if (nodeProviderTechServices != null) {
-                        nodeProviderTechServicesProperties = GCMParserHelper.parseTechnicalServicesNode(
-                                xpath, nodeProviderTechServices);
-                        nodeProvider.setTechnicalServicesProperties(nodeProviderTechServicesProperties);
-                    }
-
-                    virtualNode.addNodeProviderContract(nodeProvider, nodeProviderTechServicesProperties,
-                            capacityAsLong(capacity));
-
-                }
-            }
-
-            virtualNodes.put(virtualNode.getName(), virtualNode);
-        }
-
-        return virtualNodes;
-    }
-
-    static private long capacityAsLong(String capacity) throws NumberFormatException {
-        if (capacity == null) {
-            return GCMVirtualNode.MAX_CAPACITY;
-        }
-
-        try {
-            return Long.parseLong(capacity);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException(capacity +
-                " is an invalid value for a capacity (should have been checked by the XSD)");
-        }
-    }
-
-    public TechnicalServicesProperties getAppTechnicalServices() {
-        return appTechnicalServices;
-    }
-
-    public ProActiveSecurityManager getProactiveApplicationSecurityManager() {
-        return proactiveApplicationSecurityManager;
-    }
-
-    public void setProactiveApplicationSecurityManager(
-            ProActiveSecurityManager proactiveApplicationSecurityManager) {
-        this.proactiveApplicationSecurityManager = proactiveApplicationSecurityManager;
+        return application;
     }
 }

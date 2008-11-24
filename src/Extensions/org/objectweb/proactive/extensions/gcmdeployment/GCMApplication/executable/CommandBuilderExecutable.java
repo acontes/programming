@@ -29,56 +29,20 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.executable;
 
 import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
 public class CommandBuilderExecutable implements CommandBuilder {
 
-    /** List of providers to be used */
-    private List<NodeProvider> providers;
-    private String command;
-
-    /** The path to the command */
-    private PathElement path;
-
-    /** The arguments */
-    private List<String> args;
-
-    public enum Instances {
-        onePerHost, onePerVM, onePerCapacity;
-    }
-
-    private Instances instances;
-
     public CommandBuilderExecutable() {
-        providers = new ArrayList<NodeProvider>();
-        args = new ArrayList<String>();
-        instances = Instances.onePerHost;
+     
     }
 
-    public void setCommand(String command) {
-        this.command = command;
-    }
-
-    public void setPath(PathElement pe) {
-        path = pe;
-    }
-
-    public void addArg(String arg) {
-        args.add(arg);
-    }
-
-    public void addNodeProvider(NodeProvider nodeProvider) {
-        providers.add(nodeProvider);
-    }
 
     public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma) {
         StringBuilder sb = new StringBuilder();
@@ -134,9 +98,5 @@ public class CommandBuilderExecutable implements CommandBuilder {
         } else {
             return "";
         }
-    }
-
-    public void setInstances(String instancesValue) {
-        instances = Instances.valueOf(instancesValue);
     }
 }

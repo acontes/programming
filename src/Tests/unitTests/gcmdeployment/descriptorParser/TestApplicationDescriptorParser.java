@@ -94,7 +94,7 @@ public class TestApplicationDescriptorParser {
         @Override
         public void parseApplicationNode(Node paNode, GCMApplicationParser applicationParser, XPath xpath)
                 throws Exception {
-            super.parseApplicationNode(paNode, applicationParser, xpath);
+            super.parseProActiveNode(paNode, applicationParser, xpath);
 
             System.out.println("User Application Parser - someattr value = " +
                 paNode.getAttributes().getNamedItem("someattr").getNodeValue());

@@ -40,23 +40,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
@@ -80,22 +74,18 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     static private Map<Long, GCMApplication> localDeployments = new HashMap<Long, GCMApplication>();
 
     /** An unique identifier for this deployment */
-    private long deploymentId;
+    final private long deploymentId;
 
     /** descriptor file */
-    private URL descriptor = null;
+    final private URL descriptor;
 
     /** GCM Application parser (statefull) */
-    private GCMApplicationParser parser = null;
+    final private GCMApplicationParser parser;
+    
+    final private Application application;
 
     /** All Node Providers referenced by the Application descriptor */
     private Map<String, NodeProvider> nodeProviders = null;
-
-    /** Defined Virtual Nodes */
-    private Map<String, GCMVirtualNodeInternal> virtualNodes = null;
-
-    /** The Deployment Tree */
-    private TopologyRootImpl deploymentTree;
 
     /** A mapping to associate deployment IDs to Node Provider */
     private Map<Long, NodeProvider> topologyIdToNodeProviderMapping;
@@ -103,20 +93,12 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     /** The Command builder to use to start the deployment */
     private CommandBuilder commandBuilder;
 
-    /** The node allocator in charge of Node dispatching */
-    private NodeMapper nodeMapper;
-    private ArrayList<String> currentDeploymentPath;
-
-    /** All the nodes created by this GCM Application */
-    private List<Node> nodes;
-
-    /** All the runtime created by this GCM Application */
-    private Queue<ProActiveRuntime> deployedRuntimes;
     private Object deploymentMutex = new Object();
     private boolean isStarted;
     private boolean isKilled;
-    private ProActiveSecurityManager proactiveApplicationSecurityManager;
 
+    private ArrayList<String> currentDeploymentPath;
+    
     private VariableContractImpl vContract;
 
     static public GCMApplication getLocal(long deploymentId) {
@@ -149,49 +131,28 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
 
         try {
-
-            deploymentId = ProActiveRandom.nextPosLong();
-            localDeployments.put(deploymentId, this);
-
-            currentDeploymentPath = new ArrayList<String>();
-            topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
-            nodes = new LinkedList<Node>();
-            deployedRuntimes = new ConcurrentLinkedQueue<ProActiveRuntime>();
-            isStarted = false;
-            isKilled = false;
-
             if (vContract == null) {
                 vContract = new VariableContractImpl();
             }
             this.vContract = vContract;
+            this.descriptor = file;
+            
+            deploymentId = ProActiveRandom.nextPosLong();
+            localDeployments.put(deploymentId, this);
+            isStarted = false;
+            isKilled = false;
 
-            descriptor = file;
+            currentDeploymentPath = new ArrayList<String>();
+            topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
+            
             // vContract will be modified by the Parser to include variable defined in the descriptor
             parser = new GCMApplicationParserImpl(descriptor, this.vContract);
+            application = parser.getApplication();
             nodeProviders = parser.getNodeProviders();
-            virtualNodes = parser.getVirtualNodes();
-            commandBuilder = parser.getCommandBuilder();
-            nodeMapper = new NodeMapper(this, virtualNodes.values());
-
-            proactiveApplicationSecurityManager = parser.getProactiveApplicationSecurityManager();
 
             this.vContract.close();
 
-            // apply Application-wide tech services on local node
-            //
-            Node defaultNode = NodeFactory.getDefaultNode();
-            Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
-            TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
-
-            for (Map.Entry<String, HashMap<String, String>> tsp : appTSProperties) {
-
-                TechnicalService ts = TechnicalServicesFactory.create(tsp.getKey(), tsp.getValue());
-                if (ts != null) {
-                    ts.apply(defaultNode);
-                    ts.apply(halfBodiesNode);
-                }
-            }
-
+            
             // Export this GCMApplication as a remote object
             RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
                 GCMApplication.class.getName(), this, GCMApplicationRemoteObjectAdapter.class);
@@ -240,13 +201,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
     }
 
-    public GCMVirtualNode getVirtualNode(String vnName) {
-        return virtualNodes.get(vnName);
-    }
 
-    public Map<String, GCMVirtualNode> getVirtualNodes() {
-        return new HashMap<String, GCMVirtualNode>(virtualNodes);
-    }
 
     public void kill() {
         isKilled = true;
@@ -260,27 +215,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
     }
 
-    public Topology getTopology() throws ProActiveException {
-        if (!virtualNodes.isEmpty())
-            throw new ProActiveException("getTopology cannot be called if a VirtualNode is defined");
 
-        this.updateNodes();
-        // To not block other threads too long we make a snapshot of the node set
-        Set<Node> nodesCopied;
-        synchronized (nodes) {
-            nodesCopied = new HashSet<Node>(nodes);
-        }
-        return TopologyImpl.createTopology(deploymentTree, nodesCopied);
-    }
-
-    public List<Node> getAllNodes() {
-        if (virtualNodes.size() != 0) {
-            throw new IllegalStateException("getAllNodes cannot be called if a VirtualNode is defined");
-        }
-
-        this.updateNodes();
-        return nodes;
-    }
+   
 
     public String getDebugInformation() {
         Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(false);
@@ -320,28 +256,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return deploymentId;
     }
 
-    public NodeProvider getNodeProviderFromTopologyId(Long topologyId) {
-        return topologyIdToNodeProviderMapping.get(topologyId);
-    }
 
-    public void addNode(Node node) {
-        synchronized (nodes) {
-            nodes.add(node);
-        }
-    }
 
-    public void addDeployedRuntime(ProActiveRuntime part) {
-        if (isKilled) {
-            try {
-                part.killRT(false);
-            } catch (Exception e) {
-                // Connection between the two runtimes will be interrupted 
-                // Eat the exception: Miam Miam Miam
-            }
-        } else {
-            deployedRuntimes.add(part);
-        }
-    }
+
+
 
     /*
      * ----------------------------- Internal Methods
@@ -461,18 +379,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
     }
 
-    public Set<String> getVirtualNodeNames() {
-        return new HashSet<String>(virtualNodes.keySet());
-    }
 
-    public ProActiveSecurityManager getProActiveApplicationSecurityManager() {
-        return proactiveApplicationSecurityManager;
-    }
 
-    public void setProActiveApplicationSecurityManager(
-            ProActiveSecurityManager proactiveApplicationSecurityManager) {
-        this.proactiveApplicationSecurityManager = proactiveApplicationSecurityManager;
-    }
+
 
     /*
      * MUST NOT BE USED IF A VIRTUAL NODE IS DEFINED
