@@ -2,13 +2,17 @@ package functionalTests.annotations.activeobject.inputs;
 
 import java.io.Serializable;
 
+// Java types available only @runtime
+import javassist.ClassPath; // UnknownInterface
+import javassist.bytecode.CodeIterator; // UNknownClass
+
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
-class UnknownExtendedClass extends UnknownClass {}
+class UnknownExtendedClass extends CodeIterator {} // unknown class @Compile time
 
-interface UnknownExtendedInterface extends UnknownInterface{}
+interface UnknownExtendedInterface extends ClassPath{}
 
-class UnknownImplementedInterface implements UnknownInterface, KnownInterface  {}
+class UnknownImplementedInterface implements ClassPath, KnownInterface  {}
 
 interface KnownInterface extends Serializable {}
 
@@ -23,7 +27,7 @@ public class ErrorMissingTypes {
 	}
 	
 	// error! unknown type
-	public ErrorMissingTypes(UnknownClass param){
+	public ErrorMissingTypes(CodeIterator param){
 		
 	}
 	

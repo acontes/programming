@@ -114,7 +114,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 							.getElement(getCurrentPath()));
 				}
 
-				if (fieldNode.getModifiers().getFlags().contains(Modifier.PUBLIC) &&
+				if (accessedFromOutside(fieldNode) &&
 					!fieldNode.getModifiers().getFlags().contains(Modifier.FINAL) &&
 					!hasAccessors(fieldNode.getName().toString(),clazzMembers)) 
 				{
@@ -132,6 +132,12 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void,Trees> {
 		}
 
 		return ret;
+	}
+
+	private final boolean accessedFromOutside(VariableTree fieldNode) {
+		
+		return !fieldNode.getModifiers().getFlags().contains(Modifier.PROTECTED) && !fieldNode.getModifiers().getFlags().contains(Modifier.PRIVATE);
+		
 	}
 
 	private boolean hasAccessors(String fieldName,
