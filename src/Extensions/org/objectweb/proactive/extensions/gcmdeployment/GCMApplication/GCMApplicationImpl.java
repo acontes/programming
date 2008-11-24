@@ -71,7 +71,7 @@ import org.objectweb.proactive.gcmdeployment.Topology;
 
 
 public class GCMApplicationImpl implements GCMApplicationInternal {
-    static private Map<Long, GCMApplication> localDeployments = new HashMap<Long, GCMApplication>();
+//    static private Map<Long, GCMApplication> localDeployments = new HashMap<Long, GCMApplication>();
 
     /** An unique identifier for this deployment */
     final private long deploymentId;
@@ -101,9 +101,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     
     private VariableContractImpl vContract;
 
-    static public GCMApplication getLocal(long deploymentId) {
-        return localDeployments.get(deploymentId);
-    }
+//    static public GCMApplication getLocal(long deploymentId) {
+//        return localDeployments.get(deploymentId);
+//    }
 
     public GCMApplicationImpl(String filename) throws ProActiveException, MalformedURLException {
         this(new URL("file", null, filename), null);
@@ -138,7 +138,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             this.descriptor = file;
             
             deploymentId = ProActiveRandom.nextPosLong();
-            localDeployments.put(deploymentId, this);
+//            localDeployments.put(deploymentId, this);
             isStarted = false;
             isKilled = false;
 
@@ -373,35 +373,15 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
     }
 
-    public void waitReady() {
-        for (GCMVirtualNode vn : virtualNodes.values()) {
-            vn.waitReady();
-        }
+    
+    public boolean isKilled() {
+    	return isKilled;
     }
 
 
 
 
 
-    /*
-     * MUST NOT BE USED IF A VIRTUAL NODE IS DEFINED
-     * 
-     * Asks all unused fakeNodes to the node mapper and creates corresponding nodes.
-     */
-    private void updateNodes() {
-        Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(true);
-        for (FakeNode fakeNode : fakeNodes) {
-            try {
-                // create should not be synchronized since it's remote call
-                Node node = fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN, null);
-                synchronized (nodes) {
-                    nodes.add(node);
-                }
-            } catch (NodeException e) {
-                GCMA_LOGGER.warn("GCM Deployment failed to create a node on " + fakeNode.getRuntimeURL() +
-                    ". Please check your network configuration", e);
-            }
-        }
-    }
 
+ 
 }

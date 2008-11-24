@@ -11,4 +11,6 @@ public interface Application {
     public String getNodeName();
     
     public void parse(Node node, XPath xpath, Map<String, NodeProvider> nodeProviders) throws Exception;
+    
+    
 }

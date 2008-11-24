@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.proactive;
 
-import java.util.ArrayList;
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -15,14 +16,14 @@ import javax.xml.xpath.XPath;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.Application;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeMapper;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesFactory;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
@@ -60,7 +61,7 @@ public class ApplicationProActive implements Application {
         return NODE_NAME;
     }
 
-    public void parse(org.w3c.dom.Node node, XPath xpath) throws Exception {
+    public void parse(org.w3c.dom.Node node, XPath xpath, Map<String, NodeProvider> nodeProvider) throws Exception {
         ApplicationParserProactive parser = new ApplicationParserProactive(configBean, null);
         parser.parseProActiveNode(node, xpath);
         
@@ -136,6 +137,32 @@ public class ApplicationProActive implements Application {
         }
     }
     
+    /*
+     * MUST NOT BE USED IF A VIRTUAL NODE IS DEFINED
+     * 
+     * Asks all unused fakeNodes to the node mapper and creates corresponding nodes.
+     */
+    private void updateNodes() {
+        Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(true);
+        for (FakeNode fakeNode : fakeNodes) {
+            try {
+                // create should not be synchronized since it's remote call
+                Node node = fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN, null);
+                synchronized (nodes) {
+                    nodes.add(node);
+                }
+            } catch (NodeException e) {
+                GCMA_LOGGER.warn("GCM Deployment failed to create a node on " + fakeNode.getRuntimeURL() +
+                    ". Please check your network configuration", e);
+            }
+        }
+    }
+
+    public void waitReady() {
+        for (GCMVirtualNode vn : virtualNodes.values()) {
+            vn.waitReady();
+        }
+    }    
     
     public Set<String> getVirtualNodeNames() {
         return new HashSet<String>(virtualNodes.keySet());
