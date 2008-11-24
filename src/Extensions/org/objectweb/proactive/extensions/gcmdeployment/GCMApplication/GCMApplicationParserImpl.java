@@ -309,19 +309,10 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         }
 
         Node applicationNode = (Node) xpath.evaluate(XPATH_APPLICATION, document, XPathConstants.NODE);
+        Node childNode = applicationNode.getFirstChild();
 
-        NodeList appNodes = applicationNode.getChildNodes();
-
-        for (int i = 0; i < appNodes.getLength(); ++i) {
-            Node commandNode = appNodes.item(i);
-            if (commandNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            
-            Application application = applicationFactory.getApplicationParser(commandNode.getNodeName());
-            application.parse(commandNode, xpath);
-        }
+        Application application = applicationFactory.getApplicationParser(childNode.getNodeName());
+        application.parse(childNode, xpath, getNodeProviders());
 
         return application;
     }

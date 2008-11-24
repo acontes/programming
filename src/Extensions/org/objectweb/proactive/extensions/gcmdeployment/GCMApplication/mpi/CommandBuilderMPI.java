@@ -31,59 +31,30 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.mpi;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
-public class CommandBuilderExecutableMPI implements CommandBuilder {
-    protected static final String NODE_NAME = "mpi";
-    
-    /** List of providers to be used */
-    private List<NodeProvider> providers;
-    private String command;
-
-    /** The path to the command */
-    private PathElement path;
-
-    /** The arguments*/
-    private List<String> args;
-
-    public CommandBuilderExecutableMPI() {
-        providers = new ArrayList<NodeProvider>();
-        args = new ArrayList<String>();
-    }
-
-    public void setCommand(String command) {
-        this.command = command;
-    }
-
-    public void setPath(PathElement pe) {
-        path = pe;
-    }
-
-    public void addArg(String arg) {
-        args.add(arg);
-    }
-
-    public void addDescriptor(NodeProvider nodeProvider) {
-        providers.add(nodeProvider);
+public class CommandBuilderMPI implements CommandBuilder {
+   final private ApplicationMPIBean configBean;
+   
+    public CommandBuilderMPI(ApplicationMPIBean configBean) {
+    	this.configBean = configBean;
     }
 
     public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma) {
         StringBuilder sb = new StringBuilder();
+        
+        PathElement path = configBean.getPath();
         if (path != null) {
-            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this), command, hostInfo));
+            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this), configBean.getCommand(), hostInfo));
         } else {
-            sb.append(command);
+            sb.append(configBean.getCommand());
         }
 
-        for (String arg : args) {
+        for (String arg : configBean.getArgs()) {
             sb.append(" " + arg);
         }
 
@@ -91,8 +62,8 @@ public class CommandBuilderExecutableMPI implements CommandBuilder {
     }
 
     public String getPath(HostInfo hostInfo) {
-        if (path != null) {
-            return path.getFullPath(hostInfo, this);
+        if (configBean.getPath() != null) {
+            return configBean.getPath().getFullPath(hostInfo, this);
         } else {
             return "";
         }

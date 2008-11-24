@@ -49,7 +49,6 @@ public class ApplicationParserExecutable {
     private static final String XPATH_NODE_PROVIDER = "app:nodeProvider";
     private static final String XPATH_COMMAND = "app:command";
     private static final String XPATH_ARG = "app:arg";
-    private static final String XPATH_FILE_TRANSFER = "app:fileTransfer";
 
     final ApplicationExecutableBean configBean;
     final Map<String, NodeProvider> nodeProviders;
@@ -95,7 +94,6 @@ public class ApplicationParserExecutable {
         }
 
         // command args
-        //
         NodeList argNodes = (NodeList) xpath.evaluate(XPATH_ARG, commandNode, XPathConstants.NODESET);
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);

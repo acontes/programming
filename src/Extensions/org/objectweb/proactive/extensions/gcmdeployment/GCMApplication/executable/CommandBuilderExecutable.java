@@ -38,26 +38,28 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.H
 
 
 public class CommandBuilderExecutable implements CommandBuilder {
-
-    public CommandBuilderExecutable() {
-     
+	final private ApplicationExecutableBean bean;
+	
+    public CommandBuilderExecutable(ApplicationExecutableBean bean) {
+    	this.bean = bean;
     }
-
 
     public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma) {
         StringBuilder sb = new StringBuilder();
+        
+        PathElement path = bean.getPath();
         if (path != null) {
-            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this), command, hostInfo));
+            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this), bean.getCommand(), hostInfo));
         } else {
-            sb.append(command);
+            sb.append(bean.getCommand());
         }
 
-        for (String arg : args) {
+        for (String arg : bean.getArgs()) {
             sb.append(" " + arg);
         }
 
         int nbCmd = 0;
-        switch (instances) {
+        switch (bean.getInstances()) {
             case onePerCapacity:
                 nbCmd = hostInfo.getHostCapacity() * hostInfo.getVmCapacity();
                 break;
@@ -93,8 +95,8 @@ public class CommandBuilderExecutable implements CommandBuilder {
     }
 
     public String getPath(HostInfo hostInfo) {
-        if (path != null) {
-            return path.getFullPath(hostInfo, this);
+        if (bean.getPath() != null) {
+            return bean.getPath().getFullPath(hostInfo, this);
         } else {
             return "";
         }
