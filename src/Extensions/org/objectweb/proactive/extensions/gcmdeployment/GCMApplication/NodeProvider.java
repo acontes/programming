@@ -77,7 +77,7 @@ public class NodeProvider {
         return id;
     }
 
-    protected Set<GCMDeploymentDescriptor> getDescriptors() {
+    public Set<GCMDeploymentDescriptor> getDescriptors() {
         return descriptors;
     }
 

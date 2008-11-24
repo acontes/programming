@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.Application;
 
 
 /**
@@ -71,8 +72,10 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * @see Topology
  */
 @PublicAPI
-public interface GCMApplication {
+public interface GCMApplication<Profile extends Application> {
     public long getDeploymentId();
+
+    public Profile getProfile();
 
     /**
      * Starts the deployment of this application instance

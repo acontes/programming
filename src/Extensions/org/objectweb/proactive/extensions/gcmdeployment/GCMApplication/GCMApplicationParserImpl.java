@@ -55,23 +55,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.Application;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.Application;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.Application;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.Application;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.environment.Environment;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -85,12 +75,12 @@ import org.xml.sax.SAXException;
  * Exceptions are not catch but always thrown to the caller. If an error occurs, we want to abort the
  * parsing in progress, wrap the Exception inside a ProActiveException and give it to the user.
  */
-public class GCMApplicationParserImpl implements GCMApplicationParser {
+public class GCMApplicationParserImpl<Profile extends Application> implements GCMApplicationParser<Profile> {
     private static final ApplicationFactory applicationFactory = new ApplicationFactory();
-    
+
     private static final String OLD_DESCRIPTOR_SCHEMA = "http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd";
     public static final String XPATH_GCMAPP = "/app:GCMApplication/";
- 
+
     private static final String XPATH_NODE_PROVIDERS = XPATH_GCMAPP + "app:resources/app:nodeProvider";
     private static final String XPATH_APPLICATION = XPATH_GCMAPP + "app:application";
 
@@ -107,12 +97,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected XPath xpath;
 
     protected List<String> schemas;
-    protected Application application;
+    protected Profile application;
     protected Map<String, NodeProvider> nodeProvidersMap;
-//    protected Map<String, GCMVirtualNodeInternal> virtualNodes;
-
-//    protected TechnicalServicesProperties appTechnicalServices;
-//    protected ProActiveSecurityManager proactiveApplicationSecurityManager;
 
     public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract) throws Exception {
         this(descriptor, vContract, null);
@@ -122,12 +108,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             throws Exception {
         this.descriptor = descriptor;
         this.vContract = vContract;
-//        this.appTechnicalServices = TechnicalServicesProperties.EMPTY;
 
         this.nodeProvidersMap = null;
-//        this.virtualNodes = null;
         this.schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
-
 
         setupJAXP();
 
@@ -141,7 +124,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             String noNamespaceSchema = document.getDocumentElement().getAttribute(
                     "xsi:noNamespaceSchemaLocation");
             if (noNamespaceSchema != null && noNamespaceSchema.contains(OLD_DESCRIPTOR_SCHEMA)) {
-                throw new SAXException("Trying to parse a descriptor using the legacy Deployment Descriptor Schema");
+                throw new SAXException(
+                    "Trying to parse a descriptor using the legacy Deployment Descriptor Schema");
             }
         } catch (SAXException e) {
             String msg = "parsing problem with document " + descriptor.toExternalForm();
@@ -154,8 +138,6 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         }
 
     }
-
-  
 
     public void setupJAXP() throws IOException, ParserConfigurationException, SAXException {
         domFactory = DocumentBuilderFactory.newInstance();
@@ -288,22 +270,13 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 nodeProvider.addGCMDeploymentDescriptor(gcmd);
             }
 
-            // get fileTransfers
-            /*
-             * HashSet<FileTransferBlock> fileTransferBlocks = new HashSet<FileTransferBlock>();
-             * NodeList fileTransferNodes = (NodeList) xpath.evaluate(XPATH_FILETRANSFER, node,
-             * XPathConstants.NODESET); for (int j = 0; j < fileTransferNodes.getLength(); ++j) {
-             * Node fileTransferNode = fileTransferNodes.item(j); FileTransferBlock
-             * fileTransferBlock = GCMParserHelper.parseFileTransferNode(fileTransferNode);
-             * fileTransferBlocks.add(fileTransferBlock); }
-             */
             nodeProvidersMap.put(nodeProvider.getId(), nodeProvider);
         }
 
         return nodeProvidersMap;
     }
 
-    public Application getApplication() throws Exception {
+    public Profile getApplication() throws Exception {
         if (application != null) {
             return application;
         }
@@ -311,7 +284,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         Node applicationNode = (Node) xpath.evaluate(XPATH_APPLICATION, document, XPathConstants.NODE);
         Node childNode = applicationNode.getFirstChild();
 
-        Application application = applicationFactory.getApplicationParser(childNode.getNodeName());
+        // XXX is this right ? We should be able to destroy the Application Factory and simply
+        // create a Profile object by using Class.newInstance()
+        application = (Profile) applicationFactory.getApplicationParser(childNode.getNodeName());
         application.parse(childNode, xpath, getNodeProviders());
 
         return application;

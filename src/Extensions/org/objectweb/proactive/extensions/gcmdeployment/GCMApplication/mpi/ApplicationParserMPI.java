@@ -19,19 +19,16 @@ public class ApplicationParserMPI {
     private static final String XPATH_COMMAND = "app:command";
     private static final String XPATH_ARG = "app:arg";
 
-
     final ApplicationMPIBean configBean;
     final Map<String, NodeProvider> nodeProviders;
-    
-    public ApplicationParserMPI(final ApplicationMPIBean configBean, final Map<String, NodeProvider> nodeProviders) {
+
+    public ApplicationParserMPI(final ApplicationMPIBean configBean,
+            final Map<String, NodeProvider> nodeProviders) {
         this.configBean = configBean;
         this.nodeProviders = Collections.unmodifiableMap(nodeProviders);
     }
 
-
-    
-    public void parseMPINode(Node appNode, XPath xpath)
-            throws Exception {
+    public void parseMPINode(Node appNode, XPath xpath) throws Exception {
 
         NodeList nodeProviderNodes;
         nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER, appNode, XPathConstants.NODESET);

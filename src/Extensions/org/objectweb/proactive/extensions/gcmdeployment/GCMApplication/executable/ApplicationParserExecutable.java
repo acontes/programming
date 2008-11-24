@@ -52,13 +52,13 @@ public class ApplicationParserExecutable {
 
     final ApplicationExecutableBean configBean;
     final Map<String, NodeProvider> nodeProviders;
-    
-    public ApplicationParserExecutable(final ApplicationExecutableBean configBean, final Map<String, NodeProvider> nodeProviders) {
+
+    public ApplicationParserExecutable(final ApplicationExecutableBean configBean,
+            final Map<String, NodeProvider> nodeProviders) {
         this.configBean = configBean;
         this.nodeProviders = Collections.unmodifiableMap(nodeProviders);
     }
-    
-    
+
     public void parseExecutableNode(Node appNode, XPath xpath) throws Exception {
 
         String instancesValue = GCMParserHelper.getAttributeValue(appNode, "instances");
@@ -68,7 +68,7 @@ public class ApplicationParserExecutable {
 
         NodeList nodeProviderNodes;
         nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER, appNode, XPathConstants.NODESET);
-  
+
         // resource providers
         if (nodeProviderNodes.getLength() != 0) {
             for (int i = 0; i < nodeProviderNodes.getLength(); ++i) {

@@ -34,9 +34,7 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 import java.io.IOException;
 import java.util.Map;
 
-import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserConstants;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.xml.sax.SAXException;
 
 
@@ -46,7 +44,7 @@ import org.xml.sax.SAXException;
  * @author The ProActive Team
  *
  */
-public interface GCMApplicationParser extends GCMParserConstants {
+public interface GCMApplicationParser<Profile extends Application> extends GCMParserConstants {
 
     /**
      * Returns all the Resources Providers
@@ -58,26 +56,5 @@ public interface GCMApplicationParser extends GCMParserConstants {
      */
     public Map<String, NodeProvider> getNodeProviders() throws Exception;
 
-    /**
-     * Returns all the Virtual Node
-     *
-     * @return all the declared Virtual Nodes
-     * @throws IOException
-     * @throws SAXException
-     */
-    public Map<String, GCMVirtualNodeInternal> getVirtualNodes() throws Exception;
-
-    public Application getApplication();
-    
-    /**
-     * 
-     * @return the technical services for the defined application
-     */
-    public TechnicalServicesProperties getAppTechnicalServices();
-
-    public ProActiveSecurityManager getProactiveApplicationSecurityManager();
-
-    public void setProactiveApplicationSecurityManager(
-            ProActiveSecurityManager proactiveApplicationSecurityManager);
-
+    public Profile getApplication() throws Exception;
 }

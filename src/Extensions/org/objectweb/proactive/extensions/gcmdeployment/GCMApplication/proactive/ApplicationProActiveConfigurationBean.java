@@ -12,6 +12,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 
+
 public class ApplicationProActiveConfigurationBean {
 
     /** Path to the ProActive installation */
@@ -47,23 +48,22 @@ public class ApplicationProActiveConfigurationBean {
     private PathElement userProperties;
 
     private ProActiveSecurityManager psm;
-    
+
     private PathElement securityPolicy;
-    
+
     /** application security policy file */
     private PathElement applicationPolicy;
 
     /** runtime security policy file */
     private PathElement runtimePolicy;
-    
+
     private TechnicalServicesProperties applicationLevelTechnicalSerives;
 
     public ApplicationProActiveConfigurationBean() {
         vns = new HashMap<String, GCMVirtualNodeInternal>();
         jvmArgs = new ArrayList<String>();
     }
-    
-    
+
     protected PathElement getProActivePath() {
         return proActivePath;
     }
@@ -155,7 +155,7 @@ public class ApplicationProActiveConfigurationBean {
     protected void setRuntimePolicy(PathElement runtimePolicy) {
         this.runtimePolicy = runtimePolicy;
     }
-    
+
     public void addProActivePath(PathElement pe) {
         if (proactiveClasspath == null) {
             proactiveClasspath = new ArrayList<PathElement>();
@@ -186,7 +186,7 @@ public class ApplicationProActiveConfigurationBean {
 
         applicationClasspath = pe;
     }
-    
+
     public void setProActivePath(String proActivePath, String base) {
         if (proActivePath != null) {
             this.proActivePath = new PathElement(proActivePath, base);
@@ -194,35 +194,29 @@ public class ApplicationProActiveConfigurationBean {
         }
     }
 
-
     protected ProActiveSecurityManager getPsm() {
         return psm;
     }
-
 
     protected void setPsm(ProActiveSecurityManager psm) {
         this.psm = psm;
     }
 
-
     protected PathElement getSecurityPolicy() {
         return securityPolicy;
     }
-
 
     protected void setSecurityPolicy(PathElement securityPolicy) {
         this.securityPolicy = securityPolicy;
     }
 
-
     protected TechnicalServicesProperties getApplicationLevelTechnicalSerives() {
         return applicationLevelTechnicalSerives;
     }
-
 
     protected void setApplicationLevelTechnicalSerives(
             TechnicalServicesProperties applicationLevelTechnicalSerives) {
         this.applicationLevelTechnicalSerives = applicationLevelTechnicalSerives;
     }
-    
+
 }

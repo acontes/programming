@@ -54,7 +54,6 @@ public class CommandBuilderProActive implements CommandBuilder {
     final static String PROACTIVE_JAR = "ProActive.jar";
 
     ApplicationProActiveConfigurationBean configBean;
-  
 
     public CommandBuilderProActive(ApplicationProActiveConfigurationBean configBean) {
         GCMD_LOGGER.trace(this.getClass().getSimpleName() + " created");

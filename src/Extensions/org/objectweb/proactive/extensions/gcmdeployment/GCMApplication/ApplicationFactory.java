@@ -5,6 +5,8 @@ import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLogg
 import java.util.HashMap;
 import java.util.Map;
 
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.executable.ApplicationExecutable;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.mpi.ApplicationMPI;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.proactive.ApplicationProActive;
 
 
@@ -18,7 +20,7 @@ public class ApplicationFactory {
 
         registerApplication(ApplicationProActive.class);
         registerApplication(ApplicationExecutable.class);
-        registerApplication(ApplicationExecutableMPI.class);
+        registerApplication(ApplicationMPI.class);
 
         // TODO:  Be able to load user provided Application Parser
     }
@@ -41,8 +43,9 @@ public class ApplicationFactory {
                 ap = cl.newInstance();
             } catch (Exception e) {
                 GCMA_LOGGER.error("Unable to create an Application Parser for " + nodeName);
-                throw new IllegalArgumentException("Failed to create an application parser for " + nodeName, e);               
-            } 
+                throw new IllegalArgumentException("Failed to create an application parser for " + nodeName,
+                    e);
+            }
         } else {
             GCMA_LOGGER.error("Unable to get an Application Parser for " + nodeName);
             throw new IllegalArgumentException("No ApplicationParser registered to parse " + nodeName);

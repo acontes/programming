@@ -31,79 +31,60 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
-import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentResources;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeRemoteObjectAdapter;
-import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.core.DeploymentMap;
+import org.objectweb.proactive.extensions.gcmdeployment.core.DeploymentTreeBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.gcmdeployment.Topology;
 
 
-public class GCMApplicationImpl implements GCMApplicationInternal {
-//    static private Map<Long, GCMApplication> localDeployments = new HashMap<Long, GCMApplication>();
+public class GCMApplicationImpl<Profile extends Application> implements GCMApplicationInternal<Profile> {
+    //    static private Map<Long, GCMApplication> localDeployments = new HashMap<Long, GCMApplication>();
 
     /** An unique identifier for this deployment */
     final private long deploymentId;
 
-    /** descriptor file */
+    /** Location of the application descriptor file */
     final private URL descriptor;
 
     /** GCM Application parser (statefull) */
-    final private GCMApplicationParser parser;
-    
-    final private Application application;
+    final private GCMApplicationParser<Profile> parser;
+
+    /** The embedded application 
+     * 
+     * All application specific operation are done by this application by using
+     * a proxy pattern 
+     */
+    final private Profile application;
 
     /** All Node Providers referenced by the Application descriptor */
     private Map<String, NodeProvider> nodeProviders = null;
 
-    /** A mapping to associate deployment IDs to Node Provider */
-    private Map<Long, NodeProvider> topologyIdToNodeProviderMapping;
+    /** The deployment tree of this application*/
+    final private TopologyRootImpl deploymentTree;
 
-    /** The Command builder to use to start the deployment */
-    private CommandBuilder commandBuilder;
+    /** A map <topologyId, NodeProvider> to enable quick lookups when only the topologyId is known */
+    final private DeploymentMap deploymentMap;
 
-    private Object deploymentMutex = new Object();
-    private boolean isStarted;
-    private boolean isKilled;
-
-    private ArrayList<String> currentDeploymentPath;
-    
+    /** The variable contract between the application and the descriptors */
     private VariableContractImpl vContract;
-
-//    static public GCMApplication getLocal(long deploymentId) {
-//        return localDeployments.get(deploymentId);
-//    }
 
     public GCMApplicationImpl(String filename) throws ProActiveException, MalformedURLException {
         this(new URL("file", null, filename), null);
@@ -127,7 +108,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             file.openStream();
         } catch (IOException e) {
             throw new ProActiveException("Failed to create GCM Application: URL " + file.toString() +
-                " cannot be opened");
+                " cannot be opened", e);
         }
 
         try {
@@ -136,109 +117,51 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             }
             this.vContract = vContract;
             this.descriptor = file;
-            
-            deploymentId = ProActiveRandom.nextPosLong();
-//            localDeployments.put(deploymentId, this);
-            isStarted = false;
-            isKilled = false;
 
-            currentDeploymentPath = new ArrayList<String>();
-            topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
-            
+            this.deploymentId = ProActiveRandom.nextPosLong();
+
             // vContract will be modified by the Parser to include variable defined in the descriptor
-            parser = new GCMApplicationParserImpl(descriptor, this.vContract);
-            application = parser.getApplication();
-            nodeProviders = parser.getNodeProviders();
-
+            this.parser = new GCMApplicationParserImpl<Profile>(descriptor, this.vContract);
             this.vContract.close();
 
-            
+            this.application = parser.getApplication();
+            this.nodeProviders = parser.getNodeProviders();
+            this.deploymentTree = new DeploymentTreeBuilder(this.nodeProviders.values(), this.descriptor)
+                    .getDeploymentTree();
+            this.deploymentMap = new DeploymentMap(this.nodeProviders, this.deploymentTree);
+
             // Export this GCMApplication as a remote object
             RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
                 GCMApplication.class.getName(), this, GCMApplicationRemoteObjectAdapter.class);
             URI uri = RemoteObjectHelper.generateUrl(deploymentId + "/GCMApplication");
             roe.createRemoteObject(uri);
 
-            // Export all VirtualNodes as remote objects
-            for (GCMVirtualNode vn : virtualNodes.values()) {
-                RemoteObjectExposer<GCMVirtualNode> vnroe = new RemoteObjectExposer<GCMVirtualNode>(
-                    GCMVirtualNode.class.getName(), vn, GCMVirtualNodeRemoteObjectAdapter.class);
-                uri = RemoteObjectHelper.generateUrl(deploymentId + "/VirtualNode/" + vn.getName());
-                vnroe.createRemoteObject(uri);
-            }
-        } catch (Exception e) {
+            this.application.configure(this);
+
+        } catch (Throwable e) {
             throw new ProActiveException("Failed to create GCMApplication: " + e.getMessage() +
                 ", see embded message for more details", e);
         }
     }
 
     /*
-     * ----------------------------- GCMApplicationDescriptor interface
+     * ----------------------------- GCMApplication interface
      */
+
+    public Profile getProfile() {
+        return application;
+    }
+
     public void startDeployment() {
-        synchronized (deploymentMutex) {
-            if (isStarted) {
-                GCMA_LOGGER.warn("A GCM Application descriptor cannot be started twice", new Exception());
-                return;
-            }
-
-            isStarted = true;
-
-            deploymentTree = buildDeploymentTree();
-            for (GCMVirtualNodeInternal virtualNode : virtualNodes.values()) {
-                virtualNode.setDeploymentTree(deploymentTree);
-            }
-
-            for (NodeProvider nodeProvider : nodeProviders.values()) {
-                nodeProvider.start(commandBuilder, this);
-            }
-        }
+        application.startDeployment();
     }
 
     public boolean isStarted() {
-        synchronized (deploymentMutex) {
-            return isStarted;
-        }
+        return application.isStarted();
     }
-
-
 
     public void kill() {
-        isKilled = true;
-        for (ProActiveRuntime part : deployedRuntimes) {
-            try {
-                part.killRT(false);
-            } catch (Exception e) {
-                // Connection between the two runtimes will be interrupted 
-                // Eat the exception: Miam Miam Miam
-            }
-        }
-    }
-
-
-   
-
-    public String getDebugInformation() {
-        Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(false);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Number of unmapped nodes: " + fakeNodes.size() + "\n");
-        for (FakeNode fakeNode : fakeNodes) {
-            sb.append("\t" + fakeNode.getRuntimeURL() + "(capacity=" + fakeNode.getCapacity() + ")\n");
-        }
-        return sb.toString();
-    }
-
-    public void updateTopology(Topology topology) throws ProActiveException {
-        if (!virtualNodes.isEmpty())
-            throw new ProActiveException("updateTopology cannot be called if a VirtualNode is defined");
-
-        this.updateNodes();
-        // To not block other threads too long we make a snapshot of the node set
-        Set<Node> nodesCopied;
-        synchronized (nodes) {
-            nodesCopied = new HashSet<Node>(nodes);
-        }
-        TopologyImpl.updateTopology(topology, nodesCopied);
+        application.kill();
     }
 
     public VariableContractImpl getVariableContract() {
@@ -250,138 +173,73 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     }
 
     /*
-     * ----------------------------- GCMApplicationDescriptorInternal interface
+     * ----------------------------- GCMApplicationInternal interface
      */
     public long getDeploymentId() {
         return deploymentId;
     }
 
+    public void addDeployedRuntime(ProActiveRuntime part) {
+        // TODO Auto-generated method stub
 
-
-
-
-
-    /*
-     * ----------------------------- Internal Methods
-     */
-    protected TopologyRootImpl buildDeploymentTree() {
-        // make root node from local JVM
-        TopologyRootImpl rootNode = new TopologyRootImpl();
-
-        ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-        currentDeploymentPath.clear();
-        pushDeploymentPath(proActiveRuntime.getVMInformation().getName());
-
-        rootNode.setDeploymentDescriptorPath("none"); // no deployment descriptor here
-
-        rootNode.setApplicationDescriptorPath(descriptor.toExternalForm());
-
-        rootNode.setDeploymentPath(getCurrentDeploymentPath());
-        popDeploymentPath();
-
-        // Build leaf nodes
-        for (NodeProvider nodeProvider : nodeProviders.values()) {
-            for (GCMDeploymentDescriptor gdd : nodeProvider.getDescriptors()) {
-                GCMDeploymentDescriptorImpl gddi = (GCMDeploymentDescriptorImpl) gdd;
-                GCMDeploymentResources resources = gddi.getResources();
-
-                HostInfo hostInfo = resources.getHostInfo();
-                if (hostInfo != null) {
-                    buildHostInfoTreeNode(rootNode, rootNode, hostInfo, nodeProvider, gdd);
-                }
-
-                for (Group group : resources.getGroups()) {
-                    buildGroupTreeNode(rootNode, rootNode, group, nodeProvider, gdd);
-                }
-
-                for (Bridge bridge : resources.getBridges()) {
-                    buildBridgeTree(rootNode, rootNode, bridge, nodeProvider, gdd);
-                }
-            }
-        }
-
-        return rootNode;
     }
 
-    /**
-     * return a copy of the current deployment path
-     * 
-     * @return
-     */
-    private List<String> getCurrentDeploymentPath() {
-        return new ArrayList<String>(currentDeploymentPath);
+    public void addNode(Node node) {
+        // TODO Auto-generated method stub
+
     }
 
-    private TopologyImpl buildHostInfoTreeNode(TopologyRootImpl rootNode, TopologyImpl parentNode,
-            HostInfo hostInfo, NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
-        pushDeploymentPath(hostInfo.getId());
-        TopologyImpl node = new TopologyImpl();
-        node.setDeploymentDescriptorPath(gcmd.getDescriptorURL().toExternalForm());
-        node.setApplicationDescriptorPath(rootNode.getApplicationDescriptorPath());
-        node.setDeploymentPath(getCurrentDeploymentPath());
-        node.setNodeProvider(nodeProvider.getId());
-        hostInfo.setTopologyId(node.getId());
-        topologyIdToNodeProviderMapping.put(node.getId(), nodeProvider);
-        rootNode.addNode(node, parentNode);
-        popDeploymentPath(); // ???
-        return node;
+    public DeploymentMap getDeploymentMap() {
+        return deploymentMap;
     }
 
-    private void buildGroupTreeNode(TopologyRootImpl rootNode, TopologyImpl parentNode, Group group,
-            NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
-        pushDeploymentPath(group.getId());
-        buildHostInfoTreeNode(rootNode, parentNode, group.getHostInfo(), nodeProvider, gcmd);
-        popDeploymentPath();
+    public List<Node> getAllNodes() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    private void buildBridgeTree(TopologyRootImpl rootNode, TopologyImpl parentNode, Bridge bridge,
-            NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
-        pushDeploymentPath(bridge.getId());
-
-        TopologyImpl node = parentNode;
-
-        // first look for a host info...
-        //
-        if (bridge.getHostInfo() != null) {
-            HostInfo hostInfo = bridge.getHostInfo();
-            node = buildHostInfoTreeNode(rootNode, parentNode, hostInfo, nodeProvider, gcmd);
-        }
-
-        // then groups...
-        //
-        if (bridge.getGroups() != null) {
-            for (Group group : bridge.getGroups()) {
-                buildGroupTreeNode(rootNode, node, group, nodeProvider, gcmd);
-            }
-        }
-
-        // then bridges (and recurse)
-        if (bridge.getBridges() != null) {
-            for (Bridge subBridge : bridge.getBridges()) {
-                buildBridgeTree(rootNode, node, subBridge, nodeProvider, gcmd);
-            }
-        }
-
-        popDeploymentPath();
+    public String getDebugInformation() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    private boolean pushDeploymentPath(String pathElement) {
-        return currentDeploymentPath.add(pathElement);
+    public ProActiveSecurityManager getProActiveApplicationSecurityManager() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    private void popDeploymentPath() {
-        currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
+    public Topology getTopology() throws ProActiveException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    
-    public boolean isKilled() {
-    	return isKilled;
+    public GCMVirtualNode getVirtualNode(String vnName) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
+    public Set<String> getVirtualNodeNames() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    public Map<String, GCMVirtualNode> getVirtualNodes() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    public void setProActiveApplicationSecurityManager(
+            ProActiveSecurityManager proactiveApplicationSecurityManager) {
+        // TODO Auto-generated method stub
 
+    }
 
+    public void updateTopology(Topology topology) throws ProActiveException {
+        // TODO Auto-generated method stub
 
- 
+    }
+
+    public void waitReady() {
+        this.application.waitReady();
+    }
 }

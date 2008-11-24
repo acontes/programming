@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.Application;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
@@ -67,7 +68,8 @@ public class PAGCMDeployment {
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
-    public static GCMApplication loadApplicationDescriptor(URL url) throws ProActiveException {
+    public static <Profile extends Application> GCMApplication<Profile> loadApplicationDescriptor(URL url)
+            throws ProActiveException {
         return loadApplicationDescriptor(url, null);
     }
 
@@ -81,7 +83,8 @@ public class PAGCMDeployment {
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
-    public static GCMApplication loadApplicationDescriptor(File file) throws ProActiveException {
+    public static <Profile extends Application> GCMApplication<Profile> loadApplicationDescriptor(File file)
+            throws ProActiveException {
         return loadApplicationDescriptor(Helpers.fileToURL(file), null);
     }
 
@@ -98,15 +101,15 @@ public class PAGCMDeployment {
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
-    public static GCMApplication loadApplicationDescriptor(URL url, VariableContractImpl vContract)
-            throws ProActiveException {
-        GCMApplication gcma = new GCMApplicationImpl(url, vContract);
+    public static <Profile extends Application> GCMApplication<Profile> loadApplicationDescriptor(URL url,
+            VariableContractImpl vContract) throws ProActiveException {
+        GCMApplication<Profile> gcma = new GCMApplicationImpl<Profile>(url, vContract);
 
         String name = gcma.getDeploymentId() + "/GCMApplication";
 
         URI uri = URIBuilder.buildURI("localhost", name);
         RemoteObject ro = RemoteObjectHelper.lookup(uri);
-        gcma = (GCMApplication) RemoteObjectHelper.generatedObjectStub(ro);
+        gcma = (GCMApplication<Profile>) RemoteObjectHelper.generatedObjectStub(ro);
 
         return gcma;
     }
@@ -123,15 +126,15 @@ public class PAGCMDeployment {
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
-    public static GCMApplication loadApplicationDescriptor(File file, VariableContractImpl vContract)
-            throws ProActiveException {
-        GCMApplication gcma = new GCMApplicationImpl(Helpers.fileToURL(file), vContract);
+    public static <Profile extends Application> GCMApplication<Profile> loadApplicationDescriptor(File file,
+            VariableContractImpl vContract) throws ProActiveException {
+        GCMApplication<Profile> gcma = new GCMApplicationImpl<Profile>(Helpers.fileToURL(file), vContract);
 
         String name = gcma.getDeploymentId() + "/GCMApplication";
 
         URI uri = URIBuilder.buildURI("localhost", name);
         RemoteObject ro = RemoteObjectHelper.lookup(uri);
-        gcma = (GCMApplication) RemoteObjectHelper.generatedObjectStub(ro);
+        gcma = (GCMApplication<Profile>) RemoteObjectHelper.generatedObjectStub(ro);
 
         return gcma;
     }

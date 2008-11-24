@@ -38,18 +38,19 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.H
 
 
 public class CommandBuilderMPI implements CommandBuilder {
-   final private ApplicationMPIBean configBean;
-   
+    final private ApplicationMPIBean configBean;
+
     public CommandBuilderMPI(ApplicationMPIBean configBean) {
-    	this.configBean = configBean;
+        this.configBean = configBean;
     }
 
     public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma) {
         StringBuilder sb = new StringBuilder();
-        
+
         PathElement path = configBean.getPath();
         if (path != null) {
-            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this), configBean.getCommand(), hostInfo));
+            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this), configBean.getCommand(),
+                    hostInfo));
         } else {
             sb.append(configBean.getCommand());
         }

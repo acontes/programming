@@ -33,10 +33,11 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.extensions.gcmdeployment.core.DeploymentMap;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
-public interface GCMApplicationInternal extends GCMApplication {
+public interface GCMApplicationInternal<Profile extends Application> extends GCMApplication<Profile> {
 
     /**
      * Adds a Node to the application
@@ -46,12 +47,5 @@ public interface GCMApplicationInternal extends GCMApplication {
 
     public void addDeployedRuntime(ProActiveRuntime part);
 
-    /**
-     * Returns the Node Provider mapped to this deployment ID
-     *
-     * @param topologyId a deployment ID
-     * @return the Node Provider mapped to this deployment ID, or null if not found
-     */
-    public NodeProvider getNodeProviderFromTopologyId(Long topologyId);
-
+    public DeploymentMap getDeploymentMap();
 }
