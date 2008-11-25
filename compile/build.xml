@@ -454,7 +454,6 @@
 			     not directly accessible through the classpath.
 			     i.e. we cannot use the jar index tip -->
 						<pathelement location="${lib.dir}/ibis-1.4.jar" />
-						<pathelement location="${java.home}/lib/tools.jar" />
 					</additionalClasspath>
 					<path refid="test.classpath" />
 				</classpath>
