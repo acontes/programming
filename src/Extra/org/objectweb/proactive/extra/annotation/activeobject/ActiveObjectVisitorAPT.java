@@ -348,7 +348,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
     //		
     //		return false;
     //	}
-
     /*
      * test for the criteria that must be met by the class constructors:
      * * there must be the empty no-arg constructor
