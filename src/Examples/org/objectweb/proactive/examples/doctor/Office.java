@@ -34,8 +34,10 @@ package org.objectweb.proactive.examples.doctor;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
+@ActiveObject
 public class Office {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 

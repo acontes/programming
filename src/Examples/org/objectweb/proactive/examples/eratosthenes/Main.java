@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -66,6 +67,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * A control window allows to terminate the application and to pause
  * temporarily the NumberSource.
  * */
+@ActiveObject
 public class Main implements ActivePrimeContainerCreator, InitActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private PrimeOutputListener outputListener;

@@ -34,6 +34,7 @@ import junit.framework.Assert;
 import functionalTests.annotations.CTreeTest;
 import functionalTests.annotations.AnnotationTest.Result;
 
+
 /**
  * Test for the @OnDeparture/@OnArrival annotations; ctree version
  * @author fabratu
@@ -42,32 +43,32 @@ import functionalTests.annotations.AnnotationTest.Result;
  */
 public class TestCTree extends CTreeTest {
 
-	@org.junit.Before
-	public void init() throws Exception {
-		envInit();
-		inputFilesPathInit(this.getClass());
-		testInit();
-	}
-	
-	@org.junit.Test
-	public void action() throws Exception {
-		
-		// misplaced annotation
-		Assert.assertEquals( new Result(2,0) , checkFile("MisplacedAnnotation") );
+    @org.junit.Before
+    public void init() throws Exception {
+        envInit();
+        inputFilesPathInit(this.getClass());
+        testInit();
+    }
 
-		// "simple" tests
-		Assert.assertEquals( OK , checkFile("SimpleAccept") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorReturnType") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorParameters") );
-		
-		// "complex" tests
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixedDeparture") );
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorMixedArrival") );
-	}
-	
-	@org.junit.After
-	public void endTest() throws Exception {
-		testCleanup();
-	}
-	
+    @org.junit.Test
+    public void action() throws Exception {
+
+        // misplaced annotation
+        Assert.assertEquals(new Result(2, 0), checkFile("MisplacedAnnotation"));
+
+        // "simple" tests
+        Assert.assertEquals(OK, checkFile("SimpleAccept"));
+        Assert.assertEquals(new Result(2, 0), checkFile("ErrorReturnType"));
+        Assert.assertEquals(new Result(2, 0), checkFile("ErrorParameters"));
+
+        // "complex" tests
+        Assert.assertEquals(new Result(2, 0), checkFile("ErrorMixedDeparture"));
+        Assert.assertEquals(new Result(2, 0), checkFile("ErrorMixedArrival"));
+    }
+
+    @org.junit.After
+    public void endTest() throws Exception {
+        testCleanup();
+    }
+
 }

@@ -38,23 +38,23 @@ package org.objectweb.proactive.extra.annotation.activeobject;
  */
 public class GenerateGettersSetters {
 
-	public static String getterName(String fieldName) {
-				
-		String name = fieldName;
-		if (name.length() > 0) {
-			name = Character.toUpperCase(name.charAt(0)) + name.substring(1);  
-		}
-		
-		return "get" + name;
-	}
+    public static String getterName(String fieldName) {
 
-	public static String setterName(String fieldName) {
-		String name = fieldName;
-		if (name.length() > 0) {
-			name = Character.toUpperCase(name.charAt(0)) + name.substring(1);  
-		}
-		
-		return "set" + name;
-	}
+        String name = fieldName;
+        if (name.length() > 0) {
+            name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        }
+
+        return "get" + name;
+    }
+
+    public static String setterName(String fieldName) {
+        String name = fieldName;
+        if (name.length() > 0) {
+            name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        }
+
+        return "set" + name;
+    }
 
 }

@@ -43,41 +43,41 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 
-public class VirtualNodeIsReadyCallbackVisitorCTree extends TreePathScanner<Void,Trees> {
 
-	private Messager compilerOutput;
+public class VirtualNodeIsReadyCallbackVisitorCTree extends TreePathScanner<Void, Trees> {
 
-	public VirtualNodeIsReadyCallbackVisitorCTree(ProcessingEnvironment procEnv) {
-		compilerOutput = procEnv.getMessager();
-	}
+    private Messager compilerOutput;
 
-	@Override
-	public Void visitMethod(MethodTree methodNode, Trees trees) {
+    public VirtualNodeIsReadyCallbackVisitorCTree(ProcessingEnvironment procEnv) {
+        compilerOutput = procEnv.getMessager();
+    }
 
-		boolean correctSignature = false;
+    @Override
+    public Void visitMethod(MethodTree methodNode, Trees trees) {
 
-		if(returnsVoid(methodNode) && methodNode.getParameters().size()==1) {
-			if (methodNode.getParameters().get(0).getType().toString().equals(String.class.getSimpleName())) {
-				correctSignature = true;
-			}
-		}
+        boolean correctSignature = false;
 
-		if (!correctSignature) {
-			compilerOutput.printMessage(
-					Diagnostic.Kind.ERROR,
-					ErrorMessages.INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK,
-					trees.getElement(getCurrentPath()));
-		}
+        if (returnsVoid(methodNode) && methodNode.getParameters().size() == 1) {
+            if (methodNode.getParameters().get(0).getType().toString().equals(String.class.getSimpleName())) {
+                correctSignature = true;
+            }
+        }
 
-		return super.visitMethod(methodNode, trees);
-	}
+        if (!correctSignature) {
+            compilerOutput.printMessage(Diagnostic.Kind.ERROR,
+                    ErrorMessages.INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK, trees
+                            .getElement(getCurrentPath()));
+        }
 
-	private boolean returnsVoid(MethodTree methodNode) {
-		if(methodNode.getReturnType().getKind().equals(Tree.Kind.PRIMITIVE_TYPE)){
-			PrimitiveTypeTree retType = (PrimitiveTypeTree)methodNode.getReturnType();
-			return retType.getPrimitiveTypeKind().equals(TypeKind.VOID);
-		}
-		return false;
-	}
+        return super.visitMethod(methodNode, trees);
+    }
+
+    private boolean returnsVoid(MethodTree methodNode) {
+        if (methodNode.getReturnType().getKind().equals(Tree.Kind.PRIMITIVE_TYPE)) {
+            PrimitiveTypeTree retType = (PrimitiveTypeTree) methodNode.getReturnType();
+            return retType.getPrimitiveTypeKind().equals(TypeKind.VOID);
+        }
+        return false;
+    }
 
 }

@@ -4,16 +4,26 @@ import java.util.List;
 
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
 
+
 @RemoteObject
-public class Reject{
-	public Reject(int n) {} // E no-arg constructor
-	private volatile List<Object> _someLocks;
-	private synchronized void doNothingSynchronized() {}
-	private final int dontOverrideMe() { return 0; } //E final method
+public class Reject {
+    public Reject(int n) {
+    } // E no-arg constructor
 
-	public int _counter; // W no getters/setters
+    private volatile List<Object> _someLocks;
 
-	//public int getCounter() { return _counter; }
+    private synchronized void doNothingSynchronized() {
+    }
 
-	public void setCounter(int counter) { _counter = counter; }
+    private final int dontOverrideMe() {
+        return 0;
+    } //E final method
+
+    public int _counter; // W no getters/setters
+
+    //public int getCounter() { return _counter; }
+
+    public void setCounter(int counter) {
+        _counter = counter;
+    }
 }

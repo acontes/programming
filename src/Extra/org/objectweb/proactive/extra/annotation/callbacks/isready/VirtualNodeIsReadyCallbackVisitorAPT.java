@@ -42,39 +42,39 @@ import com.sun.mirror.type.VoidType;
 import com.sun.mirror.util.SimpleDeclarationVisitor;
 import com.sun.mirror.util.SourcePosition;
 
+
 public class VirtualNodeIsReadyCallbackVisitorAPT extends SimpleDeclarationVisitor {
 
-	private final Messager _compilerOutput;
+    private final Messager _compilerOutput;
 
-	public VirtualNodeIsReadyCallbackVisitorAPT(final Messager messager) {
-		super();
-		_compilerOutput = messager;
-	}
+    public VirtualNodeIsReadyCallbackVisitorAPT(final Messager messager) {
+        super();
+        _compilerOutput = messager;
+    }
 
-	@Override
-	public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
+    @Override
+    public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
 
-		boolean correctSignature = false;
-		// return type must be void
-		if(methodDeclaration.getReturnType() instanceof VoidType &&
-		   methodDeclaration.getParameters().size()==1)
-		{
-			Iterator<ParameterDeclaration> it = methodDeclaration.getParameters().iterator();
-			ParameterDeclaration param = it.next();
+        boolean correctSignature = false;
+        // return type must be void
+        if (methodDeclaration.getReturnType() instanceof VoidType &&
+            methodDeclaration.getParameters().size() == 1) {
+            Iterator<ParameterDeclaration> it = methodDeclaration.getParameters().iterator();
+            ParameterDeclaration param = it.next();
 
-			if (param.getType().toString().equals(String.class.getName())) {
-				correctSignature = true;
-			}
-		}
+            if (param.getType().toString().equals(String.class.getName())) {
+                correctSignature = true;
+            }
+        }
 
-		if (!correctSignature) {
-			reportError(methodDeclaration, ErrorMessages.INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK);
-		}
-	}
+        if (!correctSignature) {
+            reportError(methodDeclaration, ErrorMessages.INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK);
+        }
+    }
 
-	protected void reportError( Declaration declaration , String msg ) {
-		SourcePosition sourceCodePos = declaration.getPosition();
-		_compilerOutput.printError( sourceCodePos , "[ERROR] " + msg);
-	}
+    protected void reportError(Declaration declaration, String msg) {
+        SourcePosition sourceCodePos = declaration.getPosition();
+        _compilerOutput.printError(sourceCodePos, "[ERROR] " + msg);
+    }
 
 }

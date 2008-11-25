@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 /**
@@ -58,6 +59,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author The ProActive Team
  */
+@ActiveObject
 public class Chat implements java.io.Serializable, RunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 

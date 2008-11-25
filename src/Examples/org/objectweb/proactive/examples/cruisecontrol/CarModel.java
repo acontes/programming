@@ -31,9 +31,13 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+
+
 /**
  * The class representing the current road
  */
+@ActiveObject
 public class CarModel implements org.objectweb.proactive.RunActive {
 
     /** constants representing the ACTIVE state of the car */

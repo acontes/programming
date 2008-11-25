@@ -35,6 +35,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 /**
  * <p>This annotation can be used on a method that is a migration signal for an Active Object.
  * It is known that, in order to migrate, an Active Object must export a public method in which 

@@ -38,30 +38,31 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitor
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.util.Trees;
 
+
 /**
  * <p>This class implements a visitor for the ProActiveProcessor, according to the Pluggable Annotation Processing API(jsr269) specification</p>
  */
 public class RemoteObjectVisitorCTree extends ActiveObjectVisitorCTree {
 
-	public RemoteObjectVisitorCTree(ProcessingEnvironment procEnv) {
-		super(procEnv);
-	}
+    public RemoteObjectVisitorCTree(ProcessingEnvironment procEnv) {
+        super(procEnv);
+    }
 
-	@Override
-	public Void visitReturn(ReturnTree returnNode, Trees trees) {
-		return null;
-	}
+    @Override
+    public Void visitReturn(ReturnTree returnNode, Trees trees) {
+        return null;
+    }
 
-	protected void reportError(String msg, Element element) {
-		String newMsg = msg.replaceAll("active", "remote");
-		newMsg = newMsg.replaceAll("Active", "Remote");
-		super.reportError(newMsg, element);
-	}
+    protected void reportError(String msg, Element element) {
+        String newMsg = msg.replaceAll("active", "remote");
+        newMsg = newMsg.replaceAll("Active", "Remote");
+        super.reportError(newMsg, element);
+    }
 
-	protected void reportWarning(String msg, Element element) {
-		String newMsg = msg.replaceAll("active", "remote");
-		newMsg = newMsg.replaceAll("Active", "Remote");
-		super.reportWarning(newMsg, element);
-	}
-	
+    protected void reportWarning(String msg, Element element) {
+        String newMsg = msg.replaceAll("active", "remote");
+        newMsg = newMsg.replaceAll("Active", "Remote");
+        super.reportWarning(newMsg, element);
+    }
+
 }

@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.annotation;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
+
 /**
  * This interface centralizes all the error messages reported by the annotation processors
  * @author fabratu
@@ -41,58 +42,61 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
  */
 public interface ErrorMessages {
 
-	/*
-	 * Error Messages issued when checking classes annotated with the ActiveObject annotation
-	 * errors related to ActiveObject conforming rules
-	 */ 
-	
-	// @ActiveObject
-	// the class doesn't have a no-arg constructor
-	public static final String NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE = "This object does not define a no-arg empty constructor.";
+    /*
+     * Error Messages issued when checking classes annotated with the ActiveObject annotation
+     * errors related to ActiveObject conforming rules
+     */
 
-	public static final String EMPTY_CONSTRUCTOR = "An active object non-args constructor should be empty";
+    // @ActiveObject
+    // the class doesn't have a no-arg constructor
+    public static final String NO_NOARG_CONSTRUCTOR_ERROR_MESSAGE = "This object does not define a no-arg empty constructor.";
 
-	// the class's  no-arg constructor is private
-	public static final String NO_NOARG_CONSTRUCTOR_CANNOT_BE_PRIVATE_MESSAGE = "An active object cannot have private non-args constructor";
-	// the class must have constructors with Serializable parameters
-	public static final String NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE = "Non-serializable parameter detected on constructor. " +
-	"An active object must have serializable parameters for all its constructors.\n";
-	public static final String NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE = "Non-serializable parameter detected for non-private method. " +
-	"An active object must have serializable parameters for all its non-private methods.\n";
-	// the class doesn't implement the serializable interface
-	public static final String NO_SERIALIZABLE_ERROR_MESSAGE = "An active object should implement the Serializable interface.\n";
-	// the class is final
-	public static final String IS_FINAL_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot be final.\n";
-	// the class has final members
-	public static final String HAS_FINAL_MEMBER_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot have final members.\n";
-	// the class has volatile members
-	public static final String HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE = "An active object already has an implicit synchronisation mechanism, wait-by-necessity. The synchronized/volatile keywords are therefore useless for a member of an active object.\n";
-	// the class is not public 
-	public static final String IS_NOT_PUBLIC_ERROR_MESSAGE = "An active object must be public.\n";
-	// the return type of a method of the class is not reifiable
-	public static final String RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE = " is not a reifiable type. The return type must be reifiable in order to have asynchronous method calls.\n";
-	// there is a field without getters/setters
-	public static final String NO_GETTERS_SETTERS_ERROR_MESSAGE = "A field of an active object cannot be accessed directly, but only through getter/setter methods.\n";
-	// a method of the class returns null
-	public static final String NO_NULL_RETURN_ERROR_MSG = "A method of an active object should not return null," +
-	" as the caller cannot check the future value against the null literal";
-	
-	// @MigrationSignal
-	// the annotation is not used inside an Active Object class declaration
-	public static final String NOT_IN_ACTIVE_OBJECT_ERROR_MESSAGE = "The " + MigrationSignal.class.getName() + " annotation has no sense outside an active object.\n" +
-			"If you think about using the enclosing class as an active object, maybe you should annotate it with " + ActiveObject.class.getName() + "\n";
-	// the migration method is not public
-	public static final String NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE = " The method is not public. It does not make sense to have a migration signal that cannot be used from outside the class definition.\n";
-	// the migrateTo call is not the last one in the method
-	public static final String MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE = "Incorrect usage of the migrateTo method. It should be the last statement in the method body on all block paths, and it should not be used inside loops, otherwise it can cause undefined behaviour.\n";
-	
-	// the migrateTo call can not be found in the migrateTo method
-	public static final String MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE = " The migrateTo call could not be found inside the body of the method.\n ";
-	
-	// MigrationStrategy - @OnDeparture/@OnArrival
-	public static final String INVALID_MIGRATION_STRATEGY_METHOD = " Invalid signature for a method which implements a migration strategy";
+    public static final String EMPTY_CONSTRUCTOR = "An active object non-args constructor should be empty";
 
-	// @VirtualNodeIsReadyCallback and @NodeAttachmentCallback
-	public static final String INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK = "Incorrect method signature. \nIsReady callback method must have the following signature: void method(String)";
-	public static final String INCORRECT_METHOD_SIGNATURE_FOR_NODE_ATTACHEMENT_CALLBACK = "Incorrect method signature. \nNode attachement callback method must have the following signature: void method(Node, String)";
+    // the class's  no-arg constructor is private
+    public static final String NO_NOARG_CONSTRUCTOR_CANNOT_BE_PRIVATE_MESSAGE = "An active object cannot have private non-args constructor";
+    // the class must have constructors with Serializable parameters
+    public static final String NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE = "Non-serializable parameter detected on constructor. "
+        + "An active object must have serializable parameters for all its constructors.\n";
+    public static final String NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE = "Non-serializable parameter detected for non-private method. "
+        + "An active object must have serializable parameters for all its non-private methods.\n";
+    // the class doesn't implement the serializable interface
+    public static final String NO_SERIALIZABLE_ERROR_MESSAGE = "An active object should implement the Serializable interface.\n";
+    // the class is final
+    public static final String IS_FINAL_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot be final.\n";
+    // the class has final members
+    public static final String HAS_FINAL_MEMBER_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot have final members.\n";
+    // the class has volatile members
+    public static final String HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE = "An active object already has an implicit synchronisation mechanism, wait-by-necessity. The synchronized/volatile keywords are therefore useless for a member of an active object.\n";
+    // the class is not public 
+    public static final String IS_NOT_PUBLIC_ERROR_MESSAGE = "An active object must be public.\n";
+    // the return type of a method of the class is not reifiable
+    public static final String RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE = " is not a reifiable type. The return type must be reifiable in order to have asynchronous method calls.\n";
+    // there is a field without getters/setters
+    public static final String NO_GETTERS_SETTERS_ERROR_MESSAGE = "A field of an active object cannot be accessed directly, but only through getter/setter methods.\n";
+    // a method of the class returns null
+    public static final String NO_NULL_RETURN_ERROR_MSG = "A method of an active object should not return null,"
+        + " as the caller cannot check the future value against the null literal";
+
+    // @MigrationSignal
+    // the annotation is not used inside an Active Object class declaration
+    public static final String NOT_IN_ACTIVE_OBJECT_ERROR_MESSAGE = "The " +
+        MigrationSignal.class.getName() +
+        " annotation has no sense outside an active object.\n" +
+        "If you think about using the enclosing class as an active object, maybe you should annotate it with " +
+        ActiveObject.class.getName() + "\n";
+    // the migration method is not public
+    public static final String NOT_PUBLIC_MIGRATION_SIGNAL_ERROR_MESSAGE = " The method is not public. It does not make sense to have a migration signal that cannot be used from outside the class definition.\n";
+    // the migrateTo call is not the last one in the method
+    public static final String MIGRATE_TO_NOT_FINAL_STATEMENT_ERROR_MESSAGE = "Incorrect usage of the migrateTo method. It should be the last statement in the method body on all block paths, and it should not be used inside loops, otherwise it can cause undefined behaviour.\n";
+
+    // the migrateTo call can not be found in the migrateTo method
+    public static final String MIGRATE_TO_NOT_FOUND_ERROR_MESSAGE = " The migrateTo call could not be found inside the body of the method.\n ";
+
+    // MigrationStrategy - @OnDeparture/@OnArrival
+    public static final String INVALID_MIGRATION_STRATEGY_METHOD = " Invalid signature for a method which implements a migration strategy";
+
+    // @VirtualNodeIsReadyCallback and @NodeAttachmentCallback
+    public static final String INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK = "Incorrect method signature. \nIsReady callback method must have the following signature: void method(String)";
+    public static final String INCORRECT_METHOD_SIGNATURE_FOR_NODE_ATTACHEMENT_CALLBACK = "Incorrect method signature. \nNode attachement callback method must have the following signature: void method(Node, String)";
 }

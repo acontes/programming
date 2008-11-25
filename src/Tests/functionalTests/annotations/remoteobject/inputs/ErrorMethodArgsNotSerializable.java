@@ -8,27 +8,35 @@ import javax.naming.directory.Attribute;
 
 import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
 
-class SerialParam implements Serializable {}
 
-class Beta extends SerialParam{}
+class SerialParam implements Serializable {
+}
+
+class Beta extends SerialParam {
+}
 
 @RemoteObject
 public class ErrorMethodArgsNotSerializable {
 
-	// Integer extends Number implements Serializable
-	public void doSomething(Integer in) {}
+    // Integer extends Number implements Serializable
+    public void doSomething(Integer in) {
+    }
 
-	// String implements Serializable
-	void doSomething2(String str) {}
+    // String implements Serializable
+    void doSomething2(String str) {
+    }
 
-	// interface javax.naming.directory.Attribute extends Serializable
-	// SerialParam implements Serializable
-	private void doSomething3(Attribute attr, SerialParam sp ) {}
+    // interface javax.naming.directory.Attribute extends Serializable
+    // SerialParam implements Serializable
+    private void doSomething3(Attribute attr, SerialParam sp) {
+    }
 
-	// Beta extends SerialParam implements Serializable
-	public void doSomethingg(Beta b) {}
+    // Beta extends SerialParam implements Serializable
+    public void doSomethingg(Beta b) {
+    }
 
-	// FileInputStream NOT serializable
-	public void readInputFromFile(FileInputStream in) throws IOException {}
+    // FileInputStream NOT serializable
+    public void readInputFromFile(FileInputStream in) throws IOException {
+    }
 
 }

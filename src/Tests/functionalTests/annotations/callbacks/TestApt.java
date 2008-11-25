@@ -33,24 +33,25 @@ package functionalTests.annotations.callbacks;
 import junit.framework.Assert;
 import functionalTests.annotations.AptTest;
 
+
 public class TestApt extends AptTest {
 
-	@org.junit.Before
-	public void init() throws Exception {
-		envInit();
-		inputFilesPathInit(this.getClass());
-		testInit();
-	}
+    @org.junit.Before
+    public void init() throws Exception {
+        envInit();
+        inputFilesPathInit(this.getClass());
+        testInit();
+    }
 
-	@org.junit.Test
-	public void action() throws Exception {
+    @org.junit.Test
+    public void action() throws Exception {
 
-		Assert.assertEquals( new Result(4,0), checkFile("IsReady") );
-		Assert.assertEquals( new Result(4,0), checkFile("NodeAttachment"));
-	}
+        Assert.assertEquals(new Result(4, 0), checkFile("IsReady"));
+        Assert.assertEquals(new Result(4, 0), checkFile("NodeAttachment"));
+    }
 
-	@org.junit.After
-	public void endTest() throws Exception {
-		testCleanup();
-	}
+    @org.junit.After
+    public void endTest() throws Exception {
+        testCleanup();
+    }
 }

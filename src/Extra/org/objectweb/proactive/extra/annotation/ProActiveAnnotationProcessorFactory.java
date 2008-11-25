@@ -1,4 +1,5 @@
 package org.objectweb.proactive.extra.annotation;
+
 /*
  * ################################################################
  *
@@ -41,65 +42,64 @@ import com.sun.mirror.apt.AnnotationProcessorFactory;
 import com.sun.mirror.apt.AnnotationProcessors;
 import com.sun.mirror.declaration.AnnotationTypeDeclaration;
 
+
 /**
  * This is the factory that provides the ActiveObjectAnnotationProcessor 
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 3.90
  */
-public class ProActiveAnnotationProcessorFactory implements
-		AnnotationProcessorFactory {
-	
-	// annotation factory supported options
-	private static final Collection<String> _supportedOptions = 
-		Collections.unmodifiableCollection(Arrays.asList(
-				"enableTypeGenerationInEditor" // Eclipse IDE option
-				));
-	// the annotations for which this factory provides processors
-	private static final Collection<String> _supportedAnnotations =
-		Collections.singletonList("org.objectweb.proactive.extra.annotation.*");
-		//new LinkedList<String>();
-	
-	// no-arg constructor required by the Mirror API
-	public ProActiveAnnotationProcessorFactory() {
-		/*_supportedAnnotations.add(ActiveObject.class.getName());
-		_supportedAnnotations.add(RemoteObject.class.getName());
-		_supportedAnnotations.add(OnDeparture.class.getName());
-		_supportedAnnotations.add(OnArrival.class.getName());
-		_supportedAnnotations.add(NodeAttachmentCallback.class.getName());
-		_supportedAnnotations.add(VirtualNodeIsReadyCallback.class.getName());*/
-	}
+public class ProActiveAnnotationProcessorFactory implements AnnotationProcessorFactory {
 
-	/* (non-Javadoc)
-	 * @see com.sun.mirror.apt.AnnotationProcessorFactory#getProcessorFor(java.util.Set, com.sun.mirror.apt.AnnotationProcessorEnvironment)
-	 */
-	@Override
-	public AnnotationProcessor getProcessorFor(
-			Set<AnnotationTypeDeclaration> annotations,
-			AnnotationProcessorEnvironment env) {
-		
-		if (annotations.isEmpty()) {
-			return AnnotationProcessors.NO_OP;
-		} else {
-			return new ProActiveProcessorApt(env);
-		}
-		
-	}
+    // annotation factory supported options
+    private static final Collection<String> _supportedOptions = Collections.unmodifiableCollection(Arrays
+            .asList("enableTypeGenerationInEditor" // Eclipse IDE option
+            ));
+    // the annotations for which this factory provides processors
+    private static final Collection<String> _supportedAnnotations = Collections
+            .singletonList("org.objectweb.proactive.extra.annotation.*");
 
-	/* (non-Javadoc)
-	 * @see com.sun.mirror.apt.AnnotationProcessorFactory#supportedAnnotationTypes()
-	 */
-	@Override
-	public Collection<String> supportedAnnotationTypes() {
-		return _supportedAnnotations;
-	}
+    //new LinkedList<String>();
 
-	/* (non-Javadoc)
-	 * @see com.sun.mirror.apt.AnnotationProcessorFactory#supportedOptions()
-	 */
-	@Override
-	public Collection<String> supportedOptions() {
-		return _supportedOptions;
-	}
+    // no-arg constructor required by the Mirror API
+    public ProActiveAnnotationProcessorFactory() {
+        /*_supportedAnnotations.add(ActiveObject.class.getName());
+        _supportedAnnotations.add(RemoteObject.class.getName());
+        _supportedAnnotations.add(OnDeparture.class.getName());
+        _supportedAnnotations.add(OnArrival.class.getName());
+        _supportedAnnotations.add(NodeAttachmentCallback.class.getName());
+        _supportedAnnotations.add(VirtualNodeIsReadyCallback.class.getName());*/
+    }
+
+    /* (non-Javadoc)
+     * @see com.sun.mirror.apt.AnnotationProcessorFactory#getProcessorFor(java.util.Set, com.sun.mirror.apt.AnnotationProcessorEnvironment)
+     */
+    @Override
+    public AnnotationProcessor getProcessorFor(Set<AnnotationTypeDeclaration> annotations,
+            AnnotationProcessorEnvironment env) {
+
+        if (annotations.isEmpty()) {
+            return AnnotationProcessors.NO_OP;
+        } else {
+            return new ProActiveProcessorApt(env);
+        }
+
+    }
+
+    /* (non-Javadoc)
+     * @see com.sun.mirror.apt.AnnotationProcessorFactory#supportedAnnotationTypes()
+     */
+    @Override
+    public Collection<String> supportedAnnotationTypes() {
+        return _supportedAnnotations;
+    }
+
+    /* (non-Javadoc)
+     * @see com.sun.mirror.apt.AnnotationProcessorFactory#supportedOptions()
+     */
+    @Override
+    public Collection<String> supportedOptions() {
+        return _supportedOptions;
+    }
 
 }

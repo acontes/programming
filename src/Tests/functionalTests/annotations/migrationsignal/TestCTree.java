@@ -34,6 +34,7 @@ import junit.framework.Assert;
 import functionalTests.annotations.CTreeTest;
 import functionalTests.annotations.AnnotationTest.Result;
 
+
 /**
  * @author fabratu
  * @version %G%, %I%
@@ -41,45 +42,45 @@ import functionalTests.annotations.AnnotationTest.Result;
  */
 public class TestCTree extends CTreeTest {
 
-	@org.junit.Before
-	public void init() throws Exception {
-		envInit();
-		inputFilesPathInit(this.getClass());
-		testInit();
-	}
-	
-	@org.junit.Test
-	public void action() throws Exception {
-		
-		// misplaced annotation
-		Assert.assertEquals( ERROR , checkFile("MisplacedAnnotation"));
-		
-		// checking conditions that should be ok
-		Assert.assertEquals( OK , checkFile("AcceptSimple"));
-		Assert.assertEquals( OK , checkFile("AcceptIndirectCall"));
-		Assert.assertEquals( new Result(3,0) , checkFile("AcceptInterClassCall")); // TODO not yet implemented
-		
-		// checking conditions that should be seen as errors
-		Assert.assertEquals( ERROR , checkFile("ErrorNotInActiveObject"));
-		Assert.assertEquals( new Result(4,0) , checkFile("ErrorNotLast"));
+    @org.junit.Before
+    public void init() throws Exception {
+        envInit();
+        inputFilesPathInit(this.getClass());
+        testInit();
+    }
 
-		Assert.assertEquals( ERROR , checkFile("ErrorNoMigrateTo"));
+    @org.junit.Test
+    public void action() throws Exception {
 
-		// block checking  
-		Assert.assertEquals( new Result(2,0) , checkFile("ErrorNotLastBlock"));
-		Assert.assertEquals( OK , checkFile("AcceptBlock")); // for sickos
-		Assert.assertEquals( ERROR , checkFile("TryCatchFinally"));
-		Assert.assertEquals( OK , checkFile("CatchMigrationException"));
-		Assert.assertEquals( new Result(2,0) , checkFile("Fi"));
-		Assert.assertEquals( new Result(8,0) , checkFile("Loopz"));
-		Assert.assertEquals( OK , checkFile("Synchronized")); // for sickos
-		Assert.assertEquals( ERROR , checkFile("Switch"));
+        // misplaced annotation
+        Assert.assertEquals(ERROR, checkFile("MisplacedAnnotation"));
 
-	}
-	
-	@org.junit.After
-	public void endTest() throws Exception {
-		testCleanup();
-	}
-	
+        // checking conditions that should be ok
+        Assert.assertEquals(OK, checkFile("AcceptSimple"));
+        Assert.assertEquals(OK, checkFile("AcceptIndirectCall"));
+        Assert.assertEquals(new Result(3, 0), checkFile("AcceptInterClassCall")); // TODO not yet implemented
+
+        // checking conditions that should be seen as errors
+        Assert.assertEquals(ERROR, checkFile("ErrorNotInActiveObject"));
+        Assert.assertEquals(new Result(4, 0), checkFile("ErrorNotLast"));
+
+        Assert.assertEquals(ERROR, checkFile("ErrorNoMigrateTo"));
+
+        // block checking  
+        Assert.assertEquals(new Result(2, 0), checkFile("ErrorNotLastBlock"));
+        Assert.assertEquals(OK, checkFile("AcceptBlock")); // for sickos
+        Assert.assertEquals(ERROR, checkFile("TryCatchFinally"));
+        Assert.assertEquals(OK, checkFile("CatchMigrationException"));
+        Assert.assertEquals(new Result(2, 0), checkFile("Fi"));
+        Assert.assertEquals(new Result(8, 0), checkFile("Loopz"));
+        Assert.assertEquals(OK, checkFile("Synchronized")); // for sickos
+        Assert.assertEquals(ERROR, checkFile("Switch"));
+
+    }
+
+    @org.junit.After
+    public void endTest() throws Exception {
+        testCleanup();
+    }
+
 }

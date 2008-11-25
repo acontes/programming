@@ -43,40 +43,40 @@ import com.sun.mirror.type.VoidType;
 import com.sun.mirror.util.SimpleDeclarationVisitor;
 import com.sun.mirror.util.SourcePosition;
 
+
 public class NodeAttachmentCallbackVisitorAPT extends SimpleDeclarationVisitor {
 
-	private final Messager _compilerOutput;
+    private final Messager _compilerOutput;
 
-	public NodeAttachmentCallbackVisitorAPT(final Messager messager) {
-		super();
-		_compilerOutput = messager;
-	}
+    public NodeAttachmentCallbackVisitorAPT(final Messager messager) {
+        super();
+        _compilerOutput = messager;
+    }
 
-	@Override
-	public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
-		boolean correctSignature = false;
-		// return type must be void
-		if(methodDeclaration.getReturnType() instanceof VoidType &&
-		   methodDeclaration.getParameters().size()==2)
-		{
-			Iterator<ParameterDeclaration> it = methodDeclaration.getParameters().iterator();
-			ParameterDeclaration param = it.next();
-			ParameterDeclaration param2 = it.next();
+    @Override
+    public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
+        boolean correctSignature = false;
+        // return type must be void
+        if (methodDeclaration.getReturnType() instanceof VoidType &&
+            methodDeclaration.getParameters().size() == 2) {
+            Iterator<ParameterDeclaration> it = methodDeclaration.getParameters().iterator();
+            ParameterDeclaration param = it.next();
+            ParameterDeclaration param2 = it.next();
 
-			if (param.getType().toString().equals(Node.class.getName()) &&
-				param2.getType().toString().equals(String.class.getName()))
-			{
-				correctSignature = true;
-			}
-		}
+            if (param.getType().toString().equals(Node.class.getName()) &&
+                param2.getType().toString().equals(String.class.getName())) {
+                correctSignature = true;
+            }
+        }
 
-		if (!correctSignature) {
-			reportError(methodDeclaration, ErrorMessages.INCORRECT_METHOD_SIGNATURE_FOR_NODE_ATTACHEMENT_CALLBACK);
-		}
-	}
+        if (!correctSignature) {
+            reportError(methodDeclaration,
+                    ErrorMessages.INCORRECT_METHOD_SIGNATURE_FOR_NODE_ATTACHEMENT_CALLBACK);
+        }
+    }
 
-	protected void reportError( Declaration declaration , String msg ) {
-		SourcePosition sourceCodePos = declaration.getPosition();
-		_compilerOutput.printError( sourceCodePos , "[ERROR] " + msg);
-	}
+    protected void reportError(Declaration declaration, String msg) {
+        SourcePosition sourceCodePos = declaration.getPosition();
+        _compilerOutput.printError(sourceCodePos, "[ERROR] " + msg);
+    }
 }

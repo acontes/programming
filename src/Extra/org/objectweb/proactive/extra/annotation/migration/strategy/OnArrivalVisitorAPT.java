@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.annotation.migration.strategy;
 
 import com.sun.mirror.apt.Messager;
 
+
 /**
  * The visitor that implements the checks for the @OnArrival annotation
  * @author fabratu
@@ -40,10 +41,10 @@ import com.sun.mirror.apt.Messager;
  */
 public class OnArrivalVisitorAPT extends OnDepartureVisitorAPT {
 
-	public OnArrivalVisitorAPT(Messager messager) {
-		super(messager);
-		ERROR_PREFIX_STATIC = " is annotated using the @" 
-			+ OnArrival.class.getSimpleName() + " annotation.\n";
-	}
+    public OnArrivalVisitorAPT(Messager messager) {
+        super(messager);
+        ERROR_PREFIX_STATIC = " is annotated using the @" + OnArrival.class.getSimpleName() +
+            " annotation.\n";
+    }
 
 }

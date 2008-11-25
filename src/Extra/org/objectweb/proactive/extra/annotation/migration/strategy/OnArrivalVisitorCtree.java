@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.annotation.migration.strategy;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
+
 /**
  * @author fabratu
  * @version %G%, %I%
@@ -39,11 +40,10 @@ import javax.annotation.processing.ProcessingEnvironment;
  */
 public class OnArrivalVisitorCtree extends OnDepartureVisitorCtree {
 
-	public OnArrivalVisitorCtree(ProcessingEnvironment procEnv) {
-		super(procEnv);
-		
-		ERROR_PREFIX_STATIC = " is annotated using the " 
-			+ OnArrival.class.getSimpleName() + " annotation.\n";
-	}
+    public OnArrivalVisitorCtree(ProcessingEnvironment procEnv) {
+        super(procEnv);
+
+        ERROR_PREFIX_STATIC = " is annotated using the " + OnArrival.class.getSimpleName() + " annotation.\n";
+    }
 
 }

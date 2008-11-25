@@ -31,9 +31,13 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+
+
 /** The active object for the controller,
  * checks the speed of the car when it is on
  */
+@ActiveObject
 public class CruiseControl implements org.objectweb.proactive.RunActive {
 
     /** */

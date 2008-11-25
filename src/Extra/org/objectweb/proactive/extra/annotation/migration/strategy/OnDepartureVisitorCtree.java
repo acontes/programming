@@ -44,60 +44,57 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 
+
 /**
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class OnDepartureVisitorCtree extends TreePathScanner<Void,Trees> {
-	// error messages
-	protected String ERROR_PREFIX_STATIC = " is annotated using the " 
-		+ OnDeparture.class.getSimpleName() + " annotation.\n";
-	
-	protected final String ERROR_SUFFIX = "\nPlease refer to the ProActive manual for further help on implementing migration strategies.\n";
-	
-	protected transient String ERROR_PREFIX;
+public class OnDepartureVisitorCtree extends TreePathScanner<Void, Trees> {
+    // error messages
+    protected String ERROR_PREFIX_STATIC = " is annotated using the " + OnDeparture.class.getSimpleName() +
+        " annotation.\n";
 
-	private Messager compilerOutput;
+    protected final String ERROR_SUFFIX = "\nPlease refer to the ProActive manual for further help on implementing migration strategies.\n";
 
-	public OnDepartureVisitorCtree(ProcessingEnvironment procEnv) {
-		compilerOutput = procEnv.getMessager();
-	}
-	
-	@Override
-	public Void visitMethod(MethodTree methodNode, Trees trees) {
-		
-		ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC;
-		
-		if(!returnsVoid(methodNode))
-			reportError( "the method shouldn't have any return value," +
-					" but instead returns " + methodNode.getReturnType().toString(),
-					trees.getElement(getCurrentPath())
-					);
-		
-		if(!methodNode.getParameters().isEmpty())
-			reportError( "the method accepts parameters" , trees.getElement(getCurrentPath()));
-		
-		return super.visitMethod(methodNode, trees);
-	}
-	
-	private boolean returnsVoid(MethodTree methodNode) {
-		if(methodNode.getReturnType().getKind().equals(Tree.Kind.PRIMITIVE_TYPE)){
-			PrimitiveTypeTree retType = (PrimitiveTypeTree)methodNode.getReturnType();
-			return retType.getPrimitiveTypeKind().equals(TypeKind.VOID);
-		}
-		return false;
-	}
+    protected transient String ERROR_PREFIX;
 
-	protected void reportError(String msg, Element element) {
-		compilerOutput.printMessage(Diagnostic.Kind.ERROR, 
-				"[ERROR]" + ERROR_PREFIX + ErrorMessages.INVALID_MIGRATION_STRATEGY_METHOD 
-				+ ": " + msg + ERROR_SUFFIX, element);
-	}
+    private Messager compilerOutput;
 
-	protected void reportWarning(String msg, Element element) {
-		compilerOutput.printMessage(Diagnostic.Kind.WARNING, 
-				"[ERROR]" + ERROR_PREFIX + ErrorMessages.INVALID_MIGRATION_STRATEGY_METHOD 
-				+ ": " + msg + ERROR_SUFFIX, element);
-	}
+    public OnDepartureVisitorCtree(ProcessingEnvironment procEnv) {
+        compilerOutput = procEnv.getMessager();
+    }
+
+    @Override
+    public Void visitMethod(MethodTree methodNode, Trees trees) {
+
+        ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC;
+
+        if (!returnsVoid(methodNode))
+            reportError("the method shouldn't have any return value," + " but instead returns " +
+                methodNode.getReturnType().toString(), trees.getElement(getCurrentPath()));
+
+        if (!methodNode.getParameters().isEmpty())
+            reportError("the method accepts parameters", trees.getElement(getCurrentPath()));
+
+        return super.visitMethod(methodNode, trees);
+    }
+
+    private boolean returnsVoid(MethodTree methodNode) {
+        if (methodNode.getReturnType().getKind().equals(Tree.Kind.PRIMITIVE_TYPE)) {
+            PrimitiveTypeTree retType = (PrimitiveTypeTree) methodNode.getReturnType();
+            return retType.getPrimitiveTypeKind().equals(TypeKind.VOID);
+        }
+        return false;
+    }
+
+    protected void reportError(String msg, Element element) {
+        compilerOutput.printMessage(Diagnostic.Kind.ERROR, "[ERROR]" + ERROR_PREFIX +
+            ErrorMessages.INVALID_MIGRATION_STRATEGY_METHOD + ": " + msg + ERROR_SUFFIX, element);
+    }
+
+    protected void reportWarning(String msg, Element element) {
+        compilerOutput.printMessage(Diagnostic.Kind.WARNING, "[ERROR]" + ERROR_PREFIX +
+            ErrorMessages.INVALID_MIGRATION_STRATEGY_METHOD + ": " + msg + ERROR_SUFFIX, element);
+    }
 }

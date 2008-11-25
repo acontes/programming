@@ -35,21 +35,22 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObjectVisitor
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.Declaration;
 
+
 public class RemoteObjectVisitorAPT extends ActiveObjectVisitorAPT {
-	
-	public RemoteObjectVisitorAPT(final Messager messager) {
-		super(messager);
-	}
-	
-	protected void reportError( Declaration declaration , String msg ) {
-		String newMsg = msg.replaceAll("active", "remote");
-		newMsg = newMsg.replaceAll("Active", "Remote");
-		super.reportError(declaration, newMsg);
-	}
-	
-	protected void reportWarning( Declaration declaration, String msg) {
-		String newMsg = msg.replaceAll("active", "remote");
-		newMsg = newMsg.replaceAll("Active", "Remote");
-		super.reportWarning(declaration, newMsg);
-	}
+
+    public RemoteObjectVisitorAPT(final Messager messager) {
+        super(messager);
+    }
+
+    protected void reportError(Declaration declaration, String msg) {
+        String newMsg = msg.replaceAll("active", "remote");
+        newMsg = newMsg.replaceAll("Active", "Remote");
+        super.reportError(declaration, newMsg);
+    }
+
+    protected void reportWarning(Declaration declaration, String msg) {
+        String newMsg = msg.replaceAll("active", "remote");
+        newMsg = newMsg.replaceAll("Active", "Remote");
+        super.reportWarning(declaration, newMsg);
+    }
 }
