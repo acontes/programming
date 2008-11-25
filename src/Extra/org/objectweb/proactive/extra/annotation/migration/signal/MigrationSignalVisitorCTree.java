@@ -479,7 +479,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void,Trees> {
 	 */
 	private boolean checkReturnStatement(StatementTree lastStatement) {
 		
-		if( !(lastStatement.getKind().equals(Kind.BREAK)) ) {
+		if( lastStatement.getKind().equals(Kind.BREAK) ) {
 			return true;
 		}
 		
