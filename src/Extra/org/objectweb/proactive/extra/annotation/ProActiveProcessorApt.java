@@ -56,7 +56,6 @@ import com.sun.mirror.declaration.AnnotationTypeDeclaration;
 import com.sun.mirror.declaration.Declaration;
 import com.sun.mirror.util.SimpleDeclarationVisitor;
 
-
 /**
  * The AnnotationProcessor that processes the ActiveObject annotation.
  * It processes only objects.
@@ -69,61 +68,60 @@ import com.sun.mirror.util.SimpleDeclarationVisitor;
  */
 
 public class ProActiveProcessorApt implements AnnotationProcessor {
+	
+	private final AnnotationProcessorEnvironment _environment;
+	
+	private final Map<Class, SimpleDeclarationVisitor> _annotationVisitors = 
+		new HashMap<Class, SimpleDeclarationVisitor>();
 
-    private final AnnotationProcessorEnvironment _environment;
+	public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
+		
+		_environment = env;
+		Messager messager = _environment.getMessager();
 
-    private final Map<Class, SimpleDeclarationVisitor> _annotationVisitors = new HashMap<Class, SimpleDeclarationVisitor>();
+		_annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(messager));
+		_annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(messager));
+		_annotationVisitors.put(OnDeparture.class, new OnDepartureVisitorAPT(messager));
+		_annotationVisitors.put(OnArrival.class, new OnArrivalVisitorAPT(messager));
+		_annotationVisitors.put(NodeAttachmentCallback.class, new NodeAttachmentCallbackVisitorAPT(messager));
+		_annotationVisitors.put(VirtualNodeIsReadyCallback.class, new VirtualNodeIsReadyCallbackVisitorAPT(messager));
+		
+	}
 
-    public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
+	@Override
+	public void process() {
+		for( Entry<Class, SimpleDeclarationVisitor> av_pair : _annotationVisitors.entrySet()) {
+			Class annotation = av_pair.getKey();
+			String annotName = annotation.getName();
+			AnnotationTypeDeclaration annotDeclaration = 
+				(AnnotationTypeDeclaration)_environment.getTypeDeclaration(annotName);
+			Target applicableOn = annotDeclaration.getAnnotation(Target.class);
+			SimpleDeclarationVisitor visitor = av_pair.getValue();
+			
+			if(visitor == null)
+				return;
+			
+			for( Declaration typeDeclaration : _environment.getDeclarationsAnnotatedWith(annotDeclaration) ) {
+				
+				if(!testSuitableDeclaration( typeDeclaration , applicableOn)) {
+					_environment.getMessager().printError(typeDeclaration.getPosition(), 
+							"[ERROR] The @" + annotation.getSimpleName() + " annotation is not applicable for this type of Java construct.");
+				}
+				
+				// check using the visitor
+				typeDeclaration.accept(visitor);
+			}
+		}
+	}
 
-        _environment = env;
-        Messager messager = _environment.getMessager();
-
-        _annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(messager));
-        _annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(messager));
-        _annotationVisitors.put(OnDeparture.class, new OnDepartureVisitorAPT(messager));
-        _annotationVisitors.put(OnArrival.class, new OnArrivalVisitorAPT(messager));
-        _annotationVisitors.put(NodeAttachmentCallback.class, new NodeAttachmentCallbackVisitorAPT(messager));
-        _annotationVisitors.put(VirtualNodeIsReadyCallback.class, new VirtualNodeIsReadyCallbackVisitorAPT(
-            messager));
-
-    }
-
-    @Override
-    public void process() {
-        for (Entry<Class, SimpleDeclarationVisitor> av_pair : _annotationVisitors.entrySet()) {
-            Class annotation = av_pair.getKey();
-            String annotName = annotation.getName();
-            AnnotationTypeDeclaration annotDeclaration = (AnnotationTypeDeclaration) _environment
-                    .getTypeDeclaration(annotName);
-            Target applicableOn = annotDeclaration.getAnnotation(Target.class);
-            SimpleDeclarationVisitor visitor = av_pair.getValue();
-
-            if (visitor == null)
-                return;
-
-            for (Declaration typeDeclaration : _environment.getDeclarationsAnnotatedWith(annotDeclaration)) {
-
-                if (!testSuitableDeclaration(typeDeclaration, applicableOn)) {
-                    _environment.getMessager().printError(
-                            typeDeclaration.getPosition(),
-                            "[ERROR] The @" + annotation.getSimpleName() +
-                                " annotation is not applicable for this type of Java construct.");
-                }
-
-                // check using the visitor
-                typeDeclaration.accept(visitor);
-            }
-        }
-    }
-
-    private boolean testSuitableDeclaration(Declaration typeDeclaration, Target applicableOn) {
-
-        for (ElementType applicableType : applicableOn.value()) {
-            if (Utils.applicableOnDeclaration(applicableType, typeDeclaration))
-                return true;
-        }
-        return false;
-    }
+	private boolean testSuitableDeclaration(Declaration typeDeclaration,
+			Target applicableOn) {
+		
+		for( ElementType applicableType : applicableOn.value() ) {
+			if(UtilsApt.applicableOnDeclaration(applicableType,typeDeclaration))
+				return true;
+		}
+		return false;
+	}	
 
 }

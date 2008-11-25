@@ -28,26 +28,22 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation;
+package org.objectweb.proactive.extra.annotation.migration.strategy;
 
-import com.sun.mirror.apt.AnnotationProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
 
-/** This annotation processor processes the annotations provided by default
- * whith JDK 1.5. This is needed in order to suppress the unnecessary warnings that
- * apt generates for these default annotations.
- * See also http://forums.sun.com/thread.jspa?threadID=5345947
+/**
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-	
-public class BogusAnnotationProcessor implements AnnotationProcessor{
+public class OnArrivalVisitorCTree extends OnDepartureVisitorCTree {
 
-	public BogusAnnotationProcessor() {
-	}
-	
-	public void process() {
-		// nothing! 
+	public OnArrivalVisitorCTree(ProcessingEnvironment procEnv) {
+		super(procEnv);
+		
+		ERROR_PREFIX_STATIC = " is annotated using the " 
+			+ OnArrival.class.getSimpleName() + " annotation.\n";
 	}
 
 }

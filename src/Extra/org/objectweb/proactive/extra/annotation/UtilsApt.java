@@ -28,22 +28,36 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.annotation.migration.strategy;
+package org.objectweb.proactive.extra.annotation;
 
-import javax.annotation.processing.ProcessingEnvironment;
+import java.lang.annotation.ElementType;
 
+import com.sun.mirror.declaration.ClassDeclaration;
+import com.sun.mirror.declaration.ConstructorDeclaration;
+import com.sun.mirror.declaration.Declaration;
+import com.sun.mirror.declaration.FieldDeclaration;
+import com.sun.mirror.declaration.MethodDeclaration;
 
 /**
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class OnArrivalVisitorCtree extends OnDepartureVisitorCtree {
-
-    public OnArrivalVisitorCtree(ProcessingEnvironment procEnv) {
-        super(procEnv);
-
-        ERROR_PREFIX_STATIC = " is annotated using the " + OnArrival.class.getSimpleName() + " annotation.\n";
-    }
-
+public class UtilsApt {
+	// hack
+	public static boolean applicableOnDeclaration(ElementType applicableType,
+			Declaration typeDeclaration) {
+		
+		if( typeDeclaration instanceof ClassDeclaration )
+			return applicableType.equals(ElementType.TYPE);
+		if( typeDeclaration instanceof MethodDeclaration )
+			return applicableType.equals(ElementType.METHOD);
+		if( typeDeclaration instanceof FieldDeclaration)
+			return applicableType.equals(ElementType.FIELD);
+		if( typeDeclaration instanceof ConstructorDeclaration)
+			return applicableType.equals(ElementType.CONSTRUCTOR);
+		// TODO add others when needed
+		
+		return false;
+	}
 }

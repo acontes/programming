@@ -41,7 +41,6 @@ import com.sun.mirror.apt.AnnotationProcessorFactory;
 import com.sun.mirror.apt.AnnotationProcessors;
 import com.sun.mirror.declaration.AnnotationTypeDeclaration;
 
-
 /** This processor factory provides the bogus annotation processor for 
  * the default annotations exported in the JDK 1.5.
  * This is needed in order to suppress the unnecessary warnings that
@@ -51,34 +50,33 @@ import com.sun.mirror.declaration.AnnotationTypeDeclaration;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class BogusAnnotationProcessorFactory implements AnnotationProcessorFactory {
+public class BogusAnnotationProcessorFactory  implements AnnotationProcessorFactory{
 
-    private static final Collection<String> _supportedAnnotations = new ArrayList<String>();
+	private static final Collection<String> _supportedAnnotations =
+		new ArrayList<String>();
+	
+	public BogusAnnotationProcessorFactory() {
+		_supportedAnnotations.add(Override.class.getName());
+		_supportedAnnotations.add(SuppressWarnings.class.getName());
+		_supportedAnnotations.add(Deprecated.class.getName());
+	}
+	
+	public AnnotationProcessor getProcessorFor(
+			Set<AnnotationTypeDeclaration> annotations,
+			AnnotationProcessorEnvironment env) {
+		if (annotations.isEmpty()) {
+			return AnnotationProcessors.NO_OP;
+		} else {
+			return new BogusAnnotationProcessor();
+		}
+	}
 
-    public BogusAnnotationProcessorFactory() {
-        _supportedAnnotations.add(Override.class.getName());
-        _supportedAnnotations.add(SuppressWarnings.class.getName());
-        _supportedAnnotations.add(Deprecated.class.getName());
-    }
+	public Collection<String> supportedAnnotationTypes() {
+		return _supportedAnnotations;
+	}
 
-    @Override
-    public AnnotationProcessor getProcessorFor(Set<AnnotationTypeDeclaration> annotations,
-            AnnotationProcessorEnvironment env) {
-        if (annotations.isEmpty()) {
-            return AnnotationProcessors.NO_OP;
-        } else {
-            return new BogusAnnotationProcessor();
-        }
-    }
-
-    @Override
-    public Collection<String> supportedAnnotationTypes() {
-        return _supportedAnnotations;
-    }
-
-    @Override
-    public Collection<String> supportedOptions() {
-        return Collections.EMPTY_LIST;
-    }
+	public Collection<String> supportedOptions() {
+		return Collections.EMPTY_LIST;
+	}
 
 }
