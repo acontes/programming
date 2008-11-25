@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.junit.Ignore;
 import org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory;
 
 import functionalTests.FunctionalTest;
@@ -48,6 +49,7 @@ import functionalTests.FunctionalTest;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
+@Ignore
 public abstract class AptTest extends AnnotationTest {
 	
 	private String[] _aptCommand;

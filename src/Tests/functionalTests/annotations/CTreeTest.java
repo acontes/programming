@@ -53,6 +53,7 @@ import javax.tools.ToolProvider;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject.Kind;
 
+import org.junit.Ignore;
 import org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree;
 
 /**
@@ -61,6 +62,7 @@ import org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
+@Ignore
 public abstract class CTreeTest extends AnnotationTest {
 	
 	private JavaCompiler _compiler;

@@ -32,6 +32,7 @@ package functionalTests.annotations;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
@@ -42,6 +43,7 @@ import functionalTests.FunctionalTest;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
+@Ignore
 public abstract class AnnotationTest extends FunctionalTest {
 	
 	// automatic environment configuration stuff
