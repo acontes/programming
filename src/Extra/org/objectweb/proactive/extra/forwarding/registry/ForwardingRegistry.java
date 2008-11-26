@@ -34,9 +34,9 @@ public class ForwardingRegistry {
 	private boolean running = false;
 	private int listeningPort;
 
-	RegistryServerSideRunnable server = new RegistryServerSideRunnable(this);
-	private HashMap<Object, RegistrationHandler> registrationHandlerMap = new HashMap<Object, RegistrationHandler>();
-	private LinkedBlockingQueue<ForwardedMessage> messageQueue = new LinkedBlockingQueue<ForwardedMessage>();
+	final RegistryServerSideRunnable server = new RegistryServerSideRunnable(this);
+	final private HashMap<Object, RegistrationHandler> registrationHandlerMap = new HashMap<Object, RegistrationHandler>();
+	final private LinkedBlockingQueue<ForwardedMessage> messageQueue = new LinkedBlockingQueue<ForwardedMessage>();
 
 	public ForwardingRegistry(int listeningPort) {
 		this.listeningPort = listeningPort;

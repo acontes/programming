@@ -23,9 +23,9 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
 	//	static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 	public static final Logger logger = TestLogger.getLogger();
 	
-	private ForwardingRegistry registry;
+	final private ForwardingRegistry registry;
 	private Object hostId = null;
-	private ForwardingSocketWrapper clientSocketWrapper;
+	final private ForwardingSocketWrapper clientSocketWrapper;
 	private OutHandler outHandler;
 	private boolean listening = true;
 

@@ -15,16 +15,16 @@ public class IncomingDispatcher implements Runnable {
 	//protected Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 	public static final Logger logger = TestLogger.getLogger();
 
-	private ForwardingSocketWrapper sock;
-	private ConnectionFailureListener listener;
+	final private ForwardingSocketWrapper sock;
+	final private ConnectionFailureListener listener;
 	private boolean isRunning;
-	private LocalConnectionHandler connectionHandler;
+	final private LocalConnectionHandler connectionHandler;
 	
 	public IncomingDispatcher(ForwardingSocketWrapper sock, ConnectionFailureListener listener, LocalConnectionHandler handler) {
 		this.sock = sock;
 		this.listener = listener;
-		connectionHandler = handler;
-		isRunning = true;
+		this.connectionHandler = handler;
+		this.isRunning = true;
 	}
 	
 	public void run() {

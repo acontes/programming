@@ -18,12 +18,12 @@ public class LocalConnectionHandler implements Runnable{
 	//protected Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 	public static final Logger logger = TestLogger.getLogger();
 
-	private LinkedBlockingQueue<ForwardedMessage> messageQueue;
-	private HashMap<ConnectionID, SocketForwarder> mappings;
+	final private LinkedBlockingQueue<ForwardedMessage> messageQueue;
+	final private HashMap<ConnectionID, SocketForwarder> mappings;
 	private boolean willClose;
 	private boolean isRunning;
-	private OutHandler outHandler;
-	private IncomingDispatcher incomingDispatcher;
+	final private OutHandler outHandler;
+	final private IncomingDispatcher incomingDispatcher;
 
 	public LocalConnectionHandler(Socket sock, ForwardingAgent agent) {
 		messageQueue = new LinkedBlockingQueue<ForwardedMessage>();
