@@ -26,6 +26,7 @@ public class ForwardedMessage implements Serializable {
         CONNECTION_REQUEST, // Connection request from a client to a server
         CONNECTION_ACCEPTED, // response to a connection request
         CONNECTION_ABORTED, // response to a connection request
+        AGENT_DISCONNECTED, // help closing properly the connections
         DATA
         // data message
     }
@@ -63,6 +64,11 @@ public class ForwardedMessage implements Serializable {
             default: //should not occur
                 return ("UNKNOWN MESSAGE");
         }
+    }
+
+    public static ForwardedMessage agentDisconnectedMessage(Object agentID) {
+        return new ForwardedMessage(ForwardedMessageType.AGENT_DISCONNECTED, agentID, 0, null, 0, null,
+            DEFAULT_TTL);
     }
 
     public static ForwardedMessage registrationMessage(Object senderID) {

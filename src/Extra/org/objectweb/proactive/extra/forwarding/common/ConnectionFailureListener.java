@@ -6,10 +6,10 @@ package org.objectweb.proactive.extra.forwarding.common;
  *
  */
 public interface ConnectionFailureListener {
-	
-	/**
-	 * Connection has failed.
-	 * @param e cause
-	 */
-	public void connectionHasFailed(Exception e);
+
+    /**
+     * Connection has failed.
+     * @param e cause
+     */
+    public void connectionHasFailed(Exception e);
 }
