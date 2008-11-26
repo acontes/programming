@@ -290,11 +290,17 @@
 		<if name="ant.java.version" value="1.5">
 			<apt srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" compile="false" encoding="UTF-8">
 				<classpath refid="examples.classpath" />
+				<compilerarg line="-factory org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory"/>
 			</apt>
+			<property name="compilerargs" value=""/>
 		</if>
+		<else>
+			<property name="compilerargs" value="-processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree"/>
+		</else>
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
 		<javac srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
 			<classpath refid="examples.classpath" />
+			<compilerarg line="${compilerargs}"/>
 		</javac>
 
 		<copy todir="${cl.examples.dir}/${proactive.path}/examples" includeEmptyDirs="no">
