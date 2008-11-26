@@ -59,11 +59,17 @@
 		<path refid="project.classpath" />
 	</path>
 
+	<if name="ant.java.version" value="1.5">
+		<!-- Exclude CTree related stuff from compilation -->
+		<property name="annotations_tests_exec_exclude" value="functionalTests/annotations/**/*CTree*.class"/>
+		<echo message="Using java 1.5, excluding from tests execution:${annotations_tests_exec_exclude}"/>
+	</if>
 	<!-- Default testsuite can be overriden by using the -Dtest property -->
 	<if name="test">
 		<fileset dir="${cl.test.dir}" id="testsuite">
 			<include name="${test}" />
 			<exclude name="**/*$*.class" />
+			<exclude name="${annotations_tests_exec_exclude}"/>
 		</fileset>
 		<else>
 			<fileset dir="${cl.test.dir}" id="testsuite">
@@ -84,6 +90,7 @@
 				<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class" />
+				<exclude name="${annotations_tests_exec_exclude}"/>
 			</fileset>
 		</else>
 	</if>
@@ -236,14 +243,19 @@
 		</subant>
 	</target>
 
-
 	<target name="compile.tests" depends="compile.core, compile.extensions, compile.extra, compile.util" description="Compile functional and unit tests classes">
+		<if name="ant.java.version" value="1.5">
+			<!-- Exclude CTree related stuff from compilation -->
+			<property name="annotations_tests_exclude" value="${src.test.dir}/functionalTests/annotations/**/*CTree*.java,${src.test.dir}/functionalTests/annotations/CTreeTest.java"/>
+			<echo message="Using java 1.5, excluding from tests compilation:${annotations_tests_exclude}"/>
+		</if>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" 
 			includes="functionalTests/**"
-			excludes="functionalTests/annotations/*/inputs/**" 
+			excludes="functionalTests/annotations/*/inputs/**,${annotations_tests_exclude}"
+			excludesfile="${src.test.dir}/functionalTests/annotations/CTreeTest.java" 
 			deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
@@ -435,13 +447,16 @@
 		Testing		
 	-->
 
+	
+
+	
 	<macrodef name="junitMacro">
 		<attribute name="nodeDescriptor" />
 		<attribute name="testsuite"/>
 		<element name="jvmargs" optional="yes" />
 		<element name="additionalClasspath" optional="yes" />
 		<sequential>
-
+			
 			<delete dir="${junit.dir}" />
 			<mkdir dir="${junit.dir}" />
 			<junit printsummary="yes" forkmode="perTest" showoutput="${junit.showoutput}">
@@ -477,7 +492,7 @@
 
 
 				<batchtest fork="yes" todir="${junit.dir}">
-					<fileset refid="@{testsuite}" />
+					<fileset refid="@{testsuite}"/>
 				</batchtest>
 			</junit>
 		</sequential>
@@ -488,7 +503,15 @@
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" testsuite="testsuite"/>
 	</target>
 
+	<!-- debug -->
+	<pathconvert pathsep="${line.separator}|   |-- "
+             property="echo.testsuite"
+             refid="testsuite">
+	</pathconvert>
 	<target name="junit" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
+		<echo message="|-- testsuite"/>
+		<echo message="|   |"/>
+		<echo message="|   |-- ${echo.testsuite}"/>
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
 	</target>
 
