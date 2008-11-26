@@ -86,8 +86,7 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
                     }
 
                     if (logger.isDebugEnabled())
-                        logger
-                                .debug("RH, processing to a new registration (new outHandler and new mapping) for uniqueID " +
+                        logger.debug("RH, processing to a new registration (new outHandler and new mapping) for uniqueID " +
                                     hostId);
                     // process to a new registration
                     // create new OutHandler

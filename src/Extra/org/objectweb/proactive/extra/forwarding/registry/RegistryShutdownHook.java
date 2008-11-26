@@ -6,14 +6,14 @@ package org.objectweb.proactive.extra.forwarding.registry;
  * @author A.Fawaz, J.Martin
  *
  */
-public class StopRegistryRunnable implements Runnable {
+public class RegistryShutdownHook implements Runnable {
 
     ForwardingRegistry registry;
 
     /**
      * @param registry The registry to be stopped harshly
      */
-    public StopRegistryRunnable(ForwardingRegistry registry) {
+    public RegistryShutdownHook(ForwardingRegistry registry) {
         this.registry = registry;
     }
 
