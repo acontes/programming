@@ -19,7 +19,7 @@ public class ForwardingAgent implements ConnectionFailureListener {
 	// SINGLETON 
 	private static ForwardingAgent _singleton = null;
 	
-	public static ForwardingAgent getAgent() {
+	synchronized public static ForwardingAgent getAgent() {
 		if(_singleton == null) {
 			_singleton = new ForwardingAgent();
 		}
