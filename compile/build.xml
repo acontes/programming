@@ -59,11 +59,6 @@
 		<path refid="project.classpath" />
 	</path>
 
-	<if name="ant.java.version" value="1.5">
-		<!-- Exclude CTree related stuff from compilation -->
-		<property name="annotations_tests_exec_exclude" value="functionalTests/annotations/**/*CTree*.class"/>
-		<echo message="Using java 1.5, excluding from tests execution:${annotations_tests_exec_exclude}"/>
-	</if>
 	<!-- Default testsuite can be overriden by using the -Dtest property -->
 	<if name="test">
 		<fileset dir="${cl.test.dir}" id="testsuite">
@@ -246,16 +241,16 @@
 	<target name="compile.tests" depends="compile.core, compile.extensions, compile.extra, compile.util" description="Compile functional and unit tests classes">
 		<if name="ant.java.version" value="1.5">
 			<!-- Exclude CTree related stuff from compilation -->
-			<property name="annotations_tests_exclude" value="${src.test.dir}/functionalTests/annotations/**/*CTree*.java,${src.test.dir}/functionalTests/annotations/CTreeTest.java"/>
-			<echo message="Using java 1.5, excluding from tests compilation:${annotations_tests_exclude}"/>
+			<property name="annotations_tests_exec_exclude" value="functionalTests/annotations/*CTree*.class,functionalTests/annotations/**/*CTree*"/>
+			<echo message="Using java 1.5, excluding from tests execution:${annotations_tests_exec_exclude}"/>
 		</if>
+
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" 
 			includes="functionalTests/**"
-			excludes="functionalTests/annotations/*/inputs/**,${annotations_tests_exclude}"
-			excludesfile="${src.test.dir}/functionalTests/annotations/CTreeTest.java" 
+			excludes="functionalTests/annotations/*/inputs/**,${annotations_tests_exec_exclude}"
 			deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
