@@ -74,7 +74,6 @@ public class ProActiveAnnotationProcessorFactory implements AnnotationProcessorF
     /* (non-Javadoc)
      * @see com.sun.mirror.apt.AnnotationProcessorFactory#getProcessorFor(java.util.Set, com.sun.mirror.apt.AnnotationProcessorEnvironment)
      */
-    @Override
     public AnnotationProcessor getProcessorFor(Set<AnnotationTypeDeclaration> annotations,
             AnnotationProcessorEnvironment env) {
 
@@ -89,7 +88,6 @@ public class ProActiveAnnotationProcessorFactory implements AnnotationProcessorF
     /* (non-Javadoc)
      * @see com.sun.mirror.apt.AnnotationProcessorFactory#supportedAnnotationTypes()
      */
-    @Override
     public Collection<String> supportedAnnotationTypes() {
         return _supportedAnnotations;
     }
@@ -97,7 +95,6 @@ public class ProActiveAnnotationProcessorFactory implements AnnotationProcessorF
     /* (non-Javadoc)
      * @see com.sun.mirror.apt.AnnotationProcessorFactory#supportedOptions()
      */
-    @Override
     public Collection<String> supportedOptions() {
         return _supportedOptions;
     }
