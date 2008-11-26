@@ -31,8 +31,6 @@
  */
 package org.objectweb.proactive.examples.cs;
 
-import javax.xml.ws.ServiceMode;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
