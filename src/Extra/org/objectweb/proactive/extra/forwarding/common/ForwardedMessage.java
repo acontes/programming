@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extra.forwarding.common;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -10,7 +11,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class ForwardedMessage implements Serializable {
     public static final int DEFAULT_TTL = 255;
-    public static int currentPort = 1000;
+    private static AtomicInteger currentPort = new AtomicInteger(0); 
 
     protected int ttl;
     protected ForwardedMessageType type;
@@ -99,8 +100,7 @@ public class ForwardedMessage implements Serializable {
      * @return
      */
     private static int getSourcePort() {
-        // TODO Auto-generated method stub
-        return currentPort++;
+        return currentPort.incrementAndGet();
     }
 
     public int getTtl() {
