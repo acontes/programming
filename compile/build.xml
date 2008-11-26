@@ -503,15 +503,7 @@
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" testsuite="testsuite"/>
 	</target>
 
-	<!-- debug -->
-	<pathconvert pathsep="${line.separator}|   |-- "
-             property="echo.testsuite"
-             refid="testsuite">
-	</pathconvert>
 	<target name="junit" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
-		<echo message="|-- testsuite"/>
-		<echo message="|   |"/>
-		<echo message="|   |-- ${echo.testsuite}"/>
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
 	</target>
 
