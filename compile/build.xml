@@ -286,6 +286,12 @@
 	
 
 	<target name="compile.examples" depends="compile.core, compile.extensions, compile.extra" description="Compile all examples classes">
+		<!-- annotation processing -->
+		<if name="ant.java.version" value="1.5">
+			<apt srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" compile="false" encoding="UTF-8">
+				<classpath refid="examples.classpath" />
+			</apt>
+		</if>
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
 		<javac srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
 			<classpath refid="examples.classpath" />
