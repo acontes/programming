@@ -44,8 +44,10 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
+@ActiveObject
 public class Manager implements Serializable, InitActive, RunActive {
 
     /** The application logger */

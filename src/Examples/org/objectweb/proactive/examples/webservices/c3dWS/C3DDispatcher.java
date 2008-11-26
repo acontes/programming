@@ -77,6 +77,7 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -84,6 +85,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 /**
  * This class decouples the set of user frames from the set of rendering
  */
+@ActiveObject
 public class C3DDispatcher implements org.objectweb.proactive.RunActive, Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 

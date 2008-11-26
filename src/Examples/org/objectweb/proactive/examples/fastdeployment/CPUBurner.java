@@ -39,8 +39,10 @@ import org.objectweb.proactive.annotation.Cache;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
+@ActiveObject
 public class CPUBurner implements Serializable, InitActive {
     int id;
     Manager manager;

@@ -36,9 +36,11 @@ import java.io.Serializable;
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
+@ActiveObject
 public class MigratableHello extends InitializedHelloWorld implements Serializable {
 
     @MigrationSignal

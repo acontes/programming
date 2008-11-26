@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 /**
@@ -53,6 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since ProActive 0.9
  *
  */
+@ActiveObject
 public class Client {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     protected String myName;

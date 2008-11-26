@@ -31,12 +31,16 @@
  */
 package org.objectweb.proactive.examples.plugtest;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+
+
 /**
  * @author The ProActive Team
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
+@ActiveObject
 public class ObjB {
     String myName;
 

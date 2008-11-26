@@ -38,11 +38,13 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 /** A stripped-down Active Object example.
  * The object has only one public method, sayHello()
  * The object does nothing but reflect the host its on. */
+@ActiveObject
 public class TinyHello implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private final String message = "Hello World!";

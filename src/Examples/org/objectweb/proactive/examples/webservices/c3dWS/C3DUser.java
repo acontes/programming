@@ -81,8 +81,10 @@ import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
+@ActiveObject
 public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 

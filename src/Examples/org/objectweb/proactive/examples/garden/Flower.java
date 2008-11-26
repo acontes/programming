@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 /**
@@ -53,6 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.9
  *
  */
+@ActiveObject
 public class Flower {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private String myName;

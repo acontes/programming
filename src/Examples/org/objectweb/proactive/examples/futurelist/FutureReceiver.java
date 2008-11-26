@@ -35,8 +35,10 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.util.FutureList;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
+@ActiveObject
 public class FutureReceiver implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     int etape = 0; // this is to count the jumps we have made so far

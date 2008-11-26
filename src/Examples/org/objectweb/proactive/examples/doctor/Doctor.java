@@ -31,6 +31,10 @@
  */
 package org.objectweb.proactive.examples.doctor;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+
+
+@ActiveObject
 public class Doctor {
     int id;
     RandomTime rand;

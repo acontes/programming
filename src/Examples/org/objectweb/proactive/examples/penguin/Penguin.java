@@ -39,9 +39,11 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.Destination;
 import org.objectweb.proactive.core.migration.MigrationStrategyImpl;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
+@ActiveObject
 public class Penguin implements org.objectweb.proactive.RunActive, java.io.Serializable {
     private boolean onItinerary;
     private boolean initialized;

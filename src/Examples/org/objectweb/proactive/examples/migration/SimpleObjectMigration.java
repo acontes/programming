@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
@@ -54,6 +55,7 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
  * @author The ProActive Team
  * @version ProActive 1.0 (March 2002)
  */
+@ActiveObject
 public class SimpleObjectMigration implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private static final int SLEEP_TIME = 9000;

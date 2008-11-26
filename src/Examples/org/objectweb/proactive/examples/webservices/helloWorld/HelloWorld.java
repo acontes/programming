@@ -35,6 +35,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 /**
@@ -42,6 +43,7 @@ import org.objectweb.proactive.extensions.webservices.WebServices;
  * A web server must be installed first to run this example
  * @author The ProActive Team
  */
+@ActiveObject
 public class HelloWorld {
     public HelloWorld() {
     }

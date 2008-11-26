@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
@@ -47,6 +48,7 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
  * The SimpleAgent simply says where it is. The main() jsut creates it,
  * and moves it to user-specified node (node must be created manually previously)
  */
+@ActiveObject
 public class SimpleAgent implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 

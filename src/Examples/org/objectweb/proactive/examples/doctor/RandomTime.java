@@ -33,7 +33,10 @@ package org.objectweb.proactive.examples.doctor;
 
 import java.util.Random;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
+
+@ActiveObject
 public class RandomTime {
     Random rand;
 

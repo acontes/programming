@@ -37,6 +37,7 @@ import org.objectweb.proactive.extensions.timitspmd.util.TimerCounter;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.EventObserver;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.commobserv.CommEvent;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.commobserv.CommEventObserver;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 /**
@@ -44,6 +45,7 @@ import org.objectweb.proactive.extensions.timitspmd.util.observing.commobserv.Co
  *
  * @author The ProActive Team
  */
+@ActiveObject
 public class Worker extends Timed implements java.io.Serializable {
 
     /**

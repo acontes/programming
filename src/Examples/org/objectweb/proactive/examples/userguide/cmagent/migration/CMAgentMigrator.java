@@ -38,9 +38,11 @@ import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.examples.userguide.cmagent.initialized.CMAgentInitialized;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
+@ActiveObject
 public class CMAgentMigrator extends CMAgentInitialized implements Serializable {
 
     @MigrationSignal

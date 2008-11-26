@@ -39,6 +39,7 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.Isect;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Surface;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
@@ -48,6 +49,7 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
  * @author The ProActive Team
  * @author The ProActive Team
  */
+@ActiveObject
 public class C3DRenderingEngine implements java.io.Serializable {
 
     /**

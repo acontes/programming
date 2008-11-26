@@ -54,11 +54,13 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 /**
  * Activate a set of ProActive descriptor
  */
+@ActiveObject
 public class VNActivator implements Serializable, RunActive, NodeCreationEventListener, InitActive {
     final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
