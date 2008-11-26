@@ -18,93 +18,84 @@ import org.objectweb.proactive.extra.forwarding.localforwarder.ForwardingAgent;
  */
 public class ConnectionRunnable implements Runnable {
 
-    ForwardingAgent agent;
-    int targetID;
-    int connectionID;
-    int nbMessages;
+	ForwardingAgent agent;
+	int targetID;
+	int connectionID;
+	int nbMessages;
+	boolean running = true;
+	
+	public ConnectionRunnable(ForwardingAgent agent, int targetID, int connectionID, int nbMessages){
+		this.agent = agent;
+		this.targetID = targetID;
+		this.connectionID = connectionID * 10;
+		this.nbMessages = nbMessages;
+	}
 
-    boolean running = true;
+	public void run() {
 
-    public ConnectionRunnable(ForwardingAgent agent, int targetID, int connectionID, int nbMessages) {
-        this.agent = agent;
-        this.targetID = targetID;
-        this.connectionID = connectionID * 10;
-        this.nbMessages = nbMessages;
-    }
+		Socket clientSocket = null;
+		ObjectOutputStream out = null;
+		ObjectInputStream in = null;
+		try {
+			clientSocket = agent.getSocket(targetID, MultiServer.DEFAULT_TARGET_SERVER_PORT);
+			out = new ObjectOutputStream(clientSocket.getOutputStream());
+			in = new ObjectInputStream(clientSocket.getInputStream());
+		} catch (ForwardingException e) {
+			System.out.println("ForwardingException, [connection = " + connectionID + "], could not connect to target number: " + targetID + ", exiting");
+			running = false;
+		} catch (IOException e) {
+			System.out.println("IOException, [connection = " + connectionID + "], could not initialize input or output stream for target number: " + targetID + ", exiting");
+			running = false;
+		}
 
-    public void run() {
+		//we send and receive Strings for now, but handle them as objects
+		String fromServer;
+		StringBuffer fromUser = new StringBuffer("I am connection [" + connectionID + ":" + clientSocket.getLocalPort() + "]");
+		int i=0;
+		
+		// send one message to each target and loop. To stop sending messages, send "exit" to any of the targets
+		while (running && i<nbMessages) {
+			//check that socket is open
+			if (!clientSocket.isClosed()) {
+				//we only write Strings for now, could use writeChars
+				try {
+					out.writeObject(fromUser + ", [MSG NB = " + i + "]");
+//					System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() + "], message sent: [" + fromUser + "]");
+					
+					//we only read Strings for now
+					fromServer = (String)in.readObject();
+					System.out.println("[Server = " + targetID + "], "+ fromServer);
+					i++;
+				} catch (IOException e1) {
+					System.out.println("IOException, [connection = " + connectionID + ":" + clientSocket.getLocalPort() + "], IOException while sending or receiving a message");
+					running = false;
+				} catch (ClassNotFoundException e) { //should not occur
+					System.out.println("ClassNotFoundExcetpion, [connection = " + connectionID + ":" + clientSocket.getLocalPort() + "], ClassNotFoundException while receiving message");
+					e.printStackTrace();
+					running = false;
+				}
+			}
+			else {
+				System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() + "], socket to target number " + targetID + " is closed. Message: "+ fromUser + " not sent");
+				running = false;
+			}
+		}
 
-        Socket clientSocket = null;
-        ObjectOutputStream out = null;
-        ObjectInputStream in = null;
-        try {
-            clientSocket = agent.getSocket(targetID, MultiServer.DEFAULT_TARGET_SERVER_PORT);
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            in = new ObjectInputStream(clientSocket.getInputStream());
-        } catch (ForwardingException e) {
-            e.printStackTrace();
-            System.out.println("[connection = " + connectionID + "], could not connect to target number: " +
-                targetID + ", exiting");
-            running = false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out
-                    .println("[connection = " + connectionID +
-                        "], could not initialize input or output stream for target number: " + targetID +
-                        ", exiting");
-            running = false;
-        }
+		System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() + "], managed to send " + i + " messages to target " + targetID);
+		System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() + "], Cleaning IO streams and Socket before exiting");
+		//cleanup before exiting
+		try { 
+			out.close();
+			in.close();
+			clientSocket.close();
+			System.out.println("connection = " + connectionID + " I/O Streams and clientSocket closed");
+		}
+		catch (IOException e) {
+			System.out.println("IOException, connection = " + connectionID + " failed while closing IO streams and client Socket");
+		}
+	}
 
-        //we send and receive Strings for now, but handle them as objects
-        String fromServer;
-        StringBuffer fromUser = new StringBuffer("I am connection [" + connectionID + ":" +
-            clientSocket.getLocalPort() + "]");
-        int i = 0;
-
-        // send one message to each target and loop. To stop sending messages, send "exit" to any of the targets
-        while (running && i < nbMessages) {
-            //check that socket is open
-            if (!clientSocket.isClosed()) {
-                //we only write Strings for now, could use writeChars
-                try {
-                    out.writeObject(fromUser + ", [MSG NB = " + i + "]");
-                    //					System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() + "], message sent: [" + fromUser + "]");
-
-                    //we only read Strings for now
-                    fromServer = (String) in.readObject();
-                    System.out.println("[Server = " + targetID + "], " + fromServer);
-                    i++;
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() +
-                        "], IOException while sending or receiving a message");
-                    e1.printStackTrace();
-                    running = false;
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() +
-                        "], ClassNotFoundException while receiving message");
-                    e.printStackTrace();
-                    running = false;
-                }
-            } else {
-                System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() +
-                    "], socket to target number " + targetID + " is closed. Message: " + fromUser +
-                    " not sent");
-                running = false;
-            }
-        }
-
-        System.out.println("[connection = " + connectionID + ":" + clientSocket.getLocalPort() +
-            "], managed to send " + i + " messages to target " + targetID);
-        //cleanup before exiting
-        try {
-            out.close();
-            in.close();
-            clientSocket.close();
-            System.out.println("connection = " + connectionID + "OOS OIS and clientSocket closed");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
 }

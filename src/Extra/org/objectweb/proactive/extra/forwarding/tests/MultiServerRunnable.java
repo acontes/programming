@@ -11,49 +11,65 @@ import java.io.*;
  *
  */
 public class MultiServerRunnable implements Runnable {
-    private Socket socket = null;
+	private Socket socket = null;
+	boolean running = true;
 
-    public MultiServerRunnable(Socket socket) {
-        this.socket = socket;
-    }
+	public MultiServerRunnable(Socket socket) {
+		this.socket = socket;
+	}
 
-    public void run() {
-        ObjectOutputStream out = null;
-        ObjectInputStream in = null;
-        String inputLine = null;
-        String outputLine = null;
+	public void run() {
+		ObjectOutputStream out = null;
+		ObjectInputStream in = null;
+		String inputLine = null;
+		String outputLine = null;
 
-        try {
-            in = new ObjectInputStream(socket.getInputStream());
-            out = new ObjectOutputStream(socket.getOutputStream());
-        } catch (IOException e1) { //TODO here the socket is not closed before exiting, handle this !!!
-            e1.printStackTrace();
-            System.err.println("could not initialize input or output stream, exiting");
-            System.exit(1);
-        }
 
-        try {
-            inputLine = (String) in.readObject();
-            while (inputLine != null) { // easier handling of try/catch blocks by using this infinite loop
-                outputLine = inputLine;
-                out.writeObject("echo of \"" + outputLine + "\"");
-                inputLine = (String) in.readObject();
-            }
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            System.err.println("an exit message might have been missed, closing the connection");
-            e1.printStackTrace();
-        } catch (ClassNotFoundException e1) { //should not occur
-            e1.printStackTrace();
-        }
+		try {
+			in = new ObjectInputStream(socket.getInputStream());
+			out = new ObjectOutputStream(socket.getOutputStream());
+		} catch (IOException e1) {
+			System.out.println("could not initialize input or output stream, exiting");
+			running = false;
+		}
 
-        try {
-            out.close();
-            in.close();
-            socket.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+		try {
+			inputLine = (String)in.readObject();
+		} catch (IOException e2) {
+			System.out.println("IOException, while reading first message, closing this connection on server side");
+			running = false;
+		} catch (ClassNotFoundException e2) { //should not occur
+			System.out.println("ClassNotFoundException");
+			e2.printStackTrace();
+			running = false;
+		}
+
+
+		while(running && inputLine != null) {
+			outputLine = inputLine;
+			try{
+				out.writeObject("echo of \"" + outputLine + "\"");
+				inputLine = (String)in.readObject();
+			} catch (IOException e1) {
+				System.out.println("IOException, while reading or writing in the socket, closing this connection on server side");
+				running = false;
+			} catch (ClassNotFoundException e1) { //should not occur
+				System.out.println("ClassNotFoundException");
+				e1.printStackTrace();
+				running = false;
+			}
+		}
+
+		try {
+			out.close();
+			in.close();
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("IOException while closing IO streams and socket");
+		}
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
 }
