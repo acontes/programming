@@ -43,13 +43,6 @@ public class Producer extends ConsumerProducer {
     public Producer() {
     }
 
-    /**
-     * The effective constructor
-     */
-    public Producer(ConsumerProducerListener listener, BoundedBuffer buffer) {
-        super("Producer", listener, buffer);
-    }
-
     @Override
     protected void doStuff(boolean wasSuspended) {
         if (isSuspended) {

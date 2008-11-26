@@ -91,15 +91,6 @@ public class VNActivator implements Serializable, RunActive, NodeCreationEventLi
         // No-args empty descriptor
     }
 
-    public VNActivator(Manager manager, Set<String> descriptors, Set<String> virtualNodes, int concurrency,
-            int pause) {
-        this.manager = manager;
-        this.descriptors = descriptors;
-        this.virtualNodeNames = virtualNodes;
-        this.concurrency = concurrency;
-        this.pause = pause;
-    }
-
     public void initActivity(Body body) {
         PAActiveObject.setImmediateService("nodeCreated");
 

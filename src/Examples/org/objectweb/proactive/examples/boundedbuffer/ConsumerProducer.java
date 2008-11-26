@@ -53,18 +53,6 @@ public abstract class ConsumerProducer implements org.objectweb.proactive.RunAct
     }
 
     /**
-     * The effective constructor
-     */
-    public ConsumerProducer(String name, ConsumerProducerListener listener, BoundedBuffer buffer) {
-        this.name = name;
-        this.buffer = buffer;
-        this.listener = listener;
-        requestChange = false;
-        isSuspended = true;
-        isActive = true;
-    }
-
-    /**
      * Toggle the consumer or producer 's activity
      */
     public void toggle() {

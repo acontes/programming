@@ -53,12 +53,6 @@ public class ObjA implements InitActive, EndActive {
     public ObjA() {
     }
 
-    public ObjA(String s, ObjB b) {
-        this.s = s;
-        this.i = new Integer(s.substring("object".length(), s.length())).intValue();
-        this.b = b;
-    }
-
     public String getInfo() {
         String property = System.getProperty("proactive.property");
         if (property != null) {

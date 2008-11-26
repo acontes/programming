@@ -32,7 +32,6 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.examples.nbody.common.Deployer;
@@ -66,22 +65,6 @@ public class BigMaestro implements Serializable {
      * Required by ProActive
      */
     public BigMaestro() {
-    }
-
-    /**
-     * Create a new master for the simulation, which pilots all the Maestro given in parameter.
-     * @param maestroArray the group of Maestro which are to be controled by this BigMaestro.
-     * @param max the total number of iterations that should be simulated
-     * @param killsupport KillSupport
-     */
-    public BigMaestro(Maestro[] maestroArray, Integer max, Deployer deployer) {
-        this.deployer = deployer;
-        maxIter = max.intValue();
-        this.maestroArray = maestroArray;
-        // All the Maestro have a list of 8 Planets
-        lPlanets = new ArrayList<Planet>(maestroArray.length * 8);
-        for (int i = 0; i < maestroArray.length * 8; i++)
-            lPlanets.add(null);
     }
 
     /**

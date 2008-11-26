@@ -57,18 +57,6 @@ public class Maestro implements Serializable {
     }
 
     /**
-     * Create a new master for the simulation, which pilots all the domains given in parameter.
-     * @param domainG the group of Domains which are to be controled by this Maestro.
-     * @param max the total number of iterations that should be simulated
-     */
-    public Maestro(Domain domainG, Integer max, Deployer deployer) {
-
-        maxIter = max.intValue();
-        domainGroup = domainG;
-        size = PAGroup.getGroup(domainGroup).size();
-    }
-
-    /**
      * Called by a Domain when computation is finished.
      * This method counts the answers, and restarts all Domains when all have finished.
      */

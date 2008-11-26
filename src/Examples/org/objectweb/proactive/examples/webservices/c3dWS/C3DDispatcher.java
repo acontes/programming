@@ -730,7 +730,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
      * @param methodName The methodname <font size="-1">Not reconputed in order to gain time</font>
      * @param r The request object
      */
-    public void processRotate(org.objectweb.proactive.Body body, String methodName, Request r) {
+    private void processRotate(org.objectweb.proactive.Body body, String methodName, Request r) {
         int i_user = 0;
 
         try {

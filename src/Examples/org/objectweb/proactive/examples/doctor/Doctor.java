@@ -45,14 +45,6 @@ public class Doctor {
     public Doctor() {
     }
 
-    public Doctor(Integer _id, Long _meanDur, Long _sigmaDur, Office _off, RandomTime _rand) {
-        id = _id.intValue();
-        meanDur = _meanDur.longValue();
-        sigmaDur = _sigmaDur.longValue();
-        off = _off;
-        rand = _rand;
-    }
-
     public void curePatient(int _pat) {
         long temps = rand.gaussianTime(meanDur, sigmaDur);
 

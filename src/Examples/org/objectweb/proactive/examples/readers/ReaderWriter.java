@@ -56,14 +56,6 @@ public class ReaderWriter implements org.objectweb.proactive.RunActive {
     }
 
     /**
-     * The real constructor
-     */
-    public ReaderWriter(ReaderDisplay display, int policy) {
-        this.display = display;
-        this.policy = policy;
-    }
-
-    /**
      * setPolicy
      * Changes the synchronization policy
      * @param policy  the id of the new policy
@@ -101,7 +93,7 @@ public class ReaderWriter implements org.objectweb.proactive.RunActive {
      * </ul><br>Note that here, we <b>explicitly</b> allow specifics
      * requests to be carried out.
      */
-    public void evenPolicy(org.objectweb.proactive.Service service) {
+    private void evenPolicy(org.objectweb.proactive.Service service) {
         // if there is no writer and no write requests are before the first Read rq.
         if (writeCount == 0) {
             service.serveOldest(new MyRequestFilter("startRead", "startWrite"));
@@ -113,7 +105,7 @@ public class ReaderWriter implements org.objectweb.proactive.RunActive {
         }
     }
 
-    public void readerPolicy(org.objectweb.proactive.Service service) {
+    private void readerPolicy(org.objectweb.proactive.Service service) {
         // If there is no activity, serve the first READER
         if (writeCount == 0) {
             // If there is a waiting reader, let him come im
@@ -125,7 +117,7 @@ public class ReaderWriter implements org.objectweb.proactive.RunActive {
         }
     }
 
-    public void writerPolicy(org.objectweb.proactive.Service service) {
+    private void writerPolicy(org.objectweb.proactive.Service service) {
         // If there is no activity, serve the first READER
         if ((readCount == 0) && (writeCount == 0)) {
             // Serve the writers in priority

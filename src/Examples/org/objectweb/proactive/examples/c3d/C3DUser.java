@@ -96,11 +96,6 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
     public C3DUser() {
     }
 
-    public C3DUser(Dispatcher disp, String name) {
-        this.c3ddispatcher = disp;
-        this.userName = name;
-    }
-
     /** Returns the C3DUser constructor arguments, after a dialog has popped up */
     private static Object[] getDispatcherAndUserName() {
         // ask user through Dialog for userName & host 

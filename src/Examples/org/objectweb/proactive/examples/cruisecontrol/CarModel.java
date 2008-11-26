@@ -80,11 +80,6 @@ public class CarModel implements org.objectweb.proactive.RunActive {
     public CarModel() {
     }
 
-    /** Initializes the car with a reference to the Interface Dispatcher : father */
-    public CarModel(Interface m_father) {
-        father = m_father;
-    }
-
     ////////////////////////////////////////////////////////////
 
     /** Changes the state of the car to ACTIVE */

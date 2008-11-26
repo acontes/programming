@@ -49,18 +49,6 @@ public class Reader implements org.objectweb.proactive.RunActive {
     public Reader() {
     }
 
-    /**
-     * The real constructor
-     */
-    public Reader(ReaderDisplay display, ReaderWriter rw, int id) {
-        this.display = display;
-        this.rw = rw;
-        this.id = id;
-        done = false;
-        autopilot = true;
-        reading = false;
-    }
-
     public void stopIt() {
         done = true;
     }
