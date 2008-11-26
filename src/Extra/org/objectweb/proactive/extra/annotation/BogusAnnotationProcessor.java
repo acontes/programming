@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.annotation;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 
+
 /** This annotation processor processes the annotations provided by default
  * whith JDK 1.5. This is needed in order to suppress the unnecessary warnings that
  * apt generates for these default annotations.
@@ -40,14 +41,14 @@ import com.sun.mirror.apt.AnnotationProcessor;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-	
-public class BogusAnnotationProcessor implements AnnotationProcessor{
 
-	public BogusAnnotationProcessor() {
-	}
-	
-	public void process() {
-		// nothing! 
-	}
+public class BogusAnnotationProcessor implements AnnotationProcessor {
+
+    public BogusAnnotationProcessor() {
+    }
+
+    public void process() {
+        // nothing! 
+    }
 
 }

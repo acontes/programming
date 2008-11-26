@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Set;
 
 import com.sun.mirror.apt.AnnotationProcessor;
@@ -40,6 +41,7 @@ import com.sun.mirror.apt.AnnotationProcessorEnvironment;
 import com.sun.mirror.apt.AnnotationProcessorFactory;
 import com.sun.mirror.apt.AnnotationProcessors;
 import com.sun.mirror.declaration.AnnotationTypeDeclaration;
+
 
 /** This processor factory provides the bogus annotation processor for 
  * the default annotations exported in the JDK 1.5.
@@ -50,33 +52,32 @@ import com.sun.mirror.declaration.AnnotationTypeDeclaration;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class BogusAnnotationProcessorFactory  implements AnnotationProcessorFactory{
+public class BogusAnnotationProcessorFactory implements AnnotationProcessorFactory {
 
-	private static final Collection<String> _supportedAnnotations =
-		new ArrayList<String>();
-	
-	public BogusAnnotationProcessorFactory() {
-		_supportedAnnotations.add(Override.class.getName());
-		_supportedAnnotations.add(SuppressWarnings.class.getName());
-		_supportedAnnotations.add(Deprecated.class.getName());
-	}
-	
-	public AnnotationProcessor getProcessorFor(
-			Set<AnnotationTypeDeclaration> annotations,
-			AnnotationProcessorEnvironment env) {
-		if (annotations.isEmpty()) {
-			return AnnotationProcessors.NO_OP;
-		} else {
-			return new BogusAnnotationProcessor();
-		}
-	}
+    private static final Collection<String> _supportedAnnotations = new ArrayList<String>();
 
-	public Collection<String> supportedAnnotationTypes() {
-		return _supportedAnnotations;
-	}
+    public BogusAnnotationProcessorFactory() {
+        _supportedAnnotations.add(Override.class.getName());
+        _supportedAnnotations.add(SuppressWarnings.class.getName());
+        _supportedAnnotations.add(Deprecated.class.getName());
+    }
 
-	public Collection<String> supportedOptions() {
-		return Collections.EMPTY_LIST;
-	}
+    public AnnotationProcessor getProcessorFor(Set<AnnotationTypeDeclaration> annotations,
+            AnnotationProcessorEnvironment env) {
+        if (annotations.isEmpty()) {
+            return AnnotationProcessors.NO_OP;
+        } else {
+            return new BogusAnnotationProcessor();
+        }
+    }
+
+    public Collection<String> supportedAnnotationTypes() {
+        return _supportedAnnotations;
+    }
+
+    public Collection<String> supportedOptions() {
+        Collection<String> ret = new LinkedList<String>();
+        return ret;
+    }
 
 }

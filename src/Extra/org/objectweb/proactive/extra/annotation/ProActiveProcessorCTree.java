@@ -65,6 +65,7 @@ import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObjectVisitor
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 
+
 /**
  * This class implements a Processor for annotations, according to the 
  * Pluggable Annotation Processing API(jsr269) specification.
@@ -75,87 +76,85 @@ import com.sun.source.util.Trees;
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 //cannot use ${Annotation}.class.getName() the value must be a constant expression BLEAH!
-@SupportedAnnotationTypes(
-		{
-			"org.objectweb.proactive.extra.annotation.*"
-			/*"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
-			"org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject",
-			"org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal",
-			"org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture",
-			"org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival",
-			"org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback",
-			"org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback"*/
-		}
-	) 
+@SupportedAnnotationTypes( { "org.objectweb.proactive.extra.annotation.*"
+/*"org.objectweb.proactive.extra.annotation.activeobject.ActiveObject",
+"org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject",
+"org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal",
+"org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture",
+"org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival",
+"org.objectweb.proactive.extra.annotation.callbacks.isready.VirtualNodeIsReadyCallback",
+"org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback"*/
+})
 @SupportedOptions("enableTypeGenerationInEditor")
 public class ProActiveProcessorCTree extends AbstractProcessor {
 
-	Trees trees;
-	Messager messager;
-	HashMap<String, TreePathScanner<Void,Trees>> scanners = new HashMap<String, TreePathScanner<Void,Trees>>();
-	
-	@Override
-	public synchronized void init(ProcessingEnvironment processingEnv) {
-		super.init(processingEnv);
-		trees = Trees.instance(processingEnv);
-		messager = processingEnv.getMessager();
+    Trees trees;
+    Messager messager;
+    HashMap<String, TreePathScanner<Void, Trees>> scanners = new HashMap<String, TreePathScanner<Void, Trees>>();
 
-		scanners.put(ActiveObject.class.getName(), new ActiveObjectVisitorCTree(processingEnv));
-		scanners.put(RemoteObject.class.getName(), new RemoteObjectVisitorCTree(processingEnv));
-		scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(messager));
-		scanners.put(OnDeparture.class.getName(), new OnDepartureVisitorCTree(processingEnv));
-		scanners.put(OnArrival.class.getName(), new OnArrivalVisitorCTree(processingEnv));
-		scanners.put(VirtualNodeIsReadyCallback.class.getName(), new VirtualNodeIsReadyCallbackVisitorCTree(processingEnv));
-		scanners.put(NodeAttachmentCallback.class.getName(), new NodeAttachmentCallbackVisitorCTree(processingEnv));
-	}
-	
-	@Override
-	public boolean process(Set<? extends TypeElement> annotations,
-			RoundEnvironment roundEnv) {
-		
-		if (annotations.isEmpty()) {
-			// called with no annotations
-			return true;
-		}
-		
-		for (TypeElement annotation : annotations) {
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+        trees = Trees.instance(processingEnv);
+        messager = processingEnv.getMessager();
 
-			TreePathScanner<Void,Trees> scanner = scanners.get(annotation.getQualifiedName().toString());
-			if ( scanner == null ) {
-				// annotation is not intended to be used for code checking
-				continue;
-			}
-			
-			// check whether the annotation is used in correct place and perform the verification
-			// of target element using appropriate scanner
-			Target target = annotation.getAnnotation(Target.class);
-			Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(annotation);
-			for ( Element element: annotatedElements ) {
-				
-				if ( target == null ) {
-					// annotation can be used everywhere
-				} else { 
-					
-					boolean usedInCorrectPlace = false;
-					
-					for (ElementType type: target.value()) {
-						if ( UtilsCTree.convertToElementType(element.getKind()).equals(type) ) {
-							usedInCorrectPlace = true;
-						}
-					}
-					
-					if ( !usedInCorrectPlace ) {
-						messager.printMessage(Diagnostic.Kind.ERROR,
-								"The @" + annotation.getSimpleName() + " annotation is declared to be used with " + target.toString());
-						continue;
-					}
-				}
-								
-				scanner.scan( trees.getPath(element) , trees );
-			}
-		}
-		
-		return true;
-	}
-	
+        scanners.put(ActiveObject.class.getName(), new ActiveObjectVisitorCTree(processingEnv));
+        scanners.put(RemoteObject.class.getName(), new RemoteObjectVisitorCTree(processingEnv));
+        scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(messager));
+        scanners.put(OnDeparture.class.getName(), new OnDepartureVisitorCTree(processingEnv));
+        scanners.put(OnArrival.class.getName(), new OnArrivalVisitorCTree(processingEnv));
+        scanners.put(VirtualNodeIsReadyCallback.class.getName(), new VirtualNodeIsReadyCallbackVisitorCTree(
+            processingEnv));
+        scanners.put(NodeAttachmentCallback.class.getName(), new NodeAttachmentCallbackVisitorCTree(
+            processingEnv));
+    }
+
+    @Override
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+
+        if (annotations.isEmpty()) {
+            // called with no annotations
+            return true;
+        }
+
+        for (TypeElement annotation : annotations) {
+
+            TreePathScanner<Void, Trees> scanner = scanners.get(annotation.getQualifiedName().toString());
+            if (scanner == null) {
+                // annotation is not intended to be used for code checking
+                continue;
+            }
+
+            // check whether the annotation is used in correct place and perform the verification
+            // of target element using appropriate scanner
+            Target target = annotation.getAnnotation(Target.class);
+            Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(annotation);
+            for (Element element : annotatedElements) {
+
+                if (target == null) {
+                    // annotation can be used everywhere
+                } else {
+
+                    boolean usedInCorrectPlace = false;
+
+                    for (ElementType type : target.value()) {
+                        if (UtilsCTree.convertToElementType(element.getKind()).equals(type)) {
+                            usedInCorrectPlace = true;
+                        }
+                    }
+
+                    if (!usedInCorrectPlace) {
+                        messager.printMessage(Diagnostic.Kind.ERROR, "The @" + annotation.getSimpleName() +
+                            " annotation is declared to be used with " + target.toString());
+                        continue;
+                    }
+                }
+
+                scanner.scan(trees.getPath(element), trees);
+            }
+        }
+
+        return true;
+    }
+
 }
