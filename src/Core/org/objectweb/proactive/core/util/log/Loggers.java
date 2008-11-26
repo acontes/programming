@@ -151,7 +151,7 @@ public interface Loggers {
 
     // Forwarding
     static final public String FORWARDING = CORE + ".forwarding";
-    
+
     // Exceptions
     public static final String EXCEPTIONS = CORE + ".exceptions";
     public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";

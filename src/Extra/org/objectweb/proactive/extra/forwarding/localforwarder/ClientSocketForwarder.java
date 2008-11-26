@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extra.forwarding.common.OutHandler;
 
+
 /**
  * The Client Socket forwarder send a connection request and wait for a response from the
  * target. If the timeout is reached, then an exception is launched and the connection fails.
@@ -22,8 +23,7 @@ public class ClientSocketForwarder extends SocketForwarder {
     private boolean launched;
 
     public ClientSocketForwarder(Object localID, int localPort, Object targetID, int targetPort,
-            OutHandler tunnel, LocalConnectionHandler handler) 
-    {
+            OutHandler tunnel, LocalConnectionHandler handler) {
         super(localID, localPort, targetID, targetPort, tunnel, handler);
     }
 

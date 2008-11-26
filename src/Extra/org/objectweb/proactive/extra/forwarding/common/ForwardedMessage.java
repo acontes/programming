@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings("serial")
 public class ForwardedMessage implements Serializable {
     public static final int DEFAULT_TTL = 255;
-    private static AtomicInteger currentPort = new AtomicInteger(0); 
+    private static AtomicInteger currentPort = new AtomicInteger(0);
 
     protected int ttl;
     protected ForwardedMessageType type;

@@ -10,6 +10,7 @@ import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage;
 import org.objectweb.proactive.extra.forwarding.exceptions.ForwardingException;
 import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
 
+
 /**
  * Class used to connect to registry and to get forwarded sockets.
  *
