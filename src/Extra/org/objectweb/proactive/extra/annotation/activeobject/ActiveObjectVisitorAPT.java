@@ -264,14 +264,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
         if (modifiers.contains(Modifier.PROTECTED) || modifiers.contains(Modifier.PRIVATE))
             return true;
 
-        // no final public/package
-        if (modifiers.contains(Modifier.FINAL)) {
-            reportError(fieldDeclaration, "The class declares the final " +
-                (modifiers.contains(Modifier.PUBLIC) ? "public" : "package") + " field " +
-                fieldDeclaration.getSimpleName() + ".\n" + ErrorMessages.HAS_FINAL_FIELD_ERROR_MESSAGE);
-            return false;
-        }
-
         // no public/package access without getters/setters
         if (!checkGettersSetters(fieldDeclaration.getSimpleName())) {
             reportWarning(fieldDeclaration, "The class declares the  " +

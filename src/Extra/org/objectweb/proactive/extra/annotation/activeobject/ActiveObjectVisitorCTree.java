@@ -105,13 +105,6 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
             if (clazzMember.getKind().equals(Kind.VARIABLE)) {
                 VariableTree fieldNode = (VariableTree) clazzMember;
 
-                if (fieldNode.getModifiers().getFlags().contains(Modifier.FINAL) &&
-                    !(fieldNode.getModifiers().getFlags().contains(Modifier.PRIVATE) || fieldNode
-                            .getModifiers().getFlags().contains(Modifier.PROTECTED))) {
-                    reportError("The class declares the final field " + fieldNode.getName() + ".\n" +
-                        ErrorMessages.HAS_FINAL_FIELD_ERROR_MESSAGE, trees.getElement(getCurrentPath()));
-                }
-
                 if (accessedFromOutside(fieldNode) &&
                     !fieldNode.getModifiers().getFlags().contains(Modifier.FINAL) &&
                     !hasAccessors(fieldNode.getName().toString(), clazzMembers)) {
