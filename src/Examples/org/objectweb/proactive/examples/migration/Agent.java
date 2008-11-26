@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
 /**
@@ -83,6 +84,7 @@ public class Agent implements InitActive, RunActive, EndActive, java.io.Serializ
         }
     }
 
+    @MigrationSignal
     public void moveTo(Node node) throws Exception {
         //try {
         logger.info(" I am going to migrate to " + node.getNodeInformation().getURL());

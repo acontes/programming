@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
 /**
@@ -54,6 +55,7 @@ public class SimpleAgent implements java.io.Serializable {
     }
 
     /** Migrate the Active Object to a new host */
+    @MigrationSignal
     public void moveTo(String t) {
         try {
             PAMobileAgent.migrateTo(t);

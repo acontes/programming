@@ -36,10 +36,12 @@ import java.io.Serializable;
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
 public class MigratableHello extends InitializedHelloWorld implements Serializable {
 
+    @MigrationSignal
     public void packUpMyVariablesAndHitTheRoad(Node whereTo) {
         try {
             System.out.println("Packing up and starting migration to " +

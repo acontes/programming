@@ -39,6 +39,7 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.Isect;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Surface;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
 /**
@@ -118,6 +119,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
     /**
      * Feature the migration property
      */
+    @MigrationSignal
     public void migrateTo(String nodeTarget) {
         try {
             org.objectweb.proactive.api.PAMobileAgent.migrateTo(nodeTarget);

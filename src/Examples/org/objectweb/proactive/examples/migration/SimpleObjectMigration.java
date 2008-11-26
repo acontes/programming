@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
 /**
@@ -103,6 +104,7 @@ public class SimpleObjectMigration implements Serializable {
      *
      * @param t The url of the destination node
      */
+    @MigrationSignal
     public void moveTo(String t) {
         try {
             logger.info("SimpleObjectMigration> moveTo(" + t + ") " + "% start migration");

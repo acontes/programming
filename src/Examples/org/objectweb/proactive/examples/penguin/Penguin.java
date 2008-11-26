@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.Destination;
 import org.objectweb.proactive.core.migration.MigrationStrategyImpl;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
 public class Penguin implements org.objectweb.proactive.RunActive, java.io.Serializable {
@@ -130,6 +131,7 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
         return r;
     }
 
+    @MigrationSignal
     public void runActivity(Body b) {
         Service service = new Service(b);
         if (!initialized) {
