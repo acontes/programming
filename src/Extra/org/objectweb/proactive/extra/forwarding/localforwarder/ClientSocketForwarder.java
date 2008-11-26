@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extra.forwarding.common.OutHandler;
 
 /**
@@ -97,7 +98,7 @@ public class ClientSocketForwarder extends SocketForwarder {
 		port = ss.getLocalPort();
 
 		try {
-			Socket sock1 = new Socket(InetAddress.getLocalHost(), port);
+			Socket sock1 = new Socket(ProActiveInet.getInstance().getInetAddress(), port);
 			Socket sock2 = creator.getSocket();
 			sockToHandle = sock1;
 			return sock2;

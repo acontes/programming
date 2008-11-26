@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage;
 import org.objectweb.proactive.extra.forwarding.common.OutHandler;
 
@@ -27,7 +28,7 @@ public class ServerSocketForwarder extends SocketForwarder {
 	protected void initSocket() {
 		// TODO create connection to server
 		try {
-			sockToHandle = new Socket(InetAddress.getLocalHost(), localPort);
+			sockToHandle = new Socket(ProActiveInet.getInstance().getInetAddress(), localPort);
 			tunnel.putMessage(ForwardedMessage.acceptMessage(localID, localPort, targetID, targetPort));
 			startHandling();
 		} catch (UnknownHostException e) {
