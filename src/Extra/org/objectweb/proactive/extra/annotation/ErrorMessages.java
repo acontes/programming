@@ -64,8 +64,10 @@ public interface ErrorMessages {
     public static final String NO_SERIALIZABLE_ERROR_MESSAGE = "An active object should implement the Serializable interface.\n";
     // the class is final
     public static final String IS_FINAL_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot be final.\n";
-    // the class has final members
-    public static final String HAS_FINAL_MEMBER_ERROR_MESSAGE = "An active object must be subclassable, and therefore cannot have final members.\n";
+    // the class has final methods
+    public static final String HAS_FINAL_METHOD_ERROR_MESSAGE = "An active object cannot have final methods.\n";
+    // the class has final field
+    public static final String HAS_FINAL_FIELD_ERROR_MESSAGE = "An active object cannot have final fileds.\n";
     // the class has volatile members
     public static final String HAS_SYNCHRONIZED_MEMBER_ERORR_MESSAGE = "An active object already has an implicit synchronisation mechanism, wait-by-necessity. The synchronized/volatile keywords are therefore useless for a member of an active object.\n";
     // the class is not public 

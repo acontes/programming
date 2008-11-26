@@ -109,7 +109,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
                     !(fieldNode.getModifiers().getFlags().contains(Modifier.PRIVATE) || fieldNode
                             .getModifiers().getFlags().contains(Modifier.PROTECTED))) {
                     reportError("The class declares the final field " + fieldNode.getName() + ".\n" +
-                        ErrorMessages.IS_FINAL_ERROR_MESSAGE, trees.getElement(getCurrentPath()));
+                        ErrorMessages.HAS_FINAL_FIELD_ERROR_MESSAGE, trees.getElement(getCurrentPath()));
                 }
 
                 if (accessedFromOutside(fieldNode) &&
@@ -167,7 +167,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
         if (methodNode.getModifiers().getFlags().contains(Modifier.FINAL) &&
             !methodNode.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
             reportError(" The class declares the final method " + methodNode.getName() + ".\n" +
-                ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE, trees.getElement(getCurrentPath()));
+                ErrorMessages.HAS_FINAL_METHOD_ERROR_MESSAGE, trees.getElement(getCurrentPath()));
         }
 
         // test serializable args

@@ -268,7 +268,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
         if (modifiers.contains(Modifier.FINAL)) {
             reportError(fieldDeclaration, "The class declares the final " +
                 (modifiers.contains(Modifier.PUBLIC) ? "public" : "package") + " field " +
-                fieldDeclaration.getSimpleName() + ".\n" + ErrorMessages.IS_FINAL_ERROR_MESSAGE);
+                fieldDeclaration.getSimpleName() + ".\n" + ErrorMessages.HAS_FINAL_FIELD_ERROR_MESSAGE);
             return false;
         }
 
@@ -322,7 +322,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 
         if (modifiers.contains(Modifier.FINAL) && !modifiers.contains(Modifier.PRIVATE)) {
             reportError(methodDeclaration, " The class declares the final method " +
-                methodDeclaration.getSimpleName() + ".\n" + ErrorMessages.HAS_FINAL_MEMBER_ERROR_MESSAGE);
+                methodDeclaration.getSimpleName() + ".\n" + ErrorMessages.HAS_FINAL_METHOD_ERROR_MESSAGE);
             return false;
         }
 
