@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor schemaVersion="3.3"
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
-	xmlns:pas="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../../../descriptors/DescriptorSchema.xsd">
+<ProActiveDescriptor 
+    schemaVersion="3.3"
+    xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+    xmlns:pas="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation=
+    "http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../../../descriptors/DescriptorSchema.xsd"    > 
 	<security>
-		<file uri="applicationPolicy.xml" />
+		<file uri="applicationPolicy.xml"/>
 	</security>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -29,7 +31,7 @@
 			</map>
 			<map virtualNode="vm2">
 				<jvmSet>
-					<currentJVM protocol="rmi" />
+				<currentJVM protocol="rmi" />
 					<!--   <vmName value="Jvm2" /> -->
 				</jvmSet>
 			</map>
@@ -41,69 +43,73 @@
 				</creation>
 			</jvm>
 			<jvm name="Jvm1">
+
 				<creation>
 					<processReference refid="linuxJVM1" />
 				</creation>
-				<!--
-					<acquisition> <serviceReference refid="psychoquack"/>
-					url="rmi://.inria.fr:2666/PA_JVMsecureVM1"> </acquisition>
-				-->
+				<!--	<acquisition>
+					<serviceReference refid="psychoquack"/>
+					url="rmi://.inria.fr:2666/PA_JVMsecureVM1"> 
+					</acquisition> -->
 			</jvm>
 			<jvm name="Jvm2">
 				<creation>
 					<processReference refid="linuxJVM2" />
 				</creation>
-				<!--
-					<acquisition> <serviceReference refid="predadab"/> </acquisition>
-				-->
+				<!--	<acquisition>
+					
+					<serviceReference refid="predadab"/>
+					
+					</acquisition>-->
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
 			<processDefinition id="linuxJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<!--
-						<classpath> <absolutePath
-						value="/user/acontes/home/dev/ProActive/classes" /> <absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/asm.jar" />
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess"><!--
+					<classpath>
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/bcel.jar" />
+							value="/user/acontes/home/dev/ProActive/classes" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/bouncycastle.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/asm.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cog-jglobus.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/bcel.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cog-ogce.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/bouncycastle.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix32.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cog-jglobus.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix-asn1.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cog-ogce.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix32.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/fractal.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix-asn1.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/ibis.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/javaxCrypto.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/fractal.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jce-jdk13-117.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/ibis.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jini-core.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/javaxCrypto.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jini-ext.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jce-jdk13-117.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/log4j.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jini-core.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/puretls.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jini-ext.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/reggie.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/log4j.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/xercesImpl.jar" />
-						</classpath>
-					-->
-					<jvmParameters>
+							value="/user/acontes/home/dev/ProActive/lib/puretls.jar" />
+						<absolutePath
+							value="/user/acontes/home/dev/ProActive/lib/reggie.jar" />
+						<absolutePath
+							value="/user/acontes/home/dev/ProActive/lib/xercesImpl.jar" />
+					</classpath>
+					--><jvmParameters>
 						<parameter
 							value="-Dlog4j.configuration=file:/user/acontes/home/dev/ProActive/dev/security/proactive-log4j" />
 						<parameter value="-Xdebug" />
@@ -117,48 +123,49 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="linuxJVM1">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<!--
-						<classpath> <absolutePath
-						value="/user/acontes/home/dev/ProActive/classes" /> <absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/asm.jar" />
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<!--<classpath>
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/bcel.jar" />
+							value="/user/acontes/home/dev/ProActive/classes" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/bouncycastle.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/asm.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cog-jglobus.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/bcel.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cog-ogce.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/bouncycastle.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix32.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cog-jglobus.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix-asn1.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cog-ogce.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix32.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/fractal.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix-asn1.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/ibis.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/javaxCrypto.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/fractal.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jce-jdk13-117.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/ibis.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jini-core.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/javaxCrypto.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jini-ext.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jce-jdk13-117.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/log4j.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jini-core.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/puretls.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jini-ext.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/reggie.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/log4j.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/xercesImpl.jar" />
-						</classpath>
-					-->
-					<jvmParameters>
+							value="/user/acontes/home/dev/ProActive/lib/puretls.jar" />
+						<absolutePath
+							value="/user/acontes/home/dev/ProActive/lib/reggie.jar" />
+						<absolutePath
+							value="/user/acontes/home/dev/ProActive/lib/xercesImpl.jar" />
+					</classpath>
+					--><jvmParameters>
 						<parameter
 							value="-Dlog4j.configuration=file:/user/acontes/home/dev/ProActive/dev/security/proactive-log4j" />
 						<parameter value="-Xdebug" />
@@ -172,47 +179,47 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="linuxJVM2">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<!--
-						<classpath> <absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/asm.jar" />
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<!--<classpath>
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/bcel.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/asm.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/bouncycastle.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/bcel.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cog-jglobus.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/bouncycastle.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cog-ogce.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cog-jglobus.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix32.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cog-ogce.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix-asn1.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix32.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/cryptix.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix-asn1.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/fractal.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/cryptix.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/ibis.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/fractal.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/javaxCrypto.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/ibis.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jce-jdk13-117.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/javaxCrypto.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jini-core.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jce-jdk13-117.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/jini-ext.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jini-core.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/log4j.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/jini-ext.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/puretls.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/log4j.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/reggie.jar" />
+							value="/user/acontes/home/dev/ProActive/lib/puretls.jar" />
 						<absolutePath
-						value="/user/acontes/home/dev/ProActive/lib/xercesImpl.jar" />
-						</classpath>
-					-->
-					<jvmParameters>
+							value="/user/acontes/home/dev/ProActive/lib/reggie.jar" />
+						<absolutePath
+							value="/user/acontes/home/dev/ProActive/lib/xercesImpl.jar" />
+					</classpath>
+					--><jvmParameters>
 						<parameter
 							value="-Dlog4j.configuration=file:/user/acontes/home/dev/ProActive/dev/security/proactive-log4j" />
 						<parameter value="-Xdebug" />
@@ -226,13 +233,15 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="rsh_predadab">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
 					hostname="predadab">
 					<processReference refid="linuxJVM1" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="rsh_wapiti">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
 					hostname="tuba">
 					<processReference refid="linuxJVM2" />
 				</rshProcess>
@@ -240,11 +249,15 @@
 		</processes>
 		<services>
 			<serviceDefinition id="psychoquack">
-				<RMIRegistryLookup url="//localhost.localdomain/PA_JVMsecureVM1" />
+				<RMIRegistryLookup
+					url="//localhost.localdomain/PA_JVMsecureVM1" />
 			</serviceDefinition>
 			<serviceDefinition id="predadab">
-				<RMIRegistryLookup url="//localhost.localdomain/PA_JVMsecureVM2" />
+				<RMIRegistryLookup
+					url="//localhost.localdomain/PA_JVMsecureVM2" />
 			</serviceDefinition>
 		</services>
+
+
 	</infrastructure>
 </ProActiveDescriptor>

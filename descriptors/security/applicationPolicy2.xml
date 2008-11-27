@@ -18,12 +18,12 @@
 			</To>
 			<Communication>
 				<Request value="authorized">
-					<Attributes authentication="optional" integrity="optional"
-						confidentiality="optional" />
+					<Attributes authentication="optional"
+						integrity="optional" confidentiality="optional" />
 				</Request>
 				<Reply value="authorized">
-					<Attributes authentication="optional" integrity="optional"
-						confidentiality="optional" />
+					<Attributes authentication="optional"
+						integrity="optional" confidentiality="optional" />
 				</Reply>
 			</Communication>
 			<Migration>authorized</Migration>

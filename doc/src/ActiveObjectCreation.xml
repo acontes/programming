@@ -1,79 +1,82 @@
-<?xml version="1.0" encoding="utf-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"
-	xml:id="ActiveObjectCreation">
-	<info>
-		<title>Active Objects: Creation And Advanced Concepts</title>
-	</info>
-	<section>
-		<info>
-			<title>Overview</title>
-		</info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ActiveObjectCreation"><info><title>Active Objects: Creation And Advanced Concepts</title></info>
+	
+
+	<section><info><title>Overview</title></info>
+		
 		<para>
-			Active objects are created on a per-object basis: an application can
-			contain active as well as passive instances of a given class. In this
-			section, we will present the three methods for creating active
-			instances of classes and how to use the arguments passed to the
-			methods to control creation. Although almost any object can be turned
-			into an Active Object, there are some restrictions that will be
-			detailed below. We also present a in depth explanation of the
-			structure and behaviour of an active object.The examples in this
-			chapter contain only the code necessary for creation of active
-			object. To see how to start the nodes, JVMs, and virtual nodes on
-			which objects can be instantiated read
-			<xref linkend="Configuration" />
+			Active objects are created on a per-object basis: an
+			application can contain active as well as passive instances
+			of a given class. In this section, we will present the three
+			methods for creating active instances of classes and how to
+			use the arguments passed to the methods to control creation.
+			Although almost any object can be turned into an Active
+			Object, there are some restrictions that will be detailed
+			below. We also present a in depth explanation of the
+			structure and behaviour of an active object.The examples in
+			this chapter contain only the code necessary for creation of
+			active object. To see how to start the nodes, JVMs, and
+			virtual nodes on which objects can be instantiated read
+			<xref linkend="Configuration"/>
+			
+			
 		</para>
+
 		<para>
+		
 			In
 			<emphasis role="bold">ProActive</emphasis>
-			there are two ways to create active objects: instantiation based
-			creation and by using an existing object. Instantion based creation
-			is done through
+			there are two ways to create active objects: instantiation
+			based creation and by using an existing object. Instantion
+			based creation is done through
 			<literal>PAActiveObject.newActive(...)</literal>
 			and
 			<literal>PAActiveObject.newActiveInParallel(...)</literal>
 			and object based creation is done through
-			<literal>PAActiveObject.turnActive(...)</literal>
-			. The methods are part of the
+			<literal>PAActiveObject.turnActive(...)</literal>.
+			The methods are part of the
 			<literal>org.objectweb.proactive.api</literal>
-			package. Each method takes several parameters that control how the
-			active object is created and most of the parameters are common
-			between creation methods. All the available creation methods with
-			parameters are presented in the
-			<link xmlns:xlink="http://www.w3.org/1999/xlink"
-				xlink:href="http://proactive.inria.fr/release-doc/api/org/objectweb/proactive/PAActiveObject.html"> PAActiveObject Javadoc </link>
+			package. Each method takes several parameters that control
+			how the active object is created and most of the parameters
+			are common between creation methods. All the available
+			creation methods with parameters are presented in the
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/api/org/objectweb/proactive/PAActiveObject.html">
+				PAActiveObject Javadoc
+			</link>
 			.
 		</para>
-		<figure>
-			<info>
-				<title>PAActiveObject class</title>
-			</info>
+
+		<figure><info><title>PAActiveObject class</title></info>
+			
 			<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="100%" contentdepth="100%"
-						fileref="images/PAActiveObject.png" format="PNG" align="center" />
+					<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/PAActiveObject.png" format="PNG" align="center"/>
+
 				</imageobject>
 			</mediaobject>
 		</figure>
-		<!--
-			<figure><info><title>Active Object creation methods and
-			parameters</title></info> <mediaobject> <imageobject> <imagedata
-			scalefit="1" width="100%" contentdepth="100%"
-			fileref="images/creationMethodsTable.png" format="PNG"
-			align="center"/> </imageobject> </mediaobject> </figure>
-		-->
-		<para> For the examples in this chapter we will be using the following
-			class that can be instantiated as an active object: </para>
-		<programlisting xml:lang="java">
-			<textobject>
-				<textdata fileref="code_snippets/ActiveWorker.txt" />
-			</textobject>
-		</programlisting>
+<!-- 
+		<figure><info><title>Active Object creation methods and parameters</title></info>
+			
+			<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/creationMethodsTable.png"  format="PNG"  align="center"/>
+
+				</imageobject>
+			</mediaobject>
+		</figure>
+ -->
+		<para>	
+			For the examples  in this chapter we will be using the following
+			class that can be instantiated as an active	object:
+		</para>	
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ActiveWorker.txt"/></textobject></programlisting>
+
 	</section>
-	<section xml:id="ActiveObjectCreation_html_restrictions">
-		<info>
-			<title>Restrictions on creating active objects</title>
-		</info>
-		<para> Not all classes can be used to instantiate active objects.
+
+	<section xml:id="ActiveObjectCreation_html_restrictions"><info><title>Restrictions on creating active objects</title></info>
+		
+		<para>
+			Not all classes can be used to instantiate active objects.
 			There are some restrictions, most of them caused by the 100%
 			Java compliance, which forbids modifying the Java Virtual
 			Machine or the compiler.

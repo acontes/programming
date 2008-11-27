@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Policy
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
-	schemaVersion="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	schemaVersion="1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd /user/acontes/home/workspace/ProActive/descriptors/SecuritySchema.xsd">
 	<ApplicationName>C3DAddUser</ApplicationName>
 	<Certificate>/net/home/acontes/certif/appli.cert</Certificate>
@@ -20,16 +21,17 @@
 			</To>
 			<Communication>
 				<Request value="denied">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Request>
 				<Reply value="denied">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Reply>
 			</Communication>
 			<Migration>authorized</Migration>
 			<OACreation>denied</OACreation>
+
 		</Rule>
 		<Rule>
 			<From>
@@ -40,16 +42,19 @@
 			</To>
 			<Communication>
 				<Request value="authorized">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Request>
 				<Reply value="authorized">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
+
 				</Reply>
 			</Communication>
 			<Migration>denied</Migration>
 			<OACreation>authorized</OACreation>
+
 		</Rule>
+
 	</Rules>
 </Policy>

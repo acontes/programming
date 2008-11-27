@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+<ProActiveDescriptor
+xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive" />
 		<descriptorVariable name="RMI_PORT" value="5000" />
@@ -9,6 +11,7 @@
 		<descriptorVariable name="VMARGS" value="-Xmx16M -Xms16M" />
 		<descriptorVariable name="NODES" value="4" />
 	</variables>
+
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Workers" property="multiple" />
@@ -33,16 +36,23 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.rmi.port=${RMI_PORT}" />
-						<parameter value="-Dproactive.communication.protocol=${COM_PROTO}" />
-						<parameter value="-Dibis.serialization=ibis" />
-						<parameter value="-Dibis.name_server.host=localhost" />
-						<parameter value="-Dibis.verbose=true" />
+						<parameter
+							value="-Dproactive.rmi.port=${RMI_PORT}" />
+						<parameter
+							value="-Dproactive.communication.protocol=${COM_PROTO}" />
+                                                <parameter
+							value="-Dibis.serialization=ibis" />
+						<parameter
+							value="-Dibis.name_server.host=localhost" />
+						<parameter
+							value="-Dibis.verbose=true" />
 						<parameter
 							value="-Dibis.serialization.classloader=org.objectweb.proactive.core.mop.MOPClassLoader" />
-						<parameter value="-Dibis.pool_host_number=1" />
+                                                <parameter
+                                                        value="-Dibis.pool_host_number=1" />
 						<parameter value="${VMARGS}" />
 					</jvmParameters>
 				</jvmProcess>

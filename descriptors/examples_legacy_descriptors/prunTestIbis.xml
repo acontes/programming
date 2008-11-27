@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+<ProActiveDescriptor
+	xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive" />
-		<!--
-			CHANGE ME!!!!
-		-->
-		<descriptorVariable name="IBIS_HOME" value="/path/to/Ibis" />
-		<!--
-			CHANGE ME!!!!
-		-->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="IBIS_HOME"
+			value="/path/to/Ibis" /><!--CHANGE ME!!!! -->
 		<descriptorVariable name="PRESERIALIZED_HOME"
 			value="/path/to/classlibs" /><!--CHANGE ME!!!! -->
-		<descriptorVariable name="JAVA_HOME" value="/path/to/jdk1.5.0" />
-		<!--
-			Path of the remote JVM , CHANGE ME!!!!
-		-->
+		<descriptorVariable name="JAVA_HOME"
+			value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -42,27 +37,35 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="linuxJVM1">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<bootclasspath>
-						<absolutePath value="${IBIS_HOME}/" />
-						<absolutePath value="${PRESERIALIZED_HOME}/jdk" /> <!--  preserialized jars from JDK -->
+						<absolutePath
+							value="${IBIS_HOME}/" />
+						<absolutePath
+							value="${PRESERIALIZED_HOME}/jdk" /> <!--  preserialized jars from JDK -->
 					</bootclasspath>
 					<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/" />
-						<absolutePath value="${PRESERIALIZED_HOME}/lib" /> <!--  preserialized jars from ProActive -->
+						<absolutePath
+							value="${PROACTIVE_HOME}/" />
+						<absolutePath
+							value="${PRESERIALIZED_HOME}/lib" /> <!--  preserialized jars from ProActive -->
 					</classpath>
 					<javaPath>
-						<absolutePath value="${JAVA_HOME}/bin/java" />
+						<absolutePath
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
 							value="${PROACTIVE_HOME}/scripts/unix/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="${PROACTIVE_HOME}/scripts/unix/proactive-log4j" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/scripts/unix/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
-						<parameter value="-Djava.library.path=${PROACTIVE_HOME}/lib" />
+						<parameter
+							value="-Djava.library.path=${PROACTIVE_HOME}/lib" />
 						<parameter
 							value="-Dsun.boot.library.path=${PROACTIVE_HOME}/lib:/${JAVA_HOME}/jre/lib/i386" />
 						<parameter

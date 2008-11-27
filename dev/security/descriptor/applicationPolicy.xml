@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Policy
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd ../../../descriptors/SecuritySchema.xsd">
+<Policy xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd ../../../descriptors/SecuritySchema.xsd"
+  >
 	<ApplicationName>Garden</ApplicationName>
 	<PKCS12KeyStore>/user/acontes/home/workspace/ProActive/dev/security/scripts/appli.keystore</PKCS12KeyStore>
 	<CertificationAuthority>
@@ -18,18 +18,22 @@
 				<Entity type="VN" name="Locale" />
 			</To>
 			<Communication>
+
 				<Request value="denied">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Request>
 				<Reply value="denied">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Reply>
 			</Communication>
 			<Migration>authorized</Migration>
 			<OACreation>denied</OACreation>
+
 		</Rule>
+
+
 		<Rule>
 			<From>
 				<Entity type="VN" name="vm1" />
@@ -39,17 +43,21 @@
 			</To>
 			<Communication>
 				<Request value="denied">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Request>
 				<Reply value="denied">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Reply>
 			</Communication>
 			<Migration>authorized</Migration>
 			<OACreation>denied</OACreation>
+
 		</Rule>
+
+
+
 		<Rule>
 			<From>
 				<Entity type="VN" name="vm2" />
@@ -59,17 +67,19 @@
 			</To>
 			<Communication>
 				<Request value="authorized">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Request>
 				<Reply value="denied">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Reply>
 			</Communication>
 			<Migration>denied</Migration>
 			<OACreation>denied</OACreation>
+
 		</Rule>
+
 		<Rule>
 			<From>
 				<Entity type="VN" name="Locale" />
@@ -79,17 +89,18 @@
 			</To>
 			<Communication>
 				<Request value="authorized">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Request>
 				<Reply value="denied">
-					<Attributes authentication="denied" integrity="denied"
-						confidentiality="denied" />
+					<Attributes authentication="denied"
+						integrity="denied" confidentiality="denied" />
 				</Reply>
 			</Communication>
 			<Migration>denied</Migration>
 			<OACreation>denied</OACreation>
 		</Rule>
+
 		<Rule>
 			<From>
 				<Entity type="VN" name="Locale" />
@@ -99,17 +110,19 @@
 			</To>
 			<Communication>
 				<Request value="authorized">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Request>
 				<Reply value="authorized">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Reply>
 			</Communication>
 			<Migration>denied</Migration>
 			<OACreation>denied</OACreation>
+
 		</Rule>
+
 		<Rule>
 			<From>
 				<Entity type="DefaultVirtualNode" name="*" />
@@ -119,16 +132,19 @@
 			</To>
 			<Communication>
 				<Request value="authorized">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
 				</Request>
 				<Reply value="authorized">
-					<Attributes authentication="required" integrity="required"
-						confidentiality="required" />
+					<Attributes authentication="required"
+						integrity="required" confidentiality="required" />
+
 				</Reply>
 			</Communication>
 			<Migration>authorized</Migration>
 			<OACreation>denied</OACreation>
+
 		</Rule>
+
 	</Rules>
 </Policy>

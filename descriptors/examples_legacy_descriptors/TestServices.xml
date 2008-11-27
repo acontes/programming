@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+<ProActiveDescriptor
+	xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<componentDefinition>
@@ -32,14 +33,15 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 				</jvmProcess>
 			</processDefinition>
 		</processes>
 		<services>
 			<serviceDefinition id="p2plookup">
-				<P2PService nodesAsked="2" acq="rmi" port="2410" NOA="10"
-					TTU="60000" TTL="10">
+				<P2PService nodesAsked="2" acq="rmi" port="2410"
+					NOA="10" TTU="60000" TTL="10">
 					<peerSet>
 						<peer>localhost</peer>
 					</peerSet>

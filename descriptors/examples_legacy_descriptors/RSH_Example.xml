@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+<ProActiveDescriptor
+	xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive" /> <!--CHANGE ME!!!! -->
-		<descriptorVariable name="JAVA_HOME" value="/path/to/jdk1.5.0" />
-		<!--
-			Path of the remote JVM , CHANGE ME!!!!
-		-->
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME"
+			value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -53,44 +52,47 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar" />
-						<absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar" />
-						<absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar" />
-						<absolutePath value="${PROACTIVE_HOME}/dist/lib/trilead-ssh2.jar" />
-						<absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar" />
-						<absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar" />
-						<absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar" />
+						                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
+
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/trilead-ssh2.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
+
 					</classpath>
 					<javaPath>
-						<absolutePath value="${JAVA_HOME}/bin/java" />
+						<absolutePath value="${JAVA_HOME}/bin/java"/>
 					</javaPath>
 					<policyFile>
-						<absolutePath value="${PROACTIVE_HOME}/dist/proactive.java.policy" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/proactive.java.policy"/>
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="${PROACTIVE_HOME}/dist/proactive-log4j" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/proactive-log4j"/>
 					</log4jpropertiesFile>
-					<!--
-						<jvmParameters> <parameter
-						value="-Dproactive.communication.protocol=rmissh"/>
-						</jvmParameters>
-					-->
+					<!--<jvmParameters>
+						<parameter value="-Dproactive.communication.protocol=rmissh"/>
+					</jvmParameters>-->
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="rsh_crusoe">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
 					hostname="crusoe.inria.fr">
 					<processReference refid="localJVM"></processReference>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="rsh_waha">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
 					hostname="waha.inria.fr">
 					<processReference refid="localJVM"></processReference>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="rsh_amstel">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
 					hostname="amstel.inria.fr">
 					<processReference refid="localJVM"></processReference>
 				</rshProcess>
