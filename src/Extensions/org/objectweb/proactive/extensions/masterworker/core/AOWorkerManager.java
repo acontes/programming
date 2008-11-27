@@ -32,6 +32,7 @@
 package org.objectweb.proactive.extensions.masterworker.core;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -146,6 +147,15 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * VN Name of the master (if any)
      */
     private String masterVNNAme;
+    
+    /**
+     * Hierarchical master worker
+     */
+    private int groupSize = 100;
+    private HashMap<Long, AOSubMaster> subMasters;
+    private HashMap<Long, Integer> subGroupSizes;
+    private HashMap<Long, AOSubMaster> fullSubMasters;
+    
 
     /**
      * ProActive no arg constructor
@@ -169,6 +179,12 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
         this.masterDescriptorURL = masterDescriptorURL;
         this.applicationUsed = applicationUsed;
         this.masterVNNAme = masterVNNAme;
+        if (null != PAProperties.PA_MASTERWORKER_SUBGROUPSIZE.getValue()){
+        	groupSize = Integer.parseInt(PAProperties.PA_MASTERWORKER_SUBGROUPSIZE.getValue());
+        }
+        subMasters = new HashMap<Long, AOSubMaster>();
+        fullSubMasters = new HashMap<Long, AOSubMaster>();
+        subGroupSizes = new HashMap<Long, Integer>();
     }
 
     /**
@@ -177,6 +193,10 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     public void addResources(final Collection<Node> nodes) {
         if (!isTerminated) {
             for (Node node : nodes) {
+            	if(createSubMaster(node)){
+            		// do nothing
+            		return;
+            	}
                 threadPool.execute(new WorkerCreationHandler(node));
             }
         }
@@ -249,6 +269,55 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     }
 
     /**
+     * Creates a submaster object inside the given node
+     *
+     * @param node the node on which a submaster will be created
+     */
+    private boolean createSubMaster(final Node node) {
+        if (!isTerminated) {
+            try {
+            	String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
+            	String nodename = node.getNodeInformation().getName();
+                long topologyId = node.getVMInformation().getTopologyId();
+
+                AOSubMaster subMaster = null;
+                
+                if(topologyId > 0){
+	                if(subMasters.containsKey(topologyId)){
+	                	// do nothing
+	                	return false;
+	                }
+	                
+	                // If no subMaster for the specified topologyID, create a new subMaster
+	                else{
+	                	subMaster = (AOSubMaster) PAActiveObject
+	                		.newActive(AOSubMaster.class.getName(), new Object[] { workername,
+	                			(WorkerMaster) provider, this.memoryFactory }, node); 
+
+	                	subMasters.put(topologyId, subMaster);
+	                	subGroupSizes.put(topologyId, 0);
+	                	
+	                	if (debug) {
+	                        logger.debug("Creating SubMaster on " + nodename);
+	                    }
+	                	
+	                	return true;
+	                }
+	                
+	                
+                }
+                return false;
+            } catch (ActiveObjectCreationException e) {
+                e.printStackTrace(); // bad node
+            } catch (NodeException e) {
+                e.printStackTrace(); // bad node
+            }
+        }
+        // If it is terminated, return true, and do nothing
+        return true;
+    }
+    
+    /**
      * Creates a worker object inside the given node
      *
      * @param node the node on which a worker will be created
@@ -256,12 +325,57 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     private void createWorker(final Node node) {
         if (!isTerminated) {
             try {
-                String nodename = node.getNodeInformation().getName();
+            	String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
+            	String nodename = node.getNodeInformation().getName();
+                long topologyId = node.getVMInformation().getTopologyId();
+                int subGroupSize = 0;
+                AOSubMaster subMaster = null;
+                
+                if (debug) {
+                    logger.debug("TopologyID is: " + node.getVMInformation().getTopologyId() + groupSize);
+                }
+                if(topologyId > 0){
+	                if(subMasters.containsKey(topologyId)){
+	                	// if the size of the group is bigger than the set size
+	                	// Remove it from the subMaster group and add it to the full group
+
+	                	subMaster = subMasters.get(topologyId);
+	                	
+	                	// If another one worker is added to the group, wait
+	                	// The group size if a critical variable
+	                	while((!subGroupSizes.containsKey(topologyId)) && (subMasters.containsKey(topologyId)))
+	                	{
+	                		try {
+								Thread.sleep(2);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	                	}
+	                	subGroupSize = subGroupSizes.remove(topologyId);
+	                	
+	                	if((++subGroupSize) < this.groupSize )
+	                		subGroupSizes.put(topologyId, subGroupSize);
+	                	else{
+	                		subMasters.remove(topologyId);
+	                		fullSubMasters.put(topologyId, subMaster);
+	                	}
+	                	
+	                	// get the submaster and give the node to the subMaster to create worker
+	                	Collection<Node> nodes = new Vector<Node>();
+	                	nodes.add(node);
+	                	
+	                	subMaster.addResources(nodes);
+	                	
+	                }
+	                return;
+                }
+                
                 if (debug) {
                     logger.debug("Creating worker on " + nodename);
                 }
 
-                String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
+                
 
                 // Creates the worker which will automatically connect to the master
                 workers.put(workername, (Worker) PAActiveObject
@@ -309,6 +423,11 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 
         // get the node
         try {
+        	if(createSubMaster(node)){
+        		// do nothing
+        		
+        		return;
+        	}
             threadPool.execute(new WorkerCreationHandler(node));
         } catch (java.util.concurrent.RejectedExecutionException e) {
             if (debug) {
