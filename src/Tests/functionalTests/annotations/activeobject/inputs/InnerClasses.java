@@ -19,14 +19,13 @@ public class InnerClasses {
 	class AnnotatedDada{}
 	
 	public void localInnerClass() {
-		// all this stuff cannot be seen by apt
 		// local inner class
 		class InnerClass{}
 		
 		// local inner class
-		// ERROR
+		// ERROR - unfortunately cannot be checked!
 		@ActiveObject
-		class InnerClass{}
+		class AnnotatedInnerClass{}
 	}
 	
 	// anonymous inner class
