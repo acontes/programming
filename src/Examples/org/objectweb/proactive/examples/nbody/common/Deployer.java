@@ -32,6 +32,7 @@
 package org.objectweb.proactive.examples.nbody.common;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 @ActiveObject
-public class Deployer {
+public class Deployer implements Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     GCMApplication gcmad;

@@ -31,6 +31,7 @@
  */
 package org.objectweb.proactive.examples.dynamicdispatch.pi;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -43,7 +44,7 @@ import java.net.UnknownHostException;
  * @author The ProActive Team
  *
  */
-public class PiComputer {
+public class PiComputer implements Serializable {
     private static final int ROUND_MODE = BigDecimal.ROUND_HALF_EVEN;
     private BigDecimal ZERO = new BigDecimal("0");
     private BigDecimal ONE = new BigDecimal("1");

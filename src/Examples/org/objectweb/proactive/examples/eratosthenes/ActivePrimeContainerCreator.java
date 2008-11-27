@@ -31,11 +31,14 @@
  */
 package org.objectweb.proactive.examples.eratosthenes;
 
+import java.io.Serializable;
+
+
 /**
  * @author The ProActive Team
  *  Interface for a class that can create new ActivePrimeConatiners on demand.
  *
  */
-public interface ActivePrimeContainerCreator {
+public interface ActivePrimeContainerCreator extends Serializable {
     public ActivePrimeContainer newActivePrimeContainer(long n, Slowable previous);
 }

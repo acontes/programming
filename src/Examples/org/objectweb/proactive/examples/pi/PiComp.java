@@ -31,12 +31,15 @@
  */
 package org.objectweb.proactive.examples.pi;
 
+import java.io.Serializable;
+
+
 /**
  * This interface has to be implemented by all workers who will perform pi computation
  * @author The ProActive Team
  *
  */
-public interface PiComp {
+public interface PiComp extends Serializable {
 
     /**
      * Computes a part of the final pi value

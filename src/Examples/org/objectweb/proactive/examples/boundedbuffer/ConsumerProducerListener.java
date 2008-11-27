@@ -31,6 +31,9 @@
  */
 package org.objectweb.proactive.examples.boundedbuffer;
 
+import java.io.Serializable;
+
+
 /**
  * Title:
  * Description:
@@ -39,7 +42,7 @@ package org.objectweb.proactive.examples.boundedbuffer;
  * @author The ProActive Team
  * @version 1.0
  */
-public interface ConsumerProducerListener extends java.util.EventListener {
+public interface ConsumerProducerListener extends java.util.EventListener, Serializable {
     public void consumerStartRunning();
 
     public void consumerStopRunning();

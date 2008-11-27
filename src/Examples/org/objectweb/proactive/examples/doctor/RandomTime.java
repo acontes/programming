@@ -31,13 +31,14 @@
  */
 package org.objectweb.proactive.examples.doctor;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 @ActiveObject
-public class RandomTime {
+public class RandomTime implements Serializable {
     Random rand;
 
     public RandomTime() {

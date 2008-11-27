@@ -31,7 +31,10 @@
  */
 package org.objectweb.proactive.examples.boundedbuffer;
 
-public class ActiveDisplay implements ConsumerProducerListener {
+import java.io.Serializable;
+
+
+public class ActiveDisplay implements ConsumerProducerListener, Serializable {
     transient private AppletBuffer applet;
     transient private BoundedBuffer buffer;
     transient private Consumer consumer;

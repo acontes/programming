@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.examples.doctor;
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -38,7 +40,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 @ActiveObject
-public class Office {
+public class Office implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     //Number of patients being created at startup 

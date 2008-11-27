@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.examples.boundedbuffer;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
@@ -38,7 +40,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  * Active BoundedBuffer
  */
 @ActiveObject
-public class BoundedBuffer implements org.objectweb.proactive.RunActive {
+public class BoundedBuffer implements org.objectweb.proactive.RunActive, Serializable {
     private String[] buffer; // The buffer containing the datas
     private int size; // The buffer's capacity
     private int count; // The number of used cells

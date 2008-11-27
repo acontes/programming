@@ -31,7 +31,10 @@
  */
 package org.objectweb.proactive.examples.penguin;
 
-public interface PenguinMessageReceiver {
+import java.io.Serializable;
+
+
+public interface PenguinMessageReceiver extends Serializable {
     public void receiveMessage(String s);
 
     public void receiveMessage(String s, java.awt.Color c);

@@ -31,6 +31,7 @@
  */
 package org.objectweb.proactive.examples.fibonacci;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 import org.objectweb.proactive.Body;
@@ -45,7 +46,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  *
  */
 @ActiveObject
-public class Cons2 implements InitActive, RunActive {
+public class Cons2 implements Serializable, InitActive, RunActive {
     private Add add;
     private BigInteger fibN_1;
 
