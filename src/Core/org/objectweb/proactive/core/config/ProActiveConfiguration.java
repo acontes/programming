@@ -78,7 +78,7 @@ public class ProActiveConfiguration {
      */
     public static final String PROACTIVE_LOG_PROPERTIES_FILE = "ProActiveLoggers.properties";
 
-    protected static final String FILE_PROTOCOL_PREFIX = "file:///";
+    protected static final String FILE_PROTOCOL_PREFIX = "file:";
 
     /** User configuration directory */
     protected static final String PROACTIVE_USER_CONFIG_FILENAME = FILE_PROTOCOL_PREFIX +
@@ -248,7 +248,7 @@ public class ProActiveConfiguration {
             fname = PROACTIVE_USER_CONFIG_FILENAME;
         }
 
-        if (!fname.matches("^\\w+://.*$")) {
+        if (!fname.matches("^\\w+:.*$")) {
             // protocol prefix was not specified
             // using "file" protocol by default
             fname = FILE_PROTOCOL_PREFIX + fname;
@@ -261,7 +261,9 @@ public class ProActiveConfiguration {
             logger.debug("User Config File is: " + u.toExternalForm());
             userProps = ProActiveConfigurationParser.parse(u.toString(), userProps);
         } catch (Exception e) {
-            logger.warn("Configuration file " + u.toExternalForm() + " not found");
+            if (!fname.equals(PROACTIVE_CONFIG_FILENAME)) {
+                logger.warn("Configuration file " + u.toExternalForm() + " not found");
+            }
         }
 
         return userProps;
