@@ -31,10 +31,7 @@
  */
 package org.objectweb.proactive.examples.binarytree;
 
-import java.io.Serializable;
-
-
-public class TreeDisplay implements Serializable {
+public class TreeDisplay {
     private TreeApplet applet;
     private Tree tree;
 

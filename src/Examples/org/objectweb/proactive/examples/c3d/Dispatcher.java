@@ -31,15 +31,13 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 
 
 /** Services proposed by a Dispatcher Active Object, without all the GUI stuff */
-public interface Dispatcher extends Serializable {
+public interface Dispatcher {
 
     /** Rotate every object by the given angle */
     public void rotateScene(int i_user, Vec angles);

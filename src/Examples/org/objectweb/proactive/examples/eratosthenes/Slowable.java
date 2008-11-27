@@ -31,13 +31,10 @@
  */
 package org.objectweb.proactive.examples.eratosthenes;
 
-import java.io.Serializable;
-
-
 /**
  * @author The ProActive Team
  */
-public interface Slowable extends Serializable {
+public interface Slowable {
 
     /** Demands slowing down of this source */
     public void sleep(boolean sleep);

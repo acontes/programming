@@ -31,9 +31,6 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
-import java.io.Serializable;
-
-
 /** This class is the main dispatcher for the active objects.
  * it acts as link between the distributed active objects
  * and the Applet.
@@ -42,7 +39,7 @@ import java.io.Serializable;
  * pass in transit through it
  *
  */
-public class Interface implements Serializable {
+public class Interface {
     // Fields 
 
     /**

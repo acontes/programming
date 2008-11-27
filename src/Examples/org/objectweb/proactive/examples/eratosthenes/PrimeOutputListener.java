@@ -31,12 +31,9 @@
  */
 package org.objectweb.proactive.examples.eratosthenes;
 
-import java.io.Serializable;
-
-
 /**
  * @author The ProActive Team
  */
-public interface PrimeOutputListener extends Serializable {
+public interface PrimeOutputListener {
     public void newPrimeNumberFound(long n);
 }

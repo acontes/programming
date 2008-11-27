@@ -31,8 +31,6 @@
  */
 package org.objectweb.proactive.examples.doctor;
 
-import java.io.Serializable;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -40,7 +38,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 @ActiveObject
-public class Receptionnist implements org.objectweb.proactive.RunActive, Serializable {
+public class Receptionnist implements org.objectweb.proactive.RunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     public final static int NO_ONE = -1;
     int pat_id;

@@ -34,14 +34,12 @@ package org.objectweb.proactive.examples.readers;
 /*
  * ajouter un futur a la place de tout ca. Dans l interface ajouter orange pour attente.
  */
-import java.io.Serializable;
-
 import org.objectweb.proactive.ObjectForSynchronousCall;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 @ActiveObject
-public class ReaderWriter implements org.objectweb.proactive.RunActive, Serializable {
+public class ReaderWriter implements org.objectweb.proactive.RunActive {
     private int readCount;
     private int writeCount;
     private ReaderDisplay display;

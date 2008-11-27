@@ -32,7 +32,6 @@
 package org.objectweb.proactive.examples.philosophers;
 
 import java.awt.GridBagConstraints;
-import java.io.Serializable;
 
 import org.objectweb.proactive.ObjectForSynchronousCall;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -43,7 +42,7 @@ import org.objectweb.proactive.api.PAActiveObject;
  * This class acts as a wrapper for the ui.
  * It is there also that the active objects are initialized.
  */
-public class DinnerLayout implements Serializable {
+public class DinnerLayout {
 
     /**
      * Reference to the philosopher's stub in order to dispatch messages from the UI

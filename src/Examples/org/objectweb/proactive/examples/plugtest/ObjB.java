@@ -31,8 +31,6 @@
  */
 package org.objectweb.proactive.examples.plugtest;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
@@ -43,7 +41,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 @ActiveObject
-public class ObjB implements Serializable {
+public class ObjB {
     String myName;
 
     public ObjB() {

@@ -31,10 +31,7 @@
  */
 package org.objectweb.proactive.examples.readers;
 
-import java.io.Serializable;
-
-
-public class ReaderDisplay implements org.objectweb.proactive.InitActive, Serializable {
+public class ReaderDisplay implements org.objectweb.proactive.InitActive {
     private AppletReader applet;
     private ReaderWriter rw;
     private Reader[] readers;
