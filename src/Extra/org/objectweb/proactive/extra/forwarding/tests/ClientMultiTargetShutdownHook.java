@@ -14,7 +14,6 @@ public class ClientMultiTargetShutdownHook implements Runnable {
 		this.connectionVector = connectionVector;
 	}
 	
-	@Override
 	public void run() {
 		for (ConnectionRunnable connection : connectionVector) {
 			connection.setRunning(false);
