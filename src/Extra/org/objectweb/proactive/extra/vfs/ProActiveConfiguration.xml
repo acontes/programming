@@ -1,0 +1,10 @@
+
+<ProActiveUserProperties>
+ <properties>
+   <prop key='schema.validation' value='disable'/>
+   <prop key='proactive.future.ac' value='true'/>
+   <prop key='proactive.communication.protocol' value='rmi'/>
+   <prop key='myprop' value='myvalue'/>
+
+ </properties>
+</ProActiveUserProperties>
