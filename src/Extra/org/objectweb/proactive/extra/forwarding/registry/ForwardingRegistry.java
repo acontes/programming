@@ -10,6 +10,7 @@ import org.objectweb.proactive.extra.forwarding.common.OutHandler;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage.ForwardedMessageType;
 import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
 
+
 /**
  * The ForwardingRegistry is a module that handles the registration of new clients and the routing of {@link ForwardedMessage} between registered clients
  * 
@@ -78,7 +79,8 @@ public class ForwardingRegistry {
         running = true;
         new Thread(server).start();
         if (logger.isDebugEnabled())
-            logger.debug("FR.start(), created and started a new thread for the registry server\n now processing messageQueue");
+            logger
+                    .debug("FR.start(), created and started a new thread for the registry server\n now processing messageQueue");
 
         // handle messageQueue
         while (running) {
@@ -90,7 +92,9 @@ public class ForwardingRegistry {
             } catch (InterruptedException e) {
                 // The waiting has been interrupted.
                 if (logger.isDebugEnabled())
-                    logger.debug("FR.start(), The waiting of the blocking queue was interrupted, exception: " + e);
+                    logger
+                            .debug("FR.start(), The waiting of the blocking queue was interrupted, exception: " +
+                                e);
             }
             if (msg != null) {
                 if (logger.isDebugEnabled())
@@ -141,7 +145,8 @@ public class ForwardingRegistry {
                 regHandler.getOutHandler().putMessage(response);
             else {
                 if (logger.isDebugEnabled())
-                    logger.debug("FR.forwardMessage(), sender tunnel died in the meantime, not sending abort message");
+                    logger
+                            .debug("FR.forwardMessage(), sender tunnel died in the meantime, not sending abort message");
             }
         }
     }
