@@ -43,8 +43,8 @@ import org.objectweb.proactive.api.PALifeCycle;
 
 
 public class PIExample {
-    public static final long NUMBER_OF_EXPERIENCES = 1000000;
-    public static final int NUMBER_OF_TASKS = 30;
+    public static final long NUMBER_OF_EXPERIENCES = 100;
+    public static final int NUMBER_OF_TASKS = 3;
 
     public static void main(String[] args) throws TaskException, ProActiveException {
 
@@ -89,7 +89,13 @@ public class PIExample {
     }
 
     public static void findOS() {
-
+        // Finding current os
+        String osName = System.getProperty("os.name");
+        if (osName.toLowerCase().contains("windows")) {
+            System.setProperty("os", "windows");
+        } else {
+            System.setProperty("os", "unix");
+        }
     }
 
     //@snippet-start masterworker_montecarlopi
