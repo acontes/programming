@@ -32,8 +32,10 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
@@ -62,6 +64,31 @@ public class Maestro implements Serializable {
      * Required by ProActive
      */
     public Maestro() {
+    }
+
+    /**
+     * Create a new master for the simulation, which pilots 8 domains maximum.
+     * @param aDomainArray all the Domain of the simulation.
+     */
+    public Maestro(Integer id, Domain[] aDomainArray, Deployer deployer) {
+        identification = id.intValue();
+
+        // We put only the Domain that correspond with this Maestro
+        if (aDomainArray.length < 8 * (identification + 1)) {
+            domainArray = new Domain[aDomainArray.length - 8 * identification];
+        } else {
+            domainArray = new Domain[8];
+        }
+        for (int i = 0; i < 8; i++) {
+            if (identification * 8 + i < aDomainArray.length) {
+                domainArray[i] = aDomainArray[identification * 8 + i];
+            }
+        }
+
+        // Initialization of the list of planets
+        lPlanets = new ArrayList<Planet>(domainArray.length);
+        for (int i = 0; i < domainArray.length; i++)
+            lPlanets.add(null);
     }
 
     /** Initialization of the reference to the Bigmaestro */

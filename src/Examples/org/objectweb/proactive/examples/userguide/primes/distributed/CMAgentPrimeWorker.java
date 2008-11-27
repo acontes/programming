@@ -33,8 +33,6 @@
 //@snippet-start primes_distributed_worker
 package org.objectweb.proactive.examples.userguide.primes.distributed;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
@@ -44,7 +42,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  * @author The ProActive Team
  */
 @ActiveObject
-public class CMAgentPrimeWorker extends CMAgent implements Serializable {
+public class CMAgentPrimeWorker extends CMAgent {
 
     /**
      * Tests a primality of a specified number in a specified range.

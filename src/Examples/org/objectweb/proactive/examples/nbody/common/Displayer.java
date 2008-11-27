@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.nbody.common;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
@@ -47,6 +48,28 @@ public class Displayer implements Serializable {
     private boolean ddd = false;
 
     public Displayer() {
+    }
+
+    public Displayer(Integer nbBodies, Boolean displayft, Deployer deployer, BooleanWrapper enable3D) {
+        this.nbBodies = nbBodies.intValue();
+        this.displayft = displayft.booleanValue();
+        if (!enable3D.booleanValue()) {
+            nbf = new NBody2DFrame("ProActive N-Body", this.nbBodies, this.displayft, deployer);
+        } else {
+            ddd = true;
+            // For compiling without Java 3D installed
+            try {
+                nbf = (NBodyFrame) Class
+                        .forName("org.objectweb.proactive.examples.nbody.common.NBody3DFrame")
+                        .getConstructor(
+                                new Class[] { String.class, Integer.class, Boolean.class, Start.class })
+                        .newInstance(
+                                new Object[] { "ProActive N-Body", new Integer(this.nbBodies),
+                                        new Boolean(this.displayft), deployer });
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void drawBody(double x, double y, double z, double vx, double vy, double vz, int weight, int d,

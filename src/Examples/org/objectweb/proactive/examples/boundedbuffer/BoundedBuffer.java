@@ -53,6 +53,18 @@ public class BoundedBuffer implements org.objectweb.proactive.RunActive {
     }
 
     /**
+     * The effective constructor
+     */
+    public BoundedBuffer(int size, ActiveDisplay display) {
+        buffer = new String[size];
+        count = 0;
+        in = 0;
+        out = 0;
+        this.size = size;
+        this.display = display;
+    }
+
+    /**
      * Put data in the buffer
      * Note that this method doesn't contain _any_ synchronization code
      */

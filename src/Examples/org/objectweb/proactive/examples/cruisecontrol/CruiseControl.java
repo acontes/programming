@@ -64,6 +64,11 @@ public class CruiseControl implements org.objectweb.proactive.RunActive {
     public CruiseControl() {
     }
 
+    /** Constructor which intializes the father field */
+    public CruiseControl(Interface m_father) {
+        father = m_father;
+    }
+
     /** Tuns on the controller, sets the new desired speed and sets the acceleration to the current acceleration of the car */
     public void controlOn(double m_desiredSpeed, double m_acc) {
         //System.out.println("control On : Cruise Control : "+ this.state);

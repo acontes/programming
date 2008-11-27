@@ -89,7 +89,7 @@ public class FutureReceiver implements java.io.Serializable {
         this.futureList = new FutureList();
     }
 
-    private void addToFutureList(Object o) {
+    public void addToFutureList(Object o) {
         this.futureList.add(o);
     }
 

@@ -48,6 +48,10 @@ public class Launcher implements java.io.Serializable {
     public Launcher() {
     }
 
+    public Launcher(List<Node> nodesList) throws NodeException {
+        this.nodesList = nodesList;
+    }
+
     // MAIN !!!
     public void start(Matrix m1, Matrix m2, int i) {
         // DISTRIBUTED MULTIPLICATION      

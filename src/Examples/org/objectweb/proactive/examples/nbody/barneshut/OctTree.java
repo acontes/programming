@@ -81,6 +81,136 @@ public class OctTree implements Serializable {
     }
 
     /**
+     * Creates a new instance of OctTree with all of his sons
+     * After creation, filling all nodes with mass and center of mass
+     * @param lplanets list of all the planets in the universe
+     * @param c cube representing the bounds of the universe
+     * @param b for distinguishing the constructor initial
+     */
+    public OctTree(List<Planet> lplanets, Cube c, Boolean b) {
+        // Creation of the OctTree
+        init(lplanets, c);
+
+        // Compute mass and mass center of all nodes
+        computeCenterOfMass();
+    }
+
+    /**
+     * Constructor for sons's creation
+     * @param lplanets list of all the planets in the universe
+     * @param c cube representing the bounds of the universe
+     */
+    public OctTree(List<Planet> lplanets, Cube c) {
+        init(lplanets, c);
+    }
+
+    //////////          I  N  I  T  I  A  L  I  Z  A  T  I  O  N          //////////
+
+    /**
+     * Initialization of the attributes of the new OctTree
+     * Start also the construction of his sons (if necessary)
+     * @param lplanets list of all the planets in the universe
+     * @param c cube representing the bounds of the universe
+     */
+    public void init(List<Planet> lplanets, Cube c) {
+        cube = c;
+        radius = Math.sqrt(c.width * c.width + c.height * c.height + c.depth * c.depth);
+        listPlanets = lplanets;
+
+        // start the creation of sons
+        createOctTree();
+    }
+
+    /**
+     * For the creation of sons of a node
+     */
+    private void createOctTree() {
+        // If there is more planets that MAX_BODIES_IN_DOMAIN then we divide
+        // into several sub-tree
+        if (listPlanets.size() > MAX_BODIES_IN_DOMAIN) {
+            // Initialization of list of sons
+            sons = new ArrayList<OctTree>(8);
+            for (int i = 0; i < 8; i++)
+                sons.add(null);
+
+            hasChild = true;
+
+            // calculate the middle of the cube
+            double midx = cube.x + cube.width / 2;
+            double midy = cube.y + cube.height / 2;
+            double midz = cube.z + cube.depth / 2;
+
+            // Initialization of list of sons
+            @SuppressWarnings("unchecked")
+            List<Planet>[] subtree = new ArrayList[8];
+            for (int i = 0; i < 8; i++)
+                subtree[i] = new ArrayList<Planet>();
+
+            // Inserts all the Planets on the good place
+            for (int i = 0; i < listPlanets.size(); i++) {
+                Planet body = (Planet) listPlanets.get(i);
+                int index = (body.x < midx ? 0 : 1) + (body.y < midy ? 0 : 2) + (body.z < midz ? 0 : 4);
+                subtree[index].add(body);
+            }
+
+            /**
+             * Cuts the space in 8 equals cube
+             * The number are associated like follow
+             *
+             *
+             *          ________
+             *         /   /   /|
+             *        /___/___/ |
+             *        | 6 | 7 | |
+             *        |___|___|/|
+             *        | 4 | 5 | /
+             *        |___|___|/
+             *    ________
+             *   /   /   /|
+             *  /___/___/ |
+             *  | 2 | 3 | |
+             *  |___|___|/|
+             *  | 0 | 1 | /
+             *  |___|___|/
+             *
+             *
+             */
+            List<Cube> tabCube = new ArrayList<Cube>(8);
+            tabCube.add(new Cube(new Point3D(cube.x, cube.y, cube.z), new Point3D(midx, midy, cube.z),
+                new Point3D(cube.x, cube.y, midz)));
+            tabCube.add(new Cube(new Point3D(midx, cube.y, cube.z), new Point3D(cube.x + cube.width, midy,
+                cube.z), new Point3D(midx, cube.y, midz)));
+            tabCube.add(new Cube(new Point3D(cube.x, midy, cube.z), new Point3D(midx, cube.y + cube.height,
+                cube.z), new Point3D(cube.x, midy, midz)));
+            tabCube.add(new Cube(new Point3D(midx, midy, cube.z), new Point3D(cube.x + cube.width, cube.y +
+                cube.height, cube.z), new Point3D(midx, midy, midz)));
+            tabCube.add(new Cube(new Point3D(cube.x, cube.y, midz), new Point3D(midx, midy, midz),
+                new Point3D(cube.x, cube.y, cube.z + cube.depth)));
+            tabCube
+                    .add(new Cube(new Point3D(midx, cube.y, midz), new Point3D(cube.x + cube.width, midy,
+                        midz), new Point3D(midx, cube.y, cube.z + cube.depth)));
+            tabCube.add(new Cube(new Point3D(cube.x, midy, midz), new Point3D(midx, cube.y + cube.height,
+                midz), new Point3D(cube.x, midy, cube.z + cube.depth)));
+            tabCube.add(new Cube(new Point3D(midx, midy, midz), new Point3D(cube.x + cube.width, cube.y +
+                cube.height, midz), new Point3D(midx, midy, cube.z + cube.depth)));
+
+            // Fill the sons with new OctTree if there are Planets in the cube
+            for (int i = 0; i < 8; i++) {
+                if (!subtree[i].isEmpty()) {
+                    sons.set(i, new OctTree(subtree[i], (Cube) tabCube.get(i)));
+                }
+            }
+        } else { // no sons to this Node, it is a leaf
+            hasChild = false;
+            Planet pl = (Planet) listPlanets.get(0); // only one planet 
+            mass = pl.mass;
+            massCenterx = pl.x;
+            massCentery = pl.y;
+            massCenterz = pl.z;
+        }
+    }
+
+    /**
      * Fill the entire OctTree with good mass and center of mass
      * At beginning only leafs have a mass and mass center initialized (in createOctTree)
      * At the end of function, all tree's nodes have their attributes initialized

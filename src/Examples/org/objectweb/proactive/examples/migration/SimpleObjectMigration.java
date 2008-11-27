@@ -261,7 +261,7 @@ public class SimpleObjectMigration implements Serializable {
         logger.info("SimpleObjectMigration> main() > end of test");
     }
 
-    private static void showIds(String urlSourceNode, Node sourceNode, String urlDestinationNode,
+    protected static void showIds(String urlSourceNode, Node sourceNode, String urlDestinationNode,
             Node destinationNode) {
         try {
             logger.info("");

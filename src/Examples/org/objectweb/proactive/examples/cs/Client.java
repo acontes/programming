@@ -32,7 +32,6 @@
 package org.objectweb.proactive.examples.cs;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -56,7 +55,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  *
  */
 @ActiveObject
-public class Client implements Serializable {
+public class Client {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     protected String myName;
     protected String serverHostName;

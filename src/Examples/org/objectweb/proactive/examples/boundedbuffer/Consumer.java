@@ -43,6 +43,13 @@ public class Consumer extends ConsumerProducer {
     public Consumer() {
     }
 
+    /**
+     * The effective constructor
+     */
+    public Consumer(ConsumerProducerListener listener, BoundedBuffer buffer) {
+        super("Consumer", listener, buffer);
+    }
+
     @Override
     protected void doStuff(boolean wasSuspended) {
         if (isSuspended) {

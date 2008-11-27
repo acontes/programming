@@ -32,10 +32,12 @@
 package org.objectweb.proactive.examples.matrix;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
@@ -260,6 +262,27 @@ public class Matrix implements java.io.Serializable {
         for (int i = 0; i < (widthStop - widthStart); i++)
             d[i] = tab[widthStart + i];
         return new Matrix(d);
+    }
+
+    public Matrix getActiveVerticalSubMatrix(int widthStart, int widthStop, Node node) {
+        Matrix vsm = null;
+
+        double[][] d = new double[widthStop - widthStart][];
+        for (int i = 0; i < (widthStop - widthStart); i++)
+            d[i] = tab[widthStart + i];
+
+        Object[] params = new Object[1];
+        params[0] = d;
+
+        try {
+            vsm = (Matrix) PAActiveObject.newActive("org.objectweb.proactive.examples.matrix.Matrix", params,
+                    node);
+        } catch (ActiveObjectCreationException e) {
+            logger.error("Error create Active Vertical Sub Matrix : ActiveObjectCreationException\n");
+        } catch (NodeException e) {
+            logger.error("Error create Active Vertical Sub Matrix : NodeException\n");
+        }
+        return vsm;
     }
 
     public Matrix transformIntoActiveVerticalSubMatrixGroup(Node[] nodeList) {

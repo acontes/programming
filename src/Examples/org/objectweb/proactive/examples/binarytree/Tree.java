@@ -42,8 +42,18 @@ public class Tree {
     private Tree left;
     private Tree right;
     private TreeDisplay display;
+    private Integer graphicDepth;
 
     public Tree() {
+    }
+
+    public Tree(String key, String value, TreeDisplay display) {
+        this.left = null;
+        this.right = null;
+        this.key = key;
+        this.value = value;
+        this.display = display;
+        display.displayMessage("[" + key + "] Created with value " + value, java.awt.Color.blue);
     }
 
     public void insert(String key, String value, boolean AC) {

@@ -64,6 +64,22 @@ public class ActivePrimeContainer implements PrimeNumber, java.io.Serializable, 
     public ActivePrimeContainer() {
     }
 
+    /** @param creator the creator of new containers (when this one is full)
+     *  @param listener the output listener used to print out new prime numbers
+     *  @param maxSize the maximum size of this container before a new one is created
+     *  @param n the first number to store in this container
+     *  @param previous the container or source that sends requests to this container
+     * */
+    public ActivePrimeContainer(ActivePrimeContainerCreator creator, PrimeOutputListener listener,
+            Integer maxSize, Long n, Slowable previous) {
+        super();
+        this.maxSize = maxSize.intValue();
+        this.activePrimeContainerCreator = creator;
+        this.outputListener = listener;
+        this.first = newPrimeNumber(n.longValue());
+        this.previous = previous;
+    }
+
     /** Asks this container to sleep in order to reduce the number of requests sent. */
     public void sleep(boolean sleep) {
         this.sleep = sleep;

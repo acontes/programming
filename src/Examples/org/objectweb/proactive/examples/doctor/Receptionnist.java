@@ -31,8 +31,6 @@
  */
 package org.objectweb.proactive.examples.doctor;
 
-import java.io.Serializable;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -40,7 +38,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 
 @ActiveObject
-public class Receptionnist implements org.objectweb.proactive.RunActive, Serializable {
+public class Receptionnist implements org.objectweb.proactive.RunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     public final static int NO_ONE = -1;
     int pat_id;
@@ -49,7 +47,12 @@ public class Receptionnist implements org.objectweb.proactive.RunActive, Seriali
 
     public Receptionnist() {
     }
-    
+
+    public Receptionnist(Office _off) {
+        off = _off;
+        doc_id = pat_id = NO_ONE;
+    }
+
     public synchronized void addPatient(int pat) {
         if (pat_id != NO_ONE) {
             logger.error("ERROR: addPatient(" + pat + ") with pat_id=" + pat_id);

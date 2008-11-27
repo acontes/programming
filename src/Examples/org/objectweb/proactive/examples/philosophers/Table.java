@@ -58,6 +58,15 @@ public class Table implements org.objectweb.proactive.RunActive {
     }
 
     /**
+     * The real constructor
+     * @param layout the reference to the Active layout stub
+     */
+    public Table(DinnerLayout layout) {
+        this.layout = layout;
+        forks = new boolean[5];
+    }
+
+    /**
      * putForks
      * Realeases both forks
      * @param id the id of the philosopher [same as the seat index]

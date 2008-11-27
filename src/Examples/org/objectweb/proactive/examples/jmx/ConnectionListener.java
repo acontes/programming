@@ -63,6 +63,14 @@ public class ConnectionListener implements NotificationListener, Serializable {
     }
 
     /**
+     * Build a Connection Listener thanks to the specified MBean Server Connection
+     * @param connection a MBean Server Connection
+     */
+    public ConnectionListener(MBeanServerConnection connection) {
+        this.connection = connection;
+    }
+
+    /**
      *  Listen to MBean corresponding to the object name
      * @param name the object name of the MBean one want to listen to
      * @throws IOException

@@ -31,8 +31,6 @@
  */
 package org.objectweb.proactive.examples.garden;
 
-import java.io.Serializable;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -57,7 +55,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  *
  */
 @ActiveObject
-public class Flower implements Serializable {
+public class Flower {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private String myName;
 

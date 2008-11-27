@@ -49,6 +49,19 @@ public class Writer implements org.objectweb.proactive.RunActive {
     public Writer() {
     }
 
+    /**
+     * The real constructor
+     */
+    public Writer(ReaderDisplay display, ReaderWriter rw, int id) {
+        this.display = display;
+        this.rw = rw;
+        this.id = id;
+
+        done = false;
+        autopilot = true;
+        writing = false;
+    }
+
     public void stopIt() {
         done = true;
     }

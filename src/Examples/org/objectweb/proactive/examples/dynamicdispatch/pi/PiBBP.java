@@ -133,7 +133,7 @@ public class PiBBP implements Serializable {
      *            the group of "pi computers" that will perform the computation
      * @return the value of PI
      */
-    private String computeOnGroup(PiComputer piComputers) {
+    public String computeOnGroup(PiComputer piComputers) {
         int nbNodes = PAGroup.getGroup(piComputers).size();
         System.out.println("\nUsing " + nbNodes + " PiComputers for the computation\n");
 
