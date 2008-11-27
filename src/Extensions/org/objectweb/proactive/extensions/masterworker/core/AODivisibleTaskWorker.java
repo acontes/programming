@@ -55,8 +55,8 @@ import java.util.Map;
 public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitActive {
 
     /**
-    * log4j logger of the worker
-    */
+     * log4j logger of the worker
+     */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
     private static final boolean debug = logger.isDebugEnabled();
 

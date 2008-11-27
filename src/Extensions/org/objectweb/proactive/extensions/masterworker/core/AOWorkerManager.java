@@ -133,13 +133,13 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     private Map<String, Worker> workers;
 
     /**
-    * descriptor used to deploy the master (if any)
-    */
+     * descriptor used to deploy the master (if any)
+     */
     private URL masterDescriptorURL;
 
     /**
-    * GCMapplication used to deploy the master (if any)
-    */
+     * GCMapplication used to deploy the master (if any)
+     */
     private GCMApplication applicationUsed;
 
     /**

@@ -101,7 +101,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     private static final int EXPL_MSG = Integer.parseInt(PAProperties.PA_P2P_EXPLORING_MSG.getValue()) - 1;
 
     /**
-    * Node acquisition request timeout 
+     * Node acquisition request timeout 
      */
     static public final long ACQ_TO = Long.parseLong(PAProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
 
@@ -414,9 +414,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     }
 
     /**
-    * Return  a stub of the P2PNodeManager active object
-    * @return stub of local P2PNodeManager active object 
-    */
+     * Return  a stub of the P2PNodeManager active object
+     * @return stub of local P2PNodeManager active object 
+     */
     public P2PNodeManager getNodeManager() {
         return this.nodeManager;
     }

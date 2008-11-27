@@ -435,28 +435,29 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
     private boolean catchesMigrationException(CatchTree catchTree) {
         Tree type = catchTree.getParameter().getType();
-        if (type.getKind().equals(Kind.IDENTIFIER)) 
-        	return isSimpleNameMigrationException(((IdentifierTree) type).getName().toString(), MigrationException.class);
-        else if (type.getKind().equals(Kind.MEMBER_SELECT)) 
-        	return isNameMigrationException(type.toString(),MigrationException.class);
+        if (type.getKind().equals(Kind.IDENTIFIER))
+            return isSimpleNameMigrationException(((IdentifierTree) type).getName().toString(),
+                    MigrationException.class);
+        else if (type.getKind().equals(Kind.MEMBER_SELECT))
+            return isNameMigrationException(type.toString(), MigrationException.class);
 
         return false;
     }
-    
+
     private boolean isSimpleNameMigrationException(String clazzName, Class excpClass) {
-    	if(excpClass.getSimpleName().equals(clazzName))
-    		return true;
-    	if(excpClass.getSuperclass() == null)
-    		return false;
-    	return isSimpleNameMigrationException(clazzName, excpClass.getSuperclass());
+        if (excpClass.getSimpleName().equals(clazzName))
+            return true;
+        if (excpClass.getSuperclass() == null)
+            return false;
+        return isSimpleNameMigrationException(clazzName, excpClass.getSuperclass());
     }
-    
+
     private boolean isNameMigrationException(String clazzName, Class excpClass) {
-    	if(excpClass.getName().equals(clazzName))
-    		return true;
-    	if(excpClass.getSuperclass() == null)
-    		return false;
-    	return isNameMigrationException(clazzName, excpClass.getSuperclass());
+        if (excpClass.getName().equals(clazzName))
+            return true;
+        if (excpClass.getSuperclass() == null)
+            return false;
+        return isNameMigrationException(clazzName, excpClass.getSuperclass());
     }
 
     /**

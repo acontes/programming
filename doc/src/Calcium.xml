@@ -1,111 +1,96 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" xmlns:ns52="http://www.w3.org/1999/xhtml" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns4="http://www.w3.org/2000/svg" xmlns:ns3="http://www.w3.org/1998/Math/MathML" xmlns:ns="http://docbook.org/ns/docbook" version="5.0" xml:id="Calcium">
-  <info>
-    <title>The Calcium Skeleton Framework</title>
-  </info>
-
-  <section>
-    <info>
-      <title>Introduction</title>
-    </info>
-
-    <section>
-      <info>
-        <title>About Calcium</title>
-      </info>
-
-      <para>Calcium is part of the ProActive Grid Middleware for programming
-      structured parallel and distributed applications. The framework provides
-      a basic set of structured patterns (skeletons) that can be nested to
-      represents more complex patterns. Skeletons are considered a high level
-      programming model because all the parallelisms details are hidden from
-      the programmer. In Calcium, distributed programming is achieved by using
-      ProActive deployment framework and active object model.</para>
-
-      <para>The Calcium implementation can be found in the following package
-      of the ProActive Middleware distribution:</para>
-
-      <programlisting xml:lang="java">package org.objectweb.proactive.extensions.calcium;</programlisting>
-    </section>
-
-    <section>
-      <info>
-        <title>The Big Picture</title>
-      </info>
-
-      <para>The following steps must be performed for programming with the
-      framework.</para>
-
-      <orderedlist>
-        <listitem>
-          <para>Define the skeleton structure.</para>
-        </listitem>
-
-        <listitem>
-          <para>Implement the missing classes of the structure (the muscle
-          codes).</para>
-        </listitem>
-
-        <listitem>
-          <para>Create a new Calcium instance.</para>
-        </listitem>
-
-        <listitem>
-          <para>Provide a inputs of the problems to be solved by the
-          framework.</para>
-        </listitem>
-
-        <listitem>
-          <para>Collect the results.</para>
-        </listitem>
-
-        <listitem>
-          <para>View the performance statistics.</para>
-        </listitem>
-      </orderedlist>
-
-      <para>Problems inputed into the framework are treated as tasks. The
-      tasks are interpreted by the remote skeleton interpreters as shown in
-      the following Figure:</para>
-
-      <figure>
-        <info>
-          <title>Task Flow in Calcium</title>
-        </info>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata contentdepth="100%" fileref="images/CalciumTaskFlow.png" scalefit="1" width="100%"/>
-          </imageobject>
-        </mediaobject>
-      </figure>
-
-      <para>All the generation, distribution of tasks and their resource is
-      completely hidden from the programmer. In fact, the task concept is
-      never used when programming in Calcium.</para>
-
-      <indexterm/>
-    </section>
-  </section>
-
-  <section>
-    <info>
-      <title>Quick Example</title>
-    </info>
-
-    <para>In this example we implement a skeleton program that finds prime
-    numbers between an interval using a brute force (naive) approach.</para>
-
-    <section>
-      <info>
-        <title>Define the skeleton structure</title>
-      </info>
-
-      <para>The approach consists of dividing the original search space into
-      several smaller search spaces, and computing each sub search space in
-      parallel. Therefore, the most suitable pattern corresponds to Divide and
-      Conquer.</para>
-
-      <programlisting xml:lang="java">//DaC(&lt;Divide&gt;,&lt;Condition&gt;,&lt;Skeleton&gt;,&lt;Conquer&gt;)
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:ns52="http://www.w3.org/1999/xhtml"
+	xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns4="http://www.w3.org/2000/svg"
+	xmlns:ns3="http://www.w3.org/1998/Math/MathML" xmlns:ns="http://docbook.org/ns/docbook"
+	version="5.0" xml:id="Calcium">
+	<info>
+		<title>The Calcium Skeleton Framework</title>
+	</info>
+	<section>
+		<info>
+			<title>Introduction</title>
+		</info>
+		<section>
+			<info>
+				<title>About Calcium</title>
+			</info>
+			<para>Calcium is part of the ProActive Grid Middleware for
+				programming structured parallel and distributed applications. The
+				framework provides a basic set of structured patterns (skeletons)
+				that can be nested to represents more complex patterns. Skeletons
+				are considered a high level programming model because all the
+				parallelisms details are hidden from the programmer. In Calcium,
+				distributed programming is achieved by using ProActive deployment
+				framework and active object model.</para>
+			<para>The Calcium implementation can be found in the following
+				package of the ProActive Middleware distribution:</para>
+			<programlisting xml:lang="java">package
+				org.objectweb.proactive.extensions.calcium;</programlisting>
+		</section>
+		<section>
+			<info>
+				<title>The Big Picture</title>
+			</info>
+			<para>The following steps must be performed for programming with
+				the framework.</para>
+			<orderedlist>
+				<listitem>
+					<para>Define the skeleton structure.</para>
+				</listitem>
+				<listitem>
+					<para>Implement the missing classes of the structure (the
+						muscle codes).</para>
+				</listitem>
+				<listitem>
+					<para>Create a new Calcium instance.</para>
+				</listitem>
+				<listitem>
+					<para>Provide a inputs of the problems to be solved by the
+						framework.</para>
+				</listitem>
+				<listitem>
+					<para>Collect the results.</para>
+				</listitem>
+				<listitem>
+					<para>View the performance statistics.</para>
+				</listitem>
+			</orderedlist>
+			<para>Problems inputed into the framework are treated as
+				tasks. The tasks are interpreted by the remote skeleton interpreters
+				as shown in the following Figure:</para>
+			<figure>
+				<info>
+					<title>Task Flow in Calcium</title>
+				</info>
+				<mediaobject>
+					<imageobject>
+						<imagedata contentdepth="100%" fileref="images/CalciumTaskFlow.png"
+							scalefit="1" width="100%" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>All the generation, distribution of tasks and their resource
+				is completely hidden from the programmer. In fact, the task concept
+				is never used when programming in Calcium.</para>
+			<indexterm />
+		</section>
+	</section>
+	<section>
+		<info>
+			<title>Quick Example</title>
+		</info>
+		<para>In this example we implement a skeleton program that finds
+			prime numbers between an interval using a brute force (naive)
+			approach.</para>
+		<section>
+			<info>
+				<title>Define the skeleton structure</title>
+			</info>
+			<para>The approach consists of dividing the original search space
+				into several smaller search spaces, and computing each sub search
+				space in parallel. Therefore, the most suitable pattern corresponds
+				to Divide and Conquer.</para>
+			<programlisting xml:lang="java">//DaC(&lt;Divide&gt;,&lt;Condition&gt;,&lt;Skeleton&gt;,&lt;Conquer&gt;)
 Skeleton&lt;Interval, Primes&gt; root = new DaC&lt;Interval, Primes&gt;(
     new IntervalDivide(),
     new IntervalDivideCondition(),

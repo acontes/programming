@@ -23,7 +23,7 @@ public class CatchMigrationException {
             migExcp.printStackTrace();
         }
     }
-    
+
     // OK superclass
     @MigrationSignal
     public void migrateTo2(Node where) {
@@ -34,7 +34,7 @@ public class CatchMigrationException {
             migExcp.printStackTrace();
         }
     }
-    
+
     // OK superclass
     @MigrationSignal
     public void migrateTo3(Node where) {

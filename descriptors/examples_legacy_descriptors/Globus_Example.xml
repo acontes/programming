@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor
-	xmlns="urn:proactive:deployment:3.3"
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
-
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME"
-			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
-		<descriptorVariable name="JAVA_HOME"
-		value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
-		<descriptorVariable name="GLOBUS_USER_HOME"
-			value="/globus/home/user"
-		/>  <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive" />
+		<!--
+			CHANGE ME!!!!
+		-->
+		<descriptorVariable name="JAVA_HOME" value="/path/to/jdk1.5.0" />
+		<!--
+			Path of the remote JVM , CHANGE ME!!!!
+		-->
+		<descriptorVariable name="GLOBUS_USER_HOME" value="/globus/home/user" />  <!--CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -32,40 +32,32 @@
 					<processReference refid="globusProcess" />
 				</creation>
 			</jvm>
-
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM1">
-				<jvmProcess
-					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
-
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/trilead-ssh2.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
-
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/trilead-ssh2.jar" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar" />
 					</classpath>
 					<javaPath>
-						<absolutePath
-							value="${JAVA_HOME}/bin/java" />
+						<absolutePath value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
-						<absolutePath
-							value="${PROACTIVE_HOME}/dist/proactive.java.policy" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath
-							value="${PROACTIVE_HOME}/dist/proactive-log4j" />
+						<absolutePath value="${PROACTIVE_HOME}/dist/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
-						<parameter
-							value="-Dproactive.communication.protocol=http" />
+						<parameter value="-Dproactive.communication.protocol=http" />
 						<parameter value="-Dproactive.http.port=22500" />
 					</jvmParameters>
 				</jvmProcess>
@@ -78,9 +70,7 @@
 					<globusOption>
 						<count>8</count>
 						<maxTime>120</maxTime>
-						<errorFile>
-							${GLOBUS_USER_HOME}/error.txt
-						</errorFile>
+						<errorFile> ${GLOBUS_USER_HOME}/error.txt </errorFile>
 					</globusOption>
 				</globusProcess>
 			</processDefinition>

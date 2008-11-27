@@ -1437,9 +1437,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     }
 
     /**
-    * @author The ProActive Team
-    *         Internal class for filtering requests in the queue
-    */
+     * @author The ProActive Team
+     *         Internal class for filtering requests in the queue
+     */
     private class FinalNotTerminateFilter implements RequestFilter {
 
         /** Creates a filter */

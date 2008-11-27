@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor
-	xmlns="urn:proactive:deployment:3.3"
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<componentDefinition>
@@ -28,8 +27,7 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="linuxJVM">
-				<jvmProcess
-					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess" />
 			</processDefinition>
 		</processes>
 	</infrastructure>

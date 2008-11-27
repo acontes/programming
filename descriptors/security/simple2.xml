@@ -30,17 +30,13 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess
-					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter
 							value='-Dproactive.runtime.security=descriptors/security/applicationPolicy2.xml' />
-						
-						<parameter
-							value='-Xdebug' />
+						<parameter value='-Xdebug' />
 						<parameter
 							value='-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8002' />
-							
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
