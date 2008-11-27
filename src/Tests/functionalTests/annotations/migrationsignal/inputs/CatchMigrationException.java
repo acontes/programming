@@ -3,6 +3,7 @@ package functionalTests.annotations.migrationsignal.inputs;
 import static org.objectweb.proactive.api.PAMobileAgent.migrateTo;
 
 import org.objectweb.proactive.api.PAMobileAgent;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
@@ -18,6 +19,28 @@ public class CatchMigrationException {
         try {
             PAMobileAgent.migrateTo(where);
         } catch (MigrationException migExcp) {
+            System.err.println("Reporting the error");
+            migExcp.printStackTrace();
+        }
+    }
+    
+    // OK superclass
+    @MigrationSignal
+    public void migrateTo2(Node where) {
+        try {
+            PAMobileAgent.migrateTo(where);
+        } catch (Exception migExcp) {
+            System.err.println("Reporting the error");
+            migExcp.printStackTrace();
+        }
+    }
+    
+    // OK superclass
+    @MigrationSignal
+    public void migrateTo3(Node where) {
+        try {
+            PAMobileAgent.migrateTo(where);
+        } catch (ProActiveException migExcp) {
             System.err.println("Reporting the error");
             migExcp.printStackTrace();
         }
