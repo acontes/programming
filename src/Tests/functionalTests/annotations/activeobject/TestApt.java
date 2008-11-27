@@ -64,6 +64,7 @@ public class TestApt extends AptTest {
         Assert.assertEquals(ERROR, checkFile("PrivateEmptyConstructor"));
         Assert.assertEquals(OK, checkFile("EmptyConstructor"));
         Assert.assertEquals(new Result(3, 0), checkFile("ErrorMissingTypes"));
+        Assert.assertEquals(ERROR, checkFile("InnerClasses"));
 
         // more complicated scenarios
         Assert.assertEquals(WARNING, checkFile("ErrorReturnTypes")); // because of getter/setter

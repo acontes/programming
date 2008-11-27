@@ -67,6 +67,7 @@ public class TestCTree extends CTreeTest {
         Assert.assertEquals(new Result(2, 0), checkFile("ErrorConstructorArgsNotSerializable"));
         Assert.assertEquals(ERROR, checkFile("ErrorMethodArgsNotSerializable"));
         Assert.assertEquals(new Result(3, 0), checkFile("ErrorMissingTypes"));
+        Assert.assertEquals(new Result(2, 0), checkFile("InnerClasses"));
 
         // more complicated scenarios
         Assert.assertEquals(WARNING, checkFile("ErrorReturnTypes")); // because of getter/setter
