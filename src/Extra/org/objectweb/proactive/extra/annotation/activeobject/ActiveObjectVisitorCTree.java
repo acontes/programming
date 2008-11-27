@@ -78,6 +78,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
 
     private Messager compilerOutput;
     private Types typesUtil;
+    private boolean insideClass = false;
 
     public ActiveObjectVisitorCTree(ProcessingEnvironment procEnv) {
         compilerOutput = procEnv.getMessager();
@@ -87,6 +88,13 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     @Override
     public Void visitClass(ClassTree clazzTree, Trees trees) {
 
+        // ignore all internal classes
+        if (!insideClass) {
+            insideClass = true;
+        } else {
+            return null;
+        }
+
         testClassModifiers(clazzTree, trees);
         testClassConstructors(clazzTree, trees);
 
@@ -94,11 +102,6 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
         Void ret = null;
         List<? extends Tree> clazzMembers = clazzTree.getMembers();
         for (Tree clazzMember : clazzMembers) {
-            if (clazzMember instanceof ClassTree) {
-                // inner class detected, skipping
-                continue;
-            }
-
             // it's not clear how to visit class fields
             // so do it from here
             // TODO change it!
@@ -119,6 +122,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
             }
         }
 
+        insideClass = false;
         return ret;
     }
 
