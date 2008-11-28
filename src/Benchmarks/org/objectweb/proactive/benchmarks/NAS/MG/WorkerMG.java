@@ -746,7 +746,7 @@ public class WorkerMG extends Timed implements Serializable {
         }
 
         T_reduce_sum.start();
-        sum_max = this.communicator.sumAndMax(s, rnmu); // XXX sumAndMax
+        sum_max = this.communicator.sumAndMax(s, rnmu);
         T_reduce_sum.stop();
 
         if (WorkerMG.COMMUNICATION_PATTERN_OBSERVING_MODE) {
@@ -777,7 +777,7 @@ public class WorkerMG extends Timed implements Serializable {
                     matrixExchanger.prepare(axis, -1, u, uoff, u, uoff, n1, n2, n3);
                     PASPMD.exchange("neg" + axis, nbr[axis][0][kk], matrixExchanger, matrixExchanger);
                 } else {
-                    comm1p(++axis, u, uoff, n1, n2, n3, kk);
+                    comm1p(axis, u, uoff, n1, n2, n3, kk);
                 }
             }
         } else {
@@ -799,86 +799,33 @@ public class WorkerMG extends Timed implements Serializable {
     }
 
     private void comm1p(int axis, double[] u, int uoff, int n1, int n2, int n3, int kk) {
-        int buff_len;
-        int indx;
-
         this.usetDimension(n1, n2, n3);
 
-        buff_len = 0;
-
         switch (axis) {
             case 1:
-
                 for (int i3 = 2; i3 <= (n3 - 1); i3++) {
                     for (int i2 = 2; i2 <= (n2 - 1); i2++) {
-                        buff[3][++buff_len] = u[uresolve(n1 - 1, i2, i3) + uoff];
-                        buff[1][++buff_len] = u[uresolve(2, i2, i3) + uoff];
+                        u[uresolve(1, i2, i3) + uoff] = u[uresolve(n1 - 1, i2, i3) + uoff];
+                        u[uresolve(n1, i2, i3) + uoff] = u[uresolve(2, i2, i3) + uoff];
                     }
                 }
-
                 break;
-
             case 2:
-
                 for (int i3 = 2; i3 <= (n3 - 1); i3++) {
                     for (int i1 = 1; i1 <= n1; i1++) {
-                        buff[3][++buff_len] = u[uresolve(i1, n2 - 1, i3) + uoff];
-                        buff[1][++buff_len] = u[uresolve(i1, 2, i3) + uoff];
+                        u[uresolve(i1, 1, i3) + uoff] = u[uresolve(i1, n2 - 1, i3) + uoff];
+                        u[uresolve(i1, n2, i3) + uoff] = u[uresolve(i1, 2, i3) + uoff];
                     }
                 }
-
                 break;
-
             case 3:
-
                 for (int i2 = 1; i2 <= n2; i2++) {
                     for (int i1 = 1; i1 <= n1; i1++) {
-                        buff[3][++buff_len] = u[uresolve(i1, i2, n3 - 1) + uoff];
-                        buff[1][++buff_len] = u[uresolve(i1, i2, 2) + uoff];
+                        u[uresolve(i1, i2, 1) + uoff] = u[uresolve(i1, i2, n3 - 1) + uoff];
+                        u[uresolve(i1, i2, n3) + uoff] = u[uresolve(i1, i2, 2) + uoff];
                     }
                 }
-
                 break;
-        }
-
-        for (int i = 1; i <= clss.nm2; i++) {
-            buff[4][i] = buff[3][i];
-            buff[2][i] = buff[1][i];
-        }
-
-        indx = 0;
-
-        switch (axis) {
-            case 1:
-
-                for (int i3 = 2; i3 <= (n3 - 1); i3++) {
-                    for (int i2 = 2; i2 <= (n2 - 1); i2++) {
-                        u[uresolve(n1, i2, i3) + uoff] = buff[2][++indx];
-                        u[uresolve(1, i2, i3) + uoff] = buff[4][++indx];
-                    }
-                }
-
-                break;
-
-            case 2:
-
-                for (int i3 = 2; i3 <= (n3 - 1); i3++) {
-                    for (int i1 = 1; i1 <= n1; i1++) {
-                        u[uresolve(i1, n2, i3) + uoff] = buff[2][++indx];
-                        u[uresolve(i1, 1, i3) + uoff] = buff[4][++indx];
-                    }
-                }
-
-                break;
-
-            case 3:
-
-                for (int i2 = 1; i2 <= n2; i2++) {
-                    for (int i1 = 1; i1 <= n1; i1++) {
-                        u[uresolve(i1, i2, n3) + uoff] = buff[2][++indx];
-                        u[uresolve(i1, i2, 1) + uoff] = buff[4][++indx];
-                    }
-                }
         }
     }
 
@@ -1232,7 +1179,7 @@ public class WorkerMG extends Timed implements Serializable {
             best = z[zresolve(j1[i1][1], j2[i1][1], j3[i1][1]) + zoff];
 
             T_reduce_max.start();
-            temp = this.communicator.max(best); // XXX REDUCES MAX
+            temp = this.communicator.max(best);
             T_reduce_max.stop();
 
             if (WorkerMG.COMMUNICATION_PATTERN_OBSERVING_MODE) {
@@ -1263,7 +1210,6 @@ public class WorkerMG extends Timed implements Serializable {
 
             ten[i][1] = best;
 
-            // XXX Reduce Max array
             T_reduce_max_array.start();
             jg_temp = this.communicator.max(new int[] { jg[0][i][1], jg[1][i][1], jg[2][i][1], jg[3][i][1] });
             T_reduce_max_array.stop();
@@ -1289,7 +1235,6 @@ public class WorkerMG extends Timed implements Serializable {
             jg[3][i][1] = jg_temp[3];
             best = z[zresolve(j1[i0][0], j2[i0][0], j3[i0][0]) + zoff];
 
-            // XXX Reduce Min
             T_reduce_min.start();
             best = this.communicator.min(best);
             T_reduce_min.stop();
@@ -1320,7 +1265,6 @@ public class WorkerMG extends Timed implements Serializable {
 
             ten[i][0] = best;
 
-            // XXX Reduce Max array
             T_reduce_max_array.start();
             jg_temp = this.communicator.max(new int[] { jg[0][i][0], jg[1][i][0], jg[2][i][0], jg[3][i][0] });
             T_reduce_max_array.stop();
