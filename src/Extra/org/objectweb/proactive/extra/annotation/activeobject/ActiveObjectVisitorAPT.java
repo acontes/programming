@@ -408,22 +408,15 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
     // check if the given type implements Serializable
     private boolean implementsSerializableOrActive(DeclaredType paramType) {
 
-        boolean isActive = false;
-        boolean isSerializable = false;
-
         if (paramType.getDeclaration() != null) {
             for (AnnotationMirror annotationMirrow : paramType.getDeclaration().getAnnotationMirrors()) {
                 if (annotationMirrow.getAnnotationType().toString().equals(ActiveObject.class.getName())) {
-                    isActive = true;
-                    break;
+                    return true;
                 }
-
             }
         }
 
-        if (isActive == true) {
-            return true;
-        }
+        boolean isSerializable = false;
 
         // now, verify its base class
         TypeDeclaration paramTypeDecl = paramType.getDeclaration();
