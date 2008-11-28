@@ -54,15 +54,17 @@ public class RemoteObjectVisitorCTree extends ActiveObjectVisitorCTree {
     }
 
     protected void reportError(String msg, Element element) {
-        String newMsg = msg.replaceAll("active", "remote");
-        newMsg = newMsg.replaceAll("Active", "Remote");
-        super.reportError(newMsg, element);
+        super.reportError(replaceActiveToRemote(msg), element);
     }
 
     protected void reportWarning(String msg, Element element) {
-        String newMsg = msg.replaceAll("active", "remote");
-        newMsg = newMsg.replaceAll("Active", "Remote");
-        super.reportWarning(newMsg, element);
+        super.reportWarning(replaceActiveToRemote(msg), element);
     }
 
+    private String replaceActiveToRemote(String msg) {
+        String newMsg = msg.replaceAll("an\\sactive", "a remote");
+        msg.replaceAll("active", "remote");
+        newMsg = newMsg.replaceAll("Active", "Remote");
+        return newMsg;
+    }
 }

@@ -35,6 +35,7 @@ import java.util.List;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -206,7 +207,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
         for (VariableElement param : params) {
             if (param.asType().getKind().equals(TypeKind.DECLARED)) {
                 DeclaredType paramType = (DeclaredType) param.asType();
-                if (!implementsSerializable(paramType)) {
+                if (!implementsSerializableOrActive(paramType)) {
                     return false;
                 }
             }
@@ -215,20 +216,37 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     }
 
     // check if the given type implements Serializable
-    private boolean implementsSerializable(DeclaredType paramType) {
+    private boolean implementsSerializableOrActive(DeclaredType paramType) {
         // System.out.println("Verifying if " + paramType.toString() +
         // " is Serializable");
         boolean isSerializable = false;
-        for (TypeMirror m : typesUtil.directSupertypes(paramType)) {
-            isSerializable = isSerializable |
-            // the type is Serializable
-                Serializable.class.getName().equals(m.toString()) |
-                // the type implements Serializable
-                implementsSerializable((DeclaredType) m);
+        boolean isActive = false;
 
+        if (Serializable.class.getName().equals(paramType.toString()) || hasActiveAnnotation(paramType)) {
+            return true;
         }
 
-        return isSerializable;
+        for (TypeMirror m : typesUtil.directSupertypes(paramType)) {
+            isSerializable = isSerializable ||
+            // the type is Serializable
+                Serializable.class.getName().equals(m.toString()) ||
+                // the type implements Serializable
+                implementsSerializableOrActive((DeclaredType) m);
+
+            isActive = isActive || hasActiveAnnotation((DeclaredType) m) ||
+                implementsSerializableOrActive((DeclaredType) m);
+        }
+
+        return isSerializable || isActive;
+    }
+
+    private boolean hasActiveAnnotation(DeclaredType m) {
+        for (AnnotationMirror annotationMirrow : m.asElement().getAnnotationMirrors()) {
+            if (annotationMirrow.getAnnotationType().toString().equals(ActiveObject.class.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

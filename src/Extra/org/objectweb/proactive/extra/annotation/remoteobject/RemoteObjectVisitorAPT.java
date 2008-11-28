@@ -43,14 +43,18 @@ public class RemoteObjectVisitorAPT extends ActiveObjectVisitorAPT {
     }
 
     protected void reportError(Declaration declaration, String msg) {
-        String newMsg = msg.replaceAll("active", "remote");
-        newMsg = newMsg.replaceAll("Active", "Remote");
-        super.reportError(declaration, newMsg);
+        super.reportError(declaration, replaceActiveToRemote(msg));
     }
 
     protected void reportWarning(Declaration declaration, String msg) {
-        String newMsg = msg.replaceAll("active", "remote");
-        newMsg = newMsg.replaceAll("Active", "Remote");
-        super.reportWarning(declaration, newMsg);
+        super.reportWarning(declaration, replaceActiveToRemote(msg));
     }
+
+    private String replaceActiveToRemote(String msg) {
+        String newMsg = msg.replaceAll("an\\sactive", "a remote");
+        msg.replaceAll("active", "remote");
+        newMsg = newMsg.replaceAll("Active", "Remote");
+        return newMsg;
+    }
+
 }

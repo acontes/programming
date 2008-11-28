@@ -31,6 +31,10 @@
  */
 package org.objectweb.proactive.examples.binarytree;
 
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+
+
+@ActiveObject
 public class TreeDisplay {
     private TreeApplet applet;
     private Tree tree;

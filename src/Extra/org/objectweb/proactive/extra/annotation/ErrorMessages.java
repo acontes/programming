@@ -56,10 +56,8 @@ public interface ErrorMessages {
     // the class's  no-arg constructor is private
     public static final String NO_NOARG_CONSTRUCTOR_CANNOT_BE_PRIVATE_MESSAGE = "An active object cannot have private non-args constructor";
     // the class must have constructors with Serializable parameters
-    public static final String NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE = "Non-serializable parameter detected on constructor. "
-        + "An active object must have serializable parameters for all its constructors.\n";
-    public static final String NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE = "Non-serializable parameter detected for non-private method. "
-        + "An active object must have serializable parameters for all its non-private methods.\n";
+    public static final String NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE = "The constructor parameter must be either serializable or an active object.\n";
+    public static final String NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE = "The method parameter must be either serializable or an active object.\n";
     // the class doesn't implement the serializable interface
     public static final String NO_SERIALIZABLE_ERROR_MESSAGE = "An active object should implement the Serializable interface.\n";
     // the class is final

@@ -39,6 +39,7 @@ import org.objectweb.proactive.extra.annotation.ErrorMessages;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 import com.sun.mirror.apt.Messager;
+import com.sun.mirror.declaration.AnnotationMirror;
 import com.sun.mirror.declaration.ClassDeclaration;
 import com.sun.mirror.declaration.ConstructorDeclaration;
 import com.sun.mirror.declaration.Declaration;
@@ -71,12 +72,7 @@ import com.sun.mirror.util.SourcePosition;
 public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 
     // error messages
-    private static final String ERROR_PREFIX_STATIC = " is annotated using the " +
-        ActiveObject.class.getSimpleName() + " annotation.\n";
-
-    private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.\n";
-
-    private transient String ERROR_PREFIX;
+    private static final String ERROR_SUFFIX = "Please refer to the ProActive manual for further help on creating Active Objects.";
 
     private final Messager _compilerOutput;
 
@@ -91,8 +87,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
     public void visitClassDeclaration(ClassDeclaration classDeclaration) {
 
         _containingClass = classDeclaration;
-
-        ERROR_PREFIX = classDeclaration.getSimpleName() + ERROR_PREFIX_STATIC;
 
         testClassModifiers(classDeclaration);
 
@@ -403,7 +397,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
             // trust me! I know it's a DeclaredType! :P
             if (param.getType() instanceof DeclaredType) {
                 DeclaredType paramType = (DeclaredType) param.getType();
-                if (!implementsSerializable(paramType)) {
+                if (!implementsSerializableOrActive(paramType)) {
                     return false;
                 }
             }
@@ -412,9 +406,24 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
     }
 
     // check if the given type implements Serializable
-    private boolean implementsSerializable(DeclaredType paramType) {
+    private boolean implementsSerializableOrActive(DeclaredType paramType) {
 
+        boolean isActive = false;
         boolean isSerializable = false;
+
+        if (paramType.getDeclaration() != null) {
+            for (AnnotationMirror annotationMirrow : paramType.getDeclaration().getAnnotationMirrors()) {
+                if (annotationMirrow.getAnnotationType().toString().equals(ActiveObject.class.getName())) {
+                    isActive = true;
+                    break;
+                }
+
+            }
+        }
+
+        if (isActive == true) {
+            return true;
+        }
 
         // now, verify its base class
         TypeDeclaration paramTypeDecl = paramType.getDeclaration();
@@ -429,7 +438,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
             ClassDeclaration paramClass = (ClassDeclaration) paramTypeDecl;
             // if we have a superclass...
             if (paramClass.getSuperclass() != null)
-                isSerializable = isSerializable | implementsSerializable(paramClass.getSuperclass());
+                isSerializable = isSerializable | implementsSerializableOrActive(paramClass.getSuperclass());
         }
 
         for (InterfaceType implementedInterface : paramTypeDecl.getSuperinterfaces()) {
@@ -446,7 +455,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
             // the interface is actually Serializable
                 Serializable.class.getName().equals(implementedInterfaceType.getQualifiedName()) |
                 // verify if one of the superclasses implements Serializable
-                implementsSerializable(implementedInterface);
+                implementsSerializableOrActive(implementedInterface);
         }
 
         return isSerializable;
@@ -455,11 +464,11 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
 
     protected void reportError(Declaration declaration, String msg) {
         SourcePosition classPos = declaration.getPosition();
-        _compilerOutput.printError(classPos, "[ERROR]" + ERROR_PREFIX + msg + ERROR_SUFFIX);
+        _compilerOutput.printError(classPos, "[ERROR]" + msg + ERROR_SUFFIX);
     }
 
     protected void reportWarning(Declaration declaration, String msg) {
         SourcePosition classPos = declaration.getPosition();
-        _compilerOutput.printWarning(classPos, "[WARNING]" + ERROR_PREFIX + msg + ERROR_SUFFIX);
+        _compilerOutput.printWarning(classPos, "[WARNING]" + msg + ERROR_SUFFIX);
     }
 }
