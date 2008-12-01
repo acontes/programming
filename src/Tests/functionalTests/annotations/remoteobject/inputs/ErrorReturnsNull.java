@@ -10,4 +10,8 @@ public class ErrorReturnsNull {
     public String testing() {
         return null;
     }
+
+    private String testing2() {
+        return null;
+    }    
 }
